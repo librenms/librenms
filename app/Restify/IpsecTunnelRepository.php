@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class IpsecTunnelRepository extends Repository
 {
@@ -17,42 +20,49 @@ class IpsecTunnelRepository extends Repository
 
     public static string $title = 'tunnel_name';
 
-    public static array $search = [
-        'tunnel_name',
-        'peer_addr',
-        'local_addr',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'peer_port' => 'integer',
-        'peer_addr' => 'text',
-        'local_addr' => 'text',
-        'local_port' => 'integer',
-        'tunnel_name' => 'text',
-        'tunnel_status' => 'text',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'peer_port',
-        'peer_addr',
-        'local_addr',
-        'local_port',
-        'tunnel_name',
-        'tunnel_status',
-    ];
+
+    public static function searchables(): array
+    {
+        return [
+            'name' => SearchableFilter::make()->setColumn('tunnel_name'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'peerPort' => MatchFilter::make()->setType('integer')->setColumn('peer_port'),
+            'peerAddress' => MatchFilter::make()->setType('text')->setColumn('peer_addr'),
+            'localAddress' => MatchFilter::make()->setType('text')->setColumn('local_addr'),
+            'localPort' => MatchFilter::make()->setType('integer')->setColumn('local_port'),
+            'name' => MatchFilter::make()->setType('text')->setColumn('tunnel_name'),
+            'status' => MatchFilter::make()->setType('text')->setColumn('tunnel_status'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'peerPort' => SortableFilter::make()->setColumn('peer_port'),
+            'peerAddress' => SortableFilter::make()->setColumn('peer_addr'),
+            'localAddress' => SortableFilter::make()->setColumn('local_addr'),
+            'localPort' => SortableFilter::make()->setColumn('local_port'),
+            'name' => SortableFilter::make()->setColumn('tunnel_name'),
+            'status' => SortableFilter::make()->setColumn('tunnel_status'),
+        ];
+    }
 
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('peer_port')->readonly(),
-            field('peer_addr')->readonly(),
-            field('local_addr')->readonly(),
-            field('local_port')->readonly(),
-            field('tunnel_name')->readonly(),
-            field('tunnel_status')->readonly(),
+            field('peerPort', fn ($value, $model) => $model->peer_port)->readonly(),
+            field('peerAddress', fn ($value, $model) => $model->peer_addr)->readonly(),
+            field('localAddress', fn ($value, $model) => $model->local_addr)->readonly(),
+            field('localPort', fn ($value, $model) => $model->local_port)->readonly(),
+            field('name', fn ($value, $model) => $model->tunnel_name)->readonly(),
+            field('status', fn ($value, $model) => $model->tunnel_status)->readonly(),
         ];
     }
 

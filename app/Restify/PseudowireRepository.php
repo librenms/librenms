@@ -5,6 +5,9 @@ namespace App\Restify;
 use App\Models\Pseudowire;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class PseudowireRepository extends Repository
 {
@@ -16,53 +19,55 @@ class PseudowireRepository extends Repository
 
     public static string $title = 'pw_descr';
 
-    public static array $search = [
-        'pw_descr',
-        'pw_type',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'port_id' => 'integer',
-        'peer_device_id' => 'integer',
-        'peer_ldp_id' => 'integer',
-        'cpwVcID' => 'integer',
-        'cpwOid' => 'integer',
-        'pw_type' => 'text',
-        'pw_psntype' => 'text',
-        'pw_local_mtu' => 'integer',
-        'pw_peer_mtu' => 'integer',
-        'pw_descr' => 'text',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'port_id',
-        'peer_device_id',
-        'peer_ldp_id',
-        'cpwVcID',
-        'cpwOid',
-        'pw_type',
-        'pw_psntype',
-        'pw_local_mtu',
-        'pw_peer_mtu',
-        'pw_descr',
-    ];
+
+    public static function searchables(): array
+    {
+        return [
+            'description' => SearchableFilter::make()->setColumn('pw_descr'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'peerLdpId' => MatchFilter::make()->setType('text')->setColumn('peer_ldp_id'),
+            'virtualCircuitId' => MatchFilter::make()->setType('integer')->setColumn('cpwVcID'),
+            'oid' => MatchFilter::make()->setType('text')->setColumn('cpwOid'),
+            'category' => MatchFilter::make()->setType('text')->setColumn('pw_type'),
+            'psnCategory' => MatchFilter::make()->setType('text')->setColumn('pw_psntype'),
+            'localMtu' => MatchFilter::make()->setType('integer')->setColumn('pw_local_mtu'),
+            'peerMtu' => MatchFilter::make()->setType('integer')->setColumn('pw_peer_mtu'),
+            'description' => MatchFilter::make()->setType('text')->setColumn('pw_descr'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'peerLdpId' => SortableFilter::make()->setColumn('peer_ldp_id'),
+            'virtualCircuitId' => SortableFilter::make()->setColumn('cpwVcID'),
+            'oid' => SortableFilter::make()->setColumn('cpwOid'),
+            'category' => SortableFilter::make()->setColumn('pw_type'),
+            'psnCategory' => SortableFilter::make()->setColumn('pw_psntype'),
+            'localMtu' => SortableFilter::make()->setColumn('pw_local_mtu'),
+            'peerMtu' => SortableFilter::make()->setColumn('pw_peer_mtu'),
+            'description' => SortableFilter::make()->setColumn('pw_descr'),
+        ];
+    }
 
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('port_id')->readonly(),
-            field('peer_device_id')->readonly(),
-            field('peer_ldp_id')->readonly(),
-            field('cpwVcID')->readonly(),
-            field('cpwOid')->readonly(),
-            field('pw_type')->readonly(),
-            field('pw_psntype')->readonly(),
-            field('pw_local_mtu')->readonly(),
-            field('pw_peer_mtu')->readonly(),
-            field('pw_descr')->readonly(),
+            field('peerLdpId', fn ($value, $model) => $model->peer_ldp_id)->readonly(),
+            field('virtualCircuitId', fn ($value, $model) => $model->cpwVcID)->readonly(),
+            field('oid', fn ($value, $model) => $model->cpwOid)->readonly(),
+            field('category', fn ($value, $model) => $model->pw_type)->readonly(),
+            field('psnCategory', fn ($value, $model) => $model->pw_psntype)->readonly(),
+            field('localMtu', fn ($value, $model) => $model->pw_local_mtu)->readonly(),
+            field('peerMtu', fn ($value, $model) => $model->pw_peer_mtu)->readonly(),
+            field('description', fn ($value, $model) => $model->pw_descr)->readonly(),
         ];
     }
 

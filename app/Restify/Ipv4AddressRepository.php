@@ -5,6 +5,9 @@ namespace App\Restify;
 use App\Models\Ipv4Address;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class Ipv4AddressRepository extends Repository
 {
@@ -16,34 +19,40 @@ class Ipv4AddressRepository extends Repository
 
     public static string $title = 'ipv4_address';
 
-    public static array $search = [
-        'ipv4_address',
-    ];
 
-    public static array $match = [
-        'ipv4_address' => 'text',
-        'ipv4_prefixlen' => 'integer',
-        'ipv4_network_id' => 'integer',
-        'port_id' => 'integer',
-        'context_name' => 'text',
-    ];
 
-    public static array $sort = [
-        'ipv4_address',
-        'ipv4_prefixlen',
-        'ipv4_network_id',
-        'port_id',
-        'context_name',
-    ];
+
+    public static function searchables(): array
+    {
+        return [
+            'address' => SearchableFilter::make()->setColumn('ipv4_address'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'address' => MatchFilter::make()->setType('text')->setColumn('ipv4_address'),
+            'prefixLength' => MatchFilter::make()->setType('integer')->setColumn('ipv4_prefixlen'),
+            'contextName' => MatchFilter::make()->setType('text')->setColumn('context_name'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'address' => SortableFilter::make()->setColumn('ipv4_address'),
+            'prefixLength' => SortableFilter::make()->setColumn('ipv4_prefixlen'),
+            'contextName' => SortableFilter::make()->setColumn('context_name'),
+        ];
+    }
 
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('ipv4_address')->readonly(),
-            field('ipv4_prefixlen')->readonly(),
-            field('ipv4_network_id')->readonly(),
-            field('port_id')->readonly(),
-            field('context_name')->readonly(),
+            field('address', fn ($value, $model) => $model->ipv4_address)->readonly(),
+            field('prefixLength', fn ($value, $model) => $model->ipv4_prefixlen)->readonly(),
+            field('contextName', fn ($value, $model) => $model->context_name)->readonly(),
         ];
     }
 

@@ -6,6 +6,9 @@ use App\Models\AlertLog;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class AlertLogRepository extends Repository
 {
@@ -15,19 +18,7 @@ class AlertLogRepository extends Repository
 
     public static string $title = 'id';
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'rule_id' => 'integer',
-        'state' => 'integer',
-        'time_logged' => 'datetime',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'rule_id',
-        'state',
-        'time_logged',
-    ];
 
     public static function related(): array
     {
@@ -37,13 +28,32 @@ class AlertLogRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'state' => MatchFilter::make()->setType('integer')->setColumn('state'),
+            'createdAt' => MatchFilter::make()->setType('datetime')->setColumn('time_logged'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'state' => SortableFilter::make()->setColumn('state'),
+            'createdAt' => SortableFilter::make()->setColumn('time_logged'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('rule_id')->readonly(),
             field('state')->readonly(),
-            field('time_logged')->readonly(),
+            field('createdAt', fn ($value, $model) => $model->time_logged)->readonly(),
         ];
     }
 

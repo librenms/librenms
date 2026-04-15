@@ -7,6 +7,9 @@ use Binaryk\LaravelRestify\Fields\BelongsToMany;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class UserRepository extends Repository
 {
@@ -16,25 +19,8 @@ class UserRepository extends Repository
 
     public static string $title = 'username';
 
-    public static array $search = [
-        'username',
-        'realname',
-        'email',
-    ];
 
-    public static array $match = [
-        'username' => 'text',
-        'realname' => 'text',
-        'email' => 'text',
-        'enabled' => 'integer',
-    ];
 
-    public static array $sort = [
-        'username',
-        'realname',
-        'email',
-        'enabled',
-    ];
 
     public static function related(): array
     {
@@ -44,13 +30,42 @@ class UserRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'username' => SearchableFilter::make()->setColumn('username'),
+            'realName' => SearchableFilter::make()->setColumn('realname'),
+            'email' => SearchableFilter::make()->setColumn('email'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'username' => MatchFilter::make()->setType('text')->setColumn('username'),
+            'realName' => MatchFilter::make()->setType('text')->setColumn('realname'),
+            'email' => MatchFilter::make()->setType('text')->setColumn('email'),
+            'isEnabled' => MatchFilter::make()->setType('bool')->setColumn('enabled'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'username' => SortableFilter::make()->setColumn('username'),
+            'realName' => SortableFilter::make()->setColumn('realname'),
+            'email' => SortableFilter::make()->setColumn('email'),
+            'isEnabled' => SortableFilter::make()->setColumn('enabled'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
             field('username')->readonly(),
-            field('realname')->readonly(),
+            field('realName', fn ($value, $model) => $model->realname)->readonly(),
             field('email')->readonly(),
-            field('enabled')->readonly(),
+            field('isEnabled', fn ($value, $model) => $model->enabled)->readonly(),
         ];
     }
 

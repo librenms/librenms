@@ -6,6 +6,9 @@ use App\Models\Application;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class ApplicationRepository extends Repository
 {
@@ -17,28 +20,8 @@ class ApplicationRepository extends Repository
 
     public static string $title = 'app_type';
 
-    public static array $search = [
-        'app_type',
-        'app_instance',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'app_type' => 'text',
-        'app_instance' => 'text',
-        'app_status' => 'text',
-        'app_state' => 'text',
-        'discovered' => 'integer',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'app_type',
-        'app_instance',
-        'app_status',
-        'app_state',
-        'discovered',
-    ];
 
     public static function related(): array
     {
@@ -47,15 +30,41 @@ class ApplicationRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'category' => MatchFilter::make()->setType('text')->setColumn('app_type'),
+            'instance' => MatchFilter::make()->setType('text')->setColumn('app_instance'),
+            'status' => MatchFilter::make()->setType('text')->setColumn('app_status'),
+            'state' => MatchFilter::make()->setType('text')->setColumn('app_state'),
+            'createdAt' => MatchFilter::make()->setType('datetime')->setColumn('discovered'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'category' => SortableFilter::make()->setColumn('app_type'),
+            'instance' => SortableFilter::make()->setColumn('app_instance'),
+            'status' => SortableFilter::make()->setColumn('app_status'),
+            'state' => SortableFilter::make()->setColumn('app_state'),
+            'createdAt' => SortableFilter::make()->setColumn('discovered'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('app_type')->readonly(),
-            field('app_instance')->readonly(),
-            field('app_status')->readonly(),
-            field('app_state')->readonly(),
-            field('discovered')->readonly(),
+            field('category', fn ($value, $model) => $model->app_type)->readonly(),
+            field('instance', fn ($value, $model) => $model->app_instance)->readonly(),
+            field('status', fn ($value, $model) => $model->app_status)->readonly(),
+            field('state', fn ($value, $model) => $model->app_state)->readonly(),
+            field('createdAt', fn ($value, $model) => $model->discovered)->readonly(),
         ];
     }
 

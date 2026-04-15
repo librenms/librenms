@@ -5,6 +5,9 @@ namespace App\Restify;
 use App\Models\PortVlan;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class PortVlanRepository extends Repository
 {
@@ -16,44 +19,47 @@ class PortVlanRepository extends Repository
 
     public static string $title = 'vlan';
 
-    public static array $search = [
-        'vlan',
-        'state',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'port_id' => 'integer',
-        'vlan' => 'integer',
-        'baseport' => 'integer',
-        'priority' => 'integer',
-        'state' => 'text',
-        'cost' => 'integer',
-        'untagged' => 'integer',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'port_id',
-        'vlan',
-        'baseport',
-        'priority',
-        'state',
-        'cost',
-        'untagged',
-    ];
+
+    public static function searchables(): array
+    {
+        return [];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'vlan' => MatchFilter::make()->setType('integer')->setColumn('vlan'),
+            'basePort' => MatchFilter::make()->setType('integer')->setColumn('baseport'),
+            'priority' => MatchFilter::make()->setType('integer')->setColumn('priority'),
+            'state' => MatchFilter::make()->setType('text')->setColumn('state'),
+            'cost' => MatchFilter::make()->setType('integer')->setColumn('cost'),
+            'isUntagged' => MatchFilter::make()->setType('bool')->setColumn('untagged'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'vlan' => SortableFilter::make()->setColumn('vlan'),
+            'basePort' => SortableFilter::make()->setColumn('baseport'),
+            'priority' => SortableFilter::make()->setColumn('priority'),
+            'state' => SortableFilter::make()->setColumn('state'),
+            'cost' => SortableFilter::make()->setColumn('cost'),
+            'isUntagged' => SortableFilter::make()->setColumn('untagged'),
+        ];
+    }
 
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('port_id')->readonly(),
             field('vlan')->readonly(),
-            field('baseport')->readonly(),
+            field('basePort', fn ($value, $model) => $model->baseport)->readonly(),
             field('priority')->readonly(),
             field('state')->readonly(),
             field('cost')->readonly(),
-            field('untagged')->readonly(),
+            field('isUntagged', fn ($value, $model) => $model->untagged)->readonly(),
         ];
     }
 

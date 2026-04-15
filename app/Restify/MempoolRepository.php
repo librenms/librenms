@@ -6,6 +6,9 @@ use App\Models\Mempool;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class MempoolRepository extends Repository
 {
@@ -17,36 +20,8 @@ class MempoolRepository extends Repository
 
     public static string $title = 'mempool_descr';
 
-    public static array $search = [
-        'mempool_descr',
-        'mempool_type',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'mempool_type' => 'text',
-        'mempool_class' => 'text',
-        'mempool_descr' => 'text',
-        'mempool_perc' => 'integer',
-        'mempool_used' => 'integer',
-        'mempool_free' => 'integer',
-        'mempool_total' => 'integer',
-        'mempool_perc_warn' => 'integer',
-        'mempool_index' => 'text',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'mempool_type',
-        'mempool_class',
-        'mempool_descr',
-        'mempool_perc',
-        'mempool_used',
-        'mempool_free',
-        'mempool_total',
-        'mempool_perc_warn',
-        'mempool_index',
-    ];
 
     public static function related(): array
     {
@@ -55,19 +30,55 @@ class MempoolRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'description' => SearchableFilter::make()->setColumn('mempool_descr'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'category' => MatchFilter::make()->setType('text')->setColumn('mempool_type'),
+            'class' => MatchFilter::make()->setType('text')->setColumn('mempool_class'),
+            'description' => MatchFilter::make()->setType('text')->setColumn('mempool_descr'),
+            'percentage' => MatchFilter::make()->setType('integer')->setColumn('mempool_perc'),
+            'used' => MatchFilter::make()->setType('integer')->setColumn('mempool_used'),
+            'free' => MatchFilter::make()->setType('integer')->setColumn('mempool_free'),
+            'total' => MatchFilter::make()->setType('integer')->setColumn('mempool_total'),
+            'warningPercentage' => MatchFilter::make()->setType('integer')->setColumn('mempool_perc_warn'),
+            'index' => MatchFilter::make()->setType('integer')->setColumn('mempool_index'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'category' => SortableFilter::make()->setColumn('mempool_type'),
+            'class' => SortableFilter::make()->setColumn('mempool_class'),
+            'description' => SortableFilter::make()->setColumn('mempool_descr'),
+            'percentage' => SortableFilter::make()->setColumn('mempool_perc'),
+            'used' => SortableFilter::make()->setColumn('mempool_used'),
+            'free' => SortableFilter::make()->setColumn('mempool_free'),
+            'total' => SortableFilter::make()->setColumn('mempool_total'),
+            'warningPercentage' => SortableFilter::make()->setColumn('mempool_perc_warn'),
+            'index' => SortableFilter::make()->setColumn('mempool_index'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('mempool_type')->readonly(),
-            field('mempool_class')->readonly(),
-            field('mempool_descr')->readonly(),
-            field('mempool_perc')->readonly(),
-            field('mempool_used')->readonly(),
-            field('mempool_free')->readonly(),
-            field('mempool_total')->readonly(),
-            field('mempool_perc_warn')->readonly(),
-            field('mempool_index')->readonly(),
+            field('category', fn ($value, $model) => $model->mempool_type)->readonly(),
+            field('class', fn ($value, $model) => $model->mempool_class)->readonly(),
+            field('description', fn ($value, $model) => $model->mempool_descr)->readonly(),
+            field('percentage', fn ($value, $model) => $model->mempool_perc)->readonly(),
+            field('used', fn ($value, $model) => $model->mempool_used)->readonly(),
+            field('free', fn ($value, $model) => $model->mempool_free)->readonly(),
+            field('total', fn ($value, $model) => $model->mempool_total)->readonly(),
+            field('warningPercentage', fn ($value, $model) => $model->mempool_perc_warn)->readonly(),
+            field('index', fn ($value, $model) => $model->mempool_index)->readonly(),
         ];
     }
 

@@ -6,6 +6,9 @@ use App\Models\Ospfv3Area;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class Ospfv3AreaRepository extends Repository
 {
@@ -15,52 +18,8 @@ class Ospfv3AreaRepository extends Repository
 
     public static string $title = 'ospfv3AreaId';
 
-    public static array $search = [
-        'ospfv3AreaId',
-        'context_name',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'ospfv3_instance_id' => 'integer',
-        'context_name' => 'text',
-        'ospfv3AreaId' => 'integer',
-        'ospfv3AreaImportAsExtern' => 'text',
-        'ospfv3AreaSpfRuns' => 'integer',
-        'ospfv3AreaBdrRtrCount' => 'integer',
-        'ospfv3AreaAsBdrRtrCount' => 'integer',
-        'ospfv3AreaScopeLsaCount' => 'integer',
-        'ospfv3AreaScopeLsaCksumSum' => 'integer',
-        'ospfv3AreaSummary' => 'text',
-        'ospfv3AreaStubMetric' => 'integer',
-        'ospfv3AreaStubMetricType' => 'text',
-        'ospfv3AreaNssaTranslatorRole' => 'text',
-        'ospfv3AreaNssaTranslatorState' => 'text',
-        'ospfv3AreaNssaTranslatorStabInterval' => 'integer',
-        'ospfv3AreaNssaTranslatorEvents' => 'integer',
-        'ospfv3AreaTEEnabled' => 'text',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'ospfv3_instance_id',
-        'context_name',
-        'ospfv3AreaId',
-        'ospfv3AreaImportAsExtern',
-        'ospfv3AreaSpfRuns',
-        'ospfv3AreaBdrRtrCount',
-        'ospfv3AreaAsBdrRtrCount',
-        'ospfv3AreaScopeLsaCount',
-        'ospfv3AreaScopeLsaCksumSum',
-        'ospfv3AreaSummary',
-        'ospfv3AreaStubMetric',
-        'ospfv3AreaStubMetricType',
-        'ospfv3AreaNssaTranslatorRole',
-        'ospfv3AreaNssaTranslatorState',
-        'ospfv3AreaNssaTranslatorStabInterval',
-        'ospfv3AreaNssaTranslatorEvents',
-        'ospfv3AreaTEEnabled',
-    ];
 
     public static function related(): array
     {
@@ -69,27 +28,76 @@ class Ospfv3AreaRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'areaId' => SearchableFilter::make()->setColumn('ospfv3AreaId'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'areaId' => MatchFilter::make()->setType('text')->setColumn('ospfv3AreaId'),
+            'importAsExtern' => MatchFilter::make()->setType('text')->setColumn('ospfv3AreaImportAsExtern'),
+            'spfRuns' => MatchFilter::make()->setType('integer')->setColumn('ospfv3AreaSpfRuns'),
+            'borderRouterCount' => MatchFilter::make()->setType('integer')->setColumn('ospfv3AreaBdrRtrCount'),
+            'asBorderRouterCount' => MatchFilter::make()->setType('integer')->setColumn('ospfv3AreaAsBdrRtrCount'),
+            'scopeLsaCount' => MatchFilter::make()->setType('integer')->setColumn('ospfv3AreaScopeLsaCount'),
+            'scopeLsaChecksumSum' => MatchFilter::make()->setType('integer')->setColumn('ospfv3AreaScopeLsaCksumSum'),
+            'summary' => MatchFilter::make()->setType('text')->setColumn('ospfv3AreaSummary'),
+            'stubMetric' => MatchFilter::make()->setType('integer')->setColumn('ospfv3AreaStubMetric'),
+            'stubMetricCategory' => MatchFilter::make()->setType('text')->setColumn('ospfv3AreaStubMetricType'),
+            'nssaTranslatorRole' => MatchFilter::make()->setType('text')->setColumn('ospfv3AreaNssaTranslatorRole'),
+            'nssaTranslatorState' => MatchFilter::make()->setType('text')->setColumn('ospfv3AreaNssaTranslatorState'),
+            'nssaTranslatorStabilityInterval' => MatchFilter::make()->setType('integer')->setColumn('ospfv3AreaNssaTranslatorStabInterval'),
+            'nssaTranslatorEvents' => MatchFilter::make()->setType('integer')->setColumn('ospfv3AreaNssaTranslatorEvents'),
+            'isTrafficEngineeringEnabled' => MatchFilter::make()->setType('bool')->setColumn('ospfv3AreaTEEnabled'),
+            'contextName' => MatchFilter::make()->setType('text')->setColumn('context_name'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'areaId' => SortableFilter::make()->setColumn('ospfv3AreaId'),
+            'importAsExtern' => SortableFilter::make()->setColumn('ospfv3AreaImportAsExtern'),
+            'spfRuns' => SortableFilter::make()->setColumn('ospfv3AreaSpfRuns'),
+            'borderRouterCount' => SortableFilter::make()->setColumn('ospfv3AreaBdrRtrCount'),
+            'asBorderRouterCount' => SortableFilter::make()->setColumn('ospfv3AreaAsBdrRtrCount'),
+            'scopeLsaCount' => SortableFilter::make()->setColumn('ospfv3AreaScopeLsaCount'),
+            'scopeLsaChecksumSum' => SortableFilter::make()->setColumn('ospfv3AreaScopeLsaCksumSum'),
+            'summary' => SortableFilter::make()->setColumn('ospfv3AreaSummary'),
+            'stubMetric' => SortableFilter::make()->setColumn('ospfv3AreaStubMetric'),
+            'stubMetricCategory' => SortableFilter::make()->setColumn('ospfv3AreaStubMetricType'),
+            'nssaTranslatorRole' => SortableFilter::make()->setColumn('ospfv3AreaNssaTranslatorRole'),
+            'nssaTranslatorState' => SortableFilter::make()->setColumn('ospfv3AreaNssaTranslatorState'),
+            'nssaTranslatorStabilityInterval' => SortableFilter::make()->setColumn('ospfv3AreaNssaTranslatorStabInterval'),
+            'nssaTranslatorEvents' => SortableFilter::make()->setColumn('ospfv3AreaNssaTranslatorEvents'),
+            'isTrafficEngineeringEnabled' => SortableFilter::make()->setColumn('ospfv3AreaTEEnabled'),
+            'contextName' => SortableFilter::make()->setColumn('context_name'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('ospfv3_instance_id')->readonly(),
-            field('context_name')->readonly(),
-            field('ospfv3AreaId')->readonly(),
-            field('ospfv3AreaImportAsExtern')->readonly(),
-            field('ospfv3AreaSpfRuns')->readonly(),
-            field('ospfv3AreaBdrRtrCount')->readonly(),
-            field('ospfv3AreaAsBdrRtrCount')->readonly(),
-            field('ospfv3AreaScopeLsaCount')->readonly(),
-            field('ospfv3AreaScopeLsaCksumSum')->readonly(),
-            field('ospfv3AreaSummary')->readonly(),
-            field('ospfv3AreaStubMetric')->readonly(),
-            field('ospfv3AreaStubMetricType')->readonly(),
-            field('ospfv3AreaNssaTranslatorRole')->readonly(),
-            field('ospfv3AreaNssaTranslatorState')->readonly(),
-            field('ospfv3AreaNssaTranslatorStabInterval')->readonly(),
-            field('ospfv3AreaNssaTranslatorEvents')->readonly(),
-            field('ospfv3AreaTEEnabled')->readonly(),
+            field('areaId', fn ($value, $model) => $model->ospfv3AreaId)->readonly(),
+            field('importAsExtern', fn ($value, $model) => $model->ospfv3AreaImportAsExtern)->readonly(),
+            field('spfRuns', fn ($value, $model) => $model->ospfv3AreaSpfRuns)->readonly(),
+            field('borderRouterCount', fn ($value, $model) => $model->ospfv3AreaBdrRtrCount)->readonly(),
+            field('asBorderRouterCount', fn ($value, $model) => $model->ospfv3AreaAsBdrRtrCount)->readonly(),
+            field('scopeLsaCount', fn ($value, $model) => $model->ospfv3AreaScopeLsaCount)->readonly(),
+            field('scopeLsaChecksumSum', fn ($value, $model) => $model->ospfv3AreaScopeLsaCksumSum)->readonly(),
+            field('summary', fn ($value, $model) => $model->ospfv3AreaSummary)->readonly(),
+            field('stubMetric', fn ($value, $model) => $model->ospfv3AreaStubMetric)->readonly(),
+            field('stubMetricCategory', fn ($value, $model) => $model->ospfv3AreaStubMetricType)->readonly(),
+            field('nssaTranslatorRole', fn ($value, $model) => $model->ospfv3AreaNssaTranslatorRole)->readonly(),
+            field('nssaTranslatorState', fn ($value, $model) => $model->ospfv3AreaNssaTranslatorState)->readonly(),
+            field('nssaTranslatorStabilityInterval', fn ($value, $model) => $model->ospfv3AreaNssaTranslatorStabInterval)->readonly(),
+            field('nssaTranslatorEvents', fn ($value, $model) => $model->ospfv3AreaNssaTranslatorEvents)->readonly(),
+            field('isTrafficEngineeringEnabled', fn ($value, $model) => $model->ospfv3AreaTEEnabled)->readonly(),
+            field('contextName', fn ($value, $model) => $model->context_name)->readonly(),
         ];
     }
 

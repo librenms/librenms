@@ -5,6 +5,9 @@ namespace App\Restify;
 use App\Models\PortsNac;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class PortsNacRepository extends Repository
 {
@@ -16,69 +19,75 @@ class PortsNacRepository extends Repository
 
     public static string $title = 'username';
 
-    public static array $search = [
-        'username',
-        'mac_address',
-        'ip_address',
-    ];
 
-    public static array $match = [
-        'auth_id' => 'text',
-        'device_id' => 'integer',
-        'port_id' => 'integer',
-        'domain' => 'text',
-        'username' => 'text',
-        'mac_address' => 'text',
-        'ip_address' => 'text',
-        'vlan' => 'integer',
-        'host_mode' => 'text',
-        'authz_status' => 'text',
-        'authz_by' => 'text',
-        'authc_status' => 'text',
-        'method' => 'text',
-        'timeout' => 'text',
-        'time_left' => 'text',
-        'time_elapsed' => 'text',
-    ];
 
-    public static array $sort = [
-        'auth_id',
-        'device_id',
-        'port_id',
-        'domain',
-        'username',
-        'mac_address',
-        'ip_address',
-        'vlan',
-        'host_mode',
-        'authz_status',
-        'authz_by',
-        'authc_status',
-        'method',
-        'timeout',
-        'time_left',
-        'time_elapsed',
-    ];
+
+    public static function searchables(): array
+    {
+        return [
+            'username' => SearchableFilter::make()->setColumn('username'),
+            'macAddress' => SearchableFilter::make()->setColumn('mac_address'),
+            'ipAddress' => SearchableFilter::make()->setColumn('ip_address'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'authenticationId' => MatchFilter::make()->setType('text')->setColumn('auth_id'),
+            'domain' => MatchFilter::make()->setType('text')->setColumn('domain'),
+            'username' => MatchFilter::make()->setType('text')->setColumn('username'),
+            'macAddress' => MatchFilter::make()->setType('text')->setColumn('mac_address'),
+            'ipAddress' => MatchFilter::make()->setType('text')->setColumn('ip_address'),
+            'vlan' => MatchFilter::make()->setType('integer')->setColumn('vlan'),
+            'hostMode' => MatchFilter::make()->setType('text')->setColumn('host_mode'),
+            'authorizationStatus' => MatchFilter::make()->setType('text')->setColumn('authz_status'),
+            'authorizedBy' => MatchFilter::make()->setType('text')->setColumn('authz_by'),
+            'authenticationStatus' => MatchFilter::make()->setType('text')->setColumn('authc_status'),
+            'method' => MatchFilter::make()->setType('text')->setColumn('method'),
+            'timeout' => MatchFilter::make()->setType('integer')->setColumn('timeout'),
+            'timeLeft' => MatchFilter::make()->setType('integer')->setColumn('time_left'),
+            'timeElapsed' => MatchFilter::make()->setType('integer')->setColumn('time_elapsed'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'authenticationId' => SortableFilter::make()->setColumn('auth_id'),
+            'domain' => SortableFilter::make()->setColumn('domain'),
+            'username' => SortableFilter::make()->setColumn('username'),
+            'macAddress' => SortableFilter::make()->setColumn('mac_address'),
+            'ipAddress' => SortableFilter::make()->setColumn('ip_address'),
+            'vlan' => SortableFilter::make()->setColumn('vlan'),
+            'hostMode' => SortableFilter::make()->setColumn('host_mode'),
+            'authorizationStatus' => SortableFilter::make()->setColumn('authz_status'),
+            'authorizedBy' => SortableFilter::make()->setColumn('authz_by'),
+            'authenticationStatus' => SortableFilter::make()->setColumn('authc_status'),
+            'method' => SortableFilter::make()->setColumn('method'),
+            'timeout' => SortableFilter::make()->setColumn('timeout'),
+            'timeLeft' => SortableFilter::make()->setColumn('time_left'),
+            'timeElapsed' => SortableFilter::make()->setColumn('time_elapsed'),
+        ];
+    }
 
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('auth_id')->readonly(),
-            field('device_id')->readonly(),
-            field('port_id')->readonly(),
+            field('authenticationId', fn ($value, $model) => $model->auth_id)->readonly(),
             field('domain')->readonly(),
             field('username')->readonly(),
-            field('mac_address')->readonly(),
-            field('ip_address')->readonly(),
+            field('macAddress', fn ($value, $model) => $model->mac_address)->readonly(),
+            field('ipAddress', fn ($value, $model) => $model->ip_address)->readonly(),
             field('vlan')->readonly(),
-            field('host_mode')->readonly(),
-            field('authz_status')->readonly(),
-            field('authz_by')->readonly(),
-            field('authc_status')->readonly(),
+            field('hostMode', fn ($value, $model) => $model->host_mode)->readonly(),
+            field('authorizationStatus', fn ($value, $model) => $model->authz_status)->readonly(),
+            field('authorizedBy', fn ($value, $model) => $model->authz_by)->readonly(),
+            field('authenticationStatus', fn ($value, $model) => $model->authc_status)->readonly(),
             field('method')->readonly(),
             field('timeout')->readonly(),
-            field('time_left')->readonly(),
-            field('time_elapsed')->readonly(),
+            field('timeLeft', fn ($value, $model) => $model->time_left)->readonly(),
+            field('timeElapsed', fn ($value, $model) => $model->time_elapsed)->readonly(),
         ];
     }
 

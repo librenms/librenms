@@ -6,6 +6,9 @@ use App\Models\Sensor;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class SensorRepository extends Repository
 {
@@ -17,53 +20,8 @@ class SensorRepository extends Repository
 
     public static string $title = 'sensor_descr';
 
-    public static array $search = [
-        'sensor_descr',
-        'sensor_class',
-        'sensor_type',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'sensor_class' => 'text',
-        'sensor_descr' => 'text',
-        'sensor_type' => 'text',
-        'sensor_oid' => 'text',
-        'sensor_index' => 'text',
-        'sensor_current' => 'integer',
-        'sensor_prev' => 'integer',
-        'sensor_limit' => 'integer',
-        'sensor_limit_warn' => 'integer',
-        'sensor_limit_low' => 'integer',
-        'sensor_limit_low_warn' => 'integer',
-        'sensor_divisor' => 'integer',
-        'sensor_multiplier' => 'integer',
-        'sensor_alert' => 'integer',
-        'sensor_custom' => 'text',
-        'lastupdate' => 'datetime',
-        'group' => 'text',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'sensor_class',
-        'sensor_descr',
-        'sensor_type',
-        'sensor_oid',
-        'sensor_index',
-        'sensor_current',
-        'sensor_prev',
-        'sensor_limit',
-        'sensor_limit_warn',
-        'sensor_limit_low',
-        'sensor_limit_low_warn',
-        'sensor_divisor',
-        'sensor_multiplier',
-        'sensor_alert',
-        'sensor_custom',
-        'lastupdate',
-        'group',
-    ];
 
     public static function related(): array
     {
@@ -72,26 +30,78 @@ class SensorRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'description' => SearchableFilter::make()->setColumn('sensor_descr'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'class' => MatchFilter::make()->setType('text')->setColumn('sensor_class'),
+            'description' => MatchFilter::make()->setType('text')->setColumn('sensor_descr'),
+            'category' => MatchFilter::make()->setType('text')->setColumn('sensor_type'),
+            'oid' => MatchFilter::make()->setType('text')->setColumn('sensor_oid'),
+            'index' => MatchFilter::make()->setType('integer')->setColumn('sensor_index'),
+            'current' => MatchFilter::make()->setType('integer')->setColumn('sensor_current'),
+            'previous' => MatchFilter::make()->setType('integer')->setColumn('sensor_prev'),
+            'limit' => MatchFilter::make()->setType('integer')->setColumn('sensor_limit'),
+            'warningLimit' => MatchFilter::make()->setType('integer')->setColumn('sensor_limit_warn'),
+            'lowLimit' => MatchFilter::make()->setType('integer')->setColumn('sensor_limit_low'),
+            'lowWarningLimit' => MatchFilter::make()->setType('integer')->setColumn('sensor_limit_low_warn'),
+            'divisor' => MatchFilter::make()->setType('integer')->setColumn('sensor_divisor'),
+            'multiplier' => MatchFilter::make()->setType('integer')->setColumn('sensor_multiplier'),
+            'isAlerting' => MatchFilter::make()->setType('bool')->setColumn('sensor_alert'),
+            'custom' => MatchFilter::make()->setType('text')->setColumn('sensor_custom'),
+            'updatedAt' => MatchFilter::make()->setType('datetime')->setColumn('lastupdate'),
+            'group' => MatchFilter::make()->setType('text')->setColumn('group'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'class' => SortableFilter::make()->setColumn('sensor_class'),
+            'description' => SortableFilter::make()->setColumn('sensor_descr'),
+            'category' => SortableFilter::make()->setColumn('sensor_type'),
+            'oid' => SortableFilter::make()->setColumn('sensor_oid'),
+            'index' => SortableFilter::make()->setColumn('sensor_index'),
+            'current' => SortableFilter::make()->setColumn('sensor_current'),
+            'previous' => SortableFilter::make()->setColumn('sensor_prev'),
+            'limit' => SortableFilter::make()->setColumn('sensor_limit'),
+            'warningLimit' => SortableFilter::make()->setColumn('sensor_limit_warn'),
+            'lowLimit' => SortableFilter::make()->setColumn('sensor_limit_low'),
+            'lowWarningLimit' => SortableFilter::make()->setColumn('sensor_limit_low_warn'),
+            'divisor' => SortableFilter::make()->setColumn('sensor_divisor'),
+            'multiplier' => SortableFilter::make()->setColumn('sensor_multiplier'),
+            'isAlerting' => SortableFilter::make()->setColumn('sensor_alert'),
+            'custom' => SortableFilter::make()->setColumn('sensor_custom'),
+            'updatedAt' => SortableFilter::make()->setColumn('lastupdate'),
+            'group' => SortableFilter::make()->setColumn('group'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('sensor_class')->readonly(),
-            field('sensor_descr')->readonly(),
-            field('sensor_type')->readonly(),
-            field('sensor_oid')->readonly(),
-            field('sensor_index')->readonly(),
-            field('sensor_current')->readonly(),
-            field('sensor_prev')->readonly(),
-            field('sensor_limit')->readonly(),
-            field('sensor_limit_warn')->readonly(),
-            field('sensor_limit_low')->readonly(),
-            field('sensor_limit_low_warn')->readonly(),
-            field('sensor_divisor')->readonly(),
-            field('sensor_multiplier')->readonly(),
-            field('sensor_alert')->readonly(),
-            field('sensor_custom')->readonly(),
-            field('lastupdate')->readonly(),
+            field('class', fn ($value, $model) => $model->sensor_class)->readonly(),
+            field('description', fn ($value, $model) => $model->sensor_descr)->readonly(),
+            field('category', fn ($value, $model) => $model->sensor_type)->readonly(),
+            field('oid', fn ($value, $model) => $model->sensor_oid)->readonly(),
+            field('index', fn ($value, $model) => $model->sensor_index)->readonly(),
+            field('current', fn ($value, $model) => $model->sensor_current)->readonly(),
+            field('previous', fn ($value, $model) => $model->sensor_prev)->readonly(),
+            field('limit', fn ($value, $model) => $model->sensor_limit)->readonly(),
+            field('warningLimit', fn ($value, $model) => $model->sensor_limit_warn)->readonly(),
+            field('lowLimit', fn ($value, $model) => $model->sensor_limit_low)->readonly(),
+            field('lowWarningLimit', fn ($value, $model) => $model->sensor_limit_low_warn)->readonly(),
+            field('divisor', fn ($value, $model) => $model->sensor_divisor)->readonly(),
+            field('multiplier', fn ($value, $model) => $model->sensor_multiplier)->readonly(),
+            field('isAlerting', fn ($value, $model) => $model->sensor_alert)->readonly(),
+            field('custom', fn ($value, $model) => $model->sensor_custom)->readonly(),
+            field('updatedAt', fn ($value, $model) => $model->lastupdate)->readonly(),
             field('group')->readonly(),
         ];
     }

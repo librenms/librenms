@@ -9,6 +9,9 @@ use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class AlertRepository extends Repository
 {
@@ -18,25 +21,8 @@ class AlertRepository extends Repository
 
     public static string $title = 'id';
 
-    public static array $search = [];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'rule_id' => 'integer',
-        'state' => 'integer',
-        'alerted' => 'integer',
-        'open' => 'integer',
-        'timestamp' => 'datetime',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'rule_id',
-        'state',
-        'alerted',
-        'open',
-        'timestamp',
-    ];
 
     public static function related(): array
     {
@@ -46,16 +32,43 @@ class AlertRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'state' => MatchFilter::make()->setType('integer')->setColumn('state'),
+            'note' => MatchFilter::make()->setType('text')->setColumn('note'),
+            'isAlerted' => MatchFilter::make()->setType('bool')->setColumn('alerted'),
+            'isOpen' => MatchFilter::make()->setType('bool')->setColumn('open'),
+            'createdAt' => MatchFilter::make()->setType('datetime')->setColumn('timestamp'),
+            'info' => MatchFilter::make()->setType('text')->setColumn('info'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'state' => SortableFilter::make()->setColumn('state'),
+            'note' => SortableFilter::make()->setColumn('note'),
+            'isAlerted' => SortableFilter::make()->setColumn('alerted'),
+            'isOpen' => SortableFilter::make()->setColumn('open'),
+            'createdAt' => SortableFilter::make()->setColumn('timestamp'),
+            'info' => SortableFilter::make()->setColumn('info'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('rule_id')->readonly(),
             field('state')->readonly(),
             field('note')->readonly(),
-            field('alerted')->readonly(),
-            field('open')->readonly(),
-            field('timestamp')->readonly(),
+            field('isAlerted', fn ($value, $model) => $model->alerted)->readonly(),
+            field('isOpen', fn ($value, $model) => $model->open)->readonly(),
+            field('createdAt', fn ($value, $model) => $model->timestamp)->readonly(),
             field('info')->readonly(),
         ];
     }

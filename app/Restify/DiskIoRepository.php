@@ -6,6 +6,9 @@ use App\Models\DiskIo;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class DiskIoRepository extends Repository
 {
@@ -17,21 +20,8 @@ class DiskIoRepository extends Repository
 
     public static string $title = 'diskio_descr';
 
-    public static array $search = [
-        'diskio_descr',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'diskio_index' => 'integer',
-        'diskio_descr' => 'text',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'diskio_index',
-        'diskio_descr',
-    ];
 
     public static function related(): array
     {
@@ -40,12 +30,34 @@ class DiskIoRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'description' => SearchableFilter::make()->setColumn('diskio_descr'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'index' => MatchFilter::make()->setType('integer')->setColumn('diskio_index'),
+            'description' => MatchFilter::make()->setType('text')->setColumn('diskio_descr'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'index' => SortableFilter::make()->setColumn('diskio_index'),
+            'description' => SortableFilter::make()->setColumn('diskio_descr'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('diskio_index')->readonly(),
-            field('diskio_descr')->readonly(),
+            field('index', fn ($value, $model) => $model->diskio_index)->readonly(),
+            field('description', fn ($value, $model) => $model->diskio_descr)->readonly(),
         ];
     }
 

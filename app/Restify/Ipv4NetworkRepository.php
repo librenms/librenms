@@ -7,6 +7,9 @@ use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class Ipv4NetworkRepository extends Repository
 {
@@ -16,25 +19,37 @@ class Ipv4NetworkRepository extends Repository
 
     public static string $title = 'ipv4_network';
 
-    public static array $search = [
-        'ipv4_network',
-    ];
 
-    public static array $match = [
-        'ipv4_network' => 'text',
-        'context_name' => 'text',
-    ];
 
-    public static array $sort = [
-        'ipv4_network',
-        'context_name',
-    ];
+
+    public static function searchables(): array
+    {
+        return [
+            'network' => SearchableFilter::make()->setColumn('ipv4_network'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'network' => MatchFilter::make()->setType('text')->setColumn('ipv4_network'),
+            'contextName' => MatchFilter::make()->setType('text')->setColumn('context_name'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'network' => SortableFilter::make()->setColumn('ipv4_network'),
+            'contextName' => SortableFilter::make()->setColumn('context_name'),
+        ];
+    }
 
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('ipv4_network')->readonly(),
-            field('context_name')->readonly(),
+            field('network', fn ($value, $model) => $model->ipv4_network)->readonly(),
+            field('contextName', fn ($value, $model) => $model->context_name)->readonly(),
         ];
     }
 

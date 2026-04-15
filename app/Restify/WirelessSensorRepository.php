@@ -6,6 +6,9 @@ use App\Models\WirelessSensor;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class WirelessSensorRepository extends Repository
 {
@@ -17,59 +20,8 @@ class WirelessSensorRepository extends Repository
 
     public static string $title = 'sensor_descr';
 
-    public static array $search = [
-        'sensor_descr',
-        'sensor_class',
-        'sensor_type',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'sensor_class' => 'text',
-        'sensor_index' => 'text',
-        'sensor_type' => 'text',
-        'sensor_descr' => 'text',
-        'sensor_divisor' => 'integer',
-        'sensor_multiplier' => 'integer',
-        'sensor_aggregator' => 'text',
-        'sensor_current' => 'integer',
-        'sensor_prev' => 'integer',
-        'sensor_limit' => 'integer',
-        'sensor_limit_warn' => 'integer',
-        'sensor_limit_low' => 'integer',
-        'sensor_limit_low_warn' => 'integer',
-        'sensor_alert' => 'integer',
-        'sensor_custom' => 'text',
-        'entPhysicalIndex' => 'text',
-        'entPhysicalIndex_measured' => 'text',
-        'lastupdate' => 'datetime',
-        'access_point_id' => 'integer',
-        'rrd_type' => 'text',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'sensor_class',
-        'sensor_index',
-        'sensor_type',
-        'sensor_descr',
-        'sensor_divisor',
-        'sensor_multiplier',
-        'sensor_aggregator',
-        'sensor_current',
-        'sensor_prev',
-        'sensor_limit',
-        'sensor_limit_warn',
-        'sensor_limit_low',
-        'sensor_limit_low_warn',
-        'sensor_alert',
-        'sensor_custom',
-        'entPhysicalIndex',
-        'entPhysicalIndex_measured',
-        'lastupdate',
-        'access_point_id',
-        'rrd_type',
-    ];
 
     public static function related(): array
     {
@@ -78,30 +30,85 @@ class WirelessSensorRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'description' => SearchableFilter::make()->setColumn('sensor_descr'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'class' => MatchFilter::make()->setType('text')->setColumn('sensor_class'),
+            'index' => MatchFilter::make()->setType('integer')->setColumn('sensor_index'),
+            'category' => MatchFilter::make()->setType('text')->setColumn('sensor_type'),
+            'description' => MatchFilter::make()->setType('text')->setColumn('sensor_descr'),
+            'divisor' => MatchFilter::make()->setType('integer')->setColumn('sensor_divisor'),
+            'multiplier' => MatchFilter::make()->setType('integer')->setColumn('sensor_multiplier'),
+            'aggregator' => MatchFilter::make()->setType('text')->setColumn('sensor_aggregator'),
+            'current' => MatchFilter::make()->setType('integer')->setColumn('sensor_current'),
+            'previous' => MatchFilter::make()->setType('integer')->setColumn('sensor_prev'),
+            'limit' => MatchFilter::make()->setType('integer')->setColumn('sensor_limit'),
+            'warningLimit' => MatchFilter::make()->setType('integer')->setColumn('sensor_limit_warn'),
+            'lowLimit' => MatchFilter::make()->setType('integer')->setColumn('sensor_limit_low'),
+            'lowWarningLimit' => MatchFilter::make()->setType('integer')->setColumn('sensor_limit_low_warn'),
+            'isAlerting' => MatchFilter::make()->setType('bool')->setColumn('sensor_alert'),
+            'custom' => MatchFilter::make()->setType('text')->setColumn('sensor_custom'),
+            'entityPhysicalIndex' => MatchFilter::make()->setType('integer')->setColumn('entPhysicalIndex'),
+            'entityPhysicalIndexMeasured' => MatchFilter::make()->setType('integer')->setColumn('entPhysicalIndex_measured'),
+            'updatedAt' => MatchFilter::make()->setType('datetime')->setColumn('lastupdate'),
+            'rrdCategory' => MatchFilter::make()->setType('text')->setColumn('rrd_type'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'class' => SortableFilter::make()->setColumn('sensor_class'),
+            'index' => SortableFilter::make()->setColumn('sensor_index'),
+            'category' => SortableFilter::make()->setColumn('sensor_type'),
+            'description' => SortableFilter::make()->setColumn('sensor_descr'),
+            'divisor' => SortableFilter::make()->setColumn('sensor_divisor'),
+            'multiplier' => SortableFilter::make()->setColumn('sensor_multiplier'),
+            'aggregator' => SortableFilter::make()->setColumn('sensor_aggregator'),
+            'current' => SortableFilter::make()->setColumn('sensor_current'),
+            'previous' => SortableFilter::make()->setColumn('sensor_prev'),
+            'limit' => SortableFilter::make()->setColumn('sensor_limit'),
+            'warningLimit' => SortableFilter::make()->setColumn('sensor_limit_warn'),
+            'lowLimit' => SortableFilter::make()->setColumn('sensor_limit_low'),
+            'lowWarningLimit' => SortableFilter::make()->setColumn('sensor_limit_low_warn'),
+            'isAlerting' => SortableFilter::make()->setColumn('sensor_alert'),
+            'custom' => SortableFilter::make()->setColumn('sensor_custom'),
+            'entityPhysicalIndex' => SortableFilter::make()->setColumn('entPhysicalIndex'),
+            'entityPhysicalIndexMeasured' => SortableFilter::make()->setColumn('entPhysicalIndex_measured'),
+            'updatedAt' => SortableFilter::make()->setColumn('lastupdate'),
+            'rrdCategory' => SortableFilter::make()->setColumn('rrd_type'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('sensor_class')->readonly(),
-            field('sensor_index')->readonly(),
-            field('sensor_type')->readonly(),
-            field('sensor_descr')->readonly(),
-            field('sensor_divisor')->readonly(),
-            field('sensor_multiplier')->readonly(),
-            field('sensor_aggregator')->readonly(),
-            field('sensor_current')->readonly(),
-            field('sensor_prev')->readonly(),
-            field('sensor_limit')->readonly(),
-            field('sensor_limit_warn')->readonly(),
-            field('sensor_limit_low')->readonly(),
-            field('sensor_limit_low_warn')->readonly(),
-            field('sensor_alert')->readonly(),
-            field('sensor_custom')->readonly(),
-            field('entPhysicalIndex')->readonly(),
-            field('entPhysicalIndex_measured')->readonly(),
-            field('lastupdate')->readonly(),
-            field('access_point_id')->readonly(),
-            field('rrd_type')->readonly(),
+            field('class', fn ($value, $model) => $model->sensor_class)->readonly(),
+            field('index', fn ($value, $model) => $model->sensor_index)->readonly(),
+            field('category', fn ($value, $model) => $model->sensor_type)->readonly(),
+            field('description', fn ($value, $model) => $model->sensor_descr)->readonly(),
+            field('divisor', fn ($value, $model) => $model->sensor_divisor)->readonly(),
+            field('multiplier', fn ($value, $model) => $model->sensor_multiplier)->readonly(),
+            field('aggregator', fn ($value, $model) => $model->sensor_aggregator)->readonly(),
+            field('current', fn ($value, $model) => $model->sensor_current)->readonly(),
+            field('previous', fn ($value, $model) => $model->sensor_prev)->readonly(),
+            field('limit', fn ($value, $model) => $model->sensor_limit)->readonly(),
+            field('warningLimit', fn ($value, $model) => $model->sensor_limit_warn)->readonly(),
+            field('lowLimit', fn ($value, $model) => $model->sensor_limit_low)->readonly(),
+            field('lowWarningLimit', fn ($value, $model) => $model->sensor_limit_low_warn)->readonly(),
+            field('isAlerting', fn ($value, $model) => $model->sensor_alert)->readonly(),
+            field('custom', fn ($value, $model) => $model->sensor_custom)->readonly(),
+            field('entityPhysicalIndex', fn ($value, $model) => $model->entPhysicalIndex)->readonly(),
+            field('entityPhysicalIndexMeasured', fn ($value, $model) => $model->entPhysicalIndex_measured)->readonly(),
+            field('updatedAt', fn ($value, $model) => $model->lastupdate)->readonly(),
+            field('rrdCategory', fn ($value, $model) => $model->rrd_type)->readonly(),
         ];
     }
 

@@ -8,6 +8,9 @@ use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Fields\BelongsToMany;
 use Binaryk\LaravelRestify\Fields\HasMany;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class DeviceRepository extends Repository
 {
@@ -19,65 +22,8 @@ class DeviceRepository extends Repository
 
     public static string $title = 'hostname';
 
-    public static array $search = [
-        'hostname',
-        'sysName',
-        'os',
-    ];
 
-    public static array $match = [
-        'hostname' => 'text',
-        'sysName' => 'text',
-        'sysDescr' => 'text',
-        'sysObjectID' => 'text',
-        'os' => 'text',
-        'status' => 'bool',
-        'status_reason' => 'text',
-        'hardware' => 'text',
-        'serial' => 'text',
-        'version' => 'text',
-        'features' => 'text',
-        'ip' => 'text',
-        'uptime' => 'integer',
-        'display' => 'text',
-        'overwrite_ip' => 'text',
-        'purpose' => 'text',
-        'type' => 'text',
-        'is_polling_enabled' => 'bool',
-        'is_alerting_enabled' => 'bool',
-        'is_ignored' => 'bool',
-        'is_status_ignored' => 'bool',
-        'sys_location_override' => 'text',
-        'sys_location' => 'text',
-        'poller_group_id' => 'integer',
-    ];
 
-    public static array $sort = [
-        'hostname',
-        'sysName',
-        'sysDescr',
-        'sysObjectID',
-        'os',
-        'status',
-        'status_reason',
-        'hardware',
-        'serial',
-        'version',
-        'features',
-        'ip',
-        'uptime',
-        'display',
-        'overwrite_ip',
-        'purpose',
-        'type',
-        'is_polling_enabled',
-        'is_alerting_enabled',
-        'is_ignored',
-        'is_status_ignored',
-        'sys_location_override',
-        'sys_location',
-        'poller_group_id',
-    ];
 
     public static function related(): array
     {
@@ -100,17 +46,85 @@ class DeviceRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'hostname' => SearchableFilter::make()->setColumn('hostname'),
+            'systemName' => SearchableFilter::make()->setColumn('sysName'),
+            'ip' => SearchableFilter::make()->setColumn('ip'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'hostname' => MatchFilter::make()->setType('text')->setColumn('hostname'),
+            'systemName' => MatchFilter::make()->setType('text')->setColumn('sysName'),
+            'systemDescription' => MatchFilter::make()->setType('text')->setColumn('sysDescr'),
+            'systemObjectId' => MatchFilter::make()->setType('text')->setColumn('sysObjectID'),
+            'os' => MatchFilter::make()->setType('text')->setColumn('os'),
+            'isUp' => MatchFilter::make()->setType('bool')->setColumn('status'),
+            'statusReason' => MatchFilter::make()->setType('text')->setColumn('status_reason'),
+            'hardware' => MatchFilter::make()->setType('text')->setColumn('hardware'),
+            'serial' => MatchFilter::make()->setType('text')->setColumn('serial'),
+            'version' => MatchFilter::make()->setType('text')->setColumn('version'),
+            'features' => MatchFilter::make()->setType('text')->setColumn('features'),
+            'ip' => MatchFilter::make()->setType('text')->setColumn('ip'),
+            'uptime' => MatchFilter::make()->setType('integer')->setColumn('uptime'),
+            'notes' => MatchFilter::make()->setType('text')->setColumn('notes'),
+            'display' => MatchFilter::make()->setType('text')->setColumn('display'),
+            'overwriteIp' => MatchFilter::make()->setType('text')->setColumn('overwrite_ip'),
+            'purpose' => MatchFilter::make()->setType('text')->setColumn('purpose'),
+            'category' => MatchFilter::make()->setType('text')->setColumn('type'),
+            'isPollingEnabled' => MatchFilter::make()->setType('bool')->setColumn('disabled'),
+            'isAlertingEnabled' => MatchFilter::make()->setType('bool')->setColumn('disable_notify'),
+            'isIgnored' => MatchFilter::make()->setType('bool')->setColumn('ignore'),
+            'isStatusIgnored' => MatchFilter::make()->setType('bool')->setColumn('ignore_status'),
+            'isSystemLocationOverridden' => MatchFilter::make()->setType('bool')->setColumn('override_sysLocation'),
+            'systemLocation' => MatchFilter::make()->setType('text')->setColumn('location_id'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'hostname' => SortableFilter::make()->setColumn('hostname'),
+            'systemName' => SortableFilter::make()->setColumn('sysName'),
+            'systemDescription' => SortableFilter::make()->setColumn('sysDescr'),
+            'systemObjectId' => SortableFilter::make()->setColumn('sysObjectID'),
+            'os' => SortableFilter::make()->setColumn('os'),
+            'isUp' => SortableFilter::make()->setColumn('status'),
+            'statusReason' => SortableFilter::make()->setColumn('status_reason'),
+            'hardware' => SortableFilter::make()->setColumn('hardware'),
+            'serial' => SortableFilter::make()->setColumn('serial'),
+            'version' => SortableFilter::make()->setColumn('version'),
+            'features' => SortableFilter::make()->setColumn('features'),
+            'ip' => SortableFilter::make()->setColumn('ip'),
+            'uptime' => SortableFilter::make()->setColumn('uptime'),
+            'notes' => SortableFilter::make()->setColumn('notes'),
+            'display' => SortableFilter::make()->setColumn('display'),
+            'overwriteIp' => SortableFilter::make()->setColumn('overwrite_ip'),
+            'purpose' => SortableFilter::make()->setColumn('purpose'),
+            'category' => SortableFilter::make()->setColumn('type'),
+            'isPollingEnabled' => SortableFilter::make()->setColumn('disabled'),
+            'isAlertingEnabled' => SortableFilter::make()->setColumn('disable_notify'),
+            'isIgnored' => SortableFilter::make()->setColumn('ignore'),
+            'isStatusIgnored' => SortableFilter::make()->setColumn('ignore_status'),
+            'isSystemLocationOverridden' => SortableFilter::make()->setColumn('override_sysLocation'),
+            'systemLocation' => SortableFilter::make()->setColumn('location_id'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            // Read-only identifying / discovered fields
             field('hostname')->readonly(),
-            field('sysName')->readonly(),
-            field('sysDescr')->readonly(),
-            field('sysObjectID')->readonly(),
+            field('systemName', fn ($value, $model) => $model->sysName)->readonly(),
+            field('systemDescription', fn ($value, $model) => $model->sysDescr)->readonly(),
+            field('systemObjectId', fn ($value, $model) => $model->sysObjectID)->readonly(),
             field('os')->readonly(),
-            field('status')->readonly(),
-            field('status_reason')->readonly(),
+            field('isUp', fn ($value, $model) => $model->status)->readonly(),
+            field('statusReason', fn ($value, $model) => $model->status_reason)->readonly(),
             field('hardware')->readonly(),
             field('serial')->readonly(),
             field('version')->readonly(),
@@ -118,82 +132,16 @@ class DeviceRepository extends Repository
             field('ip')->readonly(),
             field('uptime')->readonly(),
             field('notes')->readonly(),
-
-            // Writable: simple passthrough (column name == API name)
-            field('display')->rules('nullable', 'string', 'max:128'),
-            field('overwrite_ip')->rules('nullable', 'string', 'ip', 'max:128'),
-            field('purpose')->rules('nullable', 'string', 'max:200'),
-            field('type')->rules('nullable', 'string', 'max:128'),
-
-            // Writable: positive boolean (inverse of `disabled` column)
-            field('is_polling_enabled', fn ($value, $device) => ! $device->disabled)
-                ->fillCallback(function (RestifyRequest $request, $model, $attribute) {
-                    if ($request->exists($attribute)) {
-                        $model->disabled = ! $request->boolean($attribute);
-                    }
-                })
-                ->rules('boolean'),
-
-            // Writable: positive boolean (inverse of `disable_notify` column)
-            field('is_alerting_enabled', fn ($value, $device) => ! $device->disable_notify)
-                ->fillCallback(function (RestifyRequest $request, $model, $attribute) {
-                    if ($request->exists($attribute)) {
-                        $model->disable_notify = ! $request->boolean($attribute);
-                    }
-                })
-                ->rules('boolean'),
-
-            // Writable: rename of `ignore` column
-            field('is_ignored', fn ($value, $device) => (bool) $device->ignore)
-                ->fillCallback(function (RestifyRequest $request, $model, $attribute) {
-                    if ($request->exists($attribute)) {
-                        $model->ignore = $request->boolean($attribute);
-                    }
-                })
-                ->rules('boolean'),
-
-            // Writable: rename of `ignore_status` column
-            field('is_status_ignored', fn ($value, $device) => (bool) $device->ignore_status)
-                ->fillCallback(function (RestifyRequest $request, $model, $attribute) {
-                    if ($request->exists($attribute)) {
-                        $model->ignore_status = $request->boolean($attribute);
-                    }
-                })
-                ->rules('boolean'),
-
-            // Writable: rename of `override_sysLocation` column
-            field('sys_location_override', fn ($value, $device) => (bool) $device->override_sysLocation)
-                ->fillCallback(function (RestifyRequest $request, $model, $attribute) {
-                    if ($request->exists($attribute)) {
-                        $model->override_sysLocation = $request->boolean($attribute);
-                    }
-                })
-                ->rules('boolean'),
-
-            // Writable: human-readable location string, resolved to/from `location_id`
-            field('sys_location', fn ($value, $device) => $device->location?->location)
-                ->fillCallback(function (RestifyRequest $request, $model, $attribute) {
-                    if (! $request->exists($attribute)) {
-                        return;
-                    }
-                    $value = $request->input($attribute);
-                    if (empty($value)) {
-                        $model->location_id = null;
-
-                        return;
-                    }
-                    $model->location_id = Location::firstOrCreate(['location' => $value])->id;
-                })
-                ->rules('nullable', 'string', 'max:255'),
-
-            // Writable: rename of `poller_group` column
-            field('poller_group_id', fn ($value, $device) => $device->poller_group)
-                ->fillCallback(function (RestifyRequest $request, $model, $attribute) {
-                    if ($request->exists($attribute)) {
-                        $model->poller_group = $request->input($attribute);
-                    }
-                })
-                ->rules('nullable', 'integer', 'exists:poller_groups,id'),
+            field('display')->readonly(),
+            field('overwriteIp', fn ($value, $model) => $model->overwrite_ip)->readonly(),
+            field('purpose')->readonly(),
+            field('category', fn ($value, $model) => $model->type)->readonly(),
+            field('isPollingEnabled', fn ($value, $model) => ! $model->disabled)->readonly(),
+            field('isAlertingEnabled', fn ($value, $model) => ! $model->disable_notify)->readonly(),
+            field('isIgnored', fn ($value, $model) => $model->ignore)->readonly(),
+            field('isStatusIgnored', fn ($value, $model) => $model->ignore_status)->readonly(),
+            field('isSystemLocationOverridden', fn ($value, $model) => $model->override_sysLocation)->readonly(),
+            field('systemLocation', fn ($value, $model) => $model->location?->location)->readonly(),
         ];
     }
 }

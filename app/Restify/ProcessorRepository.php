@@ -6,6 +6,9 @@ use App\Models\Processor;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class ProcessorRepository extends Repository
 {
@@ -17,32 +20,8 @@ class ProcessorRepository extends Repository
 
     public static string $title = 'processor_descr';
 
-    public static array $search = [
-        'processor_descr',
-        'processor_type',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'processor_type' => 'text',
-        'processor_descr' => 'text',
-        'processor_usage' => 'integer',
-        'processor_oid' => 'text',
-        'processor_index' => 'text',
-        'processor_precision' => 'integer',
-        'processor_perc_warn' => 'integer',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'processor_type',
-        'processor_descr',
-        'processor_usage',
-        'processor_oid',
-        'processor_index',
-        'processor_precision',
-        'processor_perc_warn',
-    ];
 
     public static function related(): array
     {
@@ -51,17 +30,49 @@ class ProcessorRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'description' => SearchableFilter::make()->setColumn('processor_descr'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'category' => MatchFilter::make()->setType('text')->setColumn('processor_type'),
+            'description' => MatchFilter::make()->setType('text')->setColumn('processor_descr'),
+            'usage' => MatchFilter::make()->setType('integer')->setColumn('processor_usage'),
+            'oid' => MatchFilter::make()->setType('text')->setColumn('processor_oid'),
+            'index' => MatchFilter::make()->setType('integer')->setColumn('processor_index'),
+            'precision' => MatchFilter::make()->setType('integer')->setColumn('processor_precision'),
+            'warningPercentage' => MatchFilter::make()->setType('integer')->setColumn('processor_perc_warn'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'category' => SortableFilter::make()->setColumn('processor_type'),
+            'description' => SortableFilter::make()->setColumn('processor_descr'),
+            'usage' => SortableFilter::make()->setColumn('processor_usage'),
+            'oid' => SortableFilter::make()->setColumn('processor_oid'),
+            'index' => SortableFilter::make()->setColumn('processor_index'),
+            'precision' => SortableFilter::make()->setColumn('processor_precision'),
+            'warningPercentage' => SortableFilter::make()->setColumn('processor_perc_warn'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('processor_type')->readonly(),
-            field('processor_descr')->readonly(),
-            field('processor_usage')->readonly(),
-            field('processor_oid')->readonly(),
-            field('processor_index')->readonly(),
-            field('processor_precision')->readonly(),
-            field('processor_perc_warn')->readonly(),
+            field('category', fn ($value, $model) => $model->processor_type)->readonly(),
+            field('description', fn ($value, $model) => $model->processor_descr)->readonly(),
+            field('usage', fn ($value, $model) => $model->processor_usage)->readonly(),
+            field('oid', fn ($value, $model) => $model->processor_oid)->readonly(),
+            field('index', fn ($value, $model) => $model->processor_index)->readonly(),
+            field('precision', fn ($value, $model) => $model->processor_precision)->readonly(),
+            field('warningPercentage', fn ($value, $model) => $model->processor_perc_warn)->readonly(),
         ];
     }
 

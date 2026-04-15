@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class LinkRepository extends Repository
 {
@@ -16,37 +19,8 @@ class LinkRepository extends Repository
 
     public static string $title = 'remote_hostname';
 
-    public static array $search = [
-        'remote_hostname',
-        'remote_port',
-        'protocol',
-    ];
 
-    public static array $match = [
-        'local_port_id' => 'integer',
-        'local_device_id' => 'integer',
-        'remote_port_id' => 'integer',
-        'active' => 'integer',
-        'protocol' => 'text',
-        'remote_hostname' => 'text',
-        'remote_device_id' => 'integer',
-        'remote_port' => 'text',
-        'remote_platform' => 'text',
-        'remote_version' => 'text',
-    ];
 
-    public static array $sort = [
-        'local_port_id',
-        'local_device_id',
-        'remote_port_id',
-        'active',
-        'protocol',
-        'remote_hostname',
-        'remote_device_id',
-        'remote_port',
-        'remote_platform',
-        'remote_version',
-    ];
 
     public static function related(): array
     {
@@ -55,19 +29,46 @@ class LinkRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'remoteHostname' => SearchableFilter::make()->setColumn('remote_hostname'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'isActive' => MatchFilter::make()->setType('bool')->setColumn('active'),
+            'protocol' => MatchFilter::make()->setType('text')->setColumn('protocol'),
+            'remoteHostname' => MatchFilter::make()->setType('text')->setColumn('remote_hostname'),
+            'remotePortName' => MatchFilter::make()->setType('text')->setColumn('remote_port'),
+            'remotePlatform' => MatchFilter::make()->setType('text')->setColumn('remote_platform'),
+            'remoteVersion' => MatchFilter::make()->setType('text')->setColumn('remote_version'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'isActive' => SortableFilter::make()->setColumn('active'),
+            'protocol' => SortableFilter::make()->setColumn('protocol'),
+            'remoteHostname' => SortableFilter::make()->setColumn('remote_hostname'),
+            'remotePortName' => SortableFilter::make()->setColumn('remote_port'),
+            'remotePlatform' => SortableFilter::make()->setColumn('remote_platform'),
+            'remoteVersion' => SortableFilter::make()->setColumn('remote_version'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('local_port_id')->readonly(),
-            field('local_device_id')->readonly(),
-            field('remote_port_id')->readonly(),
-            field('active')->readonly(),
+            field('isActive', fn ($value, $model) => $model->active)->readonly(),
             field('protocol')->readonly(),
-            field('remote_hostname')->readonly(),
-            field('remote_device_id')->readonly(),
-            field('remote_port')->readonly(),
-            field('remote_platform')->readonly(),
-            field('remote_version')->readonly(),
+            field('remoteHostname', fn ($value, $model) => $model->remote_hostname)->readonly(),
+            field('remotePortName', fn ($value, $model) => $model->remote_port)->readonly(),
+            field('remotePlatform', fn ($value, $model) => $model->remote_platform)->readonly(),
+            field('remoteVersion', fn ($value, $model) => $model->remote_version)->readonly(),
         ];
     }
 

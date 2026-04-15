@@ -6,6 +6,9 @@ use App\Models\MplsService;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class MplsServiceRepository extends Repository
 {
@@ -22,54 +25,8 @@ class MplsServiceRepository extends Repository
 
     public static string $title = 'svcDescription';
 
-    public static array $search = [
-        'svcDescription',
-        'svcType',
-    ];
 
-    public static array $match = [
-        'svc_oid' => 'integer',
-        'device_id' => 'integer',
-        'svcRowStatus' => 'text',
-        'svcType' => 'text',
-        'svcCustId' => 'integer',
-        'svcAdminStatus' => 'text',
-        'svcOperStatus' => 'text',
-        'svcDescription' => 'text',
-        'svcMtu' => 'integer',
-        'svcNumSaps' => 'integer',
-        'svcNumSdps' => 'integer',
-        'svcLastMgmtChange' => 'integer',
-        'svcLastStatusChange' => 'integer',
-        'svcVRouterId' => 'integer',
-        'svcTlsMacLearning' => 'text',
-        'svcTlsStpAdminStatus' => 'text',
-        'svcTlsStpOperStatus' => 'text',
-        'svcTlsFdbTableSize' => 'integer',
-        'svcTlsFdbNumEntries' => 'integer',
-    ];
 
-    public static array $sort = [
-        'svc_oid',
-        'device_id',
-        'svcRowStatus',
-        'svcType',
-        'svcCustId',
-        'svcAdminStatus',
-        'svcOperStatus',
-        'svcDescription',
-        'svcMtu',
-        'svcNumSaps',
-        'svcNumSdps',
-        'svcLastMgmtChange',
-        'svcLastStatusChange',
-        'svcVRouterId',
-        'svcTlsMacLearning',
-        'svcTlsStpAdminStatus',
-        'svcTlsStpOperStatus',
-        'svcTlsFdbTableSize',
-        'svcTlsFdbNumEntries',
-    ];
 
     public static function related(): array
     {
@@ -78,28 +35,82 @@ class MplsServiceRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'description' => SearchableFilter::make()->setColumn('svcDescription'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'oid' => MatchFilter::make()->setType('text')->setColumn('svc_oid'),
+            'rowStatus' => MatchFilter::make()->setType('text')->setColumn('svcRowStatus'),
+            'category' => MatchFilter::make()->setType('text')->setColumn('svcType'),
+            'customerId' => MatchFilter::make()->setType('integer')->setColumn('svcCustId'),
+            'adminStatus' => MatchFilter::make()->setType('text')->setColumn('svcAdminStatus'),
+            'operationalStatus' => MatchFilter::make()->setType('text')->setColumn('svcOperStatus'),
+            'description' => MatchFilter::make()->setType('text')->setColumn('svcDescription'),
+            'mtu' => MatchFilter::make()->setType('integer')->setColumn('svcMtu'),
+            'sapCount' => MatchFilter::make()->setType('integer')->setColumn('svcNumSaps'),
+            'sdpCount' => MatchFilter::make()->setType('integer')->setColumn('svcNumSdps'),
+            'updatedAt' => MatchFilter::make()->setType('datetime')->setColumn('svcLastMgmtChange'),
+            'statusChangedAt' => MatchFilter::make()->setType('datetime')->setColumn('svcLastStatusChange'),
+            'virtualRouterId' => MatchFilter::make()->setType('integer')->setColumn('svcVRouterId'),
+            'tlsMacLearning' => MatchFilter::make()->setType('text')->setColumn('svcTlsMacLearning'),
+            'tlsStpAdminStatus' => MatchFilter::make()->setType('text')->setColumn('svcTlsStpAdminStatus'),
+            'tlsStpOperationalStatus' => MatchFilter::make()->setType('text')->setColumn('svcTlsStpOperStatus'),
+            'tlsFdbTableSize' => MatchFilter::make()->setType('integer')->setColumn('svcTlsFdbTableSize'),
+            'tlsFdbEntryCount' => MatchFilter::make()->setType('integer')->setColumn('svcTlsFdbNumEntries'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'oid' => SortableFilter::make()->setColumn('svc_oid'),
+            'rowStatus' => SortableFilter::make()->setColumn('svcRowStatus'),
+            'category' => SortableFilter::make()->setColumn('svcType'),
+            'customerId' => SortableFilter::make()->setColumn('svcCustId'),
+            'adminStatus' => SortableFilter::make()->setColumn('svcAdminStatus'),
+            'operationalStatus' => SortableFilter::make()->setColumn('svcOperStatus'),
+            'description' => SortableFilter::make()->setColumn('svcDescription'),
+            'mtu' => SortableFilter::make()->setColumn('svcMtu'),
+            'sapCount' => SortableFilter::make()->setColumn('svcNumSaps'),
+            'sdpCount' => SortableFilter::make()->setColumn('svcNumSdps'),
+            'updatedAt' => SortableFilter::make()->setColumn('svcLastMgmtChange'),
+            'statusChangedAt' => SortableFilter::make()->setColumn('svcLastStatusChange'),
+            'virtualRouterId' => SortableFilter::make()->setColumn('svcVRouterId'),
+            'tlsMacLearning' => SortableFilter::make()->setColumn('svcTlsMacLearning'),
+            'tlsStpAdminStatus' => SortableFilter::make()->setColumn('svcTlsStpAdminStatus'),
+            'tlsStpOperationalStatus' => SortableFilter::make()->setColumn('svcTlsStpOperStatus'),
+            'tlsFdbTableSize' => SortableFilter::make()->setColumn('svcTlsFdbTableSize'),
+            'tlsFdbEntryCount' => SortableFilter::make()->setColumn('svcTlsFdbNumEntries'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('svc_oid')->readonly(),
-            field('device_id')->readonly(),
-            field('svcRowStatus')->readonly(),
-            field('svcType')->readonly(),
-            field('svcCustId')->readonly(),
-            field('svcAdminStatus')->readonly(),
-            field('svcOperStatus')->readonly(),
-            field('svcDescription')->readonly(),
-            field('svcMtu')->readonly(),
-            field('svcNumSaps')->readonly(),
-            field('svcNumSdps')->readonly(),
-            field('svcLastMgmtChange')->readonly(),
-            field('svcLastStatusChange')->readonly(),
-            field('svcVRouterId')->readonly(),
-            field('svcTlsMacLearning')->readonly(),
-            field('svcTlsStpAdminStatus')->readonly(),
-            field('svcTlsStpOperStatus')->readonly(),
-            field('svcTlsFdbTableSize')->readonly(),
-            field('svcTlsFdbNumEntries')->readonly(),
+            field('oid', fn ($value, $model) => $model->svc_oid)->readonly(),
+            field('rowStatus', fn ($value, $model) => $model->svcRowStatus)->readonly(),
+            field('category', fn ($value, $model) => $model->svcType)->readonly(),
+            field('customerId', fn ($value, $model) => $model->svcCustId)->readonly(),
+            field('adminStatus', fn ($value, $model) => $model->svcAdminStatus)->readonly(),
+            field('operationalStatus', fn ($value, $model) => $model->svcOperStatus)->readonly(),
+            field('description', fn ($value, $model) => $model->svcDescription)->readonly(),
+            field('mtu', fn ($value, $model) => $model->svcMtu)->readonly(),
+            field('sapCount', fn ($value, $model) => $model->svcNumSaps)->readonly(),
+            field('sdpCount', fn ($value, $model) => $model->svcNumSdps)->readonly(),
+            field('updatedAt', fn ($value, $model) => $model->svcLastMgmtChange)->readonly(),
+            field('statusChangedAt', fn ($value, $model) => $model->svcLastStatusChange)->readonly(),
+            field('virtualRouterId', fn ($value, $model) => $model->svcVRouterId)->readonly(),
+            field('tlsMacLearning', fn ($value, $model) => $model->svcTlsMacLearning)->readonly(),
+            field('tlsStpAdminStatus', fn ($value, $model) => $model->svcTlsStpAdminStatus)->readonly(),
+            field('tlsStpOperationalStatus', fn ($value, $model) => $model->svcTlsStpOperStatus)->readonly(),
+            field('tlsFdbTableSize', fn ($value, $model) => $model->svcTlsFdbTableSize)->readonly(),
+            field('tlsFdbEntryCount', fn ($value, $model) => $model->svcTlsFdbNumEntries)->readonly(),
         ];
     }
 

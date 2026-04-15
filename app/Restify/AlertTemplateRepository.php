@@ -6,6 +6,9 @@ use App\Models\AlertTemplate;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class AlertTemplateRepository extends Repository
 {
@@ -13,19 +16,35 @@ class AlertTemplateRepository extends Repository
 
     public static string $title = 'name';
 
-    public static array $search = [
-        'name',
-    ];
 
-    public static array $match = [
-        'name' => 'text',
-        'title' => 'text',
-    ];
 
-    public static array $sort = [
-        'name',
-        'title',
-    ];
+
+    public static function searchables(): array
+    {
+        return [
+            'name' => SearchableFilter::make()->setColumn('name'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'name' => MatchFilter::make()->setType('text')->setColumn('name'),
+            'template' => MatchFilter::make()->setType('text')->setColumn('template'),
+            'title' => MatchFilter::make()->setType('text')->setColumn('title'),
+            'recoveryTitle' => MatchFilter::make()->setType('text')->setColumn('title_rec'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'name' => SortableFilter::make()->setColumn('name'),
+            'template' => SortableFilter::make()->setColumn('template'),
+            'title' => SortableFilter::make()->setColumn('title'),
+            'recoveryTitle' => SortableFilter::make()->setColumn('title_rec'),
+        ];
+    }
 
     public function fields(RestifyRequest $request): array
     {
@@ -33,7 +52,13 @@ class AlertTemplateRepository extends Repository
             field('name')->rules('required', 'string', 'max:255'),
             field('template')->rules('required', 'string'),
             field('title')->rules('nullable', 'string', 'max:255'),
-            field('title_rec')->rules('nullable', 'string', 'max:255'),
+            field('recoveryTitle', fn ($value, $model) => $model->title_rec)
+                ->fillCallback(function ($request, $model, $attribute) {
+                    if ($request->exists($attribute)) {
+                        $model->title_rec = $request->input($attribute);
+                    }
+                })
+                ->rules('nullable', 'string', 'max:255'),
         ];
     }
 

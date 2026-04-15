@@ -6,6 +6,9 @@ use App\Models\Component;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class ComponentRepository extends Repository
 {
@@ -15,30 +18,8 @@ class ComponentRepository extends Repository
 
     public static string $title = 'label';
 
-    public static array $search = [
-        'label',
-        'type',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'type' => 'text',
-        'label' => 'text',
-        'status' => 'integer',
-        'disabled' => 'integer',
-        'ignore' => 'integer',
-        'error' => 'text',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'type',
-        'label',
-        'status',
-        'disabled',
-        'ignore',
-        'error',
-    ];
 
     public static function related(): array
     {
@@ -47,15 +28,45 @@ class ComponentRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'label' => SearchableFilter::make()->setColumn('label'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'category' => MatchFilter::make()->setType('text')->setColumn('type'),
+            'label' => MatchFilter::make()->setType('text')->setColumn('label'),
+            'status' => MatchFilter::make()->setType('text')->setColumn('status'),
+            'isEnabled' => MatchFilter::make()->setType('bool')->setColumn('disabled'),
+            'isIgnored' => MatchFilter::make()->setType('bool')->setColumn('ignore'),
+            'error' => MatchFilter::make()->setType('text')->setColumn('error'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'category' => SortableFilter::make()->setColumn('type'),
+            'label' => SortableFilter::make()->setColumn('label'),
+            'status' => SortableFilter::make()->setColumn('status'),
+            'isEnabled' => SortableFilter::make()->setColumn('disabled'),
+            'isIgnored' => SortableFilter::make()->setColumn('ignore'),
+            'error' => SortableFilter::make()->setColumn('error'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('type')->readonly(),
+            field('category', fn ($value, $model) => $model->type)->readonly(),
             field('label')->readonly(),
             field('status')->readonly(),
-            field('disabled')->readonly(),
-            field('ignore')->readonly(),
+            field('isEnabled', fn ($value, $model) => ! $model->disabled)->readonly(),
+            field('isIgnored', fn ($value, $model) => $model->ignore)->readonly(),
             field('error')->readonly(),
         ];
     }

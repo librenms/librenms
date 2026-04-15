@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class Ipv6NdRepository extends Repository
 {
@@ -15,35 +18,41 @@ class Ipv6NdRepository extends Repository
 
     public static string $title = 'ipv6_address';
 
-    public static array $search = [
-        'ipv6_address',
-        'mac_address',
-    ];
 
-    public static array $match = [
-        'port_id' => 'integer',
-        'device_id' => 'integer',
-        'mac_address' => 'text',
-        'ipv6_address' => 'text',
-        'context_name' => 'text',
-    ];
 
-    public static array $sort = [
-        'port_id',
-        'device_id',
-        'mac_address',
-        'ipv6_address',
-        'context_name',
-    ];
+
+    public static function searchables(): array
+    {
+        return [
+            'macAddress' => SearchableFilter::make()->setColumn('mac_address'),
+            'ipv6Address' => SearchableFilter::make()->setColumn('ipv6_address'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'macAddress' => MatchFilter::make()->setType('text')->setColumn('mac_address'),
+            'ipv6Address' => MatchFilter::make()->setType('text')->setColumn('ipv6_address'),
+            'contextName' => MatchFilter::make()->setType('text')->setColumn('context_name'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'macAddress' => SortableFilter::make()->setColumn('mac_address'),
+            'ipv6Address' => SortableFilter::make()->setColumn('ipv6_address'),
+            'contextName' => SortableFilter::make()->setColumn('context_name'),
+        ];
+    }
 
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('port_id')->readonly(),
-            field('device_id')->readonly(),
-            field('mac_address')->readonly(),
-            field('ipv6_address')->readonly(),
-            field('context_name')->readonly(),
+            field('macAddress', fn ($value, $model) => $model->mac_address)->readonly(),
+            field('ipv6Address', fn ($value, $model) => $model->ipv6_address)->readonly(),
+            field('contextName', fn ($value, $model) => $model->context_name)->readonly(),
         ];
     }
 

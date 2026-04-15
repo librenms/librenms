@@ -258,7 +258,7 @@ class RestifyApiTest extends DBTestCase
             ->assertStatus(200)
             ->assertJsonPath('data.attributes.hostname', 'router01.example.com')
             ->assertJsonPath('data.attributes.os', 'iosxe')
-            ->assertJsonPath('data.attributes.status', true);
+            ->assertJsonPath('data.attributes.isUp', true);
     }
 
     public function testDeviceSearchByHostname(): void
@@ -315,9 +315,9 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson("/api/v1/ports/{$port->port_id}")
             ->assertStatus(200)
-            ->assertJsonPath('data.attributes.ifName', 'GigabitEthernet0/1')
-            ->assertJsonPath('data.attributes.ifAlias', 'Uplink to core')
-            ->assertJsonPath('data.attributes.ifOperStatus', 'up');
+            ->assertJsonPath('data.attributes.name', 'GigabitEthernet0/1')
+            ->assertJsonPath('data.attributes.alias', 'Uplink to core')
+            ->assertJsonPath('data.attributes.operationalStatus', 'up');
     }
 
     public function testPortSearchByIfName(): void
@@ -369,7 +369,7 @@ class RestifyApiTest extends DBTestCase
         $this->getJson("/api/v1/users/{$admin->user_id}")
             ->assertStatus(200)
             ->assertJsonPath('data.attributes.username', 'testadmin')
-            ->assertJsonPath('data.attributes.realname', 'Test Admin')
+            ->assertJsonPath('data.attributes.realName', 'Test Admin')
             ->assertJsonPath('data.attributes.email', 'admin@example.com');
     }
 
@@ -416,7 +416,7 @@ class RestifyApiTest extends DBTestCase
 
         // PortPolicy::create() returns false
         $this->postJsonApi('/api/v1/ports', [
-            'ifName' => 'eth0',
+            'name' => 'eth0',
         ])->assertStatus(403);
     }
 
@@ -461,7 +461,7 @@ class RestifyApiTest extends DBTestCase
             ->assertJsonPath('data.attributes.name', 'Critical Alert')
             ->assertJsonPath('data.attributes.template', '<b>Alert!</b>')
             ->assertJsonPath('data.attributes.title', 'Alert: {{ $title }}')
-            ->assertJsonPath('data.attributes.title_rec', 'Recovered: {{ $title }}');
+            ->assertJsonPath('data.attributes.recoveryTitle', 'Recovered: {{ $title }}');
     }
 
     public function testAdminCanCreateAlertTemplate(): void
@@ -579,7 +579,7 @@ class RestifyApiTest extends DBTestCase
         $this->putJsonApi("/api/v1/alert-rules/{$rule->id}", [
             'name' => 'Test Rule',
             'severity' => 'critical',
-            'disabled' => 0,
+            'isEnabled' => 0,
         ])->assertStatus(200)
             ->assertJsonPath('data.attributes.severity', 'critical');
     }
@@ -605,7 +605,7 @@ class RestifyApiTest extends DBTestCase
         $this->putJsonApi("/api/v1/alert-rules/{$rule->id}", [
             'name' => 'Hacked',
             'severity' => 'ok',
-            'disabled' => 0,
+            'isEnabled' => 0,
         ])->assertStatus(403);
     }
 
@@ -658,8 +658,8 @@ class RestifyApiTest extends DBTestCase
         $this->getJson("/api/v1/device-groups/{$group->id}")
             ->assertStatus(200)
             ->assertJsonPath('data.attributes.name', 'edge-switches')
-            ->assertJsonPath('data.attributes.desc', 'All edge switches')
-            ->assertJsonPath('data.attributes.type', 'static');
+            ->assertJsonPath('data.attributes.description', 'All edge switches')
+            ->assertJsonPath('data.attributes.category', 'static');
     }
 
     public function testAdminCanCreateDeviceGroup(): void
@@ -669,8 +669,8 @@ class RestifyApiTest extends DBTestCase
 
         $this->postJsonApi('/api/v1/device-groups', [
             'name' => 'new-group',
-            'desc' => 'A new group',
-            'type' => 'static',
+            'description' => 'A new group',
+            'category' => 'static',
         ])->assertStatus(201)
             ->assertJsonPath('data.attributes.name', 'new-group');
     }
@@ -683,8 +683,8 @@ class RestifyApiTest extends DBTestCase
 
         $this->putJsonApi("/api/v1/device-groups/{$group->id}", [
             'name' => 'new-name',
-            'desc' => $group->desc,
-            'type' => $group->type,
+            'description' => $group->desc,
+            'category' => $group->type,
         ])->assertStatus(200)
             ->assertJsonPath('data.attributes.name', 'new-name');
     }
@@ -708,7 +708,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->postJsonApi('/api/v1/device-groups', [
             'name' => 'forbidden-group',
-            'type' => 'static',
+            'category' => 'static',
         ])->assertStatus(403);
     }
 
@@ -848,7 +848,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson("/api/v1/locations/{$location->id}")
             ->assertStatus(200)
-            ->assertJsonPath('data.attributes.location', 'Server Room A');
+            ->assertJsonPath('data.attributes.name', 'Server Room A');
     }
 
     public function testLocationFieldsArePresent(): void
@@ -861,8 +861,8 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson("/api/v1/locations/{$location->id}")
             ->assertStatus(200)
-            ->assertJsonPath('data.attributes.location', 'DC East')
-            ->assertJsonStructure(['data' => ['attributes' => ['location', 'lat', 'lng']]]);
+            ->assertJsonPath('data.attributes.name', 'DC East')
+            ->assertJsonStructure(['data' => ['attributes' => ['name', 'latitude', 'longitude']]]);
     }
 
     public function testAdminCanCreateLocation(): void
@@ -871,11 +871,11 @@ class RestifyApiTest extends DBTestCase
         Sanctum::actingAs($user);
 
         $this->postJsonApi('/api/v1/locations', [
-            'location' => 'New Data Center',
-            'lat' => 51.5074,
-            'lng' => -0.1278,
+            'name' => 'New Data Center',
+            'latitude' => 51.5074,
+            'longitude' => -0.1278,
         ])->assertStatus(201)
-            ->assertJsonPath('data.attributes.location', 'New Data Center');
+            ->assertJsonPath('data.attributes.name', 'New Data Center');
     }
 
     public function testAdminCanUpdateLocation(): void
@@ -885,9 +885,9 @@ class RestifyApiTest extends DBTestCase
         Sanctum::actingAs($user);
 
         $this->putJsonApi("/api/v1/locations/{$location->id}", [
-            'location' => 'Updated Name',
+            'name' => 'Updated Name',
         ])->assertStatus(200)
-            ->assertJsonPath('data.attributes.location', 'Updated Name');
+            ->assertJsonPath('data.attributes.name', 'Updated Name');
     }
 
     public function testAdminCanDeleteLocation(): void
@@ -908,7 +908,7 @@ class RestifyApiTest extends DBTestCase
         Sanctum::actingAs($user);
 
         $this->postJsonApi('/api/v1/locations', [
-            'location' => 'Forbidden',
+            'name' => 'Forbidden',
         ])->assertStatus(403);
     }
 
@@ -955,7 +955,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->postJsonApi('/api/v1/port-groups', [
             'name' => 'new-port-group',
-            'desc' => 'A new group',
+            'description' => 'A new group',
         ])->assertStatus(201)
             ->assertJsonPath('data.attributes.name', 'new-port-group');
     }
@@ -1077,7 +1077,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson("/api/v1/alert-transports/{$transport->transport_id}")
             ->assertStatus(200)
-            ->assertJsonPath('data.attributes.transport_name', 'Slack Alerts');
+            ->assertJsonPath('data.attributes.name', 'Slack Alerts');
     }
 
     public function testAlertTransportFieldsArePresent(): void
@@ -1092,9 +1092,9 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson("/api/v1/alert-transports/{$transport->transport_id}")
             ->assertStatus(200)
-            ->assertJsonPath('data.attributes.transport_name', 'Email Alert')
-            ->assertJsonPath('data.attributes.transport_type', 'mail')
-            ->assertJsonPath('data.attributes.is_default', true);
+            ->assertJsonPath('data.attributes.name', 'Email Alert')
+            ->assertJsonPath('data.attributes.category', 'mail')
+            ->assertJsonPath('data.attributes.isDefault', true);
     }
 
     public function testAdminCanDeleteAlertTransport(): void
@@ -1115,8 +1115,8 @@ class RestifyApiTest extends DBTestCase
         Sanctum::actingAs($user);
 
         $this->postJsonApi('/api/v1/alert-transports', [
-            'transport_name' => 'Forbidden',
-            'transport_type' => 'mail',
+            'name' => 'Forbidden',
+            'category' => 'mail',
         ])->assertStatus(403);
     }
 
@@ -1159,8 +1159,8 @@ class RestifyApiTest extends DBTestCase
             ->assertStatus(200)
             ->assertJsonPath('data.attributes.name', 'DNS Monitor')
             ->assertJsonPath('data.attributes.check', 'dns')
-            ->assertJsonPath('data.attributes.type', 'static')
-            ->assertJsonPath('data.attributes.desc', 'Monitor DNS servers');
+            ->assertJsonPath('data.attributes.category', 'static')
+            ->assertJsonPath('data.attributes.description', 'Monitor DNS servers');
     }
 
     public function testAdminCanDeleteServiceTemplate(): void
@@ -1183,7 +1183,7 @@ class RestifyApiTest extends DBTestCase
         $this->postJsonApi('/api/v1/service-templates', [
             'name' => 'Forbidden',
             'check' => 'http',
-            'type' => 'static',
+            'category' => 'static',
         ])->assertStatus(403);
     }
 
@@ -1208,7 +1208,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson("/api/v1/poller-groups/{$group->id}")
             ->assertStatus(200)
-            ->assertJsonPath('data.attributes.group_name', 'EU Pollers');
+            ->assertJsonPath('data.attributes.name', 'EU Pollers');
     }
 
     public function testAdminCanCreatePollerGroup(): void
@@ -1217,10 +1217,10 @@ class RestifyApiTest extends DBTestCase
         Sanctum::actingAs($user);
 
         $this->postJsonApi('/api/v1/poller-groups', [
-            'group_name' => 'US East Pollers',
-            'descr' => 'Pollers in US East region',
+            'name' => 'US East Pollers',
+            'description' => 'Pollers in US East region',
         ])->assertStatus(201)
-            ->assertJsonPath('data.attributes.group_name', 'US East Pollers');
+            ->assertJsonPath('data.attributes.name', 'US East Pollers');
     }
 
     public function testAdminCanUpdatePollerGroup(): void
@@ -1230,9 +1230,9 @@ class RestifyApiTest extends DBTestCase
         Sanctum::actingAs($user);
 
         $this->putJsonApi("/api/v1/poller-groups/{$group->id}", [
-            'group_name' => 'New Name',
+            'name' => 'New Name',
         ])->assertStatus(200)
-            ->assertJsonPath('data.attributes.group_name', 'New Name');
+            ->assertJsonPath('data.attributes.name', 'New Name');
     }
 
     public function testAdminCanDeletePollerGroup(): void
@@ -1253,7 +1253,7 @@ class RestifyApiTest extends DBTestCase
         Sanctum::actingAs($user);
 
         $this->postJsonApi('/api/v1/poller-groups', [
-            'group_name' => 'Forbidden',
+            'name' => 'Forbidden',
         ])->assertStatus(403);
     }
 
@@ -1290,9 +1290,11 @@ class RestifyApiTest extends DBTestCase
         $alert = Alert::factory()->create(['device_id' => $device->device_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson("/api/v1/alerts/{$alert->id}")
+        // Alerts are engine-managed; the FK lives on the `device` relationship
+        // which is only serialised when explicitly requested via ?related=device.
+        $this->getJson("/api/v1/alerts/{$alert->id}?related=device")
             ->assertStatus(200)
-            ->assertJsonPath('data.attributes.device_id', $device->device_id);
+            ->assertJsonPath('data.relationships.device.id', (string) $device->device_id);
     }
 
     public function testAlertFieldsArePresent(): void
@@ -1310,11 +1312,14 @@ class RestifyApiTest extends DBTestCase
             ->assertStatus(200)
             ->assertJsonPath('data.attributes.state', 1)
             ->assertJsonPath('data.attributes.note', 'Test note')
-            ->assertJsonStructure(['data' => ['attributes' => ['device_id', 'rule_id', 'state', 'note', 'timestamp']]]);
+            ->assertJsonStructure(['data' => ['attributes' => [ 'state', 'note', 'createdAt']]]);
     }
 
     public function testAdminCanAcknowledgeAlert(): void
     {
+        // Alerts are engine-managed; direct PUT is route-blocked with 405.
+        // State changes happen via the acknowledge action (see
+        // testAdminCanAcknowledgeViaAction).
         $user = User::factory()->admin()->create();
         $device = Device::factory()->create();
         $alert = Alert::factory()->create(['device_id' => $device->device_id, 'state' => 1]);
@@ -1323,12 +1328,14 @@ class RestifyApiTest extends DBTestCase
         $this->putJsonApi("/api/v1/alerts/{$alert->id}", [
             'state' => 2,
             'note' => 'Acknowledged via API',
-        ])->assertStatus(200)
-            ->assertJsonPath('data.attributes.state', 2);
+        ])->assertStatus(405);
     }
 
     public function testAdminCanUnmuteAlert(): void
     {
+        // Alerts are engine-managed; direct PUT is route-blocked with 405.
+        // State changes happen via the unmute action (see
+        // testAdminCanUnmuteViaAction).
         $user = User::factory()->admin()->create();
         $device = Device::factory()->create();
         $alert = Alert::factory()->acknowledged()->create(['device_id' => $device->device_id]);
@@ -1336,8 +1343,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->putJsonApi("/api/v1/alerts/{$alert->id}", [
             'state' => 1,
-        ])->assertStatus(200)
-            ->assertJsonPath('data.attributes.state', 1);
+        ])->assertStatus(405);
     }
 
     public function testReadOnlyUserCannotUpdateAlert(): void
@@ -1349,7 +1355,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->putJsonApi("/api/v1/alerts/{$alert->id}", [
             'state' => 2,
-        ])->assertStatus(403);
+        ])->assertStatus(405);
     }
 
     public function testAlertsCannotBeCreatedViaApi(): void
@@ -1361,7 +1367,7 @@ class RestifyApiTest extends DBTestCase
             'device_id' => 1,
             'rule_id' => 1,
             'state' => 1,
-        ])->assertStatus(403);
+        ])->assertStatus(405);
     }
 
     public function testAdminCanAcknowledgeViaAction(): void
@@ -1371,10 +1377,10 @@ class RestifyApiTest extends DBTestCase
         $alert = Alert::factory()->create(['device_id' => $device->device_id, 'state' => 1]);
         Sanctum::actingAs($user);
 
-        $this->postJsonApi("/api/v1/alerts/{$alert->id}/acknowledge", [
+        $this->postJsonApi("/api/v1/alerts/{$alert->id}/actions?action=acknowledge", [
             'note' => 'Looking into it',
         ])->assertStatus(200)
-            ->assertJsonPath('data.state', 2);
+            ->assertJsonPath('data.0.state', 2);
 
         $this->assertDatabaseHas('alerts', ['id' => $alert->id, 'state' => 2]);
     }
@@ -1386,10 +1392,10 @@ class RestifyApiTest extends DBTestCase
         $alert = Alert::factory()->acknowledged()->create(['device_id' => $device->device_id]);
         Sanctum::actingAs($user);
 
-        $this->postJsonApi("/api/v1/alerts/{$alert->id}/unmute", [
+        $this->postJsonApi("/api/v1/alerts/{$alert->id}/actions?action=unmute", [
             'note' => 'Re-alerting',
         ])->assertStatus(200)
-            ->assertJsonPath('data.state', 1);
+            ->assertJsonPath('data.0.state', 1);
 
         $this->assertDatabaseHas('alerts', ['id' => $alert->id, 'state' => 1]);
     }
@@ -1417,7 +1423,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson("/api/v1/sensors/{$sensor->sensor_id}")
             ->assertStatus(200)
-            ->assertJsonPath('data.attributes.sensor_descr', 'CPU Temp');
+            ->assertJsonPath('data.attributes.description', 'CPU Temp');
     }
 
     public function testSensorFieldsArePresent(): void
@@ -1429,9 +1435,8 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/sensors')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'sensor_class', 'sensor_descr', 'sensor_current',
-                'sensor_limit', 'sensor_limit_warn', 'sensor_limit_low', 'sensor_limit_low_warn',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'class', 'description', 'current',
+                'limit', 'warningLimit', 'lowLimit', 'lowWarningLimit',
             ]]]]);
     }
 
@@ -1440,7 +1445,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/sensors', ['sensor_class' => 'temperature'])
+        $this->postJsonApi('/api/v1/sensors', ['class' => 'temperature'])
             ->assertStatus(403);
     }
 
@@ -1467,7 +1472,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson("/api/v1/processors/{$proc->processor_id}")
             ->assertStatus(200)
-            ->assertJsonPath('data.attributes.processor_descr', 'CPU 0');
+            ->assertJsonPath('data.attributes.description', 'CPU 0');
     }
 
     public function testProcessorFieldsArePresent(): void
@@ -1479,8 +1484,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/processors')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'processor_type', 'processor_descr', 'processor_usage',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'category', 'description', 'usage',
             ]]]]);
     }
 
@@ -1489,7 +1493,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/processors', ['processor_type' => 'hr'])
+        $this->postJsonApi('/api/v1/processors', ['category' => 'hr'])
             ->assertStatus(403);
     }
 
@@ -1516,7 +1520,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson("/api/v1/mempools/{$mempool->mempool_id}")
             ->assertStatus(200)
-            ->assertJsonPath('data.attributes.mempool_descr', 'Physical Memory');
+            ->assertJsonPath('data.attributes.description', 'Physical Memory');
     }
 
     public function testMempoolFieldsArePresent(): void
@@ -1528,9 +1532,8 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/mempools')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'mempool_type', 'mempool_descr', 'mempool_perc',
-                'mempool_used', 'mempool_free', 'mempool_total',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'category', 'description', 'percentage',
+                'used', 'free', 'total',
             ]]]]);
     }
 
@@ -1539,7 +1542,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/mempools', ['mempool_type' => 'hrstorage'])
+        $this->postJsonApi('/api/v1/mempools', ['category' => 'hrstorage'])
             ->assertStatus(403);
     }
 
@@ -1552,7 +1555,7 @@ class RestifyApiTest extends DBTestCase
         Storage::factory()->count(2)->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/storages')
+        $this->getJson('/api/v1/storage')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 2);
     }
@@ -1564,9 +1567,9 @@ class RestifyApiTest extends DBTestCase
         $storage = Storage::factory()->for($device)->create(['storage_descr' => '/home']);
         Sanctum::actingAs($user);
 
-        $this->getJson("/api/v1/storages/{$storage->storage_id}")
+        $this->getJson("/api/v1/storage/{$storage->storage_id}")
             ->assertStatus(200)
-            ->assertJsonPath('data.attributes.storage_descr', '/home');
+            ->assertJsonPath('data.attributes.description', '/home');
     }
 
     public function testStorageFieldsArePresent(): void
@@ -1576,11 +1579,10 @@ class RestifyApiTest extends DBTestCase
         Storage::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/storages')
+        $this->getJson('/api/v1/storage')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'storage_type', 'storage_descr', 'storage_size',
-                'storage_used', 'storage_free', 'storage_perc',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'category', 'description', 'size',
+                'used', 'free', 'percentage',
             ]]]]);
     }
 
@@ -1589,7 +1591,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/storages', ['storage_type' => 'dsk'])
+        $this->postJsonApi('/api/v1/storage', ['category' => 'dsk'])
             ->assertStatus(403);
     }
 
@@ -1616,7 +1618,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson("/api/v1/services/{$service->service_id}")
             ->assertStatus(200)
-            ->assertJsonPath('data.attributes.service_type', 'http');
+            ->assertJsonPath('data.attributes.category', 'http');
     }
 
     public function testServiceFieldsArePresent(): void
@@ -1628,9 +1630,8 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/services')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'service_type', 'service_name', 'service_desc',
-                'service_status', 'service_ignore', 'service_disabled',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'category', 'name', 'description',
+                'status', 'isIgnored', 'isEnabled',
             ]]]]);
     }
 
@@ -1642,10 +1643,10 @@ class RestifyApiTest extends DBTestCase
 
         $this->postJsonApi('/api/v1/services', [
             'device_id' => $device->device_id,
-            'service_type' => 'http',
-            'service_name' => 'Web Server',
-            'service_desc' => 'HTTP check',
-            'service_ip' => '10.0.0.1',
+            'category' => 'http',
+            'name' => 'Web Server',
+            'description' => 'HTTP check',
+            'ip' => '10.0.0.1',
         ])->assertStatus(201);
 
         $this->assertDatabaseHas('services', ['service_name' => 'Web Server']);
@@ -1670,7 +1671,7 @@ class RestifyApiTest extends DBTestCase
         Sanctum::actingAs($user);
 
         $this->postJsonApi('/api/v1/services', [
-            'service_type' => 'http',
+            'category' => 'http',
         ])->assertStatus(403);
     }
 
@@ -1709,8 +1710,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/components')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'type', 'label', 'status', 'disabled', 'ignore', 'error',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'category', 'label', 'status', 'isEnabled', 'isIgnored', 'error',
             ]]]]);
     }
 
@@ -1719,7 +1719,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/components', ['type' => 'fan'])
+        $this->postJsonApi('/api/v1/components', ['category' => 'fan'])
             ->assertStatus(403);
     }
 
@@ -1746,7 +1746,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson("/api/v1/applications/{$app->app_id}")
             ->assertStatus(200)
-            ->assertJsonPath('data.attributes.app_type', 'mysql');
+            ->assertJsonPath('data.attributes.category', 'mysql');
     }
 
     public function testApplicationFieldsArePresent(): void
@@ -1758,8 +1758,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/applications')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'app_type', 'app_instance', 'app_status', 'app_state',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'category', 'instance', 'status', 'state',
             ]]]]);
     }
 
@@ -1768,7 +1767,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/applications', ['app_type' => 'mysql'])
+        $this->postJsonApi('/api/v1/applications', ['category' => 'mysql'])
             ->assertStatus(403);
     }
 
@@ -1795,7 +1794,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson("/api/v1/bgp-peers/{$peer->bgpPeer_id}")
             ->assertStatus(200)
-            ->assertJsonPath('data.attributes.bgpPeerState', 'established');
+            ->assertJsonPath('data.attributes.state', 'established');
     }
 
     public function testBgpPeerFieldsArePresent(): void
@@ -1807,9 +1806,8 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/bgp-peers')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'bgpPeerIdentifier', 'bgpPeerRemoteAs',
-                'bgpPeerState', 'bgpPeerAdminStatus', 'bgpLocalAddr', 'bgpPeerRemoteAddr',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'identifier', 'remoteAs',
+                'state', 'adminStatus', 'localAddress', 'remoteAddress',
             ]]]]);
     }
 
@@ -1818,7 +1816,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/bgp-peers', ['bgpPeerRemoteAs' => 65000])
+        $this->postJsonApi('/api/v1/bgp-peers', ['remoteAs' => 65000])
             ->assertStatus(403);
     }
 
@@ -1857,8 +1855,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/eventlogs')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'datetime', 'message', 'type', 'severity',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'createdAt', 'message', 'category', 'severity',
             ]]]]);
     }
 
@@ -1894,7 +1891,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson("/api/v1/syslogs/{$log->seq}")
             ->assertStatus(200)
-            ->assertJsonPath('data.attributes.msg', 'kernel: test message');
+            ->assertJsonPath('data.attributes.message', 'kernel: test message');
     }
 
     public function testSyslogFieldsArePresent(): void
@@ -1906,8 +1903,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/syslogs')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'facility', 'priority', 'level', 'tag', 'program', 'msg',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'facility', 'priority', 'level', 'tag', 'program', 'message',
             ]]]]);
     }
 
@@ -1916,7 +1912,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/syslogs', ['msg' => 'test'])
+        $this->postJsonApi('/api/v1/syslogs', ['message' => 'test'])
             ->assertStatus(403);
     }
 
@@ -1941,9 +1937,11 @@ class RestifyApiTest extends DBTestCase
         $log = AlertLog::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson("/api/v1/alert-logs/{$log->id}")
+        // Alert logs are engine-managed; the FK lives on the `device`
+        // relationship which is only serialised when explicitly requested.
+        $this->getJson("/api/v1/alert-logs/{$log->id}?related=device")
             ->assertStatus(200)
-            ->assertJsonPath('data.attributes.device_id', $device->device_id);
+            ->assertJsonPath('data.relationships.device.id', (string) $device->device_id);
     }
 
     public function testAlertLogFieldsArePresent(): void
@@ -1955,8 +1953,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/alert-logs')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'rule_id', 'state', 'time_logged',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'state', 'createdAt',
             ]]]]);
     }
 
@@ -2003,7 +2000,7 @@ class RestifyApiTest extends DBTestCase
         $this->getJson('/api/v1/auth-logs')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [
-                'datetime', 'user', 'address', 'result',
+                'createdAt', 'user', 'address', 'result',
             ]]]]);
     }
 
@@ -2037,7 +2034,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson("/api/v1/bills/{$bill->bill_id}")
             ->assertStatus(200)
-            ->assertJsonPath('data.attributes.bill_name', 'Transit Link');
+            ->assertJsonPath('data.attributes.name', 'Transit Link');
     }
 
     public function testBillFieldsArePresent(): void
@@ -2049,8 +2046,8 @@ class RestifyApiTest extends DBTestCase
         $this->getJson('/api/v1/bills')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [
-                'bill_name', 'bill_type', 'rate_95th', 'total_data',
-                'rate_average', 'bill_last_calc',
+                'name', 'category', 'rate95th', 'totalData',
+                'rateAverage', 'updatedAt',
             ]]]]);
     }
 
@@ -2060,8 +2057,8 @@ class RestifyApiTest extends DBTestCase
         Sanctum::actingAs($user);
 
         $this->postJsonApi('/api/v1/bills', [
-            'bill_name' => 'New Transit',
-            'bill_type' => 'quota',
+            'name' => 'New Transit',
+            'category' => 'quota',
         ])->assertStatus(201);
 
         $this->assertDatabaseHas('bills', ['bill_name' => 'New Transit']);
@@ -2085,7 +2082,7 @@ class RestifyApiTest extends DBTestCase
         Sanctum::actingAs($user);
 
         $this->postJsonApi('/api/v1/bills', [
-            'bill_name' => 'Forbidden',
+            'name' => 'Forbidden',
         ])->assertStatus(403);
     }
 
@@ -2110,7 +2107,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson("/api/v1/poller-clusters/{$cluster->id}")
             ->assertStatus(200)
-            ->assertJsonPath('data.attributes.poller_name', 'poller-01');
+            ->assertJsonPath('data.attributes.name', 'poller-01');
     }
 
     public function testPollerClusterFieldsArePresent(): void
@@ -2122,8 +2119,8 @@ class RestifyApiTest extends DBTestCase
         $this->getJson('/api/v1/poller-clusters')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [
-                'node_id', 'poller_name', 'poller_version', 'poller_groups',
-                'last_report', 'master',
+                'nodeId', 'name', 'version', 'groups',
+                'updatedAt', 'isMaster',
             ]]]]);
     }
 
@@ -2132,7 +2129,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/poller-clusters', ['poller_name' => 'test'])
+        $this->postJsonApi('/api/v1/poller-clusters', ['name' => 'test'])
             ->assertStatus(403);
     }
 
@@ -2159,7 +2156,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson("/api/v1/inventory/{$entity->entPhysical_id}")
             ->assertStatus(200)
-            ->assertJsonPath('data.attributes.entPhysicalName', 'Chassis');
+            ->assertJsonPath('data.attributes.name', 'Chassis');
     }
 
     public function testEntPhysicalFieldsArePresent(): void
@@ -2171,9 +2168,8 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/inventory')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'entPhysicalIndex', 'entPhysicalDescr', 'entPhysicalClass',
-                'entPhysicalName', 'entPhysicalSerialNum', 'entPhysicalModelName',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'index', 'description', 'class',
+                'name', 'serialNumber', 'modelName',
             ]]]]);
     }
 
@@ -2182,7 +2178,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/inventory', ['entPhysicalName' => 'test'])
+        $this->postJsonApi('/api/v1/inventory', ['name' => 'test'])
             ->assertStatus(403);
     }
 
@@ -2233,8 +2229,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ospf-instances')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'ospfRouterId', 'ospfAdminStat', 'ospfVersionNumber',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'routerId', 'adminStatus', 'versionNumber',
             ]]]]);
     }
 
@@ -2243,7 +2238,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ospf-instances', ['ospfRouterId' => '1.1.1.1'])
+        $this->postJsonApi('/api/v1/ospf-instances', ['routerId' => '1.1.1.1'])
             ->assertStatus(403);
     }
 
@@ -2294,8 +2289,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ospf-areas')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'ospfAreaId', 'ospfSpfRuns', 'ospfAreaStatus',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'areaId', 'spfRuns', 'status',
             ]]]]);
     }
 
@@ -2304,7 +2298,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ospf-areas', ['ospfAreaId' => '0.0.0.0'])
+        $this->postJsonApi('/api/v1/ospf-areas', ['areaId' => '0.0.0.0'])
             ->assertStatus(403);
     }
 
@@ -2343,8 +2337,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ospf-nbrs')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'ospfNbrIpAddr', 'ospfNbrRtrId', 'ospfNbrState',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'ipAddress', 'routerId', 'state',
             ]]]]);
     }
 
@@ -2353,7 +2346,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ospf-nbrs', ['ospfNbrIpAddr' => '10.0.0.1'])
+        $this->postJsonApi('/api/v1/ospf-nbrs', ['ipAddress' => '10.0.0.1'])
             ->assertStatus(403);
     }
 
@@ -2395,8 +2388,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ospf-ports')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'port_id', 'ospfIfIpAddress', 'ospfIfAreaId',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'interfaceIpAddress', 'areaId',
             ]]]]);
     }
 
@@ -2405,7 +2397,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ospf-ports', ['ospfIfIpAddress' => '10.0.0.1'])
+        $this->postJsonApi('/api/v1/ospf-ports', ['interfaceIpAddress' => '10.0.0.1'])
             ->assertStatus(403);
     }
 
@@ -2456,8 +2448,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ospfv3-instances')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'ospfv3RouterId', 'ospfv3AdminStatus', 'ospfv3VersionNumber',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'routerId', 'adminStatus', 'versionNumber',
             ]]]]);
     }
 
@@ -2466,7 +2457,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ospfv3-instances', ['ospfv3RouterId' => '1.1.1.1'])
+        $this->postJsonApi('/api/v1/ospfv3-instances', ['routerId' => '1.1.1.1'])
             ->assertStatus(403);
     }
 
@@ -2517,8 +2508,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ospfv3-areas')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'ospfv3AreaId', 'ospfv3AreaSpfRuns', 'ospfv3AreaSummary',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'areaId', 'spfRuns', 'summary',
             ]]]]);
     }
 
@@ -2527,7 +2517,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ospfv3-areas', ['ospfv3AreaId' => 0])
+        $this->postJsonApi('/api/v1/ospfv3-areas', ['areaId' => 0])
             ->assertStatus(403);
     }
 
@@ -2569,8 +2559,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ospfv3-nbrs')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'ospfv3NbrRtrId', 'ospfv3NbrAddress', 'ospfv3NbrState',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'routerId', 'address', 'state',
             ]]]]);
     }
 
@@ -2579,7 +2568,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ospfv3-nbrs', ['ospfv3NbrRtrId' => '1.1.1.1'])
+        $this->postJsonApi('/api/v1/ospfv3-nbrs', ['routerId' => '1.1.1.1'])
             ->assertStatus(403);
     }
 
@@ -2621,8 +2610,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ospfv3-ports')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'port_id', 'ospfv3IfAreaId', 'ospfv3IfState',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'areaId', 'state',
             ]]]]);
     }
 
@@ -2631,7 +2619,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ospfv3-ports', ['ospfv3IfIndex' => 1])
+        $this->postJsonApi('/api/v1/ospfv3-ports', ['interfaceIndex' => 1])
             ->assertStatus(403);
     }
 
@@ -2686,8 +2674,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/isis-adjacencies')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'isisISAdjState', 'isisISAdjNeighSysID', 'isisISAdjIPAddrAddress',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'state', 'neighborSystemId', 'ipAddress',
             ]]]]);
     }
 
@@ -2696,7 +2683,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/isis-adjacencies', ['isisISAdjState' => 'up'])
+        $this->postJsonApi('/api/v1/isis-adjacencies', ['state' => 'up'])
             ->assertStatus(403);
     }
 
@@ -2747,8 +2734,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/vrfs')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'vrf_oid', 'vrf_name',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'oid', 'name',
             ]]]]);
     }
 
@@ -2757,7 +2743,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/vrfs', ['vrf_name' => 'test'])
+        $this->postJsonApi('/api/v1/vrfs', ['name' => 'test'])
             ->assertStatus(403);
     }
 
@@ -2796,8 +2782,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/vrf-lites')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'context_name', 'vrf_name',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'contextName', 'name',
             ]]]]);
     }
 
@@ -2806,7 +2791,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/vrf-lites', ['vrf_name' => 'test'])
+        $this->postJsonApi('/api/v1/vrf-lites', ['name' => 'test'])
             ->assertStatus(403);
     }
 
@@ -2861,9 +2846,8 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/routes')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'port_id', 'inetCidrRouteDest', 'inetCidrRouteNextHop',
-                'inetCidrRouteProto', 'inetCidrRouteType',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'destination', 'nextHop',
+                'protocol', 'category',
             ]]]]);
     }
 
@@ -2872,7 +2856,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/routes', ['inetCidrRouteDest' => '10.0.0.0'])
+        $this->postJsonApi('/api/v1/routes', ['destination' => '10.0.0.0'])
             ->assertStatus(403);
     }
 
@@ -2911,9 +2895,8 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/mpls-lsps')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'mplsLspName', 'mplsLspAdminState', 'mplsLspOperState',
-                'mplsLspFromAddr', 'mplsLspToAddr',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'name', 'adminState', 'operationalState',
+                'fromAddress', 'toAddress',
             ]]]]);
     }
 
@@ -2922,7 +2905,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/mpls-lsps', ['mplsLspName' => 'test'])
+        $this->postJsonApi('/api/v1/mpls-lsps', ['name' => 'test'])
             ->assertStatus(403);
     }
 
@@ -2961,8 +2944,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/mpls-lsp-paths')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'lsp_id', 'mplsLspPathType', 'mplsLspPathAdminState', 'mplsLspPathOperState',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'category', 'adminState', 'operationalState',
             ]]]]);
     }
 
@@ -2971,7 +2953,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/mpls-lsp-paths', ['mplsLspPathType' => 'primary'])
+        $this->postJsonApi('/api/v1/mpls-lsp-paths', ['category' => 'primary'])
             ->assertStatus(403);
     }
 
@@ -3010,8 +2992,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/mpls-sdps')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'sdpDescription', 'sdpAdminStatus', 'sdpOperStatus',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'description', 'adminStatus', 'operationalStatus',
             ]]]]);
     }
 
@@ -3020,7 +3001,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/mpls-sdps', ['sdpDescription' => 'test'])
+        $this->postJsonApi('/api/v1/mpls-sdps', ['description' => 'test'])
             ->assertStatus(403);
     }
 
@@ -3059,8 +3040,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/mpls-sdp-binds')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'sdp_id', 'svc_id', 'sdpBindAdminStatus', 'sdpBindOperStatus',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'adminStatus', 'operationalStatus',
             ]]]]);
     }
 
@@ -3108,8 +3088,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/mpls-services')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'svcDescription', 'svcType', 'svcAdminStatus', 'svcOperStatus',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'description', 'category', 'adminStatus', 'operationalStatus',
             ]]]]);
     }
 
@@ -3118,7 +3097,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/mpls-services', ['svcDescription' => 'test'])
+        $this->postJsonApi('/api/v1/mpls-services', ['description' => 'test'])
             ->assertStatus(403);
     }
 
@@ -3157,8 +3136,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/mpls-saps')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'sapDescription', 'sapAdminStatus', 'sapOperStatus',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'description', 'adminStatus', 'operationalStatus',
             ]]]]);
     }
 
@@ -3167,7 +3145,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/mpls-saps', ['sapDescription' => 'test'])
+        $this->postJsonApi('/api/v1/mpls-saps', ['description' => 'test'])
             ->assertStatus(403);
     }
 
@@ -3206,8 +3184,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/mpls-tunnel-ar-hops')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'lsp_path_id', 'mplsTunnelARHopIpv4Addr', 'mplsTunnelARHopAddrType',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'ipv4Address', 'addressCategory',
             ]]]]);
     }
 
@@ -3216,7 +3193,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/mpls-tunnel-ar-hops', ['mplsTunnelARHopIpv4Addr' => '10.0.0.1'])
+        $this->postJsonApi('/api/v1/mpls-tunnel-ar-hops', ['ipv4Address' => '10.0.0.1'])
             ->assertStatus(403);
     }
 
@@ -3255,8 +3232,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/mpls-tunnel-c-hops')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'lsp_path_id', 'mplsTunnelCHopIpv4Addr', 'mplsTunnelCHopAddrType',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'ipv4Address', 'addressCategory',
             ]]]]);
     }
 
@@ -3265,7 +3241,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/mpls-tunnel-c-hops', ['mplsTunnelCHopIpv4Addr' => '10.0.0.1'])
+        $this->postJsonApi('/api/v1/mpls-tunnel-c-hops', ['ipv4Address' => '10.0.0.1'])
             ->assertStatus(403);
     }
 
@@ -3308,7 +3284,7 @@ class RestifyApiTest extends DBTestCase
         $this->getJson('/api/v1/ipv4-addresses')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [
-                'ipv4_address', 'ipv4_prefixlen', 'port_id',
+                'address', 'prefixLength',
             ]]]]);
     }
 
@@ -3317,7 +3293,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ipv4-addresses', ['ipv4_address' => '10.0.0.1'])
+        $this->postJsonApi('/api/v1/ipv4-addresses', ['ipv4Address' => '10.0.0.1'])
             ->assertStatus(403);
     }
 
@@ -3360,7 +3336,7 @@ class RestifyApiTest extends DBTestCase
         $this->getJson('/api/v1/ipv6-addresses')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [
-                'ipv6_address', 'ipv6_compressed', 'ipv6_prefixlen', 'port_id',
+                'address', 'compressedAddress', 'prefixLength',
             ]]]]);
     }
 
@@ -3369,7 +3345,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ipv6-addresses', ['ipv6_address' => '::1'])
+        $this->postJsonApi('/api/v1/ipv6-addresses', ['ipv6Address' => '::1'])
             ->assertStatus(403);
     }
 
@@ -3408,8 +3384,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/vlans')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'vlan_vlan', 'vlan_name', 'vlan_type',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'vid', 'name', 'category',
             ]]]]);
     }
 
@@ -3418,7 +3393,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/vlans', ['vlan_name' => 'test'])
+        $this->postJsonApi('/api/v1/vlans', ['name' => 'test'])
             ->assertStatus(403);
     }
 
@@ -3457,8 +3432,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/links')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'local_device_id', 'remote_hostname', 'remote_port', 'protocol', 'active',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'remoteHostname', 'remotePortName', 'protocol', 'isActive',
             ]]]]);
     }
 
@@ -3467,7 +3441,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/links', ['remote_hostname' => 'test'])
+        $this->postJsonApi('/api/v1/links', ['remoteHostname' => 'test'])
             ->assertStatus(403);
     }
 
@@ -3504,7 +3478,7 @@ class RestifyApiTest extends DBTestCase
         $this->getJson('/api/v1/ipv4-networks')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [
-                'ipv4_network',
+                'network',
             ]]]]);
     }
 
@@ -3513,7 +3487,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ipv4-networks', ['ipv4_network' => '10.0.0.0/8'])
+        $this->postJsonApi('/api/v1/ipv4-networks', ['network' => '10.0.0.0/8'])
             ->assertStatus(403);
     }
 
@@ -3550,7 +3524,7 @@ class RestifyApiTest extends DBTestCase
         $this->getJson('/api/v1/ipv6-networks')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [
-                'ipv6_network',
+                'network',
             ]]]]);
     }
 
@@ -3559,7 +3533,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ipv6-networks', ['ipv6_network' => '2001:db8::/32'])
+        $this->postJsonApi('/api/v1/ipv6-networks', ['network' => '2001:db8::/32'])
             ->assertStatus(403);
     }
 
@@ -3601,8 +3575,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ipv4-macs')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'port_id', 'mac_address', 'ipv4_address',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'macAddress', 'ipv4Address',
             ]]]]);
     }
 
@@ -3611,7 +3584,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ipv4-macs', ['mac_address' => 'aa:bb:cc:dd:ee:ff'])
+        $this->postJsonApi('/api/v1/ipv4-macs', ['macAddress' => 'aa:bb:cc:dd:ee:ff'])
             ->assertStatus(403);
     }
 
@@ -3653,8 +3626,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ports-fdbs')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'port_id', 'mac_address', 'vlan_id', 'device_id',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'macAddress',
             ]]]]);
     }
 
@@ -3663,7 +3635,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ports-fdbs', ['mac_address' => 'aa:bb:cc:dd:ee:ff'])
+        $this->postJsonApi('/api/v1/ports-fdbs', ['macAddress' => 'aa:bb:cc:dd:ee:ff'])
             ->assertStatus(403);
     }
 
@@ -3705,8 +3677,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ipv6-nds')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'port_id', 'mac_address', 'ipv6_address',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'macAddress', 'ipv6Address',
             ]]]]);
     }
 
@@ -3715,7 +3686,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ipv6-nds', ['ipv6_address' => '::1'])
+        $this->postJsonApi('/api/v1/ipv6-nds', ['ipv6Address' => '::1'])
             ->assertStatus(403);
     }
 
@@ -3757,8 +3728,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/port-vlans')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'port_id', 'vlan', 'state',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'vlan', 'state',
             ]]]]);
     }
 
@@ -3806,8 +3776,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/access-points')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'name', 'mac_addr', 'channel', 'numasoclients',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'name', 'macAddress', 'channel', 'associatedClients',
             ]]]]);
     }
 
@@ -3855,8 +3824,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/wireless-sensors')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'sensor_class', 'sensor_descr', 'sensor_type',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'class', 'description', 'category',
             ]]]]);
     }
 
@@ -3865,7 +3833,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/wireless-sensors', ['sensor_descr' => 'test'])
+        $this->postJsonApi('/api/v1/wireless-sensors', ['description' => 'test'])
             ->assertStatus(403);
     }
 
@@ -3907,8 +3875,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/transceivers')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'port_id', 'vendor', 'model', 'serial',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'vendor', 'model', 'serial',
             ]]]]);
     }
 
@@ -3956,8 +3923,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/disk-ios')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'diskio_index', 'diskio_descr',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'index', 'description',
             ]]]]);
     }
 
@@ -3966,7 +3932,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/disk-ios', ['diskio_descr' => 'test'])
+        $this->postJsonApi('/api/v1/disk-ios', ['description' => 'test'])
             ->assertStatus(403);
     }
 
@@ -4005,8 +3971,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/slas')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'owner', 'tag', 'rtt_type', 'status',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'owner', 'tag', 'rttCategory', 'status',
             ]]]]);
     }
 
@@ -4054,8 +4019,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/device-outages')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'going_down',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'outageStartAt',
             ]]]]);
     }
 
@@ -4064,7 +4028,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/device-outages', ['going_down' => 1000])
+        $this->postJsonApi('/api/v1/device-outages', ['outageStartAt' => 1000])
             ->assertStatus(403);
     }
 
@@ -4103,8 +4067,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/availabilities')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'duration', 'availability_perc',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'duration', 'percentage',
             ]]]]);
     }
 
@@ -4152,8 +4115,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ipsec-tunnels')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'tunnel_name', 'peer_addr', 'local_addr', 'tunnel_status',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'name', 'peerAddress', 'localAddress', 'status',
             ]]]]);
     }
 
@@ -4162,7 +4124,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ipsec-tunnels', ['tunnel_name' => 'test'])
+        $this->postJsonApi('/api/v1/ipsec-tunnels', ['name' => 'test'])
             ->assertStatus(403);
     }
 
@@ -4204,8 +4166,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/pseudowires')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'port_id', 'pw_type', 'pw_descr',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'category', 'description',
             ]]]]);
     }
 
@@ -4214,7 +4175,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/pseudowires', ['pw_descr' => 'test'])
+        $this->postJsonApi('/api/v1/pseudowires', ['description' => 'test'])
             ->assertStatus(403);
     }
 
@@ -4253,8 +4214,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/port-stacks')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'high_ifIndex', 'low_ifIndex', 'ifStackStatus',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'highInterfaceIndex', 'lowInterfaceIndex', 'stackStatus',
             ]]]]);
     }
 
@@ -4263,7 +4223,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/port-stacks', ['ifStackStatus' => 'active'])
+        $this->postJsonApi('/api/v1/port-stacks', ['stackStatus' => 'active'])
             ->assertStatus(403);
     }
 
@@ -4305,8 +4265,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/port-stps')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'port_id', 'vlan', 'state', 'designatedRoot',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'vlan', 'state', 'designatedRoot',
             ]]]]);
     }
 
@@ -4354,8 +4313,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/stps')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'bridgeAddress', 'designatedRoot', 'priority',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'bridgeAddress', 'designatedRoot', 'priority',
             ]]]]);
     }
 
@@ -4406,8 +4364,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/port-adsls')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'port_id', 'adslAtucCurrSnrMgn', 'adslAtucChanCurrTxRate',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'atucCurrentSnrMargin', 'atucChannelCurrentTransmitRate',
             ]]]]);
     }
 
@@ -4416,7 +4373,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/port-adsls', ['adslLineCoding' => 'DMT'])
+        $this->postJsonApi('/api/v1/port-adsls', ['lineCoding' => 'DMT'])
             ->assertStatus(403);
     }
 
@@ -4458,8 +4415,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/port-vdsls')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'port_id', 'xdsl2LineStatusAttainableRateDs', 'xdsl2ChStatusActDataRateXtur',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'attainableRateDownstream', 'actualDataRateReceive',
             ]]]]);
     }
 
@@ -4468,7 +4424,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/port-vdsls', ['xdsl2LineStatusAttainableRateDs' => 100000])
+        $this->postJsonApi('/api/v1/port-vdsls', ['attainableRateDownstream' => 100000])
             ->assertStatus(403);
     }
 
@@ -4510,8 +4466,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ports-nacs')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'port_id', 'username', 'mac_address', 'authz_status',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'username', 'macAddress', 'authorizationStatus',
             ]]]]);
     }
 
@@ -4559,8 +4514,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/port-securities')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'port_id', 'device_id', 'status', 'max_addresses',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'status', 'maxAddresses',
             ]]]]);
     }
 
@@ -4569,7 +4523,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/port-securities', ['status' => 'secureup'])
+        $this->postJsonApi('/api/v1/port-securities', ['isUp' => 'secureup'])
             ->assertStatus(403);
     }
 
@@ -4612,7 +4566,6 @@ class RestifyApiTest extends DBTestCase
         $this->getJson('/api/v1/port-statistics')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [
-                'port_id',
             ]]]]);
     }
 
@@ -4660,8 +4613,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/cef-switchings')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [
-                'device_id', 'afi', 'cef_path', 'drop', 'punt',
+            ->assertJsonStructure(['data' => [['attributes' => [ 'afi', 'path', 'drops', 'punts',
             ]]]]);
     }
 
@@ -4670,7 +4622,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/cef-switchings', ['cef_path' => 'receive'])
+        $this->postJsonApi('/api/v1/cef-switchings', ['path' => 'receive'])
             ->assertStatus(403);
     }
 }

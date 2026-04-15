@@ -6,6 +6,9 @@ use App\Models\PortStack;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class PortStackRepository extends Repository
 {
@@ -15,23 +18,7 @@ class PortStackRepository extends Repository
 
     public static string $title = 'ifStackStatus';
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'high_ifIndex' => 'integer',
-        'high_port_id' => 'integer',
-        'low_ifIndex' => 'integer',
-        'low_port_id' => 'integer',
-        'ifStackStatus' => 'text',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'high_ifIndex',
-        'high_port_id',
-        'low_ifIndex',
-        'low_port_id',
-        'ifStackStatus',
-    ];
 
     public static function related(): array
     {
@@ -40,15 +27,35 @@ class PortStackRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'highInterfaceIndex' => MatchFilter::make()->setType('integer')->setColumn('high_ifIndex'),
+            'lowInterfaceIndex' => MatchFilter::make()->setType('integer')->setColumn('low_ifIndex'),
+            'stackStatus' => MatchFilter::make()->setType('text')->setColumn('ifStackStatus'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'highInterfaceIndex' => SortableFilter::make()->setColumn('high_ifIndex'),
+            'lowInterfaceIndex' => SortableFilter::make()->setColumn('low_ifIndex'),
+            'stackStatus' => SortableFilter::make()->setColumn('ifStackStatus'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('high_ifIndex')->readonly(),
-            field('high_port_id')->readonly(),
-            field('low_ifIndex')->readonly(),
-            field('low_port_id')->readonly(),
-            field('ifStackStatus')->readonly(),
+            field('highInterfaceIndex', fn ($value, $model) => $model->high_ifIndex)->readonly(),
+            field('lowInterfaceIndex', fn ($value, $model) => $model->low_ifIndex)->readonly(),
+            field('stackStatus', fn ($value, $model) => $model->ifStackStatus)->readonly(),
         ];
     }
 

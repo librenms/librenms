@@ -6,6 +6,9 @@ use App\Models\MplsTunnelCHop;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class MplsTunnelCHopRepository extends Repository
 {
@@ -17,35 +20,8 @@ class MplsTunnelCHopRepository extends Repository
 
     public static string $title = 'mplsTunnelCHopIpv4Addr';
 
-    public static array $search = [
-        'mplsTunnelCHopIpv4Addr',
-    ];
 
-    public static array $match = [
-        'mplsTunnelCHopListIndex' => 'integer',
-        'mplsTunnelCHopIndex' => 'integer',
-        'lsp_path_id' => 'integer',
-        'device_id' => 'integer',
-        'mplsTunnelCHopAddrType' => 'text',
-        'mplsTunnelCHopIpv4Addr' => 'text',
-        'mplsTunnelCHopIpv6Addr' => 'text',
-        'mplsTunnelCHopAsNumber' => 'integer',
-        'mplsTunnelCHopStrictOrLoose' => 'text',
-        'mplsTunnelCHopRouterId' => 'text',
-    ];
 
-    public static array $sort = [
-        'mplsTunnelCHopListIndex',
-        'mplsTunnelCHopIndex',
-        'lsp_path_id',
-        'device_id',
-        'mplsTunnelCHopAddrType',
-        'mplsTunnelCHopIpv4Addr',
-        'mplsTunnelCHopIpv6Addr',
-        'mplsTunnelCHopAsNumber',
-        'mplsTunnelCHopStrictOrLoose',
-        'mplsTunnelCHopRouterId',
-    ];
 
     public static function related(): array
     {
@@ -55,19 +31,50 @@ class MplsTunnelCHopRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'listIndex' => MatchFilter::make()->setType('integer')->setColumn('mplsTunnelCHopListIndex'),
+            'index' => MatchFilter::make()->setType('integer')->setColumn('mplsTunnelCHopIndex'),
+            'addressCategory' => MatchFilter::make()->setType('text')->setColumn('mplsTunnelCHopAddrType'),
+            'ipv4Address' => MatchFilter::make()->setType('text')->setColumn('mplsTunnelCHopIpv4Addr'),
+            'ipv6Address' => MatchFilter::make()->setType('text')->setColumn('mplsTunnelCHopIpv6Addr'),
+            'asNumber' => MatchFilter::make()->setType('integer')->setColumn('mplsTunnelCHopAsNumber'),
+            'strictOrLoose' => MatchFilter::make()->setType('text')->setColumn('mplsTunnelCHopStrictOrLoose'),
+            'routerId' => MatchFilter::make()->setType('text')->setColumn('mplsTunnelCHopRouterId'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'listIndex' => SortableFilter::make()->setColumn('mplsTunnelCHopListIndex'),
+            'index' => SortableFilter::make()->setColumn('mplsTunnelCHopIndex'),
+            'addressCategory' => SortableFilter::make()->setColumn('mplsTunnelCHopAddrType'),
+            'ipv4Address' => SortableFilter::make()->setColumn('mplsTunnelCHopIpv4Addr'),
+            'ipv6Address' => SortableFilter::make()->setColumn('mplsTunnelCHopIpv6Addr'),
+            'asNumber' => SortableFilter::make()->setColumn('mplsTunnelCHopAsNumber'),
+            'strictOrLoose' => SortableFilter::make()->setColumn('mplsTunnelCHopStrictOrLoose'),
+            'routerId' => SortableFilter::make()->setColumn('mplsTunnelCHopRouterId'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('mplsTunnelCHopListIndex')->readonly(),
-            field('mplsTunnelCHopIndex')->readonly(),
-            field('lsp_path_id')->readonly(),
-            field('device_id')->readonly(),
-            field('mplsTunnelCHopAddrType')->readonly(),
-            field('mplsTunnelCHopIpv4Addr')->readonly(),
-            field('mplsTunnelCHopIpv6Addr')->readonly(),
-            field('mplsTunnelCHopAsNumber')->readonly(),
-            field('mplsTunnelCHopStrictOrLoose')->readonly(),
-            field('mplsTunnelCHopRouterId')->readonly(),
+            field('listIndex', fn ($value, $model) => $model->mplsTunnelCHopListIndex)->readonly(),
+            field('index', fn ($value, $model) => $model->mplsTunnelCHopIndex)->readonly(),
+            field('addressCategory', fn ($value, $model) => $model->mplsTunnelCHopAddrType)->readonly(),
+            field('ipv4Address', fn ($value, $model) => $model->mplsTunnelCHopIpv4Addr)->readonly(),
+            field('ipv6Address', fn ($value, $model) => $model->mplsTunnelCHopIpv6Addr)->readonly(),
+            field('asNumber', fn ($value, $model) => $model->mplsTunnelCHopAsNumber)->readonly(),
+            field('strictOrLoose', fn ($value, $model) => $model->mplsTunnelCHopStrictOrLoose)->readonly(),
+            field('routerId', fn ($value, $model) => $model->mplsTunnelCHopRouterId)->readonly(),
         ];
     }
 

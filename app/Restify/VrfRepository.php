@@ -6,6 +6,9 @@ use App\Models\Vrf;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class VrfRepository extends Repository
 {
@@ -22,28 +25,8 @@ class VrfRepository extends Repository
 
     public static string $title = 'vrf_name';
 
-    public static array $search = [
-        'vrf_name',
-        'vrf_oid',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'vrf_oid' => 'text',
-        'vrf_name' => 'text',
-        'bgpLocalAs' => 'integer',
-        'mplsVpnVrfRouteDistinguisher' => 'text',
-        'mplsVpnVrfDescription' => 'text',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'vrf_oid',
-        'vrf_name',
-        'bgpLocalAs',
-        'mplsVpnVrfRouteDistinguisher',
-        'mplsVpnVrfDescription',
-    ];
 
     public static function related(): array
     {
@@ -52,15 +35,43 @@ class VrfRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'name' => SearchableFilter::make()->setColumn('vrf_name'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'oid' => MatchFilter::make()->setType('text')->setColumn('vrf_oid'),
+            'name' => MatchFilter::make()->setType('text')->setColumn('vrf_name'),
+            'bgpLocalAs' => MatchFilter::make()->setType('integer')->setColumn('bgpLocalAs'),
+            'routeDistinguisher' => MatchFilter::make()->setType('text')->setColumn('mplsVpnVrfRouteDistinguisher'),
+            'description' => MatchFilter::make()->setType('text')->setColumn('mplsVpnVrfDescription'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'oid' => SortableFilter::make()->setColumn('vrf_oid'),
+            'name' => SortableFilter::make()->setColumn('vrf_name'),
+            'bgpLocalAs' => SortableFilter::make()->setColumn('bgpLocalAs'),
+            'routeDistinguisher' => SortableFilter::make()->setColumn('mplsVpnVrfRouteDistinguisher'),
+            'description' => SortableFilter::make()->setColumn('mplsVpnVrfDescription'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('vrf_oid')->readonly(),
-            field('vrf_name')->readonly(),
+            field('oid', fn ($value, $model) => $model->vrf_oid)->readonly(),
+            field('name', fn ($value, $model) => $model->vrf_name)->readonly(),
             field('bgpLocalAs')->readonly(),
-            field('mplsVpnVrfRouteDistinguisher')->readonly(),
-            field('mplsVpnVrfDescription')->readonly(),
+            field('routeDistinguisher', fn ($value, $model) => $model->mplsVpnVrfRouteDistinguisher)->readonly(),
+            field('description', fn ($value, $model) => $model->mplsVpnVrfDescription)->readonly(),
         ];
     }
 

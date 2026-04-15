@@ -6,6 +6,9 @@ use App\Models\Stp;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class StpRepository extends Repository
 {
@@ -17,52 +20,8 @@ class StpRepository extends Repository
 
     public static string $title = 'bridgeAddress';
 
-    public static array $search = [
-        'bridgeAddress',
-        'designatedRoot',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'vlan' => 'integer',
-        'rootBridge' => 'integer',
-        'bridgeAddress' => 'text',
-        'protocolSpecification' => 'text',
-        'priority' => 'integer',
-        'timeSinceTopologyChange' => 'text',
-        'topChanges' => 'integer',
-        'designatedRoot' => 'text',
-        'rootCost' => 'integer',
-        'rootPort' => 'integer',
-        'maxAge' => 'integer',
-        'helloTime' => 'integer',
-        'holdTime' => 'integer',
-        'forwardDelay' => 'integer',
-        'bridgeMaxAge' => 'integer',
-        'bridgeHelloTime' => 'integer',
-        'bridgeForwardDelay' => 'integer',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'vlan',
-        'rootBridge',
-        'bridgeAddress',
-        'protocolSpecification',
-        'priority',
-        'timeSinceTopologyChange',
-        'topChanges',
-        'designatedRoot',
-        'rootCost',
-        'rootPort',
-        'maxAge',
-        'helloTime',
-        'holdTime',
-        'forwardDelay',
-        'bridgeMaxAge',
-        'bridgeHelloTime',
-        'bridgeForwardDelay',
-    ];
 
     public static function related(): array
     {
@@ -71,17 +30,70 @@ class StpRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'rootBridge' => SearchableFilter::make()->setColumn('rootBridge'),
+            'bridgeAddress' => SearchableFilter::make()->setColumn('bridgeAddress'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'vlan' => MatchFilter::make()->setType('integer')->setColumn('vlan'),
+            'rootBridge' => MatchFilter::make()->setType('text')->setColumn('rootBridge'),
+            'bridgeAddress' => MatchFilter::make()->setType('text')->setColumn('bridgeAddress'),
+            'protocolSpecification' => MatchFilter::make()->setType('integer')->setColumn('protocolSpecification'),
+            'priority' => MatchFilter::make()->setType('integer')->setColumn('priority'),
+            'timeSinceTopologyChange' => MatchFilter::make()->setType('integer')->setColumn('timeSinceTopologyChange'),
+            'topologyChanges' => MatchFilter::make()->setType('integer')->setColumn('topChanges'),
+            'designatedRoot' => MatchFilter::make()->setType('text')->setColumn('designatedRoot'),
+            'rootCost' => MatchFilter::make()->setType('integer')->setColumn('rootCost'),
+            'rootPort' => MatchFilter::make()->setType('integer')->setColumn('rootPort'),
+            'maxAge' => MatchFilter::make()->setType('integer')->setColumn('maxAge'),
+            'helloTime' => MatchFilter::make()->setType('integer')->setColumn('helloTime'),
+            'holdTime' => MatchFilter::make()->setType('integer')->setColumn('holdTime'),
+            'forwardDelay' => MatchFilter::make()->setType('integer')->setColumn('forwardDelay'),
+            'bridgeMaxAge' => MatchFilter::make()->setType('integer')->setColumn('bridgeMaxAge'),
+            'bridgeHelloTime' => MatchFilter::make()->setType('integer')->setColumn('bridgeHelloTime'),
+            'bridgeForwardDelay' => MatchFilter::make()->setType('integer')->setColumn('bridgeForwardDelay'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'vlan' => SortableFilter::make()->setColumn('vlan'),
+            'rootBridge' => SortableFilter::make()->setColumn('rootBridge'),
+            'bridgeAddress' => SortableFilter::make()->setColumn('bridgeAddress'),
+            'protocolSpecification' => SortableFilter::make()->setColumn('protocolSpecification'),
+            'priority' => SortableFilter::make()->setColumn('priority'),
+            'timeSinceTopologyChange' => SortableFilter::make()->setColumn('timeSinceTopologyChange'),
+            'topologyChanges' => SortableFilter::make()->setColumn('topChanges'),
+            'designatedRoot' => SortableFilter::make()->setColumn('designatedRoot'),
+            'rootCost' => SortableFilter::make()->setColumn('rootCost'),
+            'rootPort' => SortableFilter::make()->setColumn('rootPort'),
+            'maxAge' => SortableFilter::make()->setColumn('maxAge'),
+            'helloTime' => SortableFilter::make()->setColumn('helloTime'),
+            'holdTime' => SortableFilter::make()->setColumn('holdTime'),
+            'forwardDelay' => SortableFilter::make()->setColumn('forwardDelay'),
+            'bridgeMaxAge' => SortableFilter::make()->setColumn('bridgeMaxAge'),
+            'bridgeHelloTime' => SortableFilter::make()->setColumn('bridgeHelloTime'),
+            'bridgeForwardDelay' => SortableFilter::make()->setColumn('bridgeForwardDelay'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
             field('vlan')->readonly(),
             field('rootBridge')->readonly(),
             field('bridgeAddress')->readonly(),
             field('protocolSpecification')->readonly(),
             field('priority')->readonly(),
             field('timeSinceTopologyChange')->readonly(),
-            field('topChanges')->readonly(),
+            field('topologyChanges', fn ($value, $model) => $model->topChanges)->readonly(),
             field('designatedRoot')->readonly(),
             field('rootCost')->readonly(),
             field('rootPort')->readonly(),

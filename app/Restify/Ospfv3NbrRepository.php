@@ -6,6 +6,9 @@ use App\Models\Ospfv3Nbr;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class Ospfv3NbrRepository extends Repository
 {
@@ -15,54 +18,8 @@ class Ospfv3NbrRepository extends Repository
 
     public static string $title = 'ospfv3NbrRtrId';
 
-    public static array $search = [
-        'ospfv3NbrRtrId',
-        'ospfv3NbrAddress',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'ospfv3_instance_id' => 'integer',
-        'port_id' => 'integer',
-        'context_name' => 'text',
-        'ospfv3NbrRtrId' => 'integer',
-        'ospfv3NbrAddress' => 'text',
-        'ospfv3NbrAddressType' => 'text',
-        'ospfv3NbrOptions' => 'integer',
-        'ospfv3NbrPriority' => 'integer',
-        'ospfv3NbrState' => 'text',
-        'ospfv3NbrEvents' => 'integer',
-        'ospfv3NbrLsRetransQLen' => 'integer',
-        'ospfv3NbmaNbrStatus' => 'text',
-        'ospfv3NbmaNbrPermanence' => 'text',
-        'ospfv3NbrHelloSuppressed' => 'text',
-        'ospfv3NbrIfId' => 'integer',
-        'ospfv3NbrRestartHelperStatus' => 'text',
-        'ospfv3NbrRestartHelperAge' => 'integer',
-        'ospfv3NbrRestartHelperExitReason' => 'text',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'ospfv3_instance_id',
-        'port_id',
-        'context_name',
-        'ospfv3NbrRtrId',
-        'ospfv3NbrAddress',
-        'ospfv3NbrAddressType',
-        'ospfv3NbrOptions',
-        'ospfv3NbrPriority',
-        'ospfv3NbrState',
-        'ospfv3NbrEvents',
-        'ospfv3NbrLsRetransQLen',
-        'ospfv3NbmaNbrStatus',
-        'ospfv3NbmaNbrPermanence',
-        'ospfv3NbrHelloSuppressed',
-        'ospfv3NbrIfId',
-        'ospfv3NbrRestartHelperStatus',
-        'ospfv3NbrRestartHelperAge',
-        'ospfv3NbrRestartHelperExitReason',
-    ];
 
     public static function related(): array
     {
@@ -71,28 +28,76 @@ class Ospfv3NbrRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'routerId' => SearchableFilter::make()->setColumn('ospfv3NbrRtrId'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'routerId' => MatchFilter::make()->setType('text')->setColumn('ospfv3NbrRtrId'),
+            'address' => MatchFilter::make()->setType('text')->setColumn('ospfv3NbrAddress'),
+            'addressCategory' => MatchFilter::make()->setType('text')->setColumn('ospfv3NbrAddressType'),
+            'options' => MatchFilter::make()->setType('integer')->setColumn('ospfv3NbrOptions'),
+            'priority' => MatchFilter::make()->setType('integer')->setColumn('ospfv3NbrPriority'),
+            'state' => MatchFilter::make()->setType('text')->setColumn('ospfv3NbrState'),
+            'events' => MatchFilter::make()->setType('integer')->setColumn('ospfv3NbrEvents'),
+            'lsRetransmitQueueLength' => MatchFilter::make()->setType('integer')->setColumn('ospfv3NbrLsRetransQLen'),
+            'nbmaStatus' => MatchFilter::make()->setType('text')->setColumn('ospfv3NbmaNbrStatus'),
+            'nbmaPermanence' => MatchFilter::make()->setType('text')->setColumn('ospfv3NbmaNbrPermanence'),
+            'isHelloSuppressed' => MatchFilter::make()->setType('bool')->setColumn('ospfv3NbrHelloSuppressed'),
+            'interfaceId' => MatchFilter::make()->setType('integer')->setColumn('ospfv3NbrIfId'),
+            'restartHelperStatus' => MatchFilter::make()->setType('text')->setColumn('ospfv3NbrRestartHelperStatus'),
+            'restartHelperAge' => MatchFilter::make()->setType('integer')->setColumn('ospfv3NbrRestartHelperAge'),
+            'restartHelperExitReason' => MatchFilter::make()->setType('text')->setColumn('ospfv3NbrRestartHelperExitReason'),
+            'contextName' => MatchFilter::make()->setType('text')->setColumn('context_name'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'routerId' => SortableFilter::make()->setColumn('ospfv3NbrRtrId'),
+            'address' => SortableFilter::make()->setColumn('ospfv3NbrAddress'),
+            'addressCategory' => SortableFilter::make()->setColumn('ospfv3NbrAddressType'),
+            'options' => SortableFilter::make()->setColumn('ospfv3NbrOptions'),
+            'priority' => SortableFilter::make()->setColumn('ospfv3NbrPriority'),
+            'state' => SortableFilter::make()->setColumn('ospfv3NbrState'),
+            'events' => SortableFilter::make()->setColumn('ospfv3NbrEvents'),
+            'lsRetransmitQueueLength' => SortableFilter::make()->setColumn('ospfv3NbrLsRetransQLen'),
+            'nbmaStatus' => SortableFilter::make()->setColumn('ospfv3NbmaNbrStatus'),
+            'nbmaPermanence' => SortableFilter::make()->setColumn('ospfv3NbmaNbrPermanence'),
+            'isHelloSuppressed' => SortableFilter::make()->setColumn('ospfv3NbrHelloSuppressed'),
+            'interfaceId' => SortableFilter::make()->setColumn('ospfv3NbrIfId'),
+            'restartHelperStatus' => SortableFilter::make()->setColumn('ospfv3NbrRestartHelperStatus'),
+            'restartHelperAge' => SortableFilter::make()->setColumn('ospfv3NbrRestartHelperAge'),
+            'restartHelperExitReason' => SortableFilter::make()->setColumn('ospfv3NbrRestartHelperExitReason'),
+            'contextName' => SortableFilter::make()->setColumn('context_name'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('ospfv3_instance_id')->readonly(),
-            field('port_id')->readonly(),
-            field('context_name')->readonly(),
-            field('ospfv3NbrRtrId')->readonly(),
-            field('ospfv3NbrAddress')->readonly(),
-            field('ospfv3NbrAddressType')->readonly(),
-            field('ospfv3NbrOptions')->readonly(),
-            field('ospfv3NbrPriority')->readonly(),
-            field('ospfv3NbrState')->readonly(),
-            field('ospfv3NbrEvents')->readonly(),
-            field('ospfv3NbrLsRetransQLen')->readonly(),
-            field('ospfv3NbmaNbrStatus')->readonly(),
-            field('ospfv3NbmaNbrPermanence')->readonly(),
-            field('ospfv3NbrHelloSuppressed')->readonly(),
-            field('ospfv3NbrIfId')->readonly(),
-            field('ospfv3NbrRestartHelperStatus')->readonly(),
-            field('ospfv3NbrRestartHelperAge')->readonly(),
-            field('ospfv3NbrRestartHelperExitReason')->readonly(),
+            field('routerId', fn ($value, $model) => $model->ospfv3NbrRtrId)->readonly(),
+            field('address', fn ($value, $model) => $model->ospfv3NbrAddress)->readonly(),
+            field('addressCategory', fn ($value, $model) => $model->ospfv3NbrAddressType)->readonly(),
+            field('options', fn ($value, $model) => $model->ospfv3NbrOptions)->readonly(),
+            field('priority', fn ($value, $model) => $model->ospfv3NbrPriority)->readonly(),
+            field('state', fn ($value, $model) => $model->ospfv3NbrState)->readonly(),
+            field('events', fn ($value, $model) => $model->ospfv3NbrEvents)->readonly(),
+            field('lsRetransmitQueueLength', fn ($value, $model) => $model->ospfv3NbrLsRetransQLen)->readonly(),
+            field('nbmaStatus', fn ($value, $model) => $model->ospfv3NbmaNbrStatus)->readonly(),
+            field('nbmaPermanence', fn ($value, $model) => $model->ospfv3NbmaNbrPermanence)->readonly(),
+            field('isHelloSuppressed', fn ($value, $model) => $model->ospfv3NbrHelloSuppressed)->readonly(),
+            field('interfaceId', fn ($value, $model) => $model->ospfv3NbrIfId)->readonly(),
+            field('restartHelperStatus', fn ($value, $model) => $model->ospfv3NbrRestartHelperStatus)->readonly(),
+            field('restartHelperAge', fn ($value, $model) => $model->ospfv3NbrRestartHelperAge)->readonly(),
+            field('restartHelperExitReason', fn ($value, $model) => $model->ospfv3NbrRestartHelperExitReason)->readonly(),
+            field('contextName', fn ($value, $model) => $model->context_name)->readonly(),
         ];
     }
 

@@ -6,6 +6,9 @@ use App\Models\Port;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Fields\BelongsToMany;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class PortRepository extends Repository
 {
@@ -17,49 +20,8 @@ class PortRepository extends Repository
 
     public static string $title = 'ifName';
 
-    public static array $search = [
-        'ifName',
-        'ifAlias',
-        'ifDescr',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'ifIndex' => 'integer',
-        'ifName' => 'text',
-        'ifAlias' => 'text',
-        'ifDescr' => 'text',
-        'ifType' => 'text',
-        'ifSpeed' => 'integer',
-        'ifHighSpeed' => 'text',
-        'ifOperStatus' => 'text',
-        'ifAdminStatus' => 'text',
-        'ifMtu' => 'integer',
-        'ifPhysAddress' => 'text',
-        'ifInOctets' => 'integer',
-        'ifOutOctets' => 'integer',
-        'ifInErrors' => 'integer',
-        'ifOutErrors' => 'integer',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'ifIndex',
-        'ifName',
-        'ifAlias',
-        'ifDescr',
-        'ifType',
-        'ifSpeed',
-        'ifHighSpeed',
-        'ifOperStatus',
-        'ifAdminStatus',
-        'ifMtu',
-        'ifPhysAddress',
-        'ifInOctets',
-        'ifOutOctets',
-        'ifInErrors',
-        'ifOutErrors',
-    ];
 
     public static function related(): array
     {
@@ -69,25 +31,74 @@ class PortRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'name' => SearchableFilter::make()->setColumn('ifName'),
+            'alias' => SearchableFilter::make()->setColumn('ifAlias'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'interfaceIndex' => MatchFilter::make()->setType('integer')->setColumn('ifIndex'),
+            'name' => MatchFilter::make()->setType('text')->setColumn('ifName'),
+            'alias' => MatchFilter::make()->setType('text')->setColumn('ifAlias'),
+            'description' => MatchFilter::make()->setType('text')->setColumn('ifDescr'),
+            'category' => MatchFilter::make()->setType('text')->setColumn('ifType'),
+            'speed' => MatchFilter::make()->setType('integer')->setColumn('ifSpeed'),
+            'highSpeed' => MatchFilter::make()->setType('integer')->setColumn('ifHighSpeed'),
+            'operationalStatus' => MatchFilter::make()->setType('text')->setColumn('ifOperStatus'),
+            'adminStatus' => MatchFilter::make()->setType('text')->setColumn('ifAdminStatus'),
+            'mtu' => MatchFilter::make()->setType('integer')->setColumn('ifMtu'),
+            'physicalAddress' => MatchFilter::make()->setType('text')->setColumn('ifPhysAddress'),
+            'inOctets' => MatchFilter::make()->setType('integer')->setColumn('ifInOctets'),
+            'outOctets' => MatchFilter::make()->setType('integer')->setColumn('ifOutOctets'),
+            'inErrors' => MatchFilter::make()->setType('integer')->setColumn('ifInErrors'),
+            'outErrors' => MatchFilter::make()->setType('integer')->setColumn('ifOutErrors'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'interfaceIndex' => SortableFilter::make()->setColumn('ifIndex'),
+            'name' => SortableFilter::make()->setColumn('ifName'),
+            'alias' => SortableFilter::make()->setColumn('ifAlias'),
+            'description' => SortableFilter::make()->setColumn('ifDescr'),
+            'category' => SortableFilter::make()->setColumn('ifType'),
+            'speed' => SortableFilter::make()->setColumn('ifSpeed'),
+            'highSpeed' => SortableFilter::make()->setColumn('ifHighSpeed'),
+            'operationalStatus' => SortableFilter::make()->setColumn('ifOperStatus'),
+            'adminStatus' => SortableFilter::make()->setColumn('ifAdminStatus'),
+            'mtu' => SortableFilter::make()->setColumn('ifMtu'),
+            'physicalAddress' => SortableFilter::make()->setColumn('ifPhysAddress'),
+            'inOctets' => SortableFilter::make()->setColumn('ifInOctets'),
+            'outOctets' => SortableFilter::make()->setColumn('ifOutOctets'),
+            'inErrors' => SortableFilter::make()->setColumn('ifInErrors'),
+            'outErrors' => SortableFilter::make()->setColumn('ifOutErrors'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('ifIndex')->readonly(),
-            field('ifName')->readonly(),
-            field('ifAlias')->readonly(),
-            field('ifDescr')->readonly(),
-            field('ifType')->readonly(),
-            field('ifSpeed')->readonly(),
-            field('ifHighSpeed')->readonly(),
-            field('ifOperStatus')->readonly(),
-            field('ifAdminStatus')->readonly(),
-            field('ifMtu')->readonly(),
-            field('ifPhysAddress')->readonly(),
-            field('ifInOctets')->readonly(),
-            field('ifOutOctets')->readonly(),
-            field('ifInErrors')->readonly(),
-            field('ifOutErrors')->readonly(),
+            field('interfaceIndex', fn ($value, $model) => $model->ifIndex)->readonly(),
+            field('name', fn ($value, $model) => $model->ifName)->readonly(),
+            field('alias', fn ($value, $model) => $model->ifAlias)->readonly(),
+            field('description', fn ($value, $model) => $model->ifDescr)->readonly(),
+            field('category', fn ($value, $model) => $model->ifType)->readonly(),
+            field('speed', fn ($value, $model) => $model->ifSpeed)->readonly(),
+            field('highSpeed', fn ($value, $model) => $model->ifHighSpeed)->readonly(),
+            field('operationalStatus', fn ($value, $model) => $model->ifOperStatus)->readonly(),
+            field('adminStatus', fn ($value, $model) => $model->ifAdminStatus)->readonly(),
+            field('mtu', fn ($value, $model) => $model->ifMtu)->readonly(),
+            field('physicalAddress', fn ($value, $model) => $model->ifPhysAddress)->readonly(),
+            field('inOctets', fn ($value, $model) => $model->ifInOctets)->readonly(),
+            field('outOctets', fn ($value, $model) => $model->ifOutOctets)->readonly(),
+            field('inErrors', fn ($value, $model) => $model->ifInErrors)->readonly(),
+            field('outErrors', fn ($value, $model) => $model->ifOutErrors)->readonly(),
         ];
     }
 }

@@ -6,6 +6,9 @@ use App\Models\Sla;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class SlaRepository extends Repository
 {
@@ -17,33 +20,8 @@ class SlaRepository extends Repository
 
     public static string $title = 'tag';
 
-    public static array $search = [
-        'owner',
-        'tag',
-        'rtt_type',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'sla_nr' => 'integer',
-        'owner' => 'text',
-        'tag' => 'text',
-        'rtt_type' => 'text',
-        'rtt' => 'integer',
-        'status' => 'integer',
-        'opstatus' => 'integer',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'sla_nr',
-        'owner',
-        'tag',
-        'rtt_type',
-        'rtt',
-        'status',
-        'opstatus',
-    ];
 
     public static function related(): array
     {
@@ -52,17 +30,49 @@ class SlaRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'tag' => SearchableFilter::make()->setColumn('tag'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'number' => MatchFilter::make()->setType('integer')->setColumn('sla_nr'),
+            'owner' => MatchFilter::make()->setType('text')->setColumn('owner'),
+            'tag' => MatchFilter::make()->setType('text')->setColumn('tag'),
+            'rttCategory' => MatchFilter::make()->setType('text')->setColumn('rtt_type'),
+            'rtt' => MatchFilter::make()->setType('integer')->setColumn('rtt'),
+            'status' => MatchFilter::make()->setType('text')->setColumn('status'),
+            'operationalStatus' => MatchFilter::make()->setType('text')->setColumn('opstatus'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'number' => SortableFilter::make()->setColumn('sla_nr'),
+            'owner' => SortableFilter::make()->setColumn('owner'),
+            'tag' => SortableFilter::make()->setColumn('tag'),
+            'rttCategory' => SortableFilter::make()->setColumn('rtt_type'),
+            'rtt' => SortableFilter::make()->setColumn('rtt'),
+            'status' => SortableFilter::make()->setColumn('status'),
+            'operationalStatus' => SortableFilter::make()->setColumn('opstatus'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('sla_nr')->readonly(),
+            field('number', fn ($value, $model) => $model->sla_nr)->readonly(),
             field('owner')->readonly(),
             field('tag')->readonly(),
-            field('rtt_type')->readonly(),
+            field('rttCategory', fn ($value, $model) => $model->rtt_type)->readonly(),
             field('rtt')->readonly(),
             field('status')->readonly(),
-            field('opstatus')->readonly(),
+            field('operationalStatus', fn ($value, $model) => $model->opstatus)->readonly(),
         ];
     }
 

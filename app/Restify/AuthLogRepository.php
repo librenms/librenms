@@ -7,6 +7,9 @@ use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class AuthLogRepository extends Repository
 {
@@ -14,29 +17,40 @@ class AuthLogRepository extends Repository
 
     public static string $title = 'user';
 
-    public static array $search = [
-        'user',
-        'address',
-    ];
 
-    public static array $match = [
-        'datetime' => 'datetime',
-        'user' => 'text',
-        'address' => 'text',
-        'result' => 'text',
-    ];
 
-    public static array $sort = [
-        'datetime',
-        'user',
-        'address',
-        'result',
-    ];
+
+    public static function searchables(): array
+    {
+        return [
+            'user' => SearchableFilter::make()->setColumn('user'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'createdAt' => MatchFilter::make()->setType('datetime')->setColumn('datetime'),
+            'user' => MatchFilter::make()->setType('text')->setColumn('user'),
+            'address' => MatchFilter::make()->setType('text')->setColumn('address'),
+            'result' => MatchFilter::make()->setType('text')->setColumn('result'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'createdAt' => SortableFilter::make()->setColumn('datetime'),
+            'user' => SortableFilter::make()->setColumn('user'),
+            'address' => SortableFilter::make()->setColumn('address'),
+            'result' => SortableFilter::make()->setColumn('result'),
+        ];
+    }
 
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('datetime')->readonly(),
+            field('createdAt', fn ($value, $model) => $model->datetime)->readonly(),
             field('user')->readonly(),
             field('address')->readonly(),
             field('result')->readonly(),

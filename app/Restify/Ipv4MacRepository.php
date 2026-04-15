@@ -5,6 +5,9 @@ namespace App\Restify;
 use App\Models\Ipv4Mac;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class Ipv4MacRepository extends Repository
 {
@@ -14,35 +17,41 @@ class Ipv4MacRepository extends Repository
 
     public static string $title = 'ipv4_address';
 
-    public static array $search = [
-        'ipv4_address',
-        'mac_address',
-    ];
 
-    public static array $match = [
-        'port_id' => 'integer',
-        'device_id' => 'integer',
-        'mac_address' => 'text',
-        'ipv4_address' => 'text',
-        'context_name' => 'text',
-    ];
 
-    public static array $sort = [
-        'port_id',
-        'device_id',
-        'mac_address',
-        'ipv4_address',
-        'context_name',
-    ];
+
+    public static function searchables(): array
+    {
+        return [
+            'macAddress' => SearchableFilter::make()->setColumn('mac_address'),
+            'ipv4Address' => SearchableFilter::make()->setColumn('ipv4_address'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'macAddress' => MatchFilter::make()->setType('text')->setColumn('mac_address'),
+            'ipv4Address' => MatchFilter::make()->setType('text')->setColumn('ipv4_address'),
+            'contextName' => MatchFilter::make()->setType('text')->setColumn('context_name'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'macAddress' => SortableFilter::make()->setColumn('mac_address'),
+            'ipv4Address' => SortableFilter::make()->setColumn('ipv4_address'),
+            'contextName' => SortableFilter::make()->setColumn('context_name'),
+        ];
+    }
 
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('port_id')->readonly(),
-            field('device_id')->readonly(),
-            field('mac_address')->readonly(),
-            field('ipv4_address')->readonly(),
-            field('context_name')->readonly(),
+            field('macAddress', fn ($value, $model) => $model->mac_address)->readonly(),
+            field('ipv4Address', fn ($value, $model) => $model->ipv4_address)->readonly(),
+            field('contextName', fn ($value, $model) => $model->context_name)->readonly(),
         ];
     }
 

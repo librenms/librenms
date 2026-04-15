@@ -5,6 +5,9 @@ namespace App\Restify;
 use App\Models\PortStatistic;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class PortStatisticRepository extends Repository
 {
@@ -16,99 +19,109 @@ class PortStatisticRepository extends Repository
 
     public static string $title = 'port_id';
 
-    public static array $match = [
-        'port_id' => 'integer',
-        'ifInNUcastPkts' => 'integer',
-        'ifInNUcastPkts_delta' => 'integer',
-        'ifInNUcastPkts_rate' => 'integer',
-        'ifOutNUcastPkts' => 'integer',
-        'ifOutNUcastPkts_delta' => 'integer',
-        'ifOutNUcastPkts_rate' => 'integer',
-        'ifInDiscards' => 'integer',
-        'ifInDiscards_delta' => 'integer',
-        'ifInDiscards_rate' => 'integer',
-        'ifOutDiscards' => 'integer',
-        'ifOutDiscards_delta' => 'integer',
-        'ifOutDiscards_rate' => 'integer',
-        'ifInUnknownProtos' => 'integer',
-        'ifInUnknownProtos_delta' => 'integer',
-        'ifInUnknownProtos_rate' => 'integer',
-        'ifInBroadcastPkts' => 'integer',
-        'ifInBroadcastPkts_delta' => 'integer',
-        'ifInBroadcastPkts_rate' => 'integer',
-        'ifOutBroadcastPkts' => 'integer',
-        'ifOutBroadcastPkts_delta' => 'integer',
-        'ifOutBroadcastPkts_rate' => 'integer',
-        'ifInMulticastPkts' => 'integer',
-        'ifInMulticastPkts_delta' => 'integer',
-        'ifInMulticastPkts_rate' => 'integer',
-        'ifOutMulticastPkts' => 'integer',
-        'ifOutMulticastPkts_delta' => 'integer',
-        'ifOutMulticastPkts_rate' => 'integer',
-    ];
 
-    public static array $sort = [
-        'port_id',
-        'ifInNUcastPkts',
-        'ifInNUcastPkts_delta',
-        'ifInNUcastPkts_rate',
-        'ifOutNUcastPkts',
-        'ifOutNUcastPkts_delta',
-        'ifOutNUcastPkts_rate',
-        'ifInDiscards',
-        'ifInDiscards_delta',
-        'ifInDiscards_rate',
-        'ifOutDiscards',
-        'ifOutDiscards_delta',
-        'ifOutDiscards_rate',
-        'ifInUnknownProtos',
-        'ifInUnknownProtos_delta',
-        'ifInUnknownProtos_rate',
-        'ifInBroadcastPkts',
-        'ifInBroadcastPkts_delta',
-        'ifInBroadcastPkts_rate',
-        'ifOutBroadcastPkts',
-        'ifOutBroadcastPkts_delta',
-        'ifOutBroadcastPkts_rate',
-        'ifInMulticastPkts',
-        'ifInMulticastPkts_delta',
-        'ifInMulticastPkts_rate',
-        'ifOutMulticastPkts',
-        'ifOutMulticastPkts_delta',
-        'ifOutMulticastPkts_rate',
-    ];
+
+    public static function searchables(): array
+    {
+        return [];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'inNonUnicastPackets' => MatchFilter::make()->setType('integer')->setColumn('ifInNUcastPkts'),
+            'inNonUnicastPacketsDelta' => MatchFilter::make()->setType('integer')->setColumn('ifInNUcastPkts_delta'),
+            'inNonUnicastPacketsRate' => MatchFilter::make()->setType('integer')->setColumn('ifInNUcastPkts_rate'),
+            'outNonUnicastPackets' => MatchFilter::make()->setType('integer')->setColumn('ifOutNUcastPkts'),
+            'outNonUnicastPacketsDelta' => MatchFilter::make()->setType('integer')->setColumn('ifOutNUcastPkts_delta'),
+            'outNonUnicastPacketsRate' => MatchFilter::make()->setType('integer')->setColumn('ifOutNUcastPkts_rate'),
+            'inDiscards' => MatchFilter::make()->setType('integer')->setColumn('ifInDiscards'),
+            'inDiscardsDelta' => MatchFilter::make()->setType('integer')->setColumn('ifInDiscards_delta'),
+            'inDiscardsRate' => MatchFilter::make()->setType('integer')->setColumn('ifInDiscards_rate'),
+            'outDiscards' => MatchFilter::make()->setType('integer')->setColumn('ifOutDiscards'),
+            'outDiscardsDelta' => MatchFilter::make()->setType('integer')->setColumn('ifOutDiscards_delta'),
+            'outDiscardsRate' => MatchFilter::make()->setType('integer')->setColumn('ifOutDiscards_rate'),
+            'inUnknownProtocols' => MatchFilter::make()->setType('integer')->setColumn('ifInUnknownProtos'),
+            'inUnknownProtocolsDelta' => MatchFilter::make()->setType('integer')->setColumn('ifInUnknownProtos_delta'),
+            'inUnknownProtocolsRate' => MatchFilter::make()->setType('integer')->setColumn('ifInUnknownProtos_rate'),
+            'inBroadcastPackets' => MatchFilter::make()->setType('integer')->setColumn('ifInBroadcastPkts'),
+            'inBroadcastPacketsDelta' => MatchFilter::make()->setType('integer')->setColumn('ifInBroadcastPkts_delta'),
+            'inBroadcastPacketsRate' => MatchFilter::make()->setType('integer')->setColumn('ifInBroadcastPkts_rate'),
+            'outBroadcastPackets' => MatchFilter::make()->setType('integer')->setColumn('ifOutBroadcastPkts'),
+            'outBroadcastPacketsDelta' => MatchFilter::make()->setType('integer')->setColumn('ifOutBroadcastPkts_delta'),
+            'outBroadcastPacketsRate' => MatchFilter::make()->setType('integer')->setColumn('ifOutBroadcastPkts_rate'),
+            'inMulticastPackets' => MatchFilter::make()->setType('integer')->setColumn('ifInMulticastPkts'),
+            'inMulticastPacketsDelta' => MatchFilter::make()->setType('integer')->setColumn('ifInMulticastPkts_delta'),
+            'inMulticastPacketsRate' => MatchFilter::make()->setType('integer')->setColumn('ifInMulticastPkts_rate'),
+            'outMulticastPackets' => MatchFilter::make()->setType('integer')->setColumn('ifOutMulticastPkts'),
+            'outMulticastPacketsDelta' => MatchFilter::make()->setType('integer')->setColumn('ifOutMulticastPkts_delta'),
+            'outMulticastPacketsRate' => MatchFilter::make()->setType('integer')->setColumn('ifOutMulticastPkts_rate'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'inNonUnicastPackets' => SortableFilter::make()->setColumn('ifInNUcastPkts'),
+            'inNonUnicastPacketsDelta' => SortableFilter::make()->setColumn('ifInNUcastPkts_delta'),
+            'inNonUnicastPacketsRate' => SortableFilter::make()->setColumn('ifInNUcastPkts_rate'),
+            'outNonUnicastPackets' => SortableFilter::make()->setColumn('ifOutNUcastPkts'),
+            'outNonUnicastPacketsDelta' => SortableFilter::make()->setColumn('ifOutNUcastPkts_delta'),
+            'outNonUnicastPacketsRate' => SortableFilter::make()->setColumn('ifOutNUcastPkts_rate'),
+            'inDiscards' => SortableFilter::make()->setColumn('ifInDiscards'),
+            'inDiscardsDelta' => SortableFilter::make()->setColumn('ifInDiscards_delta'),
+            'inDiscardsRate' => SortableFilter::make()->setColumn('ifInDiscards_rate'),
+            'outDiscards' => SortableFilter::make()->setColumn('ifOutDiscards'),
+            'outDiscardsDelta' => SortableFilter::make()->setColumn('ifOutDiscards_delta'),
+            'outDiscardsRate' => SortableFilter::make()->setColumn('ifOutDiscards_rate'),
+            'inUnknownProtocols' => SortableFilter::make()->setColumn('ifInUnknownProtos'),
+            'inUnknownProtocolsDelta' => SortableFilter::make()->setColumn('ifInUnknownProtos_delta'),
+            'inUnknownProtocolsRate' => SortableFilter::make()->setColumn('ifInUnknownProtos_rate'),
+            'inBroadcastPackets' => SortableFilter::make()->setColumn('ifInBroadcastPkts'),
+            'inBroadcastPacketsDelta' => SortableFilter::make()->setColumn('ifInBroadcastPkts_delta'),
+            'inBroadcastPacketsRate' => SortableFilter::make()->setColumn('ifInBroadcastPkts_rate'),
+            'outBroadcastPackets' => SortableFilter::make()->setColumn('ifOutBroadcastPkts'),
+            'outBroadcastPacketsDelta' => SortableFilter::make()->setColumn('ifOutBroadcastPkts_delta'),
+            'outBroadcastPacketsRate' => SortableFilter::make()->setColumn('ifOutBroadcastPkts_rate'),
+            'inMulticastPackets' => SortableFilter::make()->setColumn('ifInMulticastPkts'),
+            'inMulticastPacketsDelta' => SortableFilter::make()->setColumn('ifInMulticastPkts_delta'),
+            'inMulticastPacketsRate' => SortableFilter::make()->setColumn('ifInMulticastPkts_rate'),
+            'outMulticastPackets' => SortableFilter::make()->setColumn('ifOutMulticastPkts'),
+            'outMulticastPacketsDelta' => SortableFilter::make()->setColumn('ifOutMulticastPkts_delta'),
+            'outMulticastPacketsRate' => SortableFilter::make()->setColumn('ifOutMulticastPkts_rate'),
+        ];
+    }
 
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('port_id')->readonly(),
-            field('ifInNUcastPkts')->readonly(),
-            field('ifInNUcastPkts_delta')->readonly(),
-            field('ifInNUcastPkts_rate')->readonly(),
-            field('ifOutNUcastPkts')->readonly(),
-            field('ifOutNUcastPkts_delta')->readonly(),
-            field('ifOutNUcastPkts_rate')->readonly(),
-            field('ifInDiscards')->readonly(),
-            field('ifInDiscards_delta')->readonly(),
-            field('ifInDiscards_rate')->readonly(),
-            field('ifOutDiscards')->readonly(),
-            field('ifOutDiscards_delta')->readonly(),
-            field('ifOutDiscards_rate')->readonly(),
-            field('ifInUnknownProtos')->readonly(),
-            field('ifInUnknownProtos_delta')->readonly(),
-            field('ifInUnknownProtos_rate')->readonly(),
-            field('ifInBroadcastPkts')->readonly(),
-            field('ifInBroadcastPkts_delta')->readonly(),
-            field('ifInBroadcastPkts_rate')->readonly(),
-            field('ifOutBroadcastPkts')->readonly(),
-            field('ifOutBroadcastPkts_delta')->readonly(),
-            field('ifOutBroadcastPkts_rate')->readonly(),
-            field('ifInMulticastPkts')->readonly(),
-            field('ifInMulticastPkts_delta')->readonly(),
-            field('ifInMulticastPkts_rate')->readonly(),
-            field('ifOutMulticastPkts')->readonly(),
-            field('ifOutMulticastPkts_delta')->readonly(),
-            field('ifOutMulticastPkts_rate')->readonly(),
+            field('inNonUnicastPackets', fn ($value, $model) => $model->ifInNUcastPkts)->readonly(),
+            field('inNonUnicastPacketsDelta', fn ($value, $model) => $model->ifInNUcastPkts_delta)->readonly(),
+            field('inNonUnicastPacketsRate', fn ($value, $model) => $model->ifInNUcastPkts_rate)->readonly(),
+            field('outNonUnicastPackets', fn ($value, $model) => $model->ifOutNUcastPkts)->readonly(),
+            field('outNonUnicastPacketsDelta', fn ($value, $model) => $model->ifOutNUcastPkts_delta)->readonly(),
+            field('outNonUnicastPacketsRate', fn ($value, $model) => $model->ifOutNUcastPkts_rate)->readonly(),
+            field('inDiscards', fn ($value, $model) => $model->ifInDiscards)->readonly(),
+            field('inDiscardsDelta', fn ($value, $model) => $model->ifInDiscards_delta)->readonly(),
+            field('inDiscardsRate', fn ($value, $model) => $model->ifInDiscards_rate)->readonly(),
+            field('outDiscards', fn ($value, $model) => $model->ifOutDiscards)->readonly(),
+            field('outDiscardsDelta', fn ($value, $model) => $model->ifOutDiscards_delta)->readonly(),
+            field('outDiscardsRate', fn ($value, $model) => $model->ifOutDiscards_rate)->readonly(),
+            field('inUnknownProtocols', fn ($value, $model) => $model->ifInUnknownProtos)->readonly(),
+            field('inUnknownProtocolsDelta', fn ($value, $model) => $model->ifInUnknownProtos_delta)->readonly(),
+            field('inUnknownProtocolsRate', fn ($value, $model) => $model->ifInUnknownProtos_rate)->readonly(),
+            field('inBroadcastPackets', fn ($value, $model) => $model->ifInBroadcastPkts)->readonly(),
+            field('inBroadcastPacketsDelta', fn ($value, $model) => $model->ifInBroadcastPkts_delta)->readonly(),
+            field('inBroadcastPacketsRate', fn ($value, $model) => $model->ifInBroadcastPkts_rate)->readonly(),
+            field('outBroadcastPackets', fn ($value, $model) => $model->ifOutBroadcastPkts)->readonly(),
+            field('outBroadcastPacketsDelta', fn ($value, $model) => $model->ifOutBroadcastPkts_delta)->readonly(),
+            field('outBroadcastPacketsRate', fn ($value, $model) => $model->ifOutBroadcastPkts_rate)->readonly(),
+            field('inMulticastPackets', fn ($value, $model) => $model->ifInMulticastPkts)->readonly(),
+            field('inMulticastPacketsDelta', fn ($value, $model) => $model->ifInMulticastPkts_delta)->readonly(),
+            field('inMulticastPacketsRate', fn ($value, $model) => $model->ifInMulticastPkts_rate)->readonly(),
+            field('outMulticastPackets', fn ($value, $model) => $model->ifOutMulticastPkts)->readonly(),
+            field('outMulticastPacketsDelta', fn ($value, $model) => $model->ifOutMulticastPkts_delta)->readonly(),
+            field('outMulticastPacketsRate', fn ($value, $model) => $model->ifOutMulticastPkts_rate)->readonly(),
         ];
     }
 

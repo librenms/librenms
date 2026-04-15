@@ -6,6 +6,9 @@ use App\Models\IsisAdjacency;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class IsisAdjacencyRepository extends Repository
 {
@@ -15,42 +18,8 @@ class IsisAdjacencyRepository extends Repository
 
     public static string $title = 'isisISAdjNeighSysID';
 
-    public static array $search = [
-        'isisISAdjNeighSysID',
-        'isisISAdjIPAddrAddress',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'port_id' => 'integer',
-        'ifIndex' => 'integer',
-        'index' => 'text',
-        'isisISAdjState' => 'text',
-        'isisISAdjNeighSysType' => 'text',
-        'isisISAdjNeighSysID' => 'text',
-        'isisISAdjNeighPriority' => 'text',
-        'isisISAdjLastUpTime' => 'integer',
-        'isisISAdjAreaAddress' => 'text',
-        'isisISAdjIPAddrType' => 'text',
-        'isisISAdjIPAddrAddress' => 'text',
-        'isisCircAdminState' => 'text',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'port_id',
-        'ifIndex',
-        'index',
-        'isisISAdjState',
-        'isisISAdjNeighSysType',
-        'isisISAdjNeighSysID',
-        'isisISAdjNeighPriority',
-        'isisISAdjLastUpTime',
-        'isisISAdjAreaAddress',
-        'isisISAdjIPAddrType',
-        'isisISAdjIPAddrAddress',
-        'isisCircAdminState',
-    ];
 
     public static function related(): array
     {
@@ -59,22 +28,61 @@ class IsisAdjacencyRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'neighborSystemId' => SearchableFilter::make()->setColumn('isisISAdjNeighSysID'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'interfaceIndex' => MatchFilter::make()->setType('integer')->setColumn('ifIndex'),
+            'index' => MatchFilter::make()->setType('integer')->setColumn('index'),
+            'state' => MatchFilter::make()->setType('text')->setColumn('isisISAdjState'),
+            'neighborSystemCategory' => MatchFilter::make()->setType('text')->setColumn('isisISAdjNeighSysType'),
+            'neighborSystemId' => MatchFilter::make()->setType('text')->setColumn('isisISAdjNeighSysID'),
+            'neighborPriority' => MatchFilter::make()->setType('integer')->setColumn('isisISAdjNeighPriority'),
+            'lastUpAt' => MatchFilter::make()->setType('datetime')->setColumn('isisISAdjLastUpTime'),
+            'areaAddress' => MatchFilter::make()->setType('text')->setColumn('isisISAdjAreaAddress'),
+            'ipAddressCategory' => MatchFilter::make()->setType('text')->setColumn('isisISAdjIPAddrType'),
+            'ipAddress' => MatchFilter::make()->setType('text')->setColumn('isisISAdjIPAddrAddress'),
+            'circuitAdminState' => MatchFilter::make()->setType('text')->setColumn('isisCircAdminState'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'interfaceIndex' => SortableFilter::make()->setColumn('ifIndex'),
+            'index' => SortableFilter::make()->setColumn('index'),
+            'state' => SortableFilter::make()->setColumn('isisISAdjState'),
+            'neighborSystemCategory' => SortableFilter::make()->setColumn('isisISAdjNeighSysType'),
+            'neighborSystemId' => SortableFilter::make()->setColumn('isisISAdjNeighSysID'),
+            'neighborPriority' => SortableFilter::make()->setColumn('isisISAdjNeighPriority'),
+            'lastUpAt' => SortableFilter::make()->setColumn('isisISAdjLastUpTime'),
+            'areaAddress' => SortableFilter::make()->setColumn('isisISAdjAreaAddress'),
+            'ipAddressCategory' => SortableFilter::make()->setColumn('isisISAdjIPAddrType'),
+            'ipAddress' => SortableFilter::make()->setColumn('isisISAdjIPAddrAddress'),
+            'circuitAdminState' => SortableFilter::make()->setColumn('isisCircAdminState'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('port_id')->readonly(),
-            field('ifIndex')->readonly(),
+            field('interfaceIndex', fn ($value, $model) => $model->ifIndex)->readonly(),
             field('index')->readonly(),
-            field('isisISAdjState')->readonly(),
-            field('isisISAdjNeighSysType')->readonly(),
-            field('isisISAdjNeighSysID')->readonly(),
-            field('isisISAdjNeighPriority')->readonly(),
-            field('isisISAdjLastUpTime')->readonly(),
-            field('isisISAdjAreaAddress')->readonly(),
-            field('isisISAdjIPAddrType')->readonly(),
-            field('isisISAdjIPAddrAddress')->readonly(),
-            field('isisCircAdminState')->readonly(),
+            field('state', fn ($value, $model) => $model->isisISAdjState)->readonly(),
+            field('neighborSystemCategory', fn ($value, $model) => $model->isisISAdjNeighSysType)->readonly(),
+            field('neighborSystemId', fn ($value, $model) => $model->isisISAdjNeighSysID)->readonly(),
+            field('neighborPriority', fn ($value, $model) => $model->isisISAdjNeighPriority)->readonly(),
+            field('lastUpAt', fn ($value, $model) => $model->isisISAdjLastUpTime)->readonly(),
+            field('areaAddress', fn ($value, $model) => $model->isisISAdjAreaAddress)->readonly(),
+            field('ipAddressCategory', fn ($value, $model) => $model->isisISAdjIPAddrType)->readonly(),
+            field('ipAddress', fn ($value, $model) => $model->isisISAdjIPAddrAddress)->readonly(),
+            field('circuitAdminState', fn ($value, $model) => $model->isisCircAdminState)->readonly(),
         ];
     }
 

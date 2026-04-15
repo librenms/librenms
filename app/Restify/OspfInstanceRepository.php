@@ -6,6 +6,9 @@ use App\Models\OspfInstance;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class OspfInstanceRepository extends Repository
 {
@@ -15,50 +18,8 @@ class OspfInstanceRepository extends Repository
 
     public static string $title = 'ospfRouterId';
 
-    public static array $search = [
-        'ospfRouterId',
-        'context_name',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'ospf_instance_id' => 'integer',
-        'ospfRouterId' => 'text',
-        'ospfAdminStat' => 'text',
-        'ospfVersionNumber' => 'text',
-        'ospfAreaBdrRtrStatus' => 'text',
-        'ospfASBdrRtrStatus' => 'text',
-        'ospfExternLsaCount' => 'integer',
-        'ospfExternLsaCksumSum' => 'integer',
-        'ospfTOSSupport' => 'text',
-        'ospfOriginateNewLsas' => 'integer',
-        'ospfRxNewLsas' => 'integer',
-        'ospfExtLsdbLimit' => 'integer',
-        'ospfMulticastExtensions' => 'integer',
-        'ospfExitOverflowInterval' => 'integer',
-        'ospfDemandExtensions' => 'text',
-        'context_name' => 'text',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'ospf_instance_id',
-        'ospfRouterId',
-        'ospfAdminStat',
-        'ospfVersionNumber',
-        'ospfAreaBdrRtrStatus',
-        'ospfASBdrRtrStatus',
-        'ospfExternLsaCount',
-        'ospfExternLsaCksumSum',
-        'ospfTOSSupport',
-        'ospfOriginateNewLsas',
-        'ospfRxNewLsas',
-        'ospfExtLsdbLimit',
-        'ospfMulticastExtensions',
-        'ospfExitOverflowInterval',
-        'ospfDemandExtensions',
-        'context_name',
-    ];
 
     public static function related(): array
     {
@@ -67,26 +28,73 @@ class OspfInstanceRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'routerId' => SearchableFilter::make()->setColumn('ospfRouterId'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'routerId' => MatchFilter::make()->setType('text')->setColumn('ospfRouterId'),
+            'adminStatus' => MatchFilter::make()->setType('text')->setColumn('ospfAdminStat'),
+            'versionNumber' => MatchFilter::make()->setType('integer')->setColumn('ospfVersionNumber'),
+            'isAreaBorderRouter' => MatchFilter::make()->setType('bool')->setColumn('ospfAreaBdrRtrStatus'),
+            'isAsBorderRouter' => MatchFilter::make()->setType('bool')->setColumn('ospfASBdrRtrStatus'),
+            'externLsaCount' => MatchFilter::make()->setType('integer')->setColumn('ospfExternLsaCount'),
+            'externLsaChecksumSum' => MatchFilter::make()->setType('integer')->setColumn('ospfExternLsaCksumSum'),
+            'hasTosSupport' => MatchFilter::make()->setType('bool')->setColumn('ospfTOSSupport'),
+            'originateNewLsas' => MatchFilter::make()->setType('integer')->setColumn('ospfOriginateNewLsas'),
+            'receiveNewLsas' => MatchFilter::make()->setType('integer')->setColumn('ospfRxNewLsas'),
+            'externalLsdbLimit' => MatchFilter::make()->setType('integer')->setColumn('ospfExtLsdbLimit'),
+            'multicastExtensions' => MatchFilter::make()->setType('text')->setColumn('ospfMulticastExtensions'),
+            'exitOverflowInterval' => MatchFilter::make()->setType('integer')->setColumn('ospfExitOverflowInterval'),
+            'demandExtensions' => MatchFilter::make()->setType('text')->setColumn('ospfDemandExtensions'),
+            'contextName' => MatchFilter::make()->setType('text')->setColumn('context_name'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'routerId' => SortableFilter::make()->setColumn('ospfRouterId'),
+            'adminStatus' => SortableFilter::make()->setColumn('ospfAdminStat'),
+            'versionNumber' => SortableFilter::make()->setColumn('ospfVersionNumber'),
+            'isAreaBorderRouter' => SortableFilter::make()->setColumn('ospfAreaBdrRtrStatus'),
+            'isAsBorderRouter' => SortableFilter::make()->setColumn('ospfASBdrRtrStatus'),
+            'externLsaCount' => SortableFilter::make()->setColumn('ospfExternLsaCount'),
+            'externLsaChecksumSum' => SortableFilter::make()->setColumn('ospfExternLsaCksumSum'),
+            'hasTosSupport' => SortableFilter::make()->setColumn('ospfTOSSupport'),
+            'originateNewLsas' => SortableFilter::make()->setColumn('ospfOriginateNewLsas'),
+            'receiveNewLsas' => SortableFilter::make()->setColumn('ospfRxNewLsas'),
+            'externalLsdbLimit' => SortableFilter::make()->setColumn('ospfExtLsdbLimit'),
+            'multicastExtensions' => SortableFilter::make()->setColumn('ospfMulticastExtensions'),
+            'exitOverflowInterval' => SortableFilter::make()->setColumn('ospfExitOverflowInterval'),
+            'demandExtensions' => SortableFilter::make()->setColumn('ospfDemandExtensions'),
+            'contextName' => SortableFilter::make()->setColumn('context_name'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('ospf_instance_id')->readonly(),
-            field('ospfRouterId')->readonly(),
-            field('ospfAdminStat')->readonly(),
-            field('ospfVersionNumber')->readonly(),
-            field('ospfAreaBdrRtrStatus')->readonly(),
-            field('ospfASBdrRtrStatus')->readonly(),
-            field('ospfExternLsaCount')->readonly(),
-            field('ospfExternLsaCksumSum')->readonly(),
-            field('ospfTOSSupport')->readonly(),
-            field('ospfOriginateNewLsas')->readonly(),
-            field('ospfRxNewLsas')->readonly(),
-            field('ospfExtLsdbLimit')->readonly(),
-            field('ospfMulticastExtensions')->readonly(),
-            field('ospfExitOverflowInterval')->readonly(),
-            field('ospfDemandExtensions')->readonly(),
-            field('context_name')->readonly(),
+            field('routerId', fn ($value, $model) => $model->ospfRouterId)->readonly(),
+            field('adminStatus', fn ($value, $model) => $model->ospfAdminStat)->readonly(),
+            field('versionNumber', fn ($value, $model) => $model->ospfVersionNumber)->readonly(),
+            field('isAreaBorderRouter', fn ($value, $model) => $model->ospfAreaBdrRtrStatus)->readonly(),
+            field('isAsBorderRouter', fn ($value, $model) => $model->ospfASBdrRtrStatus)->readonly(),
+            field('externLsaCount', fn ($value, $model) => $model->ospfExternLsaCount)->readonly(),
+            field('externLsaChecksumSum', fn ($value, $model) => $model->ospfExternLsaCksumSum)->readonly(),
+            field('hasTosSupport', fn ($value, $model) => $model->ospfTOSSupport)->readonly(),
+            field('originateNewLsas', fn ($value, $model) => $model->ospfOriginateNewLsas)->readonly(),
+            field('receiveNewLsas', fn ($value, $model) => $model->ospfRxNewLsas)->readonly(),
+            field('externalLsdbLimit', fn ($value, $model) => $model->ospfExtLsdbLimit)->readonly(),
+            field('multicastExtensions', fn ($value, $model) => $model->ospfMulticastExtensions)->readonly(),
+            field('exitOverflowInterval', fn ($value, $model) => $model->ospfExitOverflowInterval)->readonly(),
+            field('demandExtensions', fn ($value, $model) => $model->ospfDemandExtensions)->readonly(),
+            field('contextName', fn ($value, $model) => $model->context_name)->readonly(),
         ];
     }
 

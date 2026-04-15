@@ -6,6 +6,9 @@ use App\Models\OspfArea;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class OspfAreaRepository extends Repository
 {
@@ -15,40 +18,8 @@ class OspfAreaRepository extends Repository
 
     public static string $title = 'ospfAreaId';
 
-    public static array $search = [
-        'ospfAreaId',
-        'context_name',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'ospfAreaId' => 'text',
-        'ospfAuthType' => 'text',
-        'ospfImportAsExtern' => 'text',
-        'ospfSpfRuns' => 'integer',
-        'ospfAreaBdrRtrCount' => 'integer',
-        'ospfAsBdrRtrCount' => 'integer',
-        'ospfAreaLsaCount' => 'integer',
-        'ospfAreaLsaCksumSum' => 'integer',
-        'ospfAreaSummary' => 'text',
-        'ospfAreaStatus' => 'text',
-        'context_name' => 'text',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'ospfAreaId',
-        'ospfAuthType',
-        'ospfImportAsExtern',
-        'ospfSpfRuns',
-        'ospfAreaBdrRtrCount',
-        'ospfAsBdrRtrCount',
-        'ospfAreaLsaCount',
-        'ospfAreaLsaCksumSum',
-        'ospfAreaSummary',
-        'ospfAreaStatus',
-        'context_name',
-    ];
 
     public static function related(): array
     {
@@ -57,21 +28,61 @@ class OspfAreaRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'areaId' => SearchableFilter::make()->setColumn('ospfAreaId'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'areaId' => MatchFilter::make()->setType('text')->setColumn('ospfAreaId'),
+            'authenticationCategory' => MatchFilter::make()->setType('text')->setColumn('ospfAuthType'),
+            'importAsExtern' => MatchFilter::make()->setType('text')->setColumn('ospfImportAsExtern'),
+            'spfRuns' => MatchFilter::make()->setType('integer')->setColumn('ospfSpfRuns'),
+            'borderRouterCount' => MatchFilter::make()->setType('integer')->setColumn('ospfAreaBdrRtrCount'),
+            'asBorderRouterCount' => MatchFilter::make()->setType('integer')->setColumn('ospfAsBdrRtrCount'),
+            'lsaCount' => MatchFilter::make()->setType('integer')->setColumn('ospfAreaLsaCount'),
+            'lsaChecksumSum' => MatchFilter::make()->setType('integer')->setColumn('ospfAreaLsaCksumSum'),
+            'summary' => MatchFilter::make()->setType('text')->setColumn('ospfAreaSummary'),
+            'status' => MatchFilter::make()->setType('text')->setColumn('ospfAreaStatus'),
+            'contextName' => MatchFilter::make()->setType('text')->setColumn('context_name'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'areaId' => SortableFilter::make()->setColumn('ospfAreaId'),
+            'authenticationCategory' => SortableFilter::make()->setColumn('ospfAuthType'),
+            'importAsExtern' => SortableFilter::make()->setColumn('ospfImportAsExtern'),
+            'spfRuns' => SortableFilter::make()->setColumn('ospfSpfRuns'),
+            'borderRouterCount' => SortableFilter::make()->setColumn('ospfAreaBdrRtrCount'),
+            'asBorderRouterCount' => SortableFilter::make()->setColumn('ospfAsBdrRtrCount'),
+            'lsaCount' => SortableFilter::make()->setColumn('ospfAreaLsaCount'),
+            'lsaChecksumSum' => SortableFilter::make()->setColumn('ospfAreaLsaCksumSum'),
+            'summary' => SortableFilter::make()->setColumn('ospfAreaSummary'),
+            'status' => SortableFilter::make()->setColumn('ospfAreaStatus'),
+            'contextName' => SortableFilter::make()->setColumn('context_name'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
-            field('ospfAreaId')->readonly(),
-            field('ospfAuthType')->readonly(),
-            field('ospfImportAsExtern')->readonly(),
-            field('ospfSpfRuns')->readonly(),
-            field('ospfAreaBdrRtrCount')->readonly(),
-            field('ospfAsBdrRtrCount')->readonly(),
-            field('ospfAreaLsaCount')->readonly(),
-            field('ospfAreaLsaCksumSum')->readonly(),
-            field('ospfAreaSummary')->readonly(),
-            field('ospfAreaStatus')->readonly(),
-            field('context_name')->readonly(),
+            field('areaId', fn ($value, $model) => $model->ospfAreaId)->readonly(),
+            field('authenticationCategory', fn ($value, $model) => $model->ospfAuthType)->readonly(),
+            field('importAsExtern', fn ($value, $model) => $model->ospfImportAsExtern)->readonly(),
+            field('spfRuns', fn ($value, $model) => $model->ospfSpfRuns)->readonly(),
+            field('borderRouterCount', fn ($value, $model) => $model->ospfAreaBdrRtrCount)->readonly(),
+            field('asBorderRouterCount', fn ($value, $model) => $model->ospfAsBdrRtrCount)->readonly(),
+            field('lsaCount', fn ($value, $model) => $model->ospfAreaLsaCount)->readonly(),
+            field('lsaChecksumSum', fn ($value, $model) => $model->ospfAreaLsaCksumSum)->readonly(),
+            field('summary', fn ($value, $model) => $model->ospfAreaSummary)->readonly(),
+            field('status', fn ($value, $model) => $model->ospfAreaStatus)->readonly(),
+            field('contextName', fn ($value, $model) => $model->context_name)->readonly(),
         ];
     }
 

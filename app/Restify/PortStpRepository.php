@@ -5,6 +5,9 @@ namespace App\Restify;
 use App\Models\PortStp;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class PortStpRepository extends Repository
 {
@@ -16,54 +19,56 @@ class PortStpRepository extends Repository
 
     public static string $title = 'state';
 
-    public static array $search = [
-        'state',
-        'designatedRoot',
-        'designatedBridge',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'vlan' => 'integer',
-        'port_id' => 'integer',
-        'port_index' => 'integer',
-        'priority' => 'integer',
-        'state' => 'text',
-        'enable' => 'text',
-        'pathCost' => 'integer',
-        'designatedRoot' => 'text',
-        'designatedCost' => 'integer',
-        'designatedBridge' => 'text',
-        'designatedPort' => 'integer',
-        'forwardTransitions' => 'integer',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'vlan',
-        'port_id',
-        'port_index',
-        'priority',
-        'state',
-        'enable',
-        'pathCost',
-        'designatedRoot',
-        'designatedCost',
-        'designatedBridge',
-        'designatedPort',
-        'forwardTransitions',
-    ];
+
+    public static function searchables(): array
+    {
+        return [];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'vlan' => MatchFilter::make()->setType('integer')->setColumn('vlan'),
+            'portIndex' => MatchFilter::make()->setType('integer')->setColumn('port_index'),
+            'priority' => MatchFilter::make()->setType('integer')->setColumn('priority'),
+            'state' => MatchFilter::make()->setType('text')->setColumn('state'),
+            'isEnabled' => MatchFilter::make()->setType('bool')->setColumn('enable'),
+            'pathCost' => MatchFilter::make()->setType('integer')->setColumn('pathCost'),
+            'designatedRoot' => MatchFilter::make()->setType('text')->setColumn('designatedRoot'),
+            'designatedCost' => MatchFilter::make()->setType('integer')->setColumn('designatedCost'),
+            'designatedBridge' => MatchFilter::make()->setType('text')->setColumn('designatedBridge'),
+            'designatedPort' => MatchFilter::make()->setType('text')->setColumn('designatedPort'),
+            'forwardTransitions' => MatchFilter::make()->setType('integer')->setColumn('forwardTransitions'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'vlan' => SortableFilter::make()->setColumn('vlan'),
+            'portIndex' => SortableFilter::make()->setColumn('port_index'),
+            'priority' => SortableFilter::make()->setColumn('priority'),
+            'state' => SortableFilter::make()->setColumn('state'),
+            'isEnabled' => SortableFilter::make()->setColumn('enable'),
+            'pathCost' => SortableFilter::make()->setColumn('pathCost'),
+            'designatedRoot' => SortableFilter::make()->setColumn('designatedRoot'),
+            'designatedCost' => SortableFilter::make()->setColumn('designatedCost'),
+            'designatedBridge' => SortableFilter::make()->setColumn('designatedBridge'),
+            'designatedPort' => SortableFilter::make()->setColumn('designatedPort'),
+            'forwardTransitions' => SortableFilter::make()->setColumn('forwardTransitions'),
+        ];
+    }
 
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
             field('vlan')->readonly(),
-            field('port_id')->readonly(),
-            field('port_index')->readonly(),
+            field('portIndex', fn ($value, $model) => $model->port_index)->readonly(),
             field('priority')->readonly(),
             field('state')->readonly(),
-            field('enable')->readonly(),
+            field('isEnabled', fn ($value, $model) => $model->enable)->readonly(),
             field('pathCost')->readonly(),
             field('designatedRoot')->readonly(),
             field('designatedCost')->readonly(),

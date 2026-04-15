@@ -6,6 +6,9 @@ use App\Models\Syslog;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class SyslogRepository extends Repository
 {
@@ -17,33 +20,8 @@ class SyslogRepository extends Repository
 
     public static string $title = 'msg';
 
-    public static array $search = [
-        'msg',
-        'program',
-        'tag',
-    ];
 
-    public static array $match = [
-        'device_id' => 'integer',
-        'facility' => 'text',
-        'priority' => 'text',
-        'level' => 'text',
-        'tag' => 'text',
-        'timestamp' => 'datetime',
-        'program' => 'text',
-        'msg' => 'text',
-    ];
 
-    public static array $sort = [
-        'device_id',
-        'facility',
-        'priority',
-        'level',
-        'tag',
-        'timestamp',
-        'program',
-        'msg',
-    ];
 
     public static function related(): array
     {
@@ -52,17 +30,49 @@ class SyslogRepository extends Repository
         ];
     }
 
+    public static function searchables(): array
+    {
+        return [
+            'message' => SearchableFilter::make()->setColumn('msg'),
+        ];
+    }
+
+    public static function matches(): array
+    {
+        return [
+            'facility' => MatchFilter::make()->setType('text')->setColumn('facility'),
+            'priority' => MatchFilter::make()->setType('text')->setColumn('priority'),
+            'level' => MatchFilter::make()->setType('text')->setColumn('level'),
+            'tag' => MatchFilter::make()->setType('text')->setColumn('tag'),
+            'createdAt' => MatchFilter::make()->setType('datetime')->setColumn('timestamp'),
+            'program' => MatchFilter::make()->setType('text')->setColumn('program'),
+            'message' => MatchFilter::make()->setType('text')->setColumn('msg'),
+        ];
+    }
+
+    public static function sorts(): array
+    {
+        return [
+            'facility' => SortableFilter::make()->setColumn('facility'),
+            'priority' => SortableFilter::make()->setColumn('priority'),
+            'level' => SortableFilter::make()->setColumn('level'),
+            'tag' => SortableFilter::make()->setColumn('tag'),
+            'createdAt' => SortableFilter::make()->setColumn('timestamp'),
+            'program' => SortableFilter::make()->setColumn('program'),
+            'message' => SortableFilter::make()->setColumn('msg'),
+        ];
+    }
+
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('device_id')->readonly(),
             field('facility')->readonly(),
             field('priority')->readonly(),
             field('level')->readonly(),
             field('tag')->readonly(),
-            field('timestamp')->readonly(),
+            field('createdAt', fn ($value, $model) => $model->timestamp)->readonly(),
             field('program')->readonly(),
-            field('msg')->readonly(),
+            field('message', fn ($value, $model) => $model->msg)->readonly(),
         ];
     }
 
