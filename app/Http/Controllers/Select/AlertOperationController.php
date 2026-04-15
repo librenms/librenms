@@ -8,11 +8,17 @@ use Illuminate\Http\Request;
 
 class AlertOperationController extends SelectController
 {
-    protected function searchFields(Request $request)
+    /**
+     * @return list<string>
+     */
+    protected function searchFields(Request $request): array
     {
         return ['name'];
     }
 
+    /**
+     * @return Builder<AlertOperation>
+     */
     public function baseQuery(Request $request): Builder
     {
         return AlertOperation::query()
@@ -20,7 +26,10 @@ class AlertOperationController extends SelectController
             ->orderBy('name');
     }
 
-    /** @param  AlertOperation  $model */
+    /**
+     * @param  AlertOperation  $model
+     * @return array{id: int, text: string}
+     */
     public function formatItem($model): array
     {
         return [
