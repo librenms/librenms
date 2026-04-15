@@ -799,6 +799,7 @@ Route: `/api/v0/devices/:hostname/fdb`
 
 Input:
 - vlan_id: Filter results by VLAN ID(s). Can be a single VLAN (vlan_id=100) or multiple VLANs as comma-separated values (vlan_id=100,200,300)
+- age: Only return result last seen within the last X minutes.
 
 Example:
 
