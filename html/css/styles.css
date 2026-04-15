@@ -8,6 +8,7 @@ body {
   color: #555;
   font-size: 10pt;
   line-height: 20px;
+  overflow-y: scroll;
 }
 
 .pagemenu-selected {
@@ -1318,7 +1319,7 @@ tr.search:nth-child(odd) {
 nav.navbar-sticky-top {
   position: sticky;
   top: 0;
-  z-index: 1030;
+  z-index: 1100;
   border-bottom-width: 2px;
   border-left-width: 0;
   border-top-width: 0;
@@ -1328,10 +1329,10 @@ nav.navbar-sticky-top {
 
 /* Ensure Bootstrap modals and backdrops appear above the sticky navbar */
 .modal-backdrop {
-  z-index: 1040;
+  z-index: 1140;
 }
 .modal {
-  z-index: 1050;
+  z-index: 1150;
 }
 
 .navbar-brand {
