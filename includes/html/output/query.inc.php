@@ -24,6 +24,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
+use App\Facades\DeviceCache;
 use App\Models\Device;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Alert\AlertUtil;
@@ -40,9 +41,8 @@ $type = $_REQUEST['type'];
 switch ($type) {
     case 'alerts':
         $filename = "alerts-$hostname.txt";
-        $device_id = getidbyname($hostname);
-        $device = device_by_id_cache($device_id);
-        $rules = AlertUtil::getRules($device_id);
+        $device = DeviceCache::getByHostname($hostname);
+        $rules = AlertUtil::getRules($device->device_id);
         $output = '';
         $results = [];
         foreach ($rules as $rule) {
@@ -50,7 +50,7 @@ switch ($type) {
                 $rule['query'] = QueryBuilderParser::fromJson($rule['builder'])->toSql();
             }
             $sql = $rule['query'];
-            $qry = dbFetchRow($sql, [$device_id]);
+            $qry = dbFetchRow($sql, [$device->device_id]);
             if (is_array($qry)) {
                 $results[] = $qry;
                 $response = 'matches';
