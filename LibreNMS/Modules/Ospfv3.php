@@ -397,7 +397,7 @@ class Ospfv3 implements Module
 
     public function fetchAndFillNeighbor(Ospfv3Nbr $nbr): void
     {
-        $ospf_nbr= SnmpQuery::context($nbr->context_name)
+        $ospf_nbr = SnmpQuery::context($nbr->context_name)
             ->hideMib()->enumStrings()->get([
                 "OSPFV3-MIB::ospfv3NbrAddressType.$nbr->ospfv3NbrIfIndex.$nbr->ospfv3NbrIfInstId.$nbr->ospfv3NbrRtrId",
                 "OSPFV3-MIB::ospfv3NbrOptions.$nbr->ospfv3NbrIfIndex.$nbr->ospfv3NbrIfInstId.$nbr->ospfv3NbrRtrId",
