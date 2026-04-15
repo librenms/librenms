@@ -237,10 +237,6 @@ return new class extends Migration
                 'extra' => json_encode($this->stripLegacyExtraKeys($extra)),
             ]);
         }
-
-        if ($hasLegacyTransportMap) {
-            Schema::dropIfExists('alert_transport_map');
-        }
     }
 
     private function migrateOperationsToRulesDown(): void

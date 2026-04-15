@@ -173,6 +173,14 @@ alert_transport_groups:
     - { Field: transport_group_name, Type: varchar(30), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [transport_group_id], Unique: true, Type: BTREE }
+alert_transport_map:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: rule_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: transport_or_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: target_type, Type: varchar(16), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 api_tokens:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
