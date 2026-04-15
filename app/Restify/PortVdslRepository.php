@@ -63,7 +63,7 @@ class PortVdslRepository extends Repository
     }
 
     /**
-     * VDSL port stats are discovered automatically by LibreNMS during the polling process — not created manually.
+     * VDSL port stats are discovered automatically by LibreNMS during the polling process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {

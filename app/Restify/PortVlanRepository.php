@@ -64,7 +64,7 @@ class PortVlanRepository extends Repository
     }
 
     /**
-     * Port VLAN assignments are discovered automatically by LibreNMS during the discovery process — not created manually.
+     * Port VLAN assignments are discovered automatically by LibreNMS during the discovery process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -72,7 +72,7 @@ class PortVlanRepository extends Repository
     }
 
     /**
-     * Port VLAN assignments are managed by the LibreNMS discovery process — they are removed when no longer detected.
+     * Port VLAN assignments are managed by the LibreNMS discovery process they are removed when no longer detected.
      */
     public function authorizedToDelete(Request $request): bool
     {

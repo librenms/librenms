@@ -79,7 +79,7 @@ class Ipv6NdRepository extends Repository
     }
 
     /**
-     * IPv6 neighbor discovery entries are populated automatically by LibreNMS during polling — not created manually.
+     * IPv6 neighbor discovery entries are populated automatically by LibreNMS during polling not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -87,7 +87,7 @@ class Ipv6NdRepository extends Repository
     }
 
     /**
-     * IPv6 neighbor discovery entries are managed by the LibreNMS polling process — they are removed when no longer detected.
+     * IPv6 neighbor discovery entries are managed by the LibreNMS polling process they are removed when no longer detected.
      */
     public function authorizedToDelete(Request $request): bool
     {

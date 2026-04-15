@@ -92,7 +92,7 @@ class PortsNacRepository extends Repository
     }
 
     /**
-     * NAC entries are discovered automatically by LibreNMS during the polling process — not created manually.
+     * NAC entries are discovered automatically by LibreNMS during the polling process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {

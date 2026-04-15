@@ -66,7 +66,7 @@ class Ipv4NetworkRepository extends Repository
     }
 
     /**
-     * IPv4 networks are discovered automatically by LibreNMS during the discovery process — not created manually.
+     * IPv4 networks are discovered automatically by LibreNMS during the discovery process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -74,7 +74,7 @@ class Ipv4NetworkRepository extends Repository
     }
 
     /**
-     * IPv4 networks are managed by the LibreNMS discovery process — they are removed when no longer detected.
+     * IPv4 networks are managed by the LibreNMS discovery process they are removed when no longer detected.
      */
     public function authorizedToDelete(Request $request): bool
     {

@@ -57,7 +57,7 @@ class DeviceOutageRepository extends Repository
     }
 
     /**
-     * Device outages are recorded automatically by LibreNMS during polling — not created manually.
+     * Device outages are recorded automatically by LibreNMS during polling not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {

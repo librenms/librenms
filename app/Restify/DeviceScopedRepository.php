@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
  * authenticated user can see, based on **device-level** access control.
  *
  * The wrapped model must expose a `scopeHasAccess(User $user)` Eloquent
- * scope — typically by extending `App\Models\DeviceRelatedModel`, or by
+ * scope typically by extending `App\Models\DeviceRelatedModel`, or by
  * defining its own override (e.g. `Device`, `DeviceGroup`, `Location`,
  * `Bill`, `AlertRule`).
  */

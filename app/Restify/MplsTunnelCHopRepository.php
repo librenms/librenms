@@ -79,7 +79,7 @@ class MplsTunnelCHopRepository extends Repository
     }
 
     /**
-     * MPLS tunnel C hops are discovered automatically by LibreNMS during the discovery process — not created manually.
+     * MPLS tunnel C hops are discovered automatically by LibreNMS during the discovery process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -87,7 +87,7 @@ class MplsTunnelCHopRepository extends Repository
     }
 
     /**
-     * MPLS tunnel C hops are managed by the LibreNMS discovery process — they are removed when no longer detected.
+     * MPLS tunnel C hops are managed by the LibreNMS discovery process they are removed when no longer detected.
      */
     public function authorizedToDelete(Request $request): bool
     {

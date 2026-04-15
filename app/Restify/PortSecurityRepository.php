@@ -78,7 +78,7 @@ class PortSecurityRepository extends Repository
     }
 
     /**
-     * Port security entries are discovered automatically by LibreNMS during the discovery process — not created manually.
+     * Port security entries are discovered automatically by LibreNMS during the discovery process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {

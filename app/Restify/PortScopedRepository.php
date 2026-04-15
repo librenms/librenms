@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
  * authenticated user can see, based on **port-level** access control.
  *
  * The wrapped model must expose a `scopeHasAccess(User $user)` Eloquent
- * scope that delegates to `BaseModel::hasPortAccess` — typically by
+ * scope that delegates to `BaseModel::hasPortAccess` typically by
  * extending `App\Models\PortRelatedModel`, or `Port` itself.
  *
  * Port access is broader than device access: it includes records on any

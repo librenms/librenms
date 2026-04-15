@@ -68,7 +68,7 @@ class AuthLogRepository extends Repository
     }
 
     /**
-     * Auth logs are generated internally by the authentication system — not created manually via the API.
+     * Auth logs are generated internally by the authentication system not created manually via the API.
      */
     public static function authorizedToStore(Request $request): bool
     {

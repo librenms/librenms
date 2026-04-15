@@ -116,7 +116,7 @@ class MplsLspRepository extends Repository
     }
 
     /**
-     * MPLS LSPs are discovered automatically by LibreNMS during the discovery process — not created manually.
+     * MPLS LSPs are discovered automatically by LibreNMS during the discovery process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -124,7 +124,7 @@ class MplsLspRepository extends Repository
     }
 
     /**
-     * MPLS LSPs are managed by the LibreNMS discovery process — they are removed when no longer detected.
+     * MPLS LSPs are managed by the LibreNMS discovery process they are removed when no longer detected.
      */
     public function authorizedToDelete(Request $request): bool
     {

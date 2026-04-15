@@ -69,7 +69,7 @@ class ApplicationRepository extends Repository
     }
 
     /**
-     * Applications are discovered automatically by LibreNMS during the discovery process — not created manually.
+     * Applications are discovered automatically by LibreNMS during the discovery process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -77,7 +77,7 @@ class ApplicationRepository extends Repository
     }
 
     /**
-     * Applications are managed by the LibreNMS discovery process — they are removed when no longer detected.
+     * Applications are managed by the LibreNMS discovery process they are removed when no longer detected.
      */
     public function authorizedToDelete(Request $request): bool
     {

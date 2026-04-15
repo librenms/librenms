@@ -74,7 +74,7 @@ class AvailabilityRepository extends Repository
     }
 
     /**
-     * Availability records are calculated automatically by LibreNMS during polling — not created manually.
+     * Availability records are calculated automatically by LibreNMS during polling not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {

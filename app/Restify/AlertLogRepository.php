@@ -58,7 +58,7 @@ class AlertLogRepository extends Repository
     }
 
     /**
-     * Alert logs are generated internally by the alerting engine — not created manually via the API.
+     * Alert logs are generated internally by the alerting engine not created manually via the API.
      */
     public static function authorizedToStore(Request $request): bool
     {

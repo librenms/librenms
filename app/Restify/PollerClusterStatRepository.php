@@ -74,7 +74,7 @@ class PollerClusterStatRepository extends Repository
     }
 
     /**
-     * Poller stats are recorded automatically during polling runs — not created manually.
+     * Poller stats are recorded automatically during polling runs not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {

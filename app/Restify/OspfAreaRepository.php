@@ -87,7 +87,7 @@ class OspfAreaRepository extends Repository
     }
 
     /**
-     * OSPF areas are discovered automatically by LibreNMS during the discovery process — not created manually.
+     * OSPF areas are discovered automatically by LibreNMS during the discovery process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -95,7 +95,7 @@ class OspfAreaRepository extends Repository
     }
 
     /**
-     * OSPF areas are managed by the LibreNMS discovery process — they are removed when no longer detected.
+     * OSPF areas are managed by the LibreNMS discovery process they are removed when no longer detected.
      */
     public function authorizedToDelete(Request $request): bool
     {

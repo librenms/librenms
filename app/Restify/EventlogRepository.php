@@ -74,7 +74,7 @@ class EventlogRepository extends Repository
     }
 
     /**
-     * Event logs are generated internally by LibreNMS — not created manually via the API.
+     * Event logs are generated internally by LibreNMS not created manually via the API.
      */
     public static function authorizedToStore(Request $request): bool
     {

@@ -62,7 +62,7 @@ class PortsFdbRepository extends Repository
     }
 
     /**
-     * FDB entries are discovered automatically by LibreNMS during the polling process — not created manually.
+     * FDB entries are discovered automatically by LibreNMS during the polling process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -70,7 +70,7 @@ class PortsFdbRepository extends Repository
     }
 
     /**
-     * FDB entries are managed by the LibreNMS polling process — they are removed when no longer detected.
+     * FDB entries are managed by the LibreNMS polling process they are removed when no longer detected.
      */
     public function authorizedToDelete(Request $request): bool
     {

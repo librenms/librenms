@@ -72,7 +72,7 @@ class ComponentRepository extends Repository
     }
 
     /**
-     * Components are discovered automatically by LibreNMS during the discovery process — not created manually.
+     * Components are discovered automatically by LibreNMS during the discovery process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -80,7 +80,7 @@ class ComponentRepository extends Repository
     }
 
     /**
-     * Components are managed by the LibreNMS discovery process — they are removed when no longer detected.
+     * Components are managed by the LibreNMS discovery process they are removed when no longer detected.
      */
     public function authorizedToDelete(Request $request): bool
     {

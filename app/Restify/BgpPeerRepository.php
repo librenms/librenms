@@ -102,7 +102,7 @@ class BgpPeerRepository extends Repository
     }
 
     /**
-     * BGP peers are discovered automatically by LibreNMS during the discovery process — not created manually.
+     * BGP peers are discovered automatically by LibreNMS during the discovery process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -110,7 +110,7 @@ class BgpPeerRepository extends Repository
     }
 
     /**
-     * BGP peers are managed by the LibreNMS discovery process — they are removed when no longer detected.
+     * BGP peers are managed by the LibreNMS discovery process they are removed when no longer detected.
      */
     public function authorizedToDelete(Request $request): bool
     {

@@ -52,7 +52,7 @@ class ApiTokenCommand extends LnmsCommand
         $this->newLine();
         $this->line($token->plainTextToken);
         $this->newLine();
-        $this->warn('Save this token — it will not be shown again.');
+        $this->warn('Save this token... it will not be shown again.');
 
         return 0;
     }

@@ -127,7 +127,7 @@ class Ospfv3PortRepository extends Repository
     }
 
     /**
-     * OSPFv3 ports are discovered automatically by LibreNMS during the discovery process — not created manually.
+     * OSPFv3 ports are discovered automatically by LibreNMS during the discovery process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -135,7 +135,7 @@ class Ospfv3PortRepository extends Repository
     }
 
     /**
-     * OSPFv3 ports are managed by the LibreNMS discovery process — they are removed when no longer detected.
+     * OSPFv3 ports are managed by the LibreNMS discovery process they are removed when no longer detected.
      */
     public function authorizedToDelete(Request $request): bool
     {

@@ -56,7 +56,7 @@ class Ipv4MacRepository extends Repository
     }
 
     /**
-     * ARP entries are discovered automatically by LibreNMS during the discovery process — not created manually.
+     * ARP entries are discovered automatically by LibreNMS during the discovery process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -64,7 +64,7 @@ class Ipv4MacRepository extends Repository
     }
 
     /**
-     * ARP entries are managed by the LibreNMS discovery process — they are removed when no longer detected.
+     * ARP entries are managed by the LibreNMS discovery process they are removed when no longer detected.
      */
     public function authorizedToDelete(Request $request): bool
     {

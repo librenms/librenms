@@ -126,7 +126,7 @@ class PortStatisticRepository extends Repository
     }
 
     /**
-     * Port statistics are collected automatically by LibreNMS during the polling process — not created manually.
+     * Port statistics are collected automatically by LibreNMS during the polling process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {

@@ -91,7 +91,7 @@ class MplsTunnelArHopRepository extends Repository
     }
 
     /**
-     * MPLS tunnel AR hops are discovered automatically by LibreNMS during the discovery process — not created manually.
+     * MPLS tunnel AR hops are discovered automatically by LibreNMS during the discovery process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -99,7 +99,7 @@ class MplsTunnelArHopRepository extends Repository
     }
 
     /**
-     * MPLS tunnel AR hops are managed by the LibreNMS discovery process — they are removed when no longer detected.
+     * MPLS tunnel AR hops are managed by the LibreNMS discovery process they are removed when no longer detected.
      */
     public function authorizedToDelete(Request $request): bool
     {

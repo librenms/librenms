@@ -89,7 +89,7 @@ class IpsecTunnelRepository extends Repository
     }
 
     /**
-     * IPsec tunnels are discovered automatically by LibreNMS during the discovery process — not created manually.
+     * IPsec tunnels are discovered automatically by LibreNMS during the discovery process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -97,7 +97,7 @@ class IpsecTunnelRepository extends Repository
     }
 
     /**
-     * IPsec tunnels are managed by the LibreNMS discovery process — they are removed when no longer detected.
+     * IPsec tunnels are managed by the LibreNMS discovery process they are removed when no longer detected.
      */
     public function authorizedToDelete(Request $request): bool
     {

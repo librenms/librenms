@@ -95,7 +95,7 @@ class RouteRepository extends Repository
     }
 
     /**
-     * Routes are discovered automatically by LibreNMS during the discovery process — not created manually.
+     * Routes are discovered automatically by LibreNMS during the discovery process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -103,7 +103,7 @@ class RouteRepository extends Repository
     }
 
     /**
-     * Routes are managed by the LibreNMS discovery process — they are removed when no longer detected.
+     * Routes are managed by the LibreNMS discovery process they are removed when no longer detected.
      */
     public function authorizedToDelete(Request $request): bool
     {

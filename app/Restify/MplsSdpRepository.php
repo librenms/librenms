@@ -95,7 +95,7 @@ class MplsSdpRepository extends Repository
     }
 
     /**
-     * MPLS SDPs are discovered automatically by LibreNMS during the discovery process — not created manually.
+     * MPLS SDPs are discovered automatically by LibreNMS during the discovery process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -103,7 +103,7 @@ class MplsSdpRepository extends Repository
     }
 
     /**
-     * MPLS SDPs are managed by the LibreNMS discovery process — they are removed when no longer detected.
+     * MPLS SDPs are managed by the LibreNMS discovery process they are removed when no longer detected.
      */
     public function authorizedToDelete(Request $request): bool
     {

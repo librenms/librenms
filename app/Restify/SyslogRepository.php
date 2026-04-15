@@ -77,7 +77,7 @@ class SyslogRepository extends Repository
     }
 
     /**
-     * Syslog entries are received from devices via syslog — not created manually via the API.
+     * Syslog entries are received from devices via syslog not created manually via the API.
      */
     public static function authorizedToStore(Request $request): bool
     {

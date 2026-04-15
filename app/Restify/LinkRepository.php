@@ -95,7 +95,7 @@ class LinkRepository extends Repository
     }
 
     /**
-     * Links are discovered automatically by LibreNMS via CDP/LLDP — not created manually.
+     * Links are discovered automatically by LibreNMS via CDP/LLDP not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -103,7 +103,7 @@ class LinkRepository extends Repository
     }
 
     /**
-     * Links are managed by the LibreNMS discovery process — they are removed when no longer detected.
+     * Links are managed by the LibreNMS discovery process they are removed when no longer detected.
      */
     public function authorizedToDelete(Request $request): bool
     {

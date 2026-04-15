@@ -112,7 +112,7 @@ class PollerClusterRepository extends Repository
     }
 
     /**
-     * Poller clusters are registered automatically when a poller node starts — not created manually.
+     * Poller clusters are registered automatically when a poller node starts not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -120,7 +120,7 @@ class PollerClusterRepository extends Repository
     }
 
     /**
-     * Poller clusters are managed by the poller lifecycle — they are cleaned up when a node is decommissioned.
+     * Poller clusters are managed by the poller lifecycle they are cleaned up when a node is decommissioned.
      */
     public function authorizedToDelete(Request $request): bool
     {

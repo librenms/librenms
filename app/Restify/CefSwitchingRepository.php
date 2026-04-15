@@ -80,7 +80,7 @@ class CefSwitchingRepository extends Repository
     }
 
     /**
-     * CEF switching entries are discovered automatically by LibreNMS during the polling process — not created manually.
+     * CEF switching entries are discovered automatically by LibreNMS during the polling process not created manually.
      */
     public static function authorizedToStore(Request $request): bool
     {

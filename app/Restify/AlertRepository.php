@@ -88,7 +88,7 @@ class AlertRepository extends Repository
     }
 
     /**
-     * Alerts are created automatically by the alerting engine — not manually via the API.
+     * Alerts are created automatically by the alerting engine not manually via the API.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -96,7 +96,7 @@ class AlertRepository extends Repository
     }
 
     /**
-     * Alerts are managed by the alerting engine lifecycle — use acknowledge/unmute actions to change state instead.
+     * Alerts are managed by the alerting engine lifecycle use acknowledge/unmute actions to change state instead.
      */
     public function authorizedToDelete(Request $request): bool
     {

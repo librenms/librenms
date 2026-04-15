@@ -75,7 +75,7 @@ abstract class BaseModel extends Model
      *
      * Resolves the row's owning device by joining through the `ports` table on
      * `port_id`, so this works for any related table that has a `port_id`
-     * column — regardless of whether the table also denormalizes `device_id`.
+     * column. regardless of whether the table also denormalizes `device_id`.
      */
     protected function hasPortAccess(Builder $query, User $user, ?string $table = null): Builder
     {
