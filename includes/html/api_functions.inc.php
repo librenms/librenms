@@ -1014,6 +1014,7 @@ function trigger_device_discovery(Illuminate\Http\Request $request)
 
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
     return check_device_permission($device_id, function ($device_id) use ($hostname) {
         // find device matching the id
         $device = device_by_id_cache($device_id);
