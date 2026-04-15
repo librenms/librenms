@@ -3287,6 +3287,7 @@ function get_fdb(Illuminate\Http\Request $request)
     if (! $device) {
         return api_error(404, "Device $hostname not found");
     }
+
     $vlan_list = [];
     $vlans = $request->get('vlan_id');
     if (!empty($vlans)) {
@@ -3298,11 +3299,13 @@ function get_fdb(Illuminate\Http\Request $request)
         // Convert to integers and filter out invalid values
         $vlan_list = array_filter(array_map('intval', $vlan_list));
     }
+    $age = $request->get('age');
 
-    return check_device_permission($device_id, function () use ($device, $vlan_list) {
+    return check_device_permission($device_id, function () use ($device, $vlan_list, $age) {
         if ($device) {
             $fdb = $device->portsFdb
-                ->when(!empty($vlan_list), fn ($q) => $q->whereIn('vlan_id', $vlan_list));
+                ->when(!empty($vlan_list), fn ($q) => $q->whereIn('vlan_id', $vlan_list))
+                ->when($age, fn ($q) => $q->where('updated_at', '>=', now()->subMinutes($age)));
             
             return api_success($fdb, 'ports_fdb');
         }
