@@ -22,6 +22,7 @@
  */
 
 use Illuminate\Support\Str;
+use LibreNMS\Enum\IfOperStatus;
 
 $temp = SnmpQuery::hideMib()->walk('CISCOSB-rlInterfaces::swIfOperSuspendedStatus')->table(0);
 
@@ -40,7 +41,7 @@ if (! empty($temp)) {
         $port = PortCache::getByIfIndex(preg_replace('/^\d+\./', '', (string) $index), $device['device_id']);
         $descr = trim($port?->ifDescr . ' Suspended Status');
 
-        if (Str::contains($descr, ['ethernet', 'Ethernet']) && $port?->ifOperStatus !== 'notPresent') {
+        if (Str::contains($descr, ['ethernet', 'Ethernet']) && $port?->ifOperStatus != IfOperStatus::NotPresent) {
             //Discover Sensors
             discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $value, 'snmp', $index);
         }

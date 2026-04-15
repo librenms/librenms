@@ -1,5 +1,6 @@
 <?php
 
+use App\Facades\Rrd;
 use App\Models\Sensor;
 use LibreNMS\Exceptions\RrdGraphException;
 
@@ -30,7 +31,7 @@ foreach ($sensors as $index => $sensor) {
     };
 
     $sensor_descr_fixed = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($sensor->sensor_descr, 12);
-    $rrd_filename = get_sensor_rrd($device, $sensor);
+    $rrd_filename = Rrd::name($device['hostname'], get_sensor_rrd_name($device, $sensor));
     $field = 'sensor' . $sensor->sensor_id;
     $rrd_options[] = "DEF:$field=$rrd_filename:sensor:AVERAGE";
 

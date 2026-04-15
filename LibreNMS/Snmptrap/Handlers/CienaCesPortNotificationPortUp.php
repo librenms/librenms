@@ -29,6 +29,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
@@ -52,7 +53,7 @@ class CienaCesPortNotificationPortUp implements SnmptrapHandler
         $trap->log("Port up on Chassis: $chassis Shelf: $shelf Slot: $slot Port: $port", Severity::Ok);
 
         $librePort = $device->ports()->where('ifIndex', $port)->first();
-        $librePort->ifOperStatus = 'up';
+        $librePort->ifOperStatus = IfOperStatus::Up;
         $librePort->save();
     }
 }
