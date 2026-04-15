@@ -121,7 +121,7 @@
   "Validate Config": "Valider la configuration",
   "Auth History": "Historique d'authentification",
   "Peering": "Peering",
-  "API Settings": "Paramètres de l'API",
+  "API Settings": "Getons API",
   "API Docs": "Documentation API",
   "Shutdown": "Arrêt",
   "The :attribute must a valid IP address\/network or hostname.": ":attribute doit avoir une adresse IP valide ou un nom d'hôte valide.",
