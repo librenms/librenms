@@ -128,7 +128,7 @@
     "Validate Config": "配置验证",
     "Auth History": "验证历史",
     "Peering": "互连",
-    "API Settings": "API 设置",
+    "API Settings": "API令牌",
     "API Docs": "API 文件",
     "The :attribute must a valid IP address\/network or hostname.": "这个 :attribute 必需为有效的 IP 地址\/网络或主机名称。",
     "Never polled": "从未轮询",
