@@ -72,6 +72,36 @@ alert_log:
     alert_log_device_id_rule_id_time_logged_index: { Name: alert_log_device_id_rule_id_time_logged_index, Columns: [device_id, rule_id, time_logged], Unique: false, Type: BTREE }
     alert_log_rule_id_device_id_state_index: { Name: alert_log_rule_id_device_id_state_index, Columns: [rule_id, device_id, state], Unique: false, Type: BTREE }
     alert_log_time_logged_index: { Name: alert_log_time_logged_index, Columns: [time_logged], Unique: false, Type: BTREE }
+alert_operations:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: default_operation_step_duration_seconds, Type: 'int unsigned', 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+alert_operation_segments:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: alert_operation_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: position, Type: 'smallint unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: operation_phase, Type: varchar(16), 'Null': false, Extra: '', Default: problem }
+    - { Field: escalation_step_from, Type: 'int unsigned', 'Null': false, Extra: '', Default: '1' }
+    - { Field: escalation_step_to, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: start_in_seconds, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: step_duration_seconds, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: notifications_suppressed, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    alert_operation_segments_alert_operation_id_index: { Name: alert_operation_segments_alert_operation_id_index, Columns: [alert_operation_id], Unique: false, Type: BTREE }
+alert_operation_transport_map:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: segment_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: transport_or_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: target_type, Type: varchar(16), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    alert_operation_transport_map_segment_id_index: { Name: alert_operation_transport_map_segment_id_index, Columns: [segment_id], Unique: false, Type: BTREE }
 alert_rules:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -84,8 +114,10 @@ alert_rules:
     - { Field: proc, Type: varchar(80), 'Null': true, Extra: '' }
     - { Field: invert_map, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: notes, Type: text, 'Null': true, Extra: '' }
+    - { Field: alert_operation_id, Type: 'int unsigned', 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    alert_rules_alert_operation_id_index: { Name: alert_rules_alert_operation_id_index, Columns: [alert_operation_id], Unique: false, Type: BTREE }
     alert_rules_name_unique: { Name: alert_rules_name_unique, Columns: [name], Unique: true, Type: BTREE }
 alert_schedulables:
   Columns:

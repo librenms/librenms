@@ -16,10 +16,6 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\Alerting\QueryBuilderFilter;
 
 $default_severity = LibrenmsConfig::get('alert_rule.severity');
-$default_max_alerts = LibrenmsConfig::get('alert_rule.max_alerts');
-$default_delay = LibrenmsConfig::get('alert_rule.delay') . 'm';
-$default_interval = LibrenmsConfig::get('alert_rule.interval') . 'm';
-$default_mute_alerts = LibrenmsConfig::get('alert_rule.mute_alerts');
 $default_invert_rule_match = LibrenmsConfig::get('alert_rule.invert_rule_match');
 $default_recovery_alerts = LibrenmsConfig::get('alert_rule.recovery_alerts');
 $default_acknowledgement_alerts = LibrenmsConfig::get('alert_rule.acknowledgement_alerts');
@@ -48,6 +44,7 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                         <input type="hidden" name="device_name" id="device_name" value="<?php echo htmlentities((string) DeviceCache::get($device_id)->displayName()); ?>">
                         <input type="hidden" name="rule_id" id="rule_id" value="">
                         <input type="hidden" name="builder_json" id="builder_json" value="">
+                        <div id="alert-rule-form-error" class="alert alert-danger" style="display: none; margin-top: 10px;"></div>
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane active" id="main">
                                 <div class='form-group' title="The description of this alert rule.">
@@ -87,26 +84,8 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                                         </select>
                                     </div>
                                 </div>
-                                <div class="form-group form-inline">
-                                    <label for='count' class='col-sm-3 col-md-2 control-label' title="How many notifications to issue while active before stopping. -1 means no limit. If interval is 0, this has no effect.">Max alerts </label>
-                                    <div class="col-sm-2" title="How many notifications to issue while active before stopping. -1 means no limit. If interval is 0, this has no effect.">
-                                        <input type='text' id='count' name='count' class='form-control' size="4" value="123">
-                                    </div>
-                                    <div class="col-sm-3" title="How long to wait before issuing a notification. If the alert clears before the delay, no notification will be issued. (s,m,h,d)">
-                                        <label for='delay' class='control-label' style="vertical-align: top;">Delay </label>
-                                        <input type='text' id='delay' name='delay' class='form-control' size="4">
-                                    </div>
-                                    <div class="col-sm-4 col-md-3" title="How often to re-issue notifications while this alert is active. 0 means notify once. This is affected by the poller interval. (s,m,h,d)">
-                                        <label for='interval' class='control-label' style="vertical-align: top;">Interval </label>
-                                        <input type='text' id='interval' name='interval' class='form-control' size="4">
-                                    </div>
-                                </div>
                                 <div class='form-group form-inline'>
-                                    <label for='mute' class='col-sm-3 col-md-2 control-label' title="Show alert status in the webui, but do not issue notifications.">Mute alerts </label>
-                                    <div class='col-sm-2' title="Show alert status in the webui, but do not issue notifications.">
-                                        <input type="checkbox" name="mute" id="mute">
-                                    </div>
-                                    <label for='invert' class='col-sm-3 col-md-3 control-label' title="Alert when this rule doesn't match." style="vertical-align: top;">Invert rule match </label>
+                                    <label for='invert' class='col-sm-3 col-md-2 control-label' title="Alert when this rule doesn't match.">Invert rule match </label>
                                     <div class='col-sm-2' title="Alert when this rule doesn't match.">
                                         <input type='checkbox' name='invert' id='invert'>
                                     </div>
@@ -121,6 +100,15 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                                         <input type='checkbox' name='acknowledgement' id='acknowledgement'>
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <label for="alert_operation_id" class="col-sm-3 col-md-2 control-label" title="Notification behaviour (escalation, transports). Configure under Alerts → Operations.">Operation </label>
+                                    <div class="col-sm-9 col-md-10">
+                                        <input type="hidden" name="alert_operation_id" id="alert_operation_id_input" value="">
+                                        <select id="alert_operation_id" class="form-control" style="width: 100%;" data-placeholder="<?php echo __('None (suppress notifications)'); ?>">
+                                        </select>
+                                        <p class="help-block"><?php echo __('Leave empty to suppress all notifications for this rule.'); ?></p>
+                                    </div>
+                                </div>
                                 <div class="form-group form-inline">
                                     <label for='maps' class='col-sm-3 col-md-2 control-label' title="Restricts this alert rule to the selected devices, groups and locations.">Match devices, groups and locations list </label>
                                     <div class="col-sm-7" style="width: 56%;">
@@ -129,12 +117,6 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                                     <div>
                                         <label for='invert_map' class='col-md-1' style="width: 14.1333%;" text-align="left" title="If ON, alert rule check will run on all devices except the selected devices and groups.">All devices except in list </label>
                                         <input type='checkbox' name='invert_map' id='invert_map'>
-                                    </div>
-                                </div>
-                                <div class="form-group" title="Restricts this alert rule to specified transports.">
-                                    <label for="transports" class="col-sm-3 col-md-2 control-label">Transports </label>
-                                    <div class="col-sm-9 col-md-10">
-                                        <select id="transports" name="transports[]" class="form-control" multiple="multiple"></select>
                                     </div>
                                 </div>
                                 <div class='form-group' title="A link to some documentation on how to handle this alert. This will be included in notifications.">
@@ -231,6 +213,11 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
             }
         });
 
+        function syncAlertOperationHidden() {
+            var v = $('#alert_operation_id').val();
+            $('#alert_operation_id_input').val(v === null || v === undefined ? '' : v);
+        }
+
         $('#btn-save').on('click', function (e) {
             e.preventDefault();
 
@@ -243,7 +230,11 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
             }
             var result_json = $('#builder').queryBuilder('getRules');
 
+            // Clear any previous inline form error
+            $('#alert-rule-form-error').hide().text('');
+
             if (result_json !== null && result_json.valid) {
+                syncAlertOperationHidden();
                 $('#builder_json').val(JSON.stringify(result_json));
                 $.ajax({
                     type: method,
@@ -259,8 +250,17 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                             toastr.error(data.message);
                         }
                     },
-                    error: function (data) {
-                        toastr.error(data.responseJSON.message);
+                    error: function (xhr) {
+                        var msg = 'Request failed';
+                        if (xhr.responseJSON) {
+                            if (xhr.responseJSON.errors && xhr.responseJSON.errors.alert_operation_id && xhr.responseJSON.errors.alert_operation_id[0]) {
+                                msg = xhr.responseJSON.errors.alert_operation_id[0];
+                            } else if (xhr.responseJSON.message) {
+                                msg = xhr.responseJSON.message;
+                            }
+                        }
+
+                        $('#alert-rule-form-error').text(msg).show();
                     }
                 });
             }
@@ -306,6 +306,7 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
         });
 
         $('#create-alert').on('show.bs.modal', function(e) {
+            $('#alert-rule-form-error').hide().text('');
             //get data-id attribute of the clicked element
             var rule_id = $(e.relatedTarget).data('rule_id');
             $('#rule_id').val(rule_id);
@@ -323,16 +324,12 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                 $("#builder").queryBuilder("reset");
                 var $severity = $('#severity');
                 $severity.val($severity.find("option[selected]").val());
-                $("#mute").bootstrapSwitch('state', <?=$default_mute_alerts?>);
                 $("#invert").bootstrapSwitch('state', <?=$default_invert_rule_match?>);
                 $("#recovery").bootstrapSwitch('state', <?=$default_recovery_alerts?>);
                 $("#acknowledgement").bootstrapSwitch('state', <?=$default_acknowledgement_alerts?>);
                 $("#override_query").bootstrapSwitch('state', false);
                 $("#invert_map").bootstrapSwitch('state', <?=$default_invert_map?>);
                 $(this).find("input[type=text]").val("");
-                $('#count').val('<?=$default_max_alerts?>');
-                $('#delay').val('<?=$default_delay?>');
-                $('#interval').val('<?=$default_interval?>');
                 $('#adv_query').val('');
                 $('#notes').val('');
                 $('#severity').val('<?=$default_severity?>');
@@ -342,10 +339,7 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                 $maps.val(null).trigger('change');
                 setRuleDevice();// pre-populate device in the maps if this is a per-device rule
 
-                var $transports = $("#transports");
-                $transports.empty();
-                $transports.val(null).trigger('change');
-                $("#transport-choice").val("email");
+                $('#operations-table tbody.operation-group').remove();
             }
         });
 
@@ -356,6 +350,14 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
             $('#severity').val(rule.severity).trigger('change');
             $('#adv_query').val(rule.adv_query);
             $('#notes').val(rule.notes);
+
+            var $op = $('#alert_operation_id');
+            $op.empty().val(null).trigger('change');
+            if (rule.alert_operation_id) {
+                var opText = rule.alert_operation_name || ('#' + rule.alert_operation_id);
+                $op.append(new Option(opText, rule.alert_operation_id, true, true)).trigger('change');
+            }
+            syncAlertOperationHidden();
 
             var $maps = $('#maps');
             $maps.empty();
@@ -369,43 +371,12 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                     $maps.append(option).trigger('change')
                 });
             }
-            var $transports = $("#transports");
-            $transports.empty();
-            $transports.val(null).trigger('change');
-            if(rule.transports != null) {
-                $.each(rule.transports, function(index, value) {
-                    var option = new Option(value.text, value.id, true, true);
-                    $transports.append(option).trigger("change");
-                });
-            }
 
             if (rule.extra != null) {
                 var extra = rule.extra;
-                $('#count').val(extra.count);
-                if ((extra.delay / 86400) >= 1) {
-                    $('#delay').val(extra.delay / 86400 + 'd');
-                } else if ((extra.delay / 3600) >= 1) {
-                    $('#delay').val( extra.delay / 3600 + 'h');
-                } else if ((extra.delay / 60) >= 1) {
-                    $('#delay').val( extra.delay / 60 + 'm');
-                } else {
-                    $('#delay').val(extra.delay);
-                }
-
-                if ((extra.interval / 86400) >= 1) {
-                    $('#interval').val(extra.interval / 86400 + 'd');
-                } else if ((extra.interval / 3600) >= 1) {
-                    $('#interval').val(extra.interval / 3600 + 'h');
-                } else if ((extra.interval / 60) >= 1) {
-                    $('#interval').val(extra.interval / 60 + 'm');
-                } else {
-                    $('#interval').val(extra.interval);
-                }
-
                 if (extra.adv_query) {
                     $('#adv_query').val(extra.adv_query);
                 }
-                $("[name='mute']").bootstrapSwitch('state', extra.mute);
                 $("[name='invert']").bootstrapSwitch('state', extra.invert);
                 if (typeof extra.recovery == 'undefined') {
                     extra.recovery = '<?=$default_recovery_alerts?>';
@@ -430,8 +401,6 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                 }
 
                 $("[name='override_query']").bootstrapSwitch('state', extra.options.override_query);
-            } else {
-                $('#count').val('<?=$default_max_alerts?>');
             }
         }
 
@@ -454,12 +423,16 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
             }
         });
 
-        $("#transports").select2({
-            width: "100%",
-            placeholder: "Transport/Group Name",
+        $('#alert_operation_id').on('change', syncAlertOperationHidden);
+
+        $('#alert_operation_id').select2({
+            width: '100%',
+            placeholder: '<?php echo __('None (suppress notifications)'); ?>',
+            allowClear: true,
             ajax: {
-                url: '<?php echo route('ajax.select.alert-transports-groups') ?>',
+                url: '<?php echo route('ajax.select.alert-operation') ?>',
                 delay: 150
-            }
+            },
+            dropdownParent: $('#create-alert')
         });
     </script>
