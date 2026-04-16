@@ -219,9 +219,9 @@
                 @if($rrd_num)
                 {{ __('device.edit.size_on_disk') }}: <b>{{ $rrd_size }}</b> in <b>{{ $rrd_num }}</b> {{ __('device.edit.rrd_files') }} |
                 @endif
-                {{ __('device.edit.last_polled') }}: <b>{{ \LibreNMS\Util\Time::format($device->last_polled, 'byminute') }}</b>
+                {{ __('device.edit.last_polled') }}: <b>{{ $device->last_polled ? \LibreNMS\Util\Time::format($device->last_polled, 'byminute') : $device->last_polled }}</b>
                 @if($device->last_discovered)
-                    | {{ __('device.edit.last_discovered') }}: <b>{{ \LibreNMS\Util\Time::format($device->last_discovered, 'byminute') }}</b>
+                    | {{ __('device.edit.last_discovered') }}: <b>{{ $device->last_discovered ? \LibreNMS\Util\Time::format($device->last_discovered, 'byminute') : $device->last_discovered }}</b>
                 @endif
             </div>
         </div>
