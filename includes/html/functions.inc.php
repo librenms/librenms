@@ -828,7 +828,6 @@ function eventlog_severity($eventlog_severity)
     };
 } // end eventlog_severity
 
-
 /**
  * Convert a UTC timestamp to local timezone.
  *
@@ -851,7 +850,6 @@ function format_oxidize_timestamp($time)
         return $time;
     }
 }
-
 
 function get_oxidized_nodes_list()
 {
