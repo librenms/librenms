@@ -2,7 +2,6 @@ os: engenius-switch
 text: 'EnGenius Switch'
 type: network
 icon: engenius
-mib_dir: engenius
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
