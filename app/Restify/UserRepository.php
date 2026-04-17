@@ -25,8 +25,8 @@ class UserRepository extends Repository
     public static function related(): array
     {
         return [
-            'devicesOwned' => BelongsToMany::make('devicesOwned', DeviceRepository::class),
-            'portsOwned' => BelongsToMany::make('portsOwned', PortRepository::class),
+            'devices-owned' => BelongsToMany::make('devicesOwned', DeviceRepository::class)->label('devices-owned'),
+            'ports-owned' => BelongsToMany::make('portsOwned', PortRepository::class)->label('ports-owned'),
         ];
     }
 

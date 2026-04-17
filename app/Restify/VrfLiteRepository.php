@@ -16,6 +16,8 @@ class VrfLiteRepository extends Repository
 
     public static string $model = VrfLite::class;
 
+    public static string $uriKey = 'vrf-lite';
+
     public static string $id = 'vrf_lite_cisco_id';
 
     public static string $title = 'vrf_name';

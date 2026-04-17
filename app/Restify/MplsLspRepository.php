@@ -16,6 +16,8 @@ class MplsLspRepository extends Repository
 
     public static string $model = MplsLsp::class;
 
+    public static string $uriKey = 'mpls-label-switched-paths';
+
     public static string $id = 'lsp_id';
 
     public static string $title = 'mplsLspName';

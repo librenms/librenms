@@ -3,7 +3,6 @@
 namespace App\Restify;
 
 use App\Models\Device;
-use App\Models\Location;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Fields\BelongsToMany;
 use Binaryk\LaravelRestify\Fields\HasMany;
@@ -31,18 +30,49 @@ class DeviceRepository extends Repository
             'ports' => HasMany::make('ports', PortRepository::class),
             'sensors' => HasMany::make('sensors', SensorRepository::class),
             'processors' => HasMany::make('processors', ProcessorRepository::class),
-            'mempools' => HasMany::make('mempools', MempoolRepository::class),
+            'memory-pools' => HasMany::make('mempools', MempoolRepository::class)->label('memory-pools'),
             'storage' => HasMany::make('storage', StorageRepository::class),
             'services' => HasMany::make('services', ServiceRepository::class),
-            'bgpPeers' => HasMany::make('bgpPeers', BgpPeerRepository::class),
+            'bgp-peers' => HasMany::make('bgpPeers', BgpPeerRepository::class)->label('bgp-peers'),
             'components' => HasMany::make('components', ComponentRepository::class),
             'applications' => HasMany::make('applications', ApplicationRepository::class),
             'inventory' => HasMany::make('entityPhysical', InventoryRepository::class),
             'eventlogs' => HasMany::make('eventlogs', EventlogRepository::class),
             'syslogs' => HasMany::make('syslogs', SyslogRepository::class),
-            'alertLogs' => HasMany::make('alertLogs', AlertLogRepository::class),
+            'alert-logs' => HasMany::make('alertLogs', AlertLogRepository::class)->label('alert-logs'),
             'location' => BelongsTo::make('location', LocationRepository::class),
             'groups' => BelongsToMany::make('groups', DeviceGroupRepository::class),
+            'alerts' => HasMany::make('alerts', AlertRepository::class),
+            'outages' => HasMany::make('outages', DeviceOutageRepository::class),
+            'links' => HasMany::make('links', LinkRepository::class),
+            'vlans' => HasMany::make('vlans', VlanRepository::class),
+            'vrfs' => HasMany::make('vrfs', VrfRepository::class),
+            'vrf-lite' => HasMany::make('vrfLites', VrfLiteRepository::class)->label('vrf-lite'),
+            'routes' => HasMany::make('routes', RouteRepository::class),
+            'access-points' => HasMany::make('accessPoints', AccessPointRepository::class)->label('access-points'),
+            'wireless-sensors' => HasMany::make('wirelessSensors', WirelessSensorRepository::class)->label('wireless-sensors'),
+            'disk-io' => HasMany::make('diskIo', DiskIoRepository::class)->label('disk-io'),
+            'service-level-agreements' => HasMany::make('slas', SlaRepository::class)->label('service-level-agreements'),
+            'cef-switching' => HasMany::make('cefSwitching', CefSwitchingRepository::class)->label('cef-switching'),
+            'spanning-trees' => HasMany::make('stpInstances', StpRepository::class)->label('spanning-trees'),
+            'ipsec-tunnels' => HasMany::make('ipsecTunnels', IpsecTunnelRepository::class)->label('ipsec-tunnels'),
+            'isis-adjacencies' => HasMany::make('isisAdjacencies', IsisAdjacencyRepository::class)->label('isis-adjacencies'),
+            'ospf-instances' => HasMany::make('ospfInstances', OspfInstanceRepository::class)->label('ospf-instances'),
+            'ospf-areas' => HasMany::make('ospfAreas', OspfAreaRepository::class)->label('ospf-areas'),
+            'ospf-neighbors' => HasMany::make('ospfNbrs', OspfNbrRepository::class)->label('ospf-neighbors'),
+            'ospf-ports' => HasMany::make('ospfPorts', OspfPortRepository::class)->label('ospf-ports'),
+            'ospfv3-instances' => HasMany::make('ospfv3Instances', Ospfv3InstanceRepository::class)->label('ospfv3-instances'),
+            'ospfv3-areas' => HasMany::make('ospfv3Areas', Ospfv3AreaRepository::class)->label('ospfv3-areas'),
+            'ospfv3-neighbors' => HasMany::make('ospfv3Nbrs', Ospfv3NbrRepository::class)->label('ospfv3-neighbors'),
+            'ospfv3-ports' => HasMany::make('ospfv3Ports', Ospfv3PortRepository::class)->label('ospfv3-ports'),
+            'mpls-label-switched-paths' => HasMany::make('mplsLsps', MplsLspRepository::class)->label('mpls-label-switched-paths'),
+            'mpls-label-switched-path-routes' => HasMany::make('mplsLspPaths', MplsLspPathRepository::class)->label('mpls-label-switched-path-routes'),
+            'mpls-service-distribution-points' => HasMany::make('mplsSdps', MplsSdpRepository::class)->label('mpls-service-distribution-points'),
+            'mpls-service-distribution-point-bindings' => HasMany::make('mplsSdpBinds', MplsSdpBindRepository::class)->label('mpls-service-distribution-point-bindings'),
+            'mpls-service-access-points' => HasMany::make('mplsSaps', MplsSapRepository::class)->label('mpls-service-access-points'),
+            'mpls-services' => HasMany::make('mplsServices', MplsServiceRepository::class)->label('mpls-services'),
+            'mpls-tunnel-actual-route-hops' => HasMany::make('mplsTunnelArHops', MplsTunnelArHopRepository::class)->label('mpls-tunnel-actual-route-hops'),
+            'mpls-tunnel-computed-hops' => HasMany::make('mplsTunnelCHops', MplsTunnelCHopRepository::class)->label('mpls-tunnel-computed-hops'),
         ];
     }
 

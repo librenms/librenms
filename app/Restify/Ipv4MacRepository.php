@@ -15,6 +15,8 @@ class Ipv4MacRepository extends Repository
 
     public static string $model = Ipv4Mac::class;
 
+    public static string $uriKey = 'ipv4-mac-addresses';
+
     public static string $title = 'ipv4_address';
 
 

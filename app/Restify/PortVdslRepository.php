@@ -15,6 +15,8 @@ class PortVdslRepository extends Repository
 
     public static string $model = PortVdsl::class;
 
+    public static string $uriKey = 'port-vdsl';
+
     public static string $id = 'port_id';
 
     public static string $title = 'port_id';

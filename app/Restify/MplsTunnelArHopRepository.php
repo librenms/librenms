@@ -16,6 +16,8 @@ class MplsTunnelArHopRepository extends Repository
 
     public static string $model = MplsTunnelArHop::class;
 
+    public static string $uriKey = 'mpls-tunnel-actual-route-hops';
+
     public static string $id = 'ar_hop_id';
 
     public static string $title = 'mplsTunnelARHopIpv4Addr';
@@ -27,7 +29,7 @@ class MplsTunnelArHopRepository extends Repository
     {
         return [
             'device' => BelongsTo::make('device', DeviceRepository::class),
-            'lspPath' => BelongsTo::make('lspPath', MplsLspPathRepository::class),
+            'label-switched-path-route' => BelongsTo::make('lspPath', MplsLspPathRepository::class)->label('label-switched-path-route'),
         ];
     }
 

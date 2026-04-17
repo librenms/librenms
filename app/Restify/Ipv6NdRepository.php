@@ -16,6 +16,8 @@ class Ipv6NdRepository extends Repository
 {
     public static string $model = Ipv6Nd::class;
 
+    public static string $uriKey = 'ipv6-neighbor-discovery';
+
     public static string $title = 'ipv6_address';
 
 

@@ -15,6 +15,8 @@ class PortStpRepository extends Repository
 
     public static string $model = PortStp::class;
 
+    public static string $uriKey = 'port-spanning-trees';
+
     public static string $id = 'port_stp_id';
 
     public static string $title = 'state';

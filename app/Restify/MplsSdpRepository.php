@@ -16,6 +16,8 @@ class MplsSdpRepository extends Repository
 
     public static string $model = MplsSdp::class;
 
+    public static string $uriKey = 'mpls-service-distribution-points';
+
     public static string $id = 'sdp_id';
 
     public static string $title = 'sdpDescription';

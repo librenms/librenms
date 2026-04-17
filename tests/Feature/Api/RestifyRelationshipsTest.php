@@ -341,10 +341,10 @@ class RestifyRelationshipsTest extends DBTestCase
         $user->devicesOwned()->attach($devices->pluck('device_id'));
         Sanctum::actingAs($user);
 
-        $response = $this->getJson("/api/v1/users/{$user->user_id}?related=devicesOwned");
+        $response = $this->getJson("/api/v1/users/{$user->user_id}?related=devices-owned");
 
         $response->assertStatus(200)
-            ->assertJsonCount(2, 'data.relationships.devicesOwned');
+            ->assertJsonCount(2, 'data.relationships.devices-owned');
     }
 
     public function testUserIncludesPortsOwned(): void
@@ -355,10 +355,10 @@ class RestifyRelationshipsTest extends DBTestCase
         $user->portsOwned()->attach($ports->pluck('port_id'));
         Sanctum::actingAs($user);
 
-        $response = $this->getJson("/api/v1/users/{$user->user_id}?related=portsOwned");
+        $response = $this->getJson("/api/v1/users/{$user->user_id}?related=ports-owned");
 
         $response->assertStatus(200)
-            ->assertJsonCount(2, 'data.relationships.portsOwned');
+            ->assertJsonCount(2, 'data.relationships.ports-owned');
     }
 
     // ── Core monitoring relationships ─────────────────────
@@ -396,10 +396,10 @@ class RestifyRelationshipsTest extends DBTestCase
         Mempool::factory()->count(2)->for($device)->create();
         Sanctum::actingAs($user);
 
-        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=mempools");
+        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=memory-pools");
 
         $response->assertStatus(200)
-            ->assertJsonCount(2, 'data.relationships.mempools');
+            ->assertJsonCount(2, 'data.relationships.memory-pools');
     }
 
     public function testDeviceShowIncludesStorage(): void
@@ -461,10 +461,10 @@ class RestifyRelationshipsTest extends DBTestCase
         BgpPeer::factory()->count(2)->for($device)->create();
         Sanctum::actingAs($user);
 
-        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=bgpPeers");
+        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=bgp-peers");
 
         $response->assertStatus(200)
-            ->assertJsonCount(2, 'data.relationships.bgpPeers');
+            ->assertJsonCount(2, 'data.relationships.bgp-peers');
     }
 
     public function testDeviceShowIncludesEventlogs(): void
@@ -501,10 +501,10 @@ class RestifyRelationshipsTest extends DBTestCase
         AlertLog::factory()->count(2)->for($device)->create();
         Sanctum::actingAs($user);
 
-        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=alertLogs");
+        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=alert-logs");
 
         $response->assertStatus(200)
-            ->assertJsonCount(2, 'data.relationships.alertLogs');
+            ->assertJsonCount(2, 'data.relationships.alert-logs');
     }
 
     public function testAlertLogShowIncludesDevice(): void

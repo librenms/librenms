@@ -16,6 +16,8 @@ class DiskIoRepository extends Repository
 
     public static string $model = DiskIo::class;
 
+    public static string $uriKey = 'disk-io';
+
     public static string $id = 'diskio_id';
 
     public static string $title = 'diskio_descr';

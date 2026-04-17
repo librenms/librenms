@@ -15,6 +15,8 @@ class PortAdslRepository extends Repository
 
     public static string $model = PortAdsl::class;
 
+    public static string $uriKey = 'port-adsl';
+
     public static string $id = 'port_id';
 
     public static string $title = 'adslLineCoding';

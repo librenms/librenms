@@ -5,6 +5,8 @@ namespace App\Restify;
 use App\Models\Port;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Fields\BelongsToMany;
+use Binaryk\LaravelRestify\Fields\HasMany;
+use Binaryk\LaravelRestify\Fields\HasOne;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
@@ -28,6 +30,17 @@ class PortRepository extends Repository
         return [
             'device' => BelongsTo::make('device', DeviceRepository::class),
             'groups' => BelongsToMany::make('groups', PortGroupRepository::class),
+            'ipv4-addresses' => HasMany::make('ipv4', Ipv4AddressRepository::class)->label('ipv4-addresses'),
+            'ipv6-addresses' => HasMany::make('ipv6', Ipv6AddressRepository::class)->label('ipv6-addresses'),
+            'forwarding-database-entries' => HasMany::make('fdbEntries', PortsFdbRepository::class)->label('forwarding-database-entries'),
+            'network-access-controls' => HasMany::make('nac', PortsNacRepository::class)->label('network-access-controls'),
+            'neighbor-discovery' => HasMany::make('nd', Ipv6NdRepository::class)->label('neighbor-discovery'),
+            'vlans' => HasMany::make('vlans', PortVlanRepository::class),
+            'statistics' => HasMany::make('statistics', PortStatisticRepository::class),
+            'spanning-tree' => HasMany::make('stp', PortStpRepository::class)->label('spanning-tree'),
+            'transceivers' => HasMany::make('transceivers', TransceiverRepository::class),
+            'adsl' => HasOne::make('adsl', PortAdslRepository::class),
+            'vdsl' => HasOne::make('vdsl', PortVdslRepository::class),
         ];
     }
 

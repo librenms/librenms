@@ -16,6 +16,8 @@ class OspfNbrRepository extends Repository
 
     public static string $model = OspfNbr::class;
 
+    public static string $uriKey = 'ospf-neighbors';
+
     public static string $title = 'ospfNbrIpAddr';
 
 

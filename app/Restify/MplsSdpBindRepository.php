@@ -16,6 +16,8 @@ class MplsSdpBindRepository extends Repository
 
     public static string $model = MplsSdpBind::class;
 
+    public static string $uriKey = 'mpls-service-distribution-point-bindings';
+
     public static string $id = 'bind_id';
 
     public static string $title = 'bind_id';
@@ -26,7 +28,7 @@ class MplsSdpBindRepository extends Repository
     {
         return [
             'device' => BelongsTo::make('device', DeviceRepository::class),
-            'sdp' => BelongsTo::make('sdp', MplsSdpRepository::class),
+            'service-distribution-point' => BelongsTo::make('sdp', MplsSdpRepository::class)->label('service-distribution-point'),
             'service' => BelongsTo::make('service', MplsServiceRepository::class),
         ];
     }

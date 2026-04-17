@@ -16,6 +16,8 @@ class StpRepository extends Repository
 
     public static string $model = Stp::class;
 
+    public static string $uriKey = 'spanning-trees';
+
     public static string $id = 'stp_id';
 
     public static string $title = 'bridgeAddress';

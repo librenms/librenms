@@ -16,6 +16,8 @@ class Ospfv3NbrRepository extends Repository
 
     public static string $model = Ospfv3Nbr::class;
 
+    public static string $uriKey = 'ospfv3-neighbors';
+
     public static string $title = 'ospfv3NbrRtrId';
 
 

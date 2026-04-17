@@ -16,6 +16,8 @@ class MplsSapRepository extends Repository
 
     public static string $model = MplsSap::class;
 
+    public static string $uriKey = 'mpls-service-access-points';
+
     public static string $id = 'sap_id';
 
     public static string $title = 'sapDescription';

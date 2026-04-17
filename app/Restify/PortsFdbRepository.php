@@ -16,6 +16,8 @@ class PortsFdbRepository extends Repository
 
     public static string $model = PortsFdb::class;
 
+    public static string $uriKey = 'port-forwarding-database-entries';
+
     public static string $id = 'ports_fdb_id';
 
     public static string $title = 'mac_address';

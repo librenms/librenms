@@ -16,6 +16,8 @@ class CefSwitchingRepository extends Repository
 
     public static string $model = CefSwitching::class;
 
+    public static string $uriKey = 'cef-switching';
+
     public static string $id = 'cef_switching_id';
 
     public static string $title = 'cef_path';

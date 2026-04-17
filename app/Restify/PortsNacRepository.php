@@ -15,6 +15,8 @@ class PortsNacRepository extends Repository
 
     public static string $model = PortsNac::class;
 
+    public static string $uriKey = 'port-network-access-controls';
+
     public static string $id = 'ports_nac_id';
 
     public static string $title = 'username';

@@ -16,6 +16,8 @@ class MplsLspPathRepository extends Repository
 
     public static string $model = MplsLspPath::class;
 
+    public static string $uriKey = 'mpls-label-switched-path-routes';
+
     public static string $id = 'lsp_path_id';
 
     public static string $title = 'mplsLspPathType';
@@ -27,7 +29,7 @@ class MplsLspPathRepository extends Repository
     {
         return [
             'device' => BelongsTo::make('device', DeviceRepository::class),
-            'lsp' => BelongsTo::make('lsp', MplsLspRepository::class),
+            'label-switched-path' => BelongsTo::make('lsp', MplsLspRepository::class)->label('label-switched-path'),
         ];
     }
 

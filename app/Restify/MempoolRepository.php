@@ -16,6 +16,8 @@ class MempoolRepository extends Repository
 
     public static string $model = Mempool::class;
 
+    public static string $uriKey = 'memory-pools';
+
     public static string $id = 'mempool_id';
 
     public static string $title = 'mempool_descr';

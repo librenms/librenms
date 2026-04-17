@@ -1506,7 +1506,7 @@ class RestifyApiTest extends DBTestCase
         Mempool::factory()->count(2)->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mempools')
+        $this->getJson('/api/v1/memory-pools')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 2);
     }
@@ -1518,7 +1518,7 @@ class RestifyApiTest extends DBTestCase
         $mempool = Mempool::factory()->for($device)->create(['mempool_descr' => 'Physical Memory']);
         Sanctum::actingAs($user);
 
-        $this->getJson("/api/v1/mempools/{$mempool->mempool_id}")
+        $this->getJson("/api/v1/memory-pools/{$mempool->mempool_id}")
             ->assertStatus(200)
             ->assertJsonPath('data.attributes.description', 'Physical Memory');
     }
@@ -1530,7 +1530,7 @@ class RestifyApiTest extends DBTestCase
         Mempool::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mempools')
+        $this->getJson('/api/v1/memory-pools')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'category', 'description', 'percentage',
                 'used', 'free', 'total',
@@ -1542,7 +1542,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/mempools', ['category' => 'hrstorage'])
+        $this->postJsonApi('/api/v1/memory-pools', ['category' => 'hrstorage'])
             ->assertStatus(403);
     }
 
@@ -2311,7 +2311,7 @@ class RestifyApiTest extends DBTestCase
         OspfNbr::factory()->count(3)->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/ospf-nbrs')
+        $this->getJson('/api/v1/ospf-neighbors')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 3);
     }
@@ -2324,7 +2324,7 @@ class RestifyApiTest extends DBTestCase
         OspfNbr::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/ospf-nbrs')
+        $this->getJson('/api/v1/ospf-neighbors')
             ->assertStatus(403);
     }
 
@@ -2335,7 +2335,7 @@ class RestifyApiTest extends DBTestCase
         OspfNbr::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/ospf-nbrs')
+        $this->getJson('/api/v1/ospf-neighbors')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'ipAddress', 'routerId', 'state',
             ]]]]);
@@ -2346,7 +2346,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ospf-nbrs', ['ipAddress' => '10.0.0.1'])
+        $this->postJsonApi('/api/v1/ospf-neighbors', ['ipAddress' => '10.0.0.1'])
             ->assertStatus(403);
     }
 
@@ -2531,7 +2531,7 @@ class RestifyApiTest extends DBTestCase
         Ospfv3Nbr::factory()->count(3)->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/ospfv3-nbrs')
+        $this->getJson('/api/v1/ospfv3-neighbors')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 3);
     }
@@ -2545,7 +2545,7 @@ class RestifyApiTest extends DBTestCase
         Ospfv3Nbr::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/ospfv3-nbrs')
+        $this->getJson('/api/v1/ospfv3-neighbors')
             ->assertStatus(403);
     }
 
@@ -2557,7 +2557,7 @@ class RestifyApiTest extends DBTestCase
         Ospfv3Nbr::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/ospfv3-nbrs')
+        $this->getJson('/api/v1/ospfv3-neighbors')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'routerId', 'address', 'state',
             ]]]]);
@@ -2568,7 +2568,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ospfv3-nbrs', ['routerId' => '1.1.1.1'])
+        $this->postJsonApi('/api/v1/ospfv3-neighbors', ['routerId' => '1.1.1.1'])
             ->assertStatus(403);
     }
 
@@ -2756,7 +2756,7 @@ class RestifyApiTest extends DBTestCase
         VrfLite::factory()->count(3)->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/vrf-lites')
+        $this->getJson('/api/v1/vrf-lite')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 3);
     }
@@ -2769,7 +2769,7 @@ class RestifyApiTest extends DBTestCase
         VrfLite::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/vrf-lites')
+        $this->getJson('/api/v1/vrf-lite')
             ->assertStatus(403);
     }
 
@@ -2780,7 +2780,7 @@ class RestifyApiTest extends DBTestCase
         VrfLite::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/vrf-lites')
+        $this->getJson('/api/v1/vrf-lite')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'contextName', 'name',
             ]]]]);
@@ -2791,7 +2791,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/vrf-lites', ['name' => 'test'])
+        $this->postJsonApi('/api/v1/vrf-lite', ['name' => 'test'])
             ->assertStatus(403);
     }
 
@@ -2869,7 +2869,7 @@ class RestifyApiTest extends DBTestCase
         MplsLsp::factory()->count(3)->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-lsps')
+        $this->getJson('/api/v1/mpls-label-switched-paths')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 3);
     }
@@ -2882,7 +2882,7 @@ class RestifyApiTest extends DBTestCase
         MplsLsp::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-lsps')
+        $this->getJson('/api/v1/mpls-label-switched-paths')
             ->assertStatus(403);
     }
 
@@ -2893,7 +2893,7 @@ class RestifyApiTest extends DBTestCase
         MplsLsp::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-lsps')
+        $this->getJson('/api/v1/mpls-label-switched-paths')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'name', 'adminState', 'operationalState',
                 'fromAddress', 'toAddress',
@@ -2905,7 +2905,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/mpls-lsps', ['name' => 'test'])
+        $this->postJsonApi('/api/v1/mpls-label-switched-paths', ['name' => 'test'])
             ->assertStatus(403);
     }
 
@@ -2918,7 +2918,7 @@ class RestifyApiTest extends DBTestCase
         MplsLspPath::factory()->count(3)->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-lsp-paths')
+        $this->getJson('/api/v1/mpls-label-switched-path-routes')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 3);
     }
@@ -2931,7 +2931,7 @@ class RestifyApiTest extends DBTestCase
         MplsLspPath::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-lsp-paths')
+        $this->getJson('/api/v1/mpls-label-switched-path-routes')
             ->assertStatus(403);
     }
 
@@ -2942,7 +2942,7 @@ class RestifyApiTest extends DBTestCase
         MplsLspPath::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-lsp-paths')
+        $this->getJson('/api/v1/mpls-label-switched-path-routes')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'category', 'adminState', 'operationalState',
             ]]]]);
@@ -2953,7 +2953,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/mpls-lsp-paths', ['category' => 'primary'])
+        $this->postJsonApi('/api/v1/mpls-label-switched-path-routes', ['category' => 'primary'])
             ->assertStatus(403);
     }
 
@@ -2966,7 +2966,7 @@ class RestifyApiTest extends DBTestCase
         MplsSdp::factory()->count(3)->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-sdps')
+        $this->getJson('/api/v1/mpls-service-distribution-points')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 3);
     }
@@ -2979,7 +2979,7 @@ class RestifyApiTest extends DBTestCase
         MplsSdp::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-sdps')
+        $this->getJson('/api/v1/mpls-service-distribution-points')
             ->assertStatus(403);
     }
 
@@ -2990,7 +2990,7 @@ class RestifyApiTest extends DBTestCase
         MplsSdp::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-sdps')
+        $this->getJson('/api/v1/mpls-service-distribution-points')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'description', 'adminStatus', 'operationalStatus',
             ]]]]);
@@ -3001,7 +3001,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/mpls-sdps', ['description' => 'test'])
+        $this->postJsonApi('/api/v1/mpls-service-distribution-points', ['description' => 'test'])
             ->assertStatus(403);
     }
 
@@ -3014,7 +3014,7 @@ class RestifyApiTest extends DBTestCase
         MplsSdpBind::factory()->count(3)->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-sdp-binds')
+        $this->getJson('/api/v1/mpls-service-distribution-point-bindings')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 3);
     }
@@ -3027,7 +3027,7 @@ class RestifyApiTest extends DBTestCase
         MplsSdpBind::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-sdp-binds')
+        $this->getJson('/api/v1/mpls-service-distribution-point-bindings')
             ->assertStatus(403);
     }
 
@@ -3038,7 +3038,7 @@ class RestifyApiTest extends DBTestCase
         MplsSdpBind::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-sdp-binds')
+        $this->getJson('/api/v1/mpls-service-distribution-point-bindings')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'adminStatus', 'operationalStatus',
             ]]]]);
@@ -3049,7 +3049,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/mpls-sdp-binds', ['sdp_id' => 1])
+        $this->postJsonApi('/api/v1/mpls-service-distribution-point-bindings', ['sdp_id' => 1])
             ->assertStatus(403);
     }
 
@@ -3110,7 +3110,7 @@ class RestifyApiTest extends DBTestCase
         MplsSap::factory()->count(3)->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-saps')
+        $this->getJson('/api/v1/mpls-service-access-points')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 3);
     }
@@ -3123,7 +3123,7 @@ class RestifyApiTest extends DBTestCase
         MplsSap::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-saps')
+        $this->getJson('/api/v1/mpls-service-access-points')
             ->assertStatus(403);
     }
 
@@ -3134,7 +3134,7 @@ class RestifyApiTest extends DBTestCase
         MplsSap::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-saps')
+        $this->getJson('/api/v1/mpls-service-access-points')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'description', 'adminStatus', 'operationalStatus',
             ]]]]);
@@ -3145,7 +3145,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/mpls-saps', ['description' => 'test'])
+        $this->postJsonApi('/api/v1/mpls-service-access-points', ['description' => 'test'])
             ->assertStatus(403);
     }
 
@@ -3158,7 +3158,7 @@ class RestifyApiTest extends DBTestCase
         MplsTunnelArHop::factory()->count(3)->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-tunnel-ar-hops')
+        $this->getJson('/api/v1/mpls-tunnel-actual-route-hops')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 3);
     }
@@ -3171,7 +3171,7 @@ class RestifyApiTest extends DBTestCase
         MplsTunnelArHop::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-tunnel-ar-hops')
+        $this->getJson('/api/v1/mpls-tunnel-actual-route-hops')
             ->assertStatus(403);
     }
 
@@ -3182,7 +3182,7 @@ class RestifyApiTest extends DBTestCase
         MplsTunnelArHop::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-tunnel-ar-hops')
+        $this->getJson('/api/v1/mpls-tunnel-actual-route-hops')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'ipv4Address', 'addressCategory',
             ]]]]);
@@ -3193,7 +3193,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/mpls-tunnel-ar-hops', ['ipv4Address' => '10.0.0.1'])
+        $this->postJsonApi('/api/v1/mpls-tunnel-actual-route-hops', ['ipv4Address' => '10.0.0.1'])
             ->assertStatus(403);
     }
 
@@ -3206,7 +3206,7 @@ class RestifyApiTest extends DBTestCase
         MplsTunnelCHop::factory()->count(3)->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-tunnel-c-hops')
+        $this->getJson('/api/v1/mpls-tunnel-computed-hops')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 3);
     }
@@ -3219,7 +3219,7 @@ class RestifyApiTest extends DBTestCase
         MplsTunnelCHop::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-tunnel-c-hops')
+        $this->getJson('/api/v1/mpls-tunnel-computed-hops')
             ->assertStatus(403);
     }
 
@@ -3230,7 +3230,7 @@ class RestifyApiTest extends DBTestCase
         MplsTunnelCHop::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/mpls-tunnel-c-hops')
+        $this->getJson('/api/v1/mpls-tunnel-computed-hops')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'ipv4Address', 'addressCategory',
             ]]]]);
@@ -3241,7 +3241,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/mpls-tunnel-c-hops', ['ipv4Address' => '10.0.0.1'])
+        $this->postJsonApi('/api/v1/mpls-tunnel-computed-hops', ['ipv4Address' => '10.0.0.1'])
             ->assertStatus(403);
     }
 
@@ -3547,7 +3547,7 @@ class RestifyApiTest extends DBTestCase
         Ipv4Mac::factory()->count(3)->create(['port_id' => $port->port_id, 'device_id' => $device->device_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/ipv4-macs')
+        $this->getJson('/api/v1/ipv4-mac-addresses')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 3);
     }
@@ -3561,7 +3561,7 @@ class RestifyApiTest extends DBTestCase
         Ipv4Mac::factory()->create(['port_id' => $port->port_id, 'device_id' => $device->device_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/ipv4-macs')
+        $this->getJson('/api/v1/ipv4-mac-addresses')
             ->assertStatus(403);
     }
 
@@ -3573,7 +3573,7 @@ class RestifyApiTest extends DBTestCase
         Ipv4Mac::factory()->create(['port_id' => $port->port_id, 'device_id' => $device->device_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/ipv4-macs')
+        $this->getJson('/api/v1/ipv4-mac-addresses')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'macAddress', 'ipv4Address',
             ]]]]);
@@ -3584,7 +3584,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ipv4-macs', ['macAddress' => 'aa:bb:cc:dd:ee:ff'])
+        $this->postJsonApi('/api/v1/ipv4-mac-addresses', ['macAddress' => 'aa:bb:cc:dd:ee:ff'])
             ->assertStatus(403);
     }
 
@@ -3598,7 +3598,7 @@ class RestifyApiTest extends DBTestCase
         PortsFdb::factory()->count(3)->create(['port_id' => $port->port_id, 'device_id' => $device->device_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/ports-fdbs')
+        $this->getJson('/api/v1/port-forwarding-database-entries')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 3);
     }
@@ -3612,7 +3612,7 @@ class RestifyApiTest extends DBTestCase
         PortsFdb::factory()->create(['port_id' => $port->port_id, 'device_id' => $device->device_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/ports-fdbs')
+        $this->getJson('/api/v1/port-forwarding-database-entries')
             ->assertStatus(403);
     }
 
@@ -3624,7 +3624,7 @@ class RestifyApiTest extends DBTestCase
         PortsFdb::factory()->create(['port_id' => $port->port_id, 'device_id' => $device->device_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/ports-fdbs')
+        $this->getJson('/api/v1/port-forwarding-database-entries')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'macAddress',
             ]]]]);
@@ -3635,7 +3635,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ports-fdbs', ['macAddress' => 'aa:bb:cc:dd:ee:ff'])
+        $this->postJsonApi('/api/v1/port-forwarding-database-entries', ['macAddress' => 'aa:bb:cc:dd:ee:ff'])
             ->assertStatus(403);
     }
 
@@ -3649,7 +3649,7 @@ class RestifyApiTest extends DBTestCase
         Ipv6Nd::factory()->count(3)->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/ipv6-nds')
+        $this->getJson('/api/v1/ipv6-neighbor-discovery')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 3);
     }
@@ -3663,7 +3663,7 @@ class RestifyApiTest extends DBTestCase
         Ipv6Nd::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/ipv6-nds')
+        $this->getJson('/api/v1/ipv6-neighbor-discovery')
             ->assertStatus(403);
     }
 
@@ -3675,7 +3675,7 @@ class RestifyApiTest extends DBTestCase
         Ipv6Nd::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/ipv6-nds')
+        $this->getJson('/api/v1/ipv6-neighbor-discovery')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'macAddress', 'ipv6Address',
             ]]]]);
@@ -3686,7 +3686,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ipv6-nds', ['ipv6Address' => '::1'])
+        $this->postJsonApi('/api/v1/ipv6-neighbor-discovery', ['ipv6Address' => '::1'])
             ->assertStatus(403);
     }
 
@@ -3897,7 +3897,7 @@ class RestifyApiTest extends DBTestCase
         DiskIo::factory()->count(3)->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/disk-ios')
+        $this->getJson('/api/v1/disk-io')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 3);
     }
@@ -3910,7 +3910,7 @@ class RestifyApiTest extends DBTestCase
         DiskIo::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/disk-ios')
+        $this->getJson('/api/v1/disk-io')
             ->assertStatus(403);
     }
 
@@ -3921,7 +3921,7 @@ class RestifyApiTest extends DBTestCase
         DiskIo::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/disk-ios')
+        $this->getJson('/api/v1/disk-io')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'index', 'description',
             ]]]]);
@@ -3932,7 +3932,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/disk-ios', ['description' => 'test'])
+        $this->postJsonApi('/api/v1/disk-io', ['description' => 'test'])
             ->assertStatus(403);
     }
 
@@ -3945,7 +3945,7 @@ class RestifyApiTest extends DBTestCase
         Sla::factory()->count(3)->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/slas')
+        $this->getJson('/api/v1/service-level-agreements')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 3);
     }
@@ -3958,7 +3958,7 @@ class RestifyApiTest extends DBTestCase
         Sla::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/slas')
+        $this->getJson('/api/v1/service-level-agreements')
             ->assertStatus(403);
     }
 
@@ -3969,7 +3969,7 @@ class RestifyApiTest extends DBTestCase
         Sla::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/slas')
+        $this->getJson('/api/v1/service-level-agreements')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'owner', 'tag', 'rttCategory', 'status',
             ]]]]);
@@ -3980,7 +3980,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/slas', ['tag' => 'test'])
+        $this->postJsonApi('/api/v1/service-level-agreements', ['tag' => 'test'])
             ->assertStatus(403);
     }
 
@@ -4237,7 +4237,7 @@ class RestifyApiTest extends DBTestCase
         PortStp::factory()->count(3)->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/port-stps')
+        $this->getJson('/api/v1/port-spanning-trees')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 3);
     }
@@ -4251,7 +4251,7 @@ class RestifyApiTest extends DBTestCase
         PortStp::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/port-stps')
+        $this->getJson('/api/v1/port-spanning-trees')
             ->assertStatus(403);
     }
 
@@ -4263,7 +4263,7 @@ class RestifyApiTest extends DBTestCase
         PortStp::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/port-stps')
+        $this->getJson('/api/v1/port-spanning-trees')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'vlan', 'state', 'designatedRoot',
             ]]]]);
@@ -4274,7 +4274,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/port-stps', ['state' => 'forwarding'])
+        $this->postJsonApi('/api/v1/port-spanning-trees', ['state' => 'forwarding'])
             ->assertStatus(403);
     }
 
@@ -4287,7 +4287,7 @@ class RestifyApiTest extends DBTestCase
         Stp::factory()->count(3)->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/stps')
+        $this->getJson('/api/v1/spanning-trees')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 3);
     }
@@ -4300,7 +4300,7 @@ class RestifyApiTest extends DBTestCase
         Stp::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/stps')
+        $this->getJson('/api/v1/spanning-trees')
             ->assertStatus(403);
     }
 
@@ -4311,7 +4311,7 @@ class RestifyApiTest extends DBTestCase
         Stp::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/stps')
+        $this->getJson('/api/v1/spanning-trees')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'bridgeAddress', 'designatedRoot', 'priority',
             ]]]]);
@@ -4322,7 +4322,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/stps', ['bridgeAddress' => 'aa:bb:cc:dd:ee:ff'])
+        $this->postJsonApi('/api/v1/spanning-trees', ['bridgeAddress' => 'aa:bb:cc:dd:ee:ff'])
             ->assertStatus(403);
     }
 
@@ -4336,7 +4336,7 @@ class RestifyApiTest extends DBTestCase
         PortAdsl::factory()->create(['port_id' => $port->port_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/port-adsls')
+        $this->getJson('/api/v1/port-adsl')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 1);
     }
@@ -4350,7 +4350,7 @@ class RestifyApiTest extends DBTestCase
         PortAdsl::factory()->create(['port_id' => $port->port_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/port-adsls')
+        $this->getJson('/api/v1/port-adsl')
             ->assertStatus(403);
     }
 
@@ -4362,7 +4362,7 @@ class RestifyApiTest extends DBTestCase
         PortAdsl::factory()->create(['port_id' => $port->port_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/port-adsls')
+        $this->getJson('/api/v1/port-adsl')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'atucCurrentSnrMargin', 'atucChannelCurrentTransmitRate',
             ]]]]);
@@ -4373,7 +4373,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/port-adsls', ['lineCoding' => 'DMT'])
+        $this->postJsonApi('/api/v1/port-adsl', ['lineCoding' => 'DMT'])
             ->assertStatus(403);
     }
 
@@ -4387,7 +4387,7 @@ class RestifyApiTest extends DBTestCase
         PortVdsl::factory()->create(['port_id' => $port->port_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/port-vdsls')
+        $this->getJson('/api/v1/port-vdsl')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 1);
     }
@@ -4401,7 +4401,7 @@ class RestifyApiTest extends DBTestCase
         PortVdsl::factory()->create(['port_id' => $port->port_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/port-vdsls')
+        $this->getJson('/api/v1/port-vdsl')
             ->assertStatus(403);
     }
 
@@ -4413,7 +4413,7 @@ class RestifyApiTest extends DBTestCase
         PortVdsl::factory()->create(['port_id' => $port->port_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/port-vdsls')
+        $this->getJson('/api/v1/port-vdsl')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'attainableRateDownstream', 'actualDataRateReceive',
             ]]]]);
@@ -4424,7 +4424,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/port-vdsls', ['attainableRateDownstream' => 100000])
+        $this->postJsonApi('/api/v1/port-vdsl', ['attainableRateDownstream' => 100000])
             ->assertStatus(403);
     }
 
@@ -4438,7 +4438,7 @@ class RestifyApiTest extends DBTestCase
         PortsNac::factory()->count(3)->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/ports-nacs')
+        $this->getJson('/api/v1/port-network-access-controls')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 3);
     }
@@ -4452,7 +4452,7 @@ class RestifyApiTest extends DBTestCase
         PortsNac::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/ports-nacs')
+        $this->getJson('/api/v1/port-network-access-controls')
             ->assertStatus(403);
     }
 
@@ -4464,7 +4464,7 @@ class RestifyApiTest extends DBTestCase
         PortsNac::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/ports-nacs')
+        $this->getJson('/api/v1/port-network-access-controls')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'username', 'macAddress', 'authorizationStatus',
             ]]]]);
@@ -4475,7 +4475,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/ports-nacs', ['username' => 'test'])
+        $this->postJsonApi('/api/v1/port-network-access-controls', ['username' => 'test'])
             ->assertStatus(403);
     }
 
@@ -4587,7 +4587,7 @@ class RestifyApiTest extends DBTestCase
         CefSwitching::factory()->count(3)->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/cef-switchings')
+        $this->getJson('/api/v1/cef-switching')
             ->assertStatus(200)
             ->assertJsonPath('meta.total', 3);
     }
@@ -4600,7 +4600,7 @@ class RestifyApiTest extends DBTestCase
         CefSwitching::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/cef-switchings')
+        $this->getJson('/api/v1/cef-switching')
             ->assertStatus(403);
     }
 
@@ -4611,7 +4611,7 @@ class RestifyApiTest extends DBTestCase
         CefSwitching::factory()->for($device)->create();
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/v1/cef-switchings')
+        $this->getJson('/api/v1/cef-switching')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => [['attributes' => [ 'afi', 'path', 'drops', 'punts',
             ]]]]);
@@ -4622,7 +4622,7 @@ class RestifyApiTest extends DBTestCase
         $user = User::factory()->admin()->create();
         Sanctum::actingAs($user);
 
-        $this->postJsonApi('/api/v1/cef-switchings', ['path' => 'receive'])
+        $this->postJsonApi('/api/v1/cef-switching', ['path' => 'receive'])
             ->assertStatus(403);
     }
 }

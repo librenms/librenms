@@ -16,6 +16,8 @@ class SlaRepository extends Repository
 
     public static string $model = Sla::class;
 
+    public static string $uriKey = 'service-level-agreements';
+
     public static string $id = 'sla_id';
 
     public static string $title = 'tag';
