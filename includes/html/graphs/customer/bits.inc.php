@@ -20,6 +20,7 @@ $rrd_list = Port::with('device')
                 'descr_out' => Rewrite::shortenIfName($port->ifDescr),
             ];
         }
+
         return $rrd;
     }, []);
 
