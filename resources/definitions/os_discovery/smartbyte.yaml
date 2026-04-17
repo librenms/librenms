@@ -47,8 +47,8 @@ modules:
                     descr: 'Power {{ $index }} state'
                     state_name: 'NMS-SYS-MIB::powerState'
                     states:
-                        - { descr: 'on', graph: 1, value: 1, generic: 0 }
-                        - { descr: 'off', graph: 2, value: 2, generic: 2 }
+                        - { descr: 'on', value: 1, generic: 0 }
+                        - { descr: 'off', value: 2, generic: 2 }
                 -   
                     oid: NMS-SYS-MIB::fanStatusTable
                     value: NMS-SYS-MIB::fanStatus
@@ -57,8 +57,8 @@ modules:
                     descr: 'Fan {{ $index }} status'
                     state_name: 'NMS-SYS-MIB::fanStatus'
                     states:
-                        - { descr: normal, graph: 1, value: 1, generic: 0 }
-                        - { descr: failure, graph: 0, value: 2, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: failure, value: 2, generic: 2 }
                 - 
                     oid: NMS-SYS-MIB::fanStatusTable
                     value: NMS-SYS-MIB::fanSpeedStatus
@@ -67,10 +67,10 @@ modules:
                     index: 'fanSpeedStatus.{{ $index }}'
                     state_name: 'NMS-SYS-MIB::fanSpeedStatus'
                     states:
-                        - { descr: unknown, graph: 0, value: 0, generic: 2 }
-                        - { descr: low, graph: 1, value: 1, generic: 0 }
-                        - { descr: medium, graph: 2, value: 2, generic: 0 }
-                        - { descr: high, graph: 3, value: 3, generic: 0 }
+                        - { descr: unknown, value: 0, generic: 2 }
+                        - { descr: low, value: 1, generic: 0 }
+                        - { descr: medium, value: 2, generic: 0 }
+                        - { descr: high, value: 3, generic: 0 }
         dbm:
             data:
                 - 

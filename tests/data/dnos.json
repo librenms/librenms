@@ -24436,8 +24436,8 @@
                 {
                     "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.4.2.1.1",
-                    "processor_index": "dellNetCpuUtil1Min.2.1.1",
+                    "processor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.4.stack.1.1",
+                    "processor_index": "dellNetCpuUtil1Min.stack.1.1",
                     "processor_type": "dnos",
                     "processor_usage": 12,
                     "processor_descr": "1m Utilization",
@@ -24447,8 +24447,8 @@
                 {
                     "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.5.2.1.1",
-                    "processor_index": "dellNetCpuUtil5Min.2.1.1",
+                    "processor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.5.stack.1.1",
+                    "processor_index": "dellNetCpuUtil5Min.stack.1.1",
                     "processor_type": "dnos",
                     "processor_usage": 8,
                     "processor_descr": "5m Utilization",
@@ -24457,7 +24457,32 @@
                 }
             ]
         },
-        "poller": "matches discovery"
+        "poller": {
+            "processors": [
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.4.stack.1.1",
+                    "processor_index": "dellNetCpuUtil1Min.stack.1.1",
+                    "processor_type": "dnos",
+                    "processor_usage": 0,
+                    "processor_descr": "1m Utilization",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.5.stack.1.1",
+                    "processor_index": "dellNetCpuUtil5Min.stack.1.1",
+                    "processor_type": "dnos",
+                    "processor_usage": 0,
+                    "processor_descr": "5m Utilization",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                }
+            ]
+        }
     },
     "vlans": {
         "discovery": {
@@ -24759,42 +24784,36 @@
                 {
                     "state_name": "dellNetFanTrayOperStatus",
                     "state_descr": "up",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dellNetFanTrayOperStatus",
                     "state_descr": "down",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "dellNetFanTrayOperStatus",
                     "state_descr": "absent",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "dellNetPowerSupplyOperStatus",
                     "state_descr": "up",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dellNetPowerSupplyOperStatus",
                     "state_descr": "down",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "dellNetPowerSupplyOperStatus",
                     "state_descr": "absent",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 }
@@ -24814,11 +24833,11 @@
                     "mempool_descr": "Memory Usage",
                     "mempool_perc": 30,
                     "mempool_perc_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.6.2.1.1",
-                    "mempool_used": 644245094,
+                    "mempool_used": 31457280,
                     "mempool_used_oid": null,
-                    "mempool_free": 1503238554,
+                    "mempool_free": 73400320,
                     "mempool_free_oid": null,
-                    "mempool_total": 2147483648,
+                    "mempool_total": 104857600,
                     "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
@@ -24849,6 +24868,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -24868,6 +24888,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "DELL",
+                    "entPhysicalMfgDate": "12848-49-54,45:48:51.45,249",
                     "ifIndex": null
                 },
                 {
@@ -24887,6 +24908,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -24906,6 +24928,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1048580
                 },
                 {
@@ -24925,6 +24948,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1048708
                 },
                 {
@@ -24944,6 +24968,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1048836
                 },
                 {
@@ -24963,6 +24988,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1048964
                 },
                 {
@@ -24982,6 +25008,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1049092
                 },
                 {
@@ -25001,6 +25028,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1049220
                 },
                 {
@@ -25020,6 +25048,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1049348
                 },
                 {
@@ -25039,6 +25068,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1049476
                 },
                 {
@@ -25058,6 +25088,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1049604
                 },
                 {
@@ -25077,6 +25108,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1049732
                 },
                 {
@@ -25096,6 +25128,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1049860
                 },
                 {
@@ -25115,6 +25148,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1049988
                 },
                 {
@@ -25134,6 +25168,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1050116
                 },
                 {
@@ -25153,6 +25188,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1050244
                 },
                 {
@@ -25172,6 +25208,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1050372
                 },
                 {
@@ -25191,6 +25228,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1050500
                 },
                 {
@@ -25210,6 +25248,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1050628
                 },
                 {
@@ -25229,6 +25268,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1050756
                 },
                 {
@@ -25248,6 +25288,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1050884
                 },
                 {
@@ -25267,6 +25308,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1051012
                 },
                 {
@@ -25286,6 +25328,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1051140
                 },
                 {
@@ -25305,6 +25348,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1051268
                 },
                 {
@@ -25324,6 +25368,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1051396
                 },
                 {
@@ -25343,6 +25388,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1051524
                 },
                 {
@@ -25362,6 +25408,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1051652
                 },
                 {
@@ -25381,6 +25428,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1051780
                 },
                 {
@@ -25400,6 +25448,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1051908
                 },
                 {
@@ -25419,6 +25468,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1052036
                 },
                 {
@@ -25438,6 +25488,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 29,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1052164
                 },
                 {
@@ -25457,6 +25508,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 30,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1052292
                 },
                 {
@@ -25476,6 +25528,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 31,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1052420
                 },
                 {
@@ -25495,6 +25548,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 32,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1052548
                 },
                 {
@@ -25514,6 +25568,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2101124
                 },
                 {
@@ -25533,6 +25588,7 @@
                     "entPhysicalContainedIn": 36,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1052677
                 },
                 {
@@ -25552,6 +25608,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 34,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2101380
                 },
                 {
@@ -25571,6 +25628,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 35,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2101508
                 },
                 {
@@ -25590,6 +25648,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 36,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2101636
                 },
                 {
@@ -25609,6 +25668,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2101764
                 },
                 {
@@ -25628,6 +25688,7 @@
                     "entPhysicalContainedIn": 41,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1053189
                 },
                 {
@@ -25647,6 +25708,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 39,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2102020
                 },
                 {
@@ -25666,6 +25728,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 40,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2102148
                 },
                 {
@@ -25685,6 +25748,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 41,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2102276
                 },
                 {
@@ -25704,6 +25768,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2102404
                 },
                 {
@@ -25723,6 +25788,7 @@
                     "entPhysicalContainedIn": 46,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2102532
                 },
                 {
@@ -25742,6 +25808,7 @@
                     "entPhysicalContainedIn": 47,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1053701
                 },
                 {
@@ -25761,6 +25828,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 45,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2102788
                 },
                 {
@@ -25780,6 +25848,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 46,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2102916
                 },
                 {
@@ -25799,6 +25868,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 47,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2103044
                 },
                 {
@@ -25818,6 +25888,7 @@
                     "entPhysicalContainedIn": 47,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1054213
                 },
                 {
@@ -25837,6 +25908,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 49,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2103301
                 },
                 {
@@ -25856,6 +25928,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -25875,6 +25948,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -25894,6 +25968,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -25913,6 +25988,7 @@
                     "entPhysicalContainedIn": 56,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2103813
                 },
                 {
@@ -25932,6 +26008,7 @@
                     "entPhysicalContainedIn": 57,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1054724
                 },
                 {
@@ -25951,6 +26028,7 @@
                     "entPhysicalContainedIn": 57,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1054852
                 },
                 {
@@ -25970,6 +26048,7 @@
                     "entPhysicalContainedIn": 57,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1054980
                 },
                 {
@@ -25989,6 +26068,7 @@
                     "entPhysicalContainedIn": 57,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1055108
                 },
                 {
@@ -26008,6 +26088,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 52,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2104837
                 },
                 {
@@ -26027,6 +26108,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 53,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2105349
                 },
                 {
@@ -26046,6 +26128,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 54,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2105861
                 },
                 {
@@ -26065,6 +26148,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -26084,6 +26168,7 @@
                     "entPhysicalContainedIn": 77,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -26103,6 +26188,7 @@
                     "entPhysicalContainedIn": 77,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -26122,6 +26208,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -26141,6 +26228,7 @@
                     "entPhysicalContainedIn": 80,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -26160,6 +26248,7 @@
                     "entPhysicalContainedIn": 80,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -26179,6 +26268,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -26198,6 +26288,7 @@
                     "entPhysicalContainedIn": 83,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -26217,6 +26308,7 @@
                     "entPhysicalContainedIn": 83,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -26236,6 +26328,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -26255,6 +26348,7 @@
                     "entPhysicalContainedIn": 86,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -26274,6 +26368,7 @@
                     "entPhysicalContainedIn": 86,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -26293,6 +26388,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -26312,6 +26408,7 @@
                     "entPhysicalContainedIn": 89,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -26331,6 +26428,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -26350,6 +26448,7 @@
                     "entPhysicalContainedIn": 91,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 }
             ]
@@ -26379,6 +26478,862 @@
                     "context_name": "",
                     "ipv4_network": "192.168.240.0/24",
                     "ifIndex": 1275119104
+                }
+            ]
+        }
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 1048580,
+                    "low_ifIndex": 1258291712,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1048708,
+                    "low_ifIndex": 1258292224,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1048836,
+                    "low_ifIndex": 1258292736,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1048964,
+                    "low_ifIndex": 1258293248,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1049092,
+                    "low_ifIndex": 1258293760,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1049220,
+                    "low_ifIndex": 1258294272,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1049348,
+                    "low_ifIndex": 1258294784,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1049476,
+                    "low_ifIndex": 1258295296,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1049604,
+                    "low_ifIndex": 1258295808,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1049732,
+                    "low_ifIndex": 1258296320,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1049860,
+                    "low_ifIndex": 1258296832,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1049988,
+                    "low_ifIndex": 1258297344,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1050116,
+                    "low_ifIndex": 1258297856,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1050244,
+                    "low_ifIndex": 1258298368,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1050372,
+                    "low_ifIndex": 1258298880,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1050500,
+                    "low_ifIndex": 1258299392,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1052677,
+                    "low_ifIndex": 1258308096,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1053189,
+                    "low_ifIndex": 1258310144,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1054724,
+                    "low_ifIndex": 1275068928,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1054980,
+                    "low_ifIndex": 1275068928,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2100868,
+                    "low_ifIndex": 1275068928,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2102788,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2102916,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2103301,
+                    "low_ifIndex": 1258316288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2105349,
+                    "low_ifIndex": 1258318336,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2105861,
+                    "low_ifIndex": 1258318336,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292224,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292224,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292224,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292224,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292224,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292224,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292224,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293248,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293248,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293248,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293248,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293248,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293248,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293248,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293760,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293760,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293760,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293760,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293760,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293760,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293760,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294272,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294272,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294272,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294272,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294272,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294272,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294272,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294784,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294784,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294784,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294784,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294784,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294784,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294784,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295296,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295296,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295296,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295296,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295296,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295296,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295296,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295808,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295808,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295808,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295808,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295808,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295808,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295808,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296320,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296320,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296320,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296320,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296320,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296320,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296320,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296832,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296832,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296832,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296832,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296832,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296832,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296832,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297344,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297344,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297344,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297344,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297344,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297344,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297344,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297856,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297856,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297856,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297856,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297856,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297856,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297856,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298368,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298368,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298368,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298368,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298368,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298368,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298368,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298880,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298880,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298880,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298880,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298880,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298880,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298880,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258299392,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258299392,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258299392,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258299392,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258299392,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258299392,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258299392,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258308096,
+                    "low_ifIndex": 1275068928,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258308096,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258308096,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258308096,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258308096,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258308096,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258308096,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258308096,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258310144,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258310144,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258310144,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258310144,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258310144,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258310144,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258310144,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258314240,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258314752,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258316288,
+                    "low_ifIndex": 1275119104,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258316288,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258318336,
+                    "low_ifIndex": 1275068928,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258318336,
+                    "low_ifIndex": 1275119104,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258318336,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "abc-ag7",
+                    "remote_port": "fortyGigE 1/53 (e4f004e18918)",
+                    "remote_platform": null,
+                    "remote_version": "Dell EMC Real Time Operating System Software. Dell EMC Operating System Version: 2.0. Dell EMC Application Software Version: 9.14(0.1) Copyright (c) 1999-2018 Dell Inc. All Rights Reserved.Build Time: Fri Aug 10 23:10:14 2018",
+                    "ifAlias": "abc-ag7 Fo1/53-Po53 VLTi",
+                    "ifDescr": "fortyGigE 1/53",
+                    "ifName": "fortyGigE 1/53"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "abc-ag7",
+                    "remote_port": "fortyGigE 1/54 (e4f004e18918)",
+                    "remote_platform": null,
+                    "remote_version": "Dell EMC Real Time Operating System Software. Dell EMC Operating System Version: 2.0. Dell EMC Application Software Version: 9.14(0.1) Copyright (c) 1999-2018 Dell Inc. All Rights Reserved.Build Time: Fri Aug 10 23:10:14 2018",
+                    "ifAlias": "abc-ag7 Fo1/54-Po53 VLTi",
+                    "ifDescr": "fortyGigE 1/54",
+                    "ifName": "fortyGigE 1/54"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "abc-ag7",
+                    "remote_port": "ManagementEthernet 1/1 (e4f004e18918)",
+                    "remote_platform": null,
+                    "remote_version": "Dell EMC Real Time Operating System Software. Dell EMC Operating System Version: 2.0. Dell EMC Application Software Version: 9.14(0.1) Copyright (c) 1999-2018 Dell Inc. All Rights Reserved.Build Time: Fri Aug 10 23:10:14 2018",
+                    "ifAlias": "abc-ag7 Ma1/1 VLT Backup Link",
+                    "ifDescr": "ManagementEthernet 1/1",
+                    "ifName": "ManagementEthernet 1/1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "abc-cs2",
+                    "remote_port": "fortyGigE 1/50 (e4f004fb1ffb)",
+                    "remote_platform": null,
+                    "remote_version": "Dell EMC Real Time Operating System Software. Dell EMC Operating System Version: 2.0. Dell EMC Application Software Version: 9.14(0.2) Copyright (c) 1999-2018 Dell Inc. All Rights Reserved.Build Time: Sat Sep 22 02:36:45 2018",
+                    "ifAlias": "abc-cs2 Fo1/50-Po50 Uplink to Core",
+                    "ifDescr": "fortyGigE 1/49",
+                    "ifName": "fortyGigE 1/49"
                 }
             ]
         }

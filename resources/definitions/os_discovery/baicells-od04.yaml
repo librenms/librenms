@@ -1,4 +1,3 @@
-mib: BAICELLS-MIB
 modules:
     os:
         hardware: BAICELLS-MIB::HardwareVersion.0
@@ -8,7 +7,7 @@ modules:
         runtime:
             data:
                 -
-                    oid: ConnectionTime
+                    oid: BAICELLS-MIB::ConnectionTime
                     num_oid: .1.3.6.1.4.1.53058.2.3.5.{{ $index }}
                     index: 'ConnectionTime'
                     descr: 'Connection time'
@@ -16,44 +15,44 @@ modules:
         dbm:
             data:
                 -
-                    oid: AntRSRP0
+                    oid: BAICELLS-MIB::AntRSRP0
                     num_oid: .1.3.6.1.4.1.53058.2.2.7.{{ $index }}
                     descr: 'Ant0 RSRP'
                     index: 'RSRP.0'
                     group: 'RSPR'
                 -
-                    oid: AntRSRP1
+                    oid: BAICELLS-MIB::AntRSRP1
                     num_oid: .1.3.6.1.4.1.53058.2.2.8.{{ $index }}
                     descr: 'Ant1 RSRP'
                     index: 'RSRP.1'
                     group: 'RSPR'
                 -
-                    oid: TxPower
+                    oid: BAICELLS-MIB::TxPower
                     num_oid: .1.3.6.1.4.1.53058.2.2.13.{{ $index }}
                     index: 'TxPower.0'
                     descr: 'Tx power'
         quality_factor:
             data:
                 -
-                    oid: AntRSRQ
+                    oid: BAICELLS-MIB::AntRSRQ
                     num_oid: .1.3.6.1.4.1.53058.2.2.9.{{ $index }}
                     descr: 'Ant RSRQ'
                     index: 'RSRQ.0'
                     group: 'RSRQ'
                 -
-                    oid: AntSINR
+                    oid: BAICELLS-MIB::AntSINR
                     num_oid: .1.3.6.1.4.1.53058.2.2.10.{{ $index }}
                     descr: 'Ant SINR'
                     index: 'SINR.1'
                     group: 'RSRQ'
                 -
-                    oid: AntCINR0
+                    oid: BAICELLS-MIB::AntCINR0
                     num_oid: .1.3.6.1.4.1.53058.2.2.11.{{ $index }}
                     descr: 'Ant0 CINR'
                     index: 'CINR.0'
                     group: 'CINR'
                 -
-                    oid: AntCINR1
+                    oid: BAICELLS-MIB::AntCINR1
                     num_oid: .1.3.6.1.4.1.53058.2.2.12.{{ $index }}
                     descr: 'Ant1 CINR'
                     index: 'CINR.1'
@@ -61,92 +60,92 @@ modules:
         frequency:
             data:
                 -
-                    oid: DownLinkFrequency
+                    oid: BAICELLS-MIB::DownLinkFrequency
                     num_oid: .1.3.6.1.4.1.53058.2.2.3.{{ $index }}
                     index: DownLinkFrequency
                     descr: 'Downlink Freq'
                     multiplier: 1000
                     skip_values:
                         -
-                            oid: DownLinkFrequency
+                            oid: BAICELLS-MIB::DownLinkFrequency
                             op: '='
                             value: '65535'
                 -
-                    oid: UpLinkFrequency
+                    oid: BAICELLS-MIB::UpLinkFrequency
                     num_oid: .1.3.6.1.4.1.53058.2.2.4.{{ $index }}
                     index: UpLinkFrequency
                     descr: 'Uplink Freq'
                     multiplier: 1000
                     skip_values:
                         -
-                            oid: UpLinkFrequency
+                            oid: BAICELLS-MIB::UpLinkFrequency
                             op: '='
                             value: '65535'
                 -
-                    oid: BandWidth
+                    oid: BAICELLS-MIB::BandWidth
                     num_oid: .1.3.6.1.4.1.53058.2.2.5.{{ $index }}
                     index: BandWidth
                     descr: 'Bandwidth'
                     multiplier: 1000
                     skip_values:
                         -
-                            oid: BandWidth
+                            oid: BAICELLS-MIB::BandWidth
                             op: '='
                             value: '65535'
         bitrate:
             data:
                 -
-                    oid: DownloadRate
+                    oid: BAICELLS-MIB::DownloadRate
                     num_oid: .1.3.6.1.4.1.53058.2.3.12.{{ $index }}
                     index: DownloadRate
                     descr: 'Rx Rate'
                 -
-                    oid: UploadRate
+                    oid: BAICELLS-MIB::UploadRate
                     num_oid: .1.3.6.1.4.1.53058.2.3.15.{{ $index }}
                     index: UploadRate
                     descr: 'Tx Rate'
         count:
             data:
                 -
-                    oid: IMSI
+                    oid: BAICELLS-MIB::IMSI
                     num_oid: .1.3.6.1.4.1.53058.2.3.3.{{ $index }}
                     index: IMSI
                     descr: 'CPE IMSI'
                     group: Mobile
                     skip_values:
                         -
-                            oid: IMSI
+                            oid: BAICELLS-MIB::IMSI
                             op: '='
                             value: '0'
                 -
-                    oid: eNBID
+                    oid: BAICELLS-MIB::eNBID
                     num_oid: .1.3.6.1.4.1.53058.2.2.15.{{ $index }}
                     index: eNBID
                     descr: 'eNodeB ID'
                     group: Mobile
                     skip_values:
                         -
-                            oid: eNBID
+                            oid: BAICELLS-MIB::eNBID
                             op: '='
                             value: '65535'
                 -
-                    oid: CellID
+                    oid: BAICELLS-MIB::CellID
                     num_oid: .1.3.6.1.4.1.53058.2.2.16.{{ $index }}
                     index: CellID
                     descr: 'Cell ID'
                     group: Mobile
                     skip_values:
                         -
-                            oid: CellID
+                            oid: BAICELLS-MIB::CellID
                             op: '='
                             value: '65535'
                 -
-                    oid: SendPackages
+                    oid: BAICELLS-MIB::SendPackages
                     num_oid: .1.3.6.1.4.1.53058.2.3.20.{{ $index }}
                     index: SendPackages
                     descr: 'Tx Packets'
                 -
-                    oid: RecvPakcages  # yes, 'RecvPakcages'
+                    oid: BAICELLS-MIB::RecvPakcages  # yes, 'RecvPakcages'
                     num_oid: .1.3.6.1.4.1.53058.2.3.21.{{ $index }}
                     index: RecvPakcages  # yes, 'RecvPakcages'
                     descr: 'Rx Packets'

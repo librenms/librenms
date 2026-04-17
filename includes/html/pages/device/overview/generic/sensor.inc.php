@@ -1,22 +1,21 @@
 <?php
 
-use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Util\Html;
 
-$sensors = DeviceCache::getPrimary()->sensors->where('sensor_class', $sensor_class)->where('group', '!=', 'transceiver')->sortBy([
+$sensors = DeviceCache::getPrimary()->sensors->where('sensor_class', $sensor_class->value)->where('group', '!=', 'transceiver')->sortBy([
     ['group', 'asc'],
     ['sensor_descr', 'asc'],
 ]); // cache all sensors on device and exclude transceivers
 
 if ($sensors->isNotEmpty()) {
-    $sensor_fa_icon = 'fa-' . SensorEnum::from($sensor_class)->icon();
+    $sensor_fa_icon = 'fa-' . $sensor_class->icon();
 
     echo '
         <div class="row">
         <div class="col-md-12">
         <div class="panel panel-default panel-condensed">
         <div class="panel-heading">';
-    echo '<a href="device/device=' . $device['device_id'] . '/tab=health/metric=' . strtolower((string) $sensor_type) . '/"><i class="fa ' . $sensor_fa_icon . ' fa-lg icon-theme" aria-hidden="true"></i><strong> ' . \LibreNMS\Util\StringHelpers::niceCase($sensor_type) . '</strong></a>';
+    echo '<a href="device/device=' . $device['device_id'] . '/tab=health/metric=' . $sensor_class->value . '/"><i class="fa ' . $sensor_fa_icon . ' fa-lg icon-theme" aria-hidden="true"></i><strong> ' . $sensor_class->label() . '</strong></a>';
     echo '      </div>
         <table class="table table-hover table-condensed table-striped">';
     $group = '';
@@ -34,7 +33,7 @@ if ($sensors->isNotEmpty()) {
         $graph_array['width'] = '210';
         $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['id'] = $sensor->sensor_id;
-        $graph_array['type'] = $graph_type;
+        $graph_array['type'] = 'sensor_' . $sensor_class->value;
         $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
         $graph_array['legend'] = 'no';
 
@@ -67,9 +66,9 @@ if ($sensors->isNotEmpty()) {
         $sensor_current = Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue());
 
         echo '<tr><td><div style="display: grid; grid-gap: 10px; grid-template-columns: 3fr 1fr 1fr;">
-            <div>' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Rewrite::shortenIfName($sensor->sensor_descr), $overlib_content, $sensor_class) . '</div>
-            <div>' . \LibreNMS\Util\Url::overlibLink($link, $sensor_minigraph, $overlib_content, $sensor_class) . '</div>
-            <div>' . \LibreNMS\Util\Url::overlibLink($link, $sensor_current, $overlib_content, $sensor_class) . '</div>
+            <div>' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Rewrite::shortenIfName($sensor->sensor_descr), $overlib_content, $sensor_class->value) . '</div>
+            <div>' . \LibreNMS\Util\Url::overlibLink($link, $sensor_minigraph, $overlib_content, $sensor_class->value) . '</div>
+            <div>' . \LibreNMS\Util\Url::overlibLink($link, $sensor_current, $overlib_content, $sensor_class->value) . '</div>
             </div></td></tr>';
     }//end foreach
 

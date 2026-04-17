@@ -12,12 +12,16 @@
  * the source code distribution for details.
 */
 
+use App\Facades\DeviceCache;
+use App\Models\Device;
+use Illuminate\Support\Facades\Gate;
+
 header('Content-type: application/json');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('update', Device::class)) {
     $response = [
         'status' => 'error',
-        'message' => 'Need to be admin',
+        'message' => 'Need permission',
     ];
     echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
@@ -35,7 +39,7 @@ if (empty($device['device_id'])) {
     if ($state == true) {
         set_dev_attrib($device, $attrib, $state);
     } else {
-        del_dev_attrib($device, $attrib);
+        DeviceCache::get((int) $device['device_id'])->forgetAttrib($attrib);
     }
     $status = 'ok';
     $message = 'Config has been updated';

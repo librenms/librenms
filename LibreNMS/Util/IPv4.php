@@ -132,11 +132,21 @@ class IPv4 extends IP
     }
 
     /**
-     * Convert this IP to an snmp index hex encoded
+     * Convert this IP to an snmp index decimal encoded
      *
      * @return string
      */
     public function toSnmpIndex()
+    {
+        return (string) $this->ip;
+    }
+
+    /**
+     * Convert this IP to an snmp string
+     *
+     * @return string
+     */
+    public function toSnmpString()
     {
         return (string) $this->ip;
     }

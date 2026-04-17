@@ -12,9 +12,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
-use Permissions;
 
 class Port extends DeviceRelatedModel
 {
@@ -22,6 +22,20 @@ class Port extends DeviceRelatedModel
 
     public $timestamps = false;
     protected $primaryKey = 'port_id';
+    protected $guarded = [];
+
+    /**
+     * @return array{ifOperStatus: 'LibreNMS\Enum\IfOperStatus', ifOperStatus_prev: 'LibreNMS\Enum\IfOperStatus', ifAdminStatus: 'LibreNMS\Enum\IfOperStatus', ifAdminStatus_prev: 'LibreNMS\Enum\IfOperStatus'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'ifOperStatus' => IfOperStatus::class,
+            'ifOperStatus_prev' => IfOperStatus::class,
+            'ifAdminStatus' => IfOperStatus::class,
+            'ifAdminStatus_prev' => IfOperStatus::class,
+        ];
+    }
 
     /**
      * Initialize this class
@@ -51,6 +65,7 @@ class Port extends DeviceRelatedModel
             $port->vlans()->delete();
             $port->links()->delete();
             $port->remoteLinks()->delete();
+            $port->bills()->detach();
 
             // dont have relationships yet
             DB::table('juniAtmVp')->where('port_id', $port->port_id)->delete();
@@ -154,25 +169,6 @@ class Port extends DeviceRelatedModel
         return [$egress, $ingress];
     }
 
-    /**
-     * Check if user can access this port.
-     *
-     * @param  User|int  $user
-     * @return bool
-     */
-    public function canAccess($user)
-    {
-        if (! $user) {
-            return false;
-        }
-
-        if ($user->hasGlobalRead()) {
-            return true;
-        }
-
-        return Permissions::canAccessDevice($this->device_id, $user) || Permissions::canAccessPort($this->port_id, $user);
-    }
-
     // ---- Accessors/Mutators ----
 
     public function getIfPhysAddressAttribute($mac)
@@ -218,7 +214,7 @@ class Port extends DeviceRelatedModel
             [$this->qualifyColumn('deleted'), '=', 0],
             [$this->qualifyColumn('ignore'), '=', 0],
             [$this->qualifyColumn('disabled'), '=', 0],
-            [$this->qualifyColumn('ifOperStatus'), '=', 'up'],
+            [$this->qualifyColumn('ifOperStatus'), '=', IfOperStatus::Up],
         ]);
     }
 
@@ -232,8 +228,8 @@ class Port extends DeviceRelatedModel
             [$this->qualifyColumn('deleted'), '=', 0],
             [$this->qualifyColumn('ignore'), '=', 0],
             [$this->qualifyColumn('disabled'), '=', 0],
-            [$this->qualifyColumn('ifOperStatus'), '!=', 'up'],
-            [$this->qualifyColumn('ifAdminStatus'), '=', 'up'],
+            [$this->qualifyColumn('ifOperStatus'), '!=', IfOperStatus::Up],
+            [$this->qualifyColumn('ifAdminStatus'), '=', IfOperStatus::Up],
         ]);
     }
 
@@ -247,7 +243,7 @@ class Port extends DeviceRelatedModel
             [$this->qualifyColumn('deleted'), '=', 0],
             [$this->qualifyColumn('ignore'), '=', 0],
             [$this->qualifyColumn('disabled'), '=', 0],
-            [$this->qualifyColumn('ifAdminStatus'), '=', 'down'],
+            [$this->qualifyColumn('ifAdminStatus'), '=', IfOperStatus::Down],
         ]);
     }
 
@@ -325,6 +321,14 @@ class Port extends DeviceRelatedModel
     public function adsl(): HasOne
     {
         return $this->hasOne(PortAdsl::class, 'port_id');
+    }
+
+    /**
+     * @return BelongsToMany<Bill, $this>
+     */
+    public function bills(): BelongsToMany
+    {
+        return $this->belongsToMany(Bill::class, 'bill_ports', 'port_id', 'bill_id');
     }
 
     /**
@@ -407,6 +411,9 @@ class Port extends DeviceRelatedModel
         return $this->hasMany(Link::class, 'remote_port_id');
     }
 
+    /**
+     * @return \Illuminate\Support\Collection<int, \App\Models\Link>
+     */
     public function allLinks(): \Illuminate\Support\Collection
     {
         return $this->links->merge($this->remoteLinks);

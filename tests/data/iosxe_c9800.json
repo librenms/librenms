@@ -19,6 +19,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -38,6 +39,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Cisco Systems Inc",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -57,6 +59,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76,6 +79,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "Cisco Systems Inc",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -95,6 +99,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -114,6 +119,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -133,6 +139,7 @@
                     "entPhysicalContainedIn": 24,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -152,6 +159,7 @@
                     "entPhysicalContainedIn": 24,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -171,6 +179,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "Cisco Systems Inc",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -190,6 +199,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "CISCO",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -209,6 +219,7 @@
                     "entPhysicalContainedIn": 1040,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": 1
                 },
                 {
@@ -228,6 +239,7 @@
                     "entPhysicalContainedIn": 1040,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": 2
                 },
                 {
@@ -247,6 +259,7 @@
                     "entPhysicalContainedIn": 1040,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": 3
                 },
                 {
@@ -266,6 +279,7 @@
                     "entPhysicalContainedIn": 1040,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": 4
                 },
                 {
@@ -285,6 +299,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CISCO",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -304,6 +319,7 @@
                     "entPhysicalContainedIn": 1280,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -323,6 +339,7 @@
                     "entPhysicalContainedIn": 1331,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "CISCO-MOLEX",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -342,6 +359,7 @@
                     "entPhysicalContainedIn": 1332,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": 5
                 },
                 {
@@ -361,6 +379,7 @@
                     "entPhysicalContainedIn": 1280,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -380,6 +399,7 @@
                     "entPhysicalContainedIn": 1343,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "CISCO-MOLEX",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -399,6 +419,7 @@
                     "entPhysicalContainedIn": 1344,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": 6
                 },
                 {
@@ -418,6 +439,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Cisco Systems Inc",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -437,6 +459,7 @@
                     "entPhysicalContainedIn": 2000,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -456,6 +479,7 @@
                     "entPhysicalContainedIn": 2000,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -475,6 +499,7 @@
                     "entPhysicalContainedIn": 2000,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -494,6 +519,7 @@
                     "entPhysicalContainedIn": 2000,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -513,6 +539,7 @@
                     "entPhysicalContainedIn": 2000,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -532,6 +559,7 @@
                     "entPhysicalContainedIn": 2000,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -551,6 +579,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Cisco Systems Inc",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -570,6 +599,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "Cisco Systems Inc",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 }
             ]
@@ -588,7 +618,7 @@
                     "model": "SFP-H10GB-CU3M",
                     "revision": "V03",
                     "serial": "MPH2624A287",
-                    "date": null,
+                    "date": "0-0-0,0:0:0.0",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -607,7 +637,7 @@
                     "model": "SFP-H10GB-CU3M",
                     "revision": "V03",
                     "serial": "MPH2624A285",
-                    "date": null,
+                    "date": "0-0-0,0:0:0.0",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -1153,490 +1183,420 @@
                 {
                     "state_name": "cefcFRUPowerOperStatus",
                     "state_descr": "off (other)",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cefcFRUPowerOperStatus",
                     "state_descr": "on",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cefcFRUPowerOperStatus",
                     "state_descr": "off (admin)",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cefcFRUPowerOperStatus",
                     "state_descr": "off (denied)",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cefcFRUPowerOperStatus",
                     "state_descr": "off (environmental)",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cefcFRUPowerOperStatus",
                     "state_descr": "off (temperature)",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cefcFRUPowerOperStatus",
                     "state_descr": "off (fan)",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cefcFRUPowerOperStatus",
                     "state_descr": "failed",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cefcFRUPowerOperStatus",
                     "state_descr": "on (fan failed)",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cefcFRUPowerOperStatus",
                     "state_descr": "off (cooling)",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cefcFRUPowerOperStatus",
                     "state_descr": "off (connector rating)",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cefcFRUPowerOperStatus",
                     "state_descr": "on (no inline power)",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ciscoEnvMonFanState",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ciscoEnvMonFanState",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ciscoEnvMonFanState",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ciscoEnvMonFanState",
                     "state_descr": "shutdown",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ciscoEnvMonFanState",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ciscoEnvMonFanState",
                     "state_descr": "notFunctioning",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ciscoEnvMonSupplyState",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ciscoEnvMonSupplyState",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ciscoEnvMonSupplyState",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ciscoEnvMonSupplyState",
                     "state_descr": "shutdown",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ciscoEnvMonSupplyState",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ciscoEnvMonSupplyState",
                     "state_descr": "notFunctioning",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ciscoEnvMonTemperatureState",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ciscoEnvMonTemperatureState",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ciscoEnvMonTemperatureState",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ciscoEnvMonTemperatureState",
                     "state_descr": "shutdown",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ciscoEnvMonTemperatureState",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ciscoEnvMonTemperatureState",
                     "state_descr": "notFunctioning",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cRFCfgRedundancyOperMode",
                     "state_descr": "nonRedundant",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cRFCfgRedundancyOperMode",
                     "state_descr": "staticLoadShareNonRedundant",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cRFCfgRedundancyOperMode",
                     "state_descr": "dynamicLoadShareNonRedundant",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cRFCfgRedundancyOperMode",
                     "state_descr": "staticLoadShareRedundant",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cRFCfgRedundancyOperMode",
                     "state_descr": "dynamicLoadShareRedundant",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cRFCfgRedundancyOperMode",
                     "state_descr": "coldStandbyRedundant",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cRFCfgRedundancyOperMode",
                     "state_descr": "warmStandbyRedundant",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cRFCfgRedundancyOperMode",
                     "state_descr": "hotStandbyRedundant",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cRFStatusPeerUnitState",
                     "state_descr": "notKnown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cRFStatusPeerUnitState",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cRFStatusPeerUnitState",
                     "state_descr": "initialization",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusPeerUnitState",
                     "state_descr": "negotiation",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusPeerUnitState",
                     "state_descr": "standbyCold",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusPeerUnitState",
                     "state_descr": "standbyColdConfig",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusPeerUnitState",
                     "state_descr": "standbyColdFileSys",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusPeerUnitState",
                     "state_descr": "standbyColdBulk",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusPeerUnitState",
                     "state_descr": "standbyHot",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cRFStatusPeerUnitState",
                     "state_descr": "activeFast",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusPeerUnitState",
                     "state_descr": "activeDrain",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusPeerUnitState",
                     "state_descr": "activePreconfig",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusPeerUnitState",
                     "state_descr": "activePostconfig",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusPeerUnitState",
                     "state_descr": "active",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cRFStatusPeerUnitState",
                     "state_descr": "activeExtraload",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusPeerUnitState",
                     "state_descr": "activeHandback",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusUnitState",
                     "state_descr": "notKnown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cRFStatusUnitState",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cRFStatusUnitState",
                     "state_descr": "initialization",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusUnitState",
                     "state_descr": "negotiation",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusUnitState",
                     "state_descr": "standbyCold",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusUnitState",
                     "state_descr": "standbyColdConfig",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusUnitState",
                     "state_descr": "standbyColdFileSys",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusUnitState",
                     "state_descr": "standbyColdBulk",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusUnitState",
                     "state_descr": "standbyHot",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cRFStatusUnitState",
                     "state_descr": "activeFast",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusUnitState",
                     "state_descr": "activeDrain",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusUnitState",
                     "state_descr": "activePreconfig",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusUnitState",
                     "state_descr": "activePostconfig",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusUnitState",
                     "state_descr": "active",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cRFStatusUnitState",
                     "state_descr": "activeExtraload",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cRFStatusUnitState",
                     "state_descr": "activeHandback",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 }
@@ -4645,34 +4605,6 @@
                     "vlan_domain": 1,
                     "vlan_name": "ISE_TPE",
                     "vlan_type": "ethernet",
-                    "vlan_state": 1
-                },
-                {
-                    "vlan_vlan": 1002,
-                    "vlan_domain": 1,
-                    "vlan_name": "fddi-default",
-                    "vlan_type": "fddi",
-                    "vlan_state": 1
-                },
-                {
-                    "vlan_vlan": 1003,
-                    "vlan_domain": 1,
-                    "vlan_name": "token-ring-default",
-                    "vlan_type": "tokenRing",
-                    "vlan_state": 1
-                },
-                {
-                    "vlan_vlan": 1004,
-                    "vlan_domain": 1,
-                    "vlan_name": "fddinet-default",
-                    "vlan_type": "fddiNet",
-                    "vlan_state": 1
-                },
-                {
-                    "vlan_vlan": 1005,
-                    "vlan_domain": 1,
-                    "vlan_name": "trnet-default",
-                    "vlan_type": "trNet",
                     "vlan_state": 1
                 }
             ],

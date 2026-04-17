@@ -12,12 +12,15 @@
  * the source code distribution for details.
  */
 
+use App\Models\Storage;
+use Illuminate\Support\Facades\Gate;
+
 header('Content-type: application/json');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('update', Storage::class)) {
     $response = [
         'status' => 'error',
-        'message' => 'Need to be admin',
+        'message' => 'You need permission',
     ];
     echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
@@ -37,7 +40,7 @@ if (! is_numeric($device_id)) {
 } elseif (! is_numeric($data)) {
     $message = 'Missing value';
 } else {
-    if (dbUpdate(['storage_perc_warn' => $data], 'storage', '`storage_id`=? AND `device_id`=?', [$storage_id, $device_id]) >= 0) {
+    if (Storage::where('storage_id', $storage_id)->where('device_id', $device_id)->update(['storage_perc_warn' => $data]) >= 0) {
         $message = 'Storage information updated';
         $status = 'ok';
     } else {

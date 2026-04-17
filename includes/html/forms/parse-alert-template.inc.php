@@ -12,13 +12,10 @@
  * the source code distribution for details.
  */
 
-if (! Auth::user()->hasGlobalAdmin()) {
-    header('Content-type: text/plain');
-    exit('ERROR: You need to be admin');
-}
+use App\Models\AlertTemplate;
+use App\Models\AlertTemplateMap;
 
-$template_id = $vars['template_id'];
-$template_edit = is_numeric($template_id) && $template_id > 0;
+$template = AlertTemplate::find($vars['template_id'] ?? 0);
 
 $rules = [];
 $output = [
@@ -29,24 +26,24 @@ $output = [
     'rules' => $rules,
 ];
 
-if ($template_edit) {
-    $template = dbFetchRow('SELECT * FROM `alert_templates` WHERE `id` = ? LIMIT 1', [$template_id]);
+if ($template) {
+    Gate::authorize('view', $template);
     $output = [
-        'template' => $template['template'],
-        'name' => $template['name'],
-        'title' => $template['title'],
-        'title_rec' => $template['title_rec'],
+        'template' => $template->template,
+        'name' => $template->name,
+        'title' => $template->title,
+        'title_rec' => $template->title_rec,
     ];
 }
 
 foreach (dbFetchRows('SELECT `id`,`name` FROM `alert_rules` order by `name`', []) as $rule) {
-    $is_selected = $template_edit ? dbFetchCell('SELECT `alert_templates_id` FROM `alert_template_map` WHERE `alert_rule_id` = ? AND `alert_templates_id` = ?', [$rule['id'], $template_id]) : null;
-    $is_available = dbFetchCell('SELECT `alert_templates_id` FROM `alert_template_map` WHERE `alert_rule_id` = ?', [$rule['id']]);
+    $is_selected = $template ? AlertTemplateMap::where('alert_rule_id', $rule['id'])->where('alert_templates_id', $template->id)->value('alert_templates_id') : null;
+    $is_available = AlertTemplateMap::where('alert_rule_id', $rule['id'])->value('alert_templates_id');
     $rules[] = [
         'id' => $rule['id'],
         'name' => $rule['name'],
         'selected' => isset($is_selected),
-        'used' => isset($is_available) ? dbFetchCell('SELECT `name` FROM `alert_templates` WHERE `id` = ?', [$is_available]) : '',
+        'used' => isset($is_available) ? AlertTemplate::where('id', $is_available)->value('name') : '',
     ];
 }
 $output['rules'] = $rules;

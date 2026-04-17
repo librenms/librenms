@@ -1,6 +1,8 @@
 <?php
 
+use App\Facades\DeviceCache;
 use App\Models\Eventlog;
+use App\Models\Port;
 use LibreNMS\Enum\Severity;
 
 /*
@@ -14,6 +16,9 @@ use LibreNMS\Enum\Severity;
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
 */
+
+Gate::authorize('update', Port::class);
+
 header('Content-type: application/json');
 
 $status = 'error';
@@ -29,14 +34,14 @@ if (! empty($ifName) && is_numeric($port_id)) {
         $descr = 'repoll';
         // Set to repoll so we avoid using ifDescr on port poll
     }
-    if (dbUpdate(['ifAlias' => $descr], 'ports', '`port_id`=?', [$port_id]) > 0) {
-        $device = device_by_id_cache($device_id);
+    if (Port::where('port_id', $port_id)->update(['ifAlias' => $descr]) > 0) {
+        $device = DeviceCache::get($device_id);
         if ($descr === 'repoll') {
-            del_dev_attrib($device, 'ifName:' . $ifName);
-            Eventlog::log("$ifName Port ifAlias cleared manually", $device['device_id'], 'interface', Severity::Notice, $port_id);
+            $device->forgetAttrib('ifName:' . $ifName);
+            Eventlog::log("$ifName Port ifAlias cleared manually", $device->device_id, 'interface', Severity::Notice, $port_id);
         } else {
-            set_dev_attrib($device, 'ifName:' . $ifName, 1);
-            Eventlog::log("$ifName Port ifAlias set manually: $descr", $device['device_id'], 'interface', Severity::Notice, $port_id);
+            $device->setAttrib('ifName:' . $ifName, 1);
+            Eventlog::log("$ifName Port ifAlias set manually: $descr", $device->device_id, 'interface', Severity::Notice, $port_id);
         }
         $status = 'ok';
     } else {

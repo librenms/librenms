@@ -95,7 +95,8 @@
                             </div>
                         </form>
                     </div>
-                    @if (count($user_list) and auth()->user()->isAdmin())
+                    @can('copy', \App\Models\Dashboard::class)
+                    @if (count($user_list))
                     <div class="btn-group btn-lg" style="margin-top:5px;position:absolute;right:0px;">
                         <div class="btn-group">
                         <select class="form-control" id="dashboard_copy_target" name="dashboard_copy_target" onchange="dashboard_copy_user_select()">
@@ -108,6 +109,7 @@
                         <button disabled id="do_copy_dashboard" class="btn btn-primary" onclick="dashboard_copy(this)" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.copy') }}"><i class="fa fa-copy fa-fw"></i></button>
                     </div>
                     @endif
+                    @endcan
                 </div>
             </div>
             <!-- End Dashboard-Settings -->
@@ -194,16 +196,23 @@
     gridster = $(".gridster ul").gridster({
         widget_base_dimensions: ['auto', 100],
         autogenerate_stylesheet: true,
-        widget_margins: [5, 5],
         avoid_overlapped_widgets: true,
+        shift_widgets_up: false,
+        shift_larger_widgets_down: false,
+        move_widgets_down_only: true,
+        widget_margins: [10, 10],
         min_cols: 1,
         max_cols: 20,
+        autogrow_cols: true,
         max_rows: 200,
         draggable: {
             handle: 'header, span',
             stop: function(e, ui, $widget) {
                 updatePos(gridster);
             },
+        },
+        collision: {
+            wait_for_mouseup: true
         },
         resize: {
             enabled: true,
@@ -463,7 +472,6 @@
         });
     }
 
-@if (auth()->user()->isAdmin())
     function dashboard_copy_user_select() {
         var button_disabled = true;
         if (document.getElementById("dashboard_copy_target").value > 0) {
@@ -504,7 +512,6 @@
             dashboard_copy_user_select();
         }
     }
-@endif
 
     function widget_dom(data) {
         dom = '<li id="'+data.user_widget_id+'" data-type="'+data.widget+'" data-settings="0">'+

@@ -33063,301 +33063,258 @@
                 {
                     "state_name": "tnCardStatusLEDColor",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnCardStatusLEDColor",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnCardStatusLEDColor",
                     "state_descr": "red",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "tnCardStatusLEDColor",
                     "state_descr": "green",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnCardStatusLEDColor",
                     "state_descr": "orange",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "tnCardStatusLEDColor",
                     "state_descr": "blue",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnControlCardActivityState",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnControlCardActivityState",
                     "state_descr": "active",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnControlCardActivityState",
                     "state_descr": "inactive",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnControlCardActivityState",
                     "state_descr": "unequipped",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "tnFanUnitStatusLEDColor",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnFanUnitStatusLEDColor",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnFanUnitStatusLEDColor",
                     "state_descr": "red",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "tnFanUnitStatusLEDColor",
                     "state_descr": "green",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnFanUnitStatusLEDColor",
                     "state_descr": "orange",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "tnFanUnitStatusLEDColor",
                     "state_descr": "blue",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeCriticalLEDColor",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeCriticalLEDColor",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeCriticalLEDColor",
                     "state_descr": "red",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeCriticalLEDColor",
                     "state_descr": "green",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeCriticalLEDColor",
                     "state_descr": "orange",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeCriticalLEDColor",
                     "state_descr": "blue",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMajorLEDColor",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMajorLEDColor",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMajorLEDColor",
                     "state_descr": "red",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMajorLEDColor",
                     "state_descr": "green",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMajorLEDColor",
                     "state_descr": "orange",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMajorLEDColor",
                     "state_descr": "blue",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMinorLEDColor",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMinorLEDColor",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMinorLEDColor",
                     "state_descr": "red",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMinorLEDColor",
                     "state_descr": "green",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMinorLEDColor",
                     "state_descr": "orange",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMinorLEDColor",
                     "state_descr": "blue",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeWarningLEDColor",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeWarningLEDColor",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeWarningLEDColor",
                     "state_descr": "red",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeWarningLEDColor",
                     "state_descr": "green",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeWarningLEDColor",
                     "state_descr": "orange",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeWarningLEDColor",
                     "state_descr": "blue",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "TropicOchXcOperStateType",
                     "state_descr": "up",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "TropicOchXcOperStateType",
                     "state_descr": "down",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "TropicOchXcOperStateType",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 3
                 }
@@ -38195,301 +38152,258 @@
                 {
                     "state_name": "tnCardStatusLEDColor",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnCardStatusLEDColor",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnCardStatusLEDColor",
                     "state_descr": "red",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "tnCardStatusLEDColor",
                     "state_descr": "green",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnCardStatusLEDColor",
                     "state_descr": "orange",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "tnCardStatusLEDColor",
                     "state_descr": "blue",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnControlCardActivityState",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnControlCardActivityState",
                     "state_descr": "active",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnControlCardActivityState",
                     "state_descr": "inactive",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnControlCardActivityState",
                     "state_descr": "unequipped",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "tnFanUnitStatusLEDColor",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnFanUnitStatusLEDColor",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnFanUnitStatusLEDColor",
                     "state_descr": "red",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "tnFanUnitStatusLEDColor",
                     "state_descr": "green",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnFanUnitStatusLEDColor",
                     "state_descr": "orange",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "tnFanUnitStatusLEDColor",
                     "state_descr": "blue",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeCriticalLEDColor",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeCriticalLEDColor",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeCriticalLEDColor",
                     "state_descr": "red",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeCriticalLEDColor",
                     "state_descr": "green",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeCriticalLEDColor",
                     "state_descr": "orange",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeCriticalLEDColor",
                     "state_descr": "blue",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMajorLEDColor",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMajorLEDColor",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMajorLEDColor",
                     "state_descr": "red",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMajorLEDColor",
                     "state_descr": "green",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMajorLEDColor",
                     "state_descr": "orange",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMajorLEDColor",
                     "state_descr": "blue",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMinorLEDColor",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMinorLEDColor",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMinorLEDColor",
                     "state_descr": "red",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMinorLEDColor",
                     "state_descr": "green",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMinorLEDColor",
                     "state_descr": "orange",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeMinorLEDColor",
                     "state_descr": "blue",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeWarningLEDColor",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeWarningLEDColor",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeWarningLEDColor",
                     "state_descr": "red",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeWarningLEDColor",
                     "state_descr": "green",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeWarningLEDColor",
                     "state_descr": "orange",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "tnUserInterfacePanelNodeWarningLEDColor",
                     "state_descr": "blue",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "TropicOchXcOperStateType",
                     "state_descr": "up",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "TropicOchXcOperStateType",
                     "state_descr": "down",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "TropicOchXcOperStateType",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 3
                 }
@@ -38516,6 +38430,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38535,6 +38450,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38554,6 +38470,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38573,6 +38490,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38592,6 +38510,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38611,6 +38530,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38630,6 +38550,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38649,6 +38570,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38668,6 +38590,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38687,6 +38610,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38706,6 +38630,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38725,6 +38650,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38744,6 +38670,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38763,6 +38690,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38782,6 +38710,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38801,6 +38730,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38820,6 +38750,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38839,6 +38770,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38858,6 +38790,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38877,6 +38810,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38896,6 +38830,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38915,6 +38850,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38934,6 +38870,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38953,6 +38890,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38972,6 +38910,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38991,6 +38930,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -39010,6 +38950,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -39029,6 +38970,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -39048,6 +38990,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -39067,6 +39010,7 @@
                     "entPhysicalContainedIn": 25,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -39086,6 +39030,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -39105,6 +39050,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -39124,6 +39070,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]
@@ -39142,7 +39089,7 @@
                     "model": "3AL82081AAAA",
                     "revision": "-",
                     "serial": "LU22--HL5000085200",
-                    "date": null,
+                    "date": "0722",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39161,7 +39108,7 @@
                     "model": "3AL82074AAAA",
                     "revision": "----",
                     "serial": "ALLU22--AN19Y000YY",
-                    "date": "2022-05-13",
+                    "date": "220513",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39180,7 +39127,7 @@
                     "model": "3AL82074AAAA",
                     "revision": "----",
                     "serial": "ALLU22--AN19Y00106",
-                    "date": "2022-05-13",
+                    "date": "220513",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39199,7 +39146,7 @@
                     "model": "3KC93809AABF",
                     "revision": "-",
                     "serial": "LBALLU-PJ240600975",
-                    "date": "2024-02-08",
+                    "date": "240208",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39218,7 +39165,7 @@
                     "model": "3AL82074AAAA",
                     "revision": "----",
                     "serial": "ALLU23--AN52Y0002T",
-                    "date": "2024-01-06",
+                    "date": "240106",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39237,7 +39184,7 @@
                     "model": "3AL82074AAAA",
                     "revision": "----",
                     "serial": "ALLU23--AN52Y0002M",
-                    "date": "2024-01-06",
+                    "date": "240106",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39256,7 +39203,7 @@
                     "model": "3AL82074AAAA",
                     "revision": "----",
                     "serial": "ALLU23--AN52Y0008A",
-                    "date": "2024-01-03",
+                    "date": "240103",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39275,7 +39222,7 @@
                     "model": "3AL82074AAAA",
                     "revision": "----",
                     "serial": "ALLU23--AN52Y000BP",
-                    "date": "2024-01-03",
+                    "date": "240103",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39294,7 +39241,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN68000479",
-                    "date": "2021-11-24",
+                    "date": "211124",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39313,7 +39260,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN68000355",
-                    "date": "2021-11-24",
+                    "date": "211124",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39332,7 +39279,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN68000596",
-                    "date": "2021-11-24",
+                    "date": "211124",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39351,7 +39298,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN68000729",
-                    "date": "2021-11-24",
+                    "date": "211124",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39370,7 +39317,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN67003359",
-                    "date": "2021-11-23",
+                    "date": "211123",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39389,7 +39336,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN67003475",
-                    "date": "2021-11-23",
+                    "date": "211123",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39408,7 +39355,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN67004130",
-                    "date": "2021-11-23",
+                    "date": "211123",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39427,7 +39374,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN67002844",
-                    "date": "2021-11-23",
+                    "date": "211123",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39446,7 +39393,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN67002650",
-                    "date": "2021-11-23",
+                    "date": "211123",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39465,7 +39412,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN67003019",
-                    "date": "2021-11-23",
+                    "date": "211123",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39484,7 +39431,7 @@
                     "model": "3AL82081AAAA",
                     "revision": "-",
                     "serial": "LU23-LTC6000006200",
-                    "date": null,
+                    "date": "1008",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39503,7 +39450,7 @@
                     "model": "3AL82081AAAA",
                     "revision": "-",
                     "serial": "LU23-LTC6300000700",
-                    "date": null,
+                    "date": "1025",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,

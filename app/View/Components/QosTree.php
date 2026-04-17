@@ -9,10 +9,13 @@ use Illuminate\View\Component;
 
 class QosTree extends Component
 {
+    /** @var Collection<int, \App\Models\Qos> */
     public Collection $listItems;
 
     /**
      * Create a new component instance.
+     *
+     * @param  Collection<int, \App\Models\Qos>  $qosItems
      */
     public function __construct(
         public Collection $qosItems,

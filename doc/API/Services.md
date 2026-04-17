@@ -38,7 +38,7 @@ Output:
                 "service_changed": "1470962470",
                 "service_message": "NTP OK: Offset -0.000717 secs",
                 "service_disabled": "0",
-                "service_ds": "{\"offset\":\"s\"}"
+                "service_ds": "{\"offset\":{ \"uom\":\"s\", \"full_name\": \"offset\" } }"
             }
         ],
         [

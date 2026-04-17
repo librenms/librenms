@@ -3,11 +3,12 @@
 use App\Models\AlertRule;
 use App\Models\AlertTemplate;
 use App\Models\AlertTemplateMap;
+use Illuminate\Support\Facades\Gate as Gate;
 
 $no_refresh = true;
 
-require_once 'includes/html/modal/alert_template.inc.php';
-require_once 'includes/html/modal/delete_alert_template.inc.php';
+include 'includes/html/modal/alert_template.inc.php';
+include 'includes/html/modal/delete_alert_template.inc.php';
 ?>
 <div class="table-responsive">
     <table id="templatetable" class="table table-hover table-condensed" width="100%">
@@ -67,7 +68,7 @@ $(document).ready(function() {
         templates: {
         header: '<div id="{{ctx.id}}" class="{{css.header}}"> \
                     <div class="row"> \
-<?php if (Auth::user()->hasGlobalAdmin()) { ?>
+<?php if (Gate::allows('create', AlertTemplate::class)) { ?>
                         <div class="col-sm-8 actionBar"> \
                             <span class="pull-left"> \
                             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#alert-template" data-template_id="">Create new alert template</button> \

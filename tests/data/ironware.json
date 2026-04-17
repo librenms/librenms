@@ -24870,112 +24870,96 @@
                 {
                     "state_name": "snChasFanOperStatus",
                     "state_descr": "other",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "snChasFanOperStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "snChasFanOperStatus",
                     "state_descr": "failure",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "snChasPwrSupplyOperStatus",
                     "state_descr": "other",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "snChasPwrSupplyOperStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "snChasPwrSupplyOperStatus",
                     "state_descr": "failure",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "snStackingGlobalConfigState",
                     "state_descr": "none",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "snStackingGlobalConfigState",
                     "state_descr": "enabled",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "snStackingGlobalConfigState",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "snStackingOperUnitStackPortState",
                     "state_descr": "other",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "snStackingOperUnitStackPortState",
                     "state_descr": "up",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "snStackingOperUnitStackPortState",
                     "state_descr": "down",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "snStackingOperUnitState",
                     "state_descr": "local",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "snStackingOperUnitState",
                     "state_descr": "remote",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "snStackingOperUnitState",
                     "state_descr": "reserved",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "snStackingOperUnitState",
                     "state_descr": "empty",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 2
                 }
@@ -25535,6 +25519,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "2015-23-7,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25554,6 +25539,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25573,6 +25559,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25592,6 +25579,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25611,6 +25599,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25630,6 +25619,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25649,6 +25639,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25668,6 +25659,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25687,6 +25679,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25706,6 +25699,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25725,6 +25719,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25744,6 +25739,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25763,6 +25759,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25782,6 +25779,7 @@
                     "entPhysicalContainedIn": 20,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25801,6 +25799,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25820,6 +25819,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25839,6 +25839,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25858,6 +25859,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25877,6 +25879,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25896,6 +25899,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25915,6 +25919,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25934,6 +25939,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25953,6 +25959,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25972,6 +25979,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -25991,6 +25999,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26010,6 +26019,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26029,6 +26039,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26048,6 +26059,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26067,6 +26079,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26086,6 +26099,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26105,6 +26119,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26124,6 +26139,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26143,6 +26159,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26162,6 +26179,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26181,6 +26199,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26200,6 +26219,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26219,6 +26239,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26238,6 +26259,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26257,6 +26279,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26276,6 +26299,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26295,6 +26319,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26314,6 +26339,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26333,6 +26359,7 @@
                     "entPhysicalContainedIn": 150,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26352,6 +26379,7 @@
                     "entPhysicalContainedIn": 2130,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26371,6 +26399,7 @@
                     "entPhysicalContainedIn": 2131,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26390,6 +26419,7 @@
                     "entPhysicalContainedIn": 2132,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -26409,6 +26439,7 @@
                     "entPhysicalContainedIn": 2133,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme Networks, Inc.",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 }
             ]

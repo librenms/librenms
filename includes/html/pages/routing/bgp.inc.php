@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\BgpPeer;
 use App\Models\Device;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IPv6;
@@ -7,7 +8,7 @@ use LibreNMS\Util\Number;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
 
-if (! Auth::user()->hasGlobalRead()) {
+if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
     include 'includes/html/error-no-perm.inc.php';
 } else {
     $where = '';
@@ -354,8 +355,7 @@ if (! Auth::user()->hasGlobalRead()) {
             case 'macaccounting_bits':
             case 'macaccounting_pkts':
                 $acc = dbFetchRow('SELECT * FROM `ipv4_mac` AS I, `mac_accounting` AS M, `ports` AS P, `devices` AS D WHERE I.ipv4_address = ? AND M.mac = I.mac_address AND P.port_id = M.port_id AND D.device_id = P.device_id', [$peer['bgpPeerIdentifier']]);
-                $database = Rrd::name($device['hostname'], ['cip', $acc['ifIndex'], $acc['mac']]);
-                if (is_array($acc) && is_file($database)) {
+                if (is_array($acc) && Rrd::checkRrdExists(Rrd::name($device['hostname'], ['cip', $acc['ifIndex'], $acc['mac']]))) {
                     $peer['graph'] = 1;
                     $graph_array['id'] = $acc['ma_id'];
                     $graph_array['type'] = $vars['graph'];

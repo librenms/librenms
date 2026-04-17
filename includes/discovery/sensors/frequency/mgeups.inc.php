@@ -12,10 +12,10 @@ for ($i = 1; $i <= $numPhase; $i++) {
         $descr .= " Phase $i";
     }
 
-    $current = snmp_get($device, $freq_oid, '-Oqv');
+    $current = SnmpQuery::get($freq_oid)->value();
     if (! $current) {
         $freq_oid .= '.0';
-        $current = snmp_get($device, $freq_oid, '-Oqv');
+        $current = SnmpQuery::get($freq_oid)->value();
     }
 
     $current /= 10;
@@ -36,10 +36,10 @@ for ($i = 1; $i <= $numPhase; $i++) {
         $descr .= " Phase $i";
     }
 
-    $current = snmp_get($device, $freq_oid, '-Oqv');
+    $current = SnmpQuery::get($freq_oid)->value();
     if (! $current) {
         $freq_oid .= '.0';
-        $current = snmp_get($device, $freq_oid, '-Oqv');
+        $current = SnmpQuery::get($freq_oid)->value();
     }
 
     $current /= 10;

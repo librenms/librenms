@@ -31,6 +31,7 @@ use JsonSchema\Constraints\Constraint;
 use JsonSchema\Exception\JsonDecodingException;
 use JsonSchema\Exception\ValidationException;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
@@ -51,11 +52,13 @@ final class YamlSchemaTest extends TestCase
         $this->assertNull($error, (string) $error);
     }
 
+    #[TestDox('OS definition schema')]
     public function testOSDefinitionSchema(): void
     {
         $this->validateYamlFilesAgainstSchema(resource_path('definitions/os_detection'), resource_path('definitions/schema/os_schema.json'));
     }
 
+    #[TestDox('OS match filename')]
     public function testOSMatchFilename(): void
     {
         foreach ($this->listFiles(resource_path('definitions/os_detection/*.yaml')) as $filename => $file) {

@@ -1,0 +1,426 @@
+G6-SFP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Counter32, enterprises,NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+	DisplayString, MacAddress
+		FROM SNMPv2-TC
+	g6	FROM MICROSENS-G6-MIB
+	;
+
+device MODULE-IDENTITY --Category
+	LAST-UPDATED "202302141127Z"
+	ORGANIZATION "MICROSENS GmbH & Co. KG"
+	CONTACT-INFO
+		"Kueferstrasse 16
+		D-59067 Hamm
+		Germany
+		support@microsens.de
+		http://www.microsens.de"
+	DESCRIPTION
+		"Microsens private MIB for Generation 6 Ethernet Switches"
+
+	REVISION "202302141127Z"
+	DESCRIPTION
+		"File creation"
+	::= { g6 1 }
+
+sfp  OBJECT IDENTIFIER ::= { device 34 }
+
+
+
+-- *************************** CONFIGURATION SECTION ********************************
+
+
+-- ******************* Begin of configTable *************************
+
+configTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF ConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"These setting apply to each SFP in the system."
+	::= { sfp 1 }
+
+configEntry	OBJECT-TYPE
+	SYNTAX ConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { configIndex }
+	::= { configTable 1 }
+
+
+	ConfigEntry ::= SEQUENCE {
+	configIndex INTEGER,
+	configLossOfSignalEvent INTEGER ,
+	configOpticalDeltaDetect INTEGER ,
+	configDeltaThreshold Integer32 
+	}
+
+configIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { configEntry 1 }
+
+configLossOfSignalEvent OBJECT-TYPE   -- loss_of_signal_event
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When enabled a loss of optical signal or the return of the signal will create an event."
+	::= { configEntry 2 }
+
+configOpticalDeltaDetect OBJECT-TYPE   -- optical_delta_detect
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"An optical receive power level change of more than delta_threshold between two successive read cycles generates an event."
+	::= { configEntry 3 }
+
+configDeltaThreshold OBJECT-TYPE   -- delta_threshold
+	SYNTAX Integer32 (0..255)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Defines the dB difference required to trigger an event. Only 1 dB steps are permitted. A value of 0 detects any change. This setting is only for testing. Recommended value: 2. "
+	::= { configEntry 4 }
+
+
+-- ********************* End of configTable ***********************
+
+
+
+-- ****************************** STATUS SECTION ********************************
+
+
+-- ******************* Begin of informationTable *************************
+
+informationTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF InformationEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This table displays data which are read from the inserted SFPs."
+	::= { sfp 100 }
+
+informationEntry	OBJECT-TYPE
+	SYNTAX InformationEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { informationPortIndex }
+	::= { informationTable 1 }
+
+
+	InformationEntry ::= SEQUENCE {
+	informationPortIndex INTEGER,
+	informationPort OCTET STRING ,
+	informationLocation DisplayString,
+	informationStatus BITS ,
+	informationType INTEGER ,
+	informationConnector INTEGER ,
+	informationWavelength DisplayString,
+	informationTxTechnology DisplayString,
+	informationRxTechnology DisplayString,
+	informationNominalBitrate DisplayString,
+	informationManufacturer DisplayString,
+	informationPartNumber DisplayString,
+	informationRevision DisplayString,
+	informationSerialNumber DisplayString,
+	informationMfgDateCode DisplayString,
+	informationWarnings BITS ,
+	informationAlarms BITS ,
+	informationTxPower DisplayString,
+	informationRxPower DisplayString,
+	informationTemperature DisplayString,
+	informationMaxLength9Um DisplayString,
+	informationMaxLength50Um DisplayString,
+	informationMaxLength62Um DisplayString,
+	informationMaxLengthCopper DisplayString,
+	informationTuningRange DisplayString,
+	informationPowerConsumption DisplayString,
+	informationAdditionalInformation DisplayString
+	}
+
+informationPortIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0..47)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { informationEntry 1 }
+
+informationPort OBJECT-TYPE   -- port
+	SYNTAX OCTET STRING (SIZE (0..4))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates the physical port in which this SFP is inserted."
+	::= { informationEntry 2 }
+
+informationLocation OBJECT-TYPE   -- location
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Textual description of SFP location."
+	::= { informationEntry 3 }
+
+informationStatus OBJECT-TYPE   -- status
+	SYNTAX BITS 
+		{
+		ok (0),
+		laserDisabled (1),
+		lossOfSignal (2),
+		txFailure (3),
+		readError (4)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Should indicate OK. LOSS_OF_SIGNAL is shown when the optical receive power level is below the critical lower limit."
+	::= { informationEntry 4 }
+
+informationType OBJECT-TYPE   -- type
+	SYNTAX INTEGER 
+		{
+		empty (0),
+		unknown (1),
+		sfp (2),
+		gbic (3),
+		sff (4),
+		dwdmSfp (5),
+		xfp (7),
+		csfpA (8),
+		csfpB (9),
+		dwdmXfp (10),
+		sfpPlus (11)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"This parameter shows which type of optics are installed"
+	::= { informationEntry 5 }
+
+informationConnector OBJECT-TYPE   -- connector
+	SYNTAX INTEGER 
+		{
+		unknown (0),
+		lc (1),
+		sc (2),
+		mtRj (3),
+		rj45 (4),
+		mu (5)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Shows which connector is used with this SFP."
+	::= { informationEntry 6 }
+
+informationWavelength OBJECT-TYPE   -- wavelength
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Nominal wavelength if this SFP. May also indicate ITU channel for DWDM optics."
+	::= { informationEntry 7 }
+
+informationTxTechnology OBJECT-TYPE   -- tx_technology
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Distinguishes between multimode and single mode SFP. For DWDM SFP more details including grid are shown."
+	::= { informationEntry 8 }
+
+informationRxTechnology OBJECT-TYPE   -- rx_technology
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Distinguishes between normal PIN receivers and more sensitive APD receivers."
+	::= { informationEntry 9 }
+
+informationNominalBitrate OBJECT-TYPE   -- nominal_bitrate
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Nominal bitrate rounded to nearest 100Mbit. Usually the SFP can be operated at lower speed as well."
+	::= { informationEntry 10 }
+
+informationManufacturer OBJECT-TYPE   -- manufacturer
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Shows the manufacturer of this SFP."
+	::= { informationEntry 11 }
+
+informationPartNumber OBJECT-TYPE   -- part_number
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Shows the part number of this SFP. This will differ from the MICROSENS order code unless also MICROSENS is indicated as manufacturer."
+	::= { informationEntry 12 }
+
+informationRevision OBJECT-TYPE   -- revision
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Internal revision code of this SFP."
+	::= { informationEntry 13 }
+
+informationSerialNumber OBJECT-TYPE   -- serial_number
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Serial number of the SFP."
+	::= { informationEntry 14 }
+
+informationMfgDateCode OBJECT-TYPE   -- mfg_date_code
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Manufacturing date code. "
+	::= { informationEntry 15 }
+
+informationWarnings OBJECT-TYPE   -- warnings
+	SYNTAX BITS 
+		{
+		txPowerLow (0),
+		txPowerHigh (1),
+		txBiasLow (2),
+		txBiasHigh (3),
+		vccLow (4),
+		vccHigh (5),
+		tempLow (6),
+		tempHigh (7),
+		rxPowerLow (8),
+		rxPowerHigh (9)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	""
+	::= { informationEntry 16 }
+
+informationAlarms OBJECT-TYPE   -- alarms
+	SYNTAX BITS 
+		{
+		txPowerTooLow (0),
+		txPowerTooHigh (1),
+		txBiasTooLow (2),
+		txBiasTooHigh (3),
+		vccTooLow (4),
+		vccTooHigh (5),
+		tempTooLow (6),
+		tempTooHigh (7),
+		rxPowerTooLow (8),
+		rxPowerTooHigh (9)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	""
+	::= { informationEntry 17 }
+
+informationTxPower OBJECT-TYPE   -- tx_power
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates the optical output in dBm. Some SFP cannot display this value. For electrical SFP N/A (not applicable) is shown."
+	::= { informationEntry 18 }
+
+informationRxPower OBJECT-TYPE   -- rx_power
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates the optical input in dBm. Some SFP cannot display this value. For electrical SFP N/A (not applicable) is shown."
+	::= { informationEntry 19 }
+
+informationTemperature OBJECT-TYPE   -- temperature
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Displays the temperature inside the SFP. This is usually higher than the system temperature."
+	::= { informationEntry 20 }
+
+informationMaxLength9Um OBJECT-TYPE   -- max_length_9_um
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Displays nominal maximum reach of this SFP on a standard single mode fiber."
+	::= { informationEntry 21 }
+
+informationMaxLength50Um OBJECT-TYPE   -- max_length_50_um
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Displays nominal maximum reach of this SFP on a 50 micro meter multimode fiber."
+	::= { informationEntry 22 }
+
+informationMaxLength62Um OBJECT-TYPE   -- max_length_62_um
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Displays nominal maximum reach of this SFP on a 62.5 micro meter multimode fiber."
+	::= { informationEntry 23 }
+
+informationMaxLengthCopper OBJECT-TYPE   -- max_length_copper
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Displays nominal maximum reach of this SFP on a copper cable. Only applies to electrical SFP."
+	::= { informationEntry 24 }
+
+informationTuningRange OBJECT-TYPE   -- tuning_range
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"For wavelength tunable optics additional details are shown here."
+	::= { informationEntry 25 }
+
+informationPowerConsumption OBJECT-TYPE   -- power_consumption
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Typical power consumption values are shown if available from the interface."
+	::= { informationEntry 26 }
+
+informationAdditionalInformation OBJECT-TYPE   -- additional_information
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Some special SFP can supply additional measurement data. For example OTDR reflection data can be listed here."
+	::= { informationEntry 27 }
+
+
+-- ********************* End of informationTable ***********************
+
+
+
+END
+

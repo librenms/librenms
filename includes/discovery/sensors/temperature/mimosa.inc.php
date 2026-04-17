@@ -17,7 +17,7 @@ $index = 0;
 $sensor_type = 'mimosaInternalTemp';
 $descr = 'Internal Temp';
 $divisor = 10;
-$temperature = (snmp_get($device, $oid, '-Oqv') / $divisor);
+$temperature = (SnmpQuery::get($oid)->value() / $divisor);
 if (is_numeric($temperature)) {
     discover_sensor(null, 'temperature', $device, $oid, $index, $sensor_type, $descr, $divisor, '1', '0', null, null, '65', $temperature);
 }

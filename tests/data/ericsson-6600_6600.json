@@ -5554,6 +5554,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5573,6 +5574,7 @@
                     "entPhysicalContainedIn": 1686380543,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5592,6 +5594,7 @@
                     "entPhysicalContainedIn": 1686388735,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5611,6 +5614,7 @@
                     "entPhysicalContainedIn": 1652822527,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5630,6 +5634,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5649,6 +5654,7 @@
                     "entPhysicalContainedIn": 1652830719,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5668,6 +5674,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5687,6 +5694,7 @@
                     "entPhysicalContainedIn": 1686376959,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2129658001
                 },
                 {
@@ -5706,6 +5714,7 @@
                     "entPhysicalContainedIn": 1686380543,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2129666177
                 },
                 {
@@ -5725,6 +5734,7 @@
                     "entPhysicalContainedIn": 1686380543,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5744,6 +5754,7 @@
                     "entPhysicalContainedIn": 1686385151,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2129658257
                 },
                 {
@@ -5763,6 +5774,7 @@
                     "entPhysicalContainedIn": 1686388735,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2129666433
                 },
                 {
@@ -5782,6 +5794,7 @@
                     "entPhysicalContainedIn": 1686388735,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5801,6 +5814,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5820,6 +5834,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5839,6 +5854,7 @@
                     "entPhysicalContainedIn": 1954815999,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5858,6 +5874,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5877,6 +5894,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5896,6 +5914,7 @@
                     "entPhysicalContainedIn": 1954824191,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5915,6 +5934,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5934,6 +5954,7 @@
                     "entPhysicalContainedIn": 1954828287,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5953,6 +5974,7 @@
                     "entPhysicalContainedIn": 1954828287,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5972,6 +5994,7 @@
                     "entPhysicalContainedIn": 1954828287,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5991,6 +6014,7 @@
                     "entPhysicalContainedIn": 1954828287,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -6010,6 +6034,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -6029,6 +6054,7 @@
                     "entPhysicalContainedIn": 1921265663,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -6048,6 +6074,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -6067,6 +6094,7 @@
                     "entPhysicalContainedIn": 1921257983,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -6086,6 +6114,7 @@
                     "entPhysicalContainedIn": 1921261567,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -6105,6 +6134,7 @@
                     "entPhysicalContainedIn": 1921266175,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -6124,6 +6154,7 @@
                     "entPhysicalContainedIn": 1921269759,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -6143,6 +6174,7 @@
                     "entPhysicalContainedIn": 1921270271,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -6162,6 +6194,7 @@
                     "entPhysicalContainedIn": 1921271807,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "FINISAR CORP.",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -6181,6 +6214,7 @@
                     "entPhysicalContainedIn": 1921273855,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -6200,6 +6234,7 @@
                     "entPhysicalContainedIn": 1954812415,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2146435217
                 },
                 {
@@ -6219,6 +6254,7 @@
                     "entPhysicalContainedIn": 1954815999,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2146443393
                 },
                 {
@@ -6238,6 +6274,7 @@
                     "entPhysicalContainedIn": 1954815999,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2134646913
                 },
                 {
@@ -6257,6 +6294,7 @@
                     "entPhysicalContainedIn": 1954820607,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2146435473
                 },
                 {
@@ -6276,6 +6314,7 @@
                     "entPhysicalContainedIn": 1954824191,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2146443649
                 },
                 {
@@ -6295,6 +6334,7 @@
                     "entPhysicalContainedIn": 1954824191,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2134647169
                 },
                 {
@@ -6314,6 +6354,7 @@
                     "entPhysicalContainedIn": 1954828287,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2147443201
                 },
                 {
@@ -6333,6 +6374,7 @@
                     "entPhysicalContainedIn": 1954828287,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2147467776
                 },
                 {
@@ -6352,6 +6394,7 @@
                     "entPhysicalContainedIn": 1954828287,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2134639108
                 },
                 {
@@ -6371,6 +6414,7 @@
                     "entPhysicalContainedIn": 1954828287,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2134639109
                 },
                 {
@@ -6390,6 +6434,7 @@
                     "entPhysicalContainedIn": 1954826239,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2134639111
                 },
                 {
@@ -6409,6 +6454,7 @@
                     "entPhysicalContainedIn": 1954828287,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2147353094
                 },
                 {
@@ -6428,6 +6474,7 @@
                     "entPhysicalContainedIn": 1954828287,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2147353095
                 },
                 {
@@ -6447,6 +6494,7 @@
                     "entPhysicalContainedIn": 1954828287,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2147353096
                 },
                 {
@@ -6466,6 +6514,7 @@
                     "entPhysicalContainedIn": 1954828287,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2147353097
                 },
                 {
@@ -6485,6 +6534,7 @@
                     "entPhysicalContainedIn": 1954828287,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -6504,6 +6554,7 @@
                     "entPhysicalContainedIn": 1954828287,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -6523,6 +6574,7 @@
                     "entPhysicalContainedIn": 1954828287,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Ericsson",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

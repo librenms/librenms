@@ -28,7 +28,9 @@ namespace LibreNMS\Tests;
 
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use PHPUnit\Framework\Attributes\TestDox;
 
+#[TestDox('Add Host CLI')]
 final class AddHostCliTest extends DBTestCase
 {
     use DatabaseTransactions;
@@ -36,6 +38,7 @@ final class AddHostCliTest extends DBTestCase
     /** @var string */
     private $hostName = 'testHost';
 
+    #[TestDox('CLI SNMP v1')]
     public function testCLIsnmpV1(): void
     {
         $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '-c' => 'community', '--v1' => true])
@@ -50,6 +53,7 @@ final class AddHostCliTest extends DBTestCase
         $this->assertEquals('v1', $device->snmpver, 'Wrong snmp version');
     }
 
+    #[TestDox('CLI SNMP v2')]
     public function testCLIsnmpV2(): void
     {
         $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '-c' => 'community', '--v2c' => true])
@@ -64,6 +68,7 @@ final class AddHostCliTest extends DBTestCase
         $this->assertEquals('v2c', $device->snmpver, 'Wrong snmp version');
     }
 
+    #[TestDox('CLI SNMP v3 user and password')]
     public function testCLIsnmpV3UserAndPW(): void
     {
         $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '-u' => 'SecName', '-A' => 'AuthPW', '-X' => 'PrivPW', '--v3' => true])
@@ -96,6 +101,7 @@ final class AddHostCliTest extends DBTestCase
         }
     }
 
+    #[TestDox('SNMP transport')]
     public function testSnmpTransport(): void
     {
         $modes = ['udp', 'udp6', 'tcp', 'tcp6'];
@@ -112,6 +118,7 @@ final class AddHostCliTest extends DBTestCase
         }
     }
 
+    #[TestDox('SNMP v3 auth protocol')]
     public function testSnmpV3AuthProtocol(): void
     {
         $modes = \LibreNMS\SNMPCapabilities::supportedAuthAlgorithms();
@@ -128,6 +135,7 @@ final class AddHostCliTest extends DBTestCase
         }
     }
 
+    #[TestDox('SNMP v3 privacy protocol')]
     public function testSnmpV3PrivacyProtocol(): void
     {
         $modes = \LibreNMS\SNMPCapabilities::supportedCryptoAlgorithms();
@@ -144,6 +152,7 @@ final class AddHostCliTest extends DBTestCase
         }
     }
 
+    #[TestDox('CLI ping')]
     public function testCLIping(): void
     {
         $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '-P' => true, '-o' => 'nameOfOS', '-w' => 'hardware', '-s' => 'System', '--v1' => true])

@@ -12,18 +12,21 @@
  * the source code distribution for details.
  */
 
+use App\Models\AlertTemplate;
+use Illuminate\Support\Facades\Gate;
+
 header('Content-type: text/plain');
 
-if (! Auth::user()->hasGlobalAdmin()) {
-    exit('ERROR: You need to be admin');
+if (Gate::denies('delete', AlertTemplate::class)) {
+    exit('ERROR: You need permission');
 }
 
 if (! is_numeric($_POST['template_id'])) {
     echo 'ERROR: No template selected';
     exit;
 } else {
-    if (dbDelete('alert_templates', '`id` =  ?', [$_POST['template_id']])) {
-        dbDelete('alert_template_map', 'alert_templates_id = ?', [$_POST['template_id']]);
+    if (AlertTemplate::where('id', $_POST['template_id'])->delete()) {
+        \App\Models\AlertTemplateMap::where('alert_templates_id', $_POST['template_id'])->delete();
         echo 'Alert template has been deleted.';
         exit;
     } else {

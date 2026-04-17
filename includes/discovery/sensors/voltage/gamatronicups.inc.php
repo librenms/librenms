@@ -3,7 +3,7 @@
 for ($i = 1; $i <= 3; $i++) {
     $volt_oid = ".1.3.6.1.4.1.6050.5.4.1.1.2.$i";
     $descr = "Input Phase $i";
-    $volt = snmp_get($device, $volt_oid, '-Oqv');
+    $volt = SnmpQuery::get($volt_oid)->value();
     $type = 'gamatronicups';
     $divisor = 1;
     $index = $i;
@@ -16,7 +16,7 @@ for ($i = 1; $i <= 3; $i++) {
 for ($i = 1; $i <= 3; $i++) {
     $volt_oid = ".1.3.6.1.4.1.6050.5.5.1.1.2.$i";
     $descr = "Output Phase $i";
-    $volt = snmp_get($device, $volt_oid, '-Oqv');
+    $volt = SnmpQuery::get($volt_oid)->value();
     $type = 'gamatronicups';
     $divisor = 1;
     $index = (100 + $i);

@@ -27,6 +27,8 @@
 namespace App\ApiClients;
 
 use App\Facades\LibrenmsConfig;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Log;
 
 class Oxidized extends BaseApi
 {
@@ -45,7 +47,11 @@ class Oxidized extends BaseApi
     public function reloadNodes(): void
     {
         if ($this->enabled && LibrenmsConfig::get('oxidized.reload_nodes') === true) {
-            $this->getClient()->get('/reload.json');
+            try {
+                $this->getClient()->get('/reload.json');
+            } catch (ConnectionException $e) {
+                Log::warning('Oxidized is not reachable: ' . $e->getMessage());
+            }
         }
     }
 
@@ -58,9 +64,13 @@ class Oxidized extends BaseApi
             // Work around https://github.com/rack/rack/issues/337
             $msg = str_replace('%', '', $msg);
 
-            return $this->getClient()
-                ->put("/node/next/$hostname", ['user' => $username, 'msg' => $msg])
-                ->successful();
+            try {
+                return $this->getClient()
+                    ->put("/node/next/$hostname", ['user' => $username, 'msg' => $msg])
+                    ->successful();
+            } catch (ConnectionException $e) {
+                Log::warning('Oxidized is not reachable: ' . $e->getMessage());
+            }
         }
 
         return false;
@@ -70,9 +80,15 @@ class Oxidized extends BaseApi
     public function getContent(string $uri): string
     {
         if ($this->enabled) {
-            return $this->getClient()->get($uri);
-        } else {
-            return '';
+            try {
+                return $this->getClient()->get($uri);
+            } catch (ConnectionException $e) {
+                Log::warning('Oxidized is not reachable: ' . $e->getMessage());
+
+                return '';
+            }
         }
+
+        return '';
     }
 }

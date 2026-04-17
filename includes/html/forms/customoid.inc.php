@@ -1,8 +1,10 @@
 <?php
 
+use App\Models\Customoid;
+
 header('Content-type: application/json');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::none(['customoid.create', 'customoid.update'])) {
     exit(json_encode([
         'status' => 'error',
         'message' => 'Need to be admin',
@@ -18,7 +20,7 @@ $action = $_POST['action'];
 $name = strip_tags((string) $_POST['name']);
 $oid = strip_tags((string) $_POST['oid']);
 $datatype = strip_tags((string) $_POST['datatype']);
-$unit = $_POST['unit'];
+$unit = strip_tags((string) $_POST['unit']);
 $limit = $_POST['limit'];
 $limit_warn = $_POST['limit_warn'];
 $limit_low = $_POST['limit_low'];
@@ -66,6 +68,7 @@ if ($action == 'test') {
     }
 } else {
     if (is_numeric($id) && $id > 0) {
+        Gate::authorize('customoid.update');
         if (dbUpdate(
             [
                 'customoid_descr' => $name,
@@ -93,9 +96,10 @@ if ($action == 'test') {
         }
     } elseif (empty($name)) {
         $message = 'No OID name provided';
-    } elseif (dbFetchCell('SELECT 1 FROM `customoids` WHERE `customoid_descr` = ? AND `device_id`=?', [$name, $device_id])) {
+    } elseif (Customoid::where('customoid_descr', $name)->where('device_id', $device_id)->exists()) {
         $message = "OID named <i>$name</i> on this device already exists";
     } else {
+        Gate::authorize('customoid.create');
         $id = dbInsert(
             [
                 'device_id' => $device_id,

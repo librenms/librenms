@@ -13,7 +13,7 @@ if ($device['os_group'] == 'cisco') {
     $tunnels_db = dbFetchRows('SELECT * FROM `ipsec_tunnels` WHERE `device_id` = ?', [$device['device_id']]);
     foreach ($tunnels_db as $tunnel) {
         if (empty($tunnel['peer_addr']) && empty($tunnel['local_addr'])) {
-            dbDelete('ipsec_tunnels', '`tunnel_id` = ?', [$tunnel['tunnel_id']]);
+            \App\Models\IpsecTunnel::where('tunnel_id', $tunnel['tunnel_id'])->delete();
         }
 
         $tunnels[$tunnel['peer_addr']] = $tunnel;
@@ -134,11 +134,9 @@ if ($device['os_group'] == 'cisco') {
 
     if (! empty($valid_tunnels)) {
         d_echo($valid_tunnels);
-        dbDelete(
-            'ipsec_tunnels',
-            '`tunnel_id` NOT IN ' . dbGenPlaceholders(count($valid_tunnels)) . ' AND `device_id`=?',
-            array_merge($valid_tunnels, [$device['device_id']])
-        );
+        \App\Models\IpsecTunnel::whereNotIn('tunnel_id', $valid_tunnels)
+            ->where('device_id', $device['device_id'])
+            ->delete();
     }
 
     unset($rrd_name, $rrd_def, $fields, $oids, $data, $data, $oid, $tunnel);
@@ -152,7 +150,7 @@ if ($device['os_group'] == 'firebrick') {
     $tunnels_db = dbFetchRows('SELECT * FROM `ipsec_tunnels` WHERE `device_id` = ?', [$device['device_id']]);
     foreach ($tunnels_db as $tunnel) {
         if (empty($tunnel['peer_addr']) && empty($tunnel['local_addr'])) {
-            dbDelete('ipsec_tunnels', '`tunnel_id` = ?', [$tunnel['tunnel_id']]);
+            \App\Models\IpsecTunnel::where('tunnel_id', $tunnel['tunnel_id'])->delete();
         }
 
         $tunnels[$tunnel['tunnel_name']] = $tunnel;
@@ -215,11 +213,9 @@ if ($device['os_group'] == 'firebrick') {
 
     if (! empty($valid_tunnels)) {
         d_echo($valid_tunnels);
-        dbDelete(
-            'ipsec_tunnels',
-            '`device_id`=? AND `tunnel_id` NOT IN ' . dbGenPlaceholders(count($valid_tunnels)),
-            array_merge([$device['device_id']], $valid_tunnels)
-        );
+        \App\Models\IpsecTunnel::where('device_id', $device['device_id'])
+            ->whereNotIn('tunnel_id', $valid_tunnels)
+            ->delete();
     }
 }
 

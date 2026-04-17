@@ -8,17 +8,16 @@
     <div class="form-group">
         <label for="state-{{ $id }}" class="control-label">{{ __('State') }}</label>
         <select class="form-control" name="state" id="state-{{ $id }}">
-            <option value="-1">{{ __('not filtered') }}</option>
-            <option value="0" @if($state === '1') selected @endif>{{ __('OK') }}</option>
-            <option value="1" @if($state === '0') selected @endif>{{ __('Alert') }}</option>
+            <option value="">{{ __('not filtered') }}</option>
+            <option value="0" @if($state === '0') selected @endif>{{ __('OK') }}</option>
+            <option value="1" @if($state === '1') selected @endif>{{ __('Alert') }}</option>
         </select>
     </div>
     <div class="form-group">
-        <label for="min_severity-{{ $id }}" class="control-label">{{ __('Displayed severity') }}</label>
-        <select class="form-control" name="min_severity" id="min_severity-{{ $id }}">
-            <option value="">{{ __('any severity') }}</option>
+        <label for="severity-{{ $id }}" class="control-label">{{ __('Displayed severity') }}</label>
+        <select class="form-control" name="severity[]" id="severity-{{ $id }}" multiple>
             @foreach($severities as $name => $val)
-                <option value="{{ $val }}" @if($min_severity == $val) selected @endif>{{ $name }}{{$val > 3 ? '' : ' ' . __('or higher')}}</option>
+                <option value="{{ $val }}" @if($severity == $val) selected @endif>{{ $name }}</option>
             @endforeach
         </select>
     </div>

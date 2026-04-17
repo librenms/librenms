@@ -5669,56 +5669,48 @@
                 {
                     "state_name": "mtxrGaugeStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mtxrGaugeStatus",
                     "state_descr": "fail",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mtxrOpticalRxLoss",
                     "state_descr": "no",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mtxrOpticalRxLoss",
                     "state_descr": "yes",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mtxrOpticalRxLoss",
                     "state_descr": "null",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mtxrOpticalTxFault",
                     "state_descr": "no",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mtxrOpticalTxFault",
                     "state_descr": "yes",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mtxrOpticalTxFault",
                     "state_descr": "null",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 }
@@ -5795,6 +5787,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

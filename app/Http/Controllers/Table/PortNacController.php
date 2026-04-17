@@ -98,10 +98,10 @@ class PortNacController extends TableController
      */
     protected function search($search, $query, $fields = [])
     {
-        if ($search = trim(\Request::get('searchPhrase') ?? '')) {
+        if ($search = trim(\Request::input('searchPhrase') ?? '')) {
             $mac_search = '%' . str_replace([':', ' ', '-', '.', '0x'], '', $search) . '%';
 
-            switch (\Request::get('searchby') ?? '') {
+            switch (\Request::input('searchby') ?? '') {
                 case 'mac':
                     return $query->where('ports_nac.mac_address', 'like', $search);
                 case 'ip':
@@ -149,12 +149,12 @@ class PortNacController extends TableController
 
     /**
      * @param  string  $ifAlias
-     * @return Collection
+     * @return Collection<int, int>
      */
     protected function findPorts($ifAlias): Collection
     {
-        $port_id = \Request::get('port_id');
-        $device_id = \Request::get('device_id');
+        $port_id = \Request::input('port_id');
+        $device_id = \Request::input('device_id');
 
         return Port::where('ifAlias', 'like', "%$ifAlias%")
             ->when($device_id, fn ($query) => $query->where('device_id', $device_id))

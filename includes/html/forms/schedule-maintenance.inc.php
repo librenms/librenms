@@ -13,19 +13,24 @@
  */
 
 use App\Facades\LibrenmsConfig;
+use App\Models\AlertSchedulable;
 use App\Models\AlertSchedule;
+use App\Models\Device;
+use App\Models\DeviceGroup;
+use App\Models\Location;
 use App\Models\UserPref;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\MaintenanceBehavior;
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::none(['create', 'update', 'view', 'delete'], AlertSchedule::class)) {
     header('Content-type: text/plain');
-    exit('ERROR: You need to be admin');
+    exit('ERROR: You need permission');
 }
 
 $sub_type = $_POST['sub_type'];
 
 if ($sub_type == 'new-maintenance') {
+    Gate::authorize('create', AlertSchedule::class);
     // Defaults
     $status = 'error';
     $update = 0;
@@ -147,7 +152,7 @@ if ($sub_type == 'new-maintenance') {
             $fail = 0;
 
             if ($update == 1) {
-                dbDelete('alert_schedulables', '`schedule_id`=?', [$alert_schedule->schedule_id]);
+                AlertSchedulable::where('schedule_id', $alert_schedule->schedule_id)->delete();
             }
 
             foreach ($maps as $target) {
@@ -162,9 +167,9 @@ if ($sub_type == 'new-maintenance') {
 
                 $item = dbInsert(['schedule_id' => $alert_schedule->schedule_id, 'alert_schedulable_type' => $type, 'alert_schedulable_id' => $target], 'alert_schedulables');
                 if ($notes && $type = 'device' && UserPref::getPref(Auth::user(), 'add_schedule_note_to_device')) {
-                    $device_notes = dbFetchCell('SELECT `notes` FROM `devices` WHERE `device_id` = ?;', [$target]);
+                    $device_notes = Device::where('device_id', $target)->value('notes');
                     $device_notes .= ((empty($device_notes)) ? '' : PHP_EOL) . date('Y-m-d H:i') . ' Alerts delayed: ' . $notes;
-                    dbUpdate(['notes' => $device_notes], 'devices', '`device_id` = ?', [$target]);
+                    Device::where('device_id', $target)->update(['notes' => $device_notes]);
                 }
                 if ($item > 0) {
                     array_push($items, $item);
@@ -175,10 +180,10 @@ if ($sub_type == 'new-maintenance') {
 
             if ($fail == 1 && $update == 0) {
                 foreach ($items as $item) {
-                    dbDelete('alert_schedulables', '`item_id`=?', [$item]);
+                    AlertSchedulable::where('item_id', $item)->delete();
                 }
 
-                dbDelete('alert_schedule', '`schedule_id`=?', [$alert_schedule->schedule_id]);
+                AlertSchedule::where('schedule_id', $alert_schedule->schedule_id)->delete();
                 $message = 'Issue scheduling maintenance';
             } else {
                 $status = 'ok';
@@ -195,19 +200,20 @@ if ($sub_type == 'new-maintenance') {
         'schedule_id' => $alert_schedule->schedule_id ?? null,
     ];
 } elseif ($sub_type == 'parse-maintenance') {
+    Gate::authorize('view', AlertSchedule::class);
     $alert_schedule = AlertSchedule::findOrFail($_POST['schedule_id']);
     $items = [];
 
     foreach (dbFetchRows('SELECT `alert_schedulable_type`, `alert_schedulable_id` FROM `alert_schedulables` WHERE `schedule_id`=?', [$alert_schedule->schedule_id]) as $target) {
         $id = $target['alert_schedulable_id'];
         if ($target['alert_schedulable_type'] == 'location') {
-            $text = dbFetchCell('SELECT location FROM locations WHERE id = ?', [$id]);
+            $text = Location::where('id', $id)->value('location');
             $id = 'l' . $id;
         } elseif ($target['alert_schedulable_type'] == 'device_group') {
-            $text = dbFetchCell('SELECT name FROM device_groups WHERE id = ?', [$id]);
+            $text = DeviceGroup::where('id', $id)->value('name');
             $id = 'g' . $id;
         } else {
-            $text = dbFetchCell('SELECT hostname FROM devices WHERE device_id = ?', [$id]);
+            $text = Device::where('device_id', $id)->value('hostname');
         }
         $items[] = [
             'id' => $id,
@@ -219,6 +225,7 @@ if ($sub_type == 'new-maintenance') {
     $response['recurring_day'] = $alert_schedule->getOriginal('recurring_day');
     $response['targets'] = $items;
 } elseif ($sub_type == 'end-maintenance') {
+    Gate::authorize('update', AlertSchedule::class);
     $alert_schedule = AlertSchedule::findOrFail($_POST['schedule_id'] ?? 0);
     $alert_schedule->end = date('Y-m-d H:i:s');
     $alert_schedule->save();
@@ -227,9 +234,10 @@ if ($sub_type == 'new-maintenance') {
         'message' => 'Maintenance has been ended',
     ];
 } elseif ($sub_type == 'del-maintenance') {
+    Gate::authorize('delete', AlertSchedule::class);
     $schedule_id = $_POST['del_schedule_id'];
-    dbDelete('alert_schedule', '`schedule_id`=?', [$schedule_id]);
-    dbDelete('alert_schedulables', '`schedule_id`=?', [$schedule_id]);
+    AlertSchedule::where('schedule_id', $schedule_id)->delete();
+    AlertSchedulable::where('schedule_id', $schedule_id)->delete();
     $status = 'ok';
     $message = 'Maintenance schedule has been removed';
     $response = [

@@ -1,8 +1,5 @@
 <?php
 
-$graph_type = 'sensor_ber';
-$sensor_class = 'ber';
-$sensor_unit = '';
-$sensor_type = 'ber';
+$sensor_class = \LibreNMS\Enum\Sensor::Ber;
 
 require 'includes/html/pages/device/overview/generic/sensor.inc.php';

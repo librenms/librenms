@@ -1,14 +1,16 @@
 <?php
 
-if (! Auth::user()->hasGlobalAdmin()) {
+use App\Models\Device;
+
+if (Gate::denies('delete', Device::class)) {
     require 'includes/html/error-no-perm.inc.php';
     exit;
 }
 
 $pagetitle[] = 'Delete device';
 
-if (Auth::user()->isDemo()) {
-    demo_account();
+if (Gate::allows('demo')) {
+    print_error("You are logged in as a demo account, this page isn't accessible to you");
 } else {
     if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
         echo '
