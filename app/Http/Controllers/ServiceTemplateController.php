@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Interfaces\ToastInterface;
 use App\Models\Device;
 use App\Models\DeviceGroup;
-use App\Models\Service;
 use App\Models\ServiceTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -305,6 +304,9 @@ class ServiceTemplateController extends Controller
     public function applyDeviceAll(int $device_id): void
     {
         foreach (ServiceTemplate::all() as $template) {
+            if ($template->type == 'dynamic') {
+                $template->updateDevices();
+            }
             $this->applyDevice($template, $device_id);
         }
     }
@@ -327,7 +329,7 @@ class ServiceTemplateController extends Controller
 
         // remove any remaining services no longer in the correct device group
         foreach (Device::notInServiceTemplate($template->id)->notInDeviceGroup($template->groups->pluck('id'))->pluck('device_id') as $device_id) {
-            Service::where('device_id', $device_id)->where('service_template_id', $template->id)->delete();
+            $template->services()->where('device_id', $device_id)->delete();
         }
         $msg = __('All Service Templates have been applied');
 
@@ -387,7 +389,7 @@ class ServiceTemplateController extends Controller
 
         // remove if this template no longer applies
         foreach (Device::notInServiceTemplate($template->id)->notInDeviceGroup($template->groups->pluck('id'))->where('device_id', $device_id)->pluck('device_id') as $device_id) {
-            Service::where('device_id', $device_id)->where('service_template_id', $template->id)->delete();
+            $template->services()->where('device_id', $device_id)->delete();
         }
     }
 
@@ -401,7 +403,7 @@ class ServiceTemplateController extends Controller
     {
         $this->authorize('update', ServiceTemplate::class);
 
-        Service::where('service_template_id', $template->id)->delete();
+        $template->services()->delete();
 
         $msg = __('All Service Templates have been applied');
 
@@ -416,7 +418,7 @@ class ServiceTemplateController extends Controller
      */
     public function destroy(ServiceTemplate $template)
     {
-        Service::where('service_template_id', $template->id)->delete();
+        $template->services()->delete();
         $template->delete();
 
         $msg = __('Service Template :name deleted, Services removed', ['name' => htmlentities($template->name)]);

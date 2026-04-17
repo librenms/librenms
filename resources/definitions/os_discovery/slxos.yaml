@@ -49,10 +49,10 @@ modules:
                 descr: SYSTEM-MIB::swSensorInfo
                 state_name: SYSTEM-MIB::swSensorTable
                 states:
-                    - { value: 1, generic: 3, graph: 0, descr: unknown }
-                    - { value: 2, generic: 2, graph: 0, descr: faulty }
-                    - { value: 3, generic: 1, graph: 0, descr: below-min }
-                    - { value: 4, generic: 0, graph: 0, descr: nominal }
-                    - { value: 5, generic: 1, graph: 0, descr: above-max }
-                    - { value: 6, generic: 3, graph: 0, descr: absent }
+                    - { value: 1, generic: 3, descr: unknown }
+                    - { value: 2, generic: 2, descr: faulty }
+                    - { value: 3, generic: 1, descr: below-min }
+                    - { value: 4, generic: 0, descr: nominal }
+                    - { value: 5, generic: 1, descr: above-max }
+                    - { value: 6, generic: 3, descr: absent }
 

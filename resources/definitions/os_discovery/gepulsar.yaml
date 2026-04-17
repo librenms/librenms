@@ -8,8 +8,8 @@ modules:
                     state_name: ne843Dc1Rss
                     descr: 'System Status'
                     states:
-                        - { descr: normal, graph: 1, value: 0, generic: 0 }
-                        - { descr: critical, graph: 1, value: 1, generic: 0 }
+                        - { descr: normal, value: 0, generic: 0 }
+                        - { descr: critical, value: 1, generic: 0 }
                 -
                     oid: NE843-MIB::ne843RecTable
                     value: NE843-MIB::ne843RecEntryRfa1
@@ -18,8 +18,8 @@ modules:
                     index: 'ne843RecEntryRfa1.{{ $index }}'
                     descr: '{{ NE843-MIB::ne843RecEntryDes }}'
                     states:
-                        - { descr: normal, graph: 1, value: 0, generic: 0 }
-                        - { descr: critical, graph: 1, value: 1, generic: 0 }
+                        - { descr: normal, value: 0, generic: 0 }
+                        - { descr: critical, value: 1, generic: 0 }
        voltage:
             data:
                 - 

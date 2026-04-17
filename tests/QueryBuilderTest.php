@@ -26,7 +26,6 @@
 
 namespace LibreNMS\Tests;
 
-use App\Facades\LibrenmsConfig;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -62,7 +61,7 @@ final class QueryBuilderTest extends TestCase
 
     public static function loadQueryData(): array
     {
-        $base = LibrenmsConfig::get('install_dir');
+        $base = realpath(__DIR__ . '/..');
         $data = file_get_contents("$base/" . self::$data_file);
 
         return json_decode($data, true);

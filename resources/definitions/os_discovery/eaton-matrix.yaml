@@ -111,8 +111,8 @@ modules:
                     index: "{{ $index }}"
                     state_name: matInvOnOff
                     states:
-                        - { value: 1, generic: 1, graph: 0, descr: "Off" }
-                        - { value: 2, generic: 0, graph: 0, descr: "On" }
+                        - { value: 1, generic: 1, descr: "Off" }
+                        - { value: 2, generic: 0, descr: "On" }
                 -
                     oid: TELECOM-MIB::matConfStsPriority
                     value: TELECOM-MIB::matConfStsPriority
@@ -121,8 +121,8 @@ modules:
                     index: "{{ $index }}"
                     state_name: matConfStsPriority
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: "Inverter" }
-                        - { value: 2, generic: 0, graph: 0, descr: "Mains" }
+                        - { value: 1, generic: 0, descr: "Inverter" }
+                        - { value: 2, generic: 0, descr: "Mains" }
                 -
                     oid: TELECOM-MIB::matStsMbsStatus
                     value: TELECOM-MIB::matStsMbsStatus
@@ -131,12 +131,12 @@ modules:
                     index: "{{ $index }}"
                     state_name: matStsMbsStatus
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: "Normal" }
-                        - { value: 2, generic: 1, graph: 0, descr: "Manual - Inverted Power" }
-                        - { value: 3, generic: 2, graph: 0, descr: "Bypass - Inverted Power" }
-                        - { value: 4, generic: 1, graph: 0, descr: "Manual - Mains Power" }
-                        - { value: 5, generic: 2, graph: 0, descr: "Bypass - Mains Power" }
-                        - { value: 6, generic: 3, graph: 0, descr: "MBS Switch Error" }
+                        - { value: 1, generic: 0, descr: "Normal" }
+                        - { value: 2, generic: 1, descr: "Manual - Inverted Power" }
+                        - { value: 3, generic: 2, descr: "Bypass - Inverted Power" }
+                        - { value: 4, generic: 1, descr: "Manual - Mains Power" }
+                        - { value: 5, generic: 2, descr: "Bypass - Mains Power" }
+                        - { value: 6, generic: 3, descr: "MBS Switch Error" }
                 -
                     oid: TELECOM-MIB::matStsTable
                     value: TELECOM-MIB::matStsStatus
@@ -145,8 +145,8 @@ modules:
                     index: "{{ $index }}"
                     state_name: matStsStatus
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: "Online" }
-                        - { value: 2, generic: 2, graph: 0, descr: "Offline" }
+                        - { value: 1, generic: 0, descr: "Online" }
+                        - { value: 2, generic: 2, descr: "Offline" }
                 -
                     oid: TELECOM-MIB::matStsRunningMode
                     value: TELECOM-MIB::matStsRunningMode
@@ -155,6 +155,6 @@ modules:
                     index: "{{ $index }}"
                     state_name: matStsRunningMode
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: "Inverter" }
-                        - { value: 2, generic: 0, graph: 0, descr: "Mains" }
-                        - { value: 3, generic: 2, graph: 0, descr: "No Output" }
+                        - { value: 1, generic: 0, descr: "Inverter" }
+                        - { value: 2, generic: 0, descr: "Mains" }
+                        - { value: 3, generic: 2, descr: "No Output" }

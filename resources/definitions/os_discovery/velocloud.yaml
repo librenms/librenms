@@ -20,11 +20,11 @@ modules:
                     value: VELOCLOUD-EDGE-MIB::vceHaAdminState
                     state_name: vceHaAdminState
                     states:
-                        - { value: 1, graph: 0, generic: 0, descr: none }
-                        - { value: 2, graph: 0, generic: 0, descr: ActiveStandbyPair }
-                        - { value: 3, graph: 0, generic: 0, descr: Cluster }
-                        - { value: 4, graph: 0, generic: 0, descr: VrrpPair }
-                        - { value: 5, graph: 0, generic: 3, descr: unknown }
+                        - { value: 1, generic: 0, descr: none }
+                        - { value: 2, generic: 0, descr: ActiveStandbyPair }
+                        - { value: 3, generic: 0, descr: Cluster }
+                        - { value: 4, generic: 0, descr: VrrpPair }
+                        - { value: 5, generic: 3, descr: unknown }
                 -
                     oid: VELOCLOUD-EDGE-MIB::vceHaPeerState
                     num_oid: '.1.3.6.1.4.1.45346.1.1.2.1.2.2.{{ $index }}'
@@ -34,10 +34,10 @@ modules:
                     value: VELOCLOUD-EDGE-MIB::vceHaPeerState
                     state_name: vceHaPeerState
                     states:
-                        - { value: 1, graph: 0, generic: 0, descr: initializing }
-                        - { value: 2, graph: 0, generic: 0, descr: active }
-                        - { value: 3, graph: 0, generic: 0, descr: standby }
-                        - { value: 4, graph: 0, generic: 3, descr: unknown }
+                        - { value: 1, generic: 0, descr: initializing }
+                        - { value: 2, generic: 0, descr: active }
+                        - { value: 3, generic: 0, descr: standby }
+                        - { value: 4, generic: 3, descr: unknown }
                 -
                     oid: VELOCLOUD-EDGE-MIB::vceLinkVpnState
                     num_oid: '.1.3.6.1.4.1.45346.1.1.2.3.2.2.1.26.{{ $index }}'
@@ -47,14 +47,14 @@ modules:
                     value: VELOCLOUD-EDGE-MIB::vceLinkVpnState
                     state_name: vceLinkVpnState
                     states:
-                        - { value: 1, graph: 1, generic: 1, descr: initial }
-                        - { value: 2, graph: 2, generic: 2, descr: dead }
-                        - { value: 3, graph: 3, generic: 2, descr: unusable }
-                        - { value: 4, graph: 4, generic: 0, descr: quiet }
-                        - { value: 5, graph: 5, generic: 0, descr: standby }
-                        - { value: 6, graph: 6, generic: 2, descr: unstable }
-                        - { value: 7, graph: 7, generic: 0, descr: stable }
-                        - { value: 8, graph: 8, generic: 3, descr: unknown }
+                        - { value: 1, generic: 1, descr: initial }
+                        - { value: 2, generic: 2, descr: dead }
+                        - { value: 3, generic: 2, descr: unusable }
+                        - { value: 4, generic: 0, descr: quiet }
+                        - { value: 5, generic: 0, descr: standby }
+                        - { value: 6, generic: 2, descr: unstable }
+                        - { value: 7, generic: 0, descr: stable }
+                        - { value: 8, generic: 3, descr: unknown }
                 -
                     oid: VELOCLOUD-EDGE-MIB::vceLinkState
                     num_oid: '.1.3.6.1.4.1.45346.1.1.2.3.2.2.1.34.{{ $index }}'
@@ -64,14 +64,14 @@ modules:
                     value: VELOCLOUD-EDGE-MIB::vceLinkState
                     state_name: vceLinkState
                     states:
-                        - { value: 1, graph: 1, generic: 1, descr: initial }
-                        - { value: 2, graph: 2, generic: 2, descr: dead }
-                        - { value: 3, graph: 3, generic: 2, descr: unusable }
-                        - { value: 4, graph: 4, generic: 0, descr: quiet }
-                        - { value: 5, graph: 5, generic: 0, descr: standby }
-                        - { value: 6, graph: 6, generic: 2, descr: unstable }
-                        - { value: 7, graph: 7, generic: 0, descr: stable }
-                        - { value: 8, graph: 8, generic: 3, descr: unknown }
+                        - { value: 1, generic: 1, descr: initial }
+                        - { value: 2, generic: 2, descr: dead }
+                        - { value: 3, generic: 2, descr: unusable }
+                        - { value: 4, generic: 0, descr: quiet }
+                        - { value: 5, generic: 0, descr: standby }
+                        - { value: 6, generic: 2, descr: unstable }
+                        - { value: 7, generic: 0, descr: stable }
+                        - { value: 8, generic: 3, descr: unknown }
         loss:
             data:
                 -

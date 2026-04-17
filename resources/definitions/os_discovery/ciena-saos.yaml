@@ -209,9 +209,9 @@ modules:
                             op: 'in_array'
                             value: [4]
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: disabled }
-                        - { value: 2, generic: 0, graph: 0, descr: generic }
-                        - { value: 3, generic: 0, graph: 0, descr: enhanced }
+                        - { value: 1, generic: 0, descr: disabled }
+                        - { value: 2, generic: 0, descr: generic }
+                        - { value: 3, generic: 0, descr: enhanced }
                     group: 'Transceiver FEC Mode'
                 -
                     oid: CIENA-CES-MODULE-MIB::cienaCesModuleTable
@@ -220,9 +220,9 @@ modules:
                     descr: 'Slot {{ $subindex2 }} Admin State - {{ CIENA-CES-MODULE-MIB::cienaCesModuleModel }}'
                     state_name: cienaCesModuleAdminState
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: enabled }
-                        - { value: 2, generic: 0, graph: 0, descr: disabled }
-                        - { value: 3, generic: 0, graph: 0, descr: shutdown }
+                        - { value: 1, generic: 0, descr: enabled }
+                        - { value: 2, generic: 0, descr: disabled }
+                        - { value: 3, generic: 0, descr: shutdown }
                     group: 'Module Admin State'
                 -
                     oid: CIENA-CES-MODULE-MIB::cienaCesModuleTable
@@ -232,24 +232,24 @@ modules:
                     entPhysicalIndex: '55{{ $subindex2 }}'
                     state_name: cienaCesModuleOperState
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: uninstalled }
-                        - { value:  2, generic: 0, graph: 0, descr: unequipped }
-                        - { value:  3, generic: 1, graph: 0, descr: init }
-                        - { value:  4, generic: 0, graph: 0, descr: disabled }
-                        - { value:  5, generic: 0, graph: 0, descr: enabled }
-                        - { value:  6, generic: 2, graph: 0, descr: faulted }
-                        - { value:  7, generic: 0, graph: 0, descr: hotswap }
-                        - { value:  8, generic: 1, graph: 0, descr: poweroff }
-                        - { value:  9, generic: 1, graph: 0, descr: hitlessInit }
-                        - { value: 10, generic: 1, graph: 0, descr: fastReload }
-                        - { value: 11, generic: 1, graph: 0, descr: krnInit }
-                        - { value: 12, generic: 2, graph: 0, descr: unsupported }
-                        - { value: 13, generic: 1, graph: 0, descr: installing }
-                        - { value: 14, generic: 2, graph: 0, descr: failed }
-                        - { value: 15, generic: 1, graph: 0, descr: krnDisable }
-                        - { value: 16, generic: 2, graph: 0, descr: appFault }
-                        - { value: 17, generic: 1, graph: 0, descr: booting }
-                        - { value: 18, generic: 1, graph: 0, descr: powerdown }
+                        - { value:  1, generic: 0, descr: uninstalled }
+                        - { value:  2, generic: 0, descr: unequipped }
+                        - { value:  3, generic: 1, descr: init }
+                        - { value:  4, generic: 0, descr: disabled }
+                        - { value:  5, generic: 0, descr: enabled }
+                        - { value:  6, generic: 2, descr: faulted }
+                        - { value:  7, generic: 0, descr: hotswap }
+                        - { value:  8, generic: 1, descr: poweroff }
+                        - { value:  9, generic: 1, descr: hitlessInit }
+                        - { value: 10, generic: 1, descr: fastReload }
+                        - { value: 11, generic: 1, descr: krnInit }
+                        - { value: 12, generic: 2, descr: unsupported }
+                        - { value: 13, generic: 1, descr: installing }
+                        - { value: 14, generic: 2, descr: failed }
+                        - { value: 15, generic: 1, descr: krnDisable }
+                        - { value: 16, generic: 2, descr: appFault }
+                        - { value: 17, generic: 1, descr: booting }
+                        - { value: 18, generic: 1, descr: powerdown }
                     group: 'Module Operational State'
                 -
                     oid: CIENA-CES-MODULE-MIB::cienaCesModuleTable
@@ -258,23 +258,23 @@ modules:
                     descr: 'Slot {{ $subindex2 }} Reboot Reason'
                     state_name: cienaCesModuleLastRebootReason
                     states:
-                        - { value:  1, generic: 3, graph: 0, descr: unknown }
-                        - { value:  2, generic: 0, graph: 0, descr: snmp }
-                        - { value:  3, generic: 0, graph: 0, descr: pwrFail }
-                        - { value:  4, generic: 0, graph: 0, descr: appLoad }
-                        - { value:  5, generic: 0, graph: 0, descr: errorHandler }
-                        - { value:  6, generic: 0, graph: 0, descr: watchdog }
-                        - { value:  7, generic: 0, graph: 0, descr: upgrade }
-                        - { value:  8, generic: 0, graph: 0, descr: cli }
-                        - { value:  9, generic: 0, graph: 0, descr: resetButton }
-                        - { value: 10, generic: 0, graph: 0, descr: failOver }
-                        - { value: 11, generic: 0, graph: 0, descr: faultManager }
-                        - { value: 12, generic: 0, graph: 0, descr: communicationFailure }
-                        - { value: 13, generic: 0, graph: 0, descr: configurationRevert }
-                        - { value: 14, generic: 0, graph: 0, descr: unprotectedFailure }
-                        - { value: 15, generic: 0, graph: 0, descr: bootFailure }
-                        - { value: 16, generic: 0, graph: 0, descr: softwareRevert }
-                        - { value: 17, generic: 0, graph: 0, descr: processorWarmRestart }
-                        - { value: 18, generic: 0, graph: 0, descr: coldRestart }
-                        - { value: 19, generic: 0, graph: 0, descr: primaryRestart }
+                        - { value:  1, generic: 3, descr: unknown }
+                        - { value:  2, generic: 0, descr: snmp }
+                        - { value:  3, generic: 0, descr: pwrFail }
+                        - { value:  4, generic: 0, descr: appLoad }
+                        - { value:  5, generic: 0, descr: errorHandler }
+                        - { value:  6, generic: 0, descr: watchdog }
+                        - { value:  7, generic: 0, descr: upgrade }
+                        - { value:  8, generic: 0, descr: cli }
+                        - { value:  9, generic: 0, descr: resetButton }
+                        - { value: 10, generic: 0, descr: failOver }
+                        - { value: 11, generic: 0, descr: faultManager }
+                        - { value: 12, generic: 0, descr: communicationFailure }
+                        - { value: 13, generic: 0, descr: configurationRevert }
+                        - { value: 14, generic: 0, descr: unprotectedFailure }
+                        - { value: 15, generic: 0, descr: bootFailure }
+                        - { value: 16, generic: 0, descr: softwareRevert }
+                        - { value: 17, generic: 0, descr: processorWarmRestart }
+                        - { value: 18, generic: 0, descr: coldRestart }
+                        - { value: 19, generic: 0, descr: primaryRestart }
                     group: 'Module Last Reboot Reason'

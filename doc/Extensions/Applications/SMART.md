@@ -39,20 +39,23 @@ chmod +x /etc/snmp/smart
    result in errors.
 
 ```bash
- */5 * * * * /etc/snmp/smart -u -Z
+ */5 * * * * /etc/snmp/smart -u
 ```
 
 5. Edit your snmpd.conf file and add:
 
 ```bash
-extend smart /bin/cat /var/cache/smart
+extend smart /bin/cat /var/cache/smart.snmp
 ```
 
-6. You will also need to create the config file, which defaults to the same path as the script,
-but with .config appended. So if the script is located at /etc/snmp/smart, the config file will be `/etc/snmp/smart.config`. Alternatively you can also specific a config via `-c`.
+6. You will also need to create the config file, which defaults to the same path as the
+   script, but with .config appended. So if the script is located at /etc/snmp/smart, the
+   config file will be `/etc/snmp/smart.config`. Alternatively you can also  pecific a
+   config via `-c`.
+
 
 - Anything starting with a # is comment. 
-- variables is $variable=$value.  
+- variables is $variable=$value.
 - Empty lines are ignored. 
 - Spaces and tabes at either the start or end of a line are ignored. 
 - Any line with out a matched variable or # are treated as a disk.
@@ -78,10 +81,14 @@ The variables are as below.
 | smartctl | /usr/bin/env smartctl | The path to use for smartctl. |
 | useSN    | 1       | If set to 1, it will use the disks SN for reporting instead of the device name. |
 
-A disk line is can be as simple as just a disk name under /dev/. Such as in the config above
-The line `ada0` would resolve to `/dev/ada0` and would be called with no special argument. If a line has a space in it, everything before the space is treated as the disk name and is what used for reporting and everything after that is used as the argument to be passed to `smartctl`.
+A disk line is can be as simple as just a disk name under /dev/. Such as in the config
+above The line `ada0` would resolve to `/dev/ada0` and would be called with no special
+argument. If a line has a space in it, everything before the space is treated as the disk
+name and is what used for reporting and everything after that is used as the argument to
+be passed to `smartctl`.
 
-If you want to guess at the configuration, call it with `-g` and it will print out what it thinks it should be.
+If you want to guess at the configuration, call it with `-g` and it will print out what it
+thinks it should be.
 
 6. Restart snmpd on your host
 

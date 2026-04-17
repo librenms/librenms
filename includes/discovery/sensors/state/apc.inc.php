@@ -11,22 +11,29 @@
  * the source code distribution for details.
  */
 
+use App\Models\Sensor;
+use App\Models\StateTranslation;
+use LibreNMS\Enum\Severity;
+
 $temp = SnmpQuery::get('PowerNet-MIB::upsAdvBatteryReplaceIndicator.0')->value();
 $cur_oid = '.1.3.6.1.4.1.318.1.1.1.2.2.4.0';
 $index = '0';
 
 if (is_numeric($temp)) {
-    //Create State Index
-    $state_name = 'upsAdvBatteryReplaceIndicator';
-    $states = [
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'noBatteryNeedsReplacing'],
-        ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'batteryNeedsReplacing'],
-    ];
-    create_state_index($state_name, $states);
-
-    $descr = 'UPS Battery Replacement Status';
-    //Discover Sensors
-    discover_sensor(null, 'state', $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp, 'snmp', $index);
+    app('sensor-discovery')->discover(new Sensor([
+        'poller_type' => 'snmp',
+        'sensor_class' => 'state',
+        'sensor_oid' => $cur_oid,
+        'sensor_index' => $index,
+        'sensor_type' => 'upsAdvBatteryReplaceIndicator',
+        'sensor_descr' => 'UPS Battery Replacement Status',
+        'sensor_divisor' => 1,
+        'sensor_multiplier' => 1,
+        'sensor_current' => $temp,
+    ]))->withStateTranslations('upsAdvBatteryReplaceIndicator', [
+        StateTranslation::define('noBatteryNeedsReplacing', 1, Severity::Ok),
+        StateTranslation::define('batteryNeedsReplacing', 2, Severity::Error),
+    ]);
 }
 
 $cooling_status = snmpwalk_cache_oid($device, 'coolingUnitStatusDiscreteEntry', [], 'PowerNet-MIB');
@@ -35,15 +42,29 @@ foreach ($cooling_status as $index => $data) {
     $state_name = $data['coolingUnitStatusDiscreteDescription'];
 
     $tmp_states = explode(',', (string) $data['coolingUnitStatusDiscreteIntegerReferenceKey']);
-    $states = [];
+    $translations = [];
     foreach ($tmp_states as $ref) {
         preg_match('/([\w]+) ?\\(([\d]+)\\)/', $ref, $matches);
-        $nagios_state = get_nagios_state($matches[1]);
-        $states[] = ['value' => 0, 'generic' => $nagios_state, 'graph' => 0, $matches[2], 'descr' => $matches[1]];
+        $severity = match (get_nagios_state($matches[1])) {
+            0 => Severity::Ok,
+            1 => Severity::Warning,
+            2 => Severity::Error,
+            default => Severity::Unknown,
+        };
+        $translations[] = StateTranslation::define($matches[1], 0, $severity);
     }
-    create_state_index($state_name, $states);
 
-    discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, 'apc', $state_name, 1, 1, null, null, null, null, $data['coolingUnitStatusDiscreteValueAsInteger']);
+    app('sensor-discovery')->discover(new Sensor([
+        'poller_type' => 'snmp',
+        'sensor_class' => 'state',
+        'sensor_oid' => $cur_oid,
+        'sensor_index' => $cur_oid,
+        'sensor_type' => $state_name,
+        'sensor_descr' => $state_name,
+        'sensor_divisor' => 1,
+        'sensor_multiplier' => 1,
+        'sensor_current' => $data['coolingUnitStatusDiscreteValueAsInteger'],
+    ]))->withStateTranslations($state_name, $translations);
 }
 
 unset($cooling_status);
@@ -54,15 +75,29 @@ foreach ($cooling_unit as $index => $data) {
     $state_name = $data['coolingUnitExtendedDiscreteDescription'];
 
     $tmp_states = explode(',', (string) $data['coolingUnitExtendedDiscreteIntegerReferenceKey']);
-    $states = [];
+    $translations = [];
     foreach ($tmp_states as $ref) {
         preg_match('/([\w]+)\\(([\d]+)\\)/', $ref, $matches);
-        $nagios_state = get_nagios_state($matches[1]);
-        $states[] = ['value' => 0, 'generic' => $nagios_state, 'graph' => 0, $matches[2], 'descr' => $matches[1]];
+        $severity = match (get_nagios_state($matches[1])) {
+            0 => Severity::Ok,
+            1 => Severity::Warning,
+            2 => Severity::Error,
+            default => Severity::Unknown,
+        };
+        $translations[] = StateTranslation::define($matches[1], 0, $severity);
     }
-    create_state_index($state_name, $states);
 
-    discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, 'apc', $state_name, 1, 1, null, null, null, null, $data['coolingUnitExtendedDiscreteValueAsInteger']);
+    app('sensor-discovery')->discover(new Sensor([
+        'poller_type' => 'snmp',
+        'sensor_class' => 'state',
+        'sensor_oid' => $cur_oid,
+        'sensor_index' => $cur_oid,
+        'sensor_type' => $state_name,
+        'sensor_descr' => $state_name,
+        'sensor_divisor' => 1,
+        'sensor_multiplier' => 1,
+        'sensor_current' => $data['coolingUnitExtendedDiscreteValueAsInteger'],
+    ]))->withStateTranslations($state_name, $translations);
 }
 
 unset($cooling_unit);
@@ -71,15 +106,23 @@ $relays = snmpwalk_cache_oid($device, 'emsOutputRelayControlEntry', [], 'PowerNe
 foreach ($relays as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.10.3.2.1.1.3.' . $index;
     $state_name = $data['emsOutputRelayControlOutputRelayName'];
-    $states = [
-        ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'immediateCloseEMS'],
-        ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'immediateOpenEMS'],
-    ];
-    create_state_index($state_name, $states);
 
     $current = apc_relay_state($data['emsOutputRelayControlOutputRelayCommand']);
     if (is_numeric($current)) {
-        discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, $state_name, $state_name, 1, 1, null, null, null, null, $current);
+        app('sensor-discovery')->discover(new Sensor([
+            'poller_type' => 'snmp',
+            'sensor_class' => 'state',
+            'sensor_oid' => $cur_oid,
+            'sensor_index' => $cur_oid,
+            'sensor_type' => $state_name,
+            'sensor_descr' => $state_name,
+            'sensor_divisor' => 1,
+            'sensor_multiplier' => 1,
+            'sensor_current' => $current,
+        ]))->withStateTranslations($state_name, [
+            StateTranslation::define('immediateCloseEMS', 1, Severity::Error),
+            StateTranslation::define('immediateOpenEMS', 2, Severity::Ok),
+        ]);
     }
 }
 unset(
@@ -92,15 +135,23 @@ $switched = snmpwalk_cache_oid($device, 'emsOutletControlEntry', [], 'PowerNet-M
 foreach ($switched as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.10.3.3.1.1.3.' . $index;
     $state_name = $data['emsOutletControlOutletName'];
-    $states = [
-        ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'immediateOnEMS'],
-        ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'immediateOffEMS'],
-    ];
-    create_state_index($state_name, $states);
 
     $current = apc_relay_state($data['emsOutletControlOutletCommand']);
     if (is_numeric($current)) {
-        discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, $state_name, $state_name, 1, 1, null, null, null, null, $current);
+        app('sensor-discovery')->discover(new Sensor([
+            'poller_type' => 'snmp',
+            'sensor_class' => 'state',
+            'sensor_oid' => $cur_oid,
+            'sensor_index' => $cur_oid,
+            'sensor_type' => $state_name,
+            'sensor_descr' => $state_name,
+            'sensor_divisor' => 1,
+            'sensor_multiplier' => 1,
+            'sensor_current' => $current,
+        ]))->withStateTranslations($state_name, [
+            StateTranslation::define('immediateOnEMS', 1, Severity::Error),
+            StateTranslation::define('immediateOffEMS', 2, Severity::Ok),
+        ]);
     }
 }
 unset(
@@ -110,42 +161,52 @@ unset(
 );
 
 foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
+    $descr = ! empty($data['memSensorsStatusSensorName'])
+        ? $data['memSensorsStatusSensorName'] . ' - ' . ($data['memSensorsStatusSensorLocation'] ?? '')
+        : null;
+
     if ($data['memSensorsCommStatus']) {
         $cur_oid = '.1.3.6.1.4.1.318.1.1.10.4.2.3.1.7.' . $index;
-        $state_name = 'memSensorsCommStatus';
-        $states = [
-            ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'notInstalled'],
-            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'commsOK'],
-            ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'commsLost'],
-        ];
-        create_state_index($state_name, $states);
-
         $current = $data['memSensorsCommStatus'];
-    }
-    $descr = ($data['memSensorsStatusSensorName'] ?? '') . ' - ' . ($data['memSensorsStatusSensorLocation'] ?? '');
-    $divisor = 1;
-    $multiplier = 1;
-    if (is_numeric($current)) {
-        discover_sensor(null, 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
+        if (is_numeric($current)) {
+            app('sensor-discovery')->discover(new Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'state',
+                'sensor_oid' => $cur_oid,
+                'sensor_index' => 'memSensorsCommStatus.' . $index,
+                'sensor_type' => 'memSensorsCommStatus',
+                'sensor_descr' => $descr ?? 'memSensorsCommStatus',
+                'sensor_divisor' => 1,
+                'sensor_multiplier' => 1,
+                'sensor_current' => $current,
+            ]))->withStateTranslations('memSensorsCommStatus', [
+                StateTranslation::define('notInstalled', 1, Severity::Warning),
+                StateTranslation::define('commsOK', 2, Severity::Ok),
+                StateTranslation::define('commsLost', 3, Severity::Error),
+            ]);
+        }
     }
 
     if ($data['memSensorsAlarmStatus']) {
         $cur_oid = '.1.3.6.1.4.1.318.1.1.10.4.2.3.1.8.' . $index;
-        $state_name = 'memSensorsAlarmStatus';
-        $states = [
-            ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'memNormal'],
-            ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'memWarning'],
-            ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'memCritical'],
-        ];
-        create_state_index($state_name, $states);
-
         $current = $data['memSensorsAlarmStatus'];
-    }
-    $descr = ($data['memSensorsStatusSensorName'] ?? '') . ' - ' . ($data['memSensorsStatusSensorLocation'] ?? '');
-    $divisor = 1;
-    $multiplier = 1;
-    if (is_numeric($current)) {
-        discover_sensor(null, 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
+        if (is_numeric($current)) {
+            app('sensor-discovery')->discover(new Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'state',
+                'sensor_oid' => $cur_oid,
+                'sensor_index' => 'memSensorsAlarmStatus.' . $index,
+                'sensor_type' => 'memSensorsAlarmStatus',
+                'sensor_descr' => $descr ?? 'memSensorsAlarmStatus',
+                'sensor_divisor' => 1,
+                'sensor_multiplier' => 1,
+                'sensor_current' => $current,
+            ]))->withStateTranslations('memSensorsAlarmStatus', [
+                StateTranslation::define('memNormal', 1, Severity::Ok),
+                StateTranslation::define('memWarning', 2, Severity::Warning),
+                StateTranslation::define('memCritical', 3, Severity::Error),
+            ]);
+        }
     }
 }
 
@@ -158,20 +219,12 @@ if (isset($apcContactData['uioInputContactStatusTableSize']) && $apcContactData[
         $current = $apcContactData[$index]['uioInputContactStatusCurrentState'];
         // state 4 is "not applicable"
         if ($current != 4) {
-            $sensorType = 'apc';
             $cur_oid = '.1.3.6.1.4.1.318.1.1.25.2.2.1.5.' . $index;
-            $severity = $apcContactData[$index]['uioInputContactStatusAlarmStatus'];
 
             // APC normal (1), warning (2), critical (3), notaplicable (4)
             // LibreNMS warning (1), critical (2)
 
             $state_name = $apcContactData[$index]['uioInputContactStatusContactName'];
-            $states = [
-                ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'normal'],
-                ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'],
-                ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'critical'],
-            ];
-            create_state_index($state_name, $states);
 
             // universalInputOutput sensor entries all have an sub-index, presumably to allow for multiple sensors in the
             // future. Here we remove the sub-index from the first entry, so 1.1 becomes 1, 2.1 becomes 2, etc. However any
@@ -183,7 +236,21 @@ if (isset($apcContactData['uioInputContactStatusTableSize']) && $apcContactData[
                 $index = $split_index[0];
             }
 
-            discover_sensor(null, 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
+            app('sensor-discovery')->discover(new Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'state',
+                'sensor_oid' => $cur_oid,
+                'sensor_index' => $state_name . '.' . $index,
+                'sensor_type' => $state_name,
+                'sensor_descr' => $state_name,
+                'sensor_divisor' => 1,
+                'sensor_multiplier' => 1,
+                'sensor_current' => $current,
+            ]))->withStateTranslations($state_name, [
+                StateTranslation::define('normal', 1, Severity::Ok),
+                StateTranslation::define('warning', 2, Severity::Warning),
+                StateTranslation::define('critical', 3, Severity::Error),
+            ]);
         }
     }
 } else {
@@ -195,28 +262,30 @@ if (isset($apcContactData['uioInputContactStatusTableSize']) && $apcContactData[
         // APC disabled (1), enabled (2)
         if ($apcContactData[$index]['iemConfigContactEnable'] == 2) {
             $current = $apcContactData[$index]['iemStatusContactStatus'];
-            $sensorType = 'apc';
             $cur_oid = '.1.3.6.1.4.1.318.1.1.10.2.3.4.1.3.' . $index;
             $severity = $apcContactData[$index]['iemConfigContactSeverity'];
 
             // APC critical (1), warning (2)
             // LibreNMS warning (1), critical (2)
-            $faultGeneric = 1;
-            if ($severity == 1) {
-                $faultGeneric = 2;
-            } elseif ($severity == 2) {
-                $faultGeneric = 1;
-            }
+            $faultSeverity = $severity == 1 ? Severity::Error : Severity::Warning;
 
             $state_name = $apcContactData[$index]['iemConfigContactName'];
-            $states = [
-                ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'noFault'],
-                ['value' => 2, 'generic' => $faultGeneric, 'graph' => 1, 'descr' => 'fault'],
-                ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'disabled'],
-            ];
-            create_state_index($state_name, $states);
 
-            discover_sensor(null, 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
+            app('sensor-discovery')->discover(new Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'state',
+                'sensor_oid' => $cur_oid,
+                'sensor_index' => $state_name . '.' . $index,
+                'sensor_type' => $state_name,
+                'sensor_descr' => $state_name,
+                'sensor_divisor' => 1,
+                'sensor_multiplier' => 1,
+                'sensor_current' => $current,
+            ]))->withStateTranslations($state_name, [
+                StateTranslation::define('noFault', 1, Severity::Ok),
+                StateTranslation::define('fault', 2, $faultSeverity),
+                StateTranslation::define('disabled', 3, Severity::Ok),
+            ]);
         }
     }
 }

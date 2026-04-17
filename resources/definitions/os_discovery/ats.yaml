@@ -83,8 +83,8 @@ modules:
                     index: 'atsInputGroupSourceAstatus.{{ $index }}'
                     state_name: atsInputGroupSourceAstatus
                     states:
-                        - { descr: Ok, graph: 0, value: 2, generic: 0 }
-                        - { descr: Fail, graph: 0, value: 1, generic: 2 }
+                        - { descr: Ok, value: 2, generic: 0 }
+                        - { descr: Fail, value: 1, generic: 2 }
                 -
                     oid: ATS-MIB::atsInputGroupSourceBstatus
                     value: ATS-MIB::atsInputGroupSourceBstatus
@@ -93,8 +93,8 @@ modules:
                     index: 'atsInputGroupSourceBstatus.{{ $index }}'
                     state_name: atsInputGroupSourceBstatus
                     states:
-                        - { descr: Ok, graph: 0, value: 2, generic: 0 }
-                        - { descr: Fail, graph: 0, value: 1, generic: 2 }
+                        - { descr: Ok, value: 2, generic: 0 }
+                        - { descr: Fail, value: 1, generic: 2 }
                 -
                     oid: ATS-MIB::atsHmiSwitchGroupBuzzer
                     value: ATS-MIB::atsHmiSwitchGroupBuzzer
@@ -103,5 +103,5 @@ modules:
                     index: 'atsHmiSwitchGroupBuzzer.{{ $index }}'
                     state_name: atsHmiSwitchGroupBuzzer
                     states:
-                        - { descr: Disabled, graph: 0, value: 1, generic: 0 }
-                        - { descr: Enabled, graph: 0, value: 2, generic: 0 }
+                        - { descr: Disabled, value: 1, generic: 0 }
+                        - { descr: Enabled, value: 2, generic: 0 }

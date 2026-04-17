@@ -8250,6 +8250,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8269,6 +8270,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8288,6 +8290,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8307,6 +8310,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8326,6 +8330,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8345,6 +8350,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8364,6 +8370,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8383,6 +8390,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8402,6 +8410,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8421,6 +8430,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8440,6 +8450,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8459,6 +8470,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8478,6 +8490,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8497,6 +8510,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]
@@ -10546,133 +10560,114 @@
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmAAlarmState",
                     "state_descr": "off",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmAAlarmState",
                     "state_descr": "on",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmFanState",
                     "state_descr": "not Available",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmFanState",
                     "state_descr": "Ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmFanState",
                     "state_descr": "Failed",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmFanState",
                     "state_descr": "not Installed",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU1Status",
                     "state_descr": "not Installed",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU1Status",
                     "state_descr": "Critical",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU1Status",
                     "state_descr": "Warning",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU1Status",
                     "state_descr": "Ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU2Status",
                     "state_descr": "not Installed",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU2Status",
                     "state_descr": "Critical",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU2Status",
                     "state_descr": "Warning",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU2Status",
                     "state_descr": "Ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU3Status",
                     "state_descr": "not Installed",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU3Status",
                     "state_descr": "Critical",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU3Status",
                     "state_descr": "Warning",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU3Status",
                     "state_descr": "Ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU3Status",
                     "state_descr": "not Available",
-                    "state_draw_graph": 1,
                     "state_value": 255,
                     "state_generic_value": 0
                 }
@@ -12635,133 +12630,114 @@
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmAAlarmState",
                     "state_descr": "off",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmAAlarmState",
                     "state_descr": "on",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmFanState",
                     "state_descr": "not Available",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmFanState",
                     "state_descr": "Ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmFanState",
                     "state_descr": "Failed",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmFanState",
                     "state_descr": "not Installed",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU1Status",
                     "state_descr": "not Installed",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU1Status",
                     "state_descr": "Critical",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU1Status",
                     "state_descr": "Warning",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU1Status",
                     "state_descr": "Ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU2Status",
                     "state_descr": "not Installed",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU2Status",
                     "state_descr": "Critical",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU2Status",
                     "state_descr": "Warning",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU2Status",
                     "state_descr": "Ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU3Status",
                     "state_descr": "not Installed",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU3Status",
                     "state_descr": "Critical",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU3Status",
                     "state_descr": "Warning",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU3Status",
                     "state_descr": "Ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "SPEEDCARRIER-MIB::nmPSU3Status",
                     "state_descr": "not Available",
-                    "state_draw_graph": 1,
                     "state_value": 255,
                     "state_generic_value": 0
                 }

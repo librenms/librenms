@@ -12024,441 +12024,378 @@
                 {
                     "state_name": "AmplifierRxSignalStatus",
                     "state_descr": "down",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "AmplifierRxSignalStatus",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "AmplifierRxSignalStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "AmplifierTxSignalStatus",
                     "state_descr": "down",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "AmplifierTxSignalStatus",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "AmplifierTxSignalStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "AmpLoS",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "AmpLoS",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "AmpOperStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "AmpOperStatus",
                     "state_descr": "down",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "AmpOperStatus",
                     "state_descr": "up",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "AmpSaturationFault",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "AmpSaturationFault",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "AmpTempExceeded",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "AmpTempExceeded",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "BoardOperStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "BoardOperStatus",
                     "state_descr": "down",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "BoardOperStatus",
                     "state_descr": "up",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "BoardTempHighExceeded",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "BoardTempHighExceeded",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "equipmentSubrackOperStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "equipmentSubrackOperStatus",
                     "state_descr": "down",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "equipmentSubrackOperStatus",
                     "state_descr": "up",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "equipmentSubrackTempHighExceeded",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "equipmentSubrackTempHighExceeded",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "FanOperStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "FanOperStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "OaVoaOperStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "OaVoaOperStatus",
                     "state_descr": "down",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "OaVoaOperStatus",
                     "state_descr": "up",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "OCMModule",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "OCMModule",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "OCMOperStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "OCMOperStatus",
                     "state_descr": "down",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "OCMOperStatus",
                     "state_descr": "up",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "OCMSwitch",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "OCMSwitch",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "OTNBDIState",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "OTNBDIState",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "OTNBIAEState",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "OTNBIAEState",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "OTNIAEState",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "OTNIAEState",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "OTNIndicationSignal",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "OTNIndicationSignal",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "OTNLoF",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "OTNLoF",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "OTNLoMF",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "OTNLoMF",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "PhysPortState",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "PhysPortState",
                     "state_descr": "down",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "PhysPortState",
                     "state_descr": "up",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "PSUOperStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "PSUOperStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "WDMChannelLoSStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "WDMChannelLoSStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "WDMChannelStatus",
                     "state_descr": "initial",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "WDMChannelStatus",
                     "state_descr": "searching",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "WDMChannelStatus",
                     "state_descr": "regulating",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "WDMChannelStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "WDMChannelStatus",
                     "state_descr": "not found",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "WDMChannelStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "WDMChannelStatus",
                     "state_descr": "waiting",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 1
                 }

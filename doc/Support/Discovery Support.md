@@ -191,7 +191,7 @@ device, with history data.
 
 `slas`: SLA detection and support.
 
-`vminfo`: Detection of vm guests for VMware ESXi and libvert
+`vminfo`: Detection of vm guests for VMware ESXi, libvert and XCP-NG
 
 `printer-supplies`: Toner levels support.
 
