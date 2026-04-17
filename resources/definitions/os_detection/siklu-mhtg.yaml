@@ -2,6 +2,7 @@ os: siklu-mhtg
 text: 'Siklu MultiHaul Terragraph'
 type: wireless
 icon: siklu
+mib_dir: siklu-mhtg
 over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_wireless_rssi, text: RSSI }
