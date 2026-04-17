@@ -89,7 +89,7 @@ class UserPreferencesController extends Controller
             $data['twofactor'] = $twofactor;
         }
 
-        if (Gate::denies('viewAny', Device::class)) {
+        if (Gate::denies('viewAll', Device::class)) {
             $data['devices'] = Device::hasAccess($user)->get();
         }
 

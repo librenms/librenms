@@ -12,6 +12,8 @@
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
 */
+use LibreNMS\Enum\IfOperStatus;
+
 echo 'Comware ';
 
 $multiplier = 1;
@@ -20,7 +22,7 @@ $hh3cTransceiverInfoTable = SnmpQuery::cache()->enumStrings()->walk('HH3C-TRANSC
 foreach ($hh3cTransceiverInfoTable as $index => $entry) {
     if (is_numeric($entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverCurRXPower']) && $entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverCurRXPower'] != 2147483647 && isset($entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverDiagnostic'])) {
         $port = PortCache::getByIfIndex($index, $device['device_id']);
-        if ($port?->ifAdminStatus != 'up') {
+        if ($port?->ifAdminStatus != IfOperStatus::Up) {
             continue;
         }
 
@@ -46,7 +48,7 @@ foreach ($hh3cTransceiverInfoTable as $index => $entry) {
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
         $port = PortCache::getByIfIndex($index, $device['device_id']);
-        if ($port?->ifAdminStatus == 'up') {
+        if ($port?->ifAdminStatus == IfOperStatus::Up) {
             $descr = $port->getShortLabel() . ' Transmit Power';
             discover_sensor(null, 'dbm', $device, $oid, 'tx-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
         }

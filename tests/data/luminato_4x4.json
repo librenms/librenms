@@ -3370,119 +3370,102 @@
                 {
                     "state_name": "statusFan",
                     "state_descr": "Normal",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "statusFan",
                     "state_descr": "Failure",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "statusGeneral",
                     "state_descr": "Normal",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "statusGeneral",
                     "state_descr": "Notification",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "statusGeneral",
                     "state_descr": "Warning",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "statusGeneral",
                     "state_descr": "Alarm",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "statusHardware",
                     "state_descr": "Normal",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "statusHardware",
                     "state_descr": "Failure",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "statusSoftware",
                     "state_descr": "Normal",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "statusSoftware",
                     "state_descr": "Failure",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "statusSoftware",
                     "state_descr": "Missing",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "statusSoftware",
                     "state_descr": "Initialising",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "statusTemperature",
                     "state_descr": "Normal",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "statusTemperature",
                     "state_descr": "Hihi",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "statusTemperature",
                     "state_descr": "Hi",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "statusTemperature",
                     "state_descr": "Lo",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "statusTemperature",
                     "state_descr": "Lolo",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 }
@@ -3533,6 +3516,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Teleste",
+                    "entPhysicalMfgDate": "12288",
                     "ifIndex": null
                 },
                 {
@@ -3552,6 +3536,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Teleste",
+                    "entPhysicalMfgDate": "12288",
                     "ifIndex": null
                 },
                 {
@@ -3571,6 +3556,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Teleste",
+                    "entPhysicalMfgDate": "12288",
                     "ifIndex": null
                 },
                 {
@@ -3590,6 +3576,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Teleste",
+                    "entPhysicalMfgDate": "12288",
                     "ifIndex": null
                 }
             ]

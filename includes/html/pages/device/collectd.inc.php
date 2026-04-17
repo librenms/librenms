@@ -24,28 +24,6 @@ require 'includes/html/collectd/definitions.php';
 global $MetaGraphDefs;
 load_graph_definitions();
 
-/**
- * Send back new list content
- *
- * @param  array  $items  Array of options values to return to browser
- * @param  string  $method  Name of Javascript method that will be called to process data
- */
-function dhtml_response_list(&$items, $method)
-{
-    header('Content-Type: text/xml');
-
-    echo '<?xml version="1.0" encoding="utf-8" ?>' . "\n";
-    echo "<response>\n";
-    printf(" <method>%s</method>\n", htmlspecialchars($method));
-    echo " <result>\n";
-    foreach ($items as &$item) {
-        printf('  <option>%s</option>' . "\n", htmlspecialchars((string) $item));
-    }
-
-    echo " </result>\n";
-    echo '</response>';
-}//end dhtml_response_list()
-
 print_optionbar_start();
 
 $link_array = [

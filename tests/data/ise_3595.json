@@ -2450,6 +2450,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Cisco Systems Inc.",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

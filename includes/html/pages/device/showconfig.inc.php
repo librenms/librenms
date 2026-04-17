@@ -11,7 +11,7 @@ if (Gate::allows('showConfig', DeviceCache::getPrimary())) {
 
         print_optionbar_start('', '');
         echo is_null(LibrenmsConfig::get('rancid_repo_url')) ? 'Git repository non-browsable'
-            : '<a href="' . LibrenmsConfig::get('rancid_repo_url') . '/?a=blob;hb=HEAD;p=' . basename((string) $rancid_path) . ';f=' . $rancid_file . '">Git repository</a>';
+            : '<a href="' . htmlspecialchars(LibrenmsConfig::get('rancid_repo_url')) . '/?a=blob;hb=HEAD;p=' . basename((string) $rancid_path) . ';f=' . $rancid_file . '">Git repository</a>';
         print_optionbar_end();
 
         $process = new Process(['git', 'ls-tree', '-r', 'HEAD'], $rancid_path);
@@ -335,7 +335,7 @@ if (Gate::allows('showConfig', DeviceCache::getPrimary())) {
             echo '</div>';
         } else {
             echo '<br />';
-            print_error("We couldn't retrieve the device information from Oxidized");
+            print_error(__('device.oxidized.connection_error'));
             if (isset($response) && preg_match('#<title>(.*)</title>#', $response, $error_matches)) {
                 print_error(strip_tags($error_matches[1]));
             }

@@ -67,16 +67,16 @@ modules:
                     state_name: 'es1dc1DataBatBatTestState'
                     index: 'es1dc1DataBatBatTestState.{{ $index }}'
                     states:
-                        - { value: 0, descr: 'Never Tested', graph: 0, generic: 0 }
-                        - { value: 1, descr: 'Success', graph: 0, generic: 0 }
-                        - { value: 2, descr: 'On Going', graph: 0, generic: 1 }
-                        - { value: 3, descr: 'Failed: Timeout', graph: 0, generic: 1 }
-                        - { value: 4, descr: 'Failed: Vbus Too Low', graph: 0, generic: 1 }
-                        - { value: 5, descr: 'Failed: Load Too Low', graph: 0, generic: 1 }
-                        - { value: 6, descr: 'Failed: AC Failure', graph: 0, generic: 2 }
-                        - { value: 7, descr: 'Failed: Canceled', graph: 0, generic: 1 }
-                        - { value: 8, descr: 'Failed: LVD Opened', graph: 0, generic: 1 }
-                        - { value: 9, descr: 'Failed: No Battery', graph: 0, generic: 1 }
+                        - { value: 0, descr: 'Never Tested', generic: 0 }
+                        - { value: 1, descr: 'Success', generic: 0 }
+                        - { value: 2, descr: 'On Going', generic: 1 }
+                        - { value: 3, descr: 'Failed: Timeout', generic: 1 }
+                        - { value: 4, descr: 'Failed: Vbus Too Low', generic: 1 }
+                        - { value: 5, descr: 'Failed: Load Too Low', generic: 1 }
+                        - { value: 6, descr: 'Failed: AC Failure', generic: 2 }
+                        - { value: 7, descr: 'Failed: Canceled', generic: 1 }
+                        - { value: 8, descr: 'Failed: LVD Opened', generic: 1 }
+                        - { value: 9, descr: 'Failed: No Battery', generic: 1 }
                 -
                     oid: SITE-MONITORING-MIB::es1dc1DataList
                     value: SITE-MONITORING-MIB::es1dc1DataSystemDCMode
@@ -85,8 +85,8 @@ modules:
                     state_name: 'es1dc1DataSystemDCMode'
                     index: 'es1dc1DataSystemDCMode.{{ $index }}'
                     states:
-                        - { value: 0, descr: 'Float', graph: 0, generic: 0 }
-                        - { value: 1, descr: 'Equalize', graph: 0, generic: 0 }
-                        - { value: 2, descr: 'Battery Test', graph: 0, generic: 1 }
-                        - { value: 3, descr: 'AC Failure', graph: 0, generic: 2 }
-                        - { value: 5, descr: 'Safe', graph: 0, generic: 0 }
+                        - { value: 0, descr: 'Float', generic: 0 }
+                        - { value: 1, descr: 'Equalize', generic: 0 }
+                        - { value: 2, descr: 'Battery Test', generic: 1 }
+                        - { value: 3, descr: 'AC Failure', generic: 2 }
+                        - { value: 5, descr: 'Safe', generic: 0 }

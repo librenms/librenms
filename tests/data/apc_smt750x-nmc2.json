@@ -601,7 +601,7 @@
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "0",
+                    "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
@@ -763,168 +763,144 @@
                 {
                     "state_name": "upsAdvBatteryReplaceIndicator",
                     "state_descr": "noBatteryNeedsReplacing",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsAdvBatteryReplaceIndicator",
                     "state_descr": "batteryNeedsReplacing",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "onLine",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "onBattery",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "onSmartBoost",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "timedSleeping",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "softwareBypass",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "rebooting",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "switchedBypass",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "hardwareFailureBypass",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "sleepingUntilPowerReturn",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "onSmartTrim",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "ecoMode",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "hotStandby",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "onBatteryTest",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "emergencyStaticBypass",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "staticBypassStandby",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "powerSavingMode",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "spotMode",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "eConversion",
-                    "state_draw_graph": 0,
                     "state_value": 20,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "chargerSpotmode",
-                    "state_draw_graph": 0,
                     "state_value": 21,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "inverterSpotmode",
-                    "state_draw_graph": 0,
                     "state_value": 22,
                     "state_generic_value": 0
                 }
@@ -1100,7 +1076,7 @@
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "0",
+                    "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
@@ -1262,168 +1238,144 @@
                 {
                     "state_name": "upsAdvBatteryReplaceIndicator",
                     "state_descr": "noBatteryNeedsReplacing",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsAdvBatteryReplaceIndicator",
                     "state_descr": "batteryNeedsReplacing",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "onLine",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "onBattery",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "onSmartBoost",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "timedSleeping",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "softwareBypass",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "rebooting",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "switchedBypass",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "hardwareFailureBypass",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "sleepingUntilPowerReturn",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "onSmartTrim",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "ecoMode",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "hotStandby",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "onBatteryTest",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "emergencyStaticBypass",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "staticBypassStandby",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "powerSavingMode",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "spotMode",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "eConversion",
-                    "state_draw_graph": 0,
                     "state_value": 20,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "chargerSpotmode",
-                    "state_draw_graph": 0,
                     "state_value": 21,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
                     "state_descr": "inverterSpotmode",
-                    "state_draw_graph": 0,
                     "state_value": 22,
                     "state_generic_value": 0
                 }

@@ -25,8 +25,8 @@ modules:
                     index: 'PinState.{{ $index }}'
                     state_name: Pinstate
                     states:
-                        - { descr: READY , graph: 0, value: 0, generic: 0 }
-                        - { descr: not READY, graph: 0, value: 1, generic: 2 }
+                        - { descr: READY , value: 0, generic: 0 }
+                        - { descr: not READY, value: 1, generic: 2 }
 
                 -
                     oid: TELTONIKA-MIB::ConnectionState
@@ -36,8 +36,8 @@ modules:
                     index: 'ConnectionState.{{ $index }}'
                     state_name: ConnectionState
                     states:
-                        - { descr: connected , graph: 0, value: 0, generic: 0 }
-                        - { descr: not connected, graph: 0, value: 1, generic: 2 }
+                        - { descr: connected , value: 0, generic: 0 }
+                        - { descr: not connected, value: 1, generic: 2 }
 
                 -
                     oid: TELTONIKA-MIB::ConnectionType
@@ -47,9 +47,9 @@ modules:
                     index: 'ConnectionType.{{ $index }}'
                     state_name: ConnectionType
                     states:
-                        - { descr: LTE , graph: 0, value: 0, generic: 0 }
-                        - { descr: 3G, graph: 0, value: 1, generic: 2 }
-                        - { descr: 2G, graph: 0, value: 2, generic: 2 }
+                        - { descr: LTE , value: 0, generic: 0 }
+                        - { descr: 3G, value: 1, generic: 2 }
+                        - { descr: 2G, value: 2, generic: 2 }
 
 
         dbm:

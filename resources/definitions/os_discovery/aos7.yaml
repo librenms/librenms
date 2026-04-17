@@ -117,9 +117,9 @@ modules:
                     index: 'chasControlCertifyStatus.1'
                     state_name: chasControlCertifyStatus
                     states:
-                        - { value: 1, generic: 2, graph: 1, descr: Unknown }
-                        - { value: 2, generic: 1, graph: 1, descr: Need Certify }
-                        - { value: 3, generic: 0, graph: 1, descr: Certified }
+                        - { value: 1, generic: 2, descr: Unknown }
+                        - { value: 2, generic: 1, descr: Need Certify }
+                        - { value: 3, generic: 0, descr: Certified }
                     snmp_bulk: false
                 -
                     oid: ALCATEL-IND1-CHASSIS-MIB::chasControlModuleTable
@@ -130,10 +130,10 @@ modules:
                     index: 'chasControlSynchronizationStatus.1'
                     state_name: chasControlSynchronizationStatus
                     states:
-                        - { value: 1, generic: 2, graph: 1, descr: Unknown }
-                        - { value: 2, generic: 1, graph: 1, descr: Mono Control Module }
-                        - { value: 3, generic: 1, graph: 1, descr: Not Synchronized }
-                        - { value: 4, generic: 0, graph: 1, descr: Synchronized }
+                        - { value: 1, generic: 2, descr: Unknown }
+                        - { value: 2, generic: 1, descr: Mono Control Module }
+                        - { value: 3, generic: 1, descr: Not Synchronized }
+                        - { value: 4, generic: 0, descr: Synchronized }
                     snmp_bulk: false
                 -
                     oid: ALCATEL-IND1-LAG-MIB::alclnkaggAggNbrAttachedPorts
@@ -144,14 +144,14 @@ modules:
                     group: LACP
                     state_name: alclnkaggAggNbrAttachedPorts
                     states:
-                        - { value: 1, generic: 1, graph: 1, descr: Not Redundant }
-                        - { value: 2, generic: 0, graph: 1, descr: Redundant (2) }
-                        - { value: 3, generic: 0, graph: 1, descr: Redundant (3) }
-                        - { value: 4, generic: 0, graph: 1, descr: Redundant (4) }
-                        - { value: 5, generic: 0, graph: 1, descr: Redundant (5) }
-                        - { value: 6, generic: 0, graph: 1, descr: Redundant (6) }
-                        - { value: 7, generic: 0, graph: 1, descr: Redundant (7) }
-                        - { value: 8, generic: 0, graph: 1, descr: Redundant (8) }
+                        - { value: 1, generic: 1, descr: Not Redundant }
+                        - { value: 2, generic: 0, descr: Redundant (2) }
+                        - { value: 3, generic: 0, descr: Redundant (3) }
+                        - { value: 4, generic: 0, descr: Redundant (4) }
+                        - { value: 5, generic: 0, descr: Redundant (5) }
+                        - { value: 6, generic: 0, descr: Redundant (6) }
+                        - { value: 7, generic: 0, descr: Redundant (7) }
+                        - { value: 8, generic: 0, descr: Redundant (8) }
                     skip_values:
                         -
                             oid: ALCATEL-IND1-LAG-MIB::alclnkaggAggNbrAttachedPorts
@@ -167,9 +167,9 @@ modules:
                     index: 'alaChasEntPhysFanStatus.{{ $index }}'
                     state_name: alaChasEntPhysFanStatus
                     states:
-                        - { value: 0, generic: 2, graph: 1, descr: no-error }
-                        - { value: 1, generic: 1, graph: 1, descr: notRunning }
-                        - { value: 2, generic: 0, graph: 1, descr: running }
+                        - { value: 0, generic: 2, descr: no-error }
+                        - { value: 1, generic: 1, descr: notRunning }
+                        - { value: 2, generic: 0, descr: running }
                 -
                     oid: ALCATEL-IND1-CHASSIS-MIB::chasEntPhysOperStatus
                     num_oid: '.1.3.6.1.4.1.6486.801.1.1.1.1.1.1.1.2.{{ $index }}'
@@ -178,16 +178,16 @@ modules:
                     index: 'chasEntPhysOperStatus.{{ $index }}'
                     state_name: chasEntPhysOperStatus
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: Up }
-                        - { value: 2, generic: 2, graph: 1, descr: Down }
-                        - { value: 3, generic: 3, graph: 1, descr: Testing }
-                        - { value: 4, generic: 3, graph: 1, descr: Unknown }
-                        - { value: 5, generic: 0, graph: 1, descr: Secondary }
-                        - { value: 6, generic: 2, graph: 1, descr: NotPresent }
-                        - { value: 7, generic: 2, graph: 1, descr: UnPowered }
-                        - { value: 8, generic: 0, graph: 1, descr: Master }
-                        - { value: 9, generic: 0, graph: 1, descr: Idle }
-                        - { value: 10, generic: 0, graph: 1, descr: PwrSave }
+                        - { value: 1, generic: 0, descr: Up }
+                        - { value: 2, generic: 2, descr: Down }
+                        - { value: 3, generic: 3, descr: Testing }
+                        - { value: 4, generic: 3, descr: Unknown }
+                        - { value: 5, generic: 0, descr: Secondary }
+                        - { value: 6, generic: 2, descr: NotPresent }
+                        - { value: 7, generic: 2, descr: UnPowered }
+                        - { value: 8, generic: 0, descr: Master }
+                        - { value: 9, generic: 0, descr: Idle }
+                        - { value: 10, generic: 0, descr: PwrSave }
                     skip_values:
                         -
                             oid: ENTITY-MIB::entPhysicalName
@@ -201,21 +201,21 @@ modules:
                     index: 'virtualChassisStatus.{{ $index }}'
                     state_name: virtualChassisStatus
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: Init }
-                        - { value: 1, generic: 0, graph: 1, descr: Running }
-                        - { value: 2, generic: 2, graph: 1, descr: Invalid Chassis Id }
-                        - { value: 3, generic: 2, graph: 1, descr: Hello Down }
-                        - { value: 4, generic: 2, graph: 1, descr: Duplicate Chassis Id }
-                        - { value: 5, generic: 2, graph: 1, descr: Mismatch Image }
-                        - { value: 6, generic: 2, graph: 1, descr: Mismatch Chassis Type }
-                        - { value: 7, generic: 2, graph: 1, descr: Mismatch Hello Interval }
-                        - { value: 8, generic: 2, graph: 1, descr: Mismatch Control Vlan }
-                        - { value: 9, generic: 2, graph: 1, descr: Mismatch Group }
-                        - { value: 10, generic: 2, graph: 1, descr: Mismatch License Config }
-                        - { value: 11, generic: 2, graph: 1, descr: Invalid License }
-                        - { value: 12, generic: 2, graph: 1, descr: Split Topology }
-                        - { value: 13, generic: 2, graph: 1, descr: Command Shutdown }
-                        - { value: 14, generic: 2, graph: 1, descr: Failure Shutdown }
+                        - { value: 0, generic: 0, descr: Init }
+                        - { value: 1, generic: 0, descr: Running }
+                        - { value: 2, generic: 2, descr: Invalid Chassis Id }
+                        - { value: 3, generic: 2, descr: Hello Down }
+                        - { value: 4, generic: 2, descr: Duplicate Chassis Id }
+                        - { value: 5, generic: 2, descr: Mismatch Image }
+                        - { value: 6, generic: 2, descr: Mismatch Chassis Type }
+                        - { value: 7, generic: 2, descr: Mismatch Hello Interval }
+                        - { value: 8, generic: 2, descr: Mismatch Control Vlan }
+                        - { value: 9, generic: 2, descr: Mismatch Group }
+                        - { value: 10, generic: 2, descr: Mismatch License Config }
+                        - { value: 11, generic: 2, descr: Invalid License }
+                        - { value: 12, generic: 2, descr: Split Topology }
+                        - { value: 13, generic: 2, descr: Command Shutdown }
+                        - { value: 14, generic: 2, descr: Failure Shutdown }
                 -
                     oid: ALCATEL-IND1-VIRTUAL-CHASSIS-MIB::virtualChassisVflMemberPortOperStatus
                     num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.69.1.1.7.1.3.{{ $index }}'
@@ -224,9 +224,9 @@ modules:
                     index: 'virtualChassisVflMemberPortOperStatus.{{ $index }}'
                     state_name: virtualChassisVflMemberPortOperStatus
                     states:
-                        - { value: 0, generic: 1, graph: 1, descr: Disabled }
-                        - { value: 2, generic: 2, graph: 1, descr: Down }
-                        - { value: 1, generic: 0, graph: 1, descr: Up }
+                        - { value: 0, generic: 1, descr: Disabled }
+                        - { value: 2, generic: 2, descr: Down }
+                        - { value: 1, generic: 0, descr: Up }
                     entPhysicalIndex_measured: ports
                     entPhysicalIndex: '{{ $subindex2 }}'
         temperature:

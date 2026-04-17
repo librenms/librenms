@@ -27,16 +27,16 @@ if (! empty($agent_data['app'][$name])) {
     }
 }
 
-$client_data = $redis_data['Clients'];
-$memory_data = $redis_data['Memory'];
-$stats_data = $redis_data['Stats'];
+$client_data = $redis_data['Clients'] ?? [];
+$memory_data = $redis_data['Memory'] ?? [];
+$stats_data = $redis_data['Stats'] ?? [];
 
 $metrics = [];
 
 $category = 'clients';
 $fields = [
-    'connected' => $client_data['connected_clients'],
-    'blocked' => $client_data['blocked_clients'],
+    'connected' => $client_data['connected_clients'] ?? 0,
+    'blocked' => $client_data['blocked_clients'] ?? 0,
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('connected', 'GAUGE', 0)
@@ -49,11 +49,11 @@ app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'memory';
 $fields = [
-    'active' => $memory_data['allocator'],
-    'allocated' => $memory_data['allocator_allocated'],
-    'resident' => $memory_data['allocator_resident'],
-    'frag_bytes' => $memory_data['allocator_frag_bytes'],
-    'rss_bytes' => $memory_data['allocator_rss_bytes'],
+    'active' => $memory_data['allocator_active'] ?? 0,
+    'allocated' => $memory_data['allocator_allocated'] ?? 0,
+    'resident' => $memory_data['allocator_resident'] ?? 0,
+    'frag_bytes' => $memory_data['allocator_frag_bytes'] ?? 0,
+    'rss_bytes' => $memory_data['allocator_rss_bytes'] ?? 0,
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('active', 'GAUGE', 0)
@@ -69,7 +69,7 @@ app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'objects';
 $fields = [
-    'pending' => $memory_data['lazyfree_pending_objects'],
+    'pending' => $memory_data['lazyfree_pending_objects'] ?? 0,
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('pending', 'GAUGE', 0);
@@ -81,7 +81,7 @@ app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'fragmentation';
 $fields = [
-    'bytes' => $memory_data['mem_fragmentation_bytes'],
+    'bytes' => $memory_data['mem_fragmentation_bytes'] ?? 0,
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('bytes', 'GAUGE', 0);
@@ -93,14 +93,14 @@ app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'usage';
 $fields = [
-    'allocated' => $memory_data['used_memory'],
-    'dataset' => $memory_data['used_memory_dataset'],
-    'lua' => $memory_data['used_memory_lua'],
-    'overhead' => $memory_data['used_memory_overhead'],
-    'peak' => $memory_data['used_memory_peak'],
-    'rss' => $memory_data['used_memory_rss'],
-    'scripts' => $memory_data['used_memory_scripts'],
-    'startup' => $memory_data['used_memory_startup'],
+    'allocated' => $memory_data['used_memory'] ?? 0,
+    'dataset' => $memory_data['used_memory_dataset'] ?? 0,
+    'lua' => $memory_data['used_memory_lua'] ?? 0,
+    'overhead' => $memory_data['used_memory_overhead'] ?? 0,
+    'peak' => $memory_data['used_memory_peak'] ?? 0,
+    'rss' => $memory_data['used_memory_rss'] ?? 0,
+    'scripts' => $memory_data['used_memory_scripts'] ?? 0,
+    'startup' => $memory_data['used_memory_startup'] ?? 0,
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('allocated', 'COUNTER', 0)
@@ -119,10 +119,10 @@ app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'defrag';
 $fields = [
-    'hits' => $stats_data['active_defrag_hits'],
-    'misses' => $stats_data['active_defrag_misses'],
-    'key_hits' => $stats_data['active_defrag_key_hits'],
-    'key_misses' => $stats_data['active_defrag_key_misses'],
+    'hits' => $stats_data['active_defrag_hits'] ?? 0,
+    'misses' => $stats_data['active_defrag_misses'] ?? 0,
+    'key_hits' => $stats_data['active_defrag_key_hits'] ?? 0,
+    'key_misses' => $stats_data['active_defrag_key_misses'] ?? 0,
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('hits', 'GAUGE', 0)
@@ -137,8 +137,8 @@ app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'keyspace';
 $fields = [
-    'hits' => $stats_data['keyspace_hits'],
-    'misses' => $stats_data['keyspace_misses'],
+    'hits' => $stats_data['keyspace_hits'] ?? 0,
+    'misses' => $stats_data['keyspace_misses'] ?? 0,
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('hits', 'COUNTER', 0)
@@ -151,9 +151,9 @@ app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'sync';
 $fields = [
-    'full' => $stats_data['sync_full'],
-    'ok' => $stats_data['sync_partial_ok'],
-    'err' => $stats_data['sync_partial_err'],
+    'full' => $stats_data['sync_full'] ?? 0,
+    'ok' => $stats_data['sync_partial_ok'] ?? 0,
+    'err' => $stats_data['sync_partial_err'] ?? 0,
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('full', 'GAUGE', 0)
@@ -167,7 +167,7 @@ app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'commands';
 $fields = [
-    'processed' => $stats_data['total_commands_processed'],
+    'processed' => $stats_data['total_commands_processed'] ?? 0,
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('processed', 'COUNTER', 0);
@@ -179,8 +179,8 @@ app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'connections';
 $fields = [
-    'received' => $stats_data['total_connections_received'],
-    'rejected' => $stats_data['rejected_connections'],
+    'received' => $stats_data['total_connections_received'] ?? 0,
+    'rejected' => $stats_data['rejected_connections'] ?? 0,
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('received', 'COUNTER', 0)
@@ -193,8 +193,8 @@ app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'net';
 $fields = [
-    'input_bytes' => $stats_data['total_net_input_bytes'],
-    'output_bytes' => $stats_data['total_net_output_bytes'],
+    'input_bytes' => $stats_data['total_net_input_bytes'] ?? 0,
+    'output_bytes' => $stats_data['total_net_output_bytes'] ?? 0,
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('input_bytes', 'COUNTER', 0)

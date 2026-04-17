@@ -96,9 +96,9 @@ modules:
                     index: fan1Status.{{ $index }}
                     state_name: fanStatus_states
                     states:
-                        - { value: 0, graph: 0, generic: 0, descr: Off }
-                        - { value: 1, graph: 0, generic: 0, descr: On }
-                        - { value: 2, graph: 0, generic: 2, descr: emergency/boost }
+                        - { value: 0, generic: 0, descr: Off }
+                        - { value: 1, generic: 0, descr: On }
+                        - { value: 2, generic: 2, descr: emergency/boost }
                 -
                     oid: DANTHERM-COOLING-MIB::fan2Status
                     value: DANTHERM-COOLING-MIB::fan2Status
@@ -107,9 +107,9 @@ modules:
                     index: fan2Status.{{ $index }}
                     state_name: fanStatus_states
                     states:
-                        - { value: 0, graph: 0, generic: 0, descr: Off }
-                        - { value: 1, graph: 0, generic: 0, descr: On }
-                        - { value: 2, graph: 0, generic: 2, descr: emergency/boost }
+                        - { value: 0, generic: 0, descr: Off }
+                        - { value: 1, generic: 0, descr: On }
+                        - { value: 2, generic: 2, descr: emergency/boost }
                 -
                     oid: DANTHERM-COOLING-MIB::damper1Status
                     value: DANTHERM-COOLING-MIB::damper1Status
@@ -118,10 +118,10 @@ modules:
                     index: damper1Status.{{ $index }}
                     state_name: damperStatus_states
                     states:
-                        - { value: 0, graph: 0, generic: 0, descr: closed }
-                        - { value: 1, graph: 0, generic: 0, descr: open }
-                        - { value: 2, graph: 0, generic: 0, descr: dynamic }
-                        - { value: 3, graph: 0, generic: 2, descr: emergency/boost}
+                        - { value: 0, generic: 0, descr: closed }
+                        - { value: 1, generic: 0, descr: open }
+                        - { value: 2, generic: 0, descr: dynamic }
+                        - { value: 3, generic: 2, descr: emergency/boost}
                 -
                     oid: DANTHERM-COOLING-MIB::damper2Status
                     value: DANTHERM-COOLING-MIB::damper2Status
@@ -130,10 +130,10 @@ modules:
                     index: damper2Status.{{ $index }}
                     state_name: damperStatus_states
                     states:
-                        - { value: 0, graph: 0, generic: 0, descr: closed }
-                        - { value: 1, graph: 0, generic: 0, descr: open }
-                        - { value: 2, graph: 0, generic: 0, descr: dynamic }
-                        - { value: 3, graph: 0, generic: 2, descr: emergency/boost}
+                        - { value: 0, generic: 0, descr: closed }
+                        - { value: 1, generic: 0, descr: open }
+                        - { value: 2, generic: 0, descr: dynamic }
+                        - { value: 3, generic: 2, descr: emergency/boost}
                 -
                     oid: DANTHERM-COOLING-MIB::shelter1Status
                     value: DANTHERM-COOLING-MIB::shelter1Status
@@ -142,13 +142,13 @@ modules:
                     index: shelter1Status.{{ $index }}
                     state_name: shelterStatus_states
                     states:
-                        - { value: 0, graph: 0, generic: 0, descr: Inactive state }
-                        - { value: 1, graph: 0, generic: 0, descr: Heating state }
-                        - { value: 2, graph: 0, generic: 0, descr: Re-Cycling state }
-                        - { value: 3, graph: 0, generic: 0, descr: Free Cooling state }
-                        - { value: 4, graph: 0, generic: 0, descr: Active or Aircon Cooling state }
-                        - { value: 5, graph: 0, generic: 2, descr: Emergency state }
-                        - { value: 6, graph: 0, generic: 0, descr: Intermediate state }
+                        - { value: 0, generic: 0, descr: Inactive state }
+                        - { value: 1, generic: 0, descr: Heating state }
+                        - { value: 2, generic: 0, descr: Re-Cycling state }
+                        - { value: 3, generic: 0, descr: Free Cooling state }
+                        - { value: 4, generic: 0, descr: Active or Aircon Cooling state }
+                        - { value: 5, generic: 2, descr: Emergency state }
+                        - { value: 6, generic: 0, descr: Intermediate state }
                 -
                     oid: DANTHERM-COOLING-MIB::shelter1Mode
                     value: DANTHERM-COOLING-MIB::shelter1Mode
@@ -157,7 +157,7 @@ modules:
                     index: shelter1Mode.{{ $index }}
                     state_name: shelterMode_states
                     states:
-                        - { value: 0, graph: 0, generic: 0, descr: Free Cooling mode }
-                        - { value: 1, graph: 0, generic: 0, descr: Standard mode }
-                        - { value: 2, graph: 0, generic: 0, descr: Power Save mode }
-                        - { value: 3, graph: 0, generic: 0, descr: Air Condionter mode }
+                        - { value: 0, generic: 0, descr: Free Cooling mode }
+                        - { value: 1, generic: 0, descr: Standard mode }
+                        - { value: 2, generic: 0, descr: Power Save mode }
+                        - { value: 3, generic: 0, descr: Air Condionter mode }

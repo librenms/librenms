@@ -14,13 +14,13 @@ modules:
           descr: Power 1 Status
           group: Power Information
           states:
-            - { value: 1, generic: 1, graph: 0, descr: "Off" }
-            - { value: 2, generic: 0, graph: 0, descr: dc-100w }
-            - { value: 3, generic: 0, graph: 0, descr: dc-150w }
-            - { value: 4, generic: 2, graph: 0, descr: dc-150w }
-            - { value: 5, generic: 0, graph: 0, descr: ac }
-            - { value: 6, generic: 3, graph: 0, descr: none }
-            - { value: 7, generic: 0, graph: 0, descr: dc-125v }
+            - { value: 1, generic: 1, descr: "Off" }
+            - { value: 2, generic: 0, descr: dc-100w }
+            - { value: 3, generic: 0, descr: dc-150w }
+            - { value: 4, generic: 2, descr: dc-150w }
+            - { value: 5, generic: 0, descr: ac }
+            - { value: 6, generic: 3, descr: none }
+            - { value: 7, generic: 0, descr: dc-125v }
 
         - oid: L-AM3440-A-Private::dualPowerTable
           value: L-AM3440-A-Private::power2Status
@@ -30,13 +30,13 @@ modules:
           descr: Power 2 Status
           group: Power Information
           states:
-            - { value: 1, generic: 1, graph: 0, descr: "Off" }
-            - { value: 2, generic: 0, graph: 0, descr: dc-100w }
-            - { value: 3, generic: 0, graph: 0, descr: dc-150w }
-            - { value: 4, generic: 2, graph: 0, descr: dc-150w }
-            - { value: 5, generic: 0, graph: 0, descr: ac }
-            - { value: 6, generic: 3, graph: 0, descr: none }
-            - { value: 7, generic: 0, graph: 0, descr: dc-125v }
+            - { value: 1, generic: 1, descr: "Off" }
+            - { value: 2, generic: 0, descr: dc-100w }
+            - { value: 3, generic: 0, descr: dc-150w }
+            - { value: 4, generic: 2, descr: dc-150w }
+            - { value: 5, generic: 0, descr: ac }
+            - { value: 6, generic: 3, descr: none }
+            - { value: 7, generic: 0, descr: dc-125v }
 
         - oid: L-AM3440-A-Private::ccConsoleStatus
           state_name: ccConsoleStatus
@@ -45,19 +45,19 @@ modules:
           descr: Console state
           group: Remote access
           states:
-            - { value: 1, generic: 0, graph: 0, descr: 'No active users' }
-            - { value: 3, generic: 2, graph: 0, descr: 'Console is locked' }
-            - { value: 4, generic: 0, graph: 0, descr: 'Console is active' }
-            - { value: 10, generic: 0, graph: 0, descr: telnet1-login }
-            - { value: 11, generic: 0, graph: 0, descr: telnet2-login }
-            - { value: 12, generic: 0, graph: 0, descr: telnet3-login }
-            - { value: 13, generic: 0, graph: 0, descr: telnet4-login }
-            - { value: 14, generic: 0, graph: 0, descr: telnet5-login }
-            - { value: 15, generic: 0, graph: 0, descr: ssh1-active }
-            - { value: 16, generic: 0, graph: 0, descr: ssh2-active }
-            - { value: 17, generic: 0, graph: 0, descr: ssh3-active }
-            - { value: 18, generic: 0, graph: 0, descr: ssh4-active }
-            - { value: 19, generic: 0, graph: 0, descr: ssh5-active }
+            - { value: 1, generic: 0, descr: 'No active users' }
+            - { value: 3, generic: 2, descr: 'Console is locked' }
+            - { value: 4, generic: 0, descr: 'Console is active' }
+            - { value: 10, generic: 0, descr: telnet1-login }
+            - { value: 11, generic: 0, descr: telnet2-login }
+            - { value: 12, generic: 0, descr: telnet3-login }
+            - { value: 13, generic: 0, descr: telnet4-login }
+            - { value: 14, generic: 0, descr: telnet5-login }
+            - { value: 15, generic: 0, descr: ssh1-active }
+            - { value: 16, generic: 0, descr: ssh2-active }
+            - { value: 17, generic: 0, descr: ssh3-active }
+            - { value: 18, generic: 0, descr: ssh4-active }
+            - { value: 19, generic: 0, descr: ssh5-active }
 
         - oid: L-AM3440-A-Private::ccConsoleLockoutState
           state_name: ccConsoleLockoutState
@@ -66,8 +66,8 @@ modules:
           descr: Local console state
           group: Remote access
           states:
-            - { value: 1, generic: 2, graph: 0, descr: 'Locked' }
-            - { value: 2, generic: 0, graph: 0, descr: 'Open' }
+            - { value: 1, generic: 2, descr: 'Locked' }
+            - { value: 2, generic: 0, descr: 'Open' }
 
         - oid: L-AM3440-A-Private::ccTelnetLockoutState
           state_name: ccTelnetLockoutState
@@ -76,8 +76,8 @@ modules:
           descr: Remote console state
           group: Remote access
           states:
-            - { value: 1, generic: 2, graph: 0, descr: 'Locked' }
-            - { value: 2, generic: 0, graph: 0, descr: 'Open' }
+            - { value: 1, generic: 2, descr: 'Locked' }
+            - { value: 2, generic: 0, descr: 'Open' }
 
     power:
       data:

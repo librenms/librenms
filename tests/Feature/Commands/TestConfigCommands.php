@@ -81,7 +81,7 @@ final class TestConfigCommands extends InMemoryDbTestCase
             ->assertExitCode(2);
 
         // invalid type
-        $this->artisan('config:set', ['setting' => 'alert_rule.interval', 'value' => 'string', '--no-ansi' => true])
+        $this->artisan('config:set', ['setting' => 'alert_rule.default_operation_step_duration', 'value' => 'string', '--no-ansi' => true])
             ->expectsOutput(trans('settings.validate.integer', ['value' => '"string"']))
             ->assertExitCode(2);
 

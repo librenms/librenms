@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\PollerGroup;
 use App\Models\User;
 
 class PollerGroupPolicy
@@ -13,15 +14,17 @@ class PollerGroupPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'viewAny');
+        return $this->hasGlobalPermission($user, 'create')
+            || $this->hasGlobalPermission($user, 'update')
+            || $this->hasGlobalPermission($user, 'delete');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user): bool
+    public function view(User $user, PollerGroup $pollerGroup): bool
     {
-        return $this->hasGlobalPermission($user, 'view');
+        return false;
     }
 
     /**

@@ -182,15 +182,15 @@ modules:
                     index: 'upsBatteryStatus.{{ $index }}'
                     state_name: upsBatteryStatus
                     states:
-                        - { value: 1, generic: 3, graph: 1, descr: 'Unknown' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'Normal' }
-                        - { value: 3, generic: 1, graph: 1, descr: 'Charging' }
-                        - { value: 4, generic: 3, graph: 1, descr: 'Test' }
-                        - { value: 5, generic: 1, graph: 1, descr: 'Discharging' }
-                        - { value: 6, generic: 1, graph: 1, descr: 'Low' }
-                        - { value: 7, generic: 2, graph: 1, descr: 'Depleted' }
-                        - { value: 8, generic: 2, graph: 1, descr: 'Failure' }
-                        - { value: 9, generic: 2, graph: 1, descr: 'Disconnected' }
+                        - { value: 1, generic: 3, descr: 'Unknown' }
+                        - { value: 2, generic: 0, descr: 'Normal' }
+                        - { value: 3, generic: 1, descr: 'Charging' }
+                        - { value: 4, generic: 3, descr: 'Test' }
+                        - { value: 5, generic: 1, descr: 'Discharging' }
+                        - { value: 6, generic: 1, descr: 'Low' }
+                        - { value: 7, generic: 2, descr: 'Depleted' }
+                        - { value: 8, generic: 2, descr: 'Failure' }
+                        - { value: 9, generic: 2, descr: 'Disconnected' }
                 -
                     oid: SOCOMECUPS-MIB::upsOutput
                     value: SOCOMECUPS-MIB::upsOutputSource
@@ -199,15 +199,15 @@ modules:
                     index: 'upsOutputSource.{{ $index }}'
                     state_name: upsOutputSource
                     states:
-                        - { value: 1, generic: 3, graph: 1, descr: 'Unknown' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'on Maintenance Bypass' }
-                        - { value: 3, generic: 1, graph: 1, descr: 'on Inverter' }
-                        - { value: 4, generic: 0, graph: 1, descr: 'Normal mode' }
-                        - { value: 5, generic: 0, graph: 1, descr: 'ECO mode' }
-                        - { value: 6, generic: 1, graph: 1, descr: 'on Bypass' }
-                        - { value: 7, generic: 0, graph: 1, descr: 'on Standby' }
-                        - { value: 8, generic: 2, graph: 1, descr: 'UPS Off' }
-                        - { value: 9, generic: 1, graph: 1, descr: 'line Interactive' }
+                        - { value: 1, generic: 3, descr: 'Unknown' }
+                        - { value: 2, generic: 1, descr: 'on Maintenance Bypass' }
+                        - { value: 3, generic: 1, descr: 'on Inverter' }
+                        - { value: 4, generic: 0, descr: 'Normal mode' }
+                        - { value: 5, generic: 0, descr: 'ECO mode' }
+                        - { value: 6, generic: 1, descr: 'on Bypass' }
+                        - { value: 7, generic: 0, descr: 'on Standby' }
+                        - { value: 8, generic: 2, descr: 'UPS Off' }
+                        - { value: 9, generic: 1, descr: 'line Interactive' }
                 -
                     oid: SOCOMECUPS-MIB::upsAlarm
                     value: SOCOMECUPS-MIB::upsAlarmOverload
@@ -217,8 +217,8 @@ modules:
                     group: Alarm
                     state_name: upsAlarmOverload
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: 'OK' }
-                        - { value: 1, generic: 2, graph: 1, descr: 'Alarm' }
+                        - { value: 0, generic: 0, descr: 'OK' }
+                        - { value: 1, generic: 2, descr: 'Alarm' }
                 -
                     oid: SOCOMECUPS-MIB::upsAlarm
                     value: SOCOMECUPS-MIB::upsAlarmTemperature
@@ -228,8 +228,8 @@ modules:
                     group: Alarm
                     state_name: upsAlarmTemperature
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: 'OK' }
-                        - { value: 1, generic: 2, graph: 1, descr: 'Alarm' }
+                        - { value: 0, generic: 0, descr: 'OK' }
+                        - { value: 1, generic: 2, descr: 'Alarm' }
                 -
                     oid: SOCOMECUPS-MIB::upsAlarm
                     value: SOCOMECUPS-MIB::upsAlarmRectifierAlarm
@@ -239,8 +239,8 @@ modules:
                     group: Alarm
                     state_name: upsAlarmRectifierAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: 'OK' }
-                        - { value: 1, generic: 2, graph: 1, descr: 'Alarm' }
+                        - { value: 0, generic: 0, descr: 'OK' }
+                        - { value: 1, generic: 2, descr: 'Alarm' }
                 -
                     oid: SOCOMECUPS-MIB::upsAlarm
                     value: SOCOMECUPS-MIB::upsAlarmFansFailure
@@ -250,8 +250,8 @@ modules:
                     group: Alarm
                     state_name: upsAlarmFansFailure
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: 'OK' }
-                        - { value: 1, generic: 2, graph: 1, descr: 'Alarm' }
+                        - { value: 0, generic: 0, descr: 'OK' }
+                        - { value: 1, generic: 2, descr: 'Alarm' }
                 -
                     oid: SOCOMECUPS-MIB::upsAlarm
                     value: SOCOMECUPS-MIB::upsAlarmGeneralFault
@@ -261,5 +261,5 @@ modules:
                     group: Alarm
                     state_name: upsAlarmGeneralFault
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: 'OK' }
-                        - { value: 1, generic: 2, graph: 1, descr: 'Alarm' }
+                        - { value: 0, generic: 0, descr: 'OK' }
+                        - { value: 1, generic: 2, descr: 'Alarm' }

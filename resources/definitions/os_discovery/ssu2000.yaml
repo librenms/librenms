@@ -26,10 +26,10 @@ modules:
                     descr: 'PTP Status - Chassis.Slot# {{ $index }}'
                     state_name: staPtPtpTable
                     states:
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: disabled, graph: 0, value: 3, generic: 1 }
-                        - { descr: fault, graph: 0, value: 4, generic: 2 }
-                        - { descr: reject, graph: 0, value: 5, generic: 1 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: disabled, value: 3, generic: 1 }
+                        - { descr: fault, value: 4, generic: 2 }
+                        - { descr: reject, value: 5, generic: 1 }
                 -
                     oid: SSU2000-MIB::staPtNtpTable
                     num_oid: '.1.3.6.1.4.1.601.3.1.1.2.15.1.1.3.{{ $index }}'
@@ -37,10 +37,10 @@ modules:
                     descr: 'NTP Status - Chassis.Slot# {{ $index }}'
                     state_name: staPtNtpTable
                     states:
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: disabled, graph: 0, value: 3, generic: 1 }
-                        - { descr: fault, graph: 0, value: 4, generic: 2 }
-                        - { descr: reject, graph: 0, value: 5, generic: 1 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: disabled, value: 3, generic: 1 }
+                        - { descr: fault, value: 4, generic: 2 }
+                        - { descr: reject, value: 5, generic: 1 }
                 -
                     oid: SSU2000-MIB::staGpsTable
                     num_oid: '.1.3.6.1.4.1.601.3.1.1.2.5.1.1.3.{{ $index }}'
@@ -48,11 +48,11 @@ modules:
                     descr: 'GPS Status - Chassis.Slot# {{ $index }}'
                     state_name: staGpsTable
                     states:
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: selected, graph: 0, value: 2, generic: 0 }
-                        - { descr: disabled, graph: 0, value: 3, generic: 1 }
-                        - { descr: fault, graph: 0, value: 4, generic: 2 }
-                        - { descr: reject, graph: 0, value: 5, generic: 1 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: selected, value: 2, generic: 0 }
+                        - { descr: disabled, value: 3, generic: 1 }
+                        - { descr: fault, value: 4, generic: 2 }
+                        - { descr: reject, value: 5, generic: 1 }
                 -
                     oid: SSU2000-MIB::staClkTable
                     num_oid: '.1.3.6.1.4.1.601.3.1.1.2.2.1.1.3.{{ $index }}'
@@ -60,10 +60,10 @@ modules:
                     descr: 'Clock Status - Chassis.Slot# {{ $index }}'
                     state_name: staClkTable
                     states:
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: selected, graph: 0, value: 2, generic: 0 }
-                        - { descr: disabled, graph: 0, value: 3, generic: 1 }
-                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: selected, value: 2, generic: 0 }
+                        - { descr: disabled, value: 3, generic: 1 }
+                        - { descr: fault, value: 4, generic: 2 }
                 -
                     oid: SSU2000-MIB::staClkTable
                     num_oid: '.1.3.6.1.4.1.601.3.1.1.2.2.1.1.4.{{ $index }}'
@@ -71,11 +71,11 @@ modules:
                     descr: 'PLL Mode - Chassis.Slot# {{ $index }}'
                     state_name: staClkTable
                     states:
-                        - { descr: failed, graph: 0, value: 1, generic: 2 }
-                        - { descr: warmup, graph: 0, value: 2, generic: 1 }
-                        - { descr: acquire, graph: 0, value: 3, generic: 1 }
-                        - { descr: holdover, graph: 0, value: 4, generic: 1 }
-                        - { descr: lock, graph: 0, value: 5, generic: 0 }
+                        - { descr: failed, value: 1, generic: 2 }
+                        - { descr: warmup, value: 2, generic: 1 }
+                        - { descr: acquire, value: 3, generic: 1 }
+                        - { descr: holdover, value: 4, generic: 1 }
+                        - { descr: lock, value: 5, generic: 0 }
        delay:
             data:
                 -

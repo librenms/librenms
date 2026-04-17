@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\StringHelpers;
+
 unset($port_stats); //Unsetting stats to prevent adding the interfaces found with the IF-MIB
 
 $curIfIndex = 0;
@@ -9,7 +11,7 @@ $eth_traffic = snmpwalk_group($device, 'ethernetCountTable', 'L-AM3440-A-Private
 //Set eth interfaces
 foreach ($eth_stats as $port) {
     $curIfIndex += 1;
-    $portname = snmp_hexstring($port['ethernetStatusName']); // Convert hex to readable string
+    $portname = StringHelpers::hexToAscii($port['ethernetStatusName'], ' '); // Convert hex to readable string
     $port_stats[$curIfIndex]['ifName'] = $portname;
     $port_stats[$curIfIndex]['ifOperStatus'] = ($port['ethernetStatusLink'] == 1) ? 'up' : 'down';
     $port_stats[$curIfIndex]['ifAdminStatus'] = ($port['ethernetStatusLink'] == 1) ? 'up' : 'down'; //Set this to same as operator stat since the mib does not have admin status
@@ -50,7 +52,7 @@ foreach ($eth_stats as $port) {
 
     //Loop over eth ports and match ports to get correct data. The SNMP port is not defined in the ethernetCountTable oid
     foreach ($eth_traffic as $value) {
-        $portCountername = snmp_hexstring($value['ethernetCountName']); // Convert hex to readable string
+        $portCountername = StringHelpers::hexToAscii($value['ethernetCountName'], ' '); // Convert hex to readable string
         if ($portname == $portCountername) {
             $port_stats[$curIfIndex]['ifInOctets'] = abs($value['ethernetRxGoodPkt']);
             $port_stats[$curIfIndex]['ifOutOctets'] = abs($value['ethernetTxGoodPkt']);

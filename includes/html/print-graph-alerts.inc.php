@@ -27,7 +27,7 @@ if (isset($device['device_id']) && $device['device_id'] > 0) {
     ];
 }
 
-if (Gate::denies('viewAny', \App\Models\Alert::class)) {
+if (Gate::denies('viewAll', \App\Models\Alert::class)) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
     $sql .= ' AND `alert_log`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
