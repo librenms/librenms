@@ -1396,7 +1396,7 @@ function get_port_vlan_info(Illuminate\Http\Request $request)
         return check_port_permission($port_id, null, function ($port_id) {
             $port = PortVlan::where('port_id', $port_id)->get()->toArray();
 
-            return api_success($port, 'port');
+            return api_success($port, 'ports');
         });
     } elseif ($hostname) {
         $device = DeviceCache::get($hostname);
@@ -1404,7 +1404,7 @@ function get_port_vlan_info(Illuminate\Http\Request $request)
         return check_device_permission($device->device_id, function () use ($device) {
             $port = PortVlan::where('device_id', $device->device_id)->get()->toArray();
 
-            return api_success($port, 'port');
+            return api_success($port, 'ports');
         });
     } else {
         return api_error(500, 'No port_id or hostname has been provided');
