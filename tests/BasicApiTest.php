@@ -59,19 +59,19 @@ final class BasicApiTest extends DBTestCase
         $token = ApiToken::generateToken($user);
         $device = Device::factory()->create();
 
-        $rssi = $this->makeWirelessSensor($device, [
+        $rssi = WirelessSensor::factory()->for($device)->create([
             'sensor_class' => 'rssi',
             'sensor_index' => '1.1',
             'sensor_descr' => 'Subscriber 1 UL RSSI',
             'sensor_current' => -62,
         ]);
-        $this->makeWirelessSensor($device, [
+        WirelessSensor::factory()->for($device)->create([
             'sensor_class' => 'snr',
             'sensor_index' => '1.2',
             'sensor_descr' => 'Subscriber 1 UL SNR',
             'sensor_current' => 31,
         ]);
-        $this->makeWirelessSensor($device, [
+        WirelessSensor::factory()->for($device)->create([
             'sensor_class' => 'rssi',
             'sensor_index' => '1.3',
             'sensor_descr' => 'Deleted Sensor',
@@ -98,13 +98,13 @@ final class BasicApiTest extends DBTestCase
         $token = ApiToken::generateToken($user);
         $device = Device::factory()->create();
 
-        $rssi = $this->makeWirelessSensor($device, [
+        $rssi = WirelessSensor::factory()->for($device)->create([
             'sensor_class' => 'rssi',
             'sensor_index' => '2.1',
             'sensor_descr' => 'Subscriber 2 UL RSSI',
             'sensor_current' => -55,
         ]);
-        $this->makeWirelessSensor($device, [
+        WirelessSensor::factory()->for($device)->create([
             'sensor_class' => 'snr',
             'sensor_index' => '2.2',
             'sensor_descr' => 'Subscriber 2 UL SNR',
@@ -150,35 +150,5 @@ final class BasicApiTest extends DBTestCase
                 'status' => 'error',
                 'message' => "Invalid wireless sensor class 'bogus'",
             ]);
-    }
-
-    private function makeWirelessSensor(Device $device, array $attributes = []): WirelessSensor
-    {
-        $sensor = new WirelessSensor();
-        $sensor->device_id = $device->device_id;
-        $sensor->sensor_deleted = $attributes['sensor_deleted'] ?? 0;
-        $sensor->sensor_class = $attributes['sensor_class'] ?? 'rssi';
-        $sensor->sensor_index = $attributes['sensor_index'] ?? '1';
-        $sensor->sensor_type = $attributes['sensor_type'] ?? 'generic';
-        $sensor->sensor_descr = $attributes['sensor_descr'] ?? 'Wireless Sensor';
-        $sensor->sensor_divisor = $attributes['sensor_divisor'] ?? 1;
-        $sensor->sensor_multiplier = $attributes['sensor_multiplier'] ?? 1;
-        $sensor->sensor_aggregator = $attributes['sensor_aggregator'] ?? 'sum';
-        $sensor->sensor_current = $attributes['sensor_current'] ?? 0;
-        $sensor->sensor_prev = $attributes['sensor_prev'] ?? null;
-        $sensor->sensor_limit = $attributes['sensor_limit'] ?? null;
-        $sensor->sensor_limit_warn = $attributes['sensor_limit_warn'] ?? null;
-        $sensor->sensor_limit_low = $attributes['sensor_limit_low'] ?? null;
-        $sensor->sensor_limit_low_warn = $attributes['sensor_limit_low_warn'] ?? null;
-        $sensor->sensor_alert = $attributes['sensor_alert'] ?? 1;
-        $sensor->sensor_custom = $attributes['sensor_custom'] ?? 'No';
-        $sensor->entPhysicalIndex = $attributes['entPhysicalIndex'] ?? null;
-        $sensor->entPhysicalIndex_measured = $attributes['entPhysicalIndex_measured'] ?? null;
-        $sensor->sensor_oids = $attributes['sensor_oids'] ?? ['value' => '.1.3.6.1.4.1.17713.21.1.2.30.1.4.1'];
-        $sensor->access_point_id = $attributes['access_point_id'] ?? null;
-        $sensor->rrd_type = $attributes['rrd_type'] ?? 'GAUGE';
-        $sensor->save();
-
-        return $sensor;
     }
 }
