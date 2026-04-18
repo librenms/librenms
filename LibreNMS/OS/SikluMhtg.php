@@ -33,6 +33,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class SikluMhtg extends OS implements
     WirelessErrorRatioDiscovery,
@@ -117,10 +118,10 @@ class SikluMhtg extends OS implements
      */
     private function getRemoteLinks()
     {
-        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'rbTgRcLinksActiveRemoteName', [], 'RADIO-BRIDGE-MH-TG-MIB');
+        $oids = SnmpQuery::mibDir('siklu-mhtg')->walk('RADIO-BRIDGE-MH-TG-MIB::rbTgRcLinksActiveRemoteName')->table(1);
         $links = [];
         foreach ($oids as $ifIndex => $entry) {
-            $links[$ifIndex] = $entry['rbTgRcLinksActiveRemoteName'];
+            $links[$ifIndex] = $entry['RADIO-BRIDGE-MH-TG-MIB::rbTgRcLinksActiveRemoteName'];
         }
 
         return $links;
