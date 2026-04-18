@@ -12,16 +12,7 @@ if ($tokenName === '') {
     exit(json_encode(['status' => 'error', 'message' => 'ERROR: Token name is required']));
 }
 
-$canManage = Gate::allows('api.management');
-
-if ($canManage && ! empty($_POST['user_id'])) {
-    $user = \App\Models\User::find($_POST['user_id']);
-    if (! $user) {
-        exit(json_encode(['status' => 'error', 'message' => 'ERROR: User not found']));
-    }
-} else {
-    $user = Auth::user();
-}
+$user = Auth::user();
 
 $expiresAt = null;
 $expiresIn = trim($_POST['expires_in'] ?? '');

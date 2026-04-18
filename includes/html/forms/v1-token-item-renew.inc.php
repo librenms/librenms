@@ -17,16 +17,10 @@ if (! is_numeric($extendDays) || (int) $extendDays < 1) {
     exit(json_encode(['status' => 'error', 'message' => 'ERROR: Days must be a positive number']));
 }
 
-$canManage = Gate::allows('api.management');
-
-$query = \Laravel\Sanctum\PersonalAccessToken::where('id', $tokenId);
-
-if (! $canManage) {
-    $query->where('tokenable_id', Auth::id())
-          ->where('tokenable_type', \App\Models\User::class);
-}
-
-$token = $query->first();
+$token = \Laravel\Sanctum\PersonalAccessToken::where('id', $tokenId)
+    ->where('tokenable_id', Auth::id())
+    ->where('tokenable_type', \App\Models\User::class)
+    ->first();
 
 if (! $token) {
     exit(json_encode(['status' => 'error', 'message' => 'ERROR: Token not found']));

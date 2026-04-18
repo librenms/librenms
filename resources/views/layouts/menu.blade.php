@@ -685,7 +685,7 @@
                             </ul>
                         </li>
                         @endif
-                        @canany(['api.access', 'api.management'])
+                        @can('api.access')
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a href="#"><i class="fa fa-code fa-fw fa-lg" aria-hidden="true"></i> {{ __('API') }}</a>
@@ -698,7 +698,7 @@
                                 </li>
                             </ul>
                         </li>
-                        @endcanany
+                        @endcan
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu" id="countdown_timer_menu" style="display: none">
                             <a href="#"><i class="fa fa-clock-o fa-fw fa-lg"></i> <span id="countdown_timer"></span></a>

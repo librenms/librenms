@@ -36,9 +36,8 @@ class RolesSeeder extends Seeder
     {
         if (Role::query()->count() === 0) {
             $apiAccess = Permission::findOrCreate('api.access');
-            $apiManagement = Permission::findOrCreate('api.management');
 
-            Role::findOrCreate('admin')->givePermissionTo([$apiAccess, $apiManagement]);
+            Role::findOrCreate('admin')->givePermissionTo($apiAccess);
             Role::findOrCreate('global-read')->givePermissionTo($apiAccess);
             Role::findOrCreate('user');
         }
