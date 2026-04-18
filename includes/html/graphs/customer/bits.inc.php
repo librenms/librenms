@@ -15,8 +15,8 @@ $rrd_list = Port::with('device')
         if (Rrd::checkRrdExists($rrd_filename)) {
             $rrd[] = [
                 'filename' => $rrd_filename,
-                'descr' => $port->device->hostname . '-' . $port->ifDescr,
-                'descr_in' => $port->device->shortDisplayName(),
+                'descr' => ($port->device?->hostname ?? __('Unknown device')) . '-' . $port->ifDescr,
+                'descr_in' => $port->device?->shortDisplayName() ?? __('Unknown device'),
                 'descr_out' => Rewrite::shortenIfName($port->ifDescr),
             ];
         }
