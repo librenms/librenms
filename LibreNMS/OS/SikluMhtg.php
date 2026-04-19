@@ -118,7 +118,7 @@ class SikluMhtg extends OS implements
      */
     private function getRemoteLinks()
     {
-        $oids = SnmpQuery::mibDir('siklu-mhtg')->walk('RADIO-BRIDGE-MH-TG-MIB::rbTgRcLinksActiveRemoteName')->table(1);
+        $oids = SnmpQuery::mibDir('siklu/mhtg')->walk('RADIO-BRIDGE-MH-TG-MIB::rbTgRcLinksActiveRemoteName')->table(1);
         $links = [];
         foreach ($oids as $ifIndex => $entry) {
             $links[$ifIndex] = $entry['RADIO-BRIDGE-MH-TG-MIB::rbTgRcLinksActiveRemoteName'];
