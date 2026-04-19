@@ -6,6 +6,7 @@ over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
+mib_dir: metaswitch
 discovery:
     -
         sysObjectID:
