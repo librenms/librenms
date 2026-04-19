@@ -26,6 +26,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\AlertOperation;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -55,11 +56,6 @@ class AlertRuleRequest extends FormRequest
             'builder_json' => ['required_unless:override_query,on', 'json'],
             'adv_query' => ['required_if:override_query,on', 'nullable', 'string'],
 
-            'count' => ['nullable', 'numeric', 'min:-1'],
-            'delay' => ['nullable', 'string', 'regex:/^\d+[mhd]?$/'],
-            'interval' => ['nullable', 'string', 'regex:/^\d+[mhd]?$/'],
-
-            'mute' => ['sometimes', 'boolean'],
             'invert' => ['sometimes', 'boolean'],
             'recovery' => ['sometimes', 'boolean'],
             'acknowledgement' => ['sometimes', 'boolean'],
@@ -68,8 +64,7 @@ class AlertRuleRequest extends FormRequest
             'maps' => ['sometimes', 'array'],
             'maps.*' => ['string'],
 
-            'transports' => ['sometimes', 'array'],
-            'transports.*' => ['string'],
+            'alert_operation_id' => ['nullable', 'integer', Rule::exists(AlertOperation::class, 'id')],
 
             'proc' => ['nullable', 'string'],
             'notes' => ['nullable', 'string'],
@@ -87,14 +82,14 @@ class AlertRuleRequest extends FormRequest
         ]);
 
         // Convert checkbox values ('on' string) to boolean
-        $this->merge(collect(['mute', 'invert', 'recovery', 'acknowledgement', 'invert_map', 'override_query'])
+        $this->merge(collect(['invert', 'recovery', 'acknowledgement', 'invert_map', 'override_query'])
             ->mapWithKeys(fn ($field) => [$field => match ($this->input($field)) {
                 'on', '1', 1, true => true,
                 default => false
             }])->all());
 
-        // Ensure maps/transports are arrays if present as empty string
-        foreach (['maps', 'transports'] as $key) {
+        // Ensure maps is array if present as empty string
+        foreach (['maps'] as $key) {
             $value = $this->input($key);
             if ($value === '' || $value === null) {
                 $this->merge([$key => []]);

@@ -99,6 +99,7 @@ return [
             'reporting' => ['name' => 'Reporting'],
         ],
         'webui' => [
+            'availability-bar' => ['name' => 'Availability Bar Settings'],
             'availability-map' => ['name' => 'Availability Map Settings'],
             'custom-map' => ['name' => 'Custom Map Settings'],
             'graph' => ['name' => 'Graph Settings'],
@@ -135,21 +136,21 @@ return [
                 'description' => 'Severity',
                 'help' => 'Severity for an Alert',
             ],
-            'max_alerts' => [
-                'description' => 'Max Alerts',
-                'help' => 'Count of Alerts to be sent',
+            'default_operation_steps_to' => [
+                'description' => 'Default operation: Steps to',
+                'help' => 'Default escalation end step for created operation rows (-1 means no limit)',
             ],
-            'delay' => [
-                'description' => 'Delay',
-                'help' => 'Delay before an Alert will be sent',
+            'default_operation_start_in' => [
+                'description' => 'Default operation: Start in',
+                'help' => 'Default delay before an operation notification is sent',
             ],
-            'interval' => [
-                'description' => 'Interval',
-                'help' => 'Interval to be checked for this Alert',
+            'default_operation_step_duration' => [
+                'description' => 'Default operation: Step duration',
+                'help' => 'Default operation step duration (minutes)',
             ],
-            'mute_alerts' => [
-                'description' => 'Mute Alerts',
-                'help' => 'Should Alert only be seen in WebUI',
+            'default_operation_notifications_suppressed' => [
+                'description' => 'Default operation: Suppress notifications',
+                'help' => 'Suppress notifications by default for created operation rows',
             ],
             'invert_rule_match' => [
                 'description' => 'Invert Rule Match',
@@ -2415,6 +2416,16 @@ return [
             'scheduled_maintenance_default_behavior' => [
                 'description' => 'Default Behaviour',
                 'help' => 'When managing scheduled maintenances, this will be the default option for the Behavior option.',
+            ],
+            'availability_bar' => [
+                'threshold_green' => [
+                    'description' => 'Threshold Green',
+                    'help' => 'Threshold for green color',
+                ],
+                'threshold_orange' => [
+                    'description' => 'Threshold Orange',
+                    'help' => 'Threshold for orange color',
+                ],
             ],
             'alert_map_compact' => [
                 'description' => 'Alert map compact view',

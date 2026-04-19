@@ -25,11 +25,16 @@ class AlertRuleTemplateController extends Controller
             'extra' => $this->extraWithDefaults((array) ($rule['extra'] ?? [])),
             'severity' => $rule['severity'] ?? LibrenmsConfig::get('alert_rule.severity'),
             'invert_map' => LibrenmsConfig::get('alert_rule.invert_map'),
+            'alert_operation_id' => null,
+            'operations' => [],
+            'default_operation_step_duration_seconds' => max(0, 60 * (int) LibrenmsConfig::get('alert_rule.default_operation_step_duration', LibrenmsConfig::get('alert_rule.interval'))),
         ]);
     }
 
     public function rule(AlertRule $alertRule)
     {
+        $alertRule->loadMissing('alertOperation:id,default_operation_step_duration_seconds');
+
         return response()->json([
             'status' => 'ok',
             'name' => $alertRule->name . ' - Copy',
@@ -37,17 +42,16 @@ class AlertRuleTemplateController extends Controller
             'extra' => $this->extraWithDefaults((array) $alertRule->extra),
             'severity' => $alertRule->severity ?: LibrenmsConfig::get('alert_rule.severity'),
             'invert_map' => $alertRule->invert_map,
+            'alert_operation_id' => $alertRule->alert_operation_id,
+            'operations' => $alertRule->toOperationsApiArray(),
+            'default_operation_step_duration_seconds' => $alertRule->alertOperation?->default_operation_step_duration_seconds,
         ]);
     }
 
     private function extraWithDefaults(array $extra): array
     {
         $default_extra = [
-            'mute' => LibrenmsConfig::get('alert_rule.mute_alerts'),
-            'count' => LibrenmsConfig::get('alert_rule.max_alerts'),
-            'delay' => 60 * LibrenmsConfig::get('alert_rule.delay'),
             'invert' => LibrenmsConfig::get('alert_rule.invert_rule_match'),
-            'interval' => 60 * LibrenmsConfig::get('alert_rule.interval'),
             'recovery' => LibrenmsConfig::get('alert_rule.recovery_alerts'),
             'acknowledgement' => LibrenmsConfig::get('alert_rule.acknowledgement_alerts'),
         ];

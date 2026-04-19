@@ -193,7 +193,7 @@
                 "critical": "Critical"
             }
         },
-        "alert_rule.max_alerts": {
+        "alert_rule.default_operation_steps_to": {
             "default": 1,
             "units": "count",
             "group": "alerting",
@@ -201,7 +201,7 @@
             "order": 1,
             "type": "integer"
         },
-        "alert_rule.delay": {
+        "alert_rule.default_operation_start_in": {
             "default": 1,
             "units": "minutes",
             "group": "alerting",
@@ -209,7 +209,7 @@
             "order": 2,
             "type": "integer"
         },
-        "alert_rule.interval": {
+        "alert_rule.default_operation_step_duration": {
             "default": 5,
             "units": "minutes",
             "group": "alerting",
@@ -217,7 +217,7 @@
             "order": 3,
             "type": "integer"
         },
-        "alert_rule.mute_alerts": {
+        "alert_rule.default_operation_notifications_suppressed": {
             "default": false,
             "type": "boolean",
             "group": "alerting",
@@ -7374,6 +7374,20 @@
             "section": "availability-map",
             "order": 2,
             "type": "boolean"
+        },
+        "webui.availability_bar.threshold_good": {
+            "default": 99,
+            "group": "webui",
+            "section": "availability-bar",
+            "order": 1,
+            "type": "integer"
+        },
+        "webui.availability_bar.threshold_medium": {
+            "default": 95,
+            "group": "webui",
+            "section": "availability-bar",
+            "order": 2,
+            "type": "integer"
         },
         "webui.custom_css": {
             "default": [],

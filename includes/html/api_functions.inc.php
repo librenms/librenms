@@ -1014,15 +1014,18 @@ function trigger_device_discovery(Illuminate\Http\Request $request)
 
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    // find device matching the id
-    $device = device_by_id_cache($device_id);
-    if (! $device) {
-        return api_error(404, "Device $hostname does not exist");
-    }
 
-    $ret = device_discovery_trigger($device_id);
+    return check_device_permission($device_id, function ($device_id) use ($hostname) {
+        // find device matching the id
+        $device = device_by_id_cache($device_id);
+        if (! $device) {
+            return api_error(404, "Device $hostname does not exist");
+        }
 
-    return api_success($ret, 'result');
+        $ret = device_discovery_trigger($device_id);
+
+        return api_success($ret, 'result');
+    });
 }
 
 function list_available_health_graphs(Illuminate\Http\Request $request)
@@ -1411,7 +1414,13 @@ function list_alert_rules(Illuminate\Http\Request $request)
 
     $rules = \App\Http\Resources\AlertRule::collection(
         \App\Models\AlertRule::when($id, fn ($query) => $query->where('id', $id))
-        ->with(['devices:device_id', 'groups:id', 'locations:id'])->get()
+        ->with([
+            'devices:device_id',
+            'groups:id',
+            'locations:id',
+            'alertOperation.segments.transportSingles:alert_transports.transport_id,transport_type,transport_name',
+            'alertOperation.segments.transportGroups:alert_transport_groups.transport_group_id,transport_group_name',
+        ])->get()
     );
 
     return api_success($rules->toArray($request), 'rules');
@@ -1593,6 +1602,130 @@ function list_alerts(Illuminate\Http\Request $request): JsonResponse
     return api_success($alerts, 'alerts');
 }
 
+function api_parse_transport_targets(array $transports): array
+{
+    $single = [];
+    $group = [];
+
+    foreach ($transports as $transport) {
+        if (is_array($transport)) {
+            $type = strtolower((string) ($transport['type'] ?? 'single'));
+            $id = (int) ($transport['id'] ?? 0);
+            if ($id <= 0) {
+                continue;
+            }
+            if ($type === 'group') {
+                $group[] = $id;
+            } else {
+                $single[] = $id;
+            }
+            continue;
+        }
+
+        if (is_numeric($transport)) {
+            $single[] = (int) $transport;
+            continue;
+        }
+
+        if (is_string($transport) && Str::startsWith($transport, 'g') && is_numeric(substr($transport, 1))) {
+            $group[] = (int) substr($transport, 1);
+        }
+    }
+
+    return [array_values(array_unique($single)), array_values(array_unique($group))];
+}
+
+function api_default_transport_targets(): array
+{
+    $single = \App\Models\AlertTransport::where('is_default', true)
+        ->pluck('transport_id')
+        ->map(static fn ($id) => (int) $id)
+        ->all();
+
+    return [$single, []];
+}
+
+/**
+ * Legacy API: build one global {@see \App\Models\AlertOperation} from the operations array and assign to the rule.
+ *
+ * @param  array<int, array<string, mixed>>  $operations
+ */
+function api_assign_rule_alert_operation_from_legacy_api(int $ruleId, array $operations, string $ruleName, ?int $defaultStepSeconds = null): void
+{
+    $rule = \App\Models\AlertRule::find($ruleId);
+    if (! $rule) {
+        return;
+    }
+
+    if ($operations === []) {
+        $rule->alert_operation_id = null;
+        $rule->save();
+
+        return;
+    }
+
+    $name = mb_substr(trim($ruleName) !== '' ? $ruleName : 'Rule #' . $ruleId, 0, 200) . ' — API';
+
+    $op = \App\Models\AlertOperation::create([
+        'name' => $name,
+        'default_operation_step_duration_seconds' => $defaultStepSeconds !== null ? max(0, $defaultStepSeconds) : null,
+    ]);
+
+    $anyTransports = false;
+    foreach (array_values($operations) as $idx => $operation) {
+        $phase = $operation['operation_phase'] ?? 'problem';
+        if (! in_array($phase, ['problem', 'recovery', 'update'], true)) {
+            $phase = 'problem';
+        }
+
+        $from = max(1, (int) ($operation['escalation_step_from'] ?? 1));
+        $toRaw = $operation['escalation_step_to'] ?? null;
+        $to = ($toRaw === '' || $toRaw === null) ? null : max($from, (int) $toRaw);
+        $startIn = max(0, (int) ($operation['start_in_seconds'] ?? 0));
+        $stepDuration = max(0, (int) ($operation['step_duration_seconds'] ?? 0));
+
+        $seg = $op->segments()->create([
+            'position' => (int) ($operation['position'] ?? $idx),
+            'operation_phase' => $phase,
+            'escalation_step_from' => $from,
+            'escalation_step_to' => $to,
+            'start_in_seconds' => $startIn,
+            'step_duration_seconds' => $stepDuration,
+            'notifications_suppressed' => false,
+        ]);
+
+        [$single, $group] = api_parse_transport_targets((array) ($operation['transports'] ?? []));
+        if (empty($single) && empty($group)) {
+            $op->delete();
+            throw new \InvalidArgumentException('Each operation must include at least one transport or transport group.');
+        }
+        $anyTransports = true;
+
+        foreach ($single as $transportId) {
+            \App\Models\AlertOperationTransportMap::create([
+                'segment_id' => $seg->id,
+                'transport_or_group_id' => $transportId,
+                'target_type' => 'single',
+            ]);
+        }
+        foreach ($group as $groupId) {
+            \App\Models\AlertOperationTransportMap::create([
+                'segment_id' => $seg->id,
+                'transport_or_group_id' => $groupId,
+                'target_type' => 'group',
+            ]);
+        }
+    }
+
+    if (! $anyTransports) {
+        $op->delete();
+        throw new \InvalidArgumentException('Each operation must include at least one transport or transport group.');
+    }
+
+    $rule->alert_operation_id = $op->id;
+    $rule->save();
+}
+
 function add_edit_rule(Illuminate\Http\Request $request)
 {
     $data = json_decode($request->getContent(), true);
@@ -1600,10 +1733,10 @@ function add_edit_rule(Illuminate\Http\Request $request)
         return api_error(500, "We couldn't parse the provided json");
     }
 
-    $rule_id = $data['rule_id'];
-    $tmp_devices = (array) $data['devices'];
-    $groups = (array) $data['groups'];
-    $locations = (array) $data['locations'];
+    $rule_id = $data['rule_id'] ?? null;
+    $tmp_devices = (array) ($data['devices'] ?? []);
+    $groups = (array) ($data['groups'] ?? []);
+    $locations = (array) ($data['locations'] ?? []);
     if (empty($tmp_devices) && ! isset($rule_id)) {
         return api_error(400, 'Missing the devices or global device (-1)');
     }
@@ -1620,56 +1753,46 @@ function add_edit_rule(Illuminate\Http\Request $request)
         // accept inline json or json as a string
         $builder = is_array($data['builder']) ? json_encode($data['builder']) : $data['builder'];
     } else {
-        $builder = $data['rule'];
+        $builder = $data['rule'] ?? null;
     }
     if (empty($builder)) {
         return api_error(400, 'Missing the alert builder rule');
     }
 
-    $name = strip_tags((string) $data['name']);
+    $name = strip_tags((string) ($data['name'] ?? ''));
     if (empty($name)) {
         return api_error(400, 'Missing the alert rule name');
     }
 
-    $severity = $data['severity'];
-    $sevs = [
-        'ok',
-        'warning',
-        'critical',
-    ];
-    if (! in_array($severity, $sevs)) {
+    $severity = $data['severity'] ?? null;
+    $sevs = ['ok', 'warning', 'critical'];
+    if (! in_array($severity, $sevs, true)) {
         return api_error(400, 'Missing the severity');
     }
 
-    $disabled = $data['disabled'];
+    $disabled = $data['disabled'] ?? 0;
     if ($disabled != '0' && $disabled != '1') {
         $disabled = 0;
     }
 
-    $count = $data['count'];
-    $mute = $data['mute'];
-    $delay = $data['delay'];
-    $interval = $data['interval'];
-    $override_query = $data['override_query'];
-    $adv_query = $data['adv_query'];
-    $notes = strip_tags((string) $data['notes']);
-    $delay_sec = convert_delay($delay);
-    $interval_sec = convert_delay($interval);
-    if ($mute == 1) {
-        $mute = true;
-    } else {
-        $mute = false;
-    }
+    $override_query = $data['override_query'] ?? false;
+    $adv_query = $data['adv_query'] ?? null;
+    $notes = strip_tags((string) ($data['notes'] ?? ''));
 
     $extra = [
-        'mute' => $mute,
-        'count' => $count,
-        'delay' => $delay_sec,
-        'interval' => $interval_sec,
         'options' => [
             'override_query' => $override_query,
         ],
     ];
+    if (array_key_exists('invert', $data)) {
+        $extra['invert'] = filter_var($data['invert'], FILTER_VALIDATE_BOOLEAN);
+    }
+    if (array_key_exists('recovery', $data)) {
+        $extra['recovery'] = filter_var($data['recovery'], FILTER_VALIDATE_BOOLEAN);
+    }
+    if (array_key_exists('acknowledgement', $data)) {
+        $extra['acknowledgement'] = filter_var($data['acknowledgement'], FILTER_VALIDATE_BOOLEAN);
+    }
     $extra_json = json_encode($extra);
 
     if ($override_query === 'on' || $override_query === true) {
@@ -1682,24 +1805,115 @@ function add_edit_rule(Illuminate\Http\Request $request)
     }
 
     if (! isset($rule_id)) {
-        if (dbFetchCell('SELECT `name` FROM `alert_rules` WHERE `name`=?', [$name]) == $name) {
+        if (\App\Models\AlertRule::query()->where('name', $name)->exists()) {
             return api_error(500, 'Addition failed : Name has already been used');
         }
-    } elseif (dbFetchCell('SELECT name FROM alert_rules WHERE name=? AND id !=? ', [$name, $rule_id]) == $name) {
-        return api_error(500, 'Update failed : Invalid rule id');
+    } else {
+        if (\App\Models\AlertRule::query()->where('name', $name)->where('id', '!=', $rule_id)->exists()) {
+            return api_error(500, 'Update failed : Invalid rule id');
+        }
+    }
+
+    // New operation-based API fields
+    $operations = $data['operations'] ?? null;
+    $defaultOperationStepDuration = array_key_exists('default_operation_step_duration', $data)
+        ? convert_delay((string) $data['default_operation_step_duration'])
+        : null;
+
+    // Backwards compatibility: legacy timing fields are converted into a single problem operation.
+    $legacyProvided = array_key_exists('count', $data)
+        || array_key_exists('delay', $data)
+        || array_key_exists('interval', $data)
+        || array_key_exists('mute', $data);
+    if (! is_array($operations) && $legacyProvided && ! array_key_exists('alert_operation_id', $data)) {
+        $legacyCount = isset($data['count']) ? (int) $data['count'] : -1;
+        $legacyDelaySec = convert_delay((string) ($data['delay'] ?? 0));
+        $legacyIntervalSec = convert_delay((string) ($data['interval'] ?? 0));
+        $legacyMute = filter_var($data['mute'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        [$defaultSingles, $defaultGroups] = api_default_transport_targets();
+        $legacyTransports = array_map(static fn ($id) => (string) $id, $defaultSingles);
+        foreach ($defaultGroups as $gid) {
+            $legacyTransports[] = 'g' . $gid;
+        }
+        if ($legacyCount === -1) {
+            $legacyTo = null;
+        } elseif ($legacyCount > 0) {
+            $legacyTo = 1 + $legacyCount - 1;
+        } else {
+            $legacyTo = 1;
+        }
+
+        $operations = [[
+            'operation_phase' => 'problem',
+            'escalation_step_from' => 1,
+            'escalation_step_to' => $legacyTo,
+            'start_in_seconds' => $legacyDelaySec,
+            'step_duration_seconds' => 0,
+            'transports' => $legacyTransports,
+        ]];
+
+        if ($defaultOperationStepDuration === null) {
+            $defaultOperationStepDuration = $legacyIntervalSec;
+        }
+        if ($legacyMute) {
+            // Legacy mute means "never notify", represented by no operations.
+            $operations = [];
+        }
+    }
+
+    $saveData = [
+        'name' => $name,
+        'builder' => $builder,
+        'query' => $query,
+        'severity' => $severity,
+        'disabled' => $disabled,
+        'extra' => $extra_json,
+        'notes' => $notes,
+    ];
+
+    if (array_key_exists('alert_operation_id', $data)) {
+        $v = $data['alert_operation_id'];
+        $saveData['alert_operation_id'] = ($v === null || $v === '') ? null : (int) $v;
     }
 
     if (is_numeric($rule_id)) {
-        if (! (dbUpdate(['name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json, 'notes' => $notes], 'alert_rules', 'id=?', [$rule_id]) >= 0)) {
+        $alertRule = \App\Models\AlertRule::find($rule_id);
+        if (! $alertRule) {
             return api_error(500, 'Failed to update existing alert rule');
         }
-    } elseif (! $rule_id = dbInsert(['name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json, 'notes' => $notes], 'alert_rules')) {
-        return api_error(500, 'Failed to create new alert rule');
+
+        $alertRule->fill($saveData);
+        if (! $alertRule->save()) {
+            return api_error(500, 'Failed to update existing alert rule');
+        }
+    } else {
+        $alertRule = \App\Models\AlertRule::create($saveData);
+        if (! $alertRule?->id) {
+            return api_error(500, 'Failed to create new alert rule');
+        }
+        $rule_id = $alertRule->id;
     }
 
-    dbSyncRelationship('alert_device_map', 'rule_id', $rule_id, 'device_id', $devices);
-    dbSyncRelationship('alert_group_map', 'rule_id', $rule_id, 'group_id', $groups);
-    dbSyncRelationship('alert_location_map', 'rule_id', $rule_id, 'location_id', $locations);
+    $alertRule->devices()->sync($devices);
+    $alertRule->groups()->sync($groups);
+    $alertRule->locations()->sync($locations);
+
+    if (array_key_exists('default_operation_step_duration', $data) && $alertRule->alert_operation_id) {
+        $opSec = $defaultOperationStepDuration !== null ? max(0, (int) $defaultOperationStepDuration) : null;
+        \App\Models\AlertOperation::query()->whereKey($alertRule->alert_operation_id)->update([
+            'default_operation_step_duration_seconds' => $opSec,
+        ]);
+    }
+
+    if (! array_key_exists('alert_operation_id', $data) && is_array($operations)) {
+        try {
+            api_assign_rule_alert_operation_from_legacy_api((int) $rule_id, $operations, $name, $defaultOperationStepDuration);
+        } catch (\InvalidArgumentException $e) {
+            return api_error(400, $e->getMessage());
+        } catch (\Throwable) {
+            return api_error(500, 'Failed to save alert rule operations');
+        }
+    }
 
     return api_success_noresult(200);
 }
