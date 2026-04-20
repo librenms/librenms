@@ -260,6 +260,7 @@ nav:
       - PortGroups: API/PortGroups.md
       - PortSecurity: API/PortSecurity.md
       - Ports: API/Ports.md
+      - PortVlan: API/PortVlan.md
       - Routing: API/Routing.md
       - Services: API/Services.md
       - Switching: API/Switching.md
