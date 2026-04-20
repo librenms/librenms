@@ -28,7 +28,9 @@
         <label for="display_mode-{{ $id }}" class="control-label">{{ __('Display') }}</label>
         <select class="form-control" name="display_mode" id="display_mode-{{ $id }}">
             <option value="number" @if ($display_mode === 'number') selected @endif>{{ __('Numbers') }}</option>
+            <option value="progress-bar" @if ($display_mode === 'progress-bar') selected @endif>{{ __('Progress Bar') }}</option>
             <option value="gauge" @if ($display_mode === 'gauge') selected @endif>{{ __('Gauges') }}</option>
+            <option value="graph" @if ($display_mode === 'graph') selected @endif>{{ __('Graph (24h)') }}</option>
         </select>
     </div>
 

@@ -108,7 +108,7 @@ class HealthSensorsController extends WidgetController
             'id' => $settings['id'],
             'error' => null,
             'sensors' => $sensors,
-            'display_mode' => $settings['display_mode'] === 'gauge' ? 'gauge' : 'number',
+            'display_mode' => $settings['display_mode'] ?? '',
             'sensor_class_enum' => SensorClass::from((string) $settings['sensor_class']),
             'cols' => (int) $settings['cols'],
         ]);
@@ -124,7 +124,10 @@ class HealthSensorsController extends WidgetController
         $settings['cols'] = max(1, min(12, $settings['cols']));
         $settings['sensor_class'] = SensorClass::tryFrom((string) ($settings['sensor_class'] ?? ''))?->value
             ?? SensorClass::Temperature->value;
-        $settings['display_mode'] = ($settings['display_mode'] ?? '') === 'gauge' ? 'gauge' : 'number';
+        $settings['display_mode'] = match ($settings['display_mode'] ?? '') {
+            'number', 'progress-bar', 'gauge', 'graph' => $settings['display_mode'],
+            default => 'number',
+        };
 
         return $settings;
     }
