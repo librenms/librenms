@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use LibreNMS\Enum\SensorState;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
@@ -166,6 +167,34 @@ class Sensor extends DeviceRelatedModel implements Keyable
 
     /**
      * @param  Builder  $query
+     * @param  SensorState  $state
+     * @return Builder
+     */
+    public function scopeStateEq($query, $state)
+    {
+        return $query->whereHas('translations', function ($q) use ($state): void {
+            $q->where('state_generic_value', $state)
+                ->whereColumn('sensor_current', '=', 'state_value');
+        });
+    }
+
+    /**
+     * @param  Builder  $query
+     * @return Builder
+     */
+    public function scopeStateUnknown($query)
+    {
+        return $query->whereHas('translations', function ($q): void {
+            $q->whereColumn('sensor_current', '=', 'state_value')
+                ->where(function ($q): void {
+                    $q->where('state_generic_value', '<', SensorState::Ok)
+                        ->orWhere('state_generic_value', '>', SensorState::Error);
+                });
+        });
+    }
+
+    /**
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeIsCritical($query)
@@ -178,9 +207,36 @@ class Sensor extends DeviceRelatedModel implements Keyable
      * @param  Builder  $query
      * @return Builder
      */
+    public function scopeIsWarning($query)
+    {
+        return $query->whereColumn('sensor_current', '<', 'sensor_limit_low_warn')
+            ->orWhereColumn('sensor_current', '>', 'sensor_limit_warn');
+    }
+
+    /**
+     * @param  Builder  $query
+     * @return Builder
+     */
     public function scopeIsDisabled($query)
     {
         return $query->where('sensor_alert', 0);
+    }
+
+    public function labels(): array
+    {
+        if ($this->poller_type == 'ipmi') {
+            return [
+                'class' => $this->sensor_class,
+                'type' => $this->sensor_type,
+                'descr' => $this->sensor_descr,
+            ];
+        }
+
+        return [
+            'class' => $this->sensor_class,
+            'type' => $this->sensor_type,
+            'index' => $this->sensor_index,
+        ];
     }
 
     public function __toString(): string

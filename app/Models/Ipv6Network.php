@@ -27,12 +27,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Ipv6Network extends Model
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $primaryKey = 'ipv6_network_id';
     protected $fillable = [
@@ -54,6 +57,13 @@ class Ipv6Network extends Model
      */
     public function connectedPorts(): HasManyThrough
     {
-        return $this->hasManyThrough(Port::class, Ipv6Address::class, 'ipv6_network_id', 'port_id', 'ipv6_network_id', 'port_id');
+        return $this->hasManyThrough(
+            Port::class,
+            Ipv6Address::class,
+            'ipv6_network_id',
+            'port_id',
+            'ipv6_network_id',
+            'port_id',
+        );
     }
 }

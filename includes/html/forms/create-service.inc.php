@@ -61,7 +61,7 @@ if (is_numeric($service_id) && $service_id > 0) {
 } else {
     Gate::authorize('create', Service::class);
     // Need to add.
-    $service_id = \LibreNMS\Services::addService($device_id, $stype, $desc, $ip, $param, $ignore, $disabled, 0, $name);
+    $service_id = \LibreNMS\Services::addService($device_id, $stype, $desc, $ip, $param, (int) $ignore, (int) $disabled, 0, $name);
     if ($service_id == false) {
         $status = ['status' => 1, 'message' => 'ERROR: Failed to add Service: <i>' . $stype . '</i>'];
     } else {

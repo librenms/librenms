@@ -27,12 +27,18 @@
 namespace LibreNMS\Alert;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Alert;
+use App\Models\AlertOperationSegment;
+use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\User;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use LibreNMS\Enum\AlertRuleOperationPhase;
 use LibreNMS\Enum\MaintenanceStatus;
 use PHPMailer\PHPMailer\PHPMailer;
 
@@ -46,23 +52,197 @@ class AlertUtil
      */
     private static function getRuleId($alert_id)
     {
-        $query = 'SELECT `rule_id` FROM `alerts` WHERE `id`=?';
-
-        return dbFetchCell($query, [$alert_id]);
+        return Alert::find($alert_id)?->rule_id;
     }
 
     /**
-     * Get the transport for a given alert_id
+     * Map the alert state to the operation phase
+     *
+     * @param  int  $state  The alert state
+     * @return string The operation phase
+     */
+    public static function mapAlertStateToOperationPhase(int $state): string
+    {
+        // UI-defined operations currently use problem phase only.
+        // Keep all states mapped to problem until dedicated phase config is reintroduced.
+        unset($state);
+
+        return AlertRuleOperationPhase::PROBLEM;
+    }
+
+    /**
+     * True when the rule has at least one operation row (notifications are configured at the operation level).
+     */
+    public static function ruleHasAlertOperations(int $ruleId): bool
+    {
+        return AlertRule::find($ruleId)?->alert_operation_id !== null;
+    }
+
+    /**
+     * Merge timing for the problem phase from alert_rule_operations into $rextra
+     * (delay, interval, count) so RunAlerts can reuse existing scheduling logic.
+     * When the rule has no operations at all, notifications are treated as suppressed (mute).
+     *
+     * @param  array<string, mixed>  $details  alert_log details (decoded)
+     * @param  array<string, mixed>  $rextra  rule extra (decoded)
+     */
+    public static function mergeProblemPhaseTimingFromOperations(int $ruleId, array &$details, array &$rextra): void
+    {
+        unset($rextra['_stop_notifications']);
+
+        $ruleRow = AlertRule::query()
+            ->with('alertOperation:id,default_operation_step_duration_seconds')
+            ->whereKey($ruleId)
+            ->first(['id', 'alert_operation_id']);
+        if ($ruleRow === null || $ruleRow->alert_operation_id === null) {
+            $rextra['mute'] = true;
+
+            return;
+        }
+
+        $ops = AlertOperationSegment::where('alert_operation_id', $ruleRow->alert_operation_id)
+            ->where('operation_phase', AlertRuleOperationPhase::PROBLEM)
+            ->orderBy('position')
+            ->orderBy('id')
+            ->get();
+
+        if ($ops->isEmpty()) {
+            return;
+        }
+
+        $opDefault = $ruleRow->alertOperation?->default_operation_step_duration_seconds;
+        if ($opDefault === null) {
+            $opDefault = max(0, 60 * (int) LibrenmsConfig::get('alert_rule.default_operation_step_duration', LibrenmsConfig::get('alert_rule.interval')));
+        }
+        $defaultStep = max(0, (int) $opDefault);
+
+        $notificationCount = (int) ($details['count'] ?? 0);
+        $nextStep = $notificationCount + 1;
+
+        $op = self::selectOperationForEscalationStep($ops, $nextStep);
+        if ($op === null) {
+            $rextra['_stop_notifications'] = true;
+
+            return;
+        }
+
+        $rextra['delay'] = $notificationCount === 0 ? (int) $op->start_in_seconds : 0;
+        $stepDur = (int) $op->step_duration_seconds;
+        $rextra['interval'] = $stepDur > 0 ? $stepDur : $defaultStep;
+        // Keep legacy runAlerts() counter incrementing for escalation tracking.
+        $rextra['count'] = PHP_INT_MAX;
+    }
+
+    public static function selectOperationForEscalationStep(Collection $operations, int $escalationStep): ?AlertOperationSegment
+    {
+        foreach ($operations as $op) {
+            $from = (int) $op->escalation_step_from;
+            $to = $op->escalation_step_to === null ? null : (int) $op->escalation_step_to;
+            if ($escalationStep < $from) {
+                continue;
+            }
+            if ($to !== null && $escalationStep > $to) {
+                continue;
+            }
+
+            if ($op instanceof AlertOperationSegment) {
+                return $op;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get transports for a given alert (per operation phase and escalation step).
      *
      * @param  int  $alert_id
-     * @return array
+     * @param  string|null  $operation_phase  problem|recovery|update; inferred from alerts.state if null
+     * @param  int  $escalation_step  1-based escalation step for problem operations
+     * @return array<int, array<string, mixed>>
      */
-    public static function getAlertTransports($alert_id)
+    public static function getAlertTransports($alert_id, ?string $operation_phase = null, int $escalation_step = 1)
     {
-        $query = "SELECT b.transport_id, b.transport_type, b.transport_name FROM alert_transport_map AS a LEFT JOIN alert_transports AS b ON b.transport_id=a.transport_or_group_id WHERE a.target_type='single' AND a.rule_id=? UNION DISTINCT SELECT d.transport_id, d.transport_type, d.transport_name FROM alert_transport_map AS a LEFT JOIN alert_transport_groups AS b ON a.transport_or_group_id=b.transport_group_id LEFT JOIN transport_group_transport AS c ON b.transport_group_id=c.transport_group_id LEFT JOIN alert_transports AS d ON c.transport_id=d.transport_id WHERE a.target_type='group' AND a.rule_id=?";
         $rule_id = self::getRuleId($alert_id);
+        if ($rule_id === null) {
+            return [];
+        }
 
-        return dbFetchRows($query, [$rule_id, $rule_id]);
+        if ($operation_phase === null) {
+            // Use Eloquent instead of raw SQL for the alert state lookup.
+            $state = (int) (Alert::query()->where('id', $alert_id)->value('state') ?? 0);
+            $operation_phase = self::mapAlertStateToOperationPhase($state);
+        }
+
+        if (! self::ruleHasAlertOperations((int) $rule_id)) {
+            return [];
+        }
+
+        $rule = AlertRule::query()->whereKey($rule_id)->first(['alert_operation_id']);
+        if ($rule === null || $rule->alert_operation_id === null) {
+            return [];
+        }
+
+        $operationId = $rule->alert_operation_id;
+        // Prefer the alert's phase; if no segments exist for recovery/update, fall back to problem
+        // (UI-defined operations store segments as problem-only).
+        $phasesToTry = $operation_phase === AlertRuleOperationPhase::PROBLEM
+            ? [AlertRuleOperationPhase::PROBLEM]
+            : [$operation_phase, AlertRuleOperationPhase::PROBLEM];
+
+        $single = collect();
+        $group = collect();
+        foreach ($phasesToTry as $phase) {
+            // “Single” transports mapped per segment.
+            $single = DB::table('alert_operation_segments')
+                ->join('alert_operation_transport_map as m', 'm.segment_id', '=', 'alert_operation_segments.id')
+                ->join('alert_transports as b', 'b.transport_id', '=', 'm.transport_or_group_id')
+                ->where('m.target_type', '=', 'single')
+                ->where('alert_operation_segments.alert_operation_id', '=', $operationId)
+                ->where('alert_operation_segments.operation_phase', '=', $phase)
+                ->where('alert_operation_segments.escalation_step_from', '<=', $escalation_step)
+                ->where(function ($q) use ($escalation_step): void {
+                    $q->whereNull('alert_operation_segments.escalation_step_to')
+                        ->orWhereRaw('? <= alert_operation_segments.escalation_step_to', [$escalation_step]);
+                })
+                ->select(['b.transport_id', 'b.transport_type', 'b.transport_name'])
+                ->distinct()
+                ->get();
+
+            // Transport groups: expand group membership via transport_group_transport.
+            $group = DB::table('alert_operation_segments')
+                ->join('alert_operation_transport_map as m', 'm.segment_id', '=', 'alert_operation_segments.id')
+                ->join('alert_transport_groups as g', 'g.transport_group_id', '=', 'm.transport_or_group_id')
+                ->join('transport_group_transport as c', 'c.transport_group_id', '=', 'g.transport_group_id')
+                ->join('alert_transports as d', 'd.transport_id', '=', 'c.transport_id')
+                ->where('m.target_type', '=', 'group')
+                ->where('alert_operation_segments.alert_operation_id', '=', $operationId)
+                ->where('alert_operation_segments.operation_phase', '=', $phase)
+                ->where('alert_operation_segments.escalation_step_from', '<=', $escalation_step)
+                ->where(function ($q) use ($escalation_step): void {
+                    $q->whereNull('alert_operation_segments.escalation_step_to')
+                        ->orWhereRaw('? <= alert_operation_segments.escalation_step_to', [$escalation_step]);
+                })
+                ->select(['d.transport_id', 'd.transport_type', 'd.transport_name'])
+                ->distinct()
+                ->get();
+
+            if ($single->isNotEmpty() || $group->isNotEmpty()) {
+                break;
+            }
+        }
+
+        return $single
+            ->concat($group)
+            // Keep result stable and prevent duplicates when the same transport appears via both mappings.
+            ->unique('transport_id')
+            ->values()
+            ->map(static fn ($row) => [
+                'transport_id' => (int) $row->transport_id,
+                'transport_type' => (string) $row->transport_type,
+                'transport_name' => (string) $row->transport_name,
+            ])
+            ->all();
     }
 
     /**

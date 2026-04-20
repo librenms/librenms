@@ -10,9 +10,9 @@ if (is_array($temp)) {
     // Create State Index
     $state_name = 'cumulus_hardware_state';
     $states = [
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'OK'],
-        ['value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'UNAVAILABLE'],
-        ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'FAILED'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'OK'],
+        ['value' => 2, 'generic' => 3, 'descr' => 'UNAVAILABLE'],
+        ['value' => 3, 'generic' => 2, 'descr' => 'FAILED'],
     ];
     create_state_index($state_name, $states);
 

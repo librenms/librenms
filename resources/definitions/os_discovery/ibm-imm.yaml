@@ -39,8 +39,8 @@ modules:
                     index: 'systemHealthStat.1'
                     state_name: systemHealth
                     states:
-                        - { descr: nonRecoverable, graph: 1, value: 0, generic: 2 }
-                        - { descr: Critical, graph: 1, value: 2, generic: 2 }
-                        - { descr: nonCritical, graph: 1, value: 4, generic: 1 }
-                        - { descr: Ok, graph: 1, value: 255, generic: 0 }
+                        - { descr: nonRecoverable, value: 0, generic: 2 }
+                        - { descr: Critical, value: 2, generic: 2 }
+                        - { descr: nonCritical, value: 4, generic: 1 }
+                        - { descr: Ok, value: 255, generic: 0 }
 

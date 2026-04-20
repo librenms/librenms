@@ -36,7 +36,11 @@ the same time.
     lnms config:set auth_mechanism mysql
     ```
 
-## Built-in user roles and User account type
+## User Roles
+
+See [Authorization](Authorization.md) for more details on roles and permissions.
+
+#### Built-in Roles
 
 - **user**: You will need to assign device / port
   permissions for users in this role.
@@ -44,12 +48,6 @@ the same time.
 - **global-read**: Read only Administrator.
 
 - **admin**: This is a global read/write admin account.
-
-- **demo**: Provides full read/write with certain
-  restrictions (i.e can't delete devices). Do not use this role.
-
-**Note** Oxidized configs can often contain sensitive data. Because of
-that only Administrator account type can see configs.
 
 ## Note for SELinux users
 

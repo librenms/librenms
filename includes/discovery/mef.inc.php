@@ -17,7 +17,7 @@ $mef_list = [];
  * Fetch information about MEF Links.
  */
 
-$oids = snmpwalk_cache_multi_oid($device, 'MefServiceEvcCfgEntry', $oids, 'MEF-UNI-EVC-MIB');
+$oids = snmpwalk_cache_multi_oid($device, 'MefServiceEvcCfgEntry', [], 'MEF-UNI-EVC-MIB');
 
 echo 'MEF : ';
 foreach ($oids as $index => $entry) {
@@ -61,7 +61,7 @@ foreach (dbFetchRows($sql) as $db_mef) {
      * Delete the MEF Link that are removed from the host.
      */
     if (! in_array($db_mef['mefID'], $mef_list)) {
-        dbDelete('mefinfo', '`id` = ?', [$db_mef['id']]);
+        \App\Models\MefInfo::where('id', $db_mef['id'])->delete();
         Eventlog::log('MEF link: ' . $db_mef['mefIdent'] . ' Removed', $device['device_id'], 'system', Severity::Notice);
         echo '-';
     }

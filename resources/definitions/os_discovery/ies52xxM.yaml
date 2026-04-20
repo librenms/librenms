@@ -45,12 +45,12 @@ modules:
                     state_name: moduleStatus
                     skip_values: 0
                     states:
-                        - { descr: empty, graph: 0, value: 0, generic: 3 }
-                        - { descr: inactive, graph: 0, value: 1, generic: 2 }
-                        - { descr: init, graph: 0, value: 2, generic: 1 }
-                        - { descr: active, graph: 0, value: 3, generic: 0 }
-                        - { descr: standby, graph: 0, value: 4, generic: 3 }
-                        - { descr: disable, graph: 0, value: 5, generic: 2 }
+                        - { descr: empty, value: 0, generic: 3 }
+                        - { descr: inactive, value: 1, generic: 2 }
+                        - { descr: init, value: 2, generic: 1 }
+                        - { descr: active, value: 3, generic: 0 }
+                        - { descr: standby, value: 4, generic: 3 }
+                        - { descr: disable, value: 5, generic: 2 }
                 -
                     oid: IES5206-MIB::slotModuleTable
                     value: IES5206-MIB::slotModuleAlarmStatus
@@ -59,8 +59,8 @@ modules:
                     state_name: moduleAlarm
                     group: Alarm
                     states:
-                        - { descr: hasAlarm, graph: 0, value: 1, generic: 2 }
-                        - { descr: noAlarm, graph: 0, value: 2, generic: 0 }
+                        - { descr: hasAlarm, value: 1, generic: 2 }
+                        - { descr: noAlarm, value: 2, generic: 0 }
         dbm:
             options:
                 skip_values: 0

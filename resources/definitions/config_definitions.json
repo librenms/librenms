@@ -193,7 +193,7 @@
                 "critical": "Critical"
             }
         },
-        "alert_rule.max_alerts": {
+        "alert_rule.default_operation_steps_to": {
             "default": 1,
             "units": "count",
             "group": "alerting",
@@ -201,7 +201,7 @@
             "order": 1,
             "type": "integer"
         },
-        "alert_rule.delay": {
+        "alert_rule.default_operation_start_in": {
             "default": 1,
             "units": "minutes",
             "group": "alerting",
@@ -209,7 +209,7 @@
             "order": 2,
             "type": "integer"
         },
-        "alert_rule.interval": {
+        "alert_rule.default_operation_step_duration": {
             "default": 5,
             "units": "minutes",
             "group": "alerting",
@@ -217,7 +217,7 @@
             "order": 3,
             "type": "integer"
         },
-        "alert_rule.mute_alerts": {
+        "alert_rule.default_operation_notifications_suppressed": {
             "default": false,
             "type": "boolean",
             "group": "alerting",
@@ -2272,7 +2272,7 @@
         "enable_ports_etherlike": {
             "group": "webui",
             "section": "device",
-            "order": 22,
+            "order": 23,
             "default": false,
             "type": "boolean"
         },
@@ -6308,6 +6308,17 @@
                 "fdb": "FDB"
             }
         },
+        "ports_ipv4_neighbours": {
+            "default": "subnet",
+            "type": "select",
+            "group": "webui",
+            "section": "device",
+            "order": 22,
+            "options":{
+                "subnet": "Subnet",
+                "arp": "ARP"
+            }
+        },
         "ports_purge": {
             "group": "system",
             "section": "cleanup",
@@ -7009,6 +7020,13 @@
             "order": 12,
             "type": "executable"
         },
+        "snmptrap": {
+            "default": "/usr/bin/snmptrap",
+            "group": "external",
+            "section": "binaries",
+            "order": 13,
+            "type": "executable"
+        },
         "sso.create_users": {
             "default": true,
             "type": "boolean",
@@ -7357,6 +7375,20 @@
             "order": 2,
             "type": "boolean"
         },
+        "webui.availability_bar.threshold_good": {
+            "default": 99,
+            "group": "webui",
+            "section": "availability-bar",
+            "order": 1,
+            "type": "integer"
+        },
+        "webui.availability_bar.threshold_medium": {
+            "default": 95,
+            "group": "webui",
+            "section": "availability-bar",
+            "order": 2,
+            "type": "integer"
+        },
         "webui.custom_css": {
             "default": [],
             "group": "webui",
@@ -7419,6 +7451,40 @@
         "xirrus_disable_stations": {
             "default": false,
             "type": "boolean"
+        },
+        "ssl_certificates.auto_discover": {
+            "default": false,
+            "group": "apps",
+            "section": "ssl-certificates",
+            "order": 0,
+            "type": "boolean"
+        },
+        "ssl_certificates.skip_hosts": {
+            "default": [],
+            "group": "apps",
+            "section": "ssl-certificates",
+            "order": 1,
+            "type": "array",
+            "validate": {
+                "value": "array",
+                "value.*": "string"
+            }
+        },
+        "ssl_certificates.days_until_expiry_warning": {
+            "default": 30,
+            "group": "apps",
+            "section": "ssl-certificates",
+            "order": 2,
+            "type": "integer",
+            "units": "days"
+        },
+        "ssl_certificates.days_until_expiry_danger": {
+            "default": 0,
+            "group": "apps",
+            "section": "ssl-certificates",
+            "order": 3,
+            "type": "integer",
+            "units": "days"
         },
         "smokeping.integration": {
             "default": false,

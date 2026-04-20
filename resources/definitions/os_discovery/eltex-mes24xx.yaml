@@ -38,12 +38,12 @@ modules:
                     group: 'Chassis PSU'
                     index: 'eltMesIssBatteryStatus.{{ $index }}'
                     states:
-                        - { value: 1, descr: NotSupported, graph: 1, generic: 3 }
-                        - { value: 2, descr: Missing, graph: 1, generic: 2 }
-                        - { value: 3, descr: Charging, graph: 1, generic: 1 }
-                        - { value: 4, descr: Low, graph: 1, generic: 2 }
-                        - { value: 5, descr: Discharged, graph: 1, generic: 2 }
-                        - { value: 6, descr: Charged, graph: 1, generic: 0 }
+                        - { value: 1, descr: NotSupported, generic: 3 }
+                        - { value: 2, descr: Missing, generic: 2 }
+                        - { value: 3, descr: Charging, generic: 1 }
+                        - { value: 4, descr: Low, generic: 2 }
+                        - { value: 5, descr: Discharged, generic: 2 }
+                        - { value: 6, descr: Charged, generic: 0 }
         charge:
             data:
                 -

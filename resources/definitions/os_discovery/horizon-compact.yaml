@@ -21,8 +21,8 @@ modules:
                     index: 'hzOduModem1RxLossOfSignal.{{ $index }}'
                     descr: 'Modem1 Rx Loss of Signal'
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: 'No' }
-                        - { value: 2, generic: 2, graph: 0, descr: 'Yes' }
+                        - { value: 1, generic: 0, descr: 'No' }
+                        - { value: 2, generic: 2, descr: 'Yes' }
                 -
                     oid: HORIZON-ODU-MIB::hzOduEnetPort1EthernetLinkDown
                     num_oid: '.1.3.6.1.4.1.7262.2.2.8.3.1.9.{{ $index }}'
@@ -30,8 +30,8 @@ modules:
                     index: 'hzOduEnetPort1EthernetLinkDown.{{ $index }}'
                     descr: 'Enet Port1 Link State'
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: 'Up' }
-                        - { value: 2, generic: 2, graph: 0, descr: 'Down' }
+                        - { value: 1, generic: 0, descr: 'Up' }
+                        - { value: 2, generic: 2, descr: 'Down' }
                 -
                     oid: HORIZON-ODU-MIB::hzOduEnetPort2EthernetLinkDown
                     num_oid: '.1.3.6.1.4.1.7262.2.2.8.3.2.1.{{ $index }}'
@@ -39,8 +39,8 @@ modules:
                     index: 'hzOduEnetPort2EthernetLinkDown.{{ $index }}'
                     descr: 'Enet Port2 Link State'
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: 'Up' }
-                        - { value: 2, generic: 2, graph: 0, descr: 'Down' }
+                        - { value: 1, generic: 0, descr: 'Up' }
+                        - { value: 2, generic: 2, descr: 'Down' }
                 -
                     oid: HORIZON-ODU-MIB::hzOduRadio1TemperatureOutOfLimit
                     num_oid: '.1.3.6.1.4.1.7262.2.2.8.4.5.9.{{ $index }}'
@@ -48,8 +48,8 @@ modules:
                     index: 'hzOduRadio1TemperatureOutOfLimit.{{ $index }}'
                     descr: 'Radio1 Temp Out of Limit'
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: 'No' }
-                        - { value: 2, generic: 2, graph: 0, descr: 'Yes' }
+                        - { value: 1, generic: 0, descr: 'No' }
+                        - { value: 2, generic: 2, descr: 'Yes' }
                 -
                     oid: HORIZON-ODU-MIB::hzOduModem1ModulationType
                     num_oid: '.1.3.6.1.4.1.7262.2.2.5.1.2.5.{{ $index }}'
@@ -57,14 +57,14 @@ modules:
                     index: 'hzOduModem1ModulationType.{{ $index }}'
                     descr: 'Modem1 Modulation'
                     states:
-                        - { value: 1, generic: 2, graph: 0, descr: 'qpsk' }
-                        - { value: 2, generic: 2, graph: 0, descr: 'qam' }
-                        - { value: 3, generic: 2, graph: 0, descr: 'qam16' }
-                        - { value: 4, generic: 1, graph: 0, descr: 'qam32' }
-                        - { value: 5, generic: 1, graph: 0, descr: 'qam64' }
-                        - { value: 6, generic: 1, graph: 0, descr: 'qam128' }
-                        - { value: 7, generic: 0, graph: 0, descr: 'qam256' }
-                        - { value: 8, generic: 0, graph: 0, descr: 'x8psk' }
+                        - { value: 1, generic: 2, descr: 'qpsk' }
+                        - { value: 2, generic: 2, descr: 'qam' }
+                        - { value: 3, generic: 2, descr: 'qam16' }
+                        - { value: 4, generic: 1, descr: 'qam32' }
+                        - { value: 5, generic: 1, descr: 'qam64' }
+                        - { value: 6, generic: 1, descr: 'qam128' }
+                        - { value: 7, generic: 0, descr: 'qam256' }
+                        - { value: 8, generic: 0, descr: 'x8psk' }
         count:
             data:
                 -

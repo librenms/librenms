@@ -8,8 +8,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
-use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\StateTranslation;
 use Illuminate\Support\Facades\DB;
@@ -18,56 +18,9 @@ use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Time;
 
-/**
- * Parse cli discovery or poller modules and set config for this run
- *
- * @param  string  $type  discovery or poller
- * @param  array  $options  get_opts array (only m key is checked)
- * @return bool
- */
-function parse_modules($type, $options)
-{
-    $override = false;
-
-    if (! empty($options['m'])) {
-        // get all modules in the correct order and disable all
-        $modules = array_map(fn ($v) => false, LibrenmsConfig::get("{$type}_modules", []));
-
-        foreach (explode(',', (string) $options['m']) as $module) {
-            // parse submodules (only supported by some modules)
-            if (Str::contains($module, '/')) {
-                [$module, $submodule] = explode('/', $module, 2);
-                $existing_submodules = LibrenmsConfig::get("{$type}_submodules.$module", []);
-                $existing_submodules[] = $submodule;
-                LibrenmsConfig::set("{$type}_submodules.$module", $existing_submodules);
-            }
-
-            $dir = $type == 'poller' ? 'polling' : $type;
-            if (is_file("includes/$dir/$module.inc.php")) {
-                $modules[$module] = true; // enable module
-                $override = true;
-            }
-        }
-
-        // filter disabled modules and set in global config
-        LibrenmsConfig::set("{$type}_modules", array_filter($modules));
-
-        // display selected modules
-        $modules = array_map(function ($module) use ($type) {
-            $submodules = LibrenmsConfig::get("{$type}_submodules.$module");
-
-            return $module . ($submodules ? '(' . implode(',', $submodules) . ')' : '');
-        }, array_keys(LibrenmsConfig::get("{$type}_modules", [])));
-
-        Log::debug('Override ' . $type . ' modules: ' . implode(', ', $modules));
-    }
-
-    return $override;
-}
-
 function renamehost($id, $new, $source = 'console')
 {
-    $host = gethostbyid($id);
+    $host = DeviceCache::get((int) $id)->hostname;
     $new_rrd_dir = Rrd::dirFromHost($new);
 
     if (is_dir($new_rrd_dir)) {
@@ -146,23 +99,6 @@ function snmp2ipv6($ipv6_snmp)
     }
 
     return implode(':', $ipv6_2);
-}
-
-function hex2str($hex)
-{
-    $string = '';
-
-    for ($i = 0; $i < strlen((string) $hex) - 1; $i += 2) {
-        $string .= chr(hexdec(substr((string) $hex, $i, 2)));
-    }
-
-    return $string;
-}
-
-// Convert an SNMP hex string to regular string
-function snmp_hexstring($hex)
-{
-    return hex2str(str_replace(' ', '', str_replace(' 00', '', $hex)));
 }
 
 /**
@@ -293,37 +229,6 @@ function convert_delay($delay)
     return Time::durationToSeconds($delay);
 }
 
-function normalize_snmp_ip_address($data)
-{
-    // $data is received from snmpwalk, can be ipv4 xxx.xxx.xxx.xxx or ipv6 xx:xx:...:xx (16 chunks)
-    // ipv4 is returned unchanged, ipv6 is returned with one ':' removed out of two, like
-    //  xxxx:xxxx:...:xxxx (8 chuncks)
-    return preg_replace('/([0-9a-fA-F]{2}):([0-9a-fA-F]{2})/', '\1\2', explode('%', (string) $data, 2)[0]);
-}
-
-function fix_integer_value($value)
-{
-    if ($value < 0) {
-        $return = 4294967296 + $value;
-    } else {
-        $return = $value;
-    }
-
-    return $return;
-}
-
-/**
- * Checks if the $hostname provided exists in the DB already
- */
-function host_exists(string $hostname, ?string $sysName = null): bool
-{
-    return Device::where('hostname', $hostname)
-        ->when(! empty($sysName), function ($query) use ($sysName): void {
-            $query->when(! LibrenmsConfig::get('allow_duplicate_sysName'), fn ($q) => $q->orWhere('sysName', $sysName))
-                  ->when(! empty(LibrenmsConfig::get('mydomain')), fn ($q) => $q->orWhere('sysName', rtrim((string) $sysName, '.') . '.' . LibrenmsConfig::get('mydomain')));
-        })->exists();
-}
-
 /**
  * Create a new state index.  Update translations if $states is given.
  *
@@ -338,7 +243,6 @@ function create_state_index($state_name, $states = []): void
 {
     app('sensor-discovery')->withStateTranslations($state_name, array_map(fn ($state) => new StateTranslation([
         'state_descr' => $state['descr'],
-        'state_draw_graph' => $state['graph'],
         'state_value' => $state['value'],
         'state_generic_value' => $state['generic'],
     ]), $states));
@@ -488,14 +392,14 @@ function cache_peeringdb()
 
             // cleanup
             if (empty($peer_keep)) {
-                dbDelete('pdb_ix_peers');
+                \App\Models\PeeringdbIxPeer::query()->delete();
             } else {
-                dbDelete('pdb_ix_peers', '`pdb_ix_peers_id` NOT IN ' . dbGenPlaceholders(count($peer_keep)), $peer_keep);
+                \App\Models\PeeringdbIxPeer::whereNotIn('pdb_ix_peers_id', $peer_keep)->delete();
             }
             if (empty($ix_keep)) {
-                dbDelete('pdb_ix');
+                \App\Models\PeeringdbIx::query()->delete();
             } else {
-                dbDelete('pdb_ix', '`pdb_ix_id` NOT IN ' . dbGenPlaceholders(count($ix_keep)), $ix_keep);
+                \App\Models\PeeringdbIx::whereNotIn('pdb_ix_id', $ix_keep)->delete();
             }
         } else {
             echo 'Cached PeeringDB data found.....' . PHP_EOL;
@@ -545,7 +449,7 @@ function lock_and_purge($table, $sql)
 
         $name = str_replace('_', ' ', ucfirst($table));
         if (is_numeric($purge_days)) {
-            if (dbDelete($table, $sql, [$purge_days])) {
+            if (\Illuminate\Support\Facades\DB::table($table)->whereRaw($sql, [$purge_days])->delete()) {
                 echo "$name cleared for entries over $purge_days days\n";
             }
         }
@@ -584,27 +488,6 @@ function lock_and_purge_query($table, $sql, $msg)
     }
 
     return -1;
-}
-
-/**
- * Check if disk is valid to poll.
- * Settings: bad_disk_regexp
- *
- * @param  array  $disk
- * @param  array  $device
- * @return bool
- */
-function is_disk_valid($disk, $device)
-{
-    foreach (LibrenmsConfig::getCombined($device['os'], 'bad_disk_regexp') as $bir) {
-        if (preg_match($bir . 'i', (string) $disk['diskIODevice'])) {
-            Log::debug('Ignored Disk: ' . $disk['diskIODevice'] . ' (matched: ' . $bir . ')');
-
-            return false;
-        }
-    }
-
-    return true;
 }
 
 /**
