@@ -227,7 +227,7 @@ if ($device['os_group'] == 'firebrick') {
 
 if ($device['os'] == 'junos') {
     $mib = 'JUNIPER-IPSEC-FLOW-MON-MIB';
-    $ipsec_array = SnmpQuery::mibDir('junos')->walk([
+    $ipsec_array = SnmpQuery::walk([
         $mib . '::jnxIpSecTunMonLocalGwAddr',
         $mib . '::jnxIpSecTunMonLocalGwAddrType',
         $mib . '::jnxIpSecTunMonVpnName',
@@ -243,7 +243,7 @@ if ($device['os'] == 'junos') {
         $ipsec_array = [];
     }
 
-    $sa_state = SnmpQuery::mibDir('junos')->walk($mib . '::jnxIpSecSaMonState')->valuesByIndex();
+    $sa_state = SnmpQuery::walk($mib . '::jnxIpSecSaMonState')->valuesByIndex();
     if (is_array($sa_state)) {
         $sa_state_key = $mib . '::jnxIpSecSaMonState';
         foreach ($sa_state as $sa_index => $sa_row) {
