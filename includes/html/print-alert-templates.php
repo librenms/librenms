@@ -95,12 +95,15 @@ $(document).ready(function() {
                 return response;
             },
             "alert_rules": function(column, row) {
-                var response = '';
-                alert_rules = JSON.parse(row.alert_rules);
-                $.each(alert_rules, function(_, alert_rule) {
-                    response = response + alert_rule.name + '<br>';
+                var container = $('<div>');
+                var alert_rules = JSON.parse(row.alert_rules);
+
+                alert_rules.forEach(function(rule) {
+                    container.append(document.createTextNode(rule.name));
+                    container.append('<br>');
                 });
-                return response;
+
+                return container.html();
             },
         },
     }).on("loaded.rs.jquery.bootgrid", function() {
