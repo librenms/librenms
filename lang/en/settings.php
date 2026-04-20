@@ -99,6 +99,7 @@ return [
             'reporting' => ['name' => 'Reporting'],
         ],
         'webui' => [
+            'availability-bar' => ['name' => 'Availability Bar Settings'],
             'availability-map' => ['name' => 'Availability Map Settings'],
             'custom-map' => ['name' => 'Custom Map Settings'],
             'graph' => ['name' => 'Graph Settings'],
@@ -2415,6 +2416,16 @@ return [
             'scheduled_maintenance_default_behavior' => [
                 'description' => 'Default Behaviour',
                 'help' => 'When managing scheduled maintenances, this will be the default option for the Behavior option.',
+            ],
+            'availability_bar' => [
+                'threshold_green' => [
+                    'description' => 'Threshold Green',
+                    'help' => 'Threshold for green color',
+                ],
+                'threshold_orange' => [
+                    'description' => 'Threshold Orange',
+                    'help' => 'Threshold for orange color',
+                ],
             ],
             'alert_map_compact' => [
                 'description' => 'Alert map compact view',
