@@ -108,7 +108,7 @@ if ($device['port_association_mode']) {
 
 // Build array of ports in the database and an ifIndex/ifName -> port_id map
 $ports_mapped = get_ports_mapped($device['device_id']);
-$ports_db = $ports_mapped['ports'];
+$ports_db = $ports_mapped['ports'] ?? [];
 
 // Fill ifAlias for fibrechannel ports
 if ($device['os'] == 'fabos') {
