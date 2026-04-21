@@ -87,8 +87,8 @@ class HealthSensorsController extends WidgetController
         $descrBare = trim((string) ($settings['descr_regex'] ?? '.*'));
         $classBare = trim((string) ($settings['sensor_class_regex'] ?? '.*'));
 
-        $warning = $settings['warning'] ?? null;
-        $critical = $settings['critical'] ?? null;
+        $userWarning = $settings['warning'] ?? null;
+        $userCritical = $settings['critical'] ?? null;
         $maxEntries = $this->maxEntries((int) $settings['rows'], (int) $settings['cols']);
 
         try {
@@ -111,10 +111,18 @@ class HealthSensorsController extends WidgetController
                 ->orderBy('sensor_descr')
                 ->limit($maxEntries)
                 ->get()
-                ->map(function (Sensor $sensor) use ($warning, $critical): array {
+                ->map(function (Sensor $sensor) use ($userWarning, $userCritical): array {
                     $raw = $sensor->sensor_current;
-                    $status = $this->thresholdStatus($raw, $warning, $critical);
-                    $gaugeBounds = $this->gaugeBounds($raw, $warning, $critical);
+
+                    // If the user didn't specify thresholds, fall back to sensor limits (if set)
+                    $useSensorLimits = $userWarning === null && $userCritical === null;
+                    $highWarn = $useSensorLimits ? ($sensor->sensor_limit_warn) : $userWarning;
+                    $highCrit = $useSensorLimits ? ($sensor->sensor_limit) : $userCritical;
+                    $lowWarn = $useSensorLimits ? ($sensor->sensor_limit_low_warn) : null;
+                    $lowCrit = $useSensorLimits ? ($sensor->sensor_limit_low) : null;
+
+                    $status = $this->thresholdStatus($raw, $lowWarn, $lowCrit, $highWarn, $highCrit);
+                    $gaugeBounds = $this->gaugeBounds($raw, $lowWarn, $lowCrit, $highWarn, $highCrit);
 
                     return [
                         'sensor' => $sensor,
@@ -185,22 +193,30 @@ class HealthSensorsController extends WidgetController
         return max(1, min(48, $rows * $cols));
     }
 
-    private function thresholdStatus(?float $value, ?float $warning, ?float $critical): string
+    private function thresholdStatus(?float $value, ?float $lowWarn, ?float $lowCrit, ?float $highWarn, ?float $highCrit): string
     {
         if ($value === null) {
             return 'unknown';
         }
 
-        // If the widget has no thresholds configured, don't imply "OK" status.
-        if ($warning === null && $critical === null) {
+        // If there are no thresholds configured, don't imply "OK" status.
+        if ($lowWarn === null && $lowCrit === null && $highWarn === null && $highCrit === null) {
             return 'unknown';
         }
 
-        if ($critical !== null && $value >= $critical) {
+        if ($highCrit !== null && $value >= $highCrit) {
             return 'critical';
         }
 
-        if ($warning !== null && $value >= $warning) {
+        if ($lowCrit !== null && $value <= $lowCrit) {
+            return 'critical';
+        }
+
+        if ($highWarn !== null && $value >= $highWarn) {
+            return 'warning';
+        }
+
+        if ($lowWarn !== null && $value <= $lowWarn) {
             return 'warning';
         }
 
@@ -210,18 +226,24 @@ class HealthSensorsController extends WidgetController
     /**
      * @return array{min: float, max: float}
      */
-    private function gaugeBounds(?float $value, ?float $warning, ?float $critical): array
+    private function gaugeBounds(?float $value, ?float $lowWarn, ?float $lowCrit, ?float $highWarn, ?float $highCrit): array
     {
         if ($value === null) {
             return ['min' => 0.0, 'max' => 1.0];
         }
 
-        $points = [0.0, $value];
-        if ($warning !== null) {
-            $points[] = $warning;
+        $points = [$value];
+        if ($lowWarn !== null) {
+            $points[] = $lowWarn;
         }
-        if ($critical !== null) {
-            $points[] = $critical;
+        if ($lowCrit !== null) {
+            $points[] = $lowCrit;
+        }
+        if ($highWarn !== null) {
+            $points[] = $highWarn;
+        }
+        if ($highCrit !== null) {
+            $points[] = $highCrit;
         }
 
         $minV = min($points);
