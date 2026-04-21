@@ -11,3 +11,6 @@ discovery:
     -
         sysObjectID:
             - .1.2.826.0.1.1578918.6.508.
+ignore_mount_regexp:
+    - '/^\/disk[0-9\.]+/'
+    - '/^\/export\/.*/'
