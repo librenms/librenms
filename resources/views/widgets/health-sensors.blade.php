@@ -21,11 +21,11 @@
                 @php($range = max(0.000001, $max - $min))
                 @php($pct = $value === null ? 0.0 : max(0.0, min(100.0, (($value - $min) / $range) * 100.0)))
                 @php($barColor = match ($status) {
-                'critical' => 'tw:bg-red-600',
-                'warning' => 'tw:bg-amber-500',
-                'ok' => 'tw:bg-green-600',
-                default => 'tw:bg-gray-500',
-            })
+                    'critical' => 'tw:bg-red-600',
+                    'warning' => 'tw:bg-amber-500',
+                    'ok' => 'tw:bg-green-600',
+                    default => 'tw:bg-gray-500',
+                })
 
                 <div class="col-sm-{{ $colWidth }}">
                     <div class="tw:mb-3 tw:pt-1.5">
@@ -36,9 +36,6 @@
                             <div class="tw:flex tw:items-baseline tw:justify-between tw:gap-2">
                                 <div class="tw:text-2xl tw:font-semibold tw:leading-tight">
                                     {{ $sensor->formatValue() }}
-                                </div>
-                                <div class="tw:text-xl tw:text-gray-500 tw:whitespace-nowrap">
-                                    {{ __('Min') }}: {{ round($min, 2) }} · {{ __('Max') }}: {{ round($max, 2) }}
                                 </div>
                             </div>
 

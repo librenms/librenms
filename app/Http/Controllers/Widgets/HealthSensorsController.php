@@ -25,12 +25,12 @@
 namespace App\Http\Controllers\Widgets;
 
 use App\Models\Device;
+use App\Models\DeviceGroup;
 use App\Models\Sensor;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 use Illuminate\View\View;
 use LibreNMS\Enum\Sensor as SensorClass;
-use ValueError;
 
 class HealthSensorsController extends WidgetController
 {
@@ -39,46 +39,74 @@ class HealthSensorsController extends WidgetController
     /** @var array<string, mixed> */
     protected $defaults = [
         'title' => null,
+        'device_scope' => 'device',
         'device' => null,
+        'device_group' => null,
+        'device_regex' => '.*',
         'rows' => 4,
         'cols' => 3,
         'display_mode' => 'number',
-        'sensor_class' => SensorClass::Temperature->value,
+        'sensor_class_regex' => '.*',
         'descr_regex' => '.*',
         'warning' => '',
         'critical' => '',
     ];
 
-    public function getTitle(): string
-    {
-        $settings = $this->getSettings();
-        if (! empty($settings['title'])) {
-            return (string) $settings['title'];
-        }
-
-        return parent::getTitle();
-    }
-
     public function getView(Request $request): View|string
     {
         $settings = $this->getSettings();
-        if (empty($settings['device'])) {
+        $scope = (string) ($settings['device_scope'] ?? 'device');
+
+        if ($scope === 'device' && empty($settings['device'])) {
             return $this->getSettingsView($request);
         }
 
-        $regex = (string) ($settings['descr_regex'] ?? '.*');
-        $regex = $regex === '' ? '.*' : $regex;
+        if ($scope === 'device_group' && empty($settings['device_group'])) {
+            return view('widgets.health-sensors', [
+                'id' => $settings['id'],
+                'error' => __('Please select a device group.'),
+                'sensors' => collect(),
+                'display_mode' => $settings['display_mode'],
+                'cols' => (int) $settings['cols'],
+            ]);
+        }
 
-        $warning = $this->parseOptionalFloat($settings['warning'] ?? null);
-        $critical = $this->parseOptionalFloat($settings['critical'] ?? null);
+        if ($scope === 'device_regex') {
+            $deviceRegex = trim((string)$settings['device_regex'] ?? '.*');
+            if ($deviceRegex === '') {
+                return view('widgets.health-sensors', [
+                    'id' => $settings['id'],
+                    'error' => __('Please enter a device match regex (hostname or sysName).'),
+                    'sensors' => collect(),
+                    'display_mode' => $settings['display_mode'],
+                    'cols' => (int) $settings['cols'],
+                ]);
+            }
+        }
+
+        $descrBare = trim((string) ($settings['descr_regex'] ?? '.*'));
+        $classBare = trim((string) ($settings['sensor_class_regex'] ?? '.*'));
+
+        $warning = $settings['warning'] ?? null;
+        $critical = $settings['critical'] ?? null;
         $maxEntries = $this->maxEntries((int) $settings['rows'], (int) $settings['cols']);
 
         try {
             $sensors = Sensor::hasAccess($request->user())
                 ->where('sensor_deleted', 0)
-                ->where('device_id', (int) $settings['device'])
-                ->where('sensor_class', $settings['sensor_class'])
-                ->when($regex !== '.*', fn ($q) => $q->whereRaw('sensor_descr REGEXP ?', [$regex]))
+                ->when($scope === 'device', fn ($q) => $q->where('device_id', (int) $settings['device']))
+                ->when($scope === 'device_group', fn ($q) => $q->whereHas('device', fn ($dq) => $dq->inDeviceGroup((int) $settings['device_group'])))
+                ->when($scope === 'device_regex', function ($q) use ($settings): void {
+                    $pattern = trim((string) ($settings['device_regex'] ?? ''));
+                    $q->whereHas('device', function ($dq) use ($pattern): void {
+                        $dq->where(function ($dq) use ($pattern): void {
+                            $dq->whereRaw('devices.hostname REGEXP ?', [$pattern])
+                                ->orWhereRaw('devices.sysName REGEXP ?', [$pattern]);
+                        });
+                    });
+                })
+                ->when($classBare !== '.*', fn ($q) => $q->whereRaw('sensor_class REGEXP ?', [$classBare]))
+                ->when($descrBare !== '.*', fn ($q) => $q->whereRaw('sensor_descr REGEXP ?', [$descrBare]))
                 ->with('device')
                 ->orderBy('sensor_descr')
                 ->limit($maxEntries)
@@ -98,7 +126,7 @@ class HealthSensorsController extends WidgetController
         } catch (QueryException) {
             return view('widgets.health-sensors', [
                 'id' => $settings['id'],
-                'error' => __('Invalid regular expression for sensor description filter.'),
+                'error' => __('Invalid regular expression for one of the filters.'),
                 'sensors' => collect(),
                 'display_mode' => $settings['display_mode'],
             ]);
@@ -109,7 +137,6 @@ class HealthSensorsController extends WidgetController
             'error' => null,
             'sensors' => $sensors,
             'display_mode' => $settings['display_mode'] ?? '',
-            'sensor_class_enum' => SensorClass::from((string) $settings['sensor_class']),
             'cols' => (int) $settings['cols'],
         ]);
     }
@@ -117,17 +144,25 @@ class HealthSensorsController extends WidgetController
     public function getSettings($settingsView = false): array
     {
         $settings = parent::getSettings($settingsView);
+        $settings['device_scope'] = match ((string) ($settings['device_scope'] ?? 'device')) {
+            'device', 'device_group', 'device_regex' => (string) $settings['device_scope'],
+            default => 'device',
+        };
         $settings['device'] = isset($settings['device']) && is_numeric($settings['device']) ? (int) $settings['device'] : null;
+        $settings['device_group'] = isset($settings['device_group']) && is_numeric($settings['device_group']) ? (int) $settings['device_group'] : null;
+        $settings['device_regex'] = trim((string) ($settings['device_regex'] ?? ''));
         $settings['rows'] = isset($settings['rows']) && is_numeric($settings['rows']) ? (int) $settings['rows'] : 4;
         $settings['cols'] = isset($settings['cols']) && is_numeric($settings['cols']) ? (int) $settings['cols'] : 3;
-        $settings['rows'] = max(1, min(50, $settings['rows']));
+        $settings['rows'] = max(1, min(48, $settings['rows']));
         $settings['cols'] = max(1, min(12, $settings['cols']));
-        $settings['sensor_class'] = SensorClass::tryFrom((string) ($settings['sensor_class'] ?? ''))?->value
-            ?? SensorClass::Temperature->value;
-        $settings['display_mode'] = match ($settings['display_mode'] ?? '') {
-            'number', 'progress-bar', 'gauge', 'graph' => $settings['display_mode'],
-            default => 'number',
-        };
+
+        $sensorClassRegex = trim((string) ($settings['sensor_class_regex'] ?? ''));
+        $settings['sensor_class_regex'] = $sensorClassRegex === '' ? '.*' : $sensorClassRegex;
+
+        $descrRegex = trim((string) ($settings['descr_regex'] ?? ''));
+        $settings['descr_regex'] = $descrRegex === '' ? '.*' : $descrRegex;
+
+        $settings['display_mode'] = $settings['display_mode'] ?? 'number';
 
         return $settings;
     }
@@ -136,24 +171,9 @@ class HealthSensorsController extends WidgetController
     {
         $settings = $this->getSettings(true);
         $settings['device'] = Device::hasAccess($request->user())->find($settings['device']) ?: null;
-        $settings['sensor_classes'] = collect(SensorClass::cases())
-            ->sortBy(fn (SensorClass $c) => $c->value)
-            ->values();
+        $settings['device_group'] = DeviceGroup::find($settings['device_group']) ?: null;
 
         return view('widgets.settings.health-sensors', $settings);
-    }
-
-    private function parseOptionalFloat(mixed $value): ?float
-    {
-        if ($value === null || $value === '') {
-            return null;
-        }
-
-        if (! is_numeric($value)) {
-            return null;
-        }
-
-        return (float) $value;
     }
 
     private function maxEntries(int $rows, int $cols): int
@@ -162,7 +182,7 @@ class HealthSensorsController extends WidgetController
         $cols = max(1, min(12, $cols));
 
         // safety cap to avoid accidentally rendering huge widgets
-        return max(1, min(240, $rows * $cols));
+        return max(1, min(48, $rows * $cols));
     }
 
     private function thresholdStatus(?float $value, ?float $warning, ?float $critical): string

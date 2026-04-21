@@ -374,6 +374,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('generic-image', Widgets\ImageController::class);
             Route::post('globe', Widgets\GlobeController::class);
             Route::post('graylog', Widgets\GraylogController::class);
+            Route::post('health-sensors', Widgets\HealthSensorsController::class);
             Route::post('placeholder', Widgets\PlaceholderController::class);
             Route::post('notes', Widgets\NotesController::class);
             Route::post('server-stats', Widgets\ServerStatsController::class);
