@@ -31,7 +31,6 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
-use LibreNMS\Enum\Sensor as SensorClass;
 
 class HealthSensorsController extends WidgetController
 {
