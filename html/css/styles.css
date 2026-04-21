@@ -2609,3 +2609,11 @@ label {
   right: auto;
   left: 1px;
 }
+
+.rules-group-header .btn-primary {
+  background-color: rgb(178, 32, 32);
+}
+
+.rules-group-header .active {
+  background-color: rgb(0, 128, 0);
+}
