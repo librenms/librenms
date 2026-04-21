@@ -51,7 +51,7 @@ class YamlDiscoveryField
         if (array_key_exists($this->key, $yaml)) {
             $key = $this->key;
         } else {
-            $key = $this->default;
+            $key = is_int($this->default) ? $this->default : (string) $this->default;
             $yaml = [$key => $this->default];
         }
 
