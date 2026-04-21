@@ -2612,8 +2612,10 @@ label {
 
 .rules-group-header .btn-primary {
   background-color: #ac2925;
+  border-color: #761c19;
 }
 
 .rules-group-header .active {
   background-color: #5cb85c;
+  border-color: #4cae4c;
 }
