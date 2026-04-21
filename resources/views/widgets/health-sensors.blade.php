@@ -21,31 +21,30 @@
                 @php($range = max(0.000001, $max - $min))
                 @php($pct = $value === null ? 0.0 : max(0.0, min(100.0, (($value - $min) / $range) * 100.0)))
                 @php($barColor = match ($status) {
-                    'critical' => 'tw:bg-red-600',
-                    'warning' => 'tw:bg-amber-500',
-                    'ok' => 'tw:bg-green-600',
-                    default => 'tw:bg-gray-500',
-                })
+                        'critical' => 'tw:bg-red-600',
+                        'warning' => 'tw:bg-amber-500',
+                        default => 'tw:bg-green-600',
+                    })
 
-                <div class="col-sm-{{ $colWidth }}">
-                    <div class="tw:mb-3 tw:pt-1.5">
-                        <div class="tw:text-center tw:text-2xl tw:font-bold dark:tw:text-gray-500">
-                            {{ \Str::limit($sensor->sensor_descr, 42) }}
-                        </div>
-                        <div class="tw:rounded tw:border tw:border-black/10 dark:tw:border-black/60 tw:bg-black/5 dark:tw:bg-[#3e444c] tw:p-3">
-                            <div class="tw:flex tw:items-baseline tw:justify-between tw:gap-2">
-                                <div class="tw:text-2xl tw:font-semibold tw:leading-tight">
-                                    {{ $sensor->formatValue() }}
-                                </div>
+                    <div class="col-sm-{{ $colWidth }}">
+                        <div class="tw:mb-3 tw:pt-1.5">
+                            <div class="tw:text-center tw:text-2xl tw:font-bold dark:tw:text-gray-500">
+                                {{ \Str::limit($sensor->sensor_descr, 42) }}
                             </div>
+                            <div class="tw:rounded tw:border tw:border-black/10 dark:tw:border-black/60 tw:bg-black/5 dark:tw:bg-[#3e444c] tw:p-3">
+                                <div class="tw:flex tw:items-baseline tw:justify-between tw:gap-2">
+                                    <div class="tw:text-2xl tw:font-semibold tw:leading-tight">
+                                        {{ $sensor->formatValue() }}
+                                    </div>
+                                </div>
 
-                            <div class="tw:mt-2 tw:h-3 tw:w-full tw:rounded tw:bg-black/10 dark:tw:bg-black/40 tw:overflow-hidden">
-                                <div class="tw:h-full {{ $barColor }}" style="width: {{ $pct }}%"></div>
+                                <div class="tw:mt-2 tw:h-3 tw:w-full tw:rounded tw:bg-black/10 dark:tw:bg-black/40 tw:overflow-hidden">
+                                    <div class="tw:h-full {{ $barColor }}" style="width: {{ $pct }}%"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            @elseif ($display_mode === 'gauge')
+                @elseif ($display_mode === 'gauge')
                 <div class="col-sm-{{ $colWidth }}">
                     <div class="tw:mb-3 tw:pt-1.5">
                         <div class="tw:text-center tw:text-base tw:font-bold dark:tw:text-gray-500">
@@ -84,8 +83,7 @@
                     <div class="tw:mb-3 tw:rounded tw:border tw:border-black/10 dark:tw:border-black/60 tw:shadow-sm dark:tw:shadow-black/30 tw:bg-black/5 dark:tw:bg-[#3e444c] tw:border-l-4 tw:min-h-24 tw:flex tw:flex-col tw:justify-center tw:items-center tw:px-3 tw:py-2
                         @if($status === 'critical') tw:border-l-red-600
                         @elseif($status === 'warning') tw:border-l-amber-500
-                        @elseif($status === 'ok') tw:border-l-green-600
-                        @else tw:border-l-gray-500
+                        @else tw:border-l-green-600
                         @endif">
                         <a href="{{ $graphUrl }}" class="tw:block tw:w-full tw:no-underline hover:tw:no-underline">
                             <div class="tw:text-7xl tw:font-semibold tw:leading-tight tw:whitespace-nowrap">
