@@ -88,6 +88,8 @@ final class OSDiscoveryTest extends TestCase
 
     public function testHaveVariantsLowercase(): void
     {
+        $this->assertNotEmpty(self::$unchecked_files);
+
         foreach (self::$unchecked_files as $file => $count) {
             $underscore_pos = strpos($file, '_');
             if ($underscore_pos !== false) {
