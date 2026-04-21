@@ -2611,9 +2611,9 @@ label {
 }
 
 .rules-group-header .btn-primary {
-  background-color: rgb(178, 32, 32);
+  background-color: #ac2925;
 }
 
 .rules-group-header .active {
-  background-color: rgb(0, 128, 0);
+  background-color: #5cb85c;
 }
