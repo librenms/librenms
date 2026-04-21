@@ -86,6 +86,16 @@ final class OSDiscoveryTest extends TestCase
         $this->assertNotEmpty(self::$unchecked_files);
     }
 
+    public function testVariantsLowercase(): void
+    {
+        foreach (self::$unchecked_files as $file => $count) {
+            if (str_contains($file, '_')) {
+                [$os, $variant] = explode('_', $file, 2);
+                $this->assertSame(strtolower($variant), $variant, 'Test file variant not lowercase');
+            }
+        }
+    }
+
     /**
      * Test each OS provided by osProvider
      *
@@ -93,6 +103,8 @@ final class OSDiscoveryTest extends TestCase
      */
     #[DataProvider('osProvider')]
     #[TestDox('OS detection')]
+    #[Depends('testHaveFilesToTest')]
+    #[Depends('testVariantsLowercase')]
     public function testOSDetection($os_name): void
     {
         if (! getenv('SNMPSIM')) {
