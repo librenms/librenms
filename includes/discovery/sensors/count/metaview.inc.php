@@ -13,293 +13,301 @@
 */
 
 $count_oids = [
-    'cFSStatsR4TIClsClsCurCon' => [
+    '.1.2.826.0.1.1578918.6.1579.1.19' => [
         'descr' => 'Calls currently connected',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.19',
+        'index' => 'cFSStatsR4TIClsClsCurCon',
         'group' => 'Traffic Information: Calls',
     ],
-    'cFSStatsR4TIClsCallsCurrConnecting' => [
+    '.1.2.826.0.1.1578918.6.1579.1.20' => [
         'descr' => 'Calls currently connecting',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.20',
+        'index' => 'cFSStatsR4TIClsCallsCurrConnecting',
         'group' => 'Traffic Information: Calls',
     ],
-    'cFSStatsR4TIClsCallsCurrDisconnecting' => [
+    '.1.2.826.0.1.1578918.6.1579.1.21' => [
         'descr' => 'Calls currently disconnecting',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.21',
+        'index' => 'cFSStatsR4TIClsCallsCurrDisconnecting',
         'group' => 'Traffic Information: Calls',
     ],
-    'cFSStatsR4TrfcIEmgncyCallsClsCurCon' => [
+    '.1.2.826.0.1.1578918.6.1579.1.23' => [
         'descr' => 'Emergency calls currently connected',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.23',
+        'index' => 'cFSStatsR4TrfcIEmgncyCallsClsCurCon',
         'group' => 'Traffic Information: Emergency Calls',
     ],
-    'cFSStatsR4TrfcIEmgncyCallsCallsCurrConnecting' => [
+    '.1.2.826.0.1.1578918.6.1579.1.24' => [
         'descr' => 'Emergency calls currently connecting',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.24',
+        'index' => 'cFSStatsR4TrfcIEmgncyCallsCallsCurrConnecting',
         'group' => 'Traffic Information: Emergency Calls',
     ],
-    'cFSStatsR4CAtsSubscr' => [
+    '.1.2.826.0.1.1578918.6.1579.1.26' => [
         'descr' => 'Total call attempts',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.26',
+        'index' => 'cFSStatsR4CAtsSubscr',
         'group' => 'Traffic Information: Calls originated on-switch',
     ],
-    'cFSStatsR4CAtsTrnk' => [
+    '.1.2.826.0.1.1578918.6.1579.1.27' => [
         'descr' => 'Total call attempts',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.27',
+        'index' => 'cFSStatsR4CAtsTrnk',
         'group' => 'Traffic Information: Calls from trunks',
     ],
-    'cFSStatsR4CFlsTotSubscr' => [
+    '.1.2.826.0.1.1578918.6.1579.1.29' => [
         'descr' => 'Failed call attempt',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.29',
+        'index' => 'cFSStatsR4CFlsTotSubscr',
         'group' => 'Traffic Information: Calls originated on-switch',
     ],
-    'cFSStatsR4CFlsTotTrnk' => [
+    '.1.2.826.0.1.1578918.6.1579.1.30' => [
         'descr' => 'Failed call attempts',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.30',
+        'index' => 'cFSStatsR4CFlsTotTrnk',
         'group' => 'Traffic Information: Calls from trunks',
     ],
-    'cFSStatsR4CFlsSubBusySubscr' => [
+    '.1.2.826.0.1.1578918.6.1579.1.32' => [
         'descr' => 'Calls originated on-switch subscriber busy',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.32',
+        'index' => 'cFSStatsR4CFlsSubBusySubscr',
         'group' => 'Call attempt failures: Called on-switch subscriber busy',
     ],
-    'cFSStatsR4CFlsSubBusyTrnk' => [
+    '.1.2.826.0.1.1578918.6.1579.1.33' => [
         'descr' => 'Calls from trunks subscribers busy',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.33',
+        'index' => 'cFSStatsR4CFlsSubBusyTrnk',
         'group' => 'Call attempt failures: Called on-switch subscriber busy',
     ],
-    'cFSStatsR4CFlsSubUnavailSubscr' => [
+    '.1.2.826.0.1.1578918.6.1579.1.35' => [
         'descr' => 'Calls originated on-switch subscriber device unavailable',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.35',
+        'index' => 'cFSStatsR4CFlsSubUnavailSubscr',
         'group' => 'Call attempt failures: Called on-switch subscriber device unavailable',
     ],
-    'cFSStatsR4CFlsSubUnavailTrnk' => [
+    '.1.2.826.0.1.1578918.6.1579.1.36' => [
         'descr' => 'Calls from trunks subscriber device unavailable',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.36',
+        'index' => 'cFSStatsR4CFlsSubUnavailTrnk',
         'group' => 'Call attempt failures: Called on-switch subscriber device unavailable',
     ],
-    'cFSStatsR4CFlsTrnkNetBOrFSubscr' => [
+    '.1.2.826.0.1.1578918.6.1579.1.41' => [
         'descr' => 'On-switch remote called subscriber or remote trunk busy',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.41',
+        'index' => 'cFSStatsR4CFlsTrnkNetBOrFSubscr',
         'group' => 'Call attempt failures: Remote called subscriber or remote trunk busy',
     ],
-    'cFSStatsR4CFlsTrnkNetBOrFTrnk' => [
+    '.1.2.826.0.1.1578918.6.1579.1.42' => [
         'descr' => 'Trunks remote called subscriber or remote trunk busy',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.42',
+        'index' => 'cFSStatsR4CFlsTrnkNetBOrFTrnk',
         'group' => 'Call attempt failures: Remote called subscriber or remote trunk busy',
     ],
-    'cFSStatsR4CFlsRtgFaildSubscr' => [
+    '.1.2.826.0.1.1578918.6.1579.1.53' => [
         'descr' => 'Calls originated on-switch routing failed',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.53',
+        'index' => 'cFSStatsR4CFlsRtgFaildSubscr',
         'group' => 'Call attempt failures: Routing failed',
     ],
-    'cFSStatsR4CFlsRtgFaildTrnk' => [
+    '.1.2.826.0.1.1578918.6.1579.1.54' => [
         'descr' => 'Calls from trunks routing failed',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.54',
+        'index' => 'cFSStatsR4CFlsRtgFaildTrnk',
         'group' => 'Call attempt failures: Routing failed',
     ],
-    'cFSStatsR4CFlsSigFaildSubscr' => [
+    '.1.2.826.0.1.1578918.6.1579.1.62' => [
         'descr' => 'Calls originated on-switch signaling failed',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.62',
+        'index' => 'cFSStatsR4CFlsSigFaildSubscr',
         'group' => 'Call attempt failures: Signaling failed',
     ],
-    'cFSStatsR4CFlsSigFaildTrnk' => [
+    '.1.2.826.0.1.1578918.6.1579.1.63' => [
         'descr' => 'Calls from trunks signaling failed',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.63',
+        'index' => 'cFSStatsR4CFlsSigFaildTrnk',
         'group' => 'Call attempt failures: Signaling failed',
     ],
-    'cFSStatsR4CFlsSysCgstnSubscr' => [
+    '.1.2.826.0.1.1578918.6.1579.1.65' => [
         'descr' => 'Calls originated on-switch system congestion',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.65',
+        'index' => 'cFSStatsR4CFlsSysCgstnSubscr',
         'group' => 'Call attempt failures: System congestion',
     ],
-    'cFSStatsR4CFlsSysCgstnTrnk' => [
+    '.1.2.826.0.1.1578918.6.1579.1.66' => [
         'descr' => 'Calls from trunks system congestion',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.66',
+        'index' => 'cFSStatsR4CFlsSysCgstnTrnk',
         'group' => 'Call attempt failures: System congestion',
     ],
-    'cFSStatsR4ActCFlsSubscr' => [
+    '.1.2.826.0.1.1578918.6.1579.1.71' => [
         'descr' => 'Calls originated on-switch',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.71',
+        'index' => 'cFSStatsR4ActCFlsSubscr',
         'group' => 'Traffic Information: Connected call failures',
     ],
-    'cFSStatsR4ActCFlsTrnk' => [
+    '.1.2.826.0.1.1578918.6.1579.1.72' => [
         'descr' => 'Calls from trunks',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.72',
+        'index' => 'cFSStatsR4ActCFlsTrnk',
         'group' => 'Traffic Information: Connected call failures',
     ],
-    'cFSStatsR4CFlsCallServsSubscr' => [
+    '.1.2.826.0.1.1578918.6.1579.1.73' => [
         'descr' => 'Calls originated on-switch calls service failures',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.73',
+        'index' => 'cFSStatsR4CFlsCallServsSubscr',
         'group' => 'Calls attempt failures: Handled by Call Service',
     ],
-    'cFSStatsR4CFlsCallServsTrnk' => [
+    '.1.2.826.0.1.1578918.6.1579.1.74' => [
         'descr' => 'Calls from trunks calls service failures',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.74',
+        'index' => 'cFSStatsR4CFlsCallServsTrnk',
         'group' => 'Calls attempt failures: Handled by Call Service',
     ],
-    'cFSStatsR4SubOrigCallsNum' => [
+    '.1.2.826.0.1.1578918.6.1579.1.75' => [
         'descr' => 'Calls in progress',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.75',
+        'index' => 'cFSStatsR4SubOrigCallsNum',
         'group' => 'Traffic Information: Calls originated on-switch',
     ],
-    'cFSStatsR4SubOrigCallsHighWaterMark' => [
+    '.1.2.826.0.1.1578918.6.1579.1.76' => [
         'descr' => 'Calls in progress (high)',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.76',
+        'index' => 'cFSStatsR4SubOrigCallsHighWaterMark',
         'group' => 'Traffic Information: Calls originated on-switch',
     ],
-    'cFSStatsR4SubOrigCallsLowWaterMark' => [
+    '.1.2.826.0.1.1578918.6.1579.1.77' => [
         'descr' => 'Calls in progress (low)',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.77',
+        'index' => 'cFSStatsR4SubOrigCallsLowWaterMark',
         'group' => 'Traffic Information: Calls originated on-switch',
     ],
-    'cFSStatsR4TIClsOriginatedOnSwitchCallUsage' => [
+    '.1.2.826.0.1.1578918.6.1579.1.78' => [
         'descr' => 'Call usage',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.78',
+        'index' => 'cFSStatsR4TIClsOriginatedOnSwitchCallUsage',
         'group' => 'Traffic Information: Calls originated on-switch',
     ],
-    'cFSStatsR4InTrnkCallsNum' => [
+    '.1.2.826.0.1.1578918.6.1579.1.79' => [
         'descr' => 'Calls in progress',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.79',
+        'index' => 'cFSStatsR4InTrnkCallsNum',
         'group' => 'Traffic Information: Calls from trunks',
     ],
-    'cFSStatsR4InTrnkCallsHighWaterMark' => [
+    '.1.2.826.0.1.1578918.6.1579.1.80' => [
         'descr' => 'Calls in progress (high)',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.80',
+        'index' => 'cFSStatsR4InTrnkCallsHighWaterMark',
         'group' => 'Traffic Information: Calls from trunks',
     ],
-    'cFSStatsR4InTrnkCallsLowWaterMark' => [
+    '.1.2.826.0.1.1578918.6.1579.1.81' => [
         'descr' => 'Calls in progress (low)',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.81',
+        'index' => 'cFSStatsR4InTrnkCallsLowWaterMark',
         'group' => 'Traffic Information: Calls from trunks',
     ],
-    'cFSStatsR4TrfcITrnksCallUsage' => [
+    '.1.2.826.0.1.1578918.6.1579.1.82' => [
         'descr' => 'Call usage',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.82',
+        'index' => 'cFSStatsR4TrfcITrnksCallUsage',
         'group' => 'Traffic Information: Calls from trunks',
     ],
-    'cFSStatsR4CTpOnSwSuccessfulCallAttempts' => [
+    '.1.2.826.0.1.1578918.6.1579.1.83' => [
         'descr' => 'On-switch successful call attempts',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.83',
+        'index' => 'cFSStatsR4CTpOnSwSuccessfulCallAttempts',
         'group' => 'Call topology: On-switch',
     ],
-    'cFSStatsR4CTpOnSwClsCCon' => [
+    '.1.2.826.0.1.1578918.6.1579.1.84' => [
         'descr' => 'On-switch Calls currently connected',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.84',
+        'index' => 'cFSStatsR4CTpOnSwClsCCon',
         'group' => 'Call topology: On-switch',
     ],
-    'cFSStatsR4CTpOnSwClsCConHighWaterMark' => [
+    '.1.2.826.0.1.1578918.6.1579.1.85' => [
         'descr' => 'On-switch Calls currently connected (high)',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.85',
+        'index' => 'cFSStatsR4CTpOnSwClsCConHighWaterMark',
         'group' => 'Call topology: On-switch',
     ],
-    'cFSStatsR4CTpOnSwClsCConLowWaterMark' => [
+    '.1.2.826.0.1.1578918.6.1579.1.86' => [
         'descr' => 'On-switch Calls currently connected (low)',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.86',
+        'index' => 'cFSStatsR4CTpOnSwClsCConLowWaterMark',
         'group' => 'Call topology: On-switch',
     ],
-    'cFSStatsR4CTpOnSwCallUsage' => [
+    '.1.2.826.0.1.1578918.6.1579.1.87' => [
         'descr' => 'On-switch Call usage',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.87',
+        'index' => 'cFSStatsR4CTpOnSwCallUsage',
         'group' => 'Call topology: On-switch',
     ],
-    'cFSStatsR4CTpOnSwSubToTrnkSuccessfulCallAttempts' => [
+    '.1.2.826.0.1.1578918.6.1579.1.88' => [
         'descr' => 'On-switch subscriber to trunk - Successful call attempts',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.88',
+        'index' => 'cFSStatsR4CTpOnSwSubToTrnkSuccessfulCallAttempts',
         'group' => 'Call topology: On-switch Subscriber to Trunk',
     ],
-    'cFSStatsR4CTOnSwSbTrClsCCon' => [
+    '.1.2.826.0.1.1578918.6.1579.1.89' => [
         'descr' => 'On-switch subscriber to trunk - Calls currently connected',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.89',
+        'index' => 'cFSStatsR4CTOnSwSbTrClsCCon',
         'group' => 'Call topology: On-switch Subscriber to Trunk',
     ],
-    'cFSStatsR4CTOnSwSbTrClsCConHighWaterMark' => [
+    '.1.2.826.0.1.1578918.6.1579.1.90' => [
         'descr' => 'On-switch subscriber to trunk - Calls currently connected (high)',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.90',
+        'index' => 'cFSStatsR4CTOnSwSbTrClsCConHighWaterMark',
         'group' => 'Call topology: On-switch Subscriber to Trunk',
     ],
-    'cFSStatsR4CTOnSwSbTrClsCConLowWaterMark' => [
+    '.1.2.826.0.1.1578918.6.1579.1.91' => [
         'descr' => 'On-switch subscriber to trunk - Calls currently connected (low)',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.91',
+        'index' => 'cFSStatsR4CTOnSwSbTrClsCConLowWaterMark',
         'group' => 'Call topology: On-switch Subscriber to Trunk',
     ],
-    'cFSStatsR4CTpOnSwSubToTrnkCallUsage' => [
+    '.1.2.826.0.1.1578918.6.1579.1.92' => [
         'descr' => 'On-switch subscriber to trunk - Call usage',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.92',
+        'index' => 'cFSStatsR4CTpOnSwSubToTrnkCallUsage',
         'group' => 'Call topology: On-switch Subscriber to Trunk',
     ],
-    'cFSStatsR4CTpOnSwSubToIVRSuccessfulCallAttempts' => [
+    '.1.2.826.0.1.1578918.6.1579.1.93' => [
         'descr' => 'On-switch subscriber to IVR - Successful call attempts',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.93',
+        'index' => 'cFSStatsR4CTpOnSwSubToIVRSuccessfulCallAttempts',
         'group' => 'Call topology: On-switch Subscriber to IVR',
     ],
-    'cFSStatsR4CTpSwSubToIVRCCon' => [
+    '.1.2.826.0.1.1578918.6.1579.1.94' => [
         'descr' => 'On-switch subscriber to IVR - Calls currently connected',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.94',
+        'index' => 'cFSStatsR4CTpSwSubToIVRCCon',
         'group' => 'Call topology: On-switch Subscriber to IVR',
     ],
-    'cFSStatsR4CTpSwSubToIVRCConHighWaterMark' => [
+    '.1.2.826.0.1.1578918.6.1579.1.95' => [
         'descr' => 'On-switch subscriber to IVR - Calls currently connected (high)',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.95',
+        'index' => 'cFSStatsR4CTpSwSubToIVRCConHighWaterMark',
         'group' => 'Call topology: On-switch Subscriber to IVR',
     ],
-    'cFSStatsR4CTpSwSubToIVRCConLowWaterMark' => [
+    '.1.2.826.0.1.1578918.6.1579.1.96' => [
         'descr' => 'On-switch subscriber to IVR - Calls currently connected (low)',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.96',
+        'index' => 'cFSStatsR4CTpSwSubToIVRCConLowWaterMark',
         'group' => 'Call topology: On-switch Subscriber to IVR',
     ],
-    'cFSStatsR4CTpSwSubToIVRCCallUsage' => [
+    '.1.2.826.0.1.1578918.6.1579.1.97' => [
         'descr' => 'On-switch subscriber to IVR - Call usage',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.97',
+        'index' => 'cFSStatsR4CTpSwSubToIVRCCallUsage',
         'group' => 'Call topology: On-switch Subscriber to IVR',
     ],
-    'cFSStatsR4CTpTrOnSwSbSuccessfulCallAttempts' => [
+    '.1.2.826.0.1.1578918.6.1579.1.98' => [
         'descr' => 'Trunk to on-switch subscriber - Successful call attempts',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.98',
+        'index' => 'cFSStatsR4CTpTrOnSwSbSuccessfulCallAttempts',
         'group' => 'Call topology: Trunk to On-switch Subscriber',
     ],
-    'cFSStatsR4CTpTrOnSwSbClsCCon' => [
+    '.1.2.826.0.1.1578918.6.1579.1.99' => [
         'descr' => 'Trunk to on-switch subscriber - Calls currently connected',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.99',
+        'index' => 'cFSStatsR4CTpTrOnSwSbClsCCon',
         'group' => 'Call topology: Trunk to On-switch Subscriber',
     ],
-    'cFSStatsR4CTpTrOnSwSbClsCConHighWaterMark' => [
+    '.1.2.826.0.1.1578918.6.1579.1.100' => [
         'descr' => 'Trunk to on-switch subscriber - Calls currently connected (high)',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.100',
+        'index' => 'cFSStatsR4CTpTrOnSwSbClsCConHighWaterMark',
         'group' => 'Call topology: Trunk to On-switch Subscriber',
     ],
-    'cFSStatsR4CTpTrOnSwSbClsCConLowWaterMark' => [
+    '.1.2.826.0.1.1578918.6.1579.1.101' => [
         'descr' => 'Trunk to on-switch subscriber - Calls currently connected (low)',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.101',
+        'index' => 'cFSStatsR4CTpTrOnSwSbClsCConLowWaterMark',
         'group' => 'Call topology: Trunk to On-switch Subscriber',
     ],
-    'cFSStatsR4CTpTrSubToOnSwSuccessfulCallAttempts' => [
+    '.1.2.826.0.1.1578918.6.1579.1.102' => [
         'descr' => 'Trunk to on-switch - Call usage',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.102',
+        'index' => 'cFSStatsR4CTpTrSubToOnSwSuccessfulCallAttempts',
         'group' => 'Call topology: Trunk to On-switch Subscriber',
     ],
-    'cFSStatsR4TrfcIConnectedCallFailsCallsReachingMaxDurn' => [
+    '.1.2.826.0.1.1578918.6.1579.1.118' => [
         'descr' => 'Calls reaching max duration',
-        'num_oid' => '.1.2.826.0.1.1578918.6.1579.1.118',
+        'index' => 'cFSStatsR4TrfcIConnectedCallFailsCallsReachingMaxDurn',
         'group' => 'Traffic Information: Connected call failures',
     ],
 ];
 
-foreach ($count_oids as $name => $oid_info) {
-    $data = SnmpQuery::numeric()->next($oid_info['num_oid'])->values();
-    $oid = key($data);
-    $value = $data[$oid];
+$allNumOids = array_keys($count_oids);
+$snmp_data = SnmpQuery::numeric()->next($allNumOids)->values();
+$idx = 0;
+
+foreach ($snmp_data as $sensor_oid => $sensor_current) {
+    $num_oid = $allNumOids[$idx++] ?? null;
+
+    if ($num_oid === null || ! isset($count_oids[$num_oid])) {
+        break;
+    }
+
+    $oid_info = $count_oids[$num_oid];
 
     app('sensor-discovery')->discover(new \App\Models\Sensor([
         'poller_type' => 'snmp',
         'sensor_class' => 'count',
-        'sensor_oid' => $oid,
-        'sensor_index' => $name,
+        'sensor_oid' => $sensor_oid,
+        'sensor_index' => $oid_info['index'],
         'sensor_type' => 'metaview',
         'sensor_descr' => $oid_info['descr'],
         'sensor_divisor' => 1,
         'sensor_multiplier' => 1,
-        'sensor_current' => $value,
+        'sensor_current' => $sensor_current,
         'group' => $oid_info['group'] ?? null,
     ]));
 }
