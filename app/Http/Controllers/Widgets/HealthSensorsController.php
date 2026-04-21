@@ -29,7 +29,9 @@ use App\Models\DeviceGroup;
 use App\Models\Sensor;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use LibreNMS\Enum\Sensor as SensorClass;
 
 class HealthSensorsController extends WidgetController
 {
@@ -71,7 +73,7 @@ class HealthSensorsController extends WidgetController
         }
 
         if ($scope === 'device_regex') {
-            $deviceRegex = trim((string) $settings['device_regex'] ?? '.*');
+            $deviceRegex = trim((string) ($settings['device_regex'] ?? '.*'));
             if ($deviceRegex === '') {
                 return view('widgets.health-sensors', [
                     'id' => $settings['id'],
@@ -94,7 +96,7 @@ class HealthSensorsController extends WidgetController
             $sensors = Sensor::hasAccess($request->user())
                 ->where('sensor_deleted', 0)
                 ->when($scope === 'device', fn ($q) => $q->where('device_id', (int) $settings['device']))
-                ->when($scope === 'device_group', fn ($q) => $q->whereHas('device', fn ($dq) => $dq->inDeviceGroup((int) $settings['device_group'])))
+                ->when($scope === 'device_group', fn ($q) => $q->whereIn('device_id', DB::table('device_group_device')->select('device_id')->where('device_group_id', (int) $settings['device_group'])))
                 ->when($scope === 'device_regex', function ($q) use ($settings): void {
                     $pattern = trim((string) ($settings['device_regex'] ?? ''));
                     $q->whereHas('device', function ($dq) use ($pattern): void {
@@ -148,6 +150,9 @@ class HealthSensorsController extends WidgetController
         ]);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getSettings($settingsView = false): array
     {
         $settings = parent::getSettings($settingsView);
@@ -169,7 +174,7 @@ class HealthSensorsController extends WidgetController
         $descrRegex = trim((string) ($settings['descr_regex'] ?? ''));
         $settings['descr_regex'] = $descrRegex === '' ? '.*' : $descrRegex;
 
-        $settings['display_mode'] = $settings['display_mode'] ?? 'number';
+        $settings['display_mode'] ??= 'number';
 
         return $settings;
     }
