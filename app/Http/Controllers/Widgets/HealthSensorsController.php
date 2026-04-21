@@ -27,10 +27,9 @@ namespace App\Http\Controllers\Widgets;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Sensor;
-use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
-use LibreNMS\Enum\Sensor as SensorClass;
 
 class HealthSensorsController extends WidgetController
 {
@@ -72,7 +71,7 @@ class HealthSensorsController extends WidgetController
         }
 
         if ($scope === 'device_regex') {
-            $deviceRegex = trim((string)$settings['device_regex'] ?? '.*');
+            $deviceRegex = trim((string) $settings['device_regex'] ?? '.*');
             if ($deviceRegex === '') {
                 return view('widgets.health-sensors', [
                     'id' => $settings['id'],
