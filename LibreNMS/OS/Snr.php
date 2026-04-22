@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       https://www.librenms.org
  *
  * @copyright  2026 hrtrd
@@ -63,8 +62,8 @@ class Snr extends OS implements MempoolsDiscovery
         ])->values();
 
         $total_raw = (int) ($data['.1.3.6.1.4.1.40418.7.100.1.11.6.0'] ?? 0);
-        $used_raw  = (int) ($data['.1.3.6.1.4.1.40418.7.100.1.11.7.0'] ?? 0);
-        $percent   = $data['.1.3.6.1.4.1.40418.7.100.1.11.11.0'] ?? null;
+        $used_raw = (int) ($data['.1.3.6.1.4.1.40418.7.100.1.11.7.0'] ?? 0);
+        $percent = $data['.1.3.6.1.4.1.40418.7.100.1.11.11.0'] ?? null;
 
         if ($total_raw <= 0) {
             return new Collection();
@@ -73,10 +72,10 @@ class Snr extends OS implements MempoolsDiscovery
         // Auto-detect unit: values under 1 MiB are megabytes, otherwise bytes.
         if ($total_raw < 1048576) {
             $total_bytes = $total_raw * 1024 * 1024;
-            $used_bytes  = $used_raw  * 1024 * 1024;
+            $used_bytes = $used_raw * 1024 * 1024;
         } else {
             $total_bytes = $total_raw;
-            $used_bytes  = $used_raw;
+            $used_bytes = $used_raw;
         }
 
         $mempool = new Mempool([
