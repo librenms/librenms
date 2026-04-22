@@ -6,6 +6,36 @@ modules:
         version:
             - NAG-MIB::sysSoftwareVersion.0
             - NAG-MIB::sysSoftwareVersion.1
+    mempools:
+        data:
+            # New scalar branch .1.11.6/7. Reports memory in bytes on most current
+            # SNR families (S2985G, S2995G, S300X, S400X, S5210X). On S2990X this
+            # branch reports values in megabytes, so skip it there and let the
+            # legacy entries below provide the values for that model.
+            -
+                total: '.1.3.6.1.4.1.40418.7.100.1.11.6.0'
+                used: '.1.3.6.1.4.1.40418.7.100.1.11.7.0'
+                descr: 'Memory'
+                index: 0
+                skip_values:
+                    -
+                        oid: '.1.3.6.1.4.1.40418.7.100.1.11.6.0'
+                        op: '<'
+                        value: 1048576
+            # Legacy table .1.8.1.7/8 slot 1 — populated on S2990X (both 2019
+            # and 2023 firmwares) and other older models. Always bytes.
+            -
+                total: '.1.3.6.1.4.1.40418.7.100.1.8.1.7.1'
+                used: '.1.3.6.1.4.1.40418.7.100.1.8.1.8.1'
+                descr: 'Memory'
+                index: 1
+            # Legacy table .1.8.1.7/8 slot 2 — populated on multi-card S2990X
+            # chassis with redundant management cards.
+            -
+                total: '.1.3.6.1.4.1.40418.7.100.1.8.1.7.2'
+                used: '.1.3.6.1.4.1.40418.7.100.1.8.1.8.2'
+                descr: 'Memory'
+                index: 2
     processors:
         data:
             -
