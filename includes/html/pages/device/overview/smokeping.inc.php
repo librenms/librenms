@@ -37,7 +37,7 @@ if ($smokeping && $smokeping->hasGraphs()) {
 <table class="table table-hover table-condensed table-striped">';
 
     foreach ($directions as $direction => $label) {
-        $graph = \App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth([
+        $graph = App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth([
             'device' => $device_obj->device_id,
             'type' => 'device_smokeping_' . $direction . '_all_avg',
             'from' => LibrenmsConfig::get('time.day'),
@@ -69,7 +69,7 @@ if ($device_obj->os === 'ping' || ! Rrd::checkRrdExists(Rrd::name($device_obj->h
     return;
 }
 
-$graph = \App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth([
+$graph = App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth([
     'device' => $device_obj->device_id,
     'type' => 'device_icmp_perf',
     'from' => LibrenmsConfig::get('time.day'),
