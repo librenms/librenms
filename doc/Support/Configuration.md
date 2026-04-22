@@ -753,14 +753,14 @@ Please refer to [Auto-Discovery](../Extensions/Auto-Discovery.md)
 
 LibreNMS can discover and monitor SSL/TLS certificates presented by your devices (for example, HTTPS on port 443). This helps you track expiry dates and receive alerts before certificates expire.
 
-**Using the feature:** From the Web UI, open **SSL Certificates** to view discovered certificates, add entries manually (host and port), pause or enable monitoring for a certificate, and remove entries. An alert rule **Expiring SSL Certificates** is available to alert when a certificate will expire within 14 days.
+**Using the feature:** From the Web UI, open Overview -> Tools -> SSL Certificates to view discovered certificates, add entries manually (host and port), pause or enable monitoring for a certificate, and remove entries. An alert rule **Expiring SSL Certificates** is available to alert when a certificate will expire within 14 days.
 
 **Behaviour:**
 
 - **Discovery:** A scheduled maintenance job (`lnms maintenance:discover-ssl-certificates`) runs daily and connects to each active device on port 443 (HTTPS). If a certificate is presented, it is stored or updated. You can also run discovery manually for all devices or a single device.
 - **Refresh:** A separate scheduled job (`lnms maintenance:refresh-ssl-certificates`) runs daily to re-check existing certificates and update expiry and other details. You can refresh all enabled certificates or a single one by ID.
 
-**Configuration options:** These can be set in the Web UI under **Applications → SSL Certificates** or via the CLI (`lnms config:set`).
+**Configuration options:** These can be set in the Web UI or via the CLI (`lnms config:set`).
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
