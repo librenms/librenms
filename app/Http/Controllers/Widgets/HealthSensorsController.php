@@ -160,7 +160,11 @@ class HealthSensorsController extends WidgetController
             default => 'device',
         };
         $settings['device'] = isset($settings['device']) && is_numeric($settings['device']) ? (int) $settings['device'] : null;
-        $settings['device_group'] = isset($settings['device_group']) && is_numeric($settings['device_group']) ? (int) $settings['device_group'] : null;
+        if (! ($settingsView && ($settings['device_group'] ?? null) instanceof DeviceGroup)) {
+            $settings['device_group'] = isset($settings['device_group']) && is_numeric($settings['device_group'])
+                ? (int) $settings['device_group']
+                : null;
+        }
         $settings['device_regex'] = trim((string) ($settings['device_regex'] ?? ''));
         $settings['rows'] = isset($settings['rows']) && is_numeric($settings['rows']) ? (int) $settings['rows'] : 4;
         $settings['cols'] = isset($settings['cols']) && is_numeric($settings['cols']) ? (int) $settings['cols'] : 3;
@@ -182,7 +186,6 @@ class HealthSensorsController extends WidgetController
     {
         $settings = $this->getSettings(true);
         $settings['device'] = Device::hasAccess($request->user())->find($settings['device']) ?: null;
-        $settings['device_group'] = DeviceGroup::find($settings['device_group']) ?: null;
 
         return view('widgets.settings.health-sensors', $settings);
     }

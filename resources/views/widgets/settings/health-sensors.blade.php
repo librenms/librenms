@@ -24,7 +24,7 @@
     </div>
     <div class="form-group" id="health-sensors-device-{{ $id }}">
         <label for="device-{{ $id }}" class="control-label">{{ __('Device') }}</label>
-        <select class="form-control" id="device-{{ $id }}" name="device">
+        <select class="form-control" id="device-{{ $id }}">
             @if($device)
                 <option value="{{ $device->device_id }}">{{ $device->displayName() }}</option>
             @endif
@@ -32,7 +32,7 @@
     </div>
     <div class="form-group" id="health-sensors-device-group-{{ $id }}" style="display:none;">
         <label for="device_group-{{ $id }}" class="control-label">{{ __('Device group') }}</label>
-        <select class="form-control" name="device_group" id="device_group-{{ $id }}" data-placeholder="{{ __('Select a device group') }}">
+        <select class="form-control" id="device_group-{{ $id }}" data-placeholder="{{ __('Select a device group') }}">
             @if($device_group)
                 <option value="{{ $device_group->id }}" selected>{{ $device_group->name }}</option>
             @endif
@@ -40,7 +40,7 @@
     </div>
     <div class="form-group" id="health-sensors-device-regex-{{ $id }}" style="display:none;">
         <label for="device_regex-{{ $id }}" class="control-label">{{ __('Device match (regex)') }}</label>
-        <input type="text" class="form-control" name="device_regex" id="device_regex-{{ $id }}" value="{{ $device_regex }}" placeholder="^router">
+        <input type="text" class="form-control" id="device_regex-{{ $id }}" value="{{ $device_regex }}" placeholder="^router">
     </div>
     <div class="form-group">
         <label for="sensor_class_regex-{{ $id }}" class="control-label">{{ __('Sensor class filter (regex)') }}</label>
@@ -80,17 +80,46 @@
 
 @section('javascript')
     <script type="text/javascript">
-        init_select2('#device-{{ $id }}', 'device', {}, @json($device ? ['id' => $device->device_id, 'text' => $device->displayName()] : ''));
-        init_select2('#device_group-{{ $id }}', 'device-group', {});
+        function healthSensorsApplyNames{{ $id }}(scope) {
+            var $device = $('#device-{{ $id }}');
+            var $group = $('#device_group-{{ $id }}');
+            var $regex = $('#device_regex-{{ $id }}');
+
+            $device.removeAttr('name');
+            $group.removeAttr('name');
+            $regex.removeAttr('name');
+
+            if (scope === 'device') {
+                $device.attr('name', 'device');
+            } else if (scope === 'device_group') {
+                $group.attr('name', 'device_group');
+            } else if (scope === 'device_regex') {
+                $regex.attr('name', 'device_regex');
+            }
+        }
 
         function healthSensorsToggleDeviceScope{{ $id }}() {
-            var scope = $('input[name="device_scope"]:checked').val();
+            var $form = $('#health-sensors-device-{{ $id }}').closest('form');
+            var scope = $form.find('input[name="device_scope"]:checked').val();
             $('#health-sensors-device-{{ $id }}').toggle(scope === 'device');
             $('#health-sensors-device-group-{{ $id }}').toggle(scope === 'device_group');
             $('#health-sensors-device-regex-{{ $id }}').toggle(scope === 'device_regex');
+
+            healthSensorsApplyNames{{ $id }}(scope);
         }
 
-        $(document).on('change', 'input[name="device_scope"]', healthSensorsToggleDeviceScope{{ $id }});
-        healthSensorsToggleDeviceScope{{ $id }}();
+        (function () {
+            var $form = $('#health-sensors-device-{{ $id }}').closest('form');
+            $form.on('change', 'input[name=\"device_scope\"]', healthSensorsToggleDeviceScope{{ $id }});
+            healthSensorsToggleDeviceScope{{ $id }}();
+
+            init_select2('#device-{{ $id }}', 'device', {}, @json($device ? ['id' => $device->device_id, 'text' => $device->displayName()] : ''));
+            init_select2(
+                '#device_group-{{ $id }}',
+                'device-group',
+                {},
+                @json($device_group ? ['id' => $device_group->id, 'text' => $device_group->name] : '')
+            );
+        })();
     </script>
 @endsection

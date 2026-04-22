@@ -21,46 +21,47 @@
                 @php($range = max(0.000001, $max - $min))
                 @php($pct = $value === null ? 0.0 : max(0.0, min(100.0, (($value - $min) / $range) * 100.0)))
                 @php($barColor = match ($status) {
-                        'critical' => 'tw:bg-red-600',
-                        'warning' => 'tw:bg-amber-500',
-                        default => 'tw:bg-green-600',
-                    })
+                'critical' => 'tw:bg-red-600',
+                'warning' => 'tw:bg-amber-500',
+                default => 'tw:bg-green-600',
+            })
 
+                                                    <div class="col-sm-{{ $colWidth }}">
+                                                        <div class="tw:mb-3 tw:pt-1.5">
+                                                            <div class="tw:text-center tw:text-2xl tw:font-bold dark:tw:text-gray-500">
+                                                                <a href="{{ $graphUrl }}" class="tw:block tw:w-full tw:no-underline hover:tw:no-underline">{{ \Str::limit($sensor->sensor_descr, 42) }}</a>
+                                                            </div>
+                                                            <div class="tw:rounded tw:border tw:border-black/10 dark:tw:border-black/60 tw:bg-black/5 dark:tw:bg-[#3e444c] tw:p-3">
+                                                                <div class="tw:flex tw:items-baseline tw:justify-between tw:gap-2">
+                                                                    <div class="tw:text-2xl tw:font-semibold tw:leading-tight">
+                                                                        <a href="{{ $graphUrl }}" class="tw:block tw:w-full tw:no-underline hover:tw:no-underline">{{ $sensor->formatValue() }}</a>
+                                                                    </div>
+                                                                    <div class="tw:text-xl tw-font-semibold tw-leading-tight tw:text-right"><a href="{{ $deviceUrl }}" class="tw:text-inherit tw:no-underline hover:tw:underline dark:tw:text-gray-500">{{ $sensor->device?->displayName() ?? __('Unknown device') }}</a>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="tw:mt-2 tw:h-3 tw:w-full tw:rounded tw:bg-black/10 dark:tw:bg-black/40 tw:overflow-hidden">
+                                                                    <div class="tw:h-full {{ $barColor }}" style="width: {{ $pct }}%"></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                @elseif ($display_mode === 'gauge')
                     <div class="col-sm-{{ $colWidth }}">
                         <div class="tw:mb-3 tw:pt-1.5">
-                            <div class="tw:text-center tw:text-2xl tw:font-bold dark:tw:text-gray-500">
-                                {{ \Str::limit($sensor->sensor_descr, 42) }}
+                            <div class="tw:text-center tw:text-base tw:font-bold dark:tw:text-gray-500">
+                                <a href="{{ $graphUrl }}" class="tw:no-underline hover:tw:no-underline">{{ \Str::limit($sensor->sensor_descr, 42) }}</a> - <a href="{{ $deviceUrl }}" class="tw:text-inherit tw:no-underline hover:tw:underline dark:tw:text-gray-500">{{ $sensor->device?->displayName() ?? __('Unknown device') }}</a>
                             </div>
-                            <div class="tw:rounded tw:border tw:border-black/10 dark:tw:border-black/60 tw:bg-black/5 dark:tw:bg-[#3e444c] tw:p-3">
-                                <div class="tw:flex tw:items-baseline tw:justify-between tw:gap-2">
-                                    <div class="tw:text-2xl tw:font-semibold tw:leading-tight">
-                                        {{ $sensor->formatValue() }}
-                                    </div>
-                                </div>
-
-                                <div class="tw:mt-2 tw:h-3 tw:w-full tw:rounded tw:bg-black/10 dark:tw:bg-black/40 tw:overflow-hidden">
-                                    <div class="tw:h-full {{ $barColor }}" style="width: {{ $pct }}%"></div>
-                                </div>
-                            </div>
+                            <div
+                                id="health-gauge-{{ $id }}-{{ $sensor->sensor_id }}"
+                                class="health-gauge-{{ $id }} tw:h-28"
+                                data-value="{{ $sensor->sensor_current ?? 0 }}"
+                                data-min="{{ $row['gauge_min'] }}"
+                                data-max="{{ $row['gauge_max'] }}"
+                                data-symbol="{{ $sensor->unit() }}"
+                            ></div>
                         </div>
                     </div>
-                @elseif ($display_mode === 'gauge')
-                <div class="col-sm-{{ $colWidth }}">
-                    <div class="tw:mb-3 tw:pt-1.5">
-                        <div class="tw:text-center tw:text-base tw:font-bold dark:tw:text-gray-500">
-                            {{ \Str::limit($sensor->sensor_descr, 42) }}
-                        </div>
-                        <div
-                            id="health-gauge-{{ $id }}-{{ $sensor->sensor_id }}"
-                            class="health-gauge-{{ $id }} tw:h-28"
-                            data-value="{{ $sensor->sensor_current ?? 0 }}"
-                            data-min="{{ $row['gauge_min'] }}"
-                            data-max="{{ $row['gauge_max'] }}"
-                            data-symbol="{{ $sensor->unit() }}"
-                        ></div>
-                    </div>
-                </div>
-            @elseif ($display_mode === 'graph')
+                @elseif ($display_mode === 'graph')
                 <div class="col-sm-{{ $colWidth }}">
                     <div class="tw:mb-3 tw:rounded tw:border tw:border-black/10 dark:tw:border-black/60 tw:bg-black/5 dark:tw:bg-[#3e444c] tw:p-2">
                         <div class="tw:text-center tw:text-base tw:font-medium dark:tw:text-gray-700 dark:tw:text-gray-300">
