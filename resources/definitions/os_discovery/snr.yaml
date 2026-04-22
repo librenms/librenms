@@ -1,11 +1,4 @@
 modules:
-    mempools:
-        data:
-            -
-                total: NAG-MIB::sysMemorySize
-                used: NAG-MIB::sysMemoryBusy
-                descr: 'Memory Usage'
-                index: 0
     os:
         hardware:
             - NAG-MIB::sysHardwareVersion.0
@@ -13,23 +6,26 @@ modules:
         version:
             - NAG-MIB::sysSoftwareVersion.0
             - NAG-MIB::sysSoftwareVersion.1
+    processors:
+        data:
+            -
+                oid: NAG-MIB::switchCpuUsage
+                num_oid: '.1.3.6.1.4.1.40418.7.100.1.11.10.{{ $index }}'
+                descr: 'CPU'
     additional_oids:
         data:
             -
                 oid:
-                 - NAG-MIB::portName
-    processors:
-        data:
-            -
-                oid: NAG-MIB::sysCpuUsage
-                num_oid: '.1.3.6.1.4.1.40418.7.100.1.8.1.11.{{ $index }}'
+                    - NAG-MIB::portName
     sensors:
         temperature:
             data:
                 -
-                    oid: NAG-MIB::sysTemperature
-                    num_oid: '.1.3.6.1.4.1.40418.7.100.1.8.1.10.{{ $index }}'
-                    descr: 'Temperature {{ $index }}'
+                    oid: NAG-MIB::switchTemperature
+                    num_oid: '.1.3.6.1.4.1.40418.7.100.1.11.8.{{ $index }}'
+                    descr: 'Temperature'
+                    skip_values:
+                        - 268435356
         state:
             data:
                 -
