@@ -51,6 +51,10 @@ class Snr extends OS implements MempoolsDiscovery
      * We auto-detect by magnitude: any value under 1 MiB is assumed
      * to be megabytes (no realistic device has less than 1 MiB of RAM),
      * anything at or above is treated as bytes.
+     *
+     * @return Collection<int, Mempool>
+     *
+     * @return Collection<int, Mempool>
      */
     public function discoverMempools(): Collection
     {
