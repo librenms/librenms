@@ -154,6 +154,18 @@ return [
             'database' => env('REDIS_CACHE_DB', '1'),
         ],
 
+        'sentinel_default' => [
+            ...explode(',', (string) env('REDIS_SENTINEL_HOSTS', '')),
+            'options' => [
+                'replication' => 'sentinel',
+                'service' => env('REDIS_SENTINEL_SERVICE', 'mymaster'),
+                'parameters' => [
+                    'password' => env('REDIS_PASSWORD', ''),
+                    'database' => env('REDIS_DB', '0'),
+                ],
+            ],
+        ],
+
         'sentinel_session' => [
             ...explode(',', (string) env('REDIS_SENTINEL_HOSTS', '')),
             'options' => [
@@ -161,7 +173,7 @@ return [
                 'service' => env('REDIS_SENTINEL_SERVICE', 'mymaster'),
                 'parameters' => [
                     'password' => env('REDIS_PASSWORD', ''),
-                    'database' => env('REDIS_SESSION_DB', '0'),
+                    'database' => env('REDIS_SESSION_DB', '1'),
                 ],
             ],
         ],
@@ -173,7 +185,7 @@ return [
                 'service' => env('REDIS_SENTINEL_SERVICE', 'mymaster'),
                 'parameters' => [
                     'password' => env('REDIS_PASSWORD', ''),
-                    'database' => env('REDIS_CACHE_DB', '1'),
+                    'database' => env('REDIS_CACHE_DB', '2'),
                 ],
             ],
         ],
