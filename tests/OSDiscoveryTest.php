@@ -70,7 +70,6 @@ final class OSDiscoveryTest extends TestCase
             'allworx_voip',
             'arista_eos',
             'xirrus_aos',
-            'fujitsuiRMC',
             'ies52xxM',
             'polycomLens',
         ];
