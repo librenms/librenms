@@ -30,7 +30,6 @@ use App\Models\Mempool;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\OS;
-use LibreNMS\Util\IP;
 use SnmpQuery;
 
 class Snr extends OS implements MempoolsDiscovery
@@ -79,16 +78,16 @@ class Snr extends OS implements MempoolsDiscovery
         }
 
         $mempool = new Mempool([
-            'mempool_index'     => 0,
-            'mempool_type'      => 'snr',
-            'mempool_class'     => 'system',
+            'mempool_index' => 0,
+            'mempool_type' => 'snr',
+            'mempool_class' => 'system',
             'mempool_precision' => 1,
-            'mempool_descr'     => 'Memory',
+            'mempool_descr' => 'Memory',
             'mempool_perc_warn' => 90,
-            'mempool_total'     => $total_bytes,
-            'mempool_used'      => $used_bytes,
-            'mempool_free'      => $total_bytes - $used_bytes,
-            'mempool_perc'      => is_numeric($percent) ? (int) $percent : null,
+            'mempool_total' => $total_bytes,
+            'mempool_used' => $used_bytes,
+            'mempool_free' => $total_bytes - $used_bytes,
+            'mempool_perc' => is_numeric($percent) ? (int) $percent : null,
         ]);
 
         $mempool->fillUsage($mempool->mempool_used, $mempool->mempool_total, $mempool->mempool_free, $mempool->mempool_perc);
