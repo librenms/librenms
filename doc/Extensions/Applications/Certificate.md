@@ -1,5 +1,8 @@
 ## Certificate
 
+!!! note
+    This feature is not the same as the core [SSL Certificate Management](../../Support/Configuration.md)
+
 A small python3 script that checks age and remaining validity of certificates
 
 

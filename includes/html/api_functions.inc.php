@@ -68,6 +68,7 @@ use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\Time;
 
 function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null): JsonResponse
 {
@@ -1817,7 +1818,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
     // New operation-based API fields
     $operations = $data['operations'] ?? null;
     $defaultOperationStepDuration = array_key_exists('default_operation_step_duration', $data)
-        ? convert_delay((string) $data['default_operation_step_duration'])
+        ? Time::durationToSeconds((string) $data['default_operation_step_duration'])
         : null;
 
     // Backwards compatibility: legacy timing fields are converted into a single problem operation.
@@ -1827,8 +1828,8 @@ function add_edit_rule(Illuminate\Http\Request $request)
         || array_key_exists('mute', $data);
     if (! is_array($operations) && $legacyProvided && ! array_key_exists('alert_operation_id', $data)) {
         $legacyCount = isset($data['count']) ? (int) $data['count'] : -1;
-        $legacyDelaySec = convert_delay((string) ($data['delay'] ?? 0));
-        $legacyIntervalSec = convert_delay((string) ($data['interval'] ?? 0));
+        $legacyDelaySec = Time::durationToSeconds((string) ($data['delay'] ?? 0));
+        $legacyIntervalSec = Time::durationToSeconds((string) ($data['interval'] ?? 0));
         $legacyMute = filter_var($data['mute'] ?? false, FILTER_VALIDATE_BOOLEAN);
         [$defaultSingles, $defaultGroups] = api_default_transport_targets();
         $legacyTransports = array_map(static fn ($id) => (string) $id, $defaultSingles);

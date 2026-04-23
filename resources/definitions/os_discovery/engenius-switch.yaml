@@ -1,0 +1,5 @@
+modules:
+    os:
+        sysDescr_regex: '/EnGenius (?<hardware>\S+)/'
+        version: ENTITY-MIB::entPhysicalFirmwareRev.1
+        serial: ENTITY-MIB::entPhysicalSerialNum.1

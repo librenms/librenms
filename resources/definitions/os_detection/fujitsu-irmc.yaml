@@ -1,4 +1,4 @@
-os: fujitsuiRMC
+os: fujitsu-irmc
 text: 'FUJITSU iRMC'
 icon: fujitsu
 type: appliance
