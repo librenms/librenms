@@ -55,7 +55,7 @@
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
     <script src="{{ asset('js/popper.min.js') }}"></script>
     <script src="{{ asset('js/jquery.min.js?ver=05072021') }}"></script>
-    <script src="{{ asset('js/bootstrap.min.js?ver=22042026') }}"></script>
+    <script src="{{ asset('js/bootstrap.min.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/bootstrap-hover-dropdown.min.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/bootstrap-switch.min.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/hogan-2.0.0.js') }}"></script>
