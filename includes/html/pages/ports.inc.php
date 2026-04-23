@@ -61,6 +61,9 @@ foreach ($menu_options as $option => $text) {
     }
     $sep = ' | ';
 }
+if (isset($vars['group']) && $vars['group']) {
+    $displayLists .= ' | <a href="' . url('iftype/group=' . $vars['group']) . '"><i class="fa fa-chart-area fa-fw fa-lg"></i></a>';
+}
 
 $displayLists .= '<div style="float: right;">';
 $displayLists .= '<a href="' . \LibreNMS\Util\Url::generate($vars) . '" title="Update the browser URL to reflect the search criteria.">Update URL</a> | ';
