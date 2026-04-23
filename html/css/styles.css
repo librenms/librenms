@@ -1406,7 +1406,7 @@ nav.navbar-sticky-top {
   width: 32px;
 }
 
-.gridster * {
+.gridster *, .grid-stack * {
   margin:0;
   text-align: left;
 }
@@ -1415,20 +1415,20 @@ nav.navbar-sticky-top {
   list-style-type: none;
 }
 
-.gridster li {
+.gridster li, .grid-stack .grid-stack-item {
     font-size: 1em;
     line-height: 100%;
 }
 
-.gridster .awesome-marker {
+.gridster .awesome-marker, .grid-stack .awesome-marker {
   text-align: center;
 }
 
-.gridster {
+.gridster, .grid-stack {
     margin: 0 auto;
 }
 
-.gridster .gs-w {
+.gridster .gs-w, .grid-stack .grid-stack-item-content {
     background: #ffffff;
     box-shadow: inset 0 0 2px #000;
     color: #000000;

@@ -32,14 +32,14 @@
     <link href="{{ asset('css/vis.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/fontawesome.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/v4-shims.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/jquery.gridster.min.css?ver=09292021') }}" rel="stylesheet">
+    <link href="{{ asset('css/gridstack.min.css?ver=04232026') }}" rel="stylesheet">
     <link href="{{ asset('css/leaflet.css') }}" rel="stylesheet">
     <link href="{{ asset('css/MarkerCluster.css') }}" rel="stylesheet">
     <link href="{{ asset('css/MarkerCluster.Default.css') }}" rel="stylesheet">
     <link href="{{ asset('css/L.Control.Locate.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/leaflet.awesome-markers.css') }}" rel="stylesheet">
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/select2-bootstrap4.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet">
     <link href="{{ asset(LibrenmsConfig::get('stylesheet', 'css/styles.css')) }}?ver=02132026" rel="stylesheet">
     <link href="{{ asset('css/tw_dark.css?ver=19112025') }}" rel="stylesheet">
@@ -55,7 +55,7 @@
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
     <script src="{{ asset('js/popper.min.js') }}"></script>
     <script src="{{ asset('js/jquery.min.js?ver=05072021') }}"></script>
-    <script src="{{ asset('js/bootstrap.min.js?ver=05072021') }}"></script>
+    <script src="{{ asset('js/bootstrap4.min.js?ver=22042026') }}"></script>
     <script src="{{ asset('js/bootstrap-hover-dropdown.min.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/bootstrap-switch.min.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/hogan-2.0.0.js') }}"></script>
