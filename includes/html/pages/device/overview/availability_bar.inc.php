@@ -146,10 +146,10 @@ foreach ($day_data as $day) {
         }
     }
 
-    echo '<div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false"';
+    echo '<div x-data="{ open:false, x:0, y:0, place(){ const r=this.$el.getBoundingClientRect(); this.x=r.left+r.width/2; this.y=r.top; this.$nextTick(()=>{ const w=this.$refs.tip?.offsetWidth||0; const pad=8; this.x=Math.max(pad+w/2, Math.min(window.innerWidth-pad-w/2, this.x)); }); } }" @mouseenter="open=true; place()" @mouseleave="open=false" @scroll.window="open && place()" @resize.window="open && place()"';
     echo ' class="tw:flex-1 tw:h-[34px] tw:rounded-sm tw:cursor-pointer tw:relative" style="background:' . $day['color'] . ';">';
-    echo '<div x-show="open" x-cloak';
-    echo ' class="tw:absolute tw:bottom-[42px] tw:left-1/2 tw:-translate-x-1/2 tw:bg-white tw:border tw:border-gray-300 tw:rounded tw:min-w-[280px] tw:px-8 tw:py-5 tw:text-xl tw:font-medium tw:whitespace-nowrap tw:z-[9999] tw:shadow-md tw:pointer-events-none">';
+    echo '<div x-ref="tip" x-show="open" x-cloak :style="`left:${x}px; top:${y - 8}px; transform: translate(-50%, -100%);`"';
+    echo ' class="tw:fixed tw:bg-white tw:border tw:border-gray-300 tw:rounded tw:min-w-[280px] tw:px-8 tw:py-5 tw:text-xl tw:font-medium tw:whitespace-nowrap tw:z-[9999] tw:shadow-md tw:pointer-events-none">';
     echo $tip;
     echo '</div>';
     echo '</div>';

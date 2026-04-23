@@ -31,6 +31,11 @@ groups:
         - alert-transport.update
         - alert-transport.delete
 
+    alert-operation:
+        - alert-operation.view
+        - alert-operation.create
+        - alert-operation.update
+        - alert-operation.delete
     api:
         - api.access
 
