@@ -31,9 +31,15 @@ $days = 90;
 $start = $now - ($days * 86400);
 
 // Determine when the device was added
-$inserted = $device_obj->inserted
-    ? $device_obj->inserted->timestamp
-    : $now;
+// Fall back to the oldest known outage for devices where inserted is NULL
+// (devices added before the inserted column was introduced in 2020)
+if ($device_obj->inserted) {
+    $inserted = $device_obj->inserted->timestamp;
+} else {
+    $oldest_outage = \App\Models\DeviceOutage::where('device_id', $device_id)
+        ->min('going_down');
+    $inserted = $oldest_outage ?: $start;
+}
 
 $outages = \App\Models\DeviceOutage::where('device_id', $device_id)
     ->where(function ($q) use ($start): void {
