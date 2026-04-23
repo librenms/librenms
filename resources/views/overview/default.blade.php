@@ -12,7 +12,7 @@
         <div class="btn-group btn-lg">
             <button class="btn btn-default disabled" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.title') }}</span></button>
             <div class="btn-group">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false" style="min-width:160px;">
                     <span class="pull-left">{{ $dashboard->user_id != Auth::id() ? ($dashboard->user->username ?? trans('dashboard.deleted_user')) . ':' : null}} {{ $dashboard->dashboard_name }}</span>
                 <span class="pull-right">
                 <span class="caret"></span>
@@ -120,7 +120,7 @@
                         <div class="btn-group" role="group">
                             <a class="btn btn-default disabled" role="button" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.widgets.add') }}</span></a>
                             <div class="btn-group">
-                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.widgets.select') }}</span>
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.widgets.select') }}</span>
                                 <span class="pull-right">
                                     <span class="caret"></span>
                                     <span class="sr-only">{{ trans('dashboard.toggle_dropdown') }}</span>
