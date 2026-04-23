@@ -856,15 +856,6 @@
                 hideDashboardEditor = hideDashboardEditor ? 0 : 1;
                 $('#toggle-dashboard-editor-text').text(hideDashboardEditor ? '{{ __('Show Dashboard Editor') }}' : '{{ __('Hide Dashboard Editor') }}')
 
-                // disable and hide editing
-                if (typeof gridster !== 'undefined') {
-                    gridster.disable();
-                    gridster.disable_resize();
-                    gridster_state = 0;
-                    $('.fade-edit').fadeOut();
-                    dashboard_collapse("#hide_edit");
-                }
-
                 $('#dashboard-editor').collapse(hideDashboardEditor ? 'hide' : 'show');
             }
         });
