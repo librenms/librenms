@@ -60,7 +60,7 @@ $inserted = min(array_filter([
     $device_obj->inserted?->timestamp,
     $now_ts - $device_obj->uptime,
     $outages->first()?->going_down,
-], fn($v) => $v !== null));
+], fn ($v) => $v !== null));
 
 // Thresholds (configurable via config.php)
 $threshold_good = LibrenmsConfig::get('availability_bar.threshold_good', 99);
