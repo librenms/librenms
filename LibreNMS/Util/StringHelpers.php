@@ -107,18 +107,18 @@ class StringHelpers
             return (string) $converted;
         }
 
-        foreach (['GB18030', 'GBK', 'GB2312'] as $encoding) {
-            if (($converted = @iconv($encoding, 'UTF-8', $string)) !== false) {
-                return (string) $converted;
-            }
-        }
-
         if ($charset !== 'Windows-1252' && ($converted = @iconv('Windows-1252', 'UTF-8', $string)) !== false) {
             return (string) $converted;
         }
 
         if ($charset !== 'CP850' && ($converted = @iconv('CP850', 'UTF-8', $string)) !== false) {
             return (string) $converted;
+        }
+
+        foreach (['GB18030', 'GBK', 'GB2312'] as $encoding) {
+            if (($converted = @iconv($encoding, 'UTF-8', $string)) !== false) {
+                return (string) $converted;
+            }
         }
 
         \Log::debug('Failed to convert string: ' . $string);
