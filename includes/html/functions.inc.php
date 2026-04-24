@@ -419,18 +419,15 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     }
 
     if (isset($tmp_alerts['port_id'])) {
-        $tmp_alerts = cleanPort($tmp_alerts);
+        $port = PortCache::get($tmp_alerts['port_id']);
         if (! empty($tmp_alerts['isisISAdjState'])) {
             $fault_detail .= 'Adjacent ' . e($tmp_alerts['isisISAdjIPAddrAddress']);
-            $port = Port::find($tmp_alerts['port_id']);
             $fault_detail .= ', Interface ' . Url::portLink($port);
         } else {
-            $fault_detail .= generate_port_link($tmp_alerts) . ';&nbsp;';
+            $fault_detail .= Url::portLink($port) . ';&nbsp;';
         }
-        if ((isset($tmp_alerts['ifDescr'])) && (isset($tmp_alerts['ifAlias'])) && ($tmp_alerts['ifDescr'] != $tmp_alerts['ifAlias'])) {
-            // IfAlias has been set, so display it on alarms
-            $fault_detail .= $tmp_alerts['ifAlias'] . '; ';
-            unset($tmp_alerts['label']);
+        if ($port->ifDescr != $port->ifAlias) {
+            $fault_detail .= $port->ifAlias . '; ';
         }
         $fallback = false;
     }

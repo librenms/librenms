@@ -4,6 +4,7 @@ use App\Models\Ipv4Address;
 use App\Models\Ipv6Address;
 use App\Models\Port;
 use App\Models\Storage;
+use LibreNMS\Util\Url;
 
 require base_path('includes/nfs-shared.inc.php');
 
@@ -229,13 +230,8 @@ if ($vars['app_page'] == 'general') {
                     if (isset($port)) {
                         $new_host['raw'] = true;
                         $new_host['data'] = $data['host'] . ' (' .
-                            generate_device_link(['device_id' => $port->device_id]) . ', ' .
-                            generate_port_link([
-                                'label' => $port->label,
-                                'port_id' => $port->port_id,
-                                'ifName' => $port->ifName,
-                                'device_id' => $port->device_id,
-                            ]) . ')';
+                            Url::deviceLink($port->device) . ', ' .
+                            Url::portLink($port) . ')';
                     } else {
                         $new_host['data'] = $data['host'];
                     }
@@ -341,13 +337,8 @@ if ($vars['app_page'] == 'general') {
                     if (isset($port)) {
                         $new_host['raw'] = true;
                         $new_host['data'] = $data['host'] . ' (' .
-                            generate_device_link(['device_id' => $port->device_id]) . ', ' .
-                            generate_port_link([
-                                'label' => $port->label,
-                                'port_id' => $port->port_id,
-                                'ifName' => $port->ifName,
-                                'device_id' => $port->device_id,
-                            ]) . ')';
+                            Url::deviceLink($port->device) . ', ' .
+                            Url::portLink($port) . ')';
                     } else {
                         $new_host['data'] = $data['host'];
                     }
