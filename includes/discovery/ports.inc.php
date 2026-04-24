@@ -126,6 +126,8 @@ $default_port_group = LibrenmsConfig::get('default_port_group');
 foreach ($port_stats as $ifIndex => $snmp_data) {
     $snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry
     $snmp_data['ifAlias'] = StringHelpers::inferEncoding($snmp_data['ifAlias'] ?? null);
+    $snmp_data['ifName'] = StringHelpers::inferEncoding($snmp_data['ifName'] ?? null);
+    $snmp_data['ifDescr'] = StringHelpers::inferEncoding($snmp_data['ifDescr'] ?? null);
 
     // Get port_id according to port_association_mode used for this device
     $port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);
