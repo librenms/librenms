@@ -62,9 +62,9 @@ $inserted = min(array_filter([
     $outages->first()?->going_down,
 ], fn ($v) => $v !== null));
 
-// Thresholds (configurable via config.php)
-$threshold_good = LibrenmsConfig::get('availability_bar.threshold_good', 99);
-$threshold_medium = LibrenmsConfig::get('availability_bar.threshold_medium', 95);
+// Thresholds
+$threshold_good = LibrenmsConfig::get('webui.availability_bar.threshold_good', 99.9);
+$threshold_medium = LibrenmsConfig::get('webui.availability_bar.threshold_medium', 95);
 
 // Build per-day availability data
 $day_data = [];
@@ -94,14 +94,14 @@ for ($i = 0; $i < $days; $i++) {
     $availability = max(0, min(100, 100 - ($outage_seconds / 86400 * 100)));
 
     if ($day_start < $inserted) {
-        $color = '#cccccc';
+        $color = 'tw:bg-gray-300';
         $outage_lines = ['no_data'];
     } elseif ($availability >= $threshold_good) {
-        $color = '#2ecc71';
+        $color = 'tw:bg-green-400';
     } elseif ($availability >= $threshold_medium) {
-        $color = '#f39c12';
+        $color = 'tw:bg-orange-400';
     } else {
-        $color = '#e74c3c';
+        $color = 'tw:bg-red-500';
     }
     $day_data[] = [
         'date' => Time::format($day_start, 'date'),
@@ -118,11 +118,6 @@ $total_outage = $outages->reduce(function ($carry, $outage) use ($start_ts, $now
 
     return $carry + max(0, (int) $up - (int) $down);
 }, 0);
-
-$total_avail = round(
-    max(0, min(100, 100 - ($total_outage / ($days * 86400) * 100))),
-    2
-);
 
 echo <<<'HTML'
 <div class="row">
@@ -154,7 +149,7 @@ foreach ($day_data as $day) {
     echo <<<HTML
     <div x-data="{ open:false, x:0, y:0, place(){ const r=this.\$el.getBoundingClientRect(); this.x=r.left+r.width/2; this.y=r.top; this.\$nextTick(()=>{ const w=this.\$refs.tip?.offsetWidth||0; const pad=8; this.x=Math.max(pad+w/2, Math.min(window.innerWidth-pad-w/2, this.x)); }); } }"
          @mouseenter="open=true; place()" @mouseleave="open=false" @scroll.window="open && place()" @resize.window="open && place()"
-         class="tw:flex-1 tw:h-12 tw:rounded-sm tw:cursor-pointer tw:relative" style="background:{$day['color']};">
+         class="tw:flex-1 tw:h-12 tw:rounded-sm tw:cursor-pointer tw:relative {$day['color']}">
         <div x-ref="tip" x-show="open" x-cloak :style="`left:\${x}px; top:\${y - 8}px; transform: translate(-50%, -100%);`"
              class="tw:fixed tw:bg-white tw:border tw:border-gray-300 tw:rounded tw:min-w-70 tw:px-8 tw:py-5 tw:text-xl tw:font-medium tw:whitespace-nowrap tw:z-9999 tw:shadow-md tw:pointer-events-none">
             $tip
@@ -163,11 +158,24 @@ foreach ($day_data as $day) {
 HTML;
 }
 
+$total_avail = round(
+    max(0, min(100, 100 - ($total_outage / ($days * 86400) * 100))),
+    3
+);
+
+if ($total_avail >= $threshold_good) {
+    $total_color = '';
+} elseif ($total_avail >= $threshold_medium) {
+    $total_color = 'tw:text-orange-400';
+} else {
+    $total_color = 'tw:text-red-400';
+}
+
 echo <<<HTML
                 </div>
                 <div class="tw:flex tw:justify-between tw:text-[11px] tw:text-gray-400 tw:mt-1">
                     <span>90 days ago</span>
-                    <span><strong>$total_avail% uptime</strong></span>
+                    <span><strong class="$total_color">$total_avail% uptime</strong></span>
                     <span>Today</span>
                 </div>
             </div>

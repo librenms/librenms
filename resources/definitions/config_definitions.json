@@ -7381,18 +7381,18 @@
             "type": "boolean"
         },
         "webui.availability_bar.threshold_good": {
-            "default": 99,
+            "default": 99.9,
             "group": "webui",
             "section": "availability-bar",
             "order": 1,
-            "type": "integer"
+            "type": "float"
         },
         "webui.availability_bar.threshold_medium": {
             "default": 95,
             "group": "webui",
             "section": "availability-bar",
             "order": 2,
-            "type": "integer"
+            "type": "float"
         },
         "webui.custom_css": {
             "default": [],

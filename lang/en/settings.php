@@ -2418,13 +2418,15 @@ return [
                 'help' => 'When managing scheduled maintenances, this will be the default option for the Behavior option.',
             ],
             'availability_bar' => [
-                'threshold_green' => [
+                'threshold_good' => [
                     'description' => 'Threshold Green',
                     'help' => 'Threshold for green color',
+                    'unit' => 'Percent',
                 ],
-                'threshold_orange' => [
+                'threshold_medium' => [
                     'description' => 'Threshold Orange',
                     'help' => 'Threshold for orange color',
+                    'unit' => 'Percent',
                 ],
             ],
             'alert_map_compact' => [
