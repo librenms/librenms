@@ -149,7 +149,7 @@ foreach ($day_data as $day) {
     }
     $tip = implode('', $tipLines);
 
-    echo <<<'HTML'
+    echo <<<HTML
     <div x-data="{ open:false, x:0, y:0, place(){ const r=this.\$el.getBoundingClientRect(); this.x=r.left+r.width/2; this.y=r.top; this.\$nextTick(()=>{ const w=this.\$refs.tip?.offsetWidth||0; const pad=8; this.x=Math.max(pad+w/2, Math.min(window.innerWidth-pad-w/2, this.x)); }); } }"
          @mouseenter="open=true; place()" @mouseleave="open=false" @scroll.window="open && place()" @resize.window="open && place()"
          class="tw:flex-1 tw:h-12 tw:rounded-sm tw:cursor-pointer tw:relative" style="background:{$day['color']};">
@@ -161,7 +161,7 @@ foreach ($day_data as $day) {
 HTML;
 }
 
-echo <<<'HTML'
+echo <<<HTML
                 </div>
                 <div class="tw:flex tw:justify-between tw:text-[11px] tw:text-gray-400 tw:mt-1">
                     <span>90 days ago</span>
