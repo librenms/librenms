@@ -587,6 +587,9 @@ foreach ($ports as $port) {
             $this_port['ifName'] = $matches[1];
         }
 
+        $this_port['ifName'] = StringHelpers::inferEncoding($this_port['ifName'] ?? null);
+        $this_port['ifDescr'] = StringHelpers::inferEncoding($this_port['ifDescr'] ?? null);
+
         $polled_period = max($polled - $port['poll_time'], 1);
 
         $port['update'] = [];
