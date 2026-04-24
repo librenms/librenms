@@ -40,16 +40,9 @@ $now_ts = $now->timestamp;
 
 $outages = DeviceOutage::where('device_id', $device_id)
     ->where(function ($q) use ($start_ts): void {
-        $q->where('going_down', '>=', $start_ts)
-          ->orWhere(function ($q2) use ($start_ts): void {
-              $q2->where('going_down', '<', $start_ts)
-                 ->where(function ($q3) use ($start_ts): void {
-                     $q3->whereNull('up_again')
-                        ->orWhere('up_again', '>', $start_ts);
-                 });
-          });
+        $q->whereNull('up_again')
+          ->orWhere('up_again', '>', $start_ts);
     })
-    ->where('up_again', '!=', 0)
     ->orderBy('going_down')
     ->toBase()
     ->get(['going_down', 'up_again']);
@@ -172,7 +165,7 @@ if ($total_avail >= $threshold_good) {
 } elseif ($total_avail >= $threshold_medium) {
     $total_color = 'tw:text-orange-400';
 } else {
-    $total_color = 'tw:text-red-400';
+    $total_color = 'tw:text-red-500';
 }
 
 echo <<<HTML
