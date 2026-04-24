@@ -124,7 +124,7 @@ echo <<<HTML
                 <strong> Availability (90 days)</strong>
             </div>
             <div class="panel-body tw:px-4 tw:py-2.5">
-                <div class="tw:flex tw:gap-0.5 tw:items-center">
+                <div class="tw:flex tw:gap-px tw:items-center">
 HTML;
 
 foreach ($day_data as $day) {
