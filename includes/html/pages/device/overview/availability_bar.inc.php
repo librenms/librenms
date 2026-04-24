@@ -54,8 +54,8 @@ $inserted = $device_obj->inserted->timestamp ?? min(array_filter([
 ], fn ($v) => $v !== null));
 
 // Thresholds
-$threshold_good = LibrenmsConfig::get('webui.availability_bar.threshold_good', 99.9);
-$threshold_medium = LibrenmsConfig::get('webui.availability_bar.threshold_medium', 95);
+$threshold_ok = LibrenmsConfig::get('availablity.threshold_ok', 99.9);
+$threshold_medium = LibrenmsConfig::get('availablity.threshold_warning', 95);
 
 // Build per-day availability data
 $day_data = [];
@@ -92,7 +92,7 @@ for ($i = 0; $i < $days; $i++) {
     if ($day_start < $inserted) {
         $color = 'tw:bg-gray-300';
         $outage_lines = ['no_data'];
-    } elseif ($availability >= $threshold_good) {
+    } elseif ($availability >= $threshold_ok) {
         $color = 'tw:bg-green-400';
     } elseif ($availability >= $threshold_medium) {
         $color = 'tw:bg-orange-400';
@@ -159,7 +159,7 @@ $total_avail = round(
     3
 );
 
-if ($total_avail >= $threshold_good) {
+if ($total_avail >= $threshold_ok) {
     $total_color = '';
 } elseif ($total_avail >= $threshold_medium) {
     $total_color = 'tw:text-orange-400';

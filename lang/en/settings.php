@@ -582,6 +582,16 @@ return [
             'description' => 'Auth log entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
+        'availablity' => [
+            'threshold_ok' => [
+                'description' => 'Availability Ok Threshold',
+                'help' => 'Threshold for green color',
+            ],
+            'threshold_warning' => [
+                'description' => 'Availablilty Warning Threshold',
+                'help' => 'Threshold for orange color',
+            ],
+        ],
         'bad_entity_sensor_regex' => [
             'description' => 'Bad Entity Sensor Regex',
             'help' => 'Regex to match bad entity sensors, these will not be displayed in the web interface.',
@@ -2417,18 +2427,6 @@ return [
                 'description' => 'Default Behaviour',
                 'help' => 'When managing scheduled maintenances, this will be the default option for the Behavior option.',
             ],
-            'availability_bar' => [
-                'threshold_good' => [
-                    'description' => 'Threshold Green',
-                    'help' => 'Threshold for green color',
-                    'unit' => 'Percent',
-                ],
-                'threshold_medium' => [
-                    'description' => 'Threshold Orange',
-                    'help' => 'Threshold for orange color',
-                    'unit' => 'Percent',
-                ],
-            ],
             'alert_map_compact' => [
                 'description' => 'Alert map compact view',
                 'help' => 'Alert map view with small indicators',
@@ -2549,6 +2547,7 @@ return [
         'days' => 'days',
         'ms' => 'ms',
         'seconds' => 'seconds',
+        'percent' => '%'
     ],
     'validate' => [
         'boolean' => ':value is not a valid boolean',

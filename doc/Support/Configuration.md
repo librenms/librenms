@@ -592,19 +592,19 @@ the timeline of the graphs quite easily.
 Graphs will be movable/scalable without reloading the page:
 ![Example dynamic graph usage](img/dynamic-graph-usage.gif)
 
-## Availability Bar
+## Availability Thresholds
 
-The availability bar on the device overview page shows per-day uptime over the last 90 days.
-You can configure the thresholds for the colour coding:
+This will determine what thresholds show ok/warning/error in various screens
+including the device 90 day availability widget
 
-- **Green**: availability >= threshold_good (default: 99%)
-- **Orange**: availability >= threshold_medium (default: 95%)
-- **Red**: availability < threshold_medium
+- **Green**: availability >= availablity.threshold_ok (default: 99.9%)
+- **Orange**: availability >= availablity.threshold_warning (default: 95%)
+- **Red**: availability < availablity.threshold_warning
 
 !!! setting "webui/availability-bar"
     ```bash
-    lnms config:set webui.availability_bar.threshold_good 99
-    lnms config:set webui.availability_bar.threshold_medium 95
+    lnms config:set availablity.threshold_ok 99
+    lnms config:set availablity.threshold_warning 95
     ```
 
 ## Stacked Graphs
