@@ -107,9 +107,11 @@ class StringHelpers
             return (string) $converted;
         }
 
-        // Detect GB multi-byte pattern (0x81-0xFE followed by 0x40-0x7E or 0x80-0xFE)
-        // This is a characteristic signature of GB encodings and helps distinguish from Western encodings
-        $hasGbPattern = (bool) preg_match('/[\x81-\xFE][\x40-\x7E\x80-\xFE]/s', $string);
+        // Detect GB multi-byte pattern: strict GB2312 range (0xA1-0xF7, 0xA1-0xFE)
+        // or GBK extended range (0x81-0xA0, 0x40-0x7E/0x80-0xFE). Count occurrences to avoid
+        // false positives from Western encodings like CP850 which may have single high-byte pairs.
+        $gbPatternCount = preg_match_all('/[\xA1-\xF7][\xA1-\xFE]|[\x81-\xA0][\x40-\x7E\x80-\xFE]/s', $string);
+        $hasGbPattern = $gbPatternCount >= 2;
 
         if ($hasGbPattern) {
             // GB pattern detected, prioritize GB family encodings
