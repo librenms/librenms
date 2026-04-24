@@ -28,7 +28,6 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Enum\Severity;
 
@@ -85,51 +84,11 @@ class Eventlog extends DeviceRelatedModel
             $log->device_id = $device;
         }
 
-        try {
-            $this->save_log($log, $device);
-        } catch (QueryException $e) {
-            if (! str_contains($e->getMessage(), 'Incorrect string value')) {
-                throw $e;
-            }
-
-            $convertedText = self::convert_gbk2utf8($text);
-            if ($convertedText === null || $convertedText === $text) {
-                throw $e;
-            }
-
-            $log->message = $convertedText;
-            $this->save_log($log, $device);
-        }
-    }
-
-    private function save_log(self $log, Device|int|null $device): void
-    {
         if ($device instanceof Device) {
             $device->eventlogs()->save($log);
         } else {
             $log->save();
         }
-    }
-
-    private static function convert_gbk2utf8(string $text): ?string
-    {
-        if (mb_check_encoding($text, 'UTF-8')) {
-            return null;
-        }
-
-        foreach (['GB18030', 'GBK', 'GB2312'] as $encoding) {
-            $converted = @mb_convert_encoding($text, 'UTF-8', $encoding);
-            if (! is_string($converted) || $converted === '' || ! mb_check_encoding($converted, 'UTF-8')) {
-                continue;
-            }
-
-            $roundTrip = @mb_convert_encoding($converted, $encoding, 'UTF-8');
-            if ($roundTrip === $text) {
-                return $converted;
-            }
-        }
-
-        return null;
     }
 
     // ---- Define Relationships ----
