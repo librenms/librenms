@@ -99,7 +99,6 @@ return [
             'reporting' => ['name' => 'Reporting'],
         ],
         'webui' => [
-            'availability-bar' => ['name' => 'Availability Bar Settings'],
             'availability-map' => ['name' => 'Availability Map Settings'],
             'custom-map' => ['name' => 'Custom Map Settings'],
             'graph' => ['name' => 'Graph Settings'],
