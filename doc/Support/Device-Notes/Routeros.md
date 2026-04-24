@@ -8,7 +8,7 @@ This agent script will allow LibreNMS to run a script on a Mikrotik / RouterOS d
 - Open a Terminal / CLI on each tik and run this.  ```{ :global txtContent [/file get LNMS_vlans contents]; /system/script/add name=LNMS_vlans owner=admin policy=ftp,reboot,read,write,policy,test,password,sniff,sensitive,romon source=$txtContent ;}```  This will import the contents of that txt file into a script named LNMS_vlans
 - Run the following command on the MikroTik switch to ensure the script has the necessary execution rights: ```/system script set [find name=LNMS_vlans] dont-require-permissions=yes```
 - Enable an SNMP community that has both READ and WRITE capabilities. This is important, otherwise, LibreNMS will not be able to run the above script. It is recommended to use SNMP v3 for this.
-- Enable the "Unix Agent" and "VLANs" module in LibreNMS for the MikroTik device (Device -> Edit -> Modules).
+- Enable the "VLANs" module in LibreNMS for the MikroTik device (Device -> Edit -> Modules).
 - Discover / Force rediscover your Mikrotik devices. After discovery has been completed the vlans menu should appear within LibreNMS for the device.
 
 ### *** IMPORTANT NOTE ***
