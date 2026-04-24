@@ -27,6 +27,7 @@
 
 use App\Facades\LibrenmsConfig;
 use App\Models\DeviceOutage;
+use Carbon\CarbonInterval;
 
 $device_obj = DeviceCache::getPrimary();
 $device_id = $device_obj->device_id;
@@ -45,8 +46,10 @@ $outages = DeviceOutage::where('device_id', $device_id)
                  });
           });
     })
+    ->where('up_again', '!=', 0)
     ->orderBy('going_down')
-    ->get();
+    ->toBase()
+    ->get(['going_down', 'up_again']);
 
 // Determine when the device was added
 $inserted = $device_obj->inserted
@@ -72,15 +75,10 @@ for ($i = 0; $i < $days; $i++) {
         if ($up > $down) {
             $duration = $up - $down;
             $outage_seconds += $duration;
-            $hours = (int) floor($duration / 3600);
-            $minutes = (int) floor(($duration % 3600) / 60);
             $time_str = date('H:i', $outage->going_down);
-            $duration_str = $hours > 0
-                ? "{$hours} hrs {$minutes} mins"
-                : "{$minutes} mins";
+            $duration_str = CarbonInterval::seconds($duration)->cascade()->forHumans(['short' => true, 'parts' => 2]);
 
-            $outage_lines[] = 'Outage at ' . $time_str
-                . ' &bull; ' . $duration_str;
+            $outage_lines[] = "Outage at $time_str &bull; $duration_str";
         }
     }
 
@@ -105,61 +103,66 @@ for ($i = 0; $i < $days; $i++) {
 }
 
 // Calculate total availability over the full period.
-$total_outage = 0;
-foreach ($outages as $outage) {
+$total_outage = $outages->reduce(function ($carry, $outage) use ($start, $now) {
     $down = max($outage->going_down, $start);
     $up = min($outage->up_again ?: $now, $now);
 
-    if ($up > $down) {
-        $total_outage += ($up - $down);
-    }
-}
+    return $carry + max(0, (int) $up - (int) $down);
+}, 0);
 
 $total_avail = round(
     max(0, min(100, 100 - ($total_outage / ($days * 86400) * 100))),
     2
 );
 
-// Render the availability bar panel
-echo '<div class="row">';
-echo '<div class="col-md-12">';
-echo '<div class="panel panel-default panel-condensed">';
-echo '<div class="panel-heading">';
-echo '<i class="fa fa-check-circle fa-lg icon-theme" aria-hidden="true">';
-echo '</i><strong> Availability (90 days)</strong>';
-echo '</div>';
-echo '<div class="panel-body tw:px-4 tw:py-2.5">';
-echo '<div class="tw:flex tw:gap-0.5 tw:items-center">';
+echo <<<HTML
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default panel-condensed">
+            <div class="panel-heading">
+                <i class="fa fa-check-circle fa-lg icon-theme" aria-hidden="true"></i>
+                <strong> Availability (90 days)</strong>
+            </div>
+            <div class="panel-body tw:px-4 tw:py-2.5">
+                <div class="tw:flex tw:gap-0.5 tw:items-center">
+HTML;
 
 foreach ($day_data as $day) {
-    $tip = '<div class="tw:font-bold tw:mb-1 tw:text-gray-800">' . $day['date'] . '</div>';
+    $tipLines = [];
+    $tipLines[] = '<div class="tw:font-bold tw:mb-1 tw:text-gray-800">' . $day['date'] . '</div>';
 
     if ($day['outages'] === ['no_data']) {
-        $tip .= '<div class="tw:text-gray-400">— No data</div>';
+        $tipLines[] = '<div class="tw:text-gray-400">— No data</div>';
     } elseif (empty($day['outages'])) {
-        $tip .= '<div class="tw:text-green-600">&#10003; No outage</div>';
+        $tipLines[] = '<div class="tw:text-green-600">&#10003; No outage</div>';
     } else {
         foreach ($day['outages'] as $line) {
-            $tip .= '<div class="tw:text-red-500">&#10007; ' . $line . '</div>';
+            $tipLines[] = '<div class="tw:text-red-500">&#10007; ' . $line . '</div>';
         }
     }
+    $tip = implode('', $tipLines);
 
-    echo '<div x-data="{ open:false, x:0, y:0, place(){ const r=this.$el.getBoundingClientRect(); this.x=r.left+r.width/2; this.y=r.top; this.$nextTick(()=>{ const w=this.$refs.tip?.offsetWidth||0; const pad=8; this.x=Math.max(pad+w/2, Math.min(window.innerWidth-pad-w/2, this.x)); }); } }" @mouseenter="open=true; place()" @mouseleave="open=false" @scroll.window="open && place()" @resize.window="open && place()"';
-    echo ' class="tw:flex-1 tw:h-[34px] tw:rounded-sm tw:cursor-pointer tw:relative" style="background:' . $day['color'] . ';">';
-    echo '<div x-ref="tip" x-show="open" x-cloak :style="`left:${x}px; top:${y - 8}px; transform: translate(-50%, -100%);`"';
-    echo ' class="tw:fixed tw:bg-white tw:border tw:border-gray-300 tw:rounded tw:min-w-[280px] tw:px-8 tw:py-5 tw:text-xl tw:font-medium tw:whitespace-nowrap tw:z-[9999] tw:shadow-md tw:pointer-events-none">';
-    echo $tip;
-    echo '</div>';
-    echo '</div>';
+    echo <<<HTML
+    <div x-data="{ open:false, x:0, y:0, place(){ const r=this.\$el.getBoundingClientRect(); this.x=r.left+r.width/2; this.y=r.top; this.\$nextTick(()=>{ const w=this.\$refs.tip?.offsetWidth||0; const pad=8; this.x=Math.max(pad+w/2, Math.min(window.innerWidth-pad-w/2, this.x)); }); } }"
+         @mouseenter="open=true; place()" @mouseleave="open=false" @scroll.window="open && place()" @resize.window="open && place()"
+         class="tw:flex-1 tw:h-12 tw:rounded-sm tw:cursor-pointer tw:relative" style="background:{$day['color']};">
+        <div x-ref="tip" x-show="open" x-cloak :style="`left:\${x}px; top:\${y - 8}px; transform: translate(-50%, -100%);`"
+             class="tw:fixed tw:bg-white tw:border tw:border-gray-300 tw:rounded tw:min-w-70 tw:px-8 tw:py-5 tw:text-xl tw:font-medium tw:whitespace-nowrap tw:z-9999 tw:shadow-md tw:pointer-events-none">
+            $tip
+        </div>
+    </div>
+HTML;
 }
 
-echo '</div>';
-echo '<div class="tw:flex tw:justify-between tw:text-[11px] tw:text-gray-400 tw:mt-1">';
-echo '<span>90 days ago</span>';
-echo '<span><strong>' . $total_avail . '% uptime</strong></span>';
-echo '<span>Today</span>';
-echo '</div>';
-echo '</div>';
-echo '</div>';
-echo '</div>';
-echo '</div>';
+echo <<<HTML
+                </div>
+                <div class="tw:flex tw:justify-between tw:text-[11px] tw:text-gray-400 tw:mt-1">
+                    <span>90 days ago</span>
+                    <span><strong>$total_avail% uptime</strong></span>
+                    <span>Today</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+HTML;
