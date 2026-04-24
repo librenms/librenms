@@ -107,9 +107,16 @@ class StringHelpers
             return (string) $converted;
         }
 
-        foreach (['GB18030', 'GBK', 'GB2312'] as $encoding) {
-            if (($converted = @iconv($encoding, 'UTF-8', $string)) !== false) {
-                return (string) $converted;
+        // Detect GB multi-byte pattern (0x81-0xFE followed by 0x40-0x7E or 0x80-0xFE)
+        // This is a characteristic signature of GB encodings and helps distinguish from Western encodings
+        $hasGbPattern = (bool) preg_match('/[\x81-\xFE][\x40-\x7E\x80-\xFE]/s', $string);
+
+        if ($hasGbPattern) {
+            // GB pattern detected, prioritize GB family encodings
+            foreach (['GB18030', 'GBK', 'GB2312'] as $encoding) {
+                if (($converted = @iconv($encoding, 'UTF-8', $string)) !== false) {
+                    return (string) $converted;
+                }
             }
         }
 
