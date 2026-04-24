@@ -28,21 +28,25 @@
 use App\Facades\LibrenmsConfig;
 use App\Models\DeviceOutage;
 use Carbon\CarbonInterval;
+use LibreNMS\Util\Time;
 
 $device_obj = DeviceCache::getPrimary();
 $device_id = $device_obj->device_id;
-$now = time();
+
 $days = 90;
-$start = $now - ($days * 86400);
+$now = Time::now();
+$start = $now->copy()->subDays($days);
+$start_ts = $start->timestamp;
+$now_ts = $now->timestamp;
 
 $outages = DeviceOutage::where('device_id', $device_id)
-    ->where(function ($q) use ($start): void {
-        $q->where('going_down', '>=', $start)
-          ->orWhere(function ($q2) use ($start): void {
-              $q2->where('going_down', '<', $start)
-                 ->where(function ($q3) use ($start): void {
+    ->where(function ($q) use ($start_ts): void {
+        $q->where('going_down', '>=', $start_ts)
+          ->orWhere(function ($q2) use ($start_ts): void {
+              $q2->where('going_down', '<', $start_ts)
+                 ->where(function ($q3) use ($start_ts): void {
                      $q3->whereNull('up_again')
-                        ->orWhere('up_again', '>', $start);
+                        ->orWhere('up_again', '>', $start_ts);
                  });
           });
     })
@@ -54,7 +58,7 @@ $outages = DeviceOutage::where('device_id', $device_id)
 // Determine when the device was added
 $inserted = $device_obj->inserted
     ? $device_obj->inserted->timestamp
-    : ($outages->first()->going_down ?? $now);
+    : ($outages->first()->going_down ?? $now_ts);
 
 // Thresholds (configurable via config.php)
 $threshold_good = LibrenmsConfig::get('availability_bar.threshold_good', 99);
@@ -62,20 +66,23 @@ $threshold_medium = LibrenmsConfig::get('availability_bar.threshold_medium', 95)
 
 // Build per-day availability data
 $day_data = [];
+$current_day_start = $start->copy()->startOfDay();
+
 for ($i = 0; $i < $days; $i++) {
-    $day_start = $start + ($i * 86400);
-    $day_end = $day_start + 86400;
+    $day_start = $current_day_start->timestamp;
+    $current_day_start->addDay();
+    $day_end = $current_day_start->timestamp;
     $outage_seconds = 0;
     $outage_lines = [];
 
     foreach ($outages as $outage) {
         $down = max($outage->going_down, $day_start);
-        $up = min($outage->up_again ?: $now, $day_end);
+        $up = min($outage->up_again ?: $now_ts, $day_end);
 
         if ($up > $down) {
             $duration = $up - $down;
             $outage_seconds += $duration;
-            $time_str = date('H:i', $outage->going_down);
+            $time_str = Time::format($outage->going_down, 'time');
             $duration_str = CarbonInterval::seconds($duration)->cascade()->forHumans(['short' => true, 'parts' => 2]);
 
             $outage_lines[] = "Outage at $time_str &bull; $duration_str";
@@ -95,7 +102,7 @@ for ($i = 0; $i < $days; $i++) {
         $color = '#e74c3c';
     }
     $day_data[] = [
-        'date' => date('d M Y', $day_start),
+        'date' => Time::format($day_start, 'date'),
         'avail' => round($availability, 2),
         'color' => $color,
         'outages' => $outage_lines,
@@ -103,9 +110,9 @@ for ($i = 0; $i < $days; $i++) {
 }
 
 // Calculate total availability over the full period.
-$total_outage = $outages->reduce(function ($carry, $outage) use ($start, $now) {
-    $down = max($outage->going_down, $start);
-    $up = min($outage->up_again ?: $now, $now);
+$total_outage = $outages->reduce(function ($carry, $outage) use ($start_ts, $now_ts) {
+    $down = max($outage->going_down, $start_ts);
+    $up = min($outage->up_again ?: $now_ts, $now_ts);
 
     return $carry + max(0, (int) $up - (int) $down);
 }, 0);

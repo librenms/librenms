@@ -1390,6 +1390,10 @@
             "default": "Y-m-d H:i:s",
             "type": "text"
         },
+        "dateformat.date": {
+            "default": "D, M j, Y",
+            "type": "text"
+        },
         "dateformat.long": {
             "default": "r",
             "type": "text"
