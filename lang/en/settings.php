@@ -2547,7 +2547,7 @@ return [
         'days' => 'days',
         'ms' => 'ms',
         'seconds' => 'seconds',
-        'percent' => '%'
+        'percent' => '%',
     ],
     'validate' => [
         'boolean' => ':value is not a valid boolean',
