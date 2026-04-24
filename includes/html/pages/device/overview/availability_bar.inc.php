@@ -48,8 +48,7 @@ $outages = DeviceOutage::where('device_id', $device_id)
     ->get(['going_down', 'up_again']);
 
 // Determine when the device was added
-$inserted = min(array_filter([
-    $device_obj->inserted?->timestamp,
+$inserted = $device_obj->inserted->timestamp ?? min(array_filter([
     $now_ts - $device_obj->uptime,
     $outages->first()?->going_down,
 ], fn ($v) => $v !== null));
