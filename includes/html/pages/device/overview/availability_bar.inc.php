@@ -32,7 +32,6 @@ use LibreNMS\Util\Time;
 
 $device_obj = DeviceCache::getPrimary();
 $device_id = $device_obj->device_id;
-
 $days = 90;
 $now = Time::now();
 $start = $now->copy()->subDays($days);
@@ -91,7 +90,12 @@ for ($i = 0; $i < $days; $i++) {
         }
     }
 
-    $availability = max(0, min(100, 100 - ($outage_seconds / 86400 * 100)));
+    $time_period = min(86400, $now_ts - $day_start);
+    if ($time_period <= 0) {
+        $availability = 100;
+    } else {
+        $availability = max(0, min(100, 100 - ($outage_seconds / $time_period * 100)));
+    }
 
     if ($day_start < $inserted) {
         $color = 'tw:bg-gray-300';
@@ -159,7 +163,7 @@ HTML;
 }
 
 $total_avail = round(
-    max(0, min(100, 100 - ($total_outage / ($days * 86400) * 100))),
+    max(0, min(100, 100 - ($total_outage / ($now_ts - $start_ts) * 100))),
     3
 );
 
