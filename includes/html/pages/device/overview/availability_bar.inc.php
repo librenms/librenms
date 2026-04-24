@@ -24,18 +24,17 @@
  * @copyright  2026 Palerm0 <Palerm0@outlook.com>
  * @author     Palerm0 <Palerm0@outlook.com>
  */
+
+use App\Facades\LibrenmsConfig;
+use App\Models\DeviceOutage;
+
 $device_obj = DeviceCache::getPrimary();
 $device_id = $device_obj->device_id;
 $now = time();
 $days = 90;
 $start = $now - ($days * 86400);
 
-// Determine when the device was added
-$inserted = $device_obj->inserted
-    ? $device_obj->inserted->timestamp
-    : $now;
-
-$outages = \App\Models\DeviceOutage::where('device_id', $device_id)
+$outages = DeviceOutage::where('device_id', $device_id)
     ->where(function ($q) use ($start): void {
         $q->where('going_down', '>=', $start)
           ->orWhere(function ($q2) use ($start): void {
@@ -49,9 +48,14 @@ $outages = \App\Models\DeviceOutage::where('device_id', $device_id)
     ->orderBy('going_down')
     ->get();
 
+// Determine when the device was added
+$inserted = $device_obj->inserted
+    ? $device_obj->inserted->timestamp
+    : ($outages->first()->going_down ?? $now);
+
 // Thresholds (configurable via config.php)
-$threshold_good = \App\Facades\LibrenmsConfig::get('availability_bar.threshold_good', 99);
-$threshold_medium = \App\Facades\LibrenmsConfig::get('availability_bar.threshold_medium', 95);
+$threshold_good = LibrenmsConfig::get('availability_bar.threshold_good', 99);
+$threshold_medium = LibrenmsConfig::get('availability_bar.threshold_medium', 95);
 
 // Build per-day availability data
 $day_data = [];
