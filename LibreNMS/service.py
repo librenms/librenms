@@ -169,6 +169,9 @@ class ServiceConfig(DBConfig):
             if config.get("schedule_type").get("billing", "legacy") == "legacy"
             else config.get("schedule_type").get("billing", "legacy") == "dispatcher"
         )
+        self.billing.workers = config.get(
+            "service_billing_workers", ServiceConfig.billing.workers
+        )
         self.billing.frequency = config.get(
             "service_billing_frequency", ServiceConfig.billing.frequency
         )
@@ -524,7 +527,11 @@ class Service:
                     else "disabled"
                 ),
                 "enabled" if self.config.alerting.enabled else "disabled",
-                "enabled" if self.config.billing.enabled else "disabled",
+                (
+                    self.config.billing.workers
+                    if self.config.billing.enabled
+                    else "disabled"
+                ),
                 "enabled" if self.config.ping.enabled else "disabled",
             )
         )

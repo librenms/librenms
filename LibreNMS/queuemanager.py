@@ -340,6 +340,15 @@ class BillingQueueManager(TimedQueueManager):
             "calculate_billing_timer",
         )
 
+    def start(self):
+        """
+        Start billing worker threads
+        """
+        workers = self.get_poller_config().workers
+        logger.debug("Starting {} workers for {}".format(workers, self.type))
+        for i in range(workers):
+            self.spawn_worker("{}-{}".format(self.type.title(), i + 1), 0)
+
     def start_dispatch(self):
         """
         Start the dispatch timer, this is not called automatically on init
@@ -358,17 +367,29 @@ class BillingQueueManager(TimedQueueManager):
         self.post_work("calculate", 0)
 
     def do_dispatch(self):
-        self.post_work("poll", 0)
+        db = LibreNMS.DB(self.config)
+        cursor = db.query("SELECT `bill_id` FROM `bills` ORDER BY `bill_id`")
+        for row in cursor.fetchall():
+            self.post_work(str(row[0]), 0)
 
     def do_work(self, run_type, group):
-        if run_type == "poll":
-            logger.info("Polling billing")
-            args = ("-d", "-f") if self.config.debug else ("-f",)
-            exit_code, output = LibreNMS.call_script("poll-billing.php", args)
-        else:  # run_type == 'calculate'
+        if run_type == "calculate":
             logger.info("Calculating billing")
             args = ("-d", "-f") if self.config.debug else ("-f",)
             exit_code, output = LibreNMS.call_script("billing-calculate.php", args)
+        else:
+            logger.info("Polling billing for bill_id %s", run_type)
+            args = (
+                (
+                    "-d",
+                    "-f",
+                    "-b",
+                    str(run_type),
+                )
+                if self.config.debug
+                else ("-f", "-b", str(run_type))
+            )
+            exit_code, output = LibreNMS.call_script("poll-billing.php", args)
 
         if exit_code != 0:
             logger.warning(

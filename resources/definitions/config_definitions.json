@@ -193,7 +193,7 @@
                 "critical": "Critical"
             }
         },
-        "alert_rule.default_operation_steps_to": {
+        "alert_rule.max_alerts": {
             "default": 1,
             "units": "count",
             "group": "alerting",
@@ -201,7 +201,7 @@
             "order": 1,
             "type": "integer"
         },
-        "alert_rule.default_operation_start_in": {
+        "alert_rule.delay": {
             "default": 1,
             "units": "minutes",
             "group": "alerting",
@@ -209,7 +209,7 @@
             "order": 2,
             "type": "integer"
         },
-        "alert_rule.default_operation_step_duration": {
+        "alert_rule.interval": {
             "default": 5,
             "units": "minutes",
             "group": "alerting",
@@ -217,7 +217,7 @@
             "order": 3,
             "type": "integer"
         },
-        "alert_rule.default_operation_notifications_suppressed": {
+        "alert_rule.mute_alerts": {
             "default": false,
             "type": "boolean",
             "group": "alerting",
@@ -2272,7 +2272,7 @@
         "enable_ports_etherlike": {
             "group": "webui",
             "section": "device",
-            "order": 23,
+            "order": 22,
             "default": false,
             "type": "boolean"
         },
@@ -6308,17 +6308,6 @@
                 "fdb": "FDB"
             }
         },
-        "ports_ipv4_neighbours": {
-            "default": "subnet",
-            "type": "select",
-            "group": "webui",
-            "section": "device",
-            "order": 22,
-            "options":{
-                "subnet": "Subnet",
-                "arp": "ARP"
-            }
-        },
         "ports_purge": {
             "group": "system",
             "section": "cleanup",
@@ -6734,11 +6723,19 @@
             "type": "integer",
             "units": "Seconds"
         },
+         "service_billing_workers": {
+            "default": 2,
+            "group": "poller",
+            "section": "dispatcherservice",
+            "order": 16,
+            "type": "integer",
+            "units": "Workers"
+        },
         "service_billing_frequency": {
             "default": 300,
             "group": "poller",
             "section": "dispatcherservice",
-            "order": 16,
+            "order": 17,
             "type": "integer",
             "units": "Seconds"
         },
@@ -6746,7 +6743,7 @@
             "default": 60,
             "group": "poller",
             "section": "dispatcherservice",
-            "order": 17,
+            "order": 18,
             "type": "integer",
             "units": "Seconds"
         },
@@ -7018,13 +7015,6 @@
             "group": "external",
             "section": "binaries",
             "order": 12,
-            "type": "executable"
-        },
-        "snmptrap": {
-            "default": "/usr/bin/snmptrap",
-            "group": "external",
-            "section": "binaries",
-            "order": 13,
             "type": "executable"
         },
         "sso.create_users": {
@@ -7375,20 +7365,6 @@
             "order": 2,
             "type": "boolean"
         },
-        "webui.availability_bar.threshold_good": {
-            "default": 99,
-            "group": "webui",
-            "section": "availability-bar",
-            "order": 1,
-            "type": "integer"
-        },
-        "webui.availability_bar.threshold_medium": {
-            "default": 95,
-            "group": "webui",
-            "section": "availability-bar",
-            "order": 2,
-            "type": "integer"
-        },
         "webui.custom_css": {
             "default": [],
             "group": "webui",
@@ -7451,40 +7427,6 @@
         "xirrus_disable_stations": {
             "default": false,
             "type": "boolean"
-        },
-        "ssl_certificates.auto_discover": {
-            "default": false,
-            "group": "apps",
-            "section": "ssl-certificates",
-            "order": 0,
-            "type": "boolean"
-        },
-        "ssl_certificates.skip_hosts": {
-            "default": [],
-            "group": "apps",
-            "section": "ssl-certificates",
-            "order": 1,
-            "type": "array",
-            "validate": {
-                "value": "array",
-                "value.*": "string"
-            }
-        },
-        "ssl_certificates.days_until_expiry_warning": {
-            "default": 30,
-            "group": "apps",
-            "section": "ssl-certificates",
-            "order": 2,
-            "type": "integer",
-            "units": "days"
-        },
-        "ssl_certificates.days_until_expiry_danger": {
-            "default": 0,
-            "group": "apps",
-            "section": "ssl-certificates",
-            "order": 3,
-            "type": "integer",
-            "units": "days"
         },
         "smokeping.integration": {
             "default": false,
