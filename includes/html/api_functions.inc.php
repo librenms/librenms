@@ -1684,6 +1684,7 @@ function api_assign_rule_alert_operation_from_legacy_api(int $ruleId, array $ope
         $to = ($toRaw === '' || $toRaw === null) ? null : max($from, (int) $toRaw);
         $startIn = max(0, (int) ($operation['start_in_seconds'] ?? 0));
         $stepDuration = max(0, (int) ($operation['step_duration_seconds'] ?? 0));
+        $suppressed = filter_var($operation['notifications_suppressed'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
         $seg = $op->segments()->create([
             'position' => (int) ($operation['position'] ?? $idx),
@@ -1692,7 +1693,7 @@ function api_assign_rule_alert_operation_from_legacy_api(int $ruleId, array $ope
             'escalation_step_to' => $to,
             'start_in_seconds' => $startIn,
             'step_duration_seconds' => $stepDuration,
-            'notifications_suppressed' => false,
+            'notifications_suppressed' => $suppressed,
         ]);
 
         [$single, $group] = api_parse_transport_targets((array) ($operation['transports'] ?? []));

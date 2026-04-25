@@ -43,6 +43,7 @@ class AlertOperationRequest extends FormRequest
             'segments.*.escalation_step_to' => ['nullable', 'integer', 'min:1'],
             'segments.*.start_in_seconds' => ['required', 'integer', 'min:0'],
             'segments.*.step_duration_seconds' => ['required', 'integer', 'min:0'],
+            'segments.*.notifications_suppressed' => ['sometimes', 'boolean'],
             'segments.*.transports' => ['required', 'array', 'min:1'],
             'segments.*.transports.*' => ['nullable'],
         ];

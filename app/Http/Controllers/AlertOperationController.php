@@ -126,6 +126,7 @@ class AlertOperationController extends Controller
             $from = max(1, (int) ($row['escalation_step_from'] ?? 1));
             $toRaw = $row['escalation_step_to'] ?? null;
             $to = ($toRaw === '' || $toRaw === null) ? null : max($from, (int) $toRaw);
+            $suppressed = array_key_exists('notifications_suppressed', $row) ? (bool) $row['notifications_suppressed'] : $defaultSuppressed;
 
             $seg = $op->segments()->create([
                 'position' => (int) ($row['position'] ?? $idx),
@@ -134,7 +135,7 @@ class AlertOperationController extends Controller
                 'escalation_step_to' => $to,
                 'start_in_seconds' => max(0, (int) ($row['start_in_seconds'] ?? 0)),
                 'step_duration_seconds' => max(0, (int) ($row['step_duration_seconds'] ?? 0)),
-                'notifications_suppressed' => $defaultSuppressed,
+                'notifications_suppressed' => $suppressed,
             ]);
 
             $transportsRaw = $row['transports'] ?? [];
