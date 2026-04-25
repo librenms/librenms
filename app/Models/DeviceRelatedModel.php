@@ -28,6 +28,7 @@ namespace App\Models;
 
 use App\Facades\DeviceCache;
 use App\Models\Traits\DeletesDeviceOrphans;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
@@ -39,7 +40,7 @@ class DeviceRelatedModel extends BaseModel
 
     // ---- Query Scopes ----
 
-    public function scopeHasAccess($query, User $user)
+    public function scopeHasAccess(Builder $query, User $user): Builder
     {
         return $this->hasDeviceAccess($query, $user);
     }
@@ -58,7 +59,7 @@ class DeviceRelatedModel extends BaseModel
 
     // ---- Define Relationships ----
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Device, $this>
+     * @return BelongsTo<Device, $this>
      */
     public function device(): BelongsTo
     {

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\IfOperStatus;
@@ -114,8 +115,6 @@ class Port extends DeviceRelatedModel
 
     /**
      * Returns a human readable label for this port
-     *
-     * @return string
      */
     public function getLabel(): string
     {
@@ -216,33 +215,21 @@ class Port extends DeviceRelatedModel
 
     // ---- Query scopes ----
 
-    /**
-     * @param  Builder  $query
-     * @return Builder
-     */
-    public function scopeIsDeleted($query)
+    public function scopeIsDeleted(Builder $query): Builder
     {
         return $query->where([
             [$this->qualifyColumn('deleted'), 1],
         ]);
     }
 
-    /**
-     * @param  Builder  $query
-     * @return Builder
-     */
-    public function scopeIsNotDeleted($query)
+    public function scopeIsNotDeleted(Builder $query): Builder
     {
         return $query->where([
             [$this->qualifyColumn('deleted'), 0],
         ]);
     }
 
-    /**
-     * @param  Builder  $query
-     * @return Builder
-     */
-    public function scopeIsUp($query)
+    public function scopeIsUp(Builder $query): Builder
     {
         return $query->where([
             [$this->qualifyColumn('deleted'), '=', 0],
@@ -252,11 +239,7 @@ class Port extends DeviceRelatedModel
         ]);
     }
 
-    /**
-     * @param  Builder  $query
-     * @return Builder
-     */
-    public function scopeIsDown($query)
+    public function scopeIsDown(Builder $query): Builder
     {
         return $query->where([
             [$this->qualifyColumn('deleted'), '=', 0],
@@ -267,11 +250,7 @@ class Port extends DeviceRelatedModel
         ]);
     }
 
-    /**
-     * @param  Builder  $query
-     * @return Builder
-     */
-    public function scopeIsShutdown($query)
+    public function scopeIsShutdown(Builder $query): Builder
     {
         return $query->where([
             [$this->qualifyColumn('deleted'), '=', 0],
@@ -281,11 +260,7 @@ class Port extends DeviceRelatedModel
         ]);
     }
 
-    /**
-     * @param  Builder  $query
-     * @return Builder
-     */
-    public function scopeIsIgnored($query)
+    public function scopeIsIgnored(Builder $query): Builder
     {
         return $query->where([
             [$this->qualifyColumn('deleted'), '=', 0],
@@ -293,11 +268,7 @@ class Port extends DeviceRelatedModel
         ]);
     }
 
-    /**
-     * @param  Builder  $query
-     * @return Builder
-     */
-    public function scopeIsDisabled($query)
+    public function scopeIsDisabled(Builder $query): Builder
     {
         return $query->where([
             [$this->qualifyColumn('deleted'), '=', 0],
@@ -305,11 +276,7 @@ class Port extends DeviceRelatedModel
         ]);
     }
 
-    /**
-     * @param  Builder  $query
-     * @return Builder
-     */
-    public function scopeHasErrors($query)
+    public function scopeHasErrors(Builder $query): Builder
     {
         return $query->where([
             [$this->qualifyColumn('deleted'), '=', 0],
@@ -322,11 +289,7 @@ class Port extends DeviceRelatedModel
         });
     }
 
-    /**
-     * @param  Builder  $query
-     * @return Builder
-     */
-    public function scopeIsValid($query)
+    public function scopeIsValid(Builder $query): Builder
     {
         return $query->where([
             [$this->qualifyColumn('deleted'), '=', 0],
@@ -334,12 +297,12 @@ class Port extends DeviceRelatedModel
         ]);
     }
 
-    public function scopeHasAccess($query, User $user)
+    public function scopeHasAccess(Builder $query, User $user): Builder
     {
         return $this->hasPortAccess($query, $user);
     }
 
-    public function scopeInPortGroup($query, $portGroup)
+    public function scopeInPortGroup(Builder $query, $portGroup): Builder
     {
         return $query->whereIn($query->qualifyColumn('port_id'), function ($query) use ($portGroup): void {
             $query->select('port_id')
@@ -506,9 +469,9 @@ class Port extends DeviceRelatedModel
     }
 
     /**
-     * @return \Illuminate\Support\Collection<int, Link>
+     * @return Collection<int, Link>
      */
-    public function allLinks(): \Illuminate\Support\Collection
+    public function allLinks(): Collection
     {
         return $this->links->merge($this->remoteLinks);
     }
