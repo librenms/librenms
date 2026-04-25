@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Port;
+use LibreNMS\Util\Url;
 
 $link_array = [
     'page' => 'device',
@@ -138,13 +139,8 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
             // safe to set given we know we got a valid MAC if a $port is set
             $mac_raw = true;
             $mac = $mac . ' (' .
-                generate_device_link(['device_id' => $port->device_id]) . ', ' .
-                generate_port_link([
-                    'label' => $port->label,
-                    'port_id' => $port->port_id,
-                    'ifName' => $port->ifName,
-                    'device_id' => $port->device_id,
-                ]) . ')';
+                Url::deviceLink($port->device) . ', ' .
+                Url::portLink($port) . ')';
         }
 
         if ($lease['client_hostname'] != '') {

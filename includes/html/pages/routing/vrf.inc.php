@@ -1,6 +1,7 @@
 <?php
 
 use App\Facades\DeviceCache;
+use App\Facades\PortCache;
 use App\Models\Vrf;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Util\Rewrite;
@@ -142,7 +143,7 @@ if (Gate::denies('viewAny', Vrf::class)) {
                             echo "<div style='display: block; padding: 3px; margin: 3px; min-width: 135px; max-width:135px; min-height:75px; max-height:75px;
                             text-align: center; float: left;'>
                                 <div style='font-weight: bold;'>" . Rewrite::shortenIfName($port['ifDescr']) . '</div>';
-                            echo generate_port_link($port, Url::graphTag([
+                            echo Url::portLink(PortCache::get($port['port_id']), Url::graphTag([
                                 'type' => 'port_' . $vars['graph'],
                                 'id' => $port['port_id'],
                                 'width' => 130,
@@ -154,7 +155,8 @@ if (Gate::denies('viewAny', Vrf::class)) {
                             break;
 
                         default:
-                            echo $seperator . generate_port_link($port, Rewrite::shortenIfName($port['ifDescr']));
+                            //TODO: Rewrite to Eloquent
+                            echo $seperator . Url::portLink(PortCache::get($port['port_id']), Rewrite::shortenIfName($port['ifDescr']));
                             $seperator = ', ';
                             break;
                     }//end switch

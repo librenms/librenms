@@ -1,6 +1,10 @@
 <?php
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Facades\PortCache;
+use App\Models\Ipv4Mac;
+use LibreNMS\Cache\Device;
 use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Mac;
@@ -10,7 +14,7 @@ use LibreNMS\Util\Url;
 $hostname = $device['hostname'];
 $ifname = $port['ifDescr'];
 $ifIndex = $port['ifIndex'];
-$speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 0, 'bps');
+$speed = LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 0, 'bps');
 
 $ifalias = $port['name'];
 
@@ -60,25 +64,25 @@ if ($vars['subview'] == 'top10') {
            <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
            <span class=device-head>Two Day</span><br />
            <a href='" . Url::generate($link_array, ['view' => 'macaccounting', 'subview' => 'top10', 'graph' => $vars['graph'], 'sort' => $vars['sort'], 'period' => '2d']) . "/'>
-             <img style='border: #5e5e5e 2px;' valign=middle src='" . e(route('graph', ['type' => 'port_mac_acc_total', 'id' => $port['port_id'], 'stat' => $vars['graph'], 'sort' => $vars['sort'], 'from' => '-2d', 'width' => 150, 'height' => 50])) . "' />
+             <img style='border: #5e5e5e 2px;' valign=middle src='graph.php?id=" . $port['port_id'] . '&amp;stat=' . $vars['graph'] . '&amp;type=port_mac_acc_total&amp;sort=' . $vars['sort'] . '&amp;from=' . LibrenmsConfig::get('time.twoday') . '&amp;to=' . LibrenmsConfig::get('time.now') . "&amp;width=150&amp;height=50' />
            </a>
            </div>
            <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
            <span class=device-head>Week</span><br />
             <a href='" . Url::generate($link_array, ['view' => 'macaccounting', 'subview' => 'top10', 'graph' => $vars['graph'], 'sort' => $vars['sort'], 'period' => '1w']) . "/'>
-             <img style='border: #5e5e5e 2px;' valign=middle src='" . e(route('graph', ['type' => 'port_mac_acc_total', 'id' => $port['port_id'], 'stat' => $vars['graph'], 'sort' => $vars['sort'], 'from' => '-1w', 'width' => 150, 'height' => 50])) . "' />
+            <img style='border: #5e5e5e 2px;' valign=middle src='graph.php?id=" . $port['port_id'] . '&amp;type=port_mac_acc_total&amp;sort=' . $vars['sort'] . '&amp;stat=' . $vars['graph'] . '&amp;from=' . LibrenmsConfig::get('time.week') . '&amp;to=' . LibrenmsConfig::get('time.now') . "&amp;width=150&amp;height=50' />
             </a>
             </div>
             <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
             <span class=device-head>Month</span><br />
             <a href='" . Url::generate($link_array, ['view' => 'macaccounting', 'subview' => 'top10', 'graph' => $vars['graph'], 'sort' => $vars['sort'], 'period' => '1m']) . "/'>
-             <img style='border: #5e5e5e 2px;' valign=middle src='" . e(route('graph', ['type' => 'port_mac_acc_total', 'id' => $port['port_id'], 'stat' => $vars['graph'], 'sort' => $vars['sort'], 'from' => '-1mo', 'width' => 150, 'height' => 50])) . "' />
+            <img style='border: #5e5e5e 2px;' valign=middle src='graph.php?id=" . $port['port_id'] . '&amp;type=port_mac_acc_total&amp;sort=' . $vars['sort'] . '&amp;stat=' . $vars['graph'] . '&amp;from=' . LibrenmsConfig::get('time.month') . '&amp;to=' . LibrenmsConfig::get('time.now') . "&amp;width=150&amp;height=50' />
             </a>
             </div>
             <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
             <span class=device-head>Year</span><br />
             <a href='" . Url::generate($link_array, ['view' => 'macaccounting', 'subview' => 'top10', 'graph' => $vars['graph'], 'sort' => $vars['sort'], 'period' => '1y']) . "/'>
-             <img style='border: #5e5e5e 2px;' valign=middle src='" . e(route('graph', ['type' => 'port_mac_acc_total', 'id' => $port['port_id'], 'stat' => $vars['graph'], 'sort' => $vars['sort'], 'from' => '-1y', 'width' => 150, 'height' => 50])) . "' />
+            <img style='border: #5e5e5e 2px;' valign=middle src='graph.php?id=" . $port['port_id'] . '&amp;type=port_mac_acc_total&amp;sort=' . $vars['sort'] . '&amp;stat=' . $vars['graph'] . '&amp;from=' . LibrenmsConfig::get('time.year') . '&amp;to=' . LibrenmsConfig::get('time.now') . "&amp;width=150&amp;height=50' />
             </a>
             </div>
        </div>
@@ -89,31 +93,31 @@ if ($vars['subview'] == 'top10') {
             <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
            <span class=device-head>Traffic</span><br />
            <a href='" . Url::generate($link_array, ['view' => 'macaccounting', 'subview' => 'top10', 'graph' => 'bits', 'sort' => $vars['sort'], 'period' => $vars['period']]) . "'>
-             <img style='border: #5e5e5e 2px;' valign=middle src='" . e(route('graph', ['type' => 'port_mac_acc_total', 'id' => $port['port_id'], 'stat' => 'bits', 'sort' => $vars['sort'], 'from' => $from, 'width' => 150, 'height' => 50])) . "' />
+             <img style='border: #5e5e5e 2px;' valign=middle src='graph.php?id=" . $port['port_id'] . '&amp;stat=bits&amp;type=port_mac_acc_total&amp;sort=' . $vars['sort'] . "&amp;from=$from&amp;to=" . LibrenmsConfig::get('time.now') . "&amp;width=150&amp;height=50' />
            </a>
            </div>
            <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
            <span class=device-head>Packets</span><br />
            <a href='" . Url::generate($link_array, ['view' => 'macaccounting', 'subview' => 'top10', 'graph' => 'pkts', 'sort' => $vars['sort'], 'period' => $vars['period']]) . "/'>
-             <img style='border: #5e5e5e 2px;' valign=middle src='" . e(route('graph', ['id' => $port['port_id'], 'stat' => 'pkts', 'type' => 'port_mac_acc_total', 'sort' => $vars['sort'], 'from' => $from, 'width' => 150, 'height' => 50])) . "' />
+             <img style='border: #5e5e5e 2px;' valign=middle src='graph.php?id=" . $port['port_id'] . '&amp;stat=pkts&amp;type=port_mac_acc_total&amp;sort=' . $vars['sort'] . "&amp;from=$from&amp;to=" . LibrenmsConfig::get('time.now') . "&amp;width=150&amp;height=50' />
            </a>
            </div>
            <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
            <span class=device-head>Top Input</span><br />
            <a href='" . Url::generate($link_array, ['view' => 'macaccounting', 'subview' => 'top10', 'graph' => $vars['graph'], 'sort' => 'in', 'period' => $vars['period']]) . "'>
-             <img style='border: #5e5e5e 2px;' valign=middle src='" . e(route('graph', ['id' => $port['port_id'], 'stat' => $vars['graph'], 'type' => 'port_mac_acc_total', 'sort' => 'in', 'from' => $from, 'width' => 150, 'height' => 50])) . "' />
+             <img style='border: #5e5e5e 2px;' valign=middle src='graph.php?id=" . $port['port_id'] . '&amp;stat=' . $vars['graph'] . "&amp;type=port_mac_acc_total&amp;sort=in&amp;from=$from&amp;to=" . LibrenmsConfig::get('time.now') . "&amp;width=150&amp;height=50' />
            </a>
            </div>
            <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
            <span class=device-head>Top Output</span><br />
            <a href='" . Url::generate($link_array, ['view' => 'macaccounting', 'subview' => 'top10', 'graph' => $vars['graph'], 'sort' => 'out', 'period' => $vars['period']]) . "'>
-             <img style='border: #5e5e5e 2px;' valign=middle src='" . e(route('graph', ['id' => $port['port_id'], 'stat' => $vars['graph'], 'type' => 'port_mac_acc_total', 'sort' => 'out', 'from' => $from, 'width' => 150, 'height' => 50])) . "' />
+             <img style='border: #5e5e5e 2px;' valign=middle src='graph.php?id=" . $port['port_id'] . '&amp;stat=' . $vars['graph'] . "&amp;type=port_mac_acc_total&amp;sort=out&amp;from=$from&amp;to=" . LibrenmsConfig::get('time.now') . "&amp;width=150&amp;height=50' />
            </a>
            </div>
            <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
            <span class=device-head>Top Aggregate</span><br />
            <a href='" . Url::generate($link_array, ['view' => 'macaccounting', 'subview' => 'top10', 'graph' => $vars['graph'], 'sort' => 'both', 'period' => $vars['period']]) . "'>
-             <img style='border: #5e5e5e 2px;' valign=middle src='" . e(route('graph', ['id' => $port['port_id'], 'stat' => $vars['graph'], 'type' => 'port_mac_acc_total', 'sort' => 'both', 'from' => $from, 'width' => 150, 'height' => 50])) . "' />
+             <img style='border: #5e5e5e 2px;' valign=middle src='graph.php?id=" . $port['port_id'] . '&amp;stat=' . $vars['graph'] . "&amp;type=port_mac_acc_total&amp;sort=both&amp;from=$from&amp;to=" . LibrenmsConfig::get('time.now') . "&amp;width=150&amp;height=50' />
            </a>
            </div>
        </div>
@@ -131,25 +135,23 @@ if ($vars['subview'] == 'top10') {
         } else {
             $row_colour = LibrenmsConfig::get('list_colour.odd');
         }
-        $ipv4 = App\Models\Ipv4Mac::where('mac_address', $acc['mac'])->value('ipv4_address');
-        $arp_host = dbFetchRow('SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$ipv4]);
-        $arp_host = cleanPort($arp_host);
+        $ipv4Mac = Ipv4Mac::with('device', 'ipv4Address', 'port')->where('mac_address', $acc['mac'])->first();
         if ($arp_host) {
-            $arp_name = generate_device_link($arp_host);
-            $arp_name .= ' ' . generate_port_link($arp_host);
+            $arp_name = Url::deviceLink($ipv4Mac->device);
+            $arp_name .= ' ' . Url::portLink($ipv4Mac->port);
         } else {
             $arp_name = '';
         }
 
-        $name ??= $ipv4; // i don't know wtf $name is
-        if ($name == $ipv4) {
+        $name ??= $ipv4Mac->ipv4_address; // i don't know wtf $name is
+        if ($name == $ipv4Mac->ipv4_address) {
             $name = '';
         }
 
         $astext = '';
         $asn = '';
-        if (dbFetchCell('SELECT count(*) FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?', [$acc['device_id'], $ipv4])) {
-            $peer_info = dbFetchRow('SELECT * FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?', [$acc['device_id'], $ipv4]);
+        if (dbFetchCell('SELECT count(*) FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?', [$acc['device_id'], $ipv4Mac->ipv4_address])) {
+            $peer_info = dbFetchRow('SELECT * FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?', [$acc['device_id'], $ipv4Mac->ipv4_address]);
             $asn = 'AS' . $peer_info['bgpPeerRemoteAs'];
             $astext = $peer_info['astext'];
         }

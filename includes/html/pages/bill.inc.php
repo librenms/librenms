@@ -1,6 +1,8 @@
 <?php
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Facades\PortCache;
 use App\Models\Bill;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Billing;
@@ -72,6 +74,9 @@ if (Gate::allows('view', $bill)) {
 
     $vars['view'] ??= 'quick';
 
+    /**
+     * TODO: Convert the calls to Port Eloquent Models instead of the legacy port array
+     */
     function print_port_list($ports)
     {
         echo '<div class="panel panel-default">
@@ -82,11 +87,12 @@ if (Gate::allows('view', $bill)) {
 
         // Collected Earlier
         foreach ($ports as $port) {
-            $port = cleanPort($port);
-            $portalias = (empty($port['ifAlias']) ? '' : ' - ' . $port['ifAlias'] . '');
+            // TODO: Rewrite to Eloquent with device
+            $port = PortCache::get($port['port_id']);
+            $portalias = (empty($port->ifAlias) ? '' : ' - ' . $port->ifAlias . '');
 
             echo '<div class="list-group-item">';
-            echo generate_port_link($port, $port['ifName'] . $portalias) . ' on ' . generate_device_link($port);
+            echo Url::portLink($port, $port->ifName . $portalias) . ' on ' . Url::deviceLink(DeviceCache::get($port->device_id));
             echo '</div>';
         }
 
@@ -128,7 +134,7 @@ if (Gate::allows('view', $bill)) {
         $sep = ' | ';
     }
 
-    echo '<div style="font-weight: bold; float: right;"><a href="' . \LibreNMS\Util\Url::generate(['page' => 'bills']) . '/"><i class="fa fa-arrow-left fa-lg icon-theme" aria-hidden="true"></i> Back to Bills</a></div>';
+    echo '<div style="font-weight: bold; float: right;"><a href="' . Url::generate(['page' => 'bills']) . '/"><i class="fa fa-arrow-left fa-lg icon-theme" aria-hidden="true"></i> Back to Bills</a></div>';
 
     print_optionbar_end();
 

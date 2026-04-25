@@ -12,14 +12,19 @@
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Facades\Permissions;
 use App\Facades\PortCache;
 use App\Models\Bill;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\Sensor;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\HtmlString;
 use LibreNMS\Enum\ImageFormat;
+use LibreNMS\Util\Clean;
+use LibreNMS\Util\Color;
+use LibreNMS\Util\Graph;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
@@ -154,68 +159,82 @@ function alert_layout($severity)
         'background_color' => $background, ];
 }
 
-function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
+function generate_dynamic_graph_tag($args)
 {
-    if (is_null($port)) {
-        return (string) $text;
-    }
-    $graph_array = [];
-
-    if (! $text) {
-        $text = Rewrite::normalizeIfName($port['label'] ?? $port['ifName']);
-    }
-
-    if ($type) {
-        $port['graph_type'] = $type;
-    }
-
-    if (! isset($port['graph_type'])) {
-        $port['graph_type'] = 'port_bits';
-    }
-
-    $class = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
-
-    if (! isset($port['hostname'])) {
-        $port = array_merge($port, device_by_id_cache($port['device_id']));
+    $urlargs = [];
+    $width = 0;
+    foreach ($args as $key => $arg) {
+        switch (strtolower((string) $key)) {
+            case 'width':
+                $width = $arg;
+                $value = '{{width}}';
+                break;
+            case 'from':
+                $value = '{{start}}';
+                break;
+            case 'to':
+                $value = '{{end}}';
+                break;
+            default:
+                $value = $arg;
+                break;
+        }
+        $urlargs[] = $key . '=' . $value;
     }
 
-    if (! isset($port['label'])) {
-        $port = cleanPort($port);
-    }
+    return '<img style="width:' . $width . 'px;height:100%" class="graph graph-image img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
+}//end generate_dynamic_graph_tag()
 
-    $content = '<div class="overlib-text">' . ($port['hostname'] ?? '') . ' - ' . Rewrite::normalizeIfName(addslashes(LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
-    $content .= addslashes(LibreNMS\Util\Clean::html($port['ifAlias'], [])) . '<br />';
+function generate_dynamic_graph_js($args)
+{
+    $from = (is_numeric($args['from']) ? $args['from'] : '(new Date()).getTime() / 1000 - 24*3600');
+    $range = (is_numeric($args['to']) ? $args['to'] - $args['from'] : '24*3600');
 
-    $content .= "<div style=\'width: 850px\'>";
-    $graph_array['type'] = $port['graph_type'];
-    $graph_array['legend'] = 'yes';
-    $graph_array['height'] = '100';
-    $graph_array['width'] = '340';
-    $graph_array['to'] = LibrenmsConfig::get('time.now');
-    $graph_array['from'] = LibrenmsConfig::get('time.day');
-    $graph_array['id'] = $port['port_id'];
-    $content .= Url::graphTag($graph_array);
-    if ($single_graph == 0) {
-        $graph_array['from'] = LibrenmsConfig::get('time.week');
-        $content .= Url::graphTag($graph_array);
-        $graph_array['from'] = LibrenmsConfig::get('time.month');
-        $content .= Url::graphTag($graph_array);
-        $graph_array['from'] = LibrenmsConfig::get('time.year');
-        $content .= Url::graphTag($graph_array);
-    }
+    $output = '<script src="js/RrdGraphJS/q-5.0.2.min.js"></script>
+        <script src="js/RrdGraphJS/moment-timezone-with-data.js"></script>
+        <script src="js/RrdGraphJS/rrdGraphPng.js"></script>
+          <script type="text/javascript">
+              q.ready(function(){
+                  var graphs = [];
+                  q(\'.graph\').forEach(function(item){
+                      graphs.push(
+                          q(item).rrdGraphPng({
+                              canvasPadding: 120,
+                                initialStart: ' . $from . ',
+                                initialRange: ' . $range . '
+                          })
+                      );
+                  });
+              });
+              // needed for dynamic height
+              window.onload = function(){ window.dispatchEvent(new Event(\'resize\')); }
+          </script>';
 
-    $content .= '</div>';
+    return $output;
+}//end generate_dynamic_graph_js()
 
-    $url = generate_port_url($port);
+function generate_graph_js_state($args)
+{
+    // we are going to assume we know roughly what the graph url looks like here.
+    // TODO: Add sensible defaults
+    $from = (is_numeric($args['from']) ? $args['from'] : 0);
+    $to = (is_numeric($args['to']) ? $args['to'] : 0);
+    $width = (is_numeric($args['width']) ? $args['width'] : 0);
+    $height = (is_numeric($args['height']) ? $args['height'] : 0);
+    $legend = str_replace("'", '', $args['legend'] ?? '');
 
-    if ($overlib == 0) {
-        return $content;
-    } elseif (port_permitted($port['port_id'], $port['device_id'])) {
-        return Url::overlibLink($url, $text, $content, $class);
-    } else {
-        return Rewrite::normalizeIfName($text);
-    }
-}//end generate_port_link()
+    $state = <<<STATE
+<script type="text/javascript" language="JavaScript">
+document.graphFrom = $from;
+document.graphTo = $to;
+document.graphWidth = $width;
+document.graphHeight = $height;
+document.graphLegend = '$legend';
+</script>
+STATE;
+
+    return $state;
+}//end generate_graph_js_state()
 
 function generate_port_url($port, $vars = [])
 {

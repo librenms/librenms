@@ -1,5 +1,7 @@
 <?php
 
+use App\Facades\DeviceCache;
+use App\Facades\PortCache;
 use LibreNMS\Util\Url;
 
 $pagetitle[] = 'Pseudowires';
@@ -72,9 +74,9 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I, devices AS D W
         $bg = 'ffffff';
     }
 
-    echo "<tr style=\"background-color: #$bg;\"><td rowspan=2 style='font-size:18px; padding:4px;'>" . $pw_a['cpwVcID'] . '</td><td>' . generate_device_link($pw_a) . '</td><td>' . generate_port_link($pw_a) . "</td>
+    echo "<tr style=\"background-color: #$bg;\"><td rowspan=2 style='font-size:18px; padding:4px;'>" . $pw_a['cpwVcID'] . '</td><td>' . Url::deviceLink(DeviceCache::get($pw_a['deice_id'])) . '</td><td>' . Url::portLink(PortCache::get($pw_a['port_id'])) . "</td>
                                                                                           <td rowspan=2> <i class='fa fa-arrows-alt fa-lg icon-theme' aria-hidden='true'></i> </td>
-                                                                                          <td>" . generate_device_link($pw_b) . '</td><td>' . generate_port_link($pw_b) . '</td></tr>';
+                                                                                          <td>" . Url::deviceLink(DeviceCache::get($pw_b['device_id'])) . '</td><td>' . Url::portLink(PortCache::get($pw_b['port_id'])) . '</td></tr>';
     echo "<tr style=\"background-color: #$bg;\"><td colspan=2>" . $pw_a['ifAlias'] . '</td><td colspan=2>' . $pw_b['ifAlias'] . '</td></tr>';
 
     if ($vars['view'] == 'minigraphs') {
@@ -82,7 +84,7 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I, devices AS D W
 
         if ($pw_a) {
             foreach (['bits', 'upkts', 'errors'] as $graph_type) {
-                echo generate_port_link($pw_a, Url::graphTag([
+                echo Url::portLink(PortCache::get($pw_a['port_id']), Url::graphTag([
                     'type' => 'port_' . $graph_type,
                     'id' => $pw_a['port_id'],
                     'width' => 150,
@@ -97,7 +99,7 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I, devices AS D W
 
         if ($pw_b) {
             foreach (['bits', 'upkts', 'errors'] as $graph_type) {
-                echo generate_port_link($pw_b, Url::graphTag([
+                echo Url::portLink(PortCache::get($pw_b['port_id']), Url::graphTag([
                     'type' => 'port_' . $graph_type,
                     'id' => $pw_b['port_id'],
                     'width' => 150,
