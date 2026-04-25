@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Traits\Filterable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -120,27 +121,27 @@ class Port extends DeviceRelatedModel
     {
         $os = $this->device?->os;
 
-        if (\App\Facades\LibrenmsConfig::getOsSetting($os, 'ifname')) {
+        if (LibrenmsConfig::getOsSetting($os, 'ifname')) {
             $label = $this->ifName;
-        } elseif (\App\Facades\LibrenmsConfig::getOsSetting($os, 'ifalias')) {
+        } elseif (LibrenmsConfig::getOsSetting($os, 'ifalias')) {
             $label = $this->ifAlias;
         }
 
         if (empty($label)) {
             $label = $this->ifDescr;
 
-            if (\App\Facades\LibrenmsConfig::getOsSetting($os, 'ifindex')) {
+            if (LibrenmsConfig::getOsSetting($os, 'ifindex')) {
                 $label .= " $this->ifIndex";
             }
         }
 
-        foreach ((array) \App\Facades\LibrenmsConfig::get('rewrite_if', []) as $src => $val) {
+        foreach ((array) LibrenmsConfig::get('rewrite_if', []) as $src => $val) {
             if (Str::contains(strtolower($label), strtolower((string) $src))) {
                 $label = $val;
             }
         }
 
-        foreach ((array) \App\Facades\LibrenmsConfig::get('rewrite_if_regexp', []) as $reg => $val) {
+        foreach ((array) LibrenmsConfig::get('rewrite_if_regexp', []) as $reg => $val) {
             $label = preg_replace($reg . 'i', (string) $val, $label);
         }
 
