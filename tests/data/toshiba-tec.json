@@ -1,0 +1,159 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.641.52.71107349",
+                    "sysDescr": "TOSHIBA e-STUDIO338CS version CXTZJ.230.307 kernel 5.4.254-yocto-standard All-N-1",
+                    "sysContact": "<private>",
+                    "version": "CXTZJ.230.307",
+                    "hardware": "e-STUDIO338CS",
+                    "features": "5.4.254-yocto-standard",
+                    "location": "<private>",
+                    "os": "toshiba-tec",
+                    "type": "printer",
+                    "serial": "1234567890ABC",
+                    "icon": "toshiba.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.2.1.43.10.2.1.4.1.1",
+                    "sensor_index": "prtMarkerLifeCount",
+                    "sensor_type": "toshiba-tec",
+                    "sensor_descr": "Life time impressions",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 29648,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.2.1.43.10.2.1.5.1.1",
+                    "sensor_index": "prtMarkerPowerOnCount",
+                    "sensor_type": "toshiba-tec",
+                    "sensor_descr": "Impressions since powered on",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 56,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "printer-supplies": {
+        "discovery": {
+            "printer_supplies": [
+                {
+                    "supply_index": 1,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
+                    "supply_descr": "Black Cartridge",
+                    "supply_capacity": 9000,
+                    "supply_current": 73,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
+                },
+                {
+                    "supply_index": 2,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
+                    "supply_descr": "Cyan Cartridge",
+                    "supply_capacity": 6000,
+                    "supply_current": 85,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
+                },
+                {
+                    "supply_index": 3,
+                    "supply_type": "transferUnit",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
+                    "supply_descr": "Transfer Module",
+                    "supply_capacity": 125000,
+                    "supply_current": 100,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
+                },
+                {
+                    "supply_index": 4,
+                    "supply_type": "other",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
+                    "supply_descr": "Imaging Kit",
+                    "supply_capacity": 125000,
+                    "supply_current": 68,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
+                },
+                {
+                    "supply_index": 5,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.5",
+                    "supply_descr": "Magenta Cartridge",
+                    "supply_capacity": 6000,
+                    "supply_current": 13,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.5"
+                },
+                {
+                    "supply_index": 6,
+                    "supply_type": "fuser",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.6",
+                    "supply_descr": "Maintenance Kit",
+                    "supply_capacity": 125000,
+                    "supply_current": 78,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.6"
+                },
+                {
+                    "supply_index": 7,
+                    "supply_type": "wasteToner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.7",
+                    "supply_descr": "Waste Toner Bottle",
+                    "supply_capacity": 25000,
+                    "supply_current": 100,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.7"
+                },
+                {
+                    "supply_index": 8,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.8",
+                    "supply_descr": "Yellow Cartridge",
+                    "supply_capacity": 6000,
+                    "supply_current": 5,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.8"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
