@@ -1,0 +1,114 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.641.51.71107517",
+                    "sysDescr": "TOSHIBA e-STUDIO479P version MSNSN.240.049 kernel 5.15.58-yocto-standard All-N-1",
+                    "sysContact": "<private>",
+                    "version": "MSNSN.240.049",
+                    "hardware": "e-STUDIO479P",
+                    "features": "5.15.58-yocto-standard",
+                    "location": "<private>",
+                    "os": "toshiba-tec",
+                    "type": "printer",
+                    "serial": "3456789012CDE",
+                    "icon": "toshiba.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.2.1.43.10.2.1.4.1.1",
+                    "sensor_index": "prtMarkerLifeCount",
+                    "sensor_type": "toshiba-tec",
+                    "sensor_descr": "Life time impressions",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 385,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.2.1.43.10.2.1.5.1.1",
+                    "sensor_index": "prtMarkerPowerOnCount",
+                    "sensor_type": "toshiba-tec",
+                    "sensor_descr": "Impressions since powered on",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 27,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "printer-supplies": {
+        "discovery": {
+            "printer_supplies": [
+                {
+                    "supply_index": 1,
+                    "supply_type": "opc",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
+                    "supply_descr": "Imaging Unit",
+                    "supply_capacity": 75000,
+                    "supply_current": 100,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
+                },
+                {
+                    "supply_index": 2,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
+                    "supply_descr": "Black Cartridge",
+                    "supply_capacity": 5000,
+                    "supply_current": 84,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
+                },
+                {
+                    "supply_index": 3,
+                    "supply_type": "fuser",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
+                    "supply_descr": "Maintenance Kit",
+                    "supply_capacity": 200000,
+                    "supply_current": 100,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

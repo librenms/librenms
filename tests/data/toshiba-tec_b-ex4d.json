@@ -1,0 +1,35 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.1129.1.2.1",
+                    "sysDescr": "TOSHIBA TEC B-EX4D",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "location": "<private>",
+                    "os": "toshiba-tec",
+                    "type": "printer",
+                    "serial": null,
+                    "icon": "toshiba.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": []
+        },
+        "poller": "matches discovery"
+    },
+    "printer-supplies": {
+        "discovery": {
+            "printer_supplies": []
+        },
+        "poller": "matches discovery"
+    }
+}
