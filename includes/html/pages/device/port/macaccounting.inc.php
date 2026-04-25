@@ -1,10 +1,7 @@
 <?php
 
-use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
-use App\Facades\PortCache;
 use App\Models\Ipv4Mac;
-use LibreNMS\Cache\Device;
 use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Mac;
