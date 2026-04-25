@@ -3,6 +3,7 @@
 // Don't refresh this page to stop adding multiple ports
 
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
 use LibreNMS\Util\Url;
 
@@ -11,7 +12,7 @@ $device = DeviceCache::getPrimary();
 
 // This needs more verification. Is it already added? Does it exist?
 // Calculation to extract MB/GB/TB of Kbps/Mbps/Gbps
-$base = App\Facades\LibrenmsConfig::get('billing.base');
+$base = LibrenmsConfig::get('billing.base');
 
 if ($bill_data['bill_type'] == 'quota') {
     $data = $bill_data['bill_quota'];

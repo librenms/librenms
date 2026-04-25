@@ -1,6 +1,7 @@
 <?php
 
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Models\Port;
 use LibreNMS\Util\Number;
 
@@ -107,9 +108,9 @@ if ($vars['view'] == 'lsp') {
         $device = device_by_id_cache($lsp['device_id']);
 
         if (! is_int($i / 2)) {
-            $bg_colour = App\Facades\LibrenmsConfig::get('list_colour.even');
+            $bg_colour = LibrenmsConfig::get('list_colour.even');
         } else {
-            $bg_colour = App\Facades\LibrenmsConfig::get('list_colour.odd');
+            $bg_colour = LibrenmsConfig::get('list_colour.odd');
         }
 
         $adminstate_status_color = $operstate_status_color = $path_status_color = 'default';
@@ -182,9 +183,9 @@ if ($vars['view'] == 'paths') {
     foreach (dbFetchRows('SELECT *, `mplsLspName` FROM `mpls_lsp_paths` AS `p`, `mpls_lsps` AS `l` WHERE `p`.`lsp_id` = `l`.`lsp_id` ORDER BY `p`.`device_id`, `l`.`mplsLspName`') as $path) {
         $device = device_by_id_cache($path['device_id']);
         if (! is_int($i / 2)) {
-            $bg_colour = App\Facades\LibrenmsConfig::get('list_colour.even');
+            $bg_colour = LibrenmsConfig::get('list_colour.even');
         } else {
-            $bg_colour = App\Facades\LibrenmsConfig::get('list_colour.odd');
+            $bg_colour = LibrenmsConfig::get('list_colour.odd');
         }
 
         $adminstate_status_color = $operstate_status_color = 'default';
@@ -250,9 +251,9 @@ if ($vars['view'] == 'sdps') {
     foreach (dbFetchRows('SELECT * FROM `mpls_sdps` ORDER BY `sdp_oid`') as $sdp) {
         $device = device_by_id_cache($sdp['device_id']);
         if (! is_int($i / 2)) {
-            $bg_colour = App\Facades\LibrenmsConfig::get('list_colour.even');
+            $bg_colour = LibrenmsConfig::get('list_colour.even');
         } else {
-            $bg_colour = App\Facades\LibrenmsConfig::get('list_colour.odd');
+            $bg_colour = LibrenmsConfig::get('list_colour.odd');
         }
 
         $adminstate_status_color = $operstate_status_color = 'default';
@@ -323,9 +324,9 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
     foreach (dbFetchRows('SELECT b.*, s.svc_oid AS svcId FROM `mpls_sdp_binds` AS b LEFT JOIN `mpls_services` AS s ON `b`.`svc_id` = `s`.`svc_id` ORDER BY `sdp_oid`, `svc_oid`') as $sdpbind) {
         $device = device_by_id_cache($sdpbind['device_id']);
         if (! is_int($i / 2)) {
-            $bg_colour = App\Facades\LibrenmsConfig::get('list_colour.even');
+            $bg_colour = LibrenmsConfig::get('list_colour.even');
         } else {
-            $bg_colour = App\Facades\LibrenmsConfig::get('list_colour.odd');
+            $bg_colour = LibrenmsConfig::get('list_colour.odd');
         }
 
         $adminstate_status_color = $operstate_status_color = 'default';
@@ -391,9 +392,9 @@ vprn services are up when the service is administratively up however routing fun
     foreach (dbFetchRows('SELECT s.*, v.vrf_name FROM `mpls_services` AS s LEFT JOIN  `vrfs` AS v ON `s`.`svcVRouterId` = `v`.`vrf_oid` AND `s`.`device_id` = `v`.`device_id` ORDER BY `svc_oid`') as $svc) {
         $device = device_by_id_cache($svc['device_id']);
         if (! is_int($i / 2)) {
-            $bg_colour = App\Facades\LibrenmsConfig::get('list_colour.even');
+            $bg_colour = LibrenmsConfig::get('list_colour.even');
         } else {
-            $bg_colour = App\Facades\LibrenmsConfig::get('list_colour.odd');
+            $bg_colour = LibrenmsConfig::get('list_colour.odd');
         }
 
         $adminstate_status_color = $operstate_status_color = 'default';
@@ -463,9 +464,9 @@ if ($vars['view'] == 'saps') {
         $port = Port::whereBelongsTo($device)->where($sap['ifName'])->first();
 
         if (! is_int($i / 2)) {
-            $bg_colour = App\Facades\LibrenmsConfig::get('list_colour.even');
+            $bg_colour = LibrenmsConfig::get('list_colour.even');
         } else {
-            $bg_colour = App\Facades\LibrenmsConfig::get('list_colour.odd');
+            $bg_colour = LibrenmsConfig::get('list_colour.odd');
         }
 
         $adminstate_status_color = $operstate_status_color = 'default';

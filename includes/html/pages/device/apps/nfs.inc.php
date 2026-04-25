@@ -1,5 +1,6 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Ipv4Address;
 use App\Models\Ipv6Address;
 use App\Models\Port;
@@ -266,10 +267,10 @@ if ($vars['app_page'] == 'general') {
                     $path_graph_array = [];
                     $path_graph_array['height'] = '100';
                     $path_graph_array['width'] = '210';
-                    $path_graph_array['to'] = App\Facades\LibrenmsConfig::get('time.now');
+                    $path_graph_array['to'] = LibrenmsConfig::get('time.now');
                     $path_graph_array['id'] = $storage_info['storage_id'];
                     $path_graph_array['type'] = 'storage_usage';
-                    $path_graph_array['from'] = App\Facades\LibrenmsConfig::get('time.day');
+                    $path_graph_array['from'] = LibrenmsConfig::get('time.day');
                     $path_graph_array['legend'] = 'no';
 
                     $path_link_array = $path_graph_array;
@@ -364,10 +365,10 @@ if ($vars['app_page'] == 'general') {
                     $rpath_graph_array = [];
                     $rpath_graph_array['height'] = '100';
                     $rpath_graph_array['width'] = '210';
-                    $rpath_graph_array['to'] = App\Facades\LibrenmsConfig::get('time.now');
+                    $rpath_graph_array['to'] = LibrenmsConfig::get('time.now');
                     $rpath_graph_array['id'] = $storage_info['storage_id'];
                     $rpath_graph_array['type'] = 'storage_usage';
-                    $rpath_graph_array['from'] = App\Facades\LibrenmsConfig::get('time.day');
+                    $rpath_graph_array['from'] = LibrenmsConfig::get('time.day');
                     $rpath_graph_array['legend'] = 'no';
 
                     $rpath_link_array = $rpath_graph_array;
@@ -459,7 +460,7 @@ foreach ($graphs as $key => $text) {
     $graph_type = $key;
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
-    $graph_array['to'] = App\Facades\LibrenmsConfig::get('time.now');
+    $graph_array['to'] = LibrenmsConfig::get('time.now');
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 
