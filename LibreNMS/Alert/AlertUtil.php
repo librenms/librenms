@@ -126,6 +126,12 @@ class AlertUtil
             return;
         }
 
+        if ((bool) $op->notifications_suppressed) {
+            $rextra['mute'] = true;
+
+            return;
+        }
+
         $rextra['delay'] = $notificationCount === 0 ? (int) $op->start_in_seconds : 0;
         $stepDur = (int) $op->step_duration_seconds;
         $rextra['interval'] = $stepDur > 0 ? $stepDur : $defaultStep;

@@ -99,6 +99,7 @@ class AlertOperationSegment extends BaseModel
             'escalation_step_to' => $this->escalation_step_to,
             'start_in_seconds' => $this->start_in_seconds,
             'step_duration_seconds' => $this->step_duration_seconds,
+            'notifications_suppressed' => (bool) $this->notifications_suppressed,
             'transports' => $transports,
         ];
     }
