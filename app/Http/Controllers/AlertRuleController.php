@@ -167,7 +167,6 @@ class AlertRuleController extends Controller
             }
         }
 
-        // extra json (rule-level toggles)
         $extra = $request->safe([
             'invert',
             'acknowledgement',

@@ -126,7 +126,6 @@ class AlertUtil
             return;
         }
 
-        // Operation-level suppression: treat this as a muted rule (RunAlerts already supports rextra['mute']).
         if ((bool) ($ruleRow->alertOperation?->notifications_suppressed ?? false)) {
             $rextra['mute'] = true;
 
