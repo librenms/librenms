@@ -42,3 +42,16 @@ This can be disabled in the WebUI:
     ```bash
     lnms config:set update false
     ```
+
+## Updating on set days
+
+You can configure LibreNMS to only perform updates on set days. This configuration is an
+array and is blank by default.
+
+!!! setting "system/updates"
+    ```bash
+    lnms config:get update.on_days
+    ```
+    ```bash
+    lnms config:set update.on_days.+ "monday"
+    ```

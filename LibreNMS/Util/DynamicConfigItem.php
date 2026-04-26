@@ -97,6 +97,22 @@ class DynamicConfigItem implements \ArrayAccess
             }
 
             return true;
+        } elseif ($this->type == 'weekdays') {
+            if ($value === null) {
+                return true;
+            }
+
+            if (! is_array($value)) {
+                return false;
+            }
+
+            foreach ($value as $v) {
+                if (! is_string($v) || ! array_key_exists($v, $this->options)) {
+                    return false;
+                }
+            }
+
+            return true;
         } elseif ($this->type == 'email') {
             // allow email format that includes display text
             if (preg_match('/.* <(.*)>/', (string) $value, $matches)) {

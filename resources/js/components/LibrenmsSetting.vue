@@ -102,7 +102,7 @@ export default {
                 this.persistValue(value)
             }, 500),
             changeValue(value) {
-                if (['select', 'boolean', 'multiple'].includes(this.setting.type)) {
+                if (['select', 'boolean', 'multiple', 'weekdays'].includes(this.setting.type)) {
                     // no need to debounce
                     this.persistValue(value);
                 } else {

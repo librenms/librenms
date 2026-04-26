@@ -7297,11 +7297,11 @@
             }
         },
         "update.on_days": {
-            "default": "",
+            "default": [],
             "group": "system",
             "section": "updates",
             "order": 2,
-            "type": "multiple",
+            "type": "weekdays",
             "options": {
                 "monday": "Monday",
                 "tuesday": "Tuesday",
@@ -7310,6 +7310,10 @@
                 "friday": "Friday",
                 "saturday": "Saturday",
                 "sunday": "Sunday"
+            },
+            "validate": {
+                "value": "array",
+                "value.*": "string|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday"
             }
         },
         "uptime_warning": {

@@ -126,6 +126,7 @@
                                     "color",
                                     "float",
                                     "multiple",
+                                    "weekdays",
                                     "graph",
                                     "snmp3auth",
                                     "ad-groups",
