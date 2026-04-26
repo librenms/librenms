@@ -145,7 +145,7 @@ class Port extends DeviceRelatedModel
             $label = preg_replace($reg . 'i', (string) $val, $label);
         }
 
-        return $label;
+        return (string) $label;
     }
 
     /**
