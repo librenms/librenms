@@ -1,5 +1,3 @@
-mib: Printer-MIB
-
 modules:
   os:
     sysDescr_regex:
