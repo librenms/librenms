@@ -136,8 +136,8 @@
                 <label for="parent_id" class="col-sm-2 control-label">{{ __('device.edit.depends_on') }}</label>
                 <div class="col-sm-6">
                     <select multiple name="parent_id[]" id="parent_id" class="form-control" style="width: 100%">
-                        @foreach ($parents as $parent_id => $parent_hostname)
-                            <option value="{{  $parent_id }}" selected>{{ $parent_hostname }}</option>
+                        @foreach ($parents as $parent_id => $parent_display)
+                            <option value="{{ $parent_id }}" selected>{{ $parent_display }}</option>
                         @endforeach
                     </select>
                 </div>
