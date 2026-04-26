@@ -91,7 +91,7 @@ class AlertUtil
         unset($rextra['_stop_notifications']);
 
         $ruleRow = AlertRule::query()
-            ->with('alertOperation:id,default_operation_step_duration_seconds')
+            ->with('alertOperation:id,default_operation_step_duration_seconds,notifications_suppressed')
             ->whereKey($ruleId)
             ->first(['id', 'alert_operation_id']);
         if ($ruleRow === null || $ruleRow->alert_operation_id === null) {
@@ -126,7 +126,8 @@ class AlertUtil
             return;
         }
 
-        if ((bool) $op->notifications_suppressed) {
+        // Operation-level suppression: treat this as a muted rule (RunAlerts already supports rextra['mute']).
+        if ((bool) ($ruleRow->alertOperation?->notifications_suppressed ?? false)) {
             $rextra['mute'] = true;
 
             return;

@@ -42,13 +42,9 @@ class AlertOperationController extends Controller
             'segments.transportGroups:alert_transport_groups.transport_group_id,transport_group_name',
         ]);
 
-        $defaultSuppressed = $alertOperation->segments->contains(static fn ($s) => (bool) $s->notifications_suppressed);
-
         return response()->json([
             'status' => 'ok',
-            'operation' => array_merge($alertOperation->toApiArray(), [
-                'default_notifications_suppressed' => $defaultSuppressed,
-            ]),
+            'operation' => $alertOperation->toApiArray(),
         ]);
     }
 
@@ -61,6 +57,7 @@ class AlertOperationController extends Controller
             $op = new AlertOperation;
             $op->name = $validated['name'];
             $op->default_operation_step_duration_seconds = $validated['default_operation_step_duration_seconds'] ?? null;
+            $op->notifications_suppressed = (bool) ($validated['notifications_suppressed'] ?? false);
             $op->save();
             $this->syncSegments($op, $request);
 
@@ -85,6 +82,7 @@ class AlertOperationController extends Controller
             $validated = $request->validated();
             $alertOperation->name = $validated['name'];
             $alertOperation->default_operation_step_duration_seconds = $validated['default_operation_step_duration_seconds'] ?? null;
+            $alertOperation->notifications_suppressed = (bool) ($validated['notifications_suppressed'] ?? false);
             $alertOperation->save();
             $this->syncSegments($alertOperation, $request);
 
@@ -119,14 +117,12 @@ class AlertOperationController extends Controller
     private function syncSegments(AlertOperation $op, AlertOperationRequest $request): void
     {
         $rows = $request->validated('segments');
-        $defaultSuppressed = (bool) $request->validated('default_notifications_suppressed', false);
         $op->segments()->delete();
 
         foreach (array_values($rows) as $idx => $row) {
             $from = max(1, (int) ($row['escalation_step_from'] ?? 1));
             $toRaw = $row['escalation_step_to'] ?? null;
             $to = ($toRaw === '' || $toRaw === null) ? null : max($from, (int) $toRaw);
-            $suppressed = array_key_exists('notifications_suppressed', $row) ? (bool) $row['notifications_suppressed'] : $defaultSuppressed;
 
             $seg = $op->segments()->create([
                 'position' => (int) ($row['position'] ?? $idx),
@@ -135,7 +131,6 @@ class AlertOperationController extends Controller
                 'escalation_step_to' => $to,
                 'start_in_seconds' => max(0, (int) ($row['start_in_seconds'] ?? 0)),
                 'step_duration_seconds' => max(0, (int) ($row['step_duration_seconds'] ?? 0)),
-                'notifications_suppressed' => $suppressed,
             ]);
 
             $transportsRaw = $row['transports'] ?? [];

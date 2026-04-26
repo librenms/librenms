@@ -51,17 +51,19 @@ Here are some of the other options available when adding an alerting rule:
 
 - Rule name: The name associated with the rule.
 - Severity: How "important" the rule is.
-- Max alerts: The maximum number of alerts sent for the event.  `-1` means unlimited.
-- Delay: The amount of time in seconds to wait after a rule is matched
-  before sending an alert out transport.
-- Interval: The interval of time in seconds between alerts for an
-  event until Max alert is reached.
-- Mute alerts: Disables sending alert rule through alert
-  transport. But will still show the alert in the Web UI.
 - Invert match: Invert the matching rule (ie. alert on items that
   _don't match the rule).
+- Mute alerts: Disables sending alert rule through alert
+  transport. But will still show the alert in the Web UI.
 - Recovery alerts: This will disable the recovery notification from
   being sent if turned off.
+- Acknowledgement alerts: This will disable the acknowledgement notifications
+  from being sent if turned off.
+- Operations: Select the alert operation you want to associate to this alert rule.
+- Match devices, groups and location list: Associate this alert rule to only these devices.
+- All devices except in list: Invert the association to a device based on the Match selection.
+- Procedure URL: [Rules.md#Procedure](See Procedure).
+- Notes: Add any notes about this rule, this informtion will also be passed to the alert notifications.
 
 ## Advanced
 

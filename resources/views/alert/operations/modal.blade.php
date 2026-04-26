@@ -30,7 +30,6 @@
                                     <input type="checkbox" id="ao_default_notifications_suppressed" value="1" data-size="small">
                                 </div>
                             </div>
-                            <p class="help-block">{{ __('Seconds. When a segment’s step duration is 0, this value is the repeat interval. Leave empty to use the global default from settings.') }}</p>
                         </div>
                     </div>
                     <div class="form-group">

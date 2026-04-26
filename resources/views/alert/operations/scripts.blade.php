@@ -83,9 +83,9 @@ $(function () {
                 $('#ao_default_step_duration').val(
                     o.default_operation_step_duration_seconds != null ? o.default_operation_step_duration_seconds : ''
                 );
-                if (typeof o.default_notifications_suppressed !== 'undefined') {
+                if (typeof o.notifications_suppressed !== 'undefined') {
                     initAoSuppressSwitch();
-                    $aoSuppress.bootstrapSwitch('state', !!o.default_notifications_suppressed);
+                    $aoSuppress.bootstrapSwitch('state', !!o.notifications_suppressed);
                 }
                 if (o.segments && o.segments.length) {
                     $.each(o.segments, function (i, s) {
@@ -136,7 +136,7 @@ $(function () {
         var body = {
             name: $('#ao_name').val(),
             default_operation_step_duration_seconds: (dsRaw === '' || dsRaw === null) ? null : parseInt(dsRaw, 10),
-            default_notifications_suppressed: ($aoSuppress.bootstrapSwitch('state') ? 1 : 0),
+            notifications_suppressed: ($aoSuppress.bootstrapSwitch('state') ? 1 : 0),
             segments: segments,
             _token: '{{ csrf_token() }}'
         };

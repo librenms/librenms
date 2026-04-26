@@ -77,6 +77,7 @@ alert_operations:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: default_operation_step_duration_seconds, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: notifications_suppressed, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 alert_operation_segments:
@@ -89,7 +90,6 @@ alert_operation_segments:
     - { Field: escalation_step_to, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: start_in_seconds, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: step_duration_seconds, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
-    - { Field: notifications_suppressed, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_operation_segments_alert_operation_id_index: { Name: alert_operation_segments_alert_operation_id_index, Columns: [alert_operation_id], Unique: false, Type: BTREE }
