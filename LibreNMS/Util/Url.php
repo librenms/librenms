@@ -165,7 +165,7 @@ class Url
             $link = $contents;
         } else {
             $contents = self::escapeBothQuotes($contents);
-            $link = Url::overlibLink($url, $text, $contents, $class);
+            $link = self::overlibLink($url, $text, $contents, $class);
         }
 
         return $link;
@@ -176,7 +176,6 @@ class Url
         if ($port === null) {
             return e($text);
         }
-
         $label = Rewrite::normalizeIfName($port->getLabel());
         if (! $text) {
             $text = $label;
@@ -222,24 +221,15 @@ class Url
         return Rewrite::normalizeIfName($text);
     }
 
-    /**
-     * @param  Sensor  $sensor
-     * @param  string  $text
-     * @param  string  $type
-     * @param  bool  $overlib
-     * @param  bool  $single_graph
-     * @return string
-     */
-    public static function sensorLink(mixed $sensor, Htmlable|string|null $text = null, ?string $type = null, bool $overlib = true, bool $single_graph = false): string
+    public static function sensorLink(Sensor $sensor, ?string $text = null, ?string $type = null, bool $overlib = true, bool $single_graph = false): string
     {
-        $label = $sensor->sensor_descr;
         if (! $text) {
-            $text = $label;
+            $text = $sensor->sensor_descr;
         }
 
         $text = e($text);
 
-        $content = '<div class=list-large>' . addslashes(e($sensor->device?->display . ' - ' . $label)) . '</div>';
+        $content = '<div class=list-large>' . addslashes(htmlentities($sensor->device?->displayName() . ' - ' . $sensor->sensor_descr)) . '</div>';
 
         $content .= "<div style=\'width: 850px\'>";
         $graph_array = [
@@ -391,11 +381,7 @@ class Url
         return url()->query('graphs', ['type' => $type, ...$args]);
     }
 
-    /**
-     * @param  array<string, mixed>  $args
-     * @return string
-     */
-    public static function graphTag($args): string
+    public static function graphTag(array $args): string
     {
         return '<img class="graph-image" src="' . route('graph', $args) . '" style="border:0;" />';
     }
@@ -524,11 +510,8 @@ class Url
 
     /**
      * Get html class for a port using ifAdminStatus and ifOperStatus
-     *
-     * @param  Port  $port
-     * @return string
      */
-    public static function portLinkDisplayClass($port)
+    public static function portLinkDisplayClass(Port $port): string
     {
         if ($port->ifAdminStatus == IfOperStatus::Down) {
             return 'interface-admindown';
@@ -543,11 +526,8 @@ class Url
 
     /**
      * Get html class for a sensor
-     *
-     * @param  Sensor  $sensor
-     * @return string
      */
-    public static function sensorLinkDisplayClass($sensor)
+    public static function sensorLinkDisplayClass(Sensor $sensor): string
     {
         if ($sensor->sensor_current > $sensor->sensor_limit) {
             return 'sensor-high';
@@ -560,14 +540,7 @@ class Url
         return 'sensor-ok';
     }
 
-    /**
-     * @param  string  $os
-     * @param  string|null  $feature
-     * @param  string  $icon
-     * @param  string  $dir  directory to search in (images/os/ or images/logos)
-     * @return string
-     */
-    public static function findOsImage($os, $feature, $icon = null, $dir = 'images/os/')
+    public static function findOsImage(string $os, ?string $feature, ?string $icon = null, string $dir = 'images/os/'): string
     {
         $possibilities = [$icon];
 
