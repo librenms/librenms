@@ -32,10 +32,5 @@
     <description>As part of the continued effort to improve LibreNMS, it's code base and associated files, we will be migrating the yaml files used for OS detection and support. Please see https://community.librenms.org/t/os-definitions-and-discovery-file-relocation/27646 for further information.</description>
     <pubDate>Wed, 16 Apr 2025 22:00:00 +0000</pubDate>
   </item>
-  <item>
-    <title>Trusted Proxies default change</title>
-    <description>In order to improve the default security of LibreNMS. The default trusted proxies (APP_TRUSTED_PROXIES) will be changed to 127.0.0.1 from * on the 6th of May, 2026 and the 26.5 release.  If you use reverse proxeis, update your APP_TRUSTED_PROXIES setting to include your reverse proxy IPs to avoid any issues with the change is applied.</description>
-    <pubDate>Sun, 26 Apr 2026 22:00:00 +0000</pubDate>
-  </item>
 </channel>
 </rss>
