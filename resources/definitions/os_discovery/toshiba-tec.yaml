@@ -2,13 +2,7 @@ mib: Printer-MIB
 
 modules:
   os:
-    hardware:
-      sysDescr_regex:
-        - '/TOSHIBA (?P<value>e-STUDIO\S+)/'
-    version:
-      sysDescr_regex:
-        - '/version (?P<value>\S+)/'
-    features:
-      sysDescr_regex:
-        - '/kernel (?P<value>\S+)/'
+    sysDescr_regex:
+      - '/TOSHIBA (?<hardware>e-STUDIO\S+) version (?<version>\S+) kernel (?<features>\S+)/'
+      - '/TOSHIBA (?<hardware>e-STUDIO\S+)/'
     serial: Printer-MIB::prtGeneralSerialNumber.1
