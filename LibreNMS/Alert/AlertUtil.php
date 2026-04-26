@@ -126,7 +126,7 @@ class AlertUtil
             return;
         }
 
-        if ((bool) ($ruleRow->alertOperation?->notifications_suppressed ?? false)) {
+        if ($ruleRow->alertOperation === null || (bool) $ruleRow->alertOperation->notifications_suppressed) {
             $rextra['mute'] = true;
 
             return;
