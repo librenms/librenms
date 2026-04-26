@@ -54,9 +54,6 @@ if ($options['f'] === 'update') {
     }
 
     $on_days = LibrenmsConfig::get('update.on_days', []);
-    if (is_string($on_days)) {
-        $on_days = explode(',', $on_days);
-    }
 
     if (is_array($on_days) && ! empty($on_days)) {
         $today = strtolower(date('l')); // monday..sunday

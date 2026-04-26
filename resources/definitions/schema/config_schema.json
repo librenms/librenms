@@ -125,7 +125,6 @@
                                     "email",
                                     "color",
                                     "float",
-                                    "multiple",
                                     "weekdays",
                                     "graph",
                                     "snmp3auth",
