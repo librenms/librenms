@@ -125,6 +125,7 @@
                                     "email",
                                     "color",
                                     "float",
+                                    "multiple",
                                     "graph",
                                     "snmp3auth",
                                     "ad-groups",

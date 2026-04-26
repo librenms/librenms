@@ -2410,6 +2410,10 @@ return [
                 'release' => 'Monthly',
             ],
         ],
+        'on_days' => [
+            'description' => 'Only run updates on these days',
+            'help' => 'If set (non-empty), daily.sh will only run code updates when today matches one of these values: monday-sunday or mon-sun. Leave empty to allow updates every day.',
+        ],
         'uptime_warning' => [
             'description' => 'Show Device as warning if Uptime below (seconds)',
             'help' => 'Shows Device as warning if Uptime is below this value. Custom maps status will reflect this setting. 0 disables warning. Default 24h',

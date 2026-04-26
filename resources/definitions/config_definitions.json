@@ -7296,6 +7296,22 @@
                 "release": "release"
             }
         },
+        "update.on_days": {
+            "default": "",
+            "group": "system",
+            "section": "updates",
+            "order": 2,
+            "type": "multiple",
+            "options": {
+                "monday": "Monday",
+                "tuesday": "Tuesday",
+                "wednesday": "Wednesday",
+                "thursday": "Thursday",
+                "friday": "Friday",
+                "saturday": "Saturday",
+                "sunday": "Sunday"
+            }
+        },
         "uptime_warning": {
             "group": "webui",
             "section": "device",

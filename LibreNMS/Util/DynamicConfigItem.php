@@ -74,6 +74,29 @@ class DynamicConfigItem implements \ArrayAccess
             return filter_var($value, FILTER_VALIDATE_FLOAT) !== false;
         } elseif ($this->type == 'select') {
             return in_array($value, array_keys($this->options));
+        } elseif ($this->type == 'multiple') {
+            if (is_array($value)) {
+                $value = implode(',', $value);
+            }
+
+            if ($value === null || $value === '') {
+                return true;
+            }
+
+            if (! is_string($value)) {
+                return false;
+            }
+
+            $values = array_filter(array_map('trim', explode(',', $value)), fn ($v) => $v !== '');
+
+            // all values must exist in options
+            foreach ($values as $v) {
+                if (! array_key_exists($v, $this->options)) {
+                    return false;
+                }
+            }
+
+            return true;
         } elseif ($this->type == 'email') {
             // allow email format that includes display text
             if (preg_match('/.* <(.*)>/', (string) $value, $matches)) {
