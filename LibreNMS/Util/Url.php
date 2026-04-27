@@ -29,7 +29,6 @@ namespace LibreNMS\Util;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Port;
-use App\Models\Sensor;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Gate;
@@ -165,7 +164,7 @@ class Url
             $link = $contents;
         } else {
             $contents = self::escapeBothQuotes($contents);
-            $link = self::overlibLink($url, $text, $contents, $class);
+            $link = Url::overlibLink($url, $text, $contents, $class);
         }
 
         return $link;
@@ -221,15 +220,24 @@ class Url
         return Rewrite::normalizeIfName($text);
     }
 
-    public static function sensorLink(Sensor $sensor, ?string $text = null, ?string $type = null, bool $overlib = true, bool $single_graph = false): string
+    /**
+     * @param  \App\Models\Sensor  $sensor
+     * @param  string  $text
+     * @param  string  $type
+     * @param  bool  $overlib
+     * @param  bool  $single_graph
+     * @return mixed|string
+     */
+    public static function sensorLink(mixed $sensor, Htmlable|string|null $text = null, ?string $type = null, bool $overlib = true, bool $single_graph = false): string
     {
+        $label = $sensor->sensor_descr;
         if (! $text) {
-            $text = $sensor->sensor_descr;
+            $text = $label;
         }
 
         $text = e($text);
 
-        $content = '<div class=list-large>' . addslashes(htmlentities($sensor->device?->displayName() . ' - ' . $sensor->sensor_descr)) . '</div>';
+        $content = '<div class=list-large>' . addslashes(htmlentities($sensor->device?->displayName() . ' - ' . $label)) . '</div>';
 
         $content .= "<div style=\'width: 850px\'>";
         $graph_array = [
@@ -277,12 +285,12 @@ class Url
         return route('device', $routeParams) . self::urlParams($vars);
     }
 
-    public static function portUrl(Port $port, $vars = []): string
+    public static function portUrl($port, $vars = [])
     {
         return self::generate(['page' => 'device', 'device' => $port->device_id, 'tab' => 'port', 'port' => $port->port_id], $vars);
     }
 
-    public static function sensorUrl(Sensor $sensor, $vars = []): string
+    public static function sensorUrl($sensor, $vars = [])
     {
         return self::generate(['page' => 'device', 'device' => $sensor->device_id, 'tab' => 'health', 'metric' => $sensor->sensor_class], $vars);
     }
@@ -332,7 +340,7 @@ class Url
         return '<img src="graph-image ' . url('graph.php') . '?type=' . $args['graph_type'] . '&amp;id=' . $args['port_id'] . '&amp;from=' . $args['from'] . '&amp;to=' . $args['to'] . '&amp;width=' . $args['width'] . '&amp;height=' . $args['height'] . '&amp;bg=' . $args['bg'] . '">';
     }
 
-    public static function generate($vars, $new_vars = []): string
+    public static function generate($vars, $new_vars = [])
     {
         $vars = array_merge($vars, $new_vars);
 
@@ -381,7 +389,11 @@ class Url
         return url()->query('graphs', ['type' => $type, ...$args]);
     }
 
-    public static function graphTag(array $args): string
+    /**
+     * @param  array  $args
+     * @return string
+     */
+    public static function graphTag($args): string
     {
         return '<img class="graph-image" src="' . route('graph', $args) . '" style="border:0;" />';
     }
@@ -510,8 +522,11 @@ class Url
 
     /**
      * Get html class for a port using ifAdminStatus and ifOperStatus
+     *
+     * @param  Port  $port
+     * @return string
      */
-    public static function portLinkDisplayClass(Port $port): string
+    public static function portLinkDisplayClass($port)
     {
         if ($port->ifAdminStatus == IfOperStatus::Down) {
             return 'interface-admindown';
@@ -526,8 +541,11 @@ class Url
 
     /**
      * Get html class for a sensor
+     *
+     * @param  \App\Models\Sensor  $sensor
+     * @return string
      */
-    public static function sensorLinkDisplayClass(Sensor $sensor): string
+    public static function sensorLinkDisplayClass($sensor)
     {
         if ($sensor->sensor_current > $sensor->sensor_limit) {
             return 'sensor-high';
@@ -540,7 +558,14 @@ class Url
         return 'sensor-ok';
     }
 
-    public static function findOsImage(string $os, ?string $feature, ?string $icon = null, string $dir = 'images/os/'): string
+    /**
+     * @param  string  $os
+     * @param  string|null  $feature
+     * @param  string  $icon
+     * @param  string  $dir  directory to search in (images/os/ or images/logos)
+     * @return string
+     */
+    public static function findOsImage($os, $feature, $icon = null, $dir = 'images/os/')
     {
         $possibilities = [$icon];
 
