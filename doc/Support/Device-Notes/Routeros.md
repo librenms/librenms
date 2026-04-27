@@ -9,6 +9,7 @@ This agent script will allow LibreNMS to run a script on a Mikrotik / RouterOS d
 - Run the following command on the MikroTik switch to ensure the script has the necessary execution rights: ```/system script set [find name=LNMS_vlans] dont-require-permissions=yes```
 - Enable an SNMP community that has both READ and WRITE capabilities. This is important, otherwise, LibreNMS will not be able to run the above script. It is recommended to use SNMP v3 for this.
 - Enable the "VLANs" module in LibreNMS for the MikroTik device (Device -> Edit -> Modules).
+- Adjust the SNMP Timeout to 30 seconds and Retries to 3 in the LibreNMS device settings (Device -> Edit -> SNMP). This is required for large switches to ensure the script has enough time to return the data.
 - Discover / Force rediscover your Mikrotik devices. After discovery has been completed the vlans menu should appear within LibreNMS for the device.
 
 ### *** IMPORTANT NOTE ***
