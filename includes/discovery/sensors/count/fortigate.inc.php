@@ -17,7 +17,11 @@
  *
  * @copyright  2025 CTNET BV
  * @author     Rudy Broersma <r.broersma@ctnet.nl>
+ * 
+ * @copyright  2026 Network Solutions Factory
+ * @author     Sofia El Khalifi <sofia.elkhalifi@netsf.fr>
  */
+
 
 // Sensors for license status
 $licenseOids = SnmpQuery::hideMib()->walk('FORTINET-FORTIGATE-MIB::fgSystemInfoAdvanced')->table(1);
@@ -58,18 +62,34 @@ if (! empty($licenseOids)) {
 }
 
 $session_rate = [
-    'Sessions/sec 1m avg' => ['.1.3.6.1.4.1.12356.101.4.1.11.0', 'fgSysSesRate1.0'],  //FORTINET-FORTIGATE-MIB::fgSysSesRate1.0
+    'Sessions IPV4/sec 1m avg' => ['.1.3.6.1.4.1.12356.101.4.1.11.0', 'fgSysSesRate1.0'],  //FORTINET-FORTIGATE-MIB::fgSysSesRate1.0
+    'Sessions IPV6/sec 1m avg' => ['.1.3.6.1.4.1.12356.101.4.1.16.0', 'fgSysSes6Rate1.0'],  //FORTINET-FORTIGATE-MIB::fgSysSes6Rate1.0
     'Sessions/sec 10m avg' => ['.1.3.6.1.4.1.12356.101.4.1.12.0', 'fgSysSesRate10.0'],  //FORTINET-FORTIGATE-MIB::fgSysSesRate10.0
     'Sessions/sec 30m avg' => ['.1.3.6.1.4.1.12356.101.4.1.13.0', 'fgSysSesRate30.0'],  //FORTINET-FORTIGATE-MIB::fgSysSesRate30.0
     'Sessions/sec 60m avg' => ['.1.3.6.1.4.1.12356.101.4.1.14.0', 'fgSysSesRate60.0'],  //FORTINET-FORTIGATE-MIB::fgSysSesRate60.0
-    'Session count' => ['.1.3.6.1.4.1.12356.101.4.1.8.0', 'fgSysSesCount.0'],  //FORTINET-FORTIGATE-MIB::fgSysSesCount.0
+    'Session IPV4 count' => ['.1.3.6.1.4.1.12356.101.4.1.8.0', 'fgSysSesCount.0'],  //FORTINET-FORTIGATE-MIB::fgSysSesCount.0
+    'Session IPV6 count' => ['.1.3.6.1.4.1.12356.101.4.1.15.0', 'fgSysSes6Count.0'],  //FORTINET-FORTIGATE-MIB::fgSysSes6Count.0
+    'Total npu offloaded sessions' => ['.1.3.6.1.4.1.12356.101.20.2.1.1.3.0', 'fgNPUSessionCount.0'],  //FORTINET-FORTIGATE-MIB::fgNPUSessionCount.0
 ];
 
 foreach ($session_rate as $descr => $oid) {
     $oid_num = $oid[0];
     $oid_txt = $oid[1];
 
-    $result = SnmpQuery::get('FORTINET-FORTIGATE-MIB::' . $oid_txt)->value(0);
+    // FortiGate stores session information as two NP forward entries for a single bidirectional firewall session.
+    // To derive the approximate value of NPU offloaded sessions, divide the total by half.
+    if ($oid_txt === 'fgNPUSessionCount.0') {
+        // Fetch all NPU session counts using SnmpQuery::walk
+        $npuSessions = SnmpQuery::walk('FORTINET-FORTIGATE-MIB::fgNPUSessionCount')->values();
+
+        // Sum all the values from the walk
+        $total = array_sum($npuSessions);
+
+        // Divide the total by 2
+        $result = $total / 2;
+    } else {
+        $result = SnmpQuery::get('FORTINET-FORTIGATE-MIB::' . $oid_txt)->value(0);
+    }
 
     discover_sensor(
         null,
