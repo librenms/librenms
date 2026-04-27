@@ -512,20 +512,24 @@ if (! empty($peers)) {
                 } elseif (isset($peer_data['bgpPeerIface']) && is_numeric($peer_data['bgpPeerIface'])) {
                     // The column is already filled with the ifIndex, we leave it as is
                 } elseif (isset($peer_data['bgpPeerLocalAddr']) && IP::isValid($peer_data['bgpPeerLocalAddr'])) {
-                    // else we use the bgpPeerLocalAddr to find ifIndex
+                    // else we use the bgpPeerLocalAddr to find ifIndex on the peer device
+                    // Only populate bgpPeerIface when exactly one device has this IP — null when ambiguous (zero or multiple matches in environments with reused address space)
                     try {
                         $ip_address = IP::parse($peer_data['bgpPeerLocalAddr']);
                         $family = $ip_address->getFamily();
-                        $peer_data['bgpPeerIface'] = DB::table('ports')->join("{$family}_addresses", 'ports.port_id', '=', "{$family}_addresses.port_id")->where("{$family}_address", '=', $ip_address->uncompressed())->where('ports.device_id', '=', $device['device_id'])->value('ifIndex');
+                        $matches = DB::table('ports')->join("{$family}_addresses", 'ports.port_id', '=', "{$family}_addresses.port_id")->where("{$family}_address", '=', $ip_address->uncompressed())->select('ports.ifIndex')->get();
+                        $peer_data['bgpPeerIface'] = $matches->count() === 1 ? $matches->first()->ifIndex : null;
                     } catch (InvalidIpException) {
                         $peer_data['bgpPeerIface'] = null;
                     }
                 } elseif (isset($peer_data['bgpLocalAddr']) && IP::isValid($peer_data['bgpLocalAddr'])) {
-                    // else we use the bgpLocalAddr to find ifIndex
+                    // else we use the bgpLocalAddr to find ifIndex on the peer device
+                    // Only populate bgpPeerIface when exactly one device has this IP — null when ambiguous (zero or multiple matches in environments with reused address space)
                     try {
                         $ip_address = IP::parse($peer_data['bgpLocalAddr']);
                         $family = $ip_address->getFamily();
-                        $peer_data['bgpPeerIface'] = DB::table('ports')->join("{$family}_addresses", 'ports.port_id', '=', "{$family}_addresses.port_id")->where("{$family}_address", '=', $ip_address->uncompressed())->where('ports.device_id', '=', $device['device_id'])->value('ifIndex');
+                        $matches = DB::table('ports')->join("{$family}_addresses", 'ports.port_id', '=', "{$family}_addresses.port_id")->where("{$family}_address", '=', $ip_address->uncompressed())->select('ports.ifIndex')->get();
+                        $peer_data['bgpPeerIface'] = $matches->count() === 1 ? $matches->first()->ifIndex : null;
                     } catch (InvalidIpException) {
                         $peer_data['bgpPeerIface'] = null;
                     }
