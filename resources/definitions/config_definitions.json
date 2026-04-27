@@ -6896,7 +6896,7 @@
             "group": "poller",
             "section": "snmp",
             "order": 2,
-            "type": "array",
+            "type": "password-array",
             "default": [
                 "public"
             ]
