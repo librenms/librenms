@@ -78,7 +78,7 @@ class EditDeviceController
             'static_groups' => $static_groups,
             'types' => $types,
             'default_type' => LibrenmsConfig::getOsSetting($device->os, 'type'),
-            'parents' => $device->parents->mapWithKeys(fn ($parent) => [$parent->device_id => $parent->displayName()]),
+            'parents' => $device->parents()->select(['devices.device_id', 'hostname', 'sysName', 'ip', 'overwrite_ip', 'display'])->get()->mapWithKeys(fn ($parent) => [$parent->device_id => $parent->displayName()]),
             'poller_groups' => PollerGroup::orderBy('group_name')->pluck('group_name', 'id'),
             'default_poller_group' => LibrenmsConfig::get('distributed_poller_group'),
             'override_sysContact_bool' => $device->getAttrib('override_sysContact_bool'),
