@@ -42,6 +42,19 @@ $swrolenumber = 0;
 $swstatenumber = 0;
 $repsegmentnumber = 0;
 
+$stack_ports = SnmpQuery::walk('CISCO-STACKWISE-MIB::cswStackPortOperStatus')->valuesByIndex();
+	$stack_port_indexes = array_keys($stack_ports);
+		sort($stack_port_indexes);
+	$stack_map = [];
+	foreach ($stack_port_indexes as $i => $idx) {
+		$switch_num = intval($i / 2) + 1;
+		$port_num = ($i % 2) + 1;
+		$stack_map[$idx] = [
+			'switch' => $switch_num,
+			'port' => $port_num,
+		];
+	}
+
 foreach ($tables as $tablevalue) {
     //Some switches on 15.x expose this information regardless if they are stacked or not, we try to mitigate that by doing the following.
     if (in_array($tablevalue['oid'], ['CISCO-STACKWISE-MIB::cswGlobals', 'CISCO-STACKWISE-MIB::cswSwitchRole', 'CISCO-STACKWISE-MIB::cswSwitchState', 'CISCO-STACKWISE-MIB::cswStackPortOperStatus']) && $redundant_data == 'false' && count($role_data) <= 1) {
@@ -217,8 +230,9 @@ foreach ($tables as $tablevalue) {
                     $swstatenumber++;
                     $descr = $tablevalue['descr'] . $swstatenumber;
                 } elseif ($state_name == 'cswStackPortOperStatus') {
-                    $port = PortCache::getByIfIndex($index, $device['device_id']);
-                    $descr = $tablevalue['descr'] . $port?->ifDescr;
+                    $switch_num = $stack_map[$index]['switch'] ?? '?';
+                    $port_num   = $stack_map[$index]['port'] ?? '?';
+                    $descr = 'Stack Port - Switch #' . $switch_num . ' Port ' . $port_num;
                 } elseif ($state_name == 'cefcFRUPowerOperStatus') {
                     $descr = SnmpQuery::get('ENTITY-MIB::entPhysicalName.' . $index)->value();
                 } elseif ($state_name == 'c3gModemStatus' || $state_name == 'c3gGsmCurrentBand' || $state_name == 'c3gGsmPacketService' || $state_name == 'c3gGsmCurrentRoamingStatus' || $state_name == 'c3gGsmSimStatus') {
