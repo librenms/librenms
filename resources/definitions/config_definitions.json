@@ -979,6 +979,22 @@
                 "value.*": "is_regex"
             }
         },
+        "availablity.threshold_ok": {
+            "default": 99.9,
+            "group": "webui",
+            "section": "device",
+            "order": 101,
+            "type": "float",
+            "units": "percent"
+        },
+        "availablity.threshold_warning": {
+            "default": 95,
+            "group": "webui",
+            "section": "device",
+            "order": 102,
+            "type": "float",
+            "units": "percent"
+        },
         "bad_entity_sensor_regex": {
             "type": "array",
             "validate": {
@@ -1388,6 +1404,10 @@
         },
         "dateformat.compact": {
             "default": "Y-m-d H:i:s",
+            "type": "text"
+        },
+        "dateformat.date": {
+            "default": "D, M j, Y",
             "type": "text"
         },
         "dateformat.long": {
@@ -7375,20 +7395,6 @@
             "section": "availability-map",
             "order": 2,
             "type": "boolean"
-        },
-        "webui.availability_bar.threshold_good": {
-            "default": 99,
-            "group": "webui",
-            "section": "availability-bar",
-            "order": 1,
-            "type": "integer"
-        },
-        "webui.availability_bar.threshold_medium": {
-            "default": 95,
-            "group": "webui",
-            "section": "availability-bar",
-            "order": 2,
-            "type": "integer"
         },
         "webui.custom_css": {
             "default": [],

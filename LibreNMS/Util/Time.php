@@ -217,8 +217,8 @@ class Time
         }
 
         $format = match ($format) {
-            'long', 'compact', 'byminute', 'time' => LibrenmsConfig::get("dateformat.$format"),
-            default => throw new \Exception('Format needs to be one of log, compact, byminute or time'),
+            'long', 'compact', 'byminute', 'time', 'date' => LibrenmsConfig::get("dateformat.$format"),
+            default => throw new \Exception('Format needs to be one of log, compact, byminute, date or time'),
         };
 
         $timezone = session('preferences.timezone');
@@ -227,5 +227,10 @@ class Time
         }
 
         return $input->format($format);
+    }
+
+    public static function now(): Carbon
+    {
+        return Carbon::now(session('preferences.timezone'));
     }
 }

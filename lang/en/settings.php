@@ -99,7 +99,6 @@ return [
             'reporting' => ['name' => 'Reporting'],
         ],
         'webui' => [
-            'availability-bar' => ['name' => 'Availability Bar Settings'],
             'availability-map' => ['name' => 'Availability Map Settings'],
             'custom-map' => ['name' => 'Custom Map Settings'],
             'graph' => ['name' => 'Graph Settings'],
@@ -581,6 +580,16 @@ return [
         'authlog_purge' => [
             'description' => 'Auth log entries older than',
             'help' => 'Cleanup done by daily.sh',
+        ],
+        'availablity' => [
+            'threshold_ok' => [
+                'description' => 'Availability Ok Threshold',
+                'help' => 'Threshold for green color',
+            ],
+            'threshold_warning' => [
+                'description' => 'Availablilty Warning Threshold',
+                'help' => 'Threshold for orange color',
+            ],
         ],
         'bad_entity_sensor_regex' => [
             'description' => 'Bad Entity Sensor Regex',
@@ -2417,16 +2426,6 @@ return [
                 'description' => 'Default Behaviour',
                 'help' => 'When managing scheduled maintenances, this will be the default option for the Behavior option.',
             ],
-            'availability_bar' => [
-                'threshold_green' => [
-                    'description' => 'Threshold Green',
-                    'help' => 'Threshold for green color',
-                ],
-                'threshold_orange' => [
-                    'description' => 'Threshold Orange',
-                    'help' => 'Threshold for orange color',
-                ],
-            ],
             'alert_map_compact' => [
                 'description' => 'Alert map compact view',
                 'help' => 'Alert map view with small indicators',
@@ -2547,6 +2546,7 @@ return [
         'days' => 'days',
         'ms' => 'ms',
         'seconds' => 'seconds',
+        'percent' => '%',
     ],
     'validate' => [
         'boolean' => ':value is not a valid boolean',
