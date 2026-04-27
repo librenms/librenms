@@ -167,7 +167,6 @@
 @endsection
 
 @section('javascript')
-<script src="{{ asset('js/gridstack-all.js?ver=04232026') }}"></script>
 <script src="{{ asset('js/raphael.min.js?ver=05072021') }}"></script>
 <script src="{{ asset('js/justgage.min.js?ver=05072021') }}"></script>
 @endsection
@@ -175,6 +174,8 @@
 @push('scripts')
 @include('map.custom-js')
 <script type="text/javascript">
+    // Vite loads GridStack as a deferred module; ensure it's available before running dashboard code.
+    window.addEventListener('DOMContentLoaded', function () {
     var serialization = @json($dash_config);
     var gridstack_state = 0;
 
@@ -671,5 +672,6 @@
         $('#dashboard_name').val('Default');
         dashboard_add($('#add_form'));
     @endif
+    });
 </script>
 @endpush

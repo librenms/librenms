@@ -32,7 +32,6 @@
     <link href="{{ asset('css/vis.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/fontawesome.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/v4-shims.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/gridstack.min.css?ver=04232026') }}" rel="stylesheet">
     <link href="{{ asset('css/leaflet.css') }}" rel="stylesheet">
     <link href="{{ asset('css/MarkerCluster.css') }}" rel="stylesheet">
     <link href="{{ asset('css/MarkerCluster.Default.css') }}" rel="stylesheet">
