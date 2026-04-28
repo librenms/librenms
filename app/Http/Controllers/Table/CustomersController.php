@@ -28,29 +28,35 @@ namespace App\Http\Controllers\Table;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Port;
+use Countable;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Util\Html;
 
+/**
+ * @extends TableController<Port>
+ */
 class CustomersController extends TableController
 {
-    public function searchFields($request)
+    public function searchFields(Request $request): array
     {
         return ['port_descr_descr', 'ifName', 'ifDescr', 'ifAlias', 'hostname', 'sysDescr', 'port_descr_speed', 'port_descr_notes'];
     }
 
-    public function sortFields($request)
+    public function sortFields(Request $request): array
     {
         return ['port_descr_descr', 'hostname', 'ifDescr', 'port_descr_speed', 'port_descr_circuit', 'port_descr_notes'];
     }
 
     /**
      * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    public function baseQuery($request)
+    public function baseQuery(Request $request): Builder
     {
         // selecting just the customer name, will fetch port data later
         return Port::hasAccess($request->user())
@@ -62,10 +68,10 @@ class CustomersController extends TableController
     }
 
     /**
-     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator&\Countable  $paginator
-     * @return \Illuminate\Http\JsonResponse
+     * @param  LengthAwarePaginator&Countable  $paginator
+     * @return JsonResponse
      */
-    protected function formatResponse($paginator)
+    protected function formatResponse($paginator): JsonResponse
     {
         $customers = collect($paginator->items())->pluck('port_descr_descr');
         // fetch all ports
@@ -98,22 +104,22 @@ class CustomersController extends TableController
     }
 
     /**
-     * @param  Port  $port
-     * @return array|\Illuminate\Database\Eloquent\Model|\Illuminate\Support\Collection<string, mixed>
+     * @param  Port  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($port)
+    public function formatItem(Model $model): array
     {
         return [
-            'port_descr_descr' => $port->port_descr_descr,
-            'hostname' => Blade::render('<x-device-link :device="$device"/>', ['device' => $port->device]),
-            'ifDescr' => Blade::render('<x-port-link :port="$port"/>', ['port' => $port]),
-            'port_descr_speed' => $port->port_descr_speed,
-            'port_descr_circuit' => $port->port_descr_circuit,
-            'port_descr_notes' => $port->port_descr_notes,
+            'port_descr_descr' => $model->port_descr_descr,
+            'hostname' => Blade::render('<x-device-link :device="$device"/>', ['device' => $model->device]),
+            'ifDescr' => Blade::render('<x-port-link :port="$port"/>', ['port' => $model]),
+            'port_descr_speed' => $model->port_descr_speed,
+            'port_descr_circuit' => $model->port_descr_circuit,
+            'port_descr_notes' => $model->port_descr_notes,
         ];
     }
 
-    private function getGraphRow($customer)
+    private function getGraphRow(string $customer): array
     {
         $graph_array = [
             'type' => 'customer_bits',
@@ -134,7 +140,7 @@ class CustomersController extends TableController
         ];
     }
 
-    private function getTypeStrings()
+    private function getTypeStrings(): array
     {
         return Arr::wrap(LibrenmsConfig::get('customers_descr', ['cust']));
     }

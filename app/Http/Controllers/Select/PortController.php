@@ -27,15 +27,19 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\Port;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
+/**
+ * @extends SelectController<Port>
+ */
 class PortController extends SelectController
 {
     /**
      * Defines validation rules (will override base validation rules for select2 responses too)
-     *
-     * @return array
      */
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'device' => 'nullable|int',
@@ -45,24 +49,17 @@ class PortController extends SelectController
 
     /**
      * Defines search fields will be searched in order
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
-    protected function searchFields($request)
+    protected function searchFields(Request $request): array
     {
         return (array) $request->input('field', ['ifAlias', 'ifName', 'ifDescr', 'devices.hostname', 'devices.sysName']);
     }
 
     /**
      * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
-        /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = Port::hasAccess($request->user())
             ->isNotDeleted()
             ->has('device')
@@ -88,16 +85,19 @@ class PortController extends SelectController
         return $query;
     }
 
-    public function formatItem($port)
+    /**
+     * @param  Port  $model
+     * @returns array{id: int|string, text: string, icon?: string}
+     */
+    public function formatItem(Model $model): array
     {
-        /** @var Port $port */
-        $label = $port->getShortLabel();
-        $description = ($label == $port->ifAlias ? '' : ' - ' . $port->ifAlias);
+        $label = $model->getShortLabel();
+        $description = ($label == $model->ifAlias ? '' : ' - ' . $model->ifAlias);
 
         return [
-            'id' => $port->port_id,
-            'text' => $label . ' - ' . $port->device->shortDisplayName() . $description,
-            'device_id' => $port->device_id,
+            'id' => $model->port_id,
+            'text' => $label . ' - ' . $model->device->shortDisplayName() . $description,
+            'device_id' => $model->device_id,
         ];
     }
 }

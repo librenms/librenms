@@ -4,8 +4,12 @@ namespace App\Http\Controllers\Select;
 
 use App\Models\AlertOperation;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
+/**
+ * @extends SelectController<AlertOperation>
+ */
 class AlertOperationController extends SelectController
 {
     /**
@@ -28,9 +32,9 @@ class AlertOperationController extends SelectController
 
     /**
      * @param  AlertOperation  $model
-     * @return array{id: int, text: string}
+     * @return array{id: int|string, text: string, icon?: string}
      */
-    public function formatItem($model): array
+    public function formatItem(Model $model): array
     {
         return [
             'id' => $model->id,

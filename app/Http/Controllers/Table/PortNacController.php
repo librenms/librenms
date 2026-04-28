@@ -29,14 +29,19 @@ namespace App\Http\Controllers\Table;
 use App\Models\Port;
 use App\Models\PortsNac;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\Mac;
 
+/**
+ * @extends TableController<PortsNac>
+ */
 class PortNacController extends TableController
 {
-    public function rules()
+    public function rules(): array
     {
         return [
             'device_id' => 'nullable|integer',
@@ -44,12 +49,12 @@ class PortNacController extends TableController
         ];
     }
 
-    public function searchFields($request)
+    public function searchFields(Request $request): array
     {
         return ['username', 'ip_address', 'mac_address'];
     }
 
-    protected function sortFields($request)
+    protected function sortFields(Request $request): array
     {
         return [
             'device_id',
@@ -75,11 +80,8 @@ class PortNacController extends TableController
 
     /**
      * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return Builder|\Illuminate\Database\Query\Builder
      */
-    public function baseQuery($request)
+    public function baseQuery(Request $request): Builder
     {
         return PortsNac::select('device_id', 'port_id', 'mac_address', 'ip_address', 'vlan', 'domain', 'host_mode', 'username', 'authz_by', 'timeout', 'time_elapsed', 'time_left', 'authc_status', 'authz_status', 'method', 'created_at', 'updated_at', 'historical')
             ->when($request->device_id, fn ($q, $id) => $q->where('device_id', $id))
@@ -90,13 +92,7 @@ class PortNacController extends TableController
             ->with('device');
     }
 
-    /**
-     * @param  string  $search
-     * @param  Builder  $query
-     * @param  array  $fields
-     * @return Builder|\Illuminate\Database\Query\Builder
-     */
-    protected function search($search, $query, $fields = [])
+    protected function search(?string $search, Builder $query, array $fields): Builder
     {
         if ($search = trim(\Request::input('searchPhrase') ?? '')) {
             $mac_search = '%' . str_replace([':', ' ', '-', '.', '0x'], '', $search) . '%';
@@ -129,18 +125,19 @@ class PortNacController extends TableController
     }
 
     /**
-     * @param  PortsNac  $nac
+     * @param  PortsNac  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($nac)
+    public function formatItem(Model $model): array
     {
-        $item = $nac->toArray();
+        $item = $model->toArray();
         $mac = Mac::parse($item['mac_address']);
-        $item['updated_at'] = $nac->updated_at ? ($item['historical'] == 0 ? $nac->updated_at->diffForHumans() : $nac->updated_at->toDateTimeString()) : '';
-        $item['created_at'] = $nac->created_at ? $nac->created_at->toDateTimeString() : '';
-        $item['port_id'] = Blade::render('<x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link>', ['port' => $nac->port]);
+        $item['updated_at'] = $model->updated_at ? ($item['historical'] == 0 ? $model->updated_at->diffForHumans() : $model->updated_at->toDateTimeString()) : '';
+        $item['created_at'] = $model->created_at ? $model->created_at->toDateTimeString() : '';
+        $item['port_id'] = Blade::render('<x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link>', ['port' => $model->port]);
         $item['mac_oui'] = $mac->vendor();
         $item['mac_address'] = $mac->readable();
-        $item['device_id'] = Blade::render('<x-device-link :device="$device"/>', ['device' => $nac->device]);
+        $item['device_id'] = Blade::render('<x-device-link :device="$device"/>', ['device' => $model->device]);
         unset($item['device']); //avoid sending all device data in the JSON reply
         unset($item['port']); //free some unused data to be sent to the browser
 
@@ -151,7 +148,7 @@ class PortNacController extends TableController
      * @param  string  $ifAlias
      * @return Collection<int, int>
      */
-    protected function findPorts($ifAlias): Collection
+    protected function findPorts(string $ifAlias): Collection
     {
         $port_id = \Request::input('port_id');
         $device_id = \Request::input('device_id');

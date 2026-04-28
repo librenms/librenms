@@ -27,17 +27,20 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\Eventlog;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
+/**
+ * @extends SelectController<Eventlog>
+ */
 class EventlogController extends SelectController
 {
-    protected $default_sort = ['type' => 'asc'];
+    protected array $default_sort = ['type' => 'asc'];
 
     /**
      * Defines validation rules (will override base validation rules for select2 responses too)
-     *
-     * @return array
      */
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'field' => 'required|in:type',
@@ -47,35 +50,25 @@ class EventlogController extends SelectController
 
     /**
      * Defines sortable fields.  The incoming sort field should be the key, the sql column or DB::raw() should be the value
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
-    protected function sortFields($request)
+    protected function sortFields(Request $request): array
     {
         return ['type'];
     }
 
     /**
      * Defines search fields will be searched in order
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
-    protected function searchFields($request)
+    protected function searchFields(Request $request): array
     {
         return [$request->input('field')];
     }
 
     /**
      * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
-        /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = Eventlog::hasAccess($request->user())
             ->select($request->input('field'))->distinct();
 

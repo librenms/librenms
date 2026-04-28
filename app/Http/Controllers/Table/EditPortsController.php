@@ -26,11 +26,18 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Models\Port;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use LibreNMS\Enum\IfOperStatus;
 
+/**
+ * @extends TableController<Port>
+ */
 class EditPortsController extends TableController
 {
-    public function rules()
+    public function rules(): array
     {
         return [
             'device_id' => 'required|int',
@@ -39,53 +46,53 @@ class EditPortsController extends TableController
         ];
     }
 
-    public function searchFields($request)
+    public function searchFields(Request $request): array
     {
         return ['ifName', 'ifAlias', 'ifDescr'];
     }
 
-    protected function sortFields($request)
+    protected function sortFields(Request $request): array
     {
         return ['ifIndex', 'ifName', 'ifAdminStatus', 'ifOperStatus', 'ifSpeed', 'ifAlias'];
     }
 
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
-        return \App\Models\Port::where('device_id', $request->input('device_id'))
+        return Port::where('device_id', $request->input('device_id'))
             ->with('groups');
     }
 
     /**
-     * @param  \App\Models\Port  $port
-     * @return array
+     * @param  Port  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($port)
+    public function formatItem(Model $model): array
     {
-        $is_port_bad = $port->ifAdminStatus != IfOperStatus::Down && $port->ifOperStatus != IfOperStatus::Up;
-        $do_we_care = ($port->ignore || $port->disabled) ? false : $is_port_bad;
+        $is_port_bad = $model->ifAdminStatus != IfOperStatus::Down && $model->ifOperStatus != IfOperStatus::Up;
+        $do_we_care = ($model->ignore || $model->disabled) ? false : $is_port_bad;
         $out_of_sync = $do_we_care ? "class='red'" : '';
-        $tune = $port->device->getAttrib('ifName_tune:' . $port->ifName) == 'true' ? 'checked' : '';
-        $ifAlias_override = $port->device->getAttrib('ifName:' . $port->ifName);
+        $tune = $model->device->getAttrib('ifName_tune:' . $model->ifName) == 'true' ? 'checked' : '';
+        $ifAlias_override = $model->device->getAttrib('ifName:' . $model->ifName);
 
         $port_group_options = '';
-        foreach ($port->groups as $group) {
+        foreach ($model->groups as $group) {
             /** @var \App\Models\PortGroup $group */
             $port_group_options .= '<option value="' . $group->id . '" selected>' . htmlentities((string) $group->name) . '</option>';
         }
 
         return [
-            'ifIndex' => $port->ifIndex,
-            'ifName' => htmlentities($port->getLabel()),
-            'ifAdminStatus' => htmlentities($port->ifAdminStatus->value ?? ''),
-            'ifOperStatus' => '<span id="operstatus_' . $port->port_id . '" ' . $out_of_sync . '>' . htmlentities($port->ifOperStatus->value ?? '') . '</span>',
-            'disabled' => '<input type="checkbox" class="disable-check" data-size="small" name="disabled_' . $port->port_id . '"' . ($port->disabled ? 'checked' : '') . '>
-                               <input type="hidden" name="olddis_' . $port->port_id . '" value="' . ($port->disabled ? 1 : 0) . '"">',
-            'ignore' => '<input type="checkbox" class="ignore-check" data-size="small" name="ignore_' . $port->port_id . '"' . ($port->ignore ? 'checked' : '') . '>
-                               <input type="hidden" name="oldign_' . $port->port_id . '" value="' . ($port->ignore ? 1 : 0) . '"">',
-            'port_tune' => '<input type="checkbox" name="override_config" data-attrib="ifName_tune:' . htmlentities((string) $port->ifName) . '" data-device_id="' . $port->device_id . '" data-size="small" ' . $tune . '>',
-            'ifAlias' => '<div class="form-group has-feedback"><input class="form-control input-sm" name="if-alias" data-device_id="' . $port->device_id . '" data-port_id="' . $port->port_id . '" data-ifName="' . htmlentities((string) $port->ifName) . '" value="' . htmlentities((string) $port->ifAlias) . '"><span class="form-control-feedback"><i class="fa ' . ($ifAlias_override ? 'fa-pencil' : '') . '" aria-hidden="true"></i></span></div>',
-            'ifSpeed' => '<div class="form-group has-feedback"><input type="text" pattern="[0-9]*" inputmode="numeric" class="form-control input-sm" name="if-speed" data-device_id="' . $port->device_id . '" data-port_id="' . $port->port_id . '" data-ifName="' . htmlentities((string) $port->ifName) . '" value="' . $port->ifSpeed . '"><span class="form-control-feedback"><i class="fas" aria-hidden="true"></i></span></div>',
-            'portGroup' => '<div class="form-group has-feedback"><select class="input-sm port_group_select" name="port_group_' . $port->port_id . '[]"  data-port_id="' . $port->port_id . '" multiple>' . $port_group_options . '</select></div>',
+            'ifIndex' => $model->ifIndex,
+            'ifName' => htmlentities($model->getLabel()),
+            'ifAdminStatus' => htmlentities($model->ifAdminStatus->value ?? ''),
+            'ifOperStatus' => '<span id="operstatus_' . $model->port_id . '" ' . $out_of_sync . '>' . htmlentities($model->ifOperStatus->value ?? '') . '</span>',
+            'disabled' => '<input type="checkbox" class="disable-check" data-size="small" name="disabled_' . $model->port_id . '"' . ($model->disabled ? 'checked' : '') . '>
+                               <input type="hidden" name="olddis_' . $model->port_id . '" value="' . ($model->disabled ? 1 : 0) . '"">',
+            'ignore' => '<input type="checkbox" class="ignore-check" data-size="small" name="ignore_' . $model->port_id . '"' . ($model->ignore ? 'checked' : '') . '>
+                               <input type="hidden" name="oldign_' . $model->port_id . '" value="' . ($model->ignore ? 1 : 0) . '"">',
+            'port_tune' => '<input type="checkbox" name="override_config" data-attrib="ifName_tune:' . htmlentities((string) $model->ifName) . '" data-device_id="' . $model->device_id . '" data-size="small" ' . $tune . '>',
+            'ifAlias' => '<div class="form-group has-feedback"><input class="form-control input-sm" name="if-alias" data-device_id="' . $model->device_id . '" data-port_id="' . $model->port_id . '" data-ifName="' . htmlentities((string) $model->ifName) . '" value="' . htmlentities((string) $model->ifAlias) . '"><span class="form-control-feedback"><i class="fa ' . ($ifAlias_override ? 'fa-pencil' : '') . '" aria-hidden="true"></i></span></div>',
+            'ifSpeed' => '<div class="form-group has-feedback"><input type="text" pattern="[0-9]*" inputmode="numeric" class="form-control input-sm" name="if-speed" data-device_id="' . $model->device_id . '" data-port_id="' . $model->port_id . '" data-ifName="' . htmlentities((string) $model->ifName) . '" value="' . $model->ifSpeed . '"><span class="form-control-feedback"><i class="fas" aria-hidden="true"></i></span></div>',
+            'portGroup' => '<div class="form-group has-feedback"><select class="input-sm port_group_select" name="port_group_' . $model->port_id . '[]"  data-port_id="' . $model->port_id . '" multiple>' . $port_group_options . '</select></div>',
         ];
     }
 }

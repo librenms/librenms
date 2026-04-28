@@ -4,10 +4,14 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\Port;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\Url;
 
+/**
+ * @extends TableController<Port>
+ */
 class VlanPortsController extends TableController
 {
     protected function searchFields(Request $request): array
@@ -19,7 +23,7 @@ class VlanPortsController extends TableController
         ];
     }
 
-    protected function sortFields($request): array
+    protected function sortFields(Request $request): array
     {
         return [
             'device' => 'device_id',
@@ -61,7 +65,7 @@ class VlanPortsController extends TableController
             ]);
     }
 
-    protected function search($search, $query, $fields)
+    protected function search(?string $search, Builder $query, array $fields): Builder
     {
         if ($search) {
             $query->leftJoin('devices', 'ports.device_id', 'devices.device_id');
@@ -73,8 +77,9 @@ class VlanPortsController extends TableController
 
     /**
      * @param  Port  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($model): array
+    public function formatItem(Model $model): array
     {
         return [
             'device' => Url::deviceLink($model->device),

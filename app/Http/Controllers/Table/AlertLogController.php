@@ -5,13 +5,17 @@ namespace App\Http\Controllers\Table;
 use App\Http\Parsers\AlertLogDetailParser;
 use App\Models\AlertLog;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Url;
 
+/**
+ * @extends TableController<AlertLog>
+ */
 class AlertLogController extends TableController
 {
-    protected $default_sort = ['time_logged' => 'asc'];
+    protected array $default_sort = ['time_logged' => 'asc'];
 
     public function __construct(
         private readonly AlertLogDetailParser $parser
@@ -29,7 +33,7 @@ class AlertLogController extends TableController
         ];
     }
 
-    protected function sortFields($request): array
+    protected function sortFields(Request $request): array
     {
         return [
             'time_logged',
@@ -70,7 +74,7 @@ class AlertLogController extends TableController
     /**
      * @inheritDoc
      */
-    protected function baseQuery(Request $request): Builder
+    protected function baseQuery(Request $request): Builder|\Illuminate\Database\Query\Builder
     {
         $query = AlertLog::query()
             ->select('alert_log.*')
@@ -92,9 +96,9 @@ class AlertLogController extends TableController
      * Format alert log item for display
      *
      * @param  AlertLog  $model
-     * @return array
+     * @return array<string, scalar>
      */
-    public function formatItem($model): array
+    public function formatItem(Model $model): array
     {
         $fault_detail = view('alerts.fault-detail', [
             'details' => $this->parser->parse($model->details),

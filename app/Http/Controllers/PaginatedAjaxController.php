@@ -29,17 +29,19 @@ namespace App\Http\Controllers;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
+/**
+ * @template TModel of Model
+ */
 abstract class PaginatedAjaxController extends Controller
 {
     /**
      * Default sort, column => direction
-     *
-     * @var array
      */
-    protected $default_sort = [];
+    protected array $default_sort = [];
 
     /**
      * Base rules for this controller.
@@ -52,55 +54,43 @@ abstract class PaginatedAjaxController extends Controller
      * Defines the base query for this resource
      *
      * @param  Request  $request
-     * @return Builder|\Illuminate\Database\Query\Builder
+     * @return Builder<TModel>|\Illuminate\Database\Query\Builder
      */
-    abstract protected function baseQuery(Request $request);
+    abstract protected function baseQuery(Request $request): Builder|\Illuminate\Database\Query\Builder;
 
     /**
      * @param  Paginator  $paginator
-     * @return \Illuminate\Http\JsonResponse
      */
-    abstract protected function formatResponse($paginator);
+    abstract protected function formatResponse($paginator): JsonResponse;
 
     /**
      * Defines validation rules (will override base validation rules for select2 responses too)
-     *
-     * @return array
      */
-    protected function rules()
+    protected function rules(): array
     {
         return [];
     }
 
     /**
      * Defines search fields. They will be searched in order.
-     *
-     * @param  Request  $request
-     * @return array
      */
-    protected function searchFields(Request $request)
+    protected function searchFields(Request $request): array
     {
         return [];
     }
 
     /**
      * Defines filter fields.  Request and table fields must match.
-     *
-     * @param  Request  $request
-     * @return array
      */
-    protected function filterFields(Request $request)
+    protected function filterFields(Request $request): array
     {
         return [];
     }
 
     /**
      * Defines sortable fields.  The incoming sort field should be the key, the sql column or DB::raw() should be the value
-     *
-     * @param  Request  $request
-     * @return array
      */
-    protected function sortFields(Request $request)
+    protected function sortFields(Request $request): array
     {
         return [];
     }
@@ -108,21 +98,15 @@ abstract class PaginatedAjaxController extends Controller
     /**
      * Format an item for display.  Default is pass-through
      *
-     * @param  Model  $model
-     * @return array|Collection<string, mixed>|Model
+     * @param  TModel  $model
+     * @return array<string, scalar>|Collection<string, scalar>|TModel
      */
-    public function formatItem($model)
+    public function formatItem(Model $model): Model|array|Collection
     {
         return $model;
     }
 
-    /**
-     * @param  string  $search
-     * @param  Builder  $query
-     * @param  array  $fields
-     * @return Builder
-     */
-    protected function search($search, $query, $fields)
+    protected function search(?string $search, Builder $query, array $fields): Builder
     {
         if ($search) {
             $query->where(function (Builder $query) use ($fields, $search): void {
@@ -145,13 +129,7 @@ abstract class PaginatedAjaxController extends Controller
         return $query;
     }
 
-    /**
-     * @param  Request  $request
-     * @param  Builder  $query
-     * @param  array  $fields
-     * @return Builder
-     */
-    protected function filter($request, $query, $fields)
+    protected function filter(Request $request, Builder $query, array $fields): Builder
     {
         foreach ($fields as $target => $field) {
             $callable = is_callable($field);
@@ -178,12 +156,7 @@ abstract class PaginatedAjaxController extends Controller
         return $query;
     }
 
-    /**
-     * @param  Request  $request
-     * @param  Builder  $query
-     * @return Builder
-     */
-    protected function sort($request, $query)
+    protected function sort(Request $request, Builder $query): Builder
     {
         $columns = $this->sortFields($request);
 
@@ -201,35 +174,23 @@ abstract class PaginatedAjaxController extends Controller
 
     /**
      * Validate the given request with the given rules.
-     *
-     * @param  Request  $request
-     * @param  array  $rules
-     * @param  array  $messages
-     * @param  array  $customAttributes
-     * @return array
      */
-    public function validate(Request $request, array $rules = [], array $messages = [], array $customAttributes = [])
+    public function validate(Request $request, array $rules = [], array $messages = [], array $attributes = []): array
     {
         $full_rules = array_replace($this->baseRules(), $rules);
 
-        return parent::validate($request, $full_rules, $messages, $customAttributes);
+        return parent::validate($request, $full_rules, $messages, $attributes);
     }
 
     /**
      * Sometimes filter values need to be modified to work
      * For example if the filter value is a string, when it needs to be an id
-     *
-     * @param  string  $field  The field being filtered
-     * @param  mixed  $value  The current value
-     * @return mixed
      */
-    protected function adjustFilterValue($field, $value)
+    protected function adjustFilterValue(string $field, mixed $value): mixed
     {
-        $value = match ($field) {
+        return match ($field) {
             'device', 'device_id', 'port_id' => (int) $value,
             default => $value,
         };
-
-        return $value;
     }
 }

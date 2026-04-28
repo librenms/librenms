@@ -2,22 +2,24 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Http\Controllers\Table\Traits\SensorTrait;
 use App\Models\Sensor;
-use App\Models\WirelessSensor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\SensorState;
-use LibreNMS\Enum\Severity;
-use LibreNMS\Util\Html;
-use LibreNMS\Util\Url;
 
+/**
+ * @extends TableController<Sensor>
+ */
 class SensorsController extends TableController
 {
-    protected $model = Sensor::class;
+    /** @use SensorTrait<Sensor> */
+    use SensorTrait;
 
-    protected $default_sort = ['device_hostname' => 'asc', 'sensor_descr' => 'asc'];
+    protected ?string $model = Sensor::class;
+
+    protected array $default_sort = ['device_hostname' => 'asc', 'sensor_descr' => 'asc'];
 
     protected function rules(): array
     {
@@ -25,27 +27,6 @@ class SensorsController extends TableController
             'view' => Rule::in(['detail', 'graphs']),
             'class' => Rule::in(array_merge(\LibreNMS\Enum\Sensor::values(), ['all'])),
             'status' => 'nullable|string',
-        ];
-    }
-
-    protected function sortFields($request): array
-    {
-        return [
-            'device_hostname',
-            'sensor_descr',
-            'sensor_current',
-            'sensor_limit_low',
-            'sensor_limit',
-        ];
-    }
-
-    protected function searchFields(Request $request): array
-    {
-        return [
-            'hostname',
-            'display',
-            'sensor_descr',
-            'sensor_current',
         ];
     }
 
@@ -81,103 +62,5 @@ class SensorsController extends TableController
                         });
                 });
             });
-    }
-
-    /**
-     * @param  Sensor|WirelessSensor  $sensor
-     */
-    public function formatItem($sensor): array
-    {
-        $request = \Illuminate\Support\Facades\Request::instance();
-        $graph_array = [
-            'type' => $sensor->getGraphType(),
-            'popup_title' => htmlentities(strip_tags($sensor->device?->displayName() . ': ' . $sensor->sensor_descr)),
-            'id' => $sensor->sensor_id,
-            'from' => '-1d',
-            'height' => 20,
-            'width' => 80,
-        ];
-
-        $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $sensor->device]);
-        $sensor_class = $sensor->sensor_class instanceof \BackedEnum ? $sensor->sensor_class->value : $sensor->sensor_class;
-        $link = Url::generate(['page' => 'device', 'device' => $sensor['device_id'], 'tab' => 'health', 'metric' => $sensor_class]);
-        $descr = Url::graphPopup($graph_array, $sensor->sensor_descr, $link);
-        $mini_graph = Url::graphPopup($graph_array);
-        $sensor_current = Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue());
-        $alert = $sensor->currentStatus() == Severity::Error ? '<i class="fa fa-flag fa-lg" style="color:red" aria-hidden="true"></i>' : '';
-
-        // show graph row inline
-        if ($request->input('view') == 'graphs') {
-            $row = Html::graphRow(array_replace($graph_array, ['height' => 100, 'width' => 210]));
-            $hostname = '<div class="tw:border-b tw:border-gray-200">' . $hostname . '</div><div style="width: 210px; margin-left: auto;">' . $row[0] . '</div>';
-            $descr = '<div class="tw:border-b tw:border-gray-200">' . $descr . '</div><div style="width: 210px">' . $row[1] . '</div>';
-            $mini_graph = '<div class="tw:border-b tw:border-gray-200" style="min-height:20px">' . $mini_graph . '</div><div style="width: 210px">' . $row[2] . '</div>';
-            $sensor_current = '<div class="tw:border-b tw:border-gray-200">' . $sensor_current . '</div><div style="width: 210px">' . $row[3] . '</div>';
-        }
-
-        return [
-            'device_hostname' => $hostname,
-            'sensor_descr' => $descr,
-            'graph' => $mini_graph,
-            'alert' => $alert,
-            'sensor_current' => $sensor_current,
-            'sensor_limit_low' => Html::severityToLabel(Severity::Unknown, $sensor->formatValue('sensor_limit_low')),
-            'sensor_limit' => Html::severityToLabel(Severity::Unknown, $sensor->formatValue('sensor_limit')),
-        ];
-    }
-
-    /**
-     * Get headers for CSV export
-     *
-     * @return array
-     */
-    protected function getExportHeaders()
-    {
-        return [
-            'Device Hostname',
-            'Sensor',
-            'Current',
-            'Limit Low',
-            'Limit High',
-            'Sensor Class',
-            'Sensor Type',
-        ];
-    }
-
-    /**
-     * Format a row for CSV export
-     *
-     * @param  Sensor|WirelessSensor  $sensor
-     * @return array
-     */
-    protected function formatExportRow($sensor)
-    {
-        return [
-            $sensor->device ? $sensor->device->displayName() : '',
-            $sensor->sensor_descr,
-            $sensor->formatValue(),
-            $sensor->formatValue('sensor_limit_low'),
-            $sensor->formatValue('sensor_limit'),
-            $sensor->sensor_class instanceof \BackedEnum ? $sensor->sensor_class->value : $sensor->sensor_class,
-            $sensor->sensor_type,
-        ];
-    }
-
-    /**
-     * Export data as CSV with sensor class filter
-     *
-     * @param  Request  $request
-     * @param  string|null  $class
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
-     */
-    public function export(Request $request, $class = null)
-    {
-        if ($class) {
-            $request->merge(['class' => $class]);
-        }
-
-        $this->validate($request, $this->rules());
-
-        return parent::export($request);
     }
 }

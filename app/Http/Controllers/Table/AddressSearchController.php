@@ -26,7 +26,7 @@
 
 namespace App\Http\Controllers\Table;
 
-use App\Models\Port;
+use App\Models\PortRelatedModel;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -38,7 +38,8 @@ use LibreNMS\Util\IP;
 use LibreNMS\Util\Url;
 
 /**
- * @template TModel of Model
+ * @template TModel of PortRelatedModel
+ * @extends TableController<TModel>
  */
 abstract class AddressSearchController extends TableController
 {
@@ -48,7 +49,7 @@ abstract class AddressSearchController extends TableController
     protected string $additionalSearchField = '';
     protected string $cidrField = ''; // set for display
 
-    protected function sortFields($request)
+    protected function sortFields(Request $request): array
     {
         return [
             'hostname' => 'device_via_port_hostname',
@@ -58,7 +59,7 @@ abstract class AddressSearchController extends TableController
         ];
     }
 
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'address' => ['nullable', 'string'],
@@ -68,12 +69,12 @@ abstract class AddressSearchController extends TableController
     }
 
     /**
-     * @param  TModel&object{port: Port|null}  $model
-     * @return string[]
+     * @param  PortRelatedModel  $model
+     * @return array<string, scalar>
      *
      * @throws InvalidIpException
      */
-    public function formatItem($model): array
+    public function formatItem(Model $model): array
     {
         $port = $model->port;
 

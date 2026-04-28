@@ -26,16 +26,19 @@
 
 namespace App\Http\Controllers\Select;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 abstract class AggregateSelectController extends SelectController
 {
-    /** @var array<array{text: string, controller: class-string, prefix: string}> */
+    /** * @var array<int, array{text: string, controller: class-string<SelectController>, prefix: string}> */
     protected array $groups = [];
 
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): JsonResponse
     {
         $groups = collect($this->groups)->map(fn (array $group) => [
             ...$group,
@@ -64,30 +67,47 @@ abstract class AggregateSelectController extends SelectController
             return $group;
         });
 
+        /** @var Collection<int, array{text: string, controller: SelectController, prefix: string, items: LengthAwarePaginator}> $groups */
         return $this->formatResponse($groups, $hasMore);
     }
 
-    public function baseQuery(Request $request)
+    public function baseQuery(Request $request): Builder
     {
-        return \App\Models\Device::query(); // unused
+        return Model::query(); // unused
     }
 
     /**
-     * @param  array{text: string, controller: SelectController, prefix: string, items: Paginator}|Model  $group
-     * @return array
+     * @param Collection<int, array{text: string, controller: SelectController, prefix: string, items: LengthAwarePaginator}> $paginator
+     * @param bool $hasMore
+     * @return JsonResponse
      */
-    public function formatItem($group): array
+    protected function formatResponse($paginator, bool $hasMore = false): JsonResponse
+    {
+        $results = $paginator->map(fn (array $group) => $this->formatGroup($group));
+
+        return response()->json([
+            'results' => $results->filter()->values(),
+            'pagination' => ['more' => $hasMore],
+        ]);
+    }
+
+    /**
+     * @param array{text: string, controller: SelectController, prefix: string, items: LengthAwarePaginator} $group
+     * @return array{text: string|null, children: array<int, array{id: int|string, text: string, icon?: string}>}|array<never, never>
+     */
+    public function formatGroup(array $group): array
     {
         if (! isset($group['items'])) {
             return [];
         }
 
-        $items = $group['items']->getCollection()->map(fn ($item
-        ) => $group['controller']->formatItem($item))->map(function ($item) use ($group) {
-            $item['id'] = $group['prefix'] . $item['id'];
+        $items = $group['items']->getCollection()
+            ->map(fn ($item) => $group['controller']->formatItem($item))
+            ->map(function (array $item) use ($group) {
+                $item['id'] = $group['prefix'] . $item['id'];
 
-            return $item;
-        })->values()->toArray();
+                return $item;
+            })->values()->all();
 
         return [
             // only show header once per group

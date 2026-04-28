@@ -30,6 +30,9 @@ use App\Models\CustomMap;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
+/**
+ * @extends SelectController<CustomMap>
+ */
 class CustomMapMenuGroupController extends SelectController
 {
     protected function searchFields($request): array

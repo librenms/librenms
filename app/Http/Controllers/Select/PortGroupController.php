@@ -27,27 +27,34 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\PortGroup;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
+/**
+ * @extends SelectController<PortGroup>
+ */
 class PortGroupController extends SelectController
 {
-    protected function searchFields($request)
+    protected function searchFields(Request $request): array
     {
         return ['name'];
     }
 
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
         return PortGroup::hasAccess($request->user())->select(['id', 'name']);
     }
 
     /**
-     * @param  PortGroup  $port_group
+     * @param  PortGroup  $model
+     * @return array{id: int|string, text: string, icon?: string}
      */
-    public function formatItem($port_group)
+    public function formatItem(Model $model): array
     {
         return [
-            'id' => $port_group->id,
-            'text' => $port_group->name,
+            'id' => $model->id,
+            'text' => $model->name,
         ];
     }
 }
