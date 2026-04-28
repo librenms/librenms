@@ -1,155 +1,232 @@
 modules:
   os:
-          version: UPS-MIB::upsIdentUPSSoftwareVersion.0
-          version_regex: '/^(?<version>.*\w)|\.+$/'
-          hardware: UPS-MIB::upsIdentModel.0
-          hardware_regex: '/^(?<hardware>.*\w)|\.+$/'
+    version: UPS-MIB::psIdentUPSSoftwareVersion.0
+    version_regex: '/^(?<version>.*\w)|\.+$/'
+    hardware: UPS-MIB::psIdentModel.0
+    hardware_regex: '/^(?<hardware>.*\w)|\.+$/'
+    serial: SNMPv2-SMI::enterprises.3808.1.1.1.1.2.3.0
+
   sensors:
     runtime:
-       data:
-         -
-           oid: UPS-MIB::upsEstimatedMinutesRemaining
-           num_oid: '.1.3.6.1.2.1.33.1.2.3.{{ $index }}'
-           index: 'upsEstimatedMinutesRemaining.{{ $index }}'
-           descr: Estimated time on battery
-         -
-           oid: UPS-MIB::upsSecondsOnBattery
-           num_oid: '.1.3.6.1.2.1.33.1.2.2.{{ $index }}'
-           index: 'upsSecondsOnBattery.{{ $index }}'
-           descr: Current time on battery
-           divisor: 60
+      data:
+        - oid: UPS-MIB::psEstimatedMinutesRemaining
+          num_oid: '.1.3.6.1.2.1.33.1.2.3.{{ $index }}'
+          index: 'UPS-MIB::psEstimatedMinutesRemaining.{{ $index }}'
+          descr: Estimated time on battery
+          low_limit: 5
+          warn_limit_low: 10
+          graph: 1
+          
+        - oid: UPS-MIB::psSecondsOnBattery
+          num_oid: '.1.3.6.1.2.1.33.1.2.2.{{ $index }}'
+          index: 'UPS-MIB::psSecondsOnBattery.{{ $index }}'
+          descr: Current time on battery
+          divisor: 60
+          warn_limit: 90
+          high_limit: 110
+          graph: 1
+
     charge:
-       data:      
-         -
-           oid: UPS-MIB::upsEstimatedChargeRemaining
-           num_oid: '.1.3.6.1.2.1.33.1.2.4.{{ $index }}'
-           index: 'upsEstimatedChargeRemaining.{{ $index }}'
-           descr: Battery charge remaining
+      data:
+        - oid: UPS-MIB::psEstimatedChargeRemaining
+          num_oid: '.1.3.6.1.2.1.33.1.2.4.{{ $index }}'
+          index: 'UPS-MIB::psEstimatedChargeRemaining.{{ $index }}'
+          descr: Battery charge remaining
+          graph: 1
+
     temperature:
-       data:
-         -
-           oid: UPS-MIB::upsBatteryTemperature
-           num_oid: '.1.3.6.1.2.1.33.1.2.7.{{ $index }}'
-           index: 'upsBatteryTemperature.{{ $index }}'
-           descr: Battery Temperature
+      data:
+        - oid: UPS-MIB::psBatteryTemperature
+          num_oid: '.1.3.6.1.2.1.33.1.2.7.{{ $index }}'
+          index: 'UPS-MIB::psBatteryTemperature.{{ $index }}'
+          descr: Battery Temperature
+          low_limit: 15
+          warn_limit_low: 20
+          warn_limit: 35
+          high_limit: 45
+          graph: 1
+
     voltage:
-        data:
-          -
-           oid: UPS-MIB::upsInputVoltage
-           num_oid: '.1.3.6.1.2.1.33.1.3.3.1.3.{{ $index }}'
-           index: 'upsInputVoltage.{{ $index }}'
-           descr: 'Input Phase {{ $subindex0 }}'
-          -
-           oid: UPS-MIB::upsOutputVoltage
-           num_oid: '.1.3.6.1.2.1.33.1.4.4.1.2.{{ $index }}'
-           index: 'upsOutputVoltage.{{ $index }}'
-           descr: 'Output Phase {{ $subindex0 }}'
-          -
-           oid: UPS-MIB::upsBypassVoltage
-           num_oid: '.1.3.6.1.2.1.33.1.5.3.1.2.{{ $index }}'
-           index: 'upsBypassputVoltage.{{ $index }}'
-           descr: 'Bypass Phase {{ $subindex0 }}'
-          -
-           oid: UPS-MIB::upsBatteryVoltage
-           num_oid: '.1.3.6.1.2.1.33.1.2.5.{{ $index }}'
-           index: 'upsBatteryVoltage.{{ $index }}'
-           descr: Battery Voltage
-           divisor: 10
+      data:
+        - oid: UPS-MIB::psInputVoltage
+          num_oid: '.1.3.6.1.2.1.33.1.3.3.1.3.{{ $index }}'
+          index: 'UPS-MIB::psInputVoltage.{{ $index }}'
+          descr: 'Input Phase {{ $subindex0 }}'
+          low_limit: 210
+          warn_limit_low: 216
+          warn_limit: 253
+          high_limit: 260
+          graph: 1
+          
+        - oid: UPS-MIB::psOutputVoltage
+          num_oid: '.1.3.6.1.2.1.33.1.4.4.1.2.{{ $index }}'
+          index: 'UPS-MIB::psOutputVoltage.{{ $index }}'
+          descr: 'Output Phase {{ $subindex0 }}'
+          low_limit: 210
+          warn_limit_low: 216
+          warn_limit: 253
+          high_limit: 260
+          graph: 1
+          
+        - oid: UPS-MIB::psBypassVoltage
+          num_oid: '.1.3.6.1.2.1.33.1.5.3.1.2.{{ $index }}'
+          index: 'UPS-MIB::psBypassVoltage.{{ $index }}'
+          descr: 'Bypass Phase {{ $subindex0 }}'
+          low_limit: 210
+          warn_limit_low: 216
+          warn_limit: 253
+          high_limit: 260
+          graph: 1
+          
+        - oid: UPS-MIB::psBatteryVoltage
+          num_oid: '.1.3.6.1.2.1.33.1.2.5.{{ $index }}'
+          index: 'UPS-MIB::psBatteryVoltage.{{ $index }}'
+          descr: Battery Voltage
+          divisor: 10
+          low_limit: 10
+          warn_limit_low: 11
+          warn_limit: 13
+          high_limit: 14
+          graph: 1
+
     current:
-        data:
-          -
-           oid: UPS-MIB::upsInputCurrent
-           num_oid: '.1.3.6.1.2.1.33.1.3.3.1.4.{{ $index }}'
-           index: 'upsInputCurrent.{{ $index }}'
-           descr: 'Input Phase {{ $subindex0 }}'
-           divisor: 10
-          -
-           oid: UPS-MIB::upsOutputCurrent
-           num_oid: '.1.3.6.1.2.1.33.1.4.4.1.3.{{ $index }}'
-           index: 'upsOutputCurrent.{{ $index }}'
-           descr: 'Output Phase {{ $subindex0 }}'
-           divisor: 10
-          -
-           oid: UPS-MIB::upsBypassCurrent
-           num_oid: '.1.3.6.1.2.1.33.1.5.3.1.3.{{ $index }}'
-           index: 'upsBypassputCurrent.{{ $index }}'
-           descr: 'Bypass Phase {{ $subindex0 }}'
-           divisor: 10
-          -
-           oid: UPS-MIB::upsBatteryCurrent
-           num_oid: '.1.3.6.1.2.1.33.1.2.6.{{ $index }}'
-           index: 'upsBatteryCurrent.{{ $index }}'
-           descr: Battery
-           divisor: 10
-           
+      data:
+        - oid: UPS-MIB::upsInputCurrent
+          num_oid: '.1.3.6.1.2.1.33.1.3.3.1.4.{{ $index }}'
+          index: 'UPS-MIB::upsInputCurrent.{{ $index }}'
+          descr: 'Input Phase {{ $subindex0 }}'
+          divisor: 10
+          low_limit: 0
+          warn_limit_low: 5
+          warn_limit: 15
+          high_limit: 20
+          graph: 1
+          
+        - oid: UPS-MIB::upsOutputCurrent
+          num_oid: '.1.3.6.1.2.1.33.1.4.4.1.3.{{ $index }}'
+          index: 'UPS-MIB::upsOutputCurrent.{{ $index }}'
+          descr: 'Output Phase {{ $subindex0 }}'
+          divisor: 10
+          low_limit: 0
+          warn_limit_low: 5
+          warn_limit: 15
+          high_limit: 20
+          graph: 1
+          
+        - oid: UPS-MIB::upsBypassCurrent
+          num_oid: '.1.3.6.1.2.1.33.1.5.3.1.3.{{ $index }}'
+          index: 'UPS-MIB::upsBypassCurrent.{{ $index }}'
+          descr: 'Bypass Phase {{ $subindex0 }}'
+          divisor: 10
+          low_limit: 0
+          warn_limit_low: 5
+          warn_limit: 15
+          high_limit: 20
+          graph: 1
+          
+        - oid: UPS-MIB::upsBatteryCurrent
+          num_oid: '.1.3.6.1.2.1.33.1.2.6.{{ $index }}'
+          index: 'UPS-MIB::upsBatteryCurrent.{{ $index }}'
+          descr: Battery
+          divisor: 10
+          low_limit: 0
+          warn_limit_low: 2
+          warn_limit: 10
+          high_limit: 15
+          graph: 1
+
     power:
-       data:
-          -
-           oid: UPS-MIB::upsInputTruePower
-           num_oid: '.1.3.6.1.2.1.33.1.3.3.1.5.{{ $index }}'
-           index: 'upsInputTruePower.{{ $index }}'
-           descr: 'System Input Watts {{ $subindex0 }}'
-          -
-           oid: UPS-MIB::upsOutputPower
-           num_oid: '.1.3.6.1.2.1.33.1.4.4.1.4.{{ $index }}'
-           index: 'upsOutputPower.{{ $index }}'
-           descr: 'System Output Watts {{ $subindex0 }}'
-          -
-           oid: UPS-MIB::upsBypassPower
-           num_oid: '.1.3.6.1.2.1.33.1.5.3.1.4.{{ $index }}'
-           index: 'upsBypassPower.{{ $index }}'
-           descr: 'System Bypass Watts {{ $subindex0 }}'
-                    
-    frequency:
-       data:
-          -
-           oid: UPS-MIB::upsInputFrequency
-           num_oid: '.1.3.6.1.2.1.33.1.3.3.1.2.{{ $index }}'
-           index: 'upsInputFrequency.{{ $index }}'
-           descr: 'Input Frequency {{ $subindex0 }}'
-           divisor: 10
-          -
-           oid: UPS-MIB::upsOutputFrequency
-           num_oid: '.1.3.6.1.2.1.33.1.4.2.{{ $index }}'
-           index: 'upsOutputFrequency.{{ $index }}'
-           descr: 'Output Frequency {{ $subindex0 }}'
-           divisor: 10
-          -
-           oid: UPS-MIB::upsBypassFrequency
-           num_oid: '.1.3.6.1.2.1.33.1.5.1.{{ $index }}'
-           index: 'upsBypassputFrequency.{{ $index }}'
-           descr: 'Bypass Frequency {{ $subindex0 }}'
-           divisor: 10
-         
+      data:
+        - oid: UPS-MIB::upsInputTruePower
+          num_oid: '.1.3.6.1.2.1.33.1.3.3.1.5.{{ $index }}'
+          index: 'UPS-MIB::upsInputTruePower.{{ $index }}'
+          descr: 'System Input Watts {{ $subindex0 }}'
+          warn_limit: 250
+          high_limit: 300
+          graph: 1
+          
+        - oid: UPS-MIB::upsOutputPower
+          num_oid: '.1.3.6.1.2.1.33.1.4.4.1.4.{{ $index }}'
+          index: 'UPS-MIB::upsOutputPower.{{ $index }}'
+          descr: 'System Output Watts {{ $subindex0 }}'
+          warn_limit: 250
+          high_limit: 300
+          graph: 1
+          
+        - oid: UPS-MIB::upsBypassPower
+          num_oid: '.1.3.6.1.2.1.33.1.5.3.1.4.{{ $index }}'
+          index: 'UPS-MIB::upsBypassPower.{{ $index }}'
+          descr: 'System Bypass Watts {{ $subindex0 }}'
+          warn_limit: 250
+          high_limit: 300
+          graph: 1
+
     load:
-       data:
-          -
-           oid: UPS-MIB::upsOutputPercentLoad
-           num_oid: '.1.3.6.1.2.1.33.1.4.4.1.5.{{ $index }}'
-           index: 'upsOutputPercentLoad.{{ $index }}'
-           descr: 'Percentage Load {{ $subindex0 }}'
+      data:
+        - oid: UPS-MIB::upsOutputPercentLoad
+          num_oid: '.1.3.6.1.2.1.33.1.4.4.1.5.{{ $index }}'
+          index: 'UPS-MIB::upsOutputPercentLoad.{{ $index }}'
+          descr: 'Percentage Load {{ $subindex0 }}'
+          warn_limit: 80
+          high_limit: 95
+          graph: 1
+
+    frequency:
+      data:
+        - oid: UPS-MIB::upsInputFrequency
+          num_oid: '.1.3.6.1.2.1.33.1.3.3.1.2.{{ $index }}'
+          index: 'UPS-MIB::upsInputFrequency.{{ $index }}'
+          descr: 'Input Frequency {{ $subindex0 }}'
+          divisor: 10
+          low_limit: 48
+          warn_limit_low: 49
+          warn_limit: 51
+          high_limit: 52
+          graph: 1
+          
+        - oid: UPS-MIB::upsOutputFrequency
+          num_oid: '.1.3.6.1.2.1.33.1.4.2.{{ $index }}'
+          index: 'UPS-MIB::upsOutputFrequency.{{ $index }}'
+          descr: 'Output Frequency {{ $subindex0 }}'
+          divisor: 10
+          low_limit: 48
+          warn_limit_low: 49
+          warn_limit: 51
+          high_limit: 52
+          graph: 1
+          
+        - oid: UPS-MIB::upsBypassFrequency
+          num_oid: '.1.3.6.1.2.1.33.1.5.1.{{ $index }}'
+          index: 'UPS-MIB::upsBypassFrequency.{{ $index }}'
+          descr: 'Bypass Frequency {{ $subindex0 }}'
+          divisor: 10
+          low_limit: 48
+          warn_limit_low: 49
+          warn_limit: 51
+          high_limit: 52
+          graph: 1
+
     state:
-       data:
-         -
-          oid: UPS-MIB::upsBatteryStatus
+      data:
+        - oid: UPS-MIB::upsBatteryStatus
           num_oid: '.1.3.6.1.2.1.33.1.2.1.{{ $index }}'
           descr: Battery Status
-          state_name: upsBatteryStatus
+          state_name: UPS-MIB::upsBatteryStatus
           states:
-            - { descr: unknown, value: 1, generic: 3 }
-            - { descr: batteryNormal, value: 2, generic: 0 }
-            - { descr: batteryLow, value: 3, generic: 1 }
-            - { descr: batteryDepleted, value: 4, generic: 2 }
-         -
-          oid: UPS-MIB::upsOutputSource
+            - { descr: unknown, graph: 1, value: 1, generic: 3 }
+            - { descr: batteryNormal, graph: 1, value: 2, generic: 0 }
+            - { descr: batteryLow, graph: 1, value: 3, generic: 1 }
+            - { descr: batteryDepleted, graph: 1, value: 4, generic: 2 }
+            
+        - oid: UPS-MIB::upsOutputSource
           num_oid: '.1.3.6.1.2.1.33.1.4.1.{{ $index }}'
           descr: Output Source
-          state_name: upsOutputSource
+          state_name: UPS-MIB::upsOutputSource
           states:
-            - { descr: other, value: 1, generic: 3 }
-            - { descr: none, value: 2, generic: 3 }
-            - { descr: normal, value: 3, generic: 0 }
-            - { descr: bypass, value: 4, generic: 1 }
-            - { descr: battery, value: 5, generic: 2 }
-            - { descr: booster, value: 6, generic: 2 }
-            - { descr: reducer, value: 7, generic: 2 }
+            - { descr: other, graph: 1, value: 1, generic: 3 }
+            - { descr: none, graph: 1, value: 2, generic: 3 }
+            - { descr: normal, graph: 1, value: 3, generic: 0 }
+            - { descr: bypass, graph: 1, value: 4, generic: 1 }
+            - { descr: battery, graph: 1, value: 5, generic: 2 }
+            - { descr: booster, graph: 1, value: 6, generic: 2 }
+            - { descr: reducer, graph: 1, value: 7, generic: 2 }
