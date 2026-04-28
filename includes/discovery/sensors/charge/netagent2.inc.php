@@ -24,7 +24,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 $charge_oid = '.1.3.6.1.4.1.935.1.1.1.2.2.1.0';
-$charge = SnmpQuery::get($charge_oid)->value();
+$charge = snmp_get($device, $charge_oid, '-Osqnv');
 
 if (! empty($charge)) {
     $type = 'netagent2';
