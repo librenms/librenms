@@ -10,9 +10,9 @@ IMPORTS
     TEXTUAL-CONVENTION FROM SNMPv2-TC
     switchMgmt FROM BTS-SMI
     Integer32 FROM SNMPv2-SMI
-    Integer16 FROM BTS-TC
-    Unsigned16 FROM BTS-TC
-    Unsigned8 FROM BTS-TC
+    Integer16 FROM MIB-TC
+    Unsigned16 FROM MIB-TC
+    Unsigned8 FROM MIB-TC
     ;
 
 fanMib MODULE-IDENTITY
