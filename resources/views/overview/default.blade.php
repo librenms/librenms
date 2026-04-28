@@ -352,10 +352,7 @@
                 data: {data: JSON.stringify(serialized)},
                 dataType: "json",
                 success: function (data) {
-                    if (data.status == 'ok') {
-                        toastr.success(data.message);
-                    }
-                    else {
+                    if (data.status !== 'ok') {
                         toastr.error(data.message);
                     }
                 },
