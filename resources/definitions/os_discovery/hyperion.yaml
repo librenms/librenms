@@ -4,9 +4,23 @@ modules:
         hardware: SNMPv2-MIB::sysDescr.0
         serial: ENTITY-MIB::entPhysicalSerialNum.1
         version: ENTITY-MIB::entPhysicalSoftwareRev.1
-    sensors:
-        additional_oids:
-            data:
-                -
-                    oid:
-                        - ENTITY-MIB::entPhysicalName
+    processors:
+        data:
+#            -
+#                oid: MIB-SYSUTIL::sysutilStatusCpuLoadAverage100msec
+#                value: MIB-SYSUTIL::sysutilStatusCpuLoadAverage100msec
+#                num_oid: '.1.3.6.1.4.1.19829.1.24.1.3.1.1.{{ $index }}'
+#                index: 'sysutilStatusCpuLoadAverage100msec.{{ $index }}'
+#                descr: 'Load avg/100msec'
+#            -
+#                oid: MIB-SYSUTIL::sysutilStatusCpuLoadAverage1sec
+#                value: MIB-SYSUTIL::sysutilStatusCpuLoadAverage1sec
+#                num_oid: '.1.3.6.1.4.1.19829.1.24.1.3.1.2.{{ $index }}'
+#                index: 'sysutilStatusCpuLoadAverage1sec.{{ $index }}'
+#                descr: 'Load avg/1sec'
+            -
+                oid: MIB-SYSUTIL::sysutilStatusCpuLoadAverage10sec
+                value: MIB-SYSUTIL::sysutilStatusCpuLoadAverage10sec
+                num_oid: '.1.3.6.1.4.1.19829.1.24.1.3.1.3.{{ $index }}'
+                index: 'sysutilStatusCpuLoadAverage10sec.{{ $index }}'
+                descr: 'Load avg/10sec'
