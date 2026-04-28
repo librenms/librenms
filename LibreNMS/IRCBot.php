@@ -898,7 +898,7 @@ class IRCBot
         $pps_in = Number::formatBi($port['ifInUcastPkts_rate'], 2, 0, 'pps');
         $pps_out = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 0, 'pps');
 
-        return $this->respond($port['ifAdminStatus'] . '/' . $port['ifOperStatus'] . ' ' . $bps_in . ' > bps > ' . $bps_out . ' | ' . $pps_in . ' > PPS > ' . $pps_out);
+        return $this->respond($port['ifAdminStatus']?->value . '/' . $port['ifOperStatus']?->value . ' ' . $bps_in . ' > bps > ' . $bps_out . ' | ' . $pps_in . ' > PPS > ' . $pps_out);
     }
 
     //end _port()

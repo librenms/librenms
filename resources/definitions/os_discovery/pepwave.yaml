@@ -77,8 +77,8 @@ modules:
                     group: Power Consumption
                     state_name: devicePSUStatus
                     states:
-                        - { descr: error, graph: 1, value: 0, generic: 2 }
-                        - { descr: on, graph: 1, value: 1, generic: 0 }
+                        - { descr: error, value: 0, generic: 2 }
+                        - { descr: on, value: 1, generic: 0 }
                 -
                     oid: DEVICE::deviceFANStatus
                     num_oid: ".1.3.6.1.4.1.27662.200.1.1.1.4.4.1.{{ $index }}"
@@ -86,8 +86,8 @@ modules:
                     group: Fan
                     state_name: deviceFANStatus
                     states:
-                        - { descr: error, graph: 1, value: 0, generic: 2 }
-                        - { descr: on, graph: 1, value: 1, generic: 0 }
+                        - { descr: error, value: 0, generic: 2 }
+                        - { descr: on, value: 1, generic: 0 }
                 -
                     oid: DEVICE::devicePowerSourceStatus
                     num_oid: ".1.3.6.1.4.1.27662.200.1.1.1.4.3.1.3.{{ $index }}"
@@ -96,8 +96,8 @@ modules:
                     index: "devicePowerSourceStatus.{{ $index }}"
                     state_name: devicePowerSourceStatus
                     states:
-                        - { descr: noCableDetected, graph: 1, value: 0, generic: 3 }
-                        - { descr: connected, graph: 1, value: 1, generic: 0 }
+                        - { descr: noCableDetected, value: 0, generic: 3 }
+                        - { descr: connected, value: 1, generic: 0 }
                 -
                     oid: PEPVPN-SPEEDFUSION::pepVpnStatusConnectionState
                     num_oid: ".1.3.6.1.4.1.23695.200.1.10.1.1.2.1.3.{{ $index }}"
@@ -106,11 +106,11 @@ modules:
                     index: "pepVpnStatusConnectionState.{{ $index }}"
                     state_name: pepVpnStatusConnectionState
                     states:
-                        - { descr: start, graph: 1, value: 0, generic: 3 }
-                        - { descr: authen, graph: 1, value: 1, generic: 3 }
-                        - { descr: tunnel, graph: 1, value: 2, generic: 3 }
-                        - { descr: route, graph: 1, value: 3, generic: 3 }
-                        - { descr: connected, graph: 1, value: 4, generic: 0 }
+                        - { descr: start, value: 0, generic: 3 }
+                        - { descr: authen, value: 1, generic: 3 }
+                        - { descr: tunnel, value: 2, generic: 3 }
+                        - { descr: route, value: 3, generic: 3 }
+                        - { descr: connected, value: 4, generic: 0 }
                 -
                     oid: WAN::wanState
                     num_oid: ".1.3.6.1.4.1.27662.2.1.2.1.3.{{ $index }}"
@@ -119,12 +119,12 @@ modules:
                     index: "wanState.{{ $index }}"
                     state_name: wanState
                     states:
-                        - { descr: unknown, graph: 1, value: 0, generic: 3 }
-                        - { descr: disabled, graph: 1, value: 1, generic: 3 }
-                        - { descr: disconnected, graph: 1, value: 2, generic: 2 }
-                        - { descr: connected, graph: 1, value: 3, generic: 0 }
-                        - { descr: connecting, graph: 1, value: 4, generic: 1 }
-                        - { descr: activating, graph: 1, value: 5, generic: 1 }
-                        - { descr: helt-check-fail, graph: 1, value: 6, generic: 2 }
-                        - { descr: disconnected-manually, graph: 1, value: 7, generic: 3 }
-                        - { descr: standby, graph: 1, value: 4, generic: 3 }
+                        - { descr: unknown, value: 0, generic: 3 }
+                        - { descr: disabled, value: 1, generic: 3 }
+                        - { descr: disconnected, value: 2, generic: 2 }
+                        - { descr: connected, value: 3, generic: 0 }
+                        - { descr: connecting, value: 4, generic: 1 }
+                        - { descr: activating, value: 5, generic: 1 }
+                        - { descr: helt-check-fail, value: 6, generic: 2 }
+                        - { descr: disconnected-manually, value: 7, generic: 3 }
+                        - { descr: standby, value: 4, generic: 3 }

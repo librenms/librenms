@@ -193,7 +193,7 @@
                 "critical": "Critical"
             }
         },
-        "alert_rule.max_alerts": {
+        "alert_rule.default_operation_steps_to": {
             "default": 1,
             "units": "count",
             "group": "alerting",
@@ -201,7 +201,7 @@
             "order": 1,
             "type": "integer"
         },
-        "alert_rule.delay": {
+        "alert_rule.default_operation_start_in": {
             "default": 1,
             "units": "minutes",
             "group": "alerting",
@@ -209,7 +209,7 @@
             "order": 2,
             "type": "integer"
         },
-        "alert_rule.interval": {
+        "alert_rule.default_operation_step_duration": {
             "default": 5,
             "units": "minutes",
             "group": "alerting",
@@ -217,7 +217,7 @@
             "order": 3,
             "type": "integer"
         },
-        "alert_rule.mute_alerts": {
+        "alert_rule.default_operation_notifications_suppressed": {
             "default": false,
             "type": "boolean",
             "group": "alerting",
@@ -979,6 +979,22 @@
                 "value.*": "is_regex"
             }
         },
+        "availablity.threshold_ok": {
+            "default": 99.9,
+            "group": "webui",
+            "section": "device",
+            "order": 101,
+            "type": "float",
+            "units": "percent"
+        },
+        "availablity.threshold_warning": {
+            "default": 95,
+            "group": "webui",
+            "section": "device",
+            "order": 102,
+            "type": "float",
+            "units": "percent"
+        },
         "bad_entity_sensor_regex": {
             "type": "array",
             "validate": {
@@ -1388,6 +1404,10 @@
         },
         "dateformat.compact": {
             "default": "Y-m-d H:i:s",
+            "type": "text"
+        },
+        "dateformat.date": {
+            "default": "D, M j, Y",
             "type": "text"
         },
         "dateformat.long": {
@@ -5739,6 +5759,7 @@
                         {"match": "fireware", "value": "firewareos"},
                         {"match": "fortigate", "value": "fortios"},
                         {"match": "fortiswitch", "value": "fortios"},
+                        {"match": "siklu-mhtg", "value": "siklumhtg"},
                         {"match": "vyos", "value": "vyatta"},
                         {"match": "slms", "value": "zhoneolt"},
                         {"match": "oneaccess", "value": "oneos"}
@@ -6875,7 +6896,7 @@
             "group": "poller",
             "section": "snmp",
             "order": 2,
-            "type": "array",
+            "type": "password-array",
             "default": [
                 "public"
             ]
@@ -7455,6 +7476,22 @@
                 "value": "array",
                 "value.*": "string"
             }
+        },
+        "ssl_certificates.days_until_expiry_warning": {
+            "default": 30,
+            "group": "apps",
+            "section": "ssl-certificates",
+            "order": 2,
+            "type": "integer",
+            "units": "days"
+        },
+        "ssl_certificates.days_until_expiry_danger": {
+            "default": 0,
+            "group": "apps",
+            "section": "ssl-certificates",
+            "order": 3,
+            "type": "integer",
+            "units": "days"
         },
         "smokeping.integration": {
             "default": false,

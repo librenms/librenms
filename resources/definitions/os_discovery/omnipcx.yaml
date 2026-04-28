@@ -10,12 +10,12 @@ modules:
                     state_name: pbxState
                     index: 'pbxState'
                     states:
-                        - { descr: Normal , graph: 0, value: 5 , generic: 0 }
-                        - { descr: Critical , graph: 0, value: 1 , generic: 2 }
-                        - { descr: Major , graph: 0, value: 2 , generic: 2 }
-                        - { descr: Minor , graph: 0, value: 3 , generic: 1 }
-                        - { descr: Warning , graph: 0, value: 4 , generic: 1 }
-                        - { descr: Indeterminate , graph: 0, value: 0 , generic: 3 }
+                        - { descr: Normal , value: 5 , generic: 0 }
+                        - { descr: Critical , value: 1 , generic: 2 }
+                        - { descr: Major , value: 2 , generic: 2 }
+                        - { descr: Minor , value: 3 , generic: 1 }
+                        - { descr: Warning , value: 4 , generic: 1 }
+                        - { descr: Indeterminate , value: 0 , generic: 3 }
                 -
                     oid: A4400-RTM-MIB::pbxRole
                     value: A4400-RTM-MIB::pbxRole
@@ -24,11 +24,11 @@ modules:
                     index: 'pbxRole{{ $index }}'
                     state_name: pbxRole
                     states:
-                        - { descr: Main , graph: 0, value: 1 , generic: 0 }
-                        - { descr: Standby , graph: 0, value: 2 , generic: 0 }
-                        - { descr: Active PCS , graph: 0, value: 3 , generic: 0 }
-                        - { descr: Inactive PCS , graph: 0, value: 4 , generic: 0 }
-                        - { descr: Unknown , graph: 0, value: 0 , generic: 3 }
+                        - { descr: Main , value: 1 , generic: 0 }
+                        - { descr: Standby , value: 2 , generic: 0 }
+                        - { descr: Active PCS , value: 3 , generic: 0 }
+                        - { descr: Inactive PCS , value: 4 , generic: 0 }
+                        - { descr: Unknown , value: 0 , generic: 3 }
         count:
             data:
                 -

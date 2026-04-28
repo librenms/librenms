@@ -45,6 +45,7 @@ final class StringHelperTest extends TestCase
 
         $this->assertEquals('Øverbyvegen', StringHelpers::inferEncoding(base64_decode('w5h2ZXJieXZlZ2Vu')));
         $this->assertEquals('Øverbyvegen', StringHelpers::inferEncoding(base64_decode('2HZlcmJ5dmVnZW4=')));
+        $this->assertEquals('教科网IPv4', StringHelpers::inferEncoding(base64_decode('vcy/xs34SVB2NA==')));
 
         config(['app.charset' => 'Shift_JIS']);
         $this->assertEquals('コンサート', StringHelpers::inferEncoding(base64_decode('g1KDk4NUgVuDZw==')));

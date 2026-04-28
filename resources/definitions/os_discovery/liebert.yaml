@@ -138,8 +138,8 @@ modules:
                     index: 'lgpAgentTelnetEnabled.{{ $index }}'
                     state_name: lgpAgentTelnetEnabled
                     states:
-                        - { value: 1, graph: 0, descr: yes, generic: 0 }
-                        - { value: 2, graph: 0, descr: no, generic: 2 }
+                        - { value: 1, descr: yes, generic: 0 }
+                        - { value: 2, descr: no, generic: 2 }
                 -
                     oid: LIEBERT-GP-AGENT-MIB::lgpAgentVelocityServerEnabled
                     num_oid: '.1.3.6.1.4.1.476.1.42.2.5.3.{{ $index }}'
@@ -147,8 +147,8 @@ modules:
                     index: 'lgpAgentVelocityServerEnabled.{{ $index }}'
                     state_name: lgpAgentVelocityServerEnabled
                     states:
-                        - { value: 1, graph: 0, descr: yes, generic: 0 }
-                        - { value: 2, graph: 0, descr: no, generic: 2 }
+                        - { value: 1, descr: yes, generic: 0 }
+                        - { value: 2, descr: no, generic: 2 }
                 -
                     oid: LIEBERT-GP-AGENT-MIB::lgpAgentWebServerMode
                     num_oid: '.1.3.6.1.4.1.476.1.42.2.5.4.{{ $index }}'
@@ -156,9 +156,9 @@ modules:
                     index: 'lgpAgentWebServerMode.{{ $index }}'
                     state_name: lgpAgentWebServerMode
                     states:
-                        - { value: 0, graph: 0, descr: disabled, generic: 2 }
-                        - { value: 1, graph: 0, descr: http, generic: 1 }
-                        - { value: 2, graph: 0, descr: https, generic: 0 }
+                        - { value: 0, descr: disabled, generic: 2 }
+                        - { value: 1, descr: http, generic: 1 }
+                        - { value: 2, descr: https, generic: 0 }
                 -
                     oid: LIEBERT-GP-PDU-MIB::lgpPduEntrySysStatus
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.20.1.25.{{ $index }}'
@@ -166,13 +166,13 @@ modules:
                     index: 'lgpPduGrpSysStatus.{{ $index }}'
                     state_name: lgpPduEntrySysStatus
                     states:
-                        - { value: 1, graph: 0, descr: normalOperation, generic: 0 }
-                        - { value: 2, graph: 0, descr: startUp, generic: 1 }
-                        - { value: 4, graph: 0, descr: unknownNoSupport, generic: 3 }
-                        - { value: 8, graph: 0, descr: normalWithWarning, generic: 1 }
-                        - { value: 16, graph: 0, descr: normalWithAlarm, generic: 2 }
-                        - { value: 32, graph: 0, descr: abnormalOperation, generic: 2 }
-                        - { value: 64, graph: 0, descr: unknownCommFailure, generic: 2 }
+                        - { value: 1, descr: normalOperation, generic: 0 }
+                        - { value: 2, descr: startUp, generic: 1 }
+                        - { value: 4, descr: unknownNoSupport, generic: 3 }
+                        - { value: 8, descr: normalWithWarning, generic: 1 }
+                        - { value: 16, descr: normalWithAlarm, generic: 2 }
+                        - { value: 32, descr: abnormalOperation, generic: 2 }
+                        - { value: 64, descr: unknownCommFailure, generic: 2 }
                 -
                     oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateFan
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.7.{{ $index }}'
@@ -180,8 +180,8 @@ modules:
                     index: 'lgpEnvStateFan.{{ $index }}'
                     state_name: lgpEnvStateFan
                     states:
-                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
-                        - { value: 2, graph: 0, descr: 'off', generic: 1 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                        - { value: 2, descr: 'off', generic: 1 }
                 -
                     oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateSystem
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.1.{{ $index }}'
@@ -189,9 +189,9 @@ modules:
                     index: 'lgpEnvStateSystem.{{ $index }}'
                     state_name: lgpEnvStateSystem
                     states:
-                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
-                        - { value: 2, graph: 1, descr: 'off', generic: 1 }
-                        - { value: 3, graph: 2, descr: 'standby', generic: 0 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                        - { value: 2, descr: 'off', generic: 1 }
+                        - { value: 3, descr: 'standby', generic: 0 }
                 -
                     oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateCooling
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.2.{{ $index }}'
@@ -199,8 +199,8 @@ modules:
                     index: 'lgpEnvStateCooling.{{ $index }}'
                     state_name: lgpEnvStateCooling
                     states:
-                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
-                        - { value: 2, graph: 0, descr: 'off', generic: 1 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                        - { value: 2, descr: 'off', generic: 1 }
                 -
                     oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateHumidifying
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.4.{{ $index }}'
@@ -208,8 +208,8 @@ modules:
                     index: 'lgpEnvStateHumidifying.{{ $index }}'
                     state_name: lgpEnvStateHumidifying
                     states:
-                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
-                        - { value: 2, graph: 0, descr: 'off', generic: 1 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                        - { value: 2, descr: 'off', generic: 1 }
                 -
                     oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateDehumidifying
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.5.{{ $index }}'
@@ -217,8 +217,8 @@ modules:
                     index: 'lgpEnvStateDehumidifying.{{ $index }}'
                     state_name: lgpEnvStateDehumidifying
                     states:
-                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
-                        - { value: 2, graph: 0, descr: 'off', generic: 1 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                        - { value: 2, descr: 'off', generic: 1 }
                 -
                     oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateFan
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.7.{{ $index }}'
@@ -226,8 +226,8 @@ modules:
                     index: 'lgpEnvStateFan.{{ $index }}'
                     state_name: lgpEnvStateFan
                     states:
-                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
-                        - { value: 2, graph: 0, descr: 'off', generic: 1 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                        - { value: 2, descr: 'off', generic: 1 }
                 -
                     oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateGeneralAlarmOutput
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.8.{{ $index }}'
@@ -235,8 +235,8 @@ modules:
                     index: 'lgpEnvStateGeneralAlarmOutput.{{ $index }}'
                     state_name: lgpEnvStateGeneralAlarmOutput
                     states:
-                        - { value: 1, graph: 0, descr: 'on', generic: 2 }
-                        - { value: 2, graph: 0, descr: 'off', generic: 0 }
+                        - { value: 1, descr: 'on', generic: 2 }
+                        - { value: 2, descr: 'off', generic: 0 }
                 -
                     oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateAudibleAlarm
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.11.{{ $index }}'
@@ -244,8 +244,8 @@ modules:
                     index: 'lgpEnvStateAudibleAlarm.{{ $index }}'
                     state_name: lgpEnvStateAudibleAlarm
                     states:
-                        - { value: 1, graph: 0, descr: 'on', generic: 2 }
-                        - { value: 2, graph: 0, descr: 'off', generic: 0 }
+                        - { value: 1, descr: 'on', generic: 2 }
+                        - { value: 2, descr: 'off', generic: 0 }
                 -
                     oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateOperatingReason
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.14.{{ $index }}'
@@ -253,13 +253,13 @@ modules:
                     index: 'lgpEnvStateOperatingReason.{{ $index }}'
                     state_name: lgpEnvStateOperatingReason
                     states:
-                        - { value: 1, graph: 0, descr: 'none', generic: 0 }
-                        - { value: 2, graph: 1, descr: 'localUser', generic: 0 }
-                        - { value: 3, graph: 2, descr: 'alarm', generic: 0 }
-                        - { value: 4, graph: 3, descr: 'schedule', generic: 0 }
-                        - { value: 5, graph: 4, descr: 'remoteUser', generic: 0 }
-                        - { value: 6, graph: 5, descr: 'externalDevice', generic: 0 }
-                        - { value: 7, graph: 6, descr: 'localDisplay', generic: 0 }
+                        - { value: 1, descr: 'none', generic: 0 }
+                        - { value: 2, descr: 'localUser', generic: 0 }
+                        - { value: 3, descr: 'alarm', generic: 0 }
+                        - { value: 4, descr: 'schedule', generic: 0 }
+                        - { value: 5, descr: 'remoteUser', generic: 0 }
+                        - { value: 6, descr: 'externalDevice', generic: 0 }
+                        - { value: 7, descr: 'localDisplay', generic: 0 }
                 -
                     oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateOperatingMode
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.15.{{ $index }}'
@@ -267,8 +267,8 @@ modules:
                     index: 'lgpEnvStateOperatingMode.{{ $index }}'
                     state_name: lgpEnvStateOperatingMode
                     states:
-                        - { value: 1, graph: 0, descr: 'auto', generic: 0 }
-                        - { value: 2, graph: 1, descr: 'manual', generic: 0 }
+                        - { value: 1, descr: 'auto', generic: 0 }
+                        - { value: 2, descr: 'manual', generic: 0 }
                 -
                     oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateElectricHeater
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.21.{{ $index }}'
@@ -276,8 +276,8 @@ modules:
                     index: 'lgpEnvStateElectricHeater.{{ $index }}'
                     state_name: lgpEnvStateElectricHeater
                     states:
-                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
-                        - { value: 2, graph: 1, descr: 'off', generic: 0 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                        - { value: 2, descr: 'off', generic: 0 }
                 -
                     oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateHotWater
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.22.{{ $index }}'
@@ -285,8 +285,8 @@ modules:
                     index: 'lgpEnvStateHotWater.{{ $index }}'
                     state_name: lgpEnvStateHotWater
                     states:
-                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
-                        - { value: 2, graph: 1, descr: 'off', generic: 0 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                        - { value: 2, descr: 'off', generic: 0 }
                 -
                     oid: LIEBERT-GP-PDU-MIB::lgpPduRcpTable
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.95.{{ $index }}'
@@ -295,9 +295,9 @@ modules:
                     value: LIEBERT-GP-PDU-MIB::lgpPduRcpEntryPwrState
                     state_name: lgpPduRcpEntryPwrState
                     states:
-                        - { value: 2, graph: 0, descr: 'on', generic: 1 }
-                        - { value: 1, graph: 0, descr: 'off', generic: 0 }
-                        - { value: 0, graph: 0, descr: 'unknown', generic: 2 }
+                        - { value: 2, descr: 'on', generic: 1 }
+                        - { value: 1, descr: 'off', generic: 0 }
+                        - { value: 0, descr: 'unknown', generic: 2 }
         percent:
             data:
                 -

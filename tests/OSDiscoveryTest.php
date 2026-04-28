@@ -43,7 +43,8 @@ use PHPUnit\Framework\Attributes\TestDox;
 #[TestDox('OS Discovery')]
 final class OSDiscoveryTest extends TestCase
 {
-    private static $unchecked_files;
+    /** @var array<string, int> */
+    private static ?array $unchecked_files = null;
 
     public static function setUpBeforeClass(): void
     {
@@ -69,7 +70,6 @@ final class OSDiscoveryTest extends TestCase
             'allworx_voip',
             'arista_eos',
             'xirrus_aos',
-            'fujitsuiRMC',
             'ies52xxM',
             'polycomLens',
         ];
@@ -84,6 +84,19 @@ final class OSDiscoveryTest extends TestCase
     public function testHaveFilesToTest(): void
     {
         $this->assertNotEmpty(self::$unchecked_files);
+    }
+
+    public function testHaveVariantsLowercase(): void
+    {
+        $this->assertNotEmpty(self::$unchecked_files);
+
+        foreach (self::$unchecked_files as $file => $count) {
+            $underscore_pos = strpos($file, '_');
+            if ($underscore_pos !== false) {
+                $variant = substr($file, $underscore_pos + 1);
+                $this->assertSame(strtolower($variant), $variant, 'Test file variant not lowercase');
+            }
+        }
     }
 
     /**
@@ -187,10 +200,13 @@ final class OSDiscoveryTest extends TestCase
      */
     public static function osProvider(): array
     {
-        // make sure all OS are loaded
-        $config_os = array_keys(LibrenmsConfig::get('os'));
-        if (count($config_os) < count(glob(resource_path('definitions/os_detection/*.yaml')))) {
-            $config_os = array_keys(LibrenmsConfig::get('os'));
+        $definitionsPath = realpath(__DIR__ . '/../resources/definitions/os_detection');
+        $yamlFiles = glob($definitionsPath . '/*.yaml');
+
+        $config_os = [];
+        foreach ($yamlFiles as $file) {
+            $os = basename($file, '.yaml');
+            $config_os[] = $os;
         }
 
         $excluded_os = [

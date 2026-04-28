@@ -3995,84 +3995,72 @@
                 {
                     "state_name": "fctarget-enablestate",
                     "state_descr": "Enabled",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "fctarget-state",
                     "state_descr": "OK",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hwDisk-status",
                     "state_descr": "OK",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hwDisk-status",
                     "state_descr": "Rebuilding",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "hwEnclosure-alarms",
                     "state_descr": "OK",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hwEnclosure-psusens",
                     "state_descr": "OK",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hwEnclosure-status",
                     "state_descr": "OK",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hwEnclosure-tempsens",
                     "state_descr": "OK",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hwUnit-status",
                     "state_descr": "OK",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "license-status",
                     "state_descr": "OK",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "storagePool",
                     "state_descr": "OK",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "storageVolume",
                     "state_descr": "OK",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 }
