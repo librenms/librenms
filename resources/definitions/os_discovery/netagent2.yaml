@@ -2,6 +2,7 @@ modules:
     os:
         version: UPS-MIB::upsIdentAgentSoftwareVersion.0
         hardware: UPS-MIB::upsIdentModel.0
+        serial: SNMPv2-SMI::enterprises.935.1.1.1.1.2.3.0
     sensors:
         additional_oids:
             data:
