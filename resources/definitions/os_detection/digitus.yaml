@@ -1,0 +1,19 @@
+os: digitus
+group: digitus
+text: 'Digitus PDU'
+type: network
+ifXmcbc: true
+
+icon: digitus
+
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+
+discovery:
+    -
+        sysDescr:
+            - 'DPDUV3M'
+        sysObjectID:
+            - '.1.3.6.1.4.1.23280'
