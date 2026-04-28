@@ -80,8 +80,8 @@
                                 </li>
                                 @endconfig
                                 @can('viewAny', \App\Models\SslCertificate::class)
-                                <li><a href="{{ url('ssl-certificates') }}"><i class="fa fa-lock fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span
-                                    class="tw:md:hidden tw:2xl:inline-block">{{ __('SSL Certificates') }}</span></a>
+                                <li><a href="{{ url('ssl-certificates') }}"><i class="fa fa-lock fa-fw fa-lg fa-nav-icons"
+                                    aria-hidden="true"></i> {{ __('SSL Certificates') }}</a>
                                 </li>
                                 @endcan
                             </ul>
