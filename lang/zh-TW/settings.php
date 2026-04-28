@@ -529,15 +529,13 @@ return [
                 'description' => '基礎 URI',
                 'help' => 'Override the base uri in the case you have modified the Graylog default.',
             ],
-            'device-page' => [
-                'loglevel' => [
-                    'description' => '裝置概觀記錄等級',
-                    'help' => 'Sets the maximum log level shown on the device overview page.',
-                ],
-                'rowCount' => [
-                    'description' => '裝置概觀資料筆數',
-                    'help' => 'Sets the number of rows show on the device overview page.',
-                ],
+            'loglevel' => [
+                'description' => '裝置概觀記錄等級',
+                'help' => 'Sets the maximum log level shown on the device overview page.',
+            ],
+            'rowCount' => [
+                'description' => '裝置概觀資料筆數',
+                'help' => 'Sets the number of rows show on the device overview page.',
             ],
             'password' => [
                 'description' => '密碼',

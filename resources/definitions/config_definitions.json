@@ -4457,7 +4457,7 @@
                 "value": "other"
             }
         },
-        "graylog.device-page.loglevel": {
+        "graylog.loglevel": {
             "default": 7,
             "type": "select",
             "group": "external",
@@ -4474,21 +4474,21 @@
                 "7": "7"
             }
         },
-        "graylog.device-page.rowCount": {
+        "graylog.rowCount": {
             "default": 10,
             "type": "integer",
             "group": "external",
             "section": "graylog",
             "order": 9
         },
-        "graylog.device-page.default-stream-id": {
+        "graylog.default-stream-id": {
             "default": "",
             "type": "text",
             "group": "external",
             "section": "graylog",
             "order": 10
         },
-        "graylog.device-page.fields": {
+        "graylog.fields": {
             "default": ["severity", "origin", "level", "source", "message", "facility"],
             "type": "array",
             "group": "external",
@@ -4499,7 +4499,7 @@
                 "value.*": "string"
             }
         },
-        "graylog.device-page.hidden-fields": {
+        "graylog.hidden-fields": {
             "default": ["gl2_"],
             "type": "array",
             "group": "external",

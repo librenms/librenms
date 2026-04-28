@@ -94,7 +94,7 @@
                                                              aria-hidden="true"></i> {{ __('syslog.title') }}</a></li>
                         @endconfig
                         @config('graylog.server')
-                        <li><a href="{{ url('graylog') }}"><i class="fa fa-clone fa-fw fa-lg"
+                        <li><a href="{{ route('graylog.index') }}"><i class="fa fa-clone fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Graylog') }}</a></li>
                         @endconfig
 

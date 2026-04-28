@@ -33,8 +33,8 @@ if (LibrenmsConfig::get('graylog.server')) {
     </div>
     <script>
     ';
-    $rowCount = LibrenmsConfig::get('graylog.device-page.rowCount', 10);
-    $loglevel = LibrenmsConfig::get('graylog.device-page.loglevel', 7);
+    $rowCount = LibrenmsConfig::get('graylog.rowCount', 10);
+    $loglevel = LibrenmsConfig::get('graylog.loglevel', 7);
     $tmp_output .= '
         $.ajax({
             type: "post",

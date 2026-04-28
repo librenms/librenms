@@ -907,15 +907,13 @@ return [
                 'description' => 'URI Base',
                 'help' => 'Substitui o URI base no caso de você ter modificado o padrão do Graylog.',
             ],
-            'device-page' => [
-                'loglevel' => [
-                    'description' => 'Nível de Log da Visão Geral do Dispositivo',
-                    'help' => 'Define o nível máximo de log exibido na página de visão geral do dispositivo.',
-                ],
-                'rowCount' => [
-                    'description' => 'Contagem de Linhas da Visão Geral do Dispositivo',
-                    'help' => 'Define o número de linhas exibidas na página de visão geral do dispositivo.',
-                ],
+            'loglevel' => [
+                'description' => 'Nível de Log da Visão Geral do Dispositivo',
+                'help' => 'Define o nível máximo de log exibido na página de visão geral do dispositivo.',
+            ],
+            'rowCount' => [
+                'description' => 'Contagem de Linhas da Visão Geral do Dispositivo',
+                'help' => 'Define o número de linhas exibidas na página de visão geral do dispositivo.',
             ],
             'password' => [
                 'description' => 'Senha',

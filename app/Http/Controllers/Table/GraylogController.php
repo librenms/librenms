@@ -38,8 +38,6 @@ use Illuminate\Support\Facades\Blade;
 
 class GraylogController extends SimpleTableController
 {
-    private const BUILTIN_FIELDS = ['severity', 'origin', 'level', 'source', 'message', 'facility'];
-
     private readonly ?DateTimeZone $timezone;
     private array $deviceLinkCache = [];
     private array $fields = [];
@@ -73,20 +71,20 @@ class GraylogController extends SimpleTableController
         $limit = (int) $request->input('rowCount', 10);
         $page = (int) $request->input('current', 1);
         $offset = (int) (($page - 1) * $limit);
-        $loglevel = $request->input('loglevel') ?? LibrenmsConfig::get('graylog.loglevel');
-        $this->fields = (array) LibrenmsConfig::get('graylog.device-page.fields', self::BUILTIN_FIELDS);
-        $this->hiddenFieldPrefixes = array_values(array_filter((array) LibrenmsConfig::get('graylog.device-page.hidden-fields', ['gl2_'])));
+        $loglevel = $request->input('loglevel');
+        $this->fields = (array) LibrenmsConfig::get('graylog.fields');
+        $this->hiddenFieldPrefixes = array_values(array_filter((array) LibrenmsConfig::get('graylog.hidden-fields')));
 
         $query = $api->buildSimpleQuery($search, $device) .
-            ($loglevel !== null ? ' AND level: <=' . $loglevel : '');
+            (is_numeric($loglevel) ? ' AND level: <=' . (int) $loglevel : '');
 
         $sort = null;
         foreach ($request->input('sort', []) as $field => $direction) {
             $sort = "$field:$direction";
         }
 
-        $stream = $request->input('stream') ?: (string) LibrenmsConfig::get('graylog.device-page.default-stream-id', '');
-        $filter = $stream ? "streams:$stream" : null;
+        $stream = $request->input('stream') ?: $api->defaultStreamId();
+        $filter = $stream !== '' ? "streams:$stream" : null;
 
         try {
             $data = $api->query($query, $range, $limit, $offset, $sort, $filter);
@@ -122,7 +120,10 @@ class GraylogController extends SimpleTableController
             $displayTime = $raw['timestamp'] ?? '';
         }
 
-        $row = ['timestamp' => $displayTime];
+        $row = [
+            '_id' => $raw['_id'] ?? null,
+            'timestamp' => $displayTime,
+        ];
 
         foreach ($this->fields as $field) {
             $row[$field] = $this->renderField($field, $raw);
@@ -135,26 +136,19 @@ class GraylogController extends SimpleTableController
 
     private function renderField(string $field, array $raw): string
     {
-        switch ($field) {
-            case 'severity':
-                return $this->severityLabel($raw['level'] ?? '');
-            case 'origin':
-                return $this->deviceLinkFromSource($raw['gl2_remote_ip'] ?? '');
-            case 'source':
-                return $this->deviceLinkFromSource($raw['source'] ?? '');
-            case 'message':
-                return htmlspecialchars($raw['message'] ?? '');
-            case 'level':
-                $level = $raw['level'] ?? '';
-
-                return (is_numeric($level) && $level >= 0) ? "($level) " . __("syslog.severity.$level") : $level;
-            case 'facility':
-                $facility = $raw['facility'] ?? '';
-
-                return is_numeric($facility) ? "($facility) " . __("syslog.facility.$facility") : $facility;
-            default:
-                return htmlspecialchars($this->stringifyField($raw[$field] ?? ''));
-        }
+        return match ($field) {
+            'severity' => $this->severityLabel($raw['level'] ?? ''),
+            'origin' => $this->deviceLinkFromSource($raw['gl2_remote_ip'] ?? ''),
+            'source' => $this->deviceLinkFromSource($raw['source'] ?? ''),
+            'message' => htmlspecialchars($raw['message'] ?? ''),
+            'level' => is_numeric($raw['level'] ?? null) && $raw['level'] >= 0
+                ? "({$raw['level']}) " . __("syslog.severity.{$raw['level']}")
+                : htmlspecialchars((string) ($raw['level'] ?? '')),
+            'facility' => is_numeric($raw['facility'] ?? null)
+                ? "({$raw['facility']}) " . __("syslog.facility.{$raw['facility']}")
+                : htmlspecialchars((string) ($raw['facility'] ?? '')),
+            default => htmlspecialchars($this->stringifyField($raw[$field] ?? '')),
+        };
     }
 
     private function stringifyField($value): string
@@ -169,7 +163,7 @@ class GraylogController extends SimpleTableController
     private function renderDetail(array $raw): string
     {
         ksort($raw);
-        $rows = '';
+        $rows = [];
         foreach ($raw as $key => $value) {
             $keyStr = (string) $key;
             foreach ($this->hiddenFieldPrefixes as $prefix) {
@@ -177,10 +171,10 @@ class GraylogController extends SimpleTableController
                     continue 2;
                 }
             }
-            $rows .= '<dt>' . htmlspecialchars($keyStr) . '</dt><dd>' . htmlspecialchars($this->stringifyField($value)) . '</dd>';
+            $rows[$keyStr] = $this->stringifyField($value);
         }
 
-        return '<dl class="graylog-row-detail">' . $rows . '</dl>';
+        return Blade::render('graylog._detail', ['rows' => $rows]);
     }
 
     private function severityLabel(string $severity): string

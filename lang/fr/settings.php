@@ -609,15 +609,13 @@ return [
                 'description' => 'URI Base',
                 'help' => 'Remplace l\'URI de base pour la configuration Graylog.',
             ],
-            'device-page' => [
-                'loglevel' => [
-                    'description' => 'Filtrage par niveau pour la page d\'accueil',
-                    'help' => 'Règle le niveau maximum de criticité pour les journaux affichés sur la page d\'accueil.',
-                ],
-                'rowCount' => [
-                    'description' => 'Nombre de lignes affichées sur la page d\'accueil',
-                    'help' => 'Règle le nombre de lignes de journaux affichées sur la page d\'accueil',
-                ],
+            'loglevel' => [
+                'description' => 'Filtrage par niveau pour la page d\'accueil',
+                'help' => 'Règle le niveau maximum de criticité pour les journaux affichés sur la page d\'accueil.',
+            ],
+            'rowCount' => [
+                'description' => 'Nombre de lignes affichées sur la page d\'accueil',
+                'help' => 'Règle le nombre de lignes de journaux affichées sur la page d\'accueil',
             ],
             'password' => [
                 'description' => 'Mot de passe',
