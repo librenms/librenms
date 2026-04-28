@@ -174,11 +174,9 @@
 @push('scripts')
 @include('map.custom-js')
 <script type="text/javascript">
-    // Vite loads GridStack as a deferred module; ensure it's available before running dashboard code.
-    window.addEventListener('DOMContentLoaded', function () {
     var serialization = @json($dash_config);
     var gridstack_state = 0;
-
+    var grid;
 
     @if ($dashboard->dashboard_id > 0)
         var dashboard_id = {{ $dashboard->dashboard_id }};
@@ -186,39 +184,46 @@
         var dashboard_id = 0;
     @endif
 
-    $('[data-toggle="tooltip"]').tooltip();
-    dashboard_collapse();
-    var grid = GridStack.init({
-        cellHeight: 100,
-        margin: 10,
-        minRow: 1,
-        maxRow: 200,
-        column: 20,
-        float: false,
-        draggable: { handle: 'header, span' },
-        resizable: { handles: 'all' },
-        disableOneColumnMode: true,
-    }, '.grid-stack');
+    // Vite loads GridStack as a deferred module; ensure it's available before running dashboard code.
+    window.addEventListener('DOMContentLoaded', function () {
+        $('[data-toggle="tooltip"]').tooltip();
+        dashboard_collapse();
+        grid = GridStack.init({
+            cellHeight: 100,
+            margin: 10,
+            minRow: 1,
+            maxRow: 200,
+            column: 20,
+            float: false,
+            draggable: {handle: 'header, span'},
+            resizable: {handles: 'all'},
+            disableOneColumnMode: true,
+        }, '.grid-stack');
 
-    // load existing widgets (sorted by row/col like Gridster used to)
-    serialization.sort(function(a, b) {
-        return (a.row - b.row) || (a.col - b.col);
+        // load existing widgets (sorted by row/col like Gridster used to)
+        serialization.sort((a, b) => (a.row - b.row) || (a.col - b.col)).forEach(widget_dom);
+
+        // default to "view mode"
+        grid.enableMove(false);
+        grid.enableResize(false);
+
+        grid.on('change', function () {
+            updatePos(grid);
+        });
+
+        grid.on('resizestop', function (event, element) {
+            var $el = $(element);
+            updatePos(grid);
+            widget_reload($el.attr('id'), $el.data('type'));
+        });
+
+        @if (empty($dashboard->dashboard_id) && $default_dash == 0)
+        $('#dashboard_name').val('Default');
+        dashboard_add($('#add_form'));
+        @endif
     });
-    $.each(serialization, function() { widget_dom(this); });
 
-    // default to "view mode"
-    grid.enableMove(false);
-    grid.enableResize(false);
-
-    grid.on('change', function() {
-        updatePos(grid);
-    });
-
-    grid.on('resizestop', function(event, element) {
-        var $el = $(element);
-        updatePos(grid);
-        widget_reload($el.attr('id'), $el.data('type'));
-    });
+    $('#new-widget').popover();
 
     $(document).on('click','.edit-dash-btn', function() {
         if (gridstack_state == 0) {
@@ -664,14 +669,6 @@
                 grid.enableResize(false);
             }
         }, 100);
-    });
-
-    $('#new-widget').popover();
-
-    @if (empty($dashboard->dashboard_id) && $default_dash == 0)
-        $('#dashboard_name').val('Default');
-        dashboard_add($('#add_form'));
-    @endif
     });
 </script>
 @endpush
