@@ -10,9 +10,9 @@ IMPORTS
     TEXTUAL-CONVENTION FROM SNMPv2-TC
     switchMgmt FROM BTS-SMI
     TruthValue FROM SNMPv2-TC
-    DisplayString FROM MIB-TC
-    InterfaceIndex FROM MIB-TC
-    SfpTransceiver FROM MIB-TC
+    DisplayString FROM BTS-TC
+    InterfaceIndex FROM BTS-TC
+    SfpTransceiver FROM BTS-TC
     ;
 
 ddmiMib MODULE-IDENTITY
@@ -403,7 +403,7 @@ ddmiStatusInterfaceA2RxPowerLowWarnThreshold OBJECT-TYPE
     ::= { ddmiStatusInterfaceEntry 1027 }
 
 ddmiMibConformance OBJECT IDENTIFIER
-    ::= { ddmiMib 121 }
+    ::= { ddmiMib 2 }
 
 ddmiMibCompliances OBJECT IDENTIFIER
     ::= { ddmiMibConformance 1 }

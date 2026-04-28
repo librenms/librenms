@@ -11,8 +11,9 @@ IMPORTS
     switchMgmt FROM BTS-SMI
     Integer32 FROM SNMPv2-SMI
     TruthValue FROM SNMPv2-TC
-    InterfaceIndex FROM MIB-TC
-    Unsigned32 FROM SNMPv2-TC
+    Integer16 FROM BTS-TC
+    InterfaceIndex FROM BTS-TC
+    Unsigned8 FROM BTS-TC
     ;
 
 thermalProtectionMib MODULE-IDENTITY
@@ -40,7 +41,7 @@ thermalProtectionCapabilities OBJECT IDENTIFIER
     ::= { thermalProtectionMibObjects 1 }
 
 thermalProtectionCapabilitiesMaxSupportedGroup OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      Unsigned8
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -72,7 +73,7 @@ thermalProtectionConfigGlobalsParamEntry OBJECT-TYPE
 
 ThermalProtectionConfigGlobalsParamEntry ::= SEQUENCE {
     thermalProtectionConfigGlobalsParamGroupIndex        Integer32,
-    thermalProtectionConfigGlobalsParamGroupTemperature  Integer32
+    thermalProtectionConfigGlobalsParamGroupTemperature  Integer16
 }
 
 thermalProtectionConfigGlobalsParamGroupIndex OBJECT-TYPE
@@ -84,7 +85,7 @@ thermalProtectionConfigGlobalsParamGroupIndex OBJECT-TYPE
     ::= { thermalProtectionConfigGlobalsParamEntry 1 }
 
 thermalProtectionConfigGlobalsParamGroupTemperature OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer16
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -114,7 +115,7 @@ thermalProtectionConfigInterfaceParamEntry OBJECT-TYPE
 
 ThermalProtectionConfigInterfaceParamEntry ::= SEQUENCE {
     thermalProtectionConfigInterfaceParamIfIndex  InterfaceIndex,
-    thermalProtectionConfigInterfaceParamGroup    Unsigned32
+    thermalProtectionConfigInterfaceParamGroup    Unsigned8
 }
 
 thermalProtectionConfigInterfaceParamIfIndex OBJECT-TYPE
@@ -126,7 +127,7 @@ thermalProtectionConfigInterfaceParamIfIndex OBJECT-TYPE
     ::= { thermalProtectionConfigInterfaceParamEntry 1 }
 
 thermalProtectionConfigInterfaceParamGroup OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..4)
+    SYNTAX      Unsigned8 (0..4)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -157,7 +158,7 @@ thermalProtectionStatusInterfaceEntry OBJECT-TYPE
 
 ThermalProtectionStatusInterfaceEntry ::= SEQUENCE {
     thermalProtectionStatusInterfaceIfIndex      InterfaceIndex,
-    thermalProtectionStatusInterfaceTemperature  Integer32,
+    thermalProtectionStatusInterfaceTemperature  Integer16,
     thermalProtectionStatusInterfacePower        TruthValue
 }
 
@@ -170,7 +171,7 @@ thermalProtectionStatusInterfaceIfIndex OBJECT-TYPE
     ::= { thermalProtectionStatusInterfaceEntry 1 }
 
 thermalProtectionStatusInterfaceTemperature OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer16
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
