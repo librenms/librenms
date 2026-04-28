@@ -4,7 +4,7 @@ applicationSuite: Others
 url: https://github.com/librenms/librenms
 landingURL: https://www.librenms.org
 isBasedOn: https://www.observium.org
-softwareVersion: 26.3.1
+softwareVersion: 26.4.0
 releaseDate: 2026-03-16
 logo: https://github.com/librenms/librenms.github.io/blob/master/images/LibreNMS-Logo-Black.svg
 platforms:

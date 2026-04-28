@@ -107,6 +107,21 @@ class StringHelpers
             return (string) $converted;
         }
 
+        // Detect GB multi-byte pattern: strict GB2312 range (0xA1-0xF7, 0xA1-0xFE)
+        // or GBK extended range (0x81-0xA0, 0x40-0x7E/0x80-0xFE). Count occurrences to avoid
+        // false positives from Western encodings like CP850 which may have single high-byte pairs.
+        $gbPatternCount = preg_match_all('/[\xA1-\xF7][\xA1-\xFE]|[\x81-\xA0][\x40-\x7E\x80-\xFE]/s', $string);
+        $hasGbPattern = $gbPatternCount >= 2;
+
+        if ($hasGbPattern) {
+            // GB pattern detected, prioritize GB family encodings
+            foreach (['GB18030', 'GBK', 'GB2312'] as $encoding) {
+                if (($converted = @iconv($encoding, 'UTF-8', $string)) !== false) {
+                    return (string) $converted;
+                }
+            }
+        }
+
         if ($charset !== 'Windows-1252' && ($converted = @iconv('Windows-1252', 'UTF-8', $string)) !== false) {
             return (string) $converted;
         }

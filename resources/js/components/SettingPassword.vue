@@ -23,14 +23,27 @@
   -->
 
 <template>
-    <input type="password" class="form-control"
-           :name="name"
-           :value="value"
-           @input="$emit('input', $event.target.value)"
-           :pattern="pattern"
-           :required="required"
-           :disabled="disabled"
-    >
+    <div class="input-group">
+        <input :type="visible ? 'text' : 'password'"
+               class="form-control"
+               :name="name"
+               :value="value"
+               @input="$emit('input', $event.target.value)"
+               :pattern="pattern"
+               :required="required"
+               :disabled="disabled"
+               autocomplete="new-password"
+        >
+        <span class="input-group-btn">
+            <button type="button"
+                    class="btn btn-default"
+                    @click="visible = !visible"
+                    :title="visible ? 'Hide' : 'Show'"
+                    :disabled="disabled">
+                <i :class="visible ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+            </button>
+        </span>
+    </div>
 </template>
 
 <script>
@@ -38,10 +51,14 @@
 
     export default {
         name: "SettingPassword",
-        mixins: [BaseSetting]
+        mixins: [BaseSetting],
+        data() {
+            return {
+                visible: false
+            }
+        }
     }
 </script>
 
 <style scoped>
-
 </style>
