@@ -3,8 +3,10 @@ text: 'Bitstream Hyperion'
 type: network
 icon: bitstream
 group: bistream
+mib_dir: bitstream
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.6603
+        - .1.3.6.1.4.1.19829.1
