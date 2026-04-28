@@ -1,0 +1,210 @@
+mib: PDUMIBV07:SNMPv2-SMI
+
+modules:
+  sensors:
+
+    power:
+      data:
+        - oid: phaseStatusActivePower
+          value: phaseStatusActivePower
+          num_oid: '.1.3.6.1.4.1.23280.6.1.4.{{ $index }}'
+          index: 'phaseActivePower.{{ $index }}'
+          group: Phase
+          descr: 'Phase {{ $index }} Active Power'
+          low_limit: 0
+          warn_limit_low: 2500
+          warn_limit: 3300
+          high_limit: 3600
+          graph: 1
+
+        - oid: outletStatusActivePower
+          value: outletStatusActivePower
+          num_oid: '.1.3.6.1.4.1.23280.8.1.5.{{ $index }}'
+          index: 'outletActivePower.{{ $index }}'
+          group: Outlet
+          descr: 'Outlet {{ $index }} Active Power'
+          low_limit: 0
+          warn_limit_low: 1500
+          warn_limit: 2000
+          high_limit: 2300
+          graph: 1
+
+    energy:
+      data:
+        - oid: phaseStatusActiveEnergy
+          value: phaseStatusActiveEnergy
+          num_oid: '.1.3.6.1.4.1.23280.6.1.8.{{ $index }}'
+          index: 'phaseEnergy.{{ $index }}'
+          group: Phase
+          descr: 'Phase {{ $index }} Energy'
+
+        - oid: outletStatusActiveEnergy
+          value: outletStatusActiveEnergy
+          num_oid: '.1.3.6.1.4.1.23280.8.1.7.{{ $index }}'
+          index: 'outletEnergy.{{ $index }}'
+          group: Outlet
+          descr: 'Outlet {{ $index }} Energy'
+
+    voltage:
+      data:
+        - oid: phaseStatusVoltage
+          value: phaseStatusVoltage
+          num_oid: '.1.3.6.1.4.1.23280.6.1.2.{{ $index }}'
+          index: 'phaseVoltage.{{ $index }}'
+          divisor: 10
+          group: Phase
+          descr: 'Phase {{ $index }} Voltage'
+          low_limit: 210
+          warn_limit_low: 216
+          warn_limit: 253
+          high_limit: 270
+          graph: 1
+
+        - oid: outletStatusVoltage
+          value: outletStatusVoltage
+          num_oid: '.1.3.6.1.4.1.23280.8.1.3.{{ $index }}'
+          index: 'outletVoltage.{{ $index }}'
+          divisor: 10
+          group: Outlet
+          descr: 'Outlet {{ $index }} Voltage'
+          low_limit: 210
+          warn_limit_low: 216
+          warn_limit: 253
+          high_limit: 270
+          graph: 1
+
+    current:
+      data:
+        - oid: phaseStatusCurrent
+          value: phaseStatusCurrent
+          num_oid: '.1.3.6.1.4.1.23280.6.1.3.{{ $index }}'
+          index: 'phaseCurrent.{{ $index }}'
+          divisor: 100
+          group: Phase
+          descr: 'Phase {{ $index }} Current'
+          low_limit: 0
+          warn_limit_low: 12
+          warn_limit: 14
+          high_limit: 16
+          graph: 1
+
+        - oid: outletStatusCurrent
+          value: outletStatusCurrent
+          num_oid: '.1.3.6.1.4.1.23280.8.1.4.{{ $index }}'
+          index: 'outletCurrent.{{ $index }}'
+          divisor: 100
+          group: Outlet
+          descr: 'Outlet {{ $index }} Current'
+          low_limit: 0
+          warn_limit_low: 7
+          warn_limit: 9
+          high_limit: 10
+          graph: 1
+
+    temperature:
+      data:
+        - oid: sensorStatusTemperature
+          value: sensorStatusTemperature
+          num_oid: '.1.3.6.1.4.1.23280.12.1.2'
+          index: 'ambientTemperature.0'
+          divisor: 10
+          group: Environment
+          descr: 'Ambient Temperature'
+          low_limit: 0
+          warn_limit_low: 10
+          warn_limit: 35
+          high_limit: 45
+          graph: 1
+
+    humidity:
+      data:
+        - oid: sensorStatusHumidity
+          value: sensorStatusHumidity
+          num_oid: '.1.3.6.1.4.1.23280.12.1.3'
+          index: 'ambientHumidity.0'
+          divisor: 10
+          group: Environment
+          descr: 'Ambient Humidity'
+          low_limit: 10
+          warn_limit_low: 20
+          warn_limit: 70
+          high_limit: 85
+          graph: 1
+
+    state:
+      data:
+        - oid: outletStatusState
+          value: outletStatusState
+          num_oid: '.1.3.6.1.4.1.23280.8.1.2.{{ $index }}'
+          index: 'outletState.{{ $index }}'
+          group: Outlet
+          descr: 'Outlet {{ $index }} State'
+          state_name: digitus_outlet_state
+          low_limit: 1 
+          states:
+            - { value: 1, descr: Off, generic: 0, graph: 0 }
+            - { value: 2, descr: On,  generic: 0, graph: 1 }
+
+        - oid: phaseStatusVoltageLimitState
+          value: phaseStatusVoltageLimitState
+          num_oid: '.1.3.6.1.4.1.23280.6.1.10.1.{{ $index }}'
+          index: 'phaseVoltageAlarm.{{ $index }}'
+          group: Phase
+          descr: 'Phase {{ $index }} Voltage Alarm'
+          state_name: digitus_phase_voltage_alarm
+          high_limit: 2
+          low_limit: 3
+          states:
+            - { value: 1, descr: Normal, generic: 0, graph: 0 }
+            - { value: 2, descr: High,   generic: 2, graph: 0 }
+            - { value: 3, descr: Low,    generic: 2, graph: 0 }
+
+        - oid: phaseStatusCurrentLimitState
+          value: phaseStatusCurrentLimitState
+          num_oid: '.1.3.6.1.4.1.23280.6.1.11.1.{{ $index }}'
+          index: 'phaseCurrentAlarm.{{ $index }}'
+          group: Phase
+          descr: 'Phase {{ $index }} Current Alarm'
+          state_name: digitus_phase_current_alarm
+          high_limit: 2
+          low_limit: 3
+          states:
+            - { value: 1, descr: Normal, generic: 0, graph: 0 }
+            - { value: 2, descr: High,   generic: 2, graph: 0 }
+            - { value: 3, descr: Low,    generic: 2, graph: 0 }
+
+        - oid: sensorStatusTemperatureLimitState
+          value: sensorStatusTemperatureLimitState
+          num_oid: '.1.3.6.1.4.1.23280.12.1.4'
+          index: 'temperatureAlarm.0'
+          group: Environment
+          descr: 'Temperature Alarm'
+          state_name: digitus_temperature_alarm
+          high_limit: 2
+          low_limit: 1
+          states:
+            - { value: 1, descr: Normal, generic: 0, graph: 0 }
+            - { value: 2, descr: High,   generic: 2, graph: 0 }
+            - { value: 3, descr: Low,    generic: 2, graph: 0 }
+
+        - oid: sensorStatusHumidityLimitState
+          value: sensorStatusHumidityLimitState
+          num_oid: '.1.3.6.1.4.1.23280.12.1.5'
+          index: 'humidityAlarm.0'
+          group: Environment
+          descr: 'Humidity Alarm'
+          state_name: digitus_humidity_alarm
+          states:
+            - { value: 1, descr: Normal, generic: 0, graph: 0 }
+            - { value: 2, descr: Alarm,  generic: 2, graph: 0 }
+
+        - oid: sensorStatusIOSensorState
+          value: sensorStatusIOSensorState
+          num_oid: '.1.3.6.1.4.1.23280.12.1.6'
+          index: 'ioSensorState.0'
+          group: Environment
+          descr: 'IO Sensor State'
+          state_name: digitus_io_sensor_state
+          states:
+            - { value: 1, descr: Normal, generic: 0, graph: 0 }
+            - { value: 2, descr: Alarm,  generic: 2, graph: 0 }
