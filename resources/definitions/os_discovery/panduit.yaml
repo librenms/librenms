@@ -14,7 +14,7 @@ modules:
                     oid: PANDUIT-MIB::pdug5IdentEntry
                     value: PANDUIT-MIB::pdug5Status
                     num_oid: '.1.3.6.1.4.1.19536.10.1.1.2.1.9.{{ $index }}'
-                    descr: 'System {{ index }} Overall Status'
+                    descr: 'System {{ $index }} Overall Status'
                     state_name: PANDUIT-MIB::pdug5IdentEntry
                     states:
                       - { descr: 'Other', value: 1, generic: 3 }
