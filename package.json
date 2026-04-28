@@ -29,6 +29,7 @@
         "alpinejs": "^3.14.9",
         "babel-helper-vue-jsx-merge-props": "^2.0.3",
         "es6-object-assign": "^1.1.0",
+        "gridstack": "^12.6.0",
         "luxon": "^3.7.2",
         "v-tooltip": "^2.0.3",
         "vue": "^2.7.0",

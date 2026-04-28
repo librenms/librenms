@@ -306,6 +306,7 @@ class DeviceController extends TableController
             'title' => 'Telnet to ' . $device->hostname,
             'href' => 'telnet://' . $device->hostname,
             'icon' => 'fa-terminal',
+            'external' => false,
         ];
 
         $ssh_href = 'ssh://' . $device->hostname;
@@ -319,6 +320,7 @@ class DeviceController extends TableController
             'title' => 'SSH to ' . $device->hostname,
             'href' => $ssh_href,
             'icon' => 'fa-lock',
+            'external' => false,
         ];
 
         $actions[$row][] = [

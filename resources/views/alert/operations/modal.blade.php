@@ -19,8 +19,17 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label" title="{{ __('Used when a segment step duration is 0 (repeat interval). Leave empty to use the global default from settings.') }}">{{ __('Default step duration') }}</label>
                         <div class="col-sm-9">
-                            <input type="number" class="form-control" name="default_operation_step_duration_seconds" id="ao_default_step_duration" min="0" step="1" placeholder="">
-                            <p class="help-block">{{ __('Seconds. When a segment’s step duration is 0, this value is the repeat interval. Leave empty to use the global default from settings.') }}</p>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <input type="number" class="form-control" name="default_operation_step_duration_seconds" id="ao_default_step_duration" min="0" step="1" placeholder="">
+                                </div>
+                                <div class="col-sm-6 text-right" style="padding-top:6px;">
+                                    <label style="font-weight:600; margin:0;">
+                                        {{ __('Suppress notifications') }}
+                                    </label>
+                                    <input type="checkbox" id="ao_default_notifications_suppressed" value="1" data-size="small">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">

@@ -1,5 +1,19 @@
 <script>
 $(function () {
+    var defaultSuppress = @json((bool) \App\Facades\LibrenmsConfig::get('alert_rule.default_operation_notifications_suppressed', false));
+    var $aoSuppress = $('#ao_default_notifications_suppressed');
+
+    function initAoSuppressSwitch() {
+        if (! $aoSuppress.length) {
+            return;
+        }
+        if ($aoSuppress.data('bootstrap-switch-initialized')) {
+            return;
+        }
+        $aoSuppress.bootstrapSwitch();
+        $aoSuppress.data('bootstrap-switch-initialized', true);
+    }
+
     function initAoSegmentTransports($sel) {
         $sel.select2({
             width: '100%',
@@ -57,6 +71,8 @@ $(function () {
         $('#alert-operation-form-error').hide().text('');
         $('#ao_operation_id').val(opId || '');
         $('#ao-segments-table tbody.ao-segment-group').remove();
+        initAoSuppressSwitch();
+        $aoSuppress.bootstrapSwitch('state', !!defaultSuppress);
         if (opId) {
             $.get('{{ url('alert-operation') }}/' + opId, function (res) {
                 if (res.status !== 'ok' || !res.operation) {
@@ -67,6 +83,10 @@ $(function () {
                 $('#ao_default_step_duration').val(
                     o.default_operation_step_duration_seconds != null ? o.default_operation_step_duration_seconds : ''
                 );
+                if (typeof o.notifications_suppressed !== 'undefined') {
+                    initAoSuppressSwitch();
+                    $aoSuppress.bootstrapSwitch('state', !!o.notifications_suppressed);
+                }
                 if (o.segments && o.segments.length) {
                     $.each(o.segments, function (i, s) {
                         addAoSegmentRow(s);
@@ -116,6 +136,7 @@ $(function () {
         var body = {
             name: $('#ao_name').val(),
             default_operation_step_duration_seconds: (dsRaw === '' || dsRaw === null) ? null : parseInt(dsRaw, 10),
+            notifications_suppressed: ($aoSuppress.bootstrapSwitch('state') ? 1 : 0),
             segments: segments,
             _token: '{{ csrf_token() }}'
         };

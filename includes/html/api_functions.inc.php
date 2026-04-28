@@ -1651,7 +1651,7 @@ function api_default_transport_targets(): array
  *
  * @param  array<int, array<string, mixed>>  $operations
  */
-function api_assign_rule_alert_operation_from_legacy_api(int $ruleId, array $operations, string $ruleName, ?int $defaultStepSeconds = null): void
+function api_assign_rule_alert_operation_from_legacy_api(int $ruleId, array $operations, string $ruleName, ?int $defaultStepSeconds = null, bool $notificationsSuppressed = false): void
 {
     $rule = \App\Models\AlertRule::find($ruleId);
     if (! $rule) {
@@ -1670,6 +1670,7 @@ function api_assign_rule_alert_operation_from_legacy_api(int $ruleId, array $ope
     $op = \App\Models\AlertOperation::create([
         'name' => $name,
         'default_operation_step_duration_seconds' => $defaultStepSeconds !== null ? max(0, $defaultStepSeconds) : null,
+        'notifications_suppressed' => $notificationsSuppressed,
     ]);
 
     $anyTransports = false;
@@ -1684,7 +1685,6 @@ function api_assign_rule_alert_operation_from_legacy_api(int $ruleId, array $ope
         $to = ($toRaw === '' || $toRaw === null) ? null : max($from, (int) $toRaw);
         $startIn = max(0, (int) ($operation['start_in_seconds'] ?? 0));
         $stepDuration = max(0, (int) ($operation['step_duration_seconds'] ?? 0));
-
         $seg = $op->segments()->create([
             'position' => (int) ($operation['position'] ?? $idx),
             'operation_phase' => $phase,
@@ -1692,7 +1692,6 @@ function api_assign_rule_alert_operation_from_legacy_api(int $ruleId, array $ope
             'escalation_step_to' => $to,
             'start_in_seconds' => $startIn,
             'step_duration_seconds' => $stepDuration,
-            'notifications_suppressed' => false,
         ]);
 
         [$single, $group] = api_parse_transport_targets((array) ($operation['transports'] ?? []));
@@ -1817,6 +1816,10 @@ function add_edit_rule(Illuminate\Http\Request $request)
 
     // New operation-based API fields
     $operations = $data['operations'] ?? null;
+    $operationNotificationsSuppressed = filter_var(
+        $data['operation_notifications_suppressed'] ?? false,
+        FILTER_VALIDATE_BOOLEAN
+    );
     $defaultOperationStepDuration = array_key_exists('default_operation_step_duration', $data)
         ? Time::durationToSeconds((string) $data['default_operation_step_duration'])
         : null;
@@ -1908,7 +1911,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
 
     if (! array_key_exists('alert_operation_id', $data) && is_array($operations)) {
         try {
-            api_assign_rule_alert_operation_from_legacy_api((int) $rule_id, $operations, $name, $defaultOperationStepDuration);
+            api_assign_rule_alert_operation_from_legacy_api((int) $rule_id, $operations, $name, $defaultOperationStepDuration, $operationNotificationsSuppressed);
         } catch (\InvalidArgumentException $e) {
             return api_error(400, $e->getMessage());
         } catch (\Throwable) {

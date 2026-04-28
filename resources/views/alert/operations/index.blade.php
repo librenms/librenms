@@ -22,6 +22,7 @@
                 <tr>
                     <th>{{ __('Name') }}</th>
                     <th>{{ __('Default step (s)') }}</th>
+                    <th>{{ __('Muted') }}</th>
                     <th>{{ __('Segments') }}</th>
                     <th>{{ __('Transports') }}</th>
                     <th>{{ __('Used by rules') }}</th>
@@ -64,6 +65,13 @@
                     <tr id="alert-operation-{{ (int) $op->id }}">
                         <td>{{ $op->name }}</td>
                         <td><small>{{ $op->default_operation_step_duration_seconds !== null ? (int) $op->default_operation_step_duration_seconds : '—' }}</small></td>
+                        <td>
+                            @if($op->notifications_suppressed)
+                                <span class="text-info" title="{{ __('Notifications suppressed') }}"><i class="fa fa-volume-off"></i></span>
+                            @else
+                                <span class="text-muted">—</span>
+                            @endif
+                        </td>
                         <td><small>{!! $segStr !!}</small></td>
                         <td class="col-sm-3"><small>{!! $tpStr !!}</small></td>
                         <td>{{ (int) $op->alert_rules_count }}</td>

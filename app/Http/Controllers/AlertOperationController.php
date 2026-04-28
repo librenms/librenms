@@ -57,6 +57,7 @@ class AlertOperationController extends Controller
             $op = new AlertOperation;
             $op->name = $validated['name'];
             $op->default_operation_step_duration_seconds = $validated['default_operation_step_duration_seconds'] ?? null;
+            $op->notifications_suppressed = (bool) ($validated['notifications_suppressed'] ?? false);
             $op->save();
             $this->syncSegments($op, $request);
 
@@ -81,6 +82,7 @@ class AlertOperationController extends Controller
             $validated = $request->validated();
             $alertOperation->name = $validated['name'];
             $alertOperation->default_operation_step_duration_seconds = $validated['default_operation_step_duration_seconds'] ?? null;
+            $alertOperation->notifications_suppressed = (bool) ($validated['notifications_suppressed'] ?? false);
             $alertOperation->save();
             $this->syncSegments($alertOperation, $request);
 
@@ -129,7 +131,6 @@ class AlertOperationController extends Controller
                 'escalation_step_to' => $to,
                 'start_in_seconds' => max(0, (int) ($row['start_in_seconds'] ?? 0)),
                 'step_duration_seconds' => max(0, (int) ($row['step_duration_seconds'] ?? 0)),
-                'notifications_suppressed' => false,
             ]);
 
             $transportsRaw = $row['transports'] ?? [];
