@@ -1,0 +1,891 @@
+-- *****************************************************************
+-- MIB-AUTH: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-AUTH DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    InetAddressIPv6 FROM INET-ADDRESS-MIB
+    Integer32 FROM SNMPv2-SMI
+    IpAddress FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    DisplayString FROM BTS-TC
+    Unsigned8 FROM BTS-TC
+    ;
+
+authMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private MIB for authentication"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 48 }
+
+
+AuthAcctMethod ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the available accounting methods."
+    SYNTAX      INTEGER { none(0), tacacs(3) }
+
+AuthAuthenMethod ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the available authentication methods."
+    SYNTAX      INTEGER { none(0), local(1), radius(2), tacacs(3) }
+
+AuthAuthorMethod ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the available authorization methods."
+    SYNTAX      INTEGER { none(0), tacacs(3) }
+
+authMibObjects OBJECT IDENTIFIER
+    ::= { authMib 1 }
+
+authConfig OBJECT IDENTIFIER
+    ::= { authMibObjects 2 }
+
+authConfigGlobals OBJECT IDENTIFIER
+    ::= { authConfig 1 }
+
+authConfigGlobalsAgents OBJECT IDENTIFIER
+    ::= { authConfigGlobals 1 }
+
+authConfigGlobalsAgentsConsoleAuthen OBJECT IDENTIFIER
+    ::= { authConfigGlobalsAgents 1 }
+
+authConfigGlobalsAgentsConsoleAuthenMethodsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AuthConfigGlobalsAgentsConsoleAuthenMethodsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is an ordered table of methods used to authenticate console access"
+    ::= { authConfigGlobalsAgentsConsoleAuthen 1 }
+
+authConfigGlobalsAgentsConsoleAuthenMethodsEntry OBJECT-TYPE
+    SYNTAX      AuthConfigGlobalsAgentsConsoleAuthenMethodsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry defines a method to be consulted with a priorty equal to the
+         index"
+    INDEX       {                   authConfigGlobalsAgentsConsoleAuthenMethodsIndex }
+    ::= { authConfigGlobalsAgentsConsoleAuthenMethodsTable 1 }
+
+AuthConfigGlobalsAgentsConsoleAuthenMethodsEntry ::= SEQUENCE {
+    authConfigGlobalsAgentsConsoleAuthenMethodsIndex   Integer32,
+    authConfigGlobalsAgentsConsoleAuthenMethodsMethod  AuthAuthenMethod
+}
+
+authConfigGlobalsAgentsConsoleAuthenMethodsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Method priority index, from 0 to 3 where 0 is the highest priority
+         index"
+    ::= { authConfigGlobalsAgentsConsoleAuthenMethodsEntry 1 }
+
+authConfigGlobalsAgentsConsoleAuthenMethodsMethod OBJECT-TYPE
+    SYNTAX      AuthAuthenMethod
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Authentication method"
+    ::= { authConfigGlobalsAgentsConsoleAuthenMethodsEntry 2 }
+
+authConfigGlobalsAgentsTelnetAuthen OBJECT IDENTIFIER
+    ::= { authConfigGlobalsAgents 2 }
+
+authConfigGlobalsAgentsTelnetAuthenMethodsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AuthConfigGlobalsAgentsTelnetAuthenMethodsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is an ordered table of methods used to authenticate telnet access"
+    ::= { authConfigGlobalsAgentsTelnetAuthen 1 }
+
+authConfigGlobalsAgentsTelnetAuthenMethodsEntry OBJECT-TYPE
+    SYNTAX      AuthConfigGlobalsAgentsTelnetAuthenMethodsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry defines a method to be consulted with a priorty equal to the
+         index"
+    INDEX       {                   authConfigGlobalsAgentsTelnetAuthenMethodsIndex }
+    ::= { authConfigGlobalsAgentsTelnetAuthenMethodsTable 1 }
+
+AuthConfigGlobalsAgentsTelnetAuthenMethodsEntry ::= SEQUENCE {
+    authConfigGlobalsAgentsTelnetAuthenMethodsIndex   Integer32,
+    authConfigGlobalsAgentsTelnetAuthenMethodsMethod  AuthAuthenMethod
+}
+
+authConfigGlobalsAgentsTelnetAuthenMethodsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Method priority index, from 0 to 3 where 0 is the highest priority
+         index"
+    ::= { authConfigGlobalsAgentsTelnetAuthenMethodsEntry 1 }
+
+authConfigGlobalsAgentsTelnetAuthenMethodsMethod OBJECT-TYPE
+    SYNTAX      AuthAuthenMethod
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Authentication method"
+    ::= { authConfigGlobalsAgentsTelnetAuthenMethodsEntry 2 }
+
+authConfigGlobalsAgentsSshAuthen OBJECT IDENTIFIER
+    ::= { authConfigGlobalsAgents 3 }
+
+authConfigGlobalsAgentsSshAuthenMethodsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AuthConfigGlobalsAgentsSshAuthenMethodsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is an ordered table of methods used to authenticate ssh access"
+    ::= { authConfigGlobalsAgentsSshAuthen 1 }
+
+authConfigGlobalsAgentsSshAuthenMethodsEntry OBJECT-TYPE
+    SYNTAX      AuthConfigGlobalsAgentsSshAuthenMethodsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry defines a method to be consulted with a priorty equal to the
+         index"
+    INDEX       { authConfigGlobalsAgentsSshAuthenMethodsIndex }
+    ::= { authConfigGlobalsAgentsSshAuthenMethodsTable 1 }
+
+AuthConfigGlobalsAgentsSshAuthenMethodsEntry ::= SEQUENCE {
+    authConfigGlobalsAgentsSshAuthenMethodsIndex   Integer32,
+    authConfigGlobalsAgentsSshAuthenMethodsMethod  AuthAuthenMethod
+}
+
+authConfigGlobalsAgentsSshAuthenMethodsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Method priority index, from 0 to 3 where 0 is the highest priority
+         index"
+    ::= { authConfigGlobalsAgentsSshAuthenMethodsEntry 1 }
+
+authConfigGlobalsAgentsSshAuthenMethodsMethod OBJECT-TYPE
+    SYNTAX      AuthAuthenMethod
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Authentication method"
+    ::= { authConfigGlobalsAgentsSshAuthenMethodsEntry 2 }
+
+authConfigGlobalsAgentsHttpAuthen OBJECT IDENTIFIER
+    ::= { authConfigGlobalsAgents 4 }
+
+authConfigGlobalsAgentsHttpAuthenMethodsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AuthConfigGlobalsAgentsHttpAuthenMethodsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is an ordered table of methods used to authenticate HTTP access"
+    ::= { authConfigGlobalsAgentsHttpAuthen 1 }
+
+authConfigGlobalsAgentsHttpAuthenMethodsEntry OBJECT-TYPE
+    SYNTAX      AuthConfigGlobalsAgentsHttpAuthenMethodsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry defines a method to be consulted with a priorty equal to the
+         index"
+    INDEX       { authConfigGlobalsAgentsHttpAuthenMethodsIndex }
+    ::= { authConfigGlobalsAgentsHttpAuthenMethodsTable 1 }
+
+AuthConfigGlobalsAgentsHttpAuthenMethodsEntry ::= SEQUENCE {
+    authConfigGlobalsAgentsHttpAuthenMethodsIndex   Integer32,
+    authConfigGlobalsAgentsHttpAuthenMethodsMethod  AuthAuthenMethod
+}
+
+authConfigGlobalsAgentsHttpAuthenMethodsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Method priority index, from 0 to 3 where 0 is the highest priority
+         index"
+    ::= { authConfigGlobalsAgentsHttpAuthenMethodsEntry 1 }
+
+authConfigGlobalsAgentsHttpAuthenMethodsMethod OBJECT-TYPE
+    SYNTAX      AuthAuthenMethod
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Authentication method"
+    ::= { authConfigGlobalsAgentsHttpAuthenMethodsEntry 2 }
+
+authConfigGlobalsAgentsConsoleAuthor OBJECT IDENTIFIER
+    ::= { authConfigGlobalsAgents 11 }
+
+authConfigGlobalsAgentsConsoleAuthorMethod OBJECT-TYPE
+    SYNTAX      AuthAuthorMethod
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Authorization method"
+    ::= { authConfigGlobalsAgentsConsoleAuthor 1 }
+
+authConfigGlobalsAgentsConsoleAuthorCmdEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable authorization of commands"
+    ::= { authConfigGlobalsAgentsConsoleAuthor 2 }
+
+authConfigGlobalsAgentsConsoleAuthorCmdPrivLvl OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Command privilege level. Authorize all commands with a privilege level
+         higher than or equal to this level. Valid values are in the range 0 to
+         15"
+    ::= { authConfigGlobalsAgentsConsoleAuthor 3 }
+
+authConfigGlobalsAgentsConsoleAuthorCfgCmdEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Also authorize configuration commands"
+    ::= { authConfigGlobalsAgentsConsoleAuthor 4 }
+
+authConfigGlobalsAgentsTelnetAuthor OBJECT IDENTIFIER
+    ::= { authConfigGlobalsAgents 12 }
+
+authConfigGlobalsAgentsTelnetAuthorMethod OBJECT-TYPE
+    SYNTAX      AuthAuthorMethod
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Authorization method"
+    ::= { authConfigGlobalsAgentsTelnetAuthor 1 }
+
+authConfigGlobalsAgentsTelnetAuthorCmdEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable authorization of commands"
+    ::= { authConfigGlobalsAgentsTelnetAuthor 2 }
+
+authConfigGlobalsAgentsTelnetAuthorCmdPrivLvl OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Command privilege level. Authorize all commands with a privilege level
+         higher than or equal to this level. Valid values are in the range 0 to
+         15"
+    ::= { authConfigGlobalsAgentsTelnetAuthor 3 }
+
+authConfigGlobalsAgentsTelnetAuthorCfgCmdEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Also authorize configuration commands"
+    ::= { authConfigGlobalsAgentsTelnetAuthor 4 }
+
+authConfigGlobalsAgentsSshAuthor OBJECT IDENTIFIER
+    ::= { authConfigGlobalsAgents 13 }
+
+authConfigGlobalsAgentsSshAuthorMethod OBJECT-TYPE
+    SYNTAX      AuthAuthorMethod
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Authorization method"
+    ::= { authConfigGlobalsAgentsSshAuthor 1 }
+
+authConfigGlobalsAgentsSshAuthorCmdEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable authorization of commands"
+    ::= { authConfigGlobalsAgentsSshAuthor 2 }
+
+authConfigGlobalsAgentsSshAuthorCmdPrivLvl OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Command privilege level. Authorize all commands with a privilege level
+         higher than or equal to this level. Valid values are in the range 0 to
+         15"
+    ::= { authConfigGlobalsAgentsSshAuthor 3 }
+
+authConfigGlobalsAgentsSshAuthorCfgCmdEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Also authorize configuration commands"
+    ::= { authConfigGlobalsAgentsSshAuthor 4 }
+
+authConfigGlobalsAgentsConsoleAcct OBJECT IDENTIFIER
+    ::= { authConfigGlobalsAgents 21 }
+
+authConfigGlobalsAgentsConsoleAcctMethod OBJECT-TYPE
+    SYNTAX      AuthAcctMethod
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Accounting method"
+    ::= { authConfigGlobalsAgentsConsoleAcct 1 }
+
+authConfigGlobalsAgentsConsoleAcctCmdEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable accounting of commands"
+    ::= { authConfigGlobalsAgentsConsoleAcct 2 }
+
+authConfigGlobalsAgentsConsoleAcctCmdPrivLvl OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Command privilege level. Log all commands with a privilege level higher
+         than or equal to this level. Valid values are in the range 0 to 15"
+    ::= { authConfigGlobalsAgentsConsoleAcct 3 }
+
+authConfigGlobalsAgentsConsoleAcctExecEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable exec (login) accounting"
+    ::= { authConfigGlobalsAgentsConsoleAcct 4 }
+
+authConfigGlobalsAgentsTelnetAcct OBJECT IDENTIFIER
+    ::= { authConfigGlobalsAgents 22 }
+
+authConfigGlobalsAgentsTelnetAcctMethod OBJECT-TYPE
+    SYNTAX      AuthAcctMethod
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Accounting method"
+    ::= { authConfigGlobalsAgentsTelnetAcct 1 }
+
+authConfigGlobalsAgentsTelnetAcctCmdEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable accounting of commands"
+    ::= { authConfigGlobalsAgentsTelnetAcct 2 }
+
+authConfigGlobalsAgentsTelnetAcctCmdPrivLvl OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Command privilege level. Log all commands with a privilege level higher
+         than or equal to this level. Valid values are in the range 0 to 15"
+    ::= { authConfigGlobalsAgentsTelnetAcct 3 }
+
+authConfigGlobalsAgentsTelnetAcctExecEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable exec (login) accounting"
+    ::= { authConfigGlobalsAgentsTelnetAcct 4 }
+
+authConfigGlobalsAgentsSshAcct OBJECT IDENTIFIER
+    ::= { authConfigGlobalsAgents 23 }
+
+authConfigGlobalsAgentsSshAcctMethod OBJECT-TYPE
+    SYNTAX      AuthAcctMethod
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Accounting method"
+    ::= { authConfigGlobalsAgentsSshAcct 1 }
+
+authConfigGlobalsAgentsSshAcctCmdEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable accounting of commands"
+    ::= { authConfigGlobalsAgentsSshAcct 2 }
+
+authConfigGlobalsAgentsSshAcctCmdPrivLvl OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Command privilege level. Log all commands with a privilege level higher
+         than or equal to this level. Valid values are in the range 0 to 15"
+    ::= { authConfigGlobalsAgentsSshAcct 3 }
+
+authConfigGlobalsAgentsSshAcctExecEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable exec (login) accounting"
+    ::= { authConfigGlobalsAgentsSshAcct 4 }
+
+authConfigGlobalsRadius OBJECT IDENTIFIER
+    ::= { authConfigGlobals 2 }
+
+authConfigGlobalsRadiusGlobal OBJECT IDENTIFIER
+    ::= { authConfigGlobalsRadius 1 }
+
+authConfigGlobalsRadiusGlobalTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global timeout for for RADIUS servers. Can be overridden by individual
+         host entries. (1 to 1000 seconds)"
+    ::= { authConfigGlobalsRadiusGlobal 1 }
+
+authConfigGlobalsRadiusGlobalRetransmit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global retransmit count for RADIUS servers. Can be overridden by
+         individual host entries. (1 to 1000 times)"
+    ::= { authConfigGlobalsRadiusGlobal 2 }
+
+authConfigGlobalsRadiusGlobalDeadtime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global deadtime for RADIUS servers. (0 to 1440 minutes)"
+    ::= { authConfigGlobalsRadiusGlobal 3 }
+
+authConfigGlobalsRadiusGlobalKey OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global secret key for RADIUS servers. Can be overridden by individual
+         host entries."
+    ::= { authConfigGlobalsRadiusGlobal 4 }
+
+authConfigGlobalsRadiusGlobalNasIpv4Enable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable Global NAS IPv4 address"
+    ::= { authConfigGlobalsRadiusGlobal 11 }
+
+authConfigGlobalsRadiusGlobalNasIpv4Address OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global NAS IPv4 address"
+    ::= { authConfigGlobalsRadiusGlobal 12 }
+
+authConfigGlobalsRadiusGlobalNasIpv6Enable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable Global NAS IPv6 address"
+    ::= { authConfigGlobalsRadiusGlobal 13 }
+
+authConfigGlobalsRadiusGlobalNasIpv6Address OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global NAS IPv6 address"
+    ::= { authConfigGlobalsRadiusGlobal 14 }
+
+authConfigGlobalsRadiusGlobalNasIdentifier OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global NAS Identifier"
+    ::= { authConfigGlobalsRadiusGlobal 15 }
+
+authConfigGlobalsRadiusHostTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AuthConfigGlobalsRadiusHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of Radius servers useed to query for RADIUS
+         authentication"
+    ::= { authConfigGlobalsRadius 3 }
+
+authConfigGlobalsRadiusHostEntry OBJECT-TYPE
+    SYNTAX      AuthConfigGlobalsRadiusHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry defines a RADIUS server, with attributes used for contacting
+         it. Host entries are consulted in numerical order of the entry index"
+    INDEX       { authConfigGlobalsRadiusHostIndex }
+    ::= { authConfigGlobalsRadiusHostTable 1 }
+
+AuthConfigGlobalsRadiusHostEntry ::= SEQUENCE {
+    authConfigGlobalsRadiusHostIndex       Integer32,
+    authConfigGlobalsRadiusHostAddress     DisplayString,
+    authConfigGlobalsRadiusHostAuthPort    Unsigned32,
+    authConfigGlobalsRadiusHostAcctPort    Unsigned32,
+    authConfigGlobalsRadiusHostTimeout     Unsigned32,
+    authConfigGlobalsRadiusHostRetransmit  Unsigned32,
+    authConfigGlobalsRadiusHostKey         DisplayString
+}
+
+authConfigGlobalsRadiusHostIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Host entry index"
+    ::= { authConfigGlobalsRadiusHostEntry 1 }
+
+authConfigGlobalsRadiusHostAddress OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "IPv4/IPv6 address or hostname of this server"
+    ::= { authConfigGlobalsRadiusHostEntry 2 }
+
+authConfigGlobalsRadiusHostAuthPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Authentication port number (UDP) for use for this server"
+    ::= { authConfigGlobalsRadiusHostEntry 3 }
+
+authConfigGlobalsRadiusHostAcctPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Accounting port number (UDP) to use for this server"
+    ::= { authConfigGlobalsRadiusHostEntry 4 }
+
+authConfigGlobalsRadiusHostTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Seconds to wait for a response from this server. Use global timeout if
+         zero"
+    ::= { authConfigGlobalsRadiusHostEntry 5 }
+
+authConfigGlobalsRadiusHostRetransmit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of times a request is resent to an unresponding server. Use
+         global retransmit if zero"
+    ::= { authConfigGlobalsRadiusHostEntry 6 }
+
+authConfigGlobalsRadiusHostKey OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The secret key to use for this server. Use global key if empty"
+    ::= { authConfigGlobalsRadiusHostEntry 7 }
+
+authConfigGlobalsTacacs OBJECT IDENTIFIER
+    ::= { authConfigGlobals 3 }
+
+authConfigGlobalsTacacsGlobal OBJECT IDENTIFIER
+    ::= { authConfigGlobalsTacacs 1 }
+
+authConfigGlobalsTacacsGlobalTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global timeout for for TACACS servers. Can be overridden by individual
+         host entries. (1 to 1000 seconds)"
+    ::= { authConfigGlobalsTacacsGlobal 1 }
+
+authConfigGlobalsTacacsGlobalDeadtime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global deadtime for TACACS servers. (0 to 1440 minutes)"
+    ::= { authConfigGlobalsTacacsGlobal 2 }
+
+authConfigGlobalsTacacsGlobalKey OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global secret key for TACACS servers. Can be overridden by individual
+         host entries."
+    ::= { authConfigGlobalsTacacsGlobal 3 }
+
+authConfigGlobalsTacacsHostTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AuthConfigGlobalsTacacsHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of Tacacs servers useed to query for TACACS
+         authentication"
+    ::= { authConfigGlobalsTacacs 2 }
+
+authConfigGlobalsTacacsHostEntry OBJECT-TYPE
+    SYNTAX      AuthConfigGlobalsTacacsHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry defines a TACACS server, with attributes used for contacting
+         it. Host entries are consulted in numerical order of the entry index"
+    INDEX       { authConfigGlobalsTacacsHostIndex }
+    ::= { authConfigGlobalsTacacsHostTable 1 }
+
+AuthConfigGlobalsTacacsHostEntry ::= SEQUENCE {
+    authConfigGlobalsTacacsHostIndex     Integer32,
+    authConfigGlobalsTacacsHostAddress   DisplayString,
+    authConfigGlobalsTacacsHostAuthPort  Unsigned32,
+    authConfigGlobalsTacacsHostTimeout   Unsigned32,
+    authConfigGlobalsTacacsHostKey       DisplayString
+}
+
+authConfigGlobalsTacacsHostIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Host entry index"
+    ::= { authConfigGlobalsTacacsHostEntry 1 }
+
+authConfigGlobalsTacacsHostAddress OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "IPv4/IPv6 address or hostname of this server"
+    ::= { authConfigGlobalsTacacsHostEntry 2 }
+
+authConfigGlobalsTacacsHostAuthPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Authentication port number (TCP) to use for this server"
+    ::= { authConfigGlobalsTacacsHostEntry 3 }
+
+authConfigGlobalsTacacsHostTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Seconds to wait for a response from this server. Use global timeout if
+         zero"
+    ::= { authConfigGlobalsTacacsHostEntry 4 }
+
+authConfigGlobalsTacacsHostKey OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The secret key to use for this server. Use global key if empty"
+    ::= { authConfigGlobalsTacacsHostEntry 5 }
+
+authMibConformance OBJECT IDENTIFIER
+    ::= { authMib 2 }
+
+authMibCompliances OBJECT IDENTIFIER
+    ::= { authMibConformance 1 }
+
+authMibGroups OBJECT IDENTIFIER
+    ::= { authMibConformance 2 }
+
+authConfigGlobalsAgentsConsoleAuthenMethodsTableInfoGroup OBJECT-GROUP
+    OBJECTS     {                   authConfigGlobalsAgentsConsoleAuthenMethodsMethod }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { authMibGroups 1 }
+
+authConfigGlobalsAgentsTelnetAuthenMethodsTableInfoGroup OBJECT-GROUP
+    OBJECTS     {                   authConfigGlobalsAgentsTelnetAuthenMethodsMethod }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { authMibGroups 2 }
+
+authConfigGlobalsAgentsSshAuthenMethodsTableInfoGroup OBJECT-GROUP
+    OBJECTS     { authConfigGlobalsAgentsSshAuthenMethodsMethod }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { authMibGroups 3 }
+
+authConfigGlobalsAgentsHttpAuthenMethodsTableInfoGroup OBJECT-GROUP
+    OBJECTS     {                   authConfigGlobalsAgentsHttpAuthenMethodsMethod }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { authMibGroups 4 }
+
+authConfigGlobalsAgentsConsoleAuthorInfoGroup OBJECT-GROUP
+    OBJECTS     { authConfigGlobalsAgentsConsoleAuthorMethod,
+                  authConfigGlobalsAgentsConsoleAuthorCmdEnable,
+                  authConfigGlobalsAgentsConsoleAuthorCmdPrivLvl,
+                  authConfigGlobalsAgentsConsoleAuthorCfgCmdEnable }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { authMibGroups 5 }
+
+authConfigGlobalsAgentsTelnetAuthorInfoGroup OBJECT-GROUP
+    OBJECTS     { authConfigGlobalsAgentsTelnetAuthorMethod,
+                  authConfigGlobalsAgentsTelnetAuthorCmdEnable,
+                  authConfigGlobalsAgentsTelnetAuthorCmdPrivLvl,
+                  authConfigGlobalsAgentsTelnetAuthorCfgCmdEnable }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { authMibGroups 6 }
+
+authConfigGlobalsAgentsSshAuthorInfoGroup OBJECT-GROUP
+    OBJECTS     { authConfigGlobalsAgentsSshAuthorMethod,
+                  authConfigGlobalsAgentsSshAuthorCmdEnable,
+                  authConfigGlobalsAgentsSshAuthorCmdPrivLvl,
+                  authConfigGlobalsAgentsSshAuthorCfgCmdEnable }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { authMibGroups 7 }
+
+authConfigGlobalsAgentsConsoleAcctInfoGroup OBJECT-GROUP
+    OBJECTS     { authConfigGlobalsAgentsConsoleAcctMethod,
+                  authConfigGlobalsAgentsConsoleAcctCmdEnable,
+                  authConfigGlobalsAgentsConsoleAcctCmdPrivLvl,
+                  authConfigGlobalsAgentsConsoleAcctExecEnable }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { authMibGroups 8 }
+
+authConfigGlobalsAgentsTelnetAcctInfoGroup OBJECT-GROUP
+    OBJECTS     { authConfigGlobalsAgentsTelnetAcctMethod,
+                  authConfigGlobalsAgentsTelnetAcctCmdEnable,
+                  authConfigGlobalsAgentsTelnetAcctCmdPrivLvl,
+                  authConfigGlobalsAgentsTelnetAcctExecEnable }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { authMibGroups 9 }
+
+authConfigGlobalsAgentsSshAcctInfoGroup OBJECT-GROUP
+    OBJECTS     { authConfigGlobalsAgentsSshAcctMethod,
+                  authConfigGlobalsAgentsSshAcctCmdEnable,
+                  authConfigGlobalsAgentsSshAcctCmdPrivLvl,
+                  authConfigGlobalsAgentsSshAcctExecEnable }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { authMibGroups 10 }
+
+authConfigGlobalsRadiusGlobalInfoGroup OBJECT-GROUP
+    OBJECTS     { authConfigGlobalsRadiusGlobalTimeout,
+                  authConfigGlobalsRadiusGlobalRetransmit,
+                  authConfigGlobalsRadiusGlobalDeadtime,
+                  authConfigGlobalsRadiusGlobalKey,
+                  authConfigGlobalsRadiusGlobalNasIpv4Enable,
+                  authConfigGlobalsRadiusGlobalNasIpv4Address,
+                  authConfigGlobalsRadiusGlobalNasIpv6Enable,
+                  authConfigGlobalsRadiusGlobalNasIpv6Address,
+                  authConfigGlobalsRadiusGlobalNasIdentifier }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { authMibGroups 11 }
+
+authConfigGlobalsRadiusHostTableInfoGroup OBJECT-GROUP
+    OBJECTS     { authConfigGlobalsRadiusHostAddress,
+                  authConfigGlobalsRadiusHostAuthPort,
+                  authConfigGlobalsRadiusHostAcctPort,
+                  authConfigGlobalsRadiusHostTimeout,
+                  authConfigGlobalsRadiusHostRetransmit,
+                  authConfigGlobalsRadiusHostKey }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { authMibGroups 12 }
+
+authConfigGlobalsTacacsGlobalInfoGroup OBJECT-GROUP
+    OBJECTS     { authConfigGlobalsTacacsGlobalTimeout,
+                  authConfigGlobalsTacacsGlobalDeadtime,
+                  authConfigGlobalsTacacsGlobalKey }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { authMibGroups 13 }
+
+authConfigGlobalsTacacsHostTableInfoGroup OBJECT-GROUP
+    OBJECTS     { authConfigGlobalsTacacsHostAddress,
+                  authConfigGlobalsTacacsHostAuthPort,
+                  authConfigGlobalsTacacsHostTimeout,
+                  authConfigGlobalsTacacsHostKey }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { authMibGroups 14 }
+
+authMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS {                        authConfigGlobalsAgentsConsoleAuthenMethodsTableInfoGroup,
+                       authConfigGlobalsAgentsTelnetAuthenMethodsTableInfoGroup,
+                       authConfigGlobalsAgentsSshAuthenMethodsTableInfoGroup,
+                       authConfigGlobalsAgentsHttpAuthenMethodsTableInfoGroup,
+                       authConfigGlobalsAgentsConsoleAuthorInfoGroup,
+                       authConfigGlobalsAgentsTelnetAuthorInfoGroup,
+                       authConfigGlobalsAgentsSshAuthorInfoGroup,
+                       authConfigGlobalsAgentsConsoleAcctInfoGroup,
+                       authConfigGlobalsAgentsTelnetAcctInfoGroup,
+                       authConfigGlobalsAgentsSshAcctInfoGroup,
+                       authConfigGlobalsRadiusGlobalInfoGroup,
+                       authConfigGlobalsRadiusHostTableInfoGroup,
+                       authConfigGlobalsTacacsGlobalInfoGroup,
+                       authConfigGlobalsTacacsHostTableInfoGroup }
+
+    ::= { authMibCompliances 1 }
+
+END

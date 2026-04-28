@@ -1,0 +1,277 @@
+-- *****************************************************************
+-- MIB-UDLD: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-UDLD DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    DisplayString FROM BTS-TC
+    InterfaceIndex FROM BTS-TC
+    ;
+
+udldMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private MIB for udld"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 123 }
+
+
+UdldDetectionState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the link detection state."
+    SYNTAX      INTEGER { inDeterminant(0), uniDirectional(1),
+                          biDirectional(2), neighborMismatch(3),
+                          loopback(4), multipleNeighbor(5) }
+
+UdldMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the available udld mode."
+    SYNTAX      INTEGER { disable(0), normal(1), aggressive(2) }
+
+udldMibObjects OBJECT IDENTIFIER
+    ::= { udldMib 1 }
+
+udldConfig OBJECT IDENTIFIER
+    ::= { udldMibObjects 2 }
+
+udldConfigInterface OBJECT IDENTIFIER
+    ::= { udldConfig 1 }
+
+udldConfigInterfaceParamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF UdldConfigInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of udld interface conf parameters"
+    ::= { udldConfigInterface 1 }
+
+udldConfigInterfaceParamEntry OBJECT-TYPE
+    SYNTAX      UdldConfigInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each physical interface has a set of configurable parameters"
+    INDEX       { udldConfigInterfaceParamIfIndex }
+    ::= { udldConfigInterfaceParamTable 1 }
+
+UdldConfigInterfaceParamEntry ::= SEQUENCE {
+    udldConfigInterfaceParamIfIndex           InterfaceIndex,
+    udldConfigInterfaceParamUdldMode          UdldMode,
+    udldConfigInterfaceParamProbeMsgInterval  Unsigned32
+}
+
+udldConfigInterfaceParamIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { udldConfigInterfaceParamEntry 1 }
+
+udldConfigInterfaceParamUdldMode OBJECT-TYPE
+    SYNTAX      UdldMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Port udld mode disable/normal/aggresive."
+    ::= { udldConfigInterfaceParamEntry 2 }
+
+udldConfigInterfaceParamProbeMsgInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (7..90)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Port probe message interval(seconds). Valid range: 7 to 90 seconds."
+    ::= { udldConfigInterfaceParamEntry 3 }
+
+udldStatus OBJECT IDENTIFIER
+    ::= { udldMibObjects 3 }
+
+udldStatusInterface OBJECT IDENTIFIER
+    ::= { udldStatus 1 }
+
+udldStatusInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF UdldStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of udld interface local device information"
+    ::= { udldStatusInterface 1 }
+
+udldStatusInterfaceEntry OBJECT-TYPE
+    SYNTAX      UdldStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each udld enabled interface has a local device information"
+    INDEX       { udldStatusInterfaceIfIndex }
+    ::= { udldStatusInterfaceTable 1 }
+
+UdldStatusInterfaceEntry ::= SEQUENCE {
+    udldStatusInterfaceIfIndex     InterfaceIndex,
+    udldStatusInterfaceDeviceID    DisplayString,
+    udldStatusInterfaceDeviceName  DisplayString,
+    udldStatusInterfaceLinkState   UdldDetectionState
+}
+
+udldStatusInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { udldStatusInterfaceEntry 1 }
+
+udldStatusInterfaceDeviceID OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Local device id."
+    ::= { udldStatusInterfaceEntry 2 }
+
+udldStatusInterfaceDeviceName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Local device name."
+    ::= { udldStatusInterfaceEntry 3 }
+
+udldStatusInterfaceLinkState OBJECT-TYPE
+    SYNTAX      UdldDetectionState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Local device link detected state."
+    ::= { udldStatusInterfaceEntry 4 }
+
+udldStatusInterfaceNeighborTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF UdldStatusInterfaceNeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of udld interface neighbor cache information"
+    ::= { udldStatusInterface 2 }
+
+udldStatusInterfaceNeighborEntry OBJECT-TYPE
+    SYNTAX      UdldStatusInterfaceNeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each udld enabled interface has a neighbor cache information"
+    INDEX       { udldStatusInterfaceNeighborIfIndex }
+    ::= { udldStatusInterfaceNeighborTable 1 }
+
+UdldStatusInterfaceNeighborEntry ::= SEQUENCE {
+    udldStatusInterfaceNeighborIfIndex             InterfaceIndex,
+    udldStatusInterfaceNeighborNeighborDeviceID    DisplayString,
+    udldStatusInterfaceNeighborNeighborPortID      DisplayString,
+    udldStatusInterfaceNeighborNeighborDeviceName  DisplayString,
+    udldStatusInterfaceNeighborLinkDetectionState  UdldDetectionState
+}
+
+udldStatusInterfaceNeighborIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { udldStatusInterfaceNeighborEntry 1 }
+
+udldStatusInterfaceNeighborNeighborDeviceID OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Neighbor device id."
+    ::= { udldStatusInterfaceNeighborEntry 2 }
+
+udldStatusInterfaceNeighborNeighborPortID OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Neighbor port id."
+    ::= { udldStatusInterfaceNeighborEntry 3 }
+
+udldStatusInterfaceNeighborNeighborDeviceName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Neighbor device name."
+    ::= { udldStatusInterfaceNeighborEntry 4 }
+
+udldStatusInterfaceNeighborLinkDetectionState OBJECT-TYPE
+    SYNTAX      UdldDetectionState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Neighbor device link detected state."
+    ::= { udldStatusInterfaceNeighborEntry 5 }
+
+udldMibConformance OBJECT IDENTIFIER
+    ::= { udldMib 2 }
+
+udldMibCompliances OBJECT IDENTIFIER
+    ::= { udldMibConformance 1 }
+
+udldMibGroups OBJECT IDENTIFIER
+    ::= { udldMibConformance 2 }
+
+udldConfigInterfaceParamTableInfoGroup OBJECT-GROUP
+    OBJECTS     { udldConfigInterfaceParamUdldMode,
+                  udldConfigInterfaceParamProbeMsgInterval }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { udldMibGroups 1 }
+
+udldStatusInterfaceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { udldStatusInterfaceDeviceID,
+                  udldStatusInterfaceDeviceName,
+                  udldStatusInterfaceLinkState }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { udldMibGroups 2 }
+
+udldStatusInterfaceNeighborTableInfoGroup OBJECT-GROUP
+    OBJECTS     { udldStatusInterfaceNeighborNeighborDeviceID,
+                  udldStatusInterfaceNeighborNeighborPortID,
+                  udldStatusInterfaceNeighborNeighborDeviceName,
+                  udldStatusInterfaceNeighborLinkDetectionState }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { udldMibGroups 3 }
+
+udldMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { udldConfigInterfaceParamTableInfoGroup,
+                       udldStatusInterfaceTableInfoGroup,
+                       udldStatusInterfaceNeighborTableInfoGroup }
+
+    ::= { udldMibCompliances 1 }
+
+END

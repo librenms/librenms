@@ -1,0 +1,794 @@
+-- *****************************************************************
+-- MIB-NAS: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-NAS DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    MacAddress FROM SNMPv2-TC
+    TruthValue FROM SNMPv2-TC
+    DisplayString FROM BTS-TC
+    InterfaceIndex FROM BTS-TC
+    Unsigned16 FROM BTS-TC
+    Vlan FROM BTS-TC
+    ;
+
+nasMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is the BitStream NAS private MIB."
+    REVISION    "202503200000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 21 }
+
+
+NasPortControl ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration the NAS admin state.
+         
+         "
+    SYNTAX      INTEGER { none(0), forceAuthorized(1), auto(2),
+                          forceUnAuthorized(3), macBased(4),
+                          dot1xSingle(5), dot1xmulti(6) }
+
+NasPortStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration the NAS interface status."
+    SYNTAX      INTEGER { linkDown(0), authorized(1), unAuthorized(2),
+                          disabled(3), count(4) }
+
+NasQosClassPriority ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration the NAS QoS Class priority."
+    SYNTAX      INTEGER { pcp0(0), pcp1(1), pcp2(2), pcp3(3), pcp4(4),
+                          pcp5(5), pcp6(6), pcp7(7), none(65535) }
+
+NasVlanType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration the NAS VLAN type."
+    SYNTAX      INTEGER { none(0), radiusAssigned(1), guestVlan(2) }
+
+nasMibObjects OBJECT IDENTIFIER
+    ::= { nasMib 1 }
+
+nasConfig OBJECT IDENTIFIER
+    ::= { nasMibObjects 2 }
+
+nasConfigGlobal OBJECT IDENTIFIER
+    ::= { nasConfig 1 }
+
+nasConfigGlobalNasMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to TRUE to globally enabled or disabled NAS for the switch. If
+         globally disabled, all physical interfaces are allowed forwarding of
+         frames."
+    ::= { nasConfigGlobal 1 }
+
+nasConfigGlobalReauthenticationMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If set to TRUE, successfully authenticated supplicants/clients are
+         re-authenticated after the interval specified by the Reauthentication
+         Period. Re-authentication for 802.1X-enabled interfaces can be used to
+         detect if a new device is plugged into a switch port or if a supplicant
+         is no longer attached. For MAC-based ports, re-authentication is only
+         useful, if the RADIUS server configuration has changed. It does not
+         involve communication between the switch and the client, and therefore
+         does not imply that a client is still present on a port (see Aging
+         Period)."
+    ::= { nasConfigGlobal 2 }
+
+nasConfigGlobalReauthenticationPeriod OBJECT-TYPE
+    SYNTAX      Unsigned16 (1..3600)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the period in seconds, after which a connected client must be
+         re-authenticated. This is only active if the ReauthenticationMode is
+         set to TRUE."
+    ::= { nasConfigGlobal 3 }
+
+nasConfigGlobalEapolTimeout OBJECT-TYPE
+    SYNTAX      Unsigned16 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Determines the time for re-transmission of Request Identity EAPOL
+         frames. This has no effect for MAC-based ports."
+    ::= { nasConfigGlobal 4 }
+
+nasConfigGlobalAgingPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..1000000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specific the PSEC aging period in seconds. In the period the CPU starts
+         listening to frames from the given MAC address, and if none arrives
+         before period end, the entry will be removed."
+    ::= { nasConfigGlobal 5 }
+
+nasConfigGlobalAuthFailureHoldTime OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..1000000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Time in seconds to wait before attempting to re-authenticate if
+         re-authentication failed for a given client."
+    ::= { nasConfigGlobal 6 }
+
+nasConfigGlobalRadiusAssignedQosMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to true to enable RADIUS assigned QoS."
+    ::= { nasConfigGlobal 7 }
+
+nasConfigGlobalRadiusAssignedVlanMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to true to enable RADIUS assigned VLAN."
+    ::= { nasConfigGlobal 8 }
+
+nasConfigGlobalGuestVlanMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to true to enable Guest VLAN Mode."
+    ::= { nasConfigGlobal 9 }
+
+nasConfigGlobalGuestVlanId OBJECT-TYPE
+    SYNTAX      Vlan
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Guest VLAN ID to get assigned to an interface moved to Guest VLAN mode."
+    ::= { nasConfigGlobal 10 }
+
+nasConfigGlobalMaxReauthrequestsCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum re-authentication request count."
+    ::= { nasConfigGlobal 11 }
+
+nasConfigGlobalGuestVlanAllowEapols OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to TRUE to allow an interface to move to Guest VLAN even when EAPOL
+         packets has been received at an interface."
+    ::= { nasConfigGlobal 12 }
+
+nasConfigReAuthTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NasConfigReAuthEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table for port configuration"
+    ::= { nasConfig 2 }
+
+nasConfigReAuthEntry OBJECT-TYPE
+    SYNTAX      NasConfigReAuthEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each physical interface has a set of parameters"
+    INDEX       { nasConfigReAuthInterfaceNo }
+    ::= { nasConfigReAuthTable 1 }
+
+NasConfigReAuthEntry ::= SEQUENCE {
+    nasConfigReAuthInterfaceNo              InterfaceIndex,
+    nasConfigReAuthAdminState               NasPortControl,
+    nasConfigReAuthRadiusAssignedQosState   TruthValue,
+    nasConfigReAuthRadiusAssignedVlanState  TruthValue,
+    nasConfigReAuthGuestVlanState           TruthValue
+}
+
+nasConfigReAuthInterfaceNo OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { nasConfigReAuthEntry 1 }
+
+nasConfigReAuthAdminState OBJECT-TYPE
+    SYNTAX      NasPortControl
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Administrative State.
+         
+         TypeNone : Forces an interface to be disabled.
+         
+         forceAuthorized : Forces an interface to grant access to all clients,
+         802.1X-aware or not.
+         
+         auto : Requires an 802.1X-aware client to be authorized by the
+         authentication server. Clients that are not 802.1X-aware will be denied
+         access.
+         
+         unauthorized : Forces an interface to deny access to all clients,
+         802.1X-aware or not.
+         
+         macBased : The switch authenticates on behalf of the client, using the
+         client MAC-address as the username and password and MD5 EAP method.
+         
+         dot1xSingle : At most one supplicant is allowed to authenticate, and it
+         authenticates using normal 802.1X frames.
+         
+         dot1xmulti : One or more supplicants are allowed to authenticate
+         individually using an 802.1X variant, where EAPOL frames sent from the
+         switch are directed towards the supplicants MAC address instead of
+         using the multi-cast BPDU MAC address. Unauthenticated supplicants will
+         not get access.
+         
+         
+         
+         Note: The 802.1X Admin State must be set to Authorized for interfaces
+         that are enabled forSpanning Tree"
+    ::= { nasConfigReAuthEntry 2 }
+
+nasConfigReAuthRadiusAssignedQosState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to TRUE to enable RADIUS-assigned QoS for this interface."
+    ::= { nasConfigReAuthEntry 3 }
+
+nasConfigReAuthRadiusAssignedVlanState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to TRUE to enable RADIUS-assigned VLAN for this interface."
+    ::= { nasConfigReAuthEntry 4 }
+
+nasConfigReAuthGuestVlanState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to TRUE to enable Guest-VLAN for this interface."
+    ::= { nasConfigReAuthEntry 5 }
+
+nasStatus OBJECT IDENTIFIER
+    ::= { nasMibObjects 3 }
+
+nasStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NasStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to get NAS per-port status table."
+    ::= { nasStatus 1 }
+
+nasStatusEntry OBJECT-TYPE
+    SYNTAX      NasStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each physical interface has a set of per-port status parameters."
+    INDEX       { nasStatusInterfaceNo }
+    ::= { nasStatusTable 1 }
+
+NasStatusEntry ::= SEQUENCE {
+    nasStatusInterfaceNo  InterfaceIndex,
+    nasStatusStatus       NasPortStatus,
+    nasStatusQosClass     NasQosClassPriority,
+    nasStatusVlanType     NasVlanType,
+    nasStatusVlanId       Vlan
+}
+
+nasStatusInterfaceNo OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { nasStatusEntry 1 }
+
+nasStatusStatus OBJECT-TYPE
+    SYNTAX      NasPortStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "dot1x port status."
+    ::= { nasStatusEntry 2 }
+
+nasStatusQosClass OBJECT-TYPE
+    SYNTAX      NasQosClassPriority
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "QoS class for this port."
+    ::= { nasStatusEntry 3 }
+
+nasStatusVlanType OBJECT-TYPE
+    SYNTAX      NasVlanType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VLAN Type for this port."
+    ::= { nasStatusEntry 4 }
+
+nasStatusVlanId OBJECT-TYPE
+    SYNTAX      Vlan
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VLAN Id for this port."
+    ::= { nasStatusEntry 5 }
+
+nasStatusLastSupplicantTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NasStatusLastSupplicantEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to get NAS last supplicant"
+    ::= { nasStatus 2 }
+
+nasStatusLastSupplicantEntry OBJECT-TYPE
+    SYNTAX      NasStatusLastSupplicantEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each physical interface has a set of parameters"
+    INDEX       { nasStatusLastSupplicantInterfaceNo }
+    ::= { nasStatusLastSupplicantTable 1 }
+
+NasStatusLastSupplicantEntry ::= SEQUENCE {
+    nasStatusLastSupplicantInterfaceNo  InterfaceIndex,
+    nasStatusLastSupplicantVlanId       Vlan,
+    nasStatusLastSupplicantMac          MacAddress,
+    nasStatusLastSupplicantIdentity     DisplayString
+}
+
+nasStatusLastSupplicantInterfaceNo OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { nasStatusLastSupplicantEntry 1 }
+
+nasStatusLastSupplicantVlanId OBJECT-TYPE
+    SYNTAX      Vlan
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VLAN ID."
+    ::= { nasStatusLastSupplicantEntry 2 }
+
+nasStatusLastSupplicantMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Binary version of MacAddrStr."
+    ::= { nasStatusLastSupplicantEntry 3 }
+
+nasStatusLastSupplicantIdentity OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..39))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identity string."
+    ::= { nasStatusLastSupplicantEntry 4 }
+
+nasControl OBJECT IDENTIFIER
+    ::= { nasMibObjects 4 }
+
+nasControlPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NasControlPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to start NAS re-authorization"
+    ::= { nasControl 1 }
+
+nasControlPortEntry OBJECT-TYPE
+    SYNTAX      NasControlPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each physical interface has a set of parameters"
+    INDEX       { nasControlPortInterfaceNo }
+    ::= { nasControlPortTable 1 }
+
+NasControlPortEntry ::= SEQUENCE {
+    nasControlPortInterfaceNo  InterfaceIndex,
+    nasControlPortNow          TruthValue
+}
+
+nasControlPortInterfaceNo OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { nasControlPortEntry 1 }
+
+nasControlPortNow OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TRUE to force re-authentication immediately. FALSE to refresh (restart)
+         802.1X authentication process."
+    ::= { nasControlPortEntry 2 }
+
+nasControlStatisticsClearTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NasControlStatisticsClearEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to clear NAS statistics for a specific interface."
+    ::= { nasControl 2 }
+
+nasControlStatisticsClearEntry OBJECT-TYPE
+    SYNTAX      NasControlStatisticsClearEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each interface has a set of statistics counters"
+    INDEX       { nasControlStatisticsClearInterfaceNo }
+    ::= { nasControlStatisticsClearTable 1 }
+
+NasControlStatisticsClearEntry ::= SEQUENCE {
+    nasControlStatisticsClearInterfaceNo  InterfaceIndex,
+    nasControlStatisticsClearClear        TruthValue
+}
+
+nasControlStatisticsClearInterfaceNo OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { nasControlStatisticsClearEntry 1 }
+
+nasControlStatisticsClearClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TRUE to clear NAS statistics."
+    ::= { nasControlStatisticsClearEntry 5 }
+
+nasStatistics OBJECT IDENTIFIER
+    ::= { nasMibObjects 5 }
+
+nasStatisticsEapolTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NasStatisticsEapolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to get NAS EAPOL statistics."
+    ::= { nasStatistics 1 }
+
+nasStatisticsEapolEntry OBJECT-TYPE
+    SYNTAX      NasStatisticsEapolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each physical interface has a set of EAPOL counters."
+    INDEX       { nasStatisticsEapolInterfaceNo }
+    ::= { nasStatisticsEapolTable 1 }
+
+NasStatisticsEapolEntry ::= SEQUENCE {
+    nasStatisticsEapolInterfaceNo                      InterfaceIndex,
+    nasStatisticsEapolDot1xAuthEapolFramesRx           Unsigned32,
+    nasStatisticsEapolDot1xAuthEapolFramesTx           Unsigned32,
+    nasStatisticsEapolDot1xAuthEapolStartFramesRx      Unsigned32,
+    nasStatisticsEapolDot1xAuthEapolLogoffFramesRx     Unsigned32,
+    nasStatisticsEapolDot1xAuthEapolRespIdFramesRx     Unsigned32,
+    nasStatisticsEapolDot1xAuthEapolRespFramesRx       Unsigned32,
+    nasStatisticsEapolDot1xAuthEapolReqIdFramesTx      Unsigned32,
+    nasStatisticsEapolDot1xAuthEapolReqFramesTx        Unsigned32,
+    nasStatisticsEapolDot1xAuthInvalidEapolFramesRx    Unsigned32,
+    nasStatisticsEapolDot1xAuthEapLengthErrorFramesRx  Unsigned32
+}
+
+nasStatisticsEapolInterfaceNo OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { nasStatisticsEapolEntry 1 }
+
+nasStatisticsEapolDot1xAuthEapolFramesRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Numbers of dot1x Auth Eapol Frames Received."
+    ::= { nasStatisticsEapolEntry 5 }
+
+nasStatisticsEapolDot1xAuthEapolFramesTx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Numbers of dot1x Auth Eapol Frames Transmitted."
+    ::= { nasStatisticsEapolEntry 6 }
+
+nasStatisticsEapolDot1xAuthEapolStartFramesRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Numbers of dot1x Auth Eapol Start Frames Received."
+    ::= { nasStatisticsEapolEntry 7 }
+
+nasStatisticsEapolDot1xAuthEapolLogoffFramesRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Numbers of dot1x Auth Eapol Logoff Frames Received."
+    ::= { nasStatisticsEapolEntry 8 }
+
+nasStatisticsEapolDot1xAuthEapolRespIdFramesRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Numbers of dot1x Auth Eapol RespId Frames Received."
+    ::= { nasStatisticsEapolEntry 9 }
+
+nasStatisticsEapolDot1xAuthEapolRespFramesRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Numbers of dot1x Auth Eapol Resp Frames Received."
+    ::= { nasStatisticsEapolEntry 10 }
+
+nasStatisticsEapolDot1xAuthEapolReqIdFramesTx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Numbers of dot1x Auth Eapol Req Id Frames Transmitted."
+    ::= { nasStatisticsEapolEntry 11 }
+
+nasStatisticsEapolDot1xAuthEapolReqFramesTx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Numbers of dot1x Auth Eapol Req Frames Transmitted."
+    ::= { nasStatisticsEapolEntry 12 }
+
+nasStatisticsEapolDot1xAuthInvalidEapolFramesRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Numbers of dot1x Auth Invalid Eapol Frames Received."
+    ::= { nasStatisticsEapolEntry 13 }
+
+nasStatisticsEapolDot1xAuthEapLengthErrorFramesRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Numbers of dot1x Auth Eap Length Error Frames Received."
+    ::= { nasStatisticsEapolEntry 14 }
+
+nasStatisticsRadiusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NasStatisticsRadiusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to get NAS EAPOL statistics."
+    ::= { nasStatistics 2 }
+
+nasStatisticsRadiusEntry OBJECT-TYPE
+    SYNTAX      NasStatisticsRadiusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each physical interface has a set of EAPOL counters."
+    INDEX       { nasStatisticsRadiusInterfaceNo }
+    ::= { nasStatisticsRadiusTable 1 }
+
+NasStatisticsRadiusEntry ::= SEQUENCE {
+    nasStatisticsRadiusInterfaceNo                       InterfaceIndex,
+    nasStatisticsRadiusBackendResponses                  Unsigned32,
+    nasStatisticsRadiusBackendAccessChallenges           Unsigned32,
+    nasStatisticsRadiusBackendOtherRequestsToSupplicant  Unsigned32,
+    nasStatisticsRadiusBackendAuthSuccesses              Unsigned32,
+    nasStatisticsRadiusBackendAuthFails                  Unsigned32
+}
+
+nasStatisticsRadiusInterfaceNo OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { nasStatisticsRadiusEntry 1 }
+
+nasStatisticsRadiusBackendResponses OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Numbers of backend Responses."
+    ::= { nasStatisticsRadiusEntry 5 }
+
+nasStatisticsRadiusBackendAccessChallenges OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Numbers of backend Access Challenges."
+    ::= { nasStatisticsRadiusEntry 6 }
+
+nasStatisticsRadiusBackendOtherRequestsToSupplicant OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Numbers of backend Other Requests To Supplicant."
+    ::= { nasStatisticsRadiusEntry 7 }
+
+nasStatisticsRadiusBackendAuthSuccesses OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Numbers of backend Auth Successes."
+    ::= { nasStatisticsRadiusEntry 8 }
+
+nasStatisticsRadiusBackendAuthFails OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Numbers of backend Auth Fails."
+    ::= { nasStatisticsRadiusEntry 9 }
+
+nasMibConformance OBJECT IDENTIFIER
+    ::= { nasMib 2 }
+
+nasMibCompliances OBJECT IDENTIFIER
+    ::= { nasMibConformance 1 }
+
+nasMibGroups OBJECT IDENTIFIER
+    ::= { nasMibConformance 2 }
+
+nasConfigGlobalInfoGroup OBJECT-GROUP
+    OBJECTS     { nasConfigGlobalNasMode,
+                  nasConfigGlobalReauthenticationMode,
+                  nasConfigGlobalReauthenticationPeriod,
+                  nasConfigGlobalEapolTimeout,
+                  nasConfigGlobalAgingPeriod,
+                  nasConfigGlobalAuthFailureHoldTime,
+                  nasConfigGlobalRadiusAssignedQosMode,
+                  nasConfigGlobalRadiusAssignedVlanMode,
+                  nasConfigGlobalGuestVlanMode,
+                  nasConfigGlobalGuestVlanId,
+                  nasConfigGlobalMaxReauthrequestsCount,
+                  nasConfigGlobalGuestVlanAllowEapols }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { nasMibGroups 1 }
+
+nasConfigReAuthInfoGroup OBJECT-GROUP
+    OBJECTS     { nasConfigReAuthAdminState,
+                  nasConfigReAuthRadiusAssignedQosState,
+                  nasConfigReAuthRadiusAssignedVlanState,
+                  nasConfigReAuthGuestVlanState }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { nasMibGroups 2 }
+
+nasStatusTableInfoGroup OBJECT-GROUP
+    OBJECTS     { nasStatusStatus, nasStatusQosClass,
+                  nasStatusVlanType, nasStatusVlanId }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { nasMibGroups 3 }
+
+nasStatusLastSupplicantInfoGroup OBJECT-GROUP
+    OBJECTS     { nasStatusLastSupplicantVlanId,
+                  nasStatusLastSupplicantMac,
+                  nasStatusLastSupplicantIdentity }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { nasMibGroups 4 }
+
+nasControlPortInfoGroup OBJECT-GROUP
+    OBJECTS     { nasControlPortNow }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { nasMibGroups 5 }
+
+nasControlStatisticsClearInfoGroup OBJECT-GROUP
+    OBJECTS     { nasControlStatisticsClearClear }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { nasMibGroups 6 }
+
+nasStatisticsEapolInfoGroup OBJECT-GROUP
+    OBJECTS     { nasStatisticsEapolDot1xAuthEapolFramesRx,
+                  nasStatisticsEapolDot1xAuthEapolFramesTx,
+                  nasStatisticsEapolDot1xAuthEapolStartFramesRx,
+                  nasStatisticsEapolDot1xAuthEapolLogoffFramesRx,
+                  nasStatisticsEapolDot1xAuthEapolRespIdFramesRx,
+                  nasStatisticsEapolDot1xAuthEapolRespFramesRx,
+                  nasStatisticsEapolDot1xAuthEapolReqIdFramesTx,
+                  nasStatisticsEapolDot1xAuthEapolReqFramesTx,
+                  nasStatisticsEapolDot1xAuthInvalidEapolFramesRx,
+                  nasStatisticsEapolDot1xAuthEapLengthErrorFramesRx }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { nasMibGroups 7 }
+
+nasStatisticsRadiusInfoGroup OBJECT-GROUP
+    OBJECTS     { nasStatisticsRadiusBackendResponses,
+                  nasStatisticsRadiusBackendAccessChallenges,
+                  nasStatisticsRadiusBackendOtherRequestsToSupplicant,
+                  nasStatisticsRadiusBackendAuthSuccesses,
+                  nasStatisticsRadiusBackendAuthFails }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { nasMibGroups 8 }
+
+nasMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { nasConfigGlobalInfoGroup,
+                       nasConfigReAuthInfoGroup,
+                       nasStatusTableInfoGroup,
+                       nasStatusLastSupplicantInfoGroup,
+                       nasControlPortInfoGroup,
+                       nasControlStatisticsClearInfoGroup,
+                       nasStatisticsEapolInfoGroup,
+                       nasStatisticsRadiusInfoGroup }
+
+    ::= { nasMibCompliances 1 }
+
+END

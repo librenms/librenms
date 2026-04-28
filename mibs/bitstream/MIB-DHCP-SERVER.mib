@@ -1,0 +1,1645 @@
+-- *****************************************************************
+-- MIB-DHCP-SERVER: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-DHCP-SERVER DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    IpAddress FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    MacAddress FROM SNMPv2-TC
+    TruthValue FROM SNMPv2-TC
+    DisplayString FROM BTS-TC
+    InterfaceIndex FROM BTS-TC
+    RowEditorState FROM BTS-TC
+    Unsigned16 FROM BTS-TC
+    ;
+
+dhcpServerMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of DhcpServer"
+    REVISION    "201411270000Z"
+    DESCRIPTION
+        "revise descriptions by Palle"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 109 }
+
+
+DhcpServerBindingEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the type of binding."
+    SYNTAX      INTEGER { none(0), automatic(1), manual(2),
+                          expired(3) }
+
+DhcpServerBindingStateEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the state of binding."
+    SYNTAX      INTEGER { none(0), allocated(1), committed(2),
+                          expired(3) }
+
+DhcpServerClientIdentifierEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the type of client identifier."
+    SYNTAX      INTEGER { none(0), fqdn(1), mac(2) }
+
+DhcpServerNetbiosNodeEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the type of NetBIOS node."
+    SYNTAX      INTEGER { nodeNone(0), nodeB(1), nodeP(2), nodeM(3),
+                          nodeH(4) }
+
+DhcpServerPoolEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the type of DHCP pool."
+    SYNTAX      INTEGER { none(0), network(1), host(2) }
+
+dhcpServerMibObjects OBJECT IDENTIFIER
+    ::= { dhcpServerMib 1 }
+
+dhcpServerConfig OBJECT IDENTIFIER
+    ::= { dhcpServerMibObjects 2 }
+
+dhcpServerConfigGlobals OBJECT IDENTIFIER
+    ::= { dhcpServerConfig 1 }
+
+dhcpServerConfigGlobalsMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global mode of DHCP server. true is to enable the functions of DHCP
+         server and false is to disable it."
+    ::= { dhcpServerConfigGlobals 1 }
+
+dhcpServerConfigVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DhcpServerConfigVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the table of DHCP server VLAN configuration. The index is VLAN
+         ID."
+    ::= { dhcpServerConfig 2 }
+
+dhcpServerConfigVlanEntry OBJECT-TYPE
+    SYNTAX      DhcpServerConfigVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each VLAN has a set of parameters"
+    INDEX       { dhcpServerConfigVlanIfIndex }
+    ::= { dhcpServerConfigVlanTable 1 }
+
+DhcpServerConfigVlanEntry ::= SEQUENCE {
+    dhcpServerConfigVlanIfIndex  InterfaceIndex,
+    dhcpServerConfigVlanMode     TruthValue
+}
+
+dhcpServerConfigVlanIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number of VLAN."
+    ::= { dhcpServerConfigVlanEntry 1 }
+
+dhcpServerConfigVlanMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "VLAN mode of DHCP server. true is to enable DHCP server per VLAN and
+         false is to disable it per VLAN."
+    ::= { dhcpServerConfigVlanEntry 2 }
+
+dhcpServerConfigExcludedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DhcpServerConfigExcludedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table is DHCP server excluded IP onfiguration table. The indexes
+         are low IP and high IP address."
+    ::= { dhcpServerConfig 3 }
+
+dhcpServerConfigExcludedEntry OBJECT-TYPE
+    SYNTAX      DhcpServerConfigExcludedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters"
+    INDEX       { dhcpServerConfigExcludedLowIpAddress,
+                  dhcpServerConfigExcludedHighIpAddress }
+    ::= { dhcpServerConfigExcludedTable 1 }
+
+DhcpServerConfigExcludedEntry ::= SEQUENCE {
+    dhcpServerConfigExcludedLowIpAddress   IpAddress,
+    dhcpServerConfigExcludedHighIpAddress  IpAddress,
+    dhcpServerConfigExcludedAction         RowEditorState
+}
+
+dhcpServerConfigExcludedLowIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Low IP address."
+    ::= { dhcpServerConfigExcludedEntry 1 }
+
+dhcpServerConfigExcludedHighIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "High IP address."
+    ::= { dhcpServerConfigExcludedEntry 2 }
+
+dhcpServerConfigExcludedAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { dhcpServerConfigExcludedEntry 100 }
+
+dhcpServerConfigExcludedIpTableRowEditor OBJECT IDENTIFIER
+    ::= { dhcpServerConfig 4 }
+
+dhcpServerConfigExcludedIpTableRowEditorLowIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Low IP address."
+    ::= { dhcpServerConfigExcludedIpTableRowEditor 1 }
+
+dhcpServerConfigExcludedIpTableRowEditorHighIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "High IP address."
+    ::= { dhcpServerConfigExcludedIpTableRowEditor 2 }
+
+dhcpServerConfigExcludedIpTableRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { dhcpServerConfigExcludedIpTableRowEditor 100 }
+
+dhcpServerConfigPoolTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DhcpServerConfigPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table is DHCP server pool onfiguration table. The indexe is pool
+         name."
+    ::= { dhcpServerConfig 5 }
+
+dhcpServerConfigPoolEntry OBJECT-TYPE
+    SYNTAX      DhcpServerConfigPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters"
+    INDEX       { dhcpServerConfigPoolPoolName }
+    ::= { dhcpServerConfigPoolTable 1 }
+
+DhcpServerConfigPoolEntry ::= SEQUENCE {
+    dhcpServerConfigPoolPoolName               DisplayString,
+    dhcpServerConfigPoolPoolType               DhcpServerPoolEnum,
+    dhcpServerConfigPoolIpv4Address            IpAddress,
+    dhcpServerConfigPoolSubnetMask             IpAddress,
+    dhcpServerConfigPoolSubnetBroadcast        IpAddress,
+    dhcpServerConfigPoolLeaseDay               Unsigned32,
+    dhcpServerConfigPoolLeaseHour              Unsigned32,
+    dhcpServerConfigPoolLeaseMinute            Unsigned32,
+    dhcpServerConfigPoolDomainName             DisplayString,
+    dhcpServerConfigPoolDefaultRouter1         IpAddress,
+    dhcpServerConfigPoolDefaultRouter2         IpAddress,
+    dhcpServerConfigPoolDefaultRouter3         IpAddress,
+    dhcpServerConfigPoolDefaultRouter4         IpAddress,
+    dhcpServerConfigPoolDnsServer1             IpAddress,
+    dhcpServerConfigPoolDnsServer2             IpAddress,
+    dhcpServerConfigPoolDnsServer3             IpAddress,
+    dhcpServerConfigPoolDnsServer4             IpAddress,
+    dhcpServerConfigPoolNtpServer1             IpAddress,
+    dhcpServerConfigPoolNtpServer2             IpAddress,
+    dhcpServerConfigPoolNtpServer3             IpAddress,
+    dhcpServerConfigPoolNtpServer4             IpAddress,
+    dhcpServerConfigPoolNetbiosNodeType        DhcpServerNetbiosNodeEnum,
+    dhcpServerConfigPoolNetbiosScope           DisplayString,
+    dhcpServerConfigPoolNetbiosNameServer1     IpAddress,
+    dhcpServerConfigPoolNetbiosNameServer2     IpAddress,
+    dhcpServerConfigPoolNetbiosNameServer3     IpAddress,
+    dhcpServerConfigPoolNetbiosNameServer4     IpAddress,
+    dhcpServerConfigPoolNisDomainName          DisplayString,
+    dhcpServerConfigPoolNisServer1             IpAddress,
+    dhcpServerConfigPoolNisServer2             IpAddress,
+    dhcpServerConfigPoolNisServer3             IpAddress,
+    dhcpServerConfigPoolNisServer4             IpAddress,
+    dhcpServerConfigPoolClientIdentifierType   DhcpServerClientIdentifierEnum,
+    dhcpServerConfigPoolClientIdentifierFqdn   DisplayString,
+    dhcpServerConfigPoolClientIdentifierMac    MacAddress,
+    dhcpServerConfigPoolClientHardwareAddress  MacAddress,
+    dhcpServerConfigPoolClientName             DisplayString,
+    dhcpServerConfigPoolVendorClassId1         DisplayString,
+    dhcpServerConfigPoolVendorSpecificInfo1    DisplayString,
+    dhcpServerConfigPoolVendorClassId2         DisplayString,
+    dhcpServerConfigPoolVendorSpecificInfo2    DisplayString,
+    dhcpServerConfigPoolVendorClassId3         DisplayString,
+    dhcpServerConfigPoolVendorSpecificInfo3    DisplayString,
+    dhcpServerConfigPoolVendorClassId4         DisplayString,
+    dhcpServerConfigPoolVendorSpecificInfo4    DisplayString,
+    dhcpServerConfigPoolAction                 RowEditorState
+}
+
+dhcpServerConfigPoolPoolName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Name of DHCP pool."
+    ::= { dhcpServerConfigPoolEntry 1 }
+
+dhcpServerConfigPoolPoolType OBJECT-TYPE
+    SYNTAX      DhcpServerPoolEnum
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of pool. none(0) means the pool type is not defined yet.
+         network(1) means the pool defines a pool of IP addresses to service
+         more than one DHCP client. host(2) means the pool services for a
+         specific DHCP client identified by client identifier or hardware
+         address."
+    ::= { dhcpServerConfigPoolEntry 2 }
+
+dhcpServerConfigPoolIpv4Address OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Network number of the subnet. If the pool type is of network, the IP
+         address can be any general IP address. If the pool type is of host, the
+         IP address must be a unicast IP address."
+    ::= { dhcpServerConfigPoolEntry 3 }
+
+dhcpServerConfigPoolSubnetMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Subnet Mask. DHCP option 1. Specify subnet mask of the DHCP address
+         pool, excluding 0.0.0.0 and 255.255.255.255."
+    ::= { dhcpServerConfigPoolEntry 4 }
+
+dhcpServerConfigPoolSubnetBroadcast OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Broadcast IP address in the subnet. DHCP option 28. Specify the
+         broadcast address in use on the client's subnet."
+    ::= { dhcpServerConfigPoolEntry 5 }
+
+dhcpServerConfigPoolLeaseDay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of days of lease time. DHCP option 51, 58 and 59. The value
+         range is 0-365. Specify lease time that allows the client to request a
+         lease time for the IP address. If all of LeaseDay, LeaseHour and
+         LeaseMinute are 0's, then it means the lease time is infinite."
+    ::= { dhcpServerConfigPoolEntry 6 }
+
+dhcpServerConfigPoolLeaseHour OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of hours of lease time. DHCP option 51, 58 and 59. The value
+         range is 0-23. Specify lease time that allows the client to request a
+         lease time for the IP address. If all of LeaseDay, LeaseHour and
+         LeaseMinute are 0's, then it means the lease time is infinite."
+    ::= { dhcpServerConfigPoolEntry 7 }
+
+dhcpServerConfigPoolLeaseMinute OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of minutes of lease time. DHCP option 51, 58 and 59. The value
+         range is 0-59. Specify lease time that allows the client to request a
+         lease time for the IP address. If all of LeaseDay, LeaseHour and
+         LeaseMinute are 0's, then it means the lease time is infinite."
+    ::= { dhcpServerConfigPoolEntry 8 }
+
+dhcpServerConfigPoolDomainName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Domain name. DHCP option 15. Specify domain name that client should use
+         when resolving hostname via DNS."
+    ::= { dhcpServerConfigPoolEntry 9 }
+
+dhcpServerConfigPoolDefaultRouter1 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Default router 1."
+    ::= { dhcpServerConfigPoolEntry 10 }
+
+dhcpServerConfigPoolDefaultRouter2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Default router 2."
+    ::= { dhcpServerConfigPoolEntry 11 }
+
+dhcpServerConfigPoolDefaultRouter3 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Default router 3."
+    ::= { dhcpServerConfigPoolEntry 12 }
+
+dhcpServerConfigPoolDefaultRouter4 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Default router 4."
+    ::= { dhcpServerConfigPoolEntry 13 }
+
+dhcpServerConfigPoolDnsServer1 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DNS server 1."
+    ::= { dhcpServerConfigPoolEntry 14 }
+
+dhcpServerConfigPoolDnsServer2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DNS server 2."
+    ::= { dhcpServerConfigPoolEntry 15 }
+
+dhcpServerConfigPoolDnsServer3 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DNS server 3."
+    ::= { dhcpServerConfigPoolEntry 16 }
+
+dhcpServerConfigPoolDnsServer4 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DNS server 4."
+    ::= { dhcpServerConfigPoolEntry 17 }
+
+dhcpServerConfigPoolNtpServer1 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NTP server 1."
+    ::= { dhcpServerConfigPoolEntry 18 }
+
+dhcpServerConfigPoolNtpServer2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NTP server 2."
+    ::= { dhcpServerConfigPoolEntry 19 }
+
+dhcpServerConfigPoolNtpServer3 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NTP server 3."
+    ::= { dhcpServerConfigPoolEntry 20 }
+
+dhcpServerConfigPoolNtpServer4 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NTP server 4."
+    ::= { dhcpServerConfigPoolEntry 21 }
+
+dhcpServerConfigPoolNetbiosNodeType OBJECT-TYPE
+    SYNTAX      DhcpServerNetbiosNodeEnum
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of NetBIOS node. DHCP option 46. Specify NetBIOS node type option
+         to allow Netbios over TCP/IP clients which are configurable to be
+         configured as described in RFC 1001/1002. nodeNone(0) means the node
+         type is not defined yet. nodeB(1) means the node type is type of B.
+         nodeP(2) means the node type is type of P. nodeM(3) means the node type
+         is type of M. nodeH(4) means the node type is type of H."
+    ::= { dhcpServerConfigPoolEntry 22 }
+
+dhcpServerConfigPoolNetbiosScope OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NetBIOS scope. DHCP option 47. Specify the NetBIOS over TCP/IP scope
+         parameter for the client as specified in RFC 1001/1002."
+    ::= { dhcpServerConfigPoolEntry 23 }
+
+dhcpServerConfigPoolNetbiosNameServer1 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NetBIOS name server 1."
+    ::= { dhcpServerConfigPoolEntry 24 }
+
+dhcpServerConfigPoolNetbiosNameServer2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NetBIOS name server 2."
+    ::= { dhcpServerConfigPoolEntry 25 }
+
+dhcpServerConfigPoolNetbiosNameServer3 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NetBIOS name server 3."
+    ::= { dhcpServerConfigPoolEntry 26 }
+
+dhcpServerConfigPoolNetbiosNameServer4 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NetBIOS name server 4."
+    ::= { dhcpServerConfigPoolEntry 27 }
+
+dhcpServerConfigPoolNisDomainName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NIS Domain Name. DHCP option 40. Specify the name of the client's NIS
+         domain."
+    ::= { dhcpServerConfigPoolEntry 28 }
+
+dhcpServerConfigPoolNisServer1 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NIS server 1."
+    ::= { dhcpServerConfigPoolEntry 29 }
+
+dhcpServerConfigPoolNisServer2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NIS server 2."
+    ::= { dhcpServerConfigPoolEntry 30 }
+
+dhcpServerConfigPoolNisServer3 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NIS server 3."
+    ::= { dhcpServerConfigPoolEntry 31 }
+
+dhcpServerConfigPoolNisServer4 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NIS server 4."
+    ::= { dhcpServerConfigPoolEntry 32 }
+
+dhcpServerConfigPoolClientIdentifierType OBJECT-TYPE
+    SYNTAX      DhcpServerClientIdentifierEnum
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of client identifier. DHCP option 61. Specify client's unique
+         identifier to be used when the pool is the type of host. none(0) means
+         the client identifier type is not defined yet. fqdn(1) means the client
+         identifier type is type of FQDN (Fully Qualified Domain Name). mac(2)
+         means the client identifier type is type of MAC address."
+    ::= { dhcpServerConfigPoolEntry 33 }
+
+dhcpServerConfigPoolClientIdentifierFqdn OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Client's Fully Qualified Domain Name. DHCP option 61. Specify client's
+         unique identifier to be used when the pool is the type of host. This
+         takes effect only if ClientIdentifierType is defined fqdn(1)."
+    ::= { dhcpServerConfigPoolEntry 34 }
+
+dhcpServerConfigPoolClientIdentifierMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Client's MAC address. DHCP option 61. Specify client's unique
+         identifier to be used when the pool is the type of host. This takes
+         effect only if ClientIdentifierType is defined as mac(2)."
+    ::= { dhcpServerConfigPoolEntry 35 }
+
+dhcpServerConfigPoolClientHardwareAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Client's hardware address. Specify client's hardware(MAC) address to be
+         used when the pool is the type of host."
+    ::= { dhcpServerConfigPoolEntry 36 }
+
+dhcpServerConfigPoolClientName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Client name. DHCP option 12. Specify the name of client to be used when
+         the pool is the type of host."
+    ::= { dhcpServerConfigPoolEntry 37 }
+
+dhcpServerConfigPoolVendorClassId1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vendor Class Identifier. DHCP option 60. Specify to be used by DHCP
+         client to optionally identify the vendor type and configuration of a
+         DHCP client. DHCP server will deliver the corresponding option 43
+         specific information to the client that sends option 60 vendor class
+         identifier."
+    ::= { dhcpServerConfigPoolEntry 38 }
+
+dhcpServerConfigPoolVendorSpecificInfo1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..66))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vendor Specific Information. DHCP option 43. Specify vendor specific
+         information corresponding to option 60 vendor class identifier.
+         Therefore, the corresponding vendor class identifier must be defined
+         before this specific information."
+    ::= { dhcpServerConfigPoolEntry 39 }
+
+dhcpServerConfigPoolVendorClassId2 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vendor Class Identifier. DHCP option 60. Specify to be used by DHCP
+         client to optionally identify the vendor type and configuration of a
+         DHCP client. DHCP server will deliver the corresponding option 43
+         specific information to the client that sends option 60 vendor class
+         identifier."
+    ::= { dhcpServerConfigPoolEntry 40 }
+
+dhcpServerConfigPoolVendorSpecificInfo2 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..66))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vendor Specific Information. DHCP option 43. Specify vendor specific
+         information corresponding to option 60 vendor class identifier.
+         Therefore, the corresponding vendor class identifier must be defined
+         before this specific information."
+    ::= { dhcpServerConfigPoolEntry 41 }
+
+dhcpServerConfigPoolVendorClassId3 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vendor Class Identifier. DHCP option 60. Specify to be used by DHCP
+         client to optionally identify the vendor type and configuration of a
+         DHCP client. DHCP server will deliver the corresponding option 43
+         specific information to the client that sends option 60 vendor class
+         identifier."
+    ::= { dhcpServerConfigPoolEntry 42 }
+
+dhcpServerConfigPoolVendorSpecificInfo3 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..66))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vendor Specific Information. DHCP option 43. Specify vendor specific
+         information corresponding to option 60 vendor class identifier.
+         Therefore, the corresponding vendor class identifier must be defined
+         before this specific information."
+    ::= { dhcpServerConfigPoolEntry 43 }
+
+dhcpServerConfigPoolVendorClassId4 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vendor Class Identifier. DHCP option 60. Specify to be used by DHCP
+         client to optionally identify the vendor type and configuration of a
+         DHCP client. DHCP server will deliver the corresponding option 43
+         specific information to the client that sends option 60 vendor class
+         identifier."
+    ::= { dhcpServerConfigPoolEntry 44 }
+
+dhcpServerConfigPoolVendorSpecificInfo4 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..66))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vendor Specific Information. DHCP option 43. Specify vendor specific
+         information corresponding to option 60 vendor class identifier.
+         Therefore, the corresponding vendor class identifier must be defined
+         before this specific information."
+    ::= { dhcpServerConfigPoolEntry 45 }
+
+dhcpServerConfigPoolAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { dhcpServerConfigPoolEntry 100 }
+
+dhcpServerConfigPoolTableRowEditor OBJECT IDENTIFIER
+    ::= { dhcpServerConfig 6 }
+
+dhcpServerConfigPoolTableRowEditorPoolName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Name of DHCP pool."
+    ::= { dhcpServerConfigPoolTableRowEditor 1 }
+
+dhcpServerConfigPoolTableRowEditorPoolType OBJECT-TYPE
+    SYNTAX      DhcpServerPoolEnum
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of pool. none(0) means the pool type is not defined yet.
+         network(1) means the pool defines a pool of IP addresses to service
+         more than one DHCP client. host(2) means the pool services for a
+         specific DHCP client identified by client identifier or hardware
+         address."
+    ::= { dhcpServerConfigPoolTableRowEditor 2 }
+
+dhcpServerConfigPoolTableRowEditorIpv4Address OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Network number of the subnet. If the pool type is of network, the IP
+         address can be any general IP address. If the pool type is of host, the
+         IP address must be a unicast IP address."
+    ::= { dhcpServerConfigPoolTableRowEditor 3 }
+
+dhcpServerConfigPoolTableRowEditorSubnetMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Subnet Mask. DHCP option 1. Specify subnet mask of the DHCP address
+         pool, excluding 0.0.0.0 and 255.255.255.255."
+    ::= { dhcpServerConfigPoolTableRowEditor 4 }
+
+dhcpServerConfigPoolTableRowEditorSubnetBroadcast OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Broadcast IP address in the subnet. DHCP option 28. Specify the
+         broadcast address in use on the client's subnet."
+    ::= { dhcpServerConfigPoolTableRowEditor 5 }
+
+dhcpServerConfigPoolTableRowEditorLeaseDay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of days of lease time. DHCP option 51, 58 and 59. The value
+         range is 0-365. Specify lease time that allows the client to request a
+         lease time for the IP address. If all of LeaseDay, LeaseHour and
+         LeaseMinute are 0's, then it means the lease time is infinite."
+    ::= { dhcpServerConfigPoolTableRowEditor 6 }
+
+dhcpServerConfigPoolTableRowEditorLeaseHour OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of hours of lease time. DHCP option 51, 58 and 59. The value
+         range is 0-23. Specify lease time that allows the client to request a
+         lease time for the IP address. If all of LeaseDay, LeaseHour and
+         LeaseMinute are 0's, then it means the lease time is infinite."
+    ::= { dhcpServerConfigPoolTableRowEditor 7 }
+
+dhcpServerConfigPoolTableRowEditorLeaseMinute OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of minutes of lease time. DHCP option 51, 58 and 59. The value
+         range is 0-59. Specify lease time that allows the client to request a
+         lease time for the IP address. If all of LeaseDay, LeaseHour and
+         LeaseMinute are 0's, then it means the lease time is infinite."
+    ::= { dhcpServerConfigPoolTableRowEditor 8 }
+
+dhcpServerConfigPoolTableRowEditorDomainName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Domain name. DHCP option 15. Specify domain name that client should use
+         when resolving hostname via DNS."
+    ::= { dhcpServerConfigPoolTableRowEditor 9 }
+
+dhcpServerConfigPoolTableRowEditorDefaultRouter1 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Default router 1."
+    ::= { dhcpServerConfigPoolTableRowEditor 10 }
+
+dhcpServerConfigPoolTableRowEditorDefaultRouter2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Default router 2."
+    ::= { dhcpServerConfigPoolTableRowEditor 11 }
+
+dhcpServerConfigPoolTableRowEditorDefaultRouter3 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Default router 3."
+    ::= { dhcpServerConfigPoolTableRowEditor 12 }
+
+dhcpServerConfigPoolTableRowEditorDefaultRouter4 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Default router 4."
+    ::= { dhcpServerConfigPoolTableRowEditor 13 }
+
+dhcpServerConfigPoolTableRowEditorDnsServer1 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DNS server 1."
+    ::= { dhcpServerConfigPoolTableRowEditor 14 }
+
+dhcpServerConfigPoolTableRowEditorDnsServer2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DNS server 2."
+    ::= { dhcpServerConfigPoolTableRowEditor 15 }
+
+dhcpServerConfigPoolTableRowEditorDnsServer3 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DNS server 3."
+    ::= { dhcpServerConfigPoolTableRowEditor 16 }
+
+dhcpServerConfigPoolTableRowEditorDnsServer4 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DNS server 4."
+    ::= { dhcpServerConfigPoolTableRowEditor 17 }
+
+dhcpServerConfigPoolTableRowEditorNtpServer1 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NTP server 1."
+    ::= { dhcpServerConfigPoolTableRowEditor 18 }
+
+dhcpServerConfigPoolTableRowEditorNtpServer2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NTP server 2."
+    ::= { dhcpServerConfigPoolTableRowEditor 19 }
+
+dhcpServerConfigPoolTableRowEditorNtpServer3 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NTP server 3."
+    ::= { dhcpServerConfigPoolTableRowEditor 20 }
+
+dhcpServerConfigPoolTableRowEditorNtpServer4 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NTP server 4."
+    ::= { dhcpServerConfigPoolTableRowEditor 21 }
+
+dhcpServerConfigPoolTableRowEditorNetbiosNodeType OBJECT-TYPE
+    SYNTAX      DhcpServerNetbiosNodeEnum
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of NetBIOS node. DHCP option 46. Specify NetBIOS node type option
+         to allow Netbios over TCP/IP clients which are configurable to be
+         configured as described in RFC 1001/1002. nodeNone(0) means the node
+         type is not defined yet. nodeB(1) means the node type is type of B.
+         nodeP(2) means the node type is type of P. nodeM(3) means the node type
+         is type of M. nodeH(4) means the node type is type of H."
+    ::= { dhcpServerConfigPoolTableRowEditor 22 }
+
+dhcpServerConfigPoolTableRowEditorNetbiosScope OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NetBIOS scope. DHCP option 47. Specify the NetBIOS over TCP/IP scope
+         parameter for the client as specified in RFC 1001/1002."
+    ::= { dhcpServerConfigPoolTableRowEditor 23 }
+
+dhcpServerConfigPoolTableRowEditorNetbiosNameServer1 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NetBIOS name server 1."
+    ::= { dhcpServerConfigPoolTableRowEditor 24 }
+
+dhcpServerConfigPoolTableRowEditorNetbiosNameServer2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NetBIOS name server 2."
+    ::= { dhcpServerConfigPoolTableRowEditor 25 }
+
+dhcpServerConfigPoolTableRowEditorNetbiosNameServer3 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NetBIOS name server 3."
+    ::= { dhcpServerConfigPoolTableRowEditor 26 }
+
+dhcpServerConfigPoolTableRowEditorNetbiosNameServer4 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NetBIOS name server 4."
+    ::= { dhcpServerConfigPoolTableRowEditor 27 }
+
+dhcpServerConfigPoolTableRowEditorNisDomainName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NIS Domain Name. DHCP option 40. Specify the name of the client's NIS
+         domain."
+    ::= { dhcpServerConfigPoolTableRowEditor 28 }
+
+dhcpServerConfigPoolTableRowEditorNisServer1 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NIS server 1."
+    ::= { dhcpServerConfigPoolTableRowEditor 29 }
+
+dhcpServerConfigPoolTableRowEditorNisServer2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NIS server 2."
+    ::= { dhcpServerConfigPoolTableRowEditor 30 }
+
+dhcpServerConfigPoolTableRowEditorNisServer3 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NIS server 3."
+    ::= { dhcpServerConfigPoolTableRowEditor 31 }
+
+dhcpServerConfigPoolTableRowEditorNisServer4 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NIS server 4."
+    ::= { dhcpServerConfigPoolTableRowEditor 32 }
+
+dhcpServerConfigPoolTableRowEditorClientIdentifierType OBJECT-TYPE
+    SYNTAX      DhcpServerClientIdentifierEnum
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of client identifier. DHCP option 61. Specify client's unique
+         identifier to be used when the pool is the type of host. none(0) means
+         the client identifier type is not defined yet. fqdn(1) means the client
+         identifier type is type of FQDN (Fully Qualified Domain Name). mac(2)
+         means the client identifier type is type of MAC address."
+    ::= { dhcpServerConfigPoolTableRowEditor 33 }
+
+dhcpServerConfigPoolTableRowEditorClientIdentifierFqdn OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Client's Fully Qualified Domain Name. DHCP option 61. Specify client's
+         unique identifier to be used when the pool is the type of host. This
+         takes effect only if ClientIdentifierType is defined fqdn(1)."
+    ::= { dhcpServerConfigPoolTableRowEditor 34 }
+
+dhcpServerConfigPoolTableRowEditorClientIdentifierMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Client's MAC address. DHCP option 61. Specify client's unique
+         identifier to be used when the pool is the type of host. This takes
+         effect only if ClientIdentifierType is defined as mac(2)."
+    ::= { dhcpServerConfigPoolTableRowEditor 35 }
+
+dhcpServerConfigPoolTableRowEditorClientHardwareAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Client's hardware address. Specify client's hardware(MAC) address to be
+         used when the pool is the type of host."
+    ::= { dhcpServerConfigPoolTableRowEditor 36 }
+
+dhcpServerConfigPoolTableRowEditorClientName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Client name. DHCP option 12. Specify the name of client to be used when
+         the pool is the type of host."
+    ::= { dhcpServerConfigPoolTableRowEditor 37 }
+
+dhcpServerConfigPoolTableRowEditorVendorClassId1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vendor Class Identifier. DHCP option 60. Specify to be used by DHCP
+         client to optionally identify the vendor type and configuration of a
+         DHCP client. DHCP server will deliver the corresponding option 43
+         specific information to the client that sends option 60 vendor class
+         identifier."
+    ::= { dhcpServerConfigPoolTableRowEditor 38 }
+
+dhcpServerConfigPoolTableRowEditorVendorSpecificInfo1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..66))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vendor Specific Information. DHCP option 43. Specify vendor specific
+         information corresponding to option 60 vendor class identifier.
+         Therefore, the corresponding vendor class identifier must be defined
+         before this specific information."
+    ::= { dhcpServerConfigPoolTableRowEditor 39 }
+
+dhcpServerConfigPoolTableRowEditorVendorClassId2 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vendor Class Identifier. DHCP option 60. Specify to be used by DHCP
+         client to optionally identify the vendor type and configuration of a
+         DHCP client. DHCP server will deliver the corresponding option 43
+         specific information to the client that sends option 60 vendor class
+         identifier."
+    ::= { dhcpServerConfigPoolTableRowEditor 40 }
+
+dhcpServerConfigPoolTableRowEditorVendorSpecificInfo2 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..66))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vendor Specific Information. DHCP option 43. Specify vendor specific
+         information corresponding to option 60 vendor class identifier.
+         Therefore, the corresponding vendor class identifier must be defined
+         before this specific information."
+    ::= { dhcpServerConfigPoolTableRowEditor 41 }
+
+dhcpServerConfigPoolTableRowEditorVendorClassId3 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vendor Class Identifier. DHCP option 60. Specify to be used by DHCP
+         client to optionally identify the vendor type and configuration of a
+         DHCP client. DHCP server will deliver the corresponding option 43
+         specific information to the client that sends option 60 vendor class
+         identifier."
+    ::= { dhcpServerConfigPoolTableRowEditor 42 }
+
+dhcpServerConfigPoolTableRowEditorVendorSpecificInfo3 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..66))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vendor Specific Information. DHCP option 43. Specify vendor specific
+         information corresponding to option 60 vendor class identifier.
+         Therefore, the corresponding vendor class identifier must be defined
+         before this specific information."
+    ::= { dhcpServerConfigPoolTableRowEditor 43 }
+
+dhcpServerConfigPoolTableRowEditorVendorClassId4 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vendor Class Identifier. DHCP option 60. Specify to be used by DHCP
+         client to optionally identify the vendor type and configuration of a
+         DHCP client. DHCP server will deliver the corresponding option 43
+         specific information to the client that sends option 60 vendor class
+         identifier."
+    ::= { dhcpServerConfigPoolTableRowEditor 44 }
+
+dhcpServerConfigPoolTableRowEditorVendorSpecificInfo4 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..66))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vendor Specific Information. DHCP option 43. Specify vendor specific
+         information corresponding to option 60 vendor class identifier.
+         Therefore, the corresponding vendor class identifier must be defined
+         before this specific information."
+    ::= { dhcpServerConfigPoolTableRowEditor 45 }
+
+dhcpServerConfigPoolTableRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { dhcpServerConfigPoolTableRowEditor 100 }
+
+dhcpServerStatus OBJECT IDENTIFIER
+    ::= { dhcpServerMibObjects 3 }
+
+dhcpServerStatusDeclinedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DhcpServerStatusDeclinedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of IP addresses declined by DHCP client."
+    ::= { dhcpServerStatus 1 }
+
+dhcpServerStatusDeclinedEntry OBJECT-TYPE
+    SYNTAX      DhcpServerStatusDeclinedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a declined IP address."
+    INDEX       { dhcpServerStatusDeclinedEntryNo }
+    ::= { dhcpServerStatusDeclinedTable 1 }
+
+DhcpServerStatusDeclinedEntry ::= SEQUENCE {
+    dhcpServerStatusDeclinedEntryNo      Integer32,
+    dhcpServerStatusDeclinedIpv4Address  IpAddress
+}
+
+dhcpServerStatusDeclinedEntryNo OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of entry. The number starts from 1."
+    ::= { dhcpServerStatusDeclinedEntry 1 }
+
+dhcpServerStatusDeclinedIpv4Address OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IPv4 address declined by DHCP client."
+    ::= { dhcpServerStatusDeclinedEntry 2 }
+
+dhcpServerStatusStatistics OBJECT IDENTIFIER
+    ::= { dhcpServerStatus 2 }
+
+dhcpServerStatusStatisticsDiscoverCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP DISCOVER messages received."
+    ::= { dhcpServerStatusStatistics 1 }
+
+dhcpServerStatusStatisticsOfferCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP OFFER messages sent."
+    ::= { dhcpServerStatusStatistics 2 }
+
+dhcpServerStatusStatisticsRequestCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP REQUEST messages received."
+    ::= { dhcpServerStatusStatistics 3 }
+
+dhcpServerStatusStatisticsAckCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP ACK messages sent."
+    ::= { dhcpServerStatusStatistics 4 }
+
+dhcpServerStatusStatisticsNakCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP NAK messages sent."
+    ::= { dhcpServerStatusStatistics 5 }
+
+dhcpServerStatusStatisticsDeclineCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP DECLINE messages received."
+    ::= { dhcpServerStatusStatistics 6 }
+
+dhcpServerStatusStatisticsReleaseCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP RELEASE messages received."
+    ::= { dhcpServerStatusStatistics 7 }
+
+dhcpServerStatusStatisticsInformCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP INFORM messages received."
+    ::= { dhcpServerStatusStatistics 8 }
+
+dhcpServerStatusBindingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DhcpServerStatusBindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of binding data."
+    ::= { dhcpServerStatus 3 }
+
+dhcpServerStatusBindingEntry OBJECT-TYPE
+    SYNTAX      DhcpServerStatusBindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has the binding data."
+    INDEX       { dhcpServerStatusBindingIpAddress }
+    ::= { dhcpServerStatusBindingTable 1 }
+
+DhcpServerStatusBindingEntry ::= SEQUENCE {
+    dhcpServerStatusBindingIpAddress             IpAddress,
+    dhcpServerStatusBindingState                 DhcpServerBindingStateEnum,
+    dhcpServerStatusBindingType                  DhcpServerBindingEnum,
+    dhcpServerStatusBindingPoolName              DisplayString,
+    dhcpServerStatusBindingServerId              IpAddress,
+    dhcpServerStatusBindingVlanId                Unsigned16,
+    dhcpServerStatusBindingSubnetMask            IpAddress,
+    dhcpServerStatusBindingClientIdentifierType  DhcpServerClientIdentifierEnum,
+    dhcpServerStatusBindingClientIdentifierFqdn  DisplayString,
+    dhcpServerStatusBindingClientIdentifierMac   MacAddress,
+    dhcpServerStatusBindingMacAddress            MacAddress,
+    dhcpServerStatusBindingLease                 DisplayString,
+    dhcpServerStatusBindingTimeToExpire          DisplayString
+}
+
+dhcpServerStatusBindingIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IP address."
+    ::= { dhcpServerStatusBindingEntry 1 }
+
+dhcpServerStatusBindingState OBJECT-TYPE
+    SYNTAX      DhcpServerBindingStateEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "State of binding. none(0) means the binding is not in use. allocated(1)
+         means the binding is allocated to the new DHCP client who send
+         DHCPDISCOVER. committed(2) means the binding is committed as the DHCP
+         process is completed successfully. expired(3) means the lease of the
+         binding expired."
+    ::= { dhcpServerStatusBindingEntry 2 }
+
+dhcpServerStatusBindingType OBJECT-TYPE
+    SYNTAX      DhcpServerBindingEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of binding. none(0) means the binding is not in use. automatic(1)
+         means the binding is mapped to network-type pool. manual(2) means the
+         binding is mapped to host-type pool. expired(3) means the lease of the
+         binding expired."
+    ::= { dhcpServerStatusBindingEntry 3 }
+
+dhcpServerStatusBindingPoolName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Name of the pool that creates the binding."
+    ::= { dhcpServerStatusBindingEntry 4 }
+
+dhcpServerStatusBindingServerId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP address of the DHCP server to service the binding."
+    ::= { dhcpServerStatusBindingEntry 5 }
+
+dhcpServerStatusBindingVlanId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The VLAN where the binding works on."
+    ::= { dhcpServerStatusBindingEntry 6 }
+
+dhcpServerStatusBindingSubnetMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Subnet mask of the DHCP client."
+    ::= { dhcpServerStatusBindingEntry 7 }
+
+dhcpServerStatusBindingClientIdentifierType OBJECT-TYPE
+    SYNTAX      DhcpServerClientIdentifierEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of client identifier. DHCP option 61. Specify client's unique
+         identifier to be used when the pool is the type of host. none(0) means
+         the client identifier type is not defined yet. fqdn(1) means the client
+         identifier type is type of FQDN (Fully Qualified Domain Name). mac(2)
+         means the client identifier type is type of MAC address."
+    ::= { dhcpServerStatusBindingEntry 8 }
+
+dhcpServerStatusBindingClientIdentifierFqdn OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Client's Fully Qualified Domain Name. DHCP option 61."
+    ::= { dhcpServerStatusBindingEntry 9 }
+
+dhcpServerStatusBindingClientIdentifierMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Client's MAC address. DHCP option 61."
+    ::= { dhcpServerStatusBindingEntry 10 }
+
+dhcpServerStatusBindingMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MAC address of the DHCP client."
+    ::= { dhcpServerStatusBindingEntry 11 }
+
+dhcpServerStatusBindingLease OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Lease time of the binding."
+    ::= { dhcpServerStatusBindingEntry 12 }
+
+dhcpServerStatusBindingTimeToExpire OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "remaining time to expire."
+    ::= { dhcpServerStatusBindingEntry 13 }
+
+dhcpServerControl OBJECT IDENTIFIER
+    ::= { dhcpServerMibObjects 4 }
+
+dhcpServerControlStatistics OBJECT IDENTIFIER
+    ::= { dhcpServerControl 1 }
+
+dhcpServerControlStatisticsClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Clear all statistics."
+    ::= { dhcpServerControlStatistics 1 }
+
+dhcpServerControlBinding OBJECT IDENTIFIER
+    ::= { dhcpServerControl 2 }
+
+dhcpServerControlBindingClearByIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Clear binding with the IP address. If 0.0.0.0 then do nothing."
+    ::= { dhcpServerControlBinding 1 }
+
+dhcpServerControlBindingClearByType OBJECT-TYPE
+    SYNTAX      DhcpServerBindingEnum
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Clear binding by binding type. If none(0) then do nothing."
+    ::= { dhcpServerControlBinding 2 }
+
+dhcpServerMibConformance OBJECT IDENTIFIER
+    ::= { dhcpServerMib 2 }
+
+dhcpServerMibCompliances OBJECT IDENTIFIER
+    ::= { dhcpServerMibConformance 1 }
+
+dhcpServerMibGroups OBJECT IDENTIFIER
+    ::= { dhcpServerMibConformance 2 }
+
+dhcpServerConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcpServerConfigGlobalsMode }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcpServerMibGroups 1 }
+
+dhcpServerConfigVlanTableInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcpServerConfigVlanMode }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcpServerMibGroups 2 }
+
+dhcpServerConfigExcludedTableInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcpServerConfigExcludedAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcpServerMibGroups 3 }
+
+dhcpServerConfigExcludedIpTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     {                   dhcpServerConfigExcludedIpTableRowEditorLowIpAddress,
+                  dhcpServerConfigExcludedIpTableRowEditorHighIpAddress,
+                  dhcpServerConfigExcludedIpTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcpServerMibGroups 4 }
+
+dhcpServerConfigPoolTableInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcpServerConfigPoolPoolType,
+                  dhcpServerConfigPoolIpv4Address,
+                  dhcpServerConfigPoolSubnetMask,
+                  dhcpServerConfigPoolSubnetBroadcast,
+                  dhcpServerConfigPoolLeaseDay,
+                  dhcpServerConfigPoolLeaseHour,
+                  dhcpServerConfigPoolLeaseMinute,
+                  dhcpServerConfigPoolDomainName,
+                  dhcpServerConfigPoolDefaultRouter1,
+                  dhcpServerConfigPoolDefaultRouter2,
+                  dhcpServerConfigPoolDefaultRouter3,
+                  dhcpServerConfigPoolDefaultRouter4,
+                  dhcpServerConfigPoolDnsServer1,
+                  dhcpServerConfigPoolDnsServer2,
+                  dhcpServerConfigPoolDnsServer3,
+                  dhcpServerConfigPoolDnsServer4,
+                  dhcpServerConfigPoolNtpServer1,
+                  dhcpServerConfigPoolNtpServer2,
+                  dhcpServerConfigPoolNtpServer3,
+                  dhcpServerConfigPoolNtpServer4,
+                  dhcpServerConfigPoolNetbiosNodeType,
+                  dhcpServerConfigPoolNetbiosScope,
+                  dhcpServerConfigPoolNetbiosNameServer1,
+                  dhcpServerConfigPoolNetbiosNameServer2,
+                  dhcpServerConfigPoolNetbiosNameServer3,
+                  dhcpServerConfigPoolNetbiosNameServer4,
+                  dhcpServerConfigPoolNisDomainName,
+                  dhcpServerConfigPoolNisServer1,
+                  dhcpServerConfigPoolNisServer2,
+                  dhcpServerConfigPoolNisServer3,
+                  dhcpServerConfigPoolNisServer4,
+                  dhcpServerConfigPoolClientIdentifierType,
+                  dhcpServerConfigPoolClientIdentifierFqdn,
+                  dhcpServerConfigPoolClientIdentifierMac,
+                  dhcpServerConfigPoolClientHardwareAddress,
+                  dhcpServerConfigPoolClientName,
+                  dhcpServerConfigPoolVendorClassId1,
+                  dhcpServerConfigPoolVendorSpecificInfo1,
+                  dhcpServerConfigPoolVendorClassId2,
+                  dhcpServerConfigPoolVendorSpecificInfo2,
+                  dhcpServerConfigPoolVendorClassId3,
+                  dhcpServerConfigPoolVendorSpecificInfo3,
+                  dhcpServerConfigPoolVendorClassId4,
+                  dhcpServerConfigPoolVendorSpecificInfo4,
+                  dhcpServerConfigPoolAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcpServerMibGroups 5 }
+
+dhcpServerConfigPoolTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcpServerConfigPoolTableRowEditorPoolName,
+                  dhcpServerConfigPoolTableRowEditorPoolType,
+                  dhcpServerConfigPoolTableRowEditorIpv4Address,
+                  dhcpServerConfigPoolTableRowEditorSubnetMask,
+                  dhcpServerConfigPoolTableRowEditorSubnetBroadcast,
+                  dhcpServerConfigPoolTableRowEditorLeaseDay,
+                  dhcpServerConfigPoolTableRowEditorLeaseHour,
+                  dhcpServerConfigPoolTableRowEditorLeaseMinute,
+                  dhcpServerConfigPoolTableRowEditorDomainName,
+                  dhcpServerConfigPoolTableRowEditorDefaultRouter1,
+                  dhcpServerConfigPoolTableRowEditorDefaultRouter2,
+                  dhcpServerConfigPoolTableRowEditorDefaultRouter3,
+                  dhcpServerConfigPoolTableRowEditorDefaultRouter4,
+                  dhcpServerConfigPoolTableRowEditorDnsServer1,
+                  dhcpServerConfigPoolTableRowEditorDnsServer2,
+                  dhcpServerConfigPoolTableRowEditorDnsServer3,
+                  dhcpServerConfigPoolTableRowEditorDnsServer4,
+                  dhcpServerConfigPoolTableRowEditorNtpServer1,
+                  dhcpServerConfigPoolTableRowEditorNtpServer2,
+                  dhcpServerConfigPoolTableRowEditorNtpServer3,
+                  dhcpServerConfigPoolTableRowEditorNtpServer4,
+                  dhcpServerConfigPoolTableRowEditorNetbiosNodeType,
+                  dhcpServerConfigPoolTableRowEditorNetbiosScope,
+                  dhcpServerConfigPoolTableRowEditorNetbiosNameServer1,
+                  dhcpServerConfigPoolTableRowEditorNetbiosNameServer2,
+                  dhcpServerConfigPoolTableRowEditorNetbiosNameServer3,
+                  dhcpServerConfigPoolTableRowEditorNetbiosNameServer4,
+                  dhcpServerConfigPoolTableRowEditorNisDomainName,
+                  dhcpServerConfigPoolTableRowEditorNisServer1,
+                  dhcpServerConfigPoolTableRowEditorNisServer2,
+                  dhcpServerConfigPoolTableRowEditorNisServer3,
+                  dhcpServerConfigPoolTableRowEditorNisServer4,
+                  dhcpServerConfigPoolTableRowEditorClientIdentifierType,
+                  dhcpServerConfigPoolTableRowEditorClientIdentifierFqdn,
+                  dhcpServerConfigPoolTableRowEditorClientIdentifierMac,
+                  dhcpServerConfigPoolTableRowEditorClientHardwareAddress,
+                  dhcpServerConfigPoolTableRowEditorClientName,
+                  dhcpServerConfigPoolTableRowEditorVendorClassId1,
+                  dhcpServerConfigPoolTableRowEditorVendorSpecificInfo1,
+                  dhcpServerConfigPoolTableRowEditorVendorClassId2,
+                  dhcpServerConfigPoolTableRowEditorVendorSpecificInfo2,
+                  dhcpServerConfigPoolTableRowEditorVendorClassId3,
+                  dhcpServerConfigPoolTableRowEditorVendorSpecificInfo3,
+                  dhcpServerConfigPoolTableRowEditorVendorClassId4,
+                  dhcpServerConfigPoolTableRowEditorVendorSpecificInfo4,
+                  dhcpServerConfigPoolTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcpServerMibGroups 6 }
+
+dhcpServerStatusDeclinedTableInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcpServerStatusDeclinedIpv4Address }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcpServerMibGroups 7 }
+
+dhcpServerStatusStatisticsInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcpServerStatusStatisticsDiscoverCnt,
+                  dhcpServerStatusStatisticsOfferCnt,
+                  dhcpServerStatusStatisticsRequestCnt,
+                  dhcpServerStatusStatisticsAckCnt,
+                  dhcpServerStatusStatisticsNakCnt,
+                  dhcpServerStatusStatisticsDeclineCnt,
+                  dhcpServerStatusStatisticsReleaseCnt,
+                  dhcpServerStatusStatisticsInformCnt }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcpServerMibGroups 8 }
+
+dhcpServerStatusBindingTableInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcpServerStatusBindingState,
+                  dhcpServerStatusBindingType,
+                  dhcpServerStatusBindingPoolName,
+                  dhcpServerStatusBindingServerId,
+                  dhcpServerStatusBindingVlanId,
+                  dhcpServerStatusBindingSubnetMask,
+                  dhcpServerStatusBindingClientIdentifierType,
+                  dhcpServerStatusBindingClientIdentifierFqdn,
+                  dhcpServerStatusBindingClientIdentifierMac,
+                  dhcpServerStatusBindingMacAddress,
+                  dhcpServerStatusBindingLease,
+                  dhcpServerStatusBindingTimeToExpire }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcpServerMibGroups 9 }
+
+dhcpServerControlStatisticsInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcpServerControlStatisticsClear }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcpServerMibGroups 10 }
+
+dhcpServerControlBindingInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcpServerControlBindingClearByIp,
+                  dhcpServerControlBindingClearByType }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcpServerMibGroups 11 }
+
+dhcpServerMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { dhcpServerConfigGlobalsInfoGroup,
+                       dhcpServerConfigVlanTableInfoGroup,
+                       dhcpServerConfigExcludedTableInfoGroup,
+                       dhcpServerConfigExcludedIpTableRowEditorInfoGroup,
+                       dhcpServerConfigPoolTableInfoGroup,
+                       dhcpServerConfigPoolTableRowEditorInfoGroup,
+                       dhcpServerStatusDeclinedTableInfoGroup,
+                       dhcpServerStatusStatisticsInfoGroup,
+                       dhcpServerStatusBindingTableInfoGroup,
+                       dhcpServerControlStatisticsInfoGroup,
+                       dhcpServerControlBindingInfoGroup }
+
+    ::= { dhcpServerMibCompliances 1 }
+
+END

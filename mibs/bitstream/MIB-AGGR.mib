@@ -1,0 +1,291 @@
+-- *****************************************************************
+-- MIB-AGGR: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-AGGR DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    TruthValue FROM SNMPv2-TC
+    DisplayString FROM BTS-TC
+    InterfaceIndex FROM BTS-TC
+    PortList FROM BTS-TC
+    RowEditorState FROM BTS-TC
+    ;
+
+aggrMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private mib of static aggregation"
+    REVISION    "201411180000Z"
+    DESCRIPTION
+        "Added aggregation group status table"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 19 }
+
+
+AggrLinkSpeedStatusEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enum represents the link speed."
+    SYNTAX      INTEGER { undefined(0), s10M(1), s100M(2), s1G(3),
+                          s2500M(4), s5G(5), s10G(6), s12G(7) }
+
+aggrMibObjects OBJECT IDENTIFIER
+    ::= { aggrMib 1 }
+
+aggrConfig OBJECT IDENTIFIER
+    ::= { aggrMibObjects 2 }
+
+aggrConfigModeGlobals OBJECT IDENTIFIER
+    ::= { aggrConfig 1 }
+
+aggrConfigModeGlobalsSmacAddr OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to true to enable the use of the Source MAC address, or false to
+         disable. By default, Source MAC Address is enabled."
+    ::= { aggrConfigModeGlobals 1 }
+
+aggrConfigModeGlobalsDmacAddr OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to true to enable the use of the Destination MAC address, or false
+         to disable. By default, Destination MAC Address is disabled."
+    ::= { aggrConfigModeGlobals 2 }
+
+aggrConfigModeGlobalsSourceAndDestinationIpAddr OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to true to enable the use of the IP address, or false to disable.
+         By default, Destination MAC Address is enabled."
+    ::= { aggrConfigModeGlobals 3 }
+
+aggrConfigModeGlobalsTcpOrUdpSportAndDportNo OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to true to enable the use of the TCP/UDP Port Number, or false to
+         disable. By default, TCP/UDP Port Number is enabled."
+    ::= { aggrConfigModeGlobals 4 }
+
+aggrConfigGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AggrConfigGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table is static Link Aggregation Group configuration table. The
+         index is Aggregration Group Identifier."
+    ::= { aggrConfig 2 }
+
+aggrConfigGroupEntry OBJECT-TYPE
+    SYNTAX      AggrConfigGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters"
+    INDEX       { aggrConfigGroupAggrIndexNo }
+    ::= { aggrConfigGroupTable 1 }
+
+AggrConfigGroupEntry ::= SEQUENCE {
+    aggrConfigGroupAggrIndexNo  InterfaceIndex,
+    aggrConfigGroupPortMembers  PortList,
+    aggrConfigGroupAction       RowEditorState
+}
+
+aggrConfigGroupAggrIndexNo OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Link Aggregation Group Identifier."
+    ::= { aggrConfigGroupEntry 1 }
+
+aggrConfigGroupPortMembers OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The list of port members for this Link Aggregation Group."
+    ::= { aggrConfigGroupEntry 2 }
+
+aggrConfigGroupAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { aggrConfigGroupEntry 100 }
+
+aggrConfigGroupTableRowEditor OBJECT IDENTIFIER
+    ::= { aggrConfig 3 }
+
+aggrConfigGroupTableRowEditorAggrIndexNo OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Link Aggregation Group Identifier."
+    ::= { aggrConfigGroupTableRowEditor 1 }
+
+aggrConfigGroupTableRowEditorPortMembers OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The list of port members for this Link Aggregation Group."
+    ::= { aggrConfigGroupTableRowEditor 2 }
+
+aggrConfigGroupTableRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { aggrConfigGroupTableRowEditor 100 }
+
+aggrStatus OBJECT IDENTIFIER
+    ::= { aggrMibObjects 3 }
+
+aggrStatusGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AggrStatusGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table is Aggregation Group status table. The index is Aggregration
+         Group Identifier."
+    ::= { aggrStatus 1 }
+
+aggrStatusGroupEntry OBJECT-TYPE
+    SYNTAX      AggrStatusGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters"
+    INDEX       { aggrStatusGroupAggrIndexNo }
+    ::= { aggrStatusGroupTable 1 }
+
+AggrStatusGroupEntry ::= SEQUENCE {
+    aggrStatusGroupAggrIndexNo      InterfaceIndex,
+    aggrStatusGroupConfiguredPorts  PortList,
+    aggrStatusGroupAggregatedPorts  PortList,
+    aggrStatusGroupSpeed            AggrLinkSpeedStatusEnum,
+    aggrStatusGroupType             DisplayString
+}
+
+aggrStatusGroupAggrIndexNo OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Link Aggregation Group Identifier."
+    ::= { aggrStatusGroupEntry 1 }
+
+aggrStatusGroupConfiguredPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Configured member ports of the aggregation Group."
+    ::= { aggrStatusGroupEntry 2 }
+
+aggrStatusGroupAggregatedPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Aggregated member ports of the aggregation Group."
+    ::= { aggrStatusGroupEntry 3 }
+
+aggrStatusGroupSpeed OBJECT-TYPE
+    SYNTAX      AggrLinkSpeedStatusEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Speed of the Aggregation Group."
+    ::= { aggrStatusGroupEntry 4 }
+
+aggrStatusGroupType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..6))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of the Aggregation Group."
+    ::= { aggrStatusGroupEntry 5 }
+
+aggrMibConformance OBJECT IDENTIFIER
+    ::= { aggrMib 2 }
+
+aggrMibCompliances OBJECT IDENTIFIER
+    ::= { aggrMibConformance 1 }
+
+aggrMibGroups OBJECT IDENTIFIER
+    ::= { aggrMibConformance 2 }
+
+aggrConfigModeGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { aggrConfigModeGlobalsSmacAddr,
+                  aggrConfigModeGlobalsDmacAddr,
+                  aggrConfigModeGlobalsSourceAndDestinationIpAddr,
+                  aggrConfigModeGlobalsTcpOrUdpSportAndDportNo }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { aggrMibGroups 1 }
+
+aggrConfigGroupTableInfoGroup OBJECT-GROUP
+    OBJECTS     { aggrConfigGroupPortMembers,
+                  aggrConfigGroupAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { aggrMibGroups 2 }
+
+aggrConfigGroupTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { aggrConfigGroupTableRowEditorAggrIndexNo,
+                  aggrConfigGroupTableRowEditorPortMembers,
+                  aggrConfigGroupTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { aggrMibGroups 3 }
+
+aggrStatusGroupTableInfoGroup OBJECT-GROUP
+    OBJECTS     { aggrStatusGroupConfiguredPorts,
+                  aggrStatusGroupAggregatedPorts,
+                  aggrStatusGroupSpeed, aggrStatusGroupType }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { aggrMibGroups 4 }
+
+aggrMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { aggrConfigModeGlobalsInfoGroup,
+                       aggrConfigGroupTableInfoGroup,
+                       aggrConfigGroupTableRowEditorInfoGroup,
+                       aggrStatusGroupTableInfoGroup }
+
+    ::= { aggrMibCompliances 1 }
+
+END

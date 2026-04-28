@@ -1,0 +1,73 @@
+-- *****************************************************************
+-- MIB-SSH: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-SSH DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    TruthValue FROM SNMPv2-TC
+    ;
+
+sshMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of the SSH MIB"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 49 }
+
+
+sshMibObjects OBJECT IDENTIFIER
+    ::= { sshMib 1 }
+
+sshConfig OBJECT IDENTIFIER
+    ::= { sshMibObjects 2 }
+
+sshConfigGlobals OBJECT IDENTIFIER
+    ::= { sshConfig 1 }
+
+sshConfigGlobalsAdminState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable the SSH functionality."
+    ::= { sshConfigGlobals 1 }
+
+sshMibConformance OBJECT IDENTIFIER
+    ::= { sshMib 2 }
+
+sshMibCompliances OBJECT IDENTIFIER
+    ::= { sshMibConformance 1 }
+
+sshMibGroups OBJECT IDENTIFIER
+    ::= { sshMibConformance 2 }
+
+sshConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { sshConfigGlobalsAdminState }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { sshMibGroups 1 }
+
+sshMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { sshConfigGlobalsInfoGroup }
+
+    ::= { sshMibCompliances 1 }
+
+END

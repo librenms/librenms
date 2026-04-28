@@ -1,0 +1,1197 @@
+-- *****************************************************************
+-- MIB-ERPS: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-ERPS DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Counter64 FROM SNMPv2-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    InterfaceIndex FROM BTS-TC
+    RowEditorState FROM BTS-TC
+    VlanListQuarter FROM BTS-TC
+    ;
+
+erpsMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "Private MIB for Ethernet Ring Protection Switching, ERPS."
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 72 }
+
+
+ErpsAdminCmd ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Specifies the Administrative command."
+    SYNTAX      INTEGER { manualSwitch(1), forcedSwitch(2), clear(3) }
+
+ErpsControlCmd ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Specifies a control command."
+    SYNTAX      INTEGER { none(0), admCmdForcedSwitch(1),
+                          admCmdManualSwitch(2), admCmdClear(3),
+                          statisticsClear(4) }
+
+ErpsPort ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Specifies a particular logical ring port."
+    SYNTAX      INTEGER { port0(1), port1(2) }
+
+ErpsPortState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Specifies the ring port state."
+    SYNTAX      INTEGER { ok(1), signalFail(2) }
+
+ErpsProtectionState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Specifies the ring protection state."
+    SYNTAX      INTEGER { none(1), idle(2), protected(3),
+                          forcedSwitch(4), manualSwitch(5),
+                          pending(6) }
+
+ErpsRequestState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Specifies a request/state."
+    SYNTAX      INTEGER { none(1), manualSwitch(2), signalFail(3),
+                          forcedSwitch(4), event(5) }
+
+ErpsRingType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Specifies the ERPS ring type."
+    SYNTAX      INTEGER { major(1), sub(2) }
+
+ErpsRplMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Specifies the Ring Protection Link mode. Use 'none' if port is neither
+         RPL owner nor neighbour."
+    SYNTAX      INTEGER { none(1), owner(2), neighbour(3) }
+
+ErpsVersion ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Specifies the ERPS protocol version."
+    SYNTAX      INTEGER { version1(1), version2(2) }
+
+erpsMibObjects OBJECT IDENTIFIER
+    ::= { erpsMib 1 }
+
+erpsCapabilities OBJECT IDENTIFIER
+    ::= { erpsMibObjects 1 }
+
+erpsCapabilitiesMaxGroups OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of configured ERPS groups."
+    ::= { erpsCapabilities 1 }
+
+erpsCapabilitiesMaxVlansPerGroup OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of protected VLANS per ERPS group."
+    ::= { erpsCapabilities 2 }
+
+erpsConfig OBJECT IDENTIFIER
+    ::= { erpsMibObjects 2 }
+
+erpsConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ErpsConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the ERPS group configuration table."
+    ::= { erpsConfig 1 }
+
+erpsConfigEntry OBJECT-TYPE
+    SYNTAX      ErpsConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an ERPS group."
+    INDEX       { erpsConfigGroupIndex }
+    ::= { erpsConfigTable 1 }
+
+ErpsConfigEntry ::= SEQUENCE {
+    erpsConfigGroupIndex                       Integer32,
+    erpsConfigRingType                         ErpsRingType,
+    erpsConfigPort0                            InterfaceIndex,
+    erpsConfigPort1                            InterfaceIndex,
+    erpsConfigInterconnectMajorRingGroupIndex  Unsigned32,
+    erpsConfigVirtualChannel                   TruthValue,
+    erpsConfigPort0SignalFailMepIndex          Unsigned32,
+    erpsConfigPort0ApsMepIndex                 Unsigned32,
+    erpsConfigPort1SignalFailMepIndex          Unsigned32,
+    erpsConfigPort1ApsMepIndex                 Unsigned32,
+    erpsConfigHoldOffTime                      Unsigned32,
+    erpsConfigWaitToRestoreTime                Unsigned32,
+    erpsConfigGuardTime                        Unsigned32,
+    erpsConfigRplMode                          ErpsRplMode,
+    erpsConfigRplPort                          ErpsPort,
+    erpsConfigRevertive                        TruthValue,
+    erpsConfigVersion                          ErpsVersion,
+    erpsConfigTopologyChange                   TruthValue,
+    erpsConfigProtectedVlans0Kto1K             VlanListQuarter,
+    erpsConfigProtectedVlans1Kto2K             VlanListQuarter,
+    erpsConfigProtectedVlans2Kto3K             VlanListQuarter,
+    erpsConfigProtectedVlans3Kto4K             VlanListQuarter,
+    erpsConfigAction                           RowEditorState
+}
+
+erpsConfigGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ERPS group index number. Valid range is (1..max groups). The maximum
+         group number is platform-specific and can be retrieved from the ERPS
+         capabilities."
+    ::= { erpsConfigEntry 1 }
+
+erpsConfigRingType OBJECT-TYPE
+    SYNTAX      ErpsRingType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of ring. Can only be set once for a ring instance."
+    ::= { erpsConfigEntry 2 }
+
+erpsConfigPort0 OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "ifindex of ring protection port 0. Can only be set once for a ring
+         instance."
+    ::= { erpsConfigEntry 3 }
+
+erpsConfigPort1 OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "ifindex of ring protection Port 1. For interconnected sub-rings this
+         value must be zero. Can only be set once for a ring instance."
+    ::= { erpsConfigEntry 4 }
+
+erpsConfigInterconnectMajorRingGroupIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "For sub-ring: zero = not interconnected; > zero = index of major ring
+         group. For major ring: zero = not interconnected; > zero = is
+         interconnected (i.e flag-like semantics). Can only be set once for a
+         ring instance."
+    ::= { erpsConfigEntry 5 }
+
+erpsConfigVirtualChannel OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether to use a virtual channel. Can only be set once for a ring
+         instance."
+    ::= { erpsConfigEntry 6 }
+
+erpsConfigPort0SignalFailMepIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Index of SignalFail MEP for Port 0. Zero if not set. To clear an ERPS
+         group's MEP association, set this to zero; it affects all MEP indices."
+    ::= { erpsConfigEntry 7 }
+
+erpsConfigPort0ApsMepIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Index of APS MEP for Port 0. Zero if not set."
+    ::= { erpsConfigEntry 8 }
+
+erpsConfigPort1SignalFailMepIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Index of SignalFail MEP for Port 1. Zero if not set. Must be zero for
+         interconnected sub-rings."
+    ::= { erpsConfigEntry 9 }
+
+erpsConfigPort1ApsMepIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Index of APS MEP for Port 1. Zero if not set. Must be zero for
+         interconnected sub-rings with virtual channel."
+    ::= { erpsConfigEntry 10 }
+
+erpsConfigHoldOffTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Hold off time in ms. Value is rounded down to 100ms precision. Valid
+         range is 0-10000 ms"
+    ::= { erpsConfigEntry 11 }
+
+erpsConfigWaitToRestoreTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Wait-to-Restore time in ms. Valid range is 60000-720000 ms (1-12
+         minutes)."
+    ::= { erpsConfigEntry 12 }
+
+erpsConfigGuardTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Guard time in ms. Valid range is 10-2000 ms."
+    ::= { erpsConfigEntry 13 }
+
+erpsConfigRplMode OBJECT-TYPE
+    SYNTAX      ErpsRplMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ring Protection Link mode."
+    ::= { erpsConfigEntry 14 }
+
+erpsConfigRplPort OBJECT-TYPE
+    SYNTAX      ErpsPort
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "RPL port. Only valid if the ERPS group is RPL owner or neighbour."
+    ::= { erpsConfigEntry 15 }
+
+erpsConfigRevertive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Revertive (true) or Non-revertive (false) mode."
+    ::= { erpsConfigEntry 16 }
+
+erpsConfigVersion OBJECT-TYPE
+    SYNTAX      ErpsVersion
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "ERPS protocol version."
+    ::= { erpsConfigEntry 17 }
+
+erpsConfigTopologyChange OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether to enable Topology Change propagation; only valid for an
+         interconnected node."
+    ::= { erpsConfigEntry 18 }
+
+erpsConfigProtectedVlans0Kto1K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "First quarter of bit-array indicating whether a VLAN is protected by
+         this ring instance ('1') or not ('0')."
+    ::= { erpsConfigEntry 19 }
+
+erpsConfigProtectedVlans1Kto2K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Second quarter of bit-array indicating whether a VLAN is protected by
+         this ring instance ('1') or not ('0')."
+    ::= { erpsConfigEntry 20 }
+
+erpsConfigProtectedVlans2Kto3K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Third quarter of bit-array indicating whether a VLAN is protected by
+         this ring instance ('1') or not ('0')."
+    ::= { erpsConfigEntry 21 }
+
+erpsConfigProtectedVlans3Kto4K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Fourth quarter of bit-array indicating whether a VLAN is protected by
+         this ring instance ('1') or not ('0')."
+    ::= { erpsConfigEntry 22 }
+
+erpsConfigAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { erpsConfigEntry 100 }
+
+erpsConfigRowEditor OBJECT IDENTIFIER
+    ::= { erpsConfig 2 }
+
+erpsConfigRowEditorGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "ERPS group index number. Valid range is (1..max groups). The maximum
+         group number is platform-specific and can be retrieved from the ERPS
+         capabilities."
+    ::= { erpsConfigRowEditor 1 }
+
+erpsConfigRowEditorRingType OBJECT-TYPE
+    SYNTAX      ErpsRingType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of ring. Can only be set once for a ring instance."
+    ::= { erpsConfigRowEditor 2 }
+
+erpsConfigRowEditorPort0 OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "ifindex of ring protection port 0. Can only be set once for a ring
+         instance."
+    ::= { erpsConfigRowEditor 3 }
+
+erpsConfigRowEditorPort1 OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "ifindex of ring protection Port 1. For interconnected sub-rings this
+         value must be zero. Can only be set once for a ring instance."
+    ::= { erpsConfigRowEditor 4 }
+
+erpsConfigRowEditorInterconnectMajorRingGroupIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "For sub-ring: zero = not interconnected; > zero = index of major ring
+         group. For major ring: zero = not interconnected; > zero = is
+         interconnected (i.e flag-like semantics). Can only be set once for a
+         ring instance."
+    ::= { erpsConfigRowEditor 5 }
+
+erpsConfigRowEditorVirtualChannel OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether to use a virtual channel. Can only be set once for a ring
+         instance."
+    ::= { erpsConfigRowEditor 6 }
+
+erpsConfigRowEditorPort0SignalFailMepIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Index of SignalFail MEP for Port 0. Zero if not set. To clear an ERPS
+         group's MEP association, set this to zero; it affects all MEP indices."
+    ::= { erpsConfigRowEditor 7 }
+
+erpsConfigRowEditorPort0ApsMepIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Index of APS MEP for Port 0. Zero if not set."
+    ::= { erpsConfigRowEditor 8 }
+
+erpsConfigRowEditorPort1SignalFailMepIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Index of SignalFail MEP for Port 1. Zero if not set. Must be zero for
+         interconnected sub-rings."
+    ::= { erpsConfigRowEditor 9 }
+
+erpsConfigRowEditorPort1ApsMepIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Index of APS MEP for Port 1. Zero if not set. Must be zero for
+         interconnected sub-rings with virtual channel."
+    ::= { erpsConfigRowEditor 10 }
+
+erpsConfigRowEditorHoldOffTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Hold off time in ms. Value is rounded down to 100ms precision. Valid
+         range is 0-10000 ms"
+    ::= { erpsConfigRowEditor 11 }
+
+erpsConfigRowEditorWaitToRestoreTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Wait-to-Restore time in ms. Valid range is 60000-720000 ms (1-12
+         minutes)."
+    ::= { erpsConfigRowEditor 12 }
+
+erpsConfigRowEditorGuardTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Guard time in ms. Valid range is 10-2000 ms."
+    ::= { erpsConfigRowEditor 13 }
+
+erpsConfigRowEditorRplMode OBJECT-TYPE
+    SYNTAX      ErpsRplMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ring Protection Link mode."
+    ::= { erpsConfigRowEditor 14 }
+
+erpsConfigRowEditorRplPort OBJECT-TYPE
+    SYNTAX      ErpsPort
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "RPL port. Only valid if the ERPS group is RPL owner or neighbour."
+    ::= { erpsConfigRowEditor 15 }
+
+erpsConfigRowEditorRevertive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Revertive (true) or Non-revertive (false) mode."
+    ::= { erpsConfigRowEditor 16 }
+
+erpsConfigRowEditorVersion OBJECT-TYPE
+    SYNTAX      ErpsVersion
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "ERPS protocol version."
+    ::= { erpsConfigRowEditor 17 }
+
+erpsConfigRowEditorTopologyChange OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether to enable Topology Change propagation; only valid for an
+         interconnected node."
+    ::= { erpsConfigRowEditor 18 }
+
+erpsConfigRowEditorProtectedVlans0Kto1K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "First quarter of bit-array indicating whether a VLAN is protected by
+         this ring instance ('1') or not ('0')."
+    ::= { erpsConfigRowEditor 19 }
+
+erpsConfigRowEditorProtectedVlans1Kto2K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Second quarter of bit-array indicating whether a VLAN is protected by
+         this ring instance ('1') or not ('0')."
+    ::= { erpsConfigRowEditor 20 }
+
+erpsConfigRowEditorProtectedVlans2Kto3K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Third quarter of bit-array indicating whether a VLAN is protected by
+         this ring instance ('1') or not ('0')."
+    ::= { erpsConfigRowEditor 21 }
+
+erpsConfigRowEditorProtectedVlans3Kto4K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Fourth quarter of bit-array indicating whether a VLAN is protected by
+         this ring instance ('1') or not ('0')."
+    ::= { erpsConfigRowEditor 22 }
+
+erpsConfigRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { erpsConfigRowEditor 100 }
+
+erpsStatus OBJECT IDENTIFIER
+    ::= { erpsMibObjects 3 }
+
+erpsStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ErpsStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains status per EPRS group."
+    ::= { erpsStatus 1 }
+
+erpsStatusEntry OBJECT-TYPE
+    SYNTAX      ErpsStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Status."
+    INDEX       { erpsStatusGroupIndex }
+    ::= { erpsStatusTable 1 }
+
+ErpsStatusEntry ::= SEQUENCE {
+    erpsStatusGroupIndex                   Integer32,
+    erpsStatusActive                       TruthValue,
+    erpsStatusProtectionState              ErpsProtectionState,
+    erpsStatusRplBlocked                   TruthValue,
+    erpsStatusWtrRemaining                 Unsigned32,
+    erpsStatusAdminCmd                     ErpsAdminCmd,
+    erpsStatusFopAlarm                     TruthValue,
+    erpsStatusTxActive                     TruthValue,
+    erpsStatusTxRequestOrState             ErpsRequestState,
+    erpsStatusTxRplBlocked                 TruthValue,
+    erpsStatusTxDoNotFlush                 TruthValue,
+    erpsStatusBlockedPortReference         ErpsPort,
+    erpsStatusPort0Blocked                 TruthValue,
+    erpsStatusPort0State                   ErpsPortState,
+    erpsStatusPort0RxActive                TruthValue,
+    erpsStatusPort0RxRequestOrState        ErpsRequestState,
+    erpsStatusPort0RxRplBlocked            TruthValue,
+    erpsStatusPort0RxDoNotFlush            TruthValue,
+    erpsStatusPort0RxBlockedPortReference  ErpsPort,
+    erpsStatusPort0RxNodeId                OCTET STRING,
+    erpsStatusPort1Blocked                 TruthValue,
+    erpsStatusPort1State                   ErpsPortState,
+    erpsStatusPort1RxActive                TruthValue,
+    erpsStatusPort1RxRequestOrState        ErpsRequestState,
+    erpsStatusPort1RxRplBlocked            TruthValue,
+    erpsStatusPort1RxDoNotFlush            TruthValue,
+    erpsStatusPort1RxBlockedPortReference  ErpsPort,
+    erpsStatusPort1RxNodeId                OCTET STRING
+}
+
+erpsStatusGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ERPS group index number. Valid range is (1..max groups). The maximum
+         group number is platform-specific and can be retrieved from the ERPS
+         capabilities."
+    ::= { erpsStatusEntry 1 }
+
+erpsStatusActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether ERPS group is currently active or not."
+    ::= { erpsStatusEntry 2 }
+
+erpsStatusProtectionState OBJECT-TYPE
+    SYNTAX      ErpsProtectionState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies current ERPS group protection state."
+    ::= { erpsStatusEntry 3 }
+
+erpsStatusRplBlocked OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether the RPL is currently blocked or not."
+    ::= { erpsStatusEntry 4 }
+
+erpsStatusWtrRemaining OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the remaining wait-time before restoring ring."
+    ::= { erpsStatusEntry 5 }
+
+erpsStatusAdminCmd OBJECT-TYPE
+    SYNTAX      ErpsAdminCmd
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the currently active administrative command."
+    ::= { erpsStatusEntry 6 }
+
+erpsStatusFopAlarm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether the FailureOfProtocol alarm is currently active or
+         not."
+    ::= { erpsStatusEntry 7 }
+
+erpsStatusTxActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether R-APS transmission is currently active."
+    ::= { erpsStatusEntry 8 }
+
+erpsStatusTxRequestOrState OBJECT-TYPE
+    SYNTAX      ErpsRequestState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the currently transmitted request/state. Only relevant when
+         Tx is active."
+    ::= { erpsStatusEntry 9 }
+
+erpsStatusTxRplBlocked OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the currently transmitted RPL Blocked flag. Only relevant
+         when Tx is active."
+    ::= { erpsStatusEntry 10 }
+
+erpsStatusTxDoNotFlush OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the currently transmitted Do Not Flush flag. Only relevant
+         when Tx is active."
+    ::= { erpsStatusEntry 11 }
+
+erpsStatusBlockedPortReference OBJECT-TYPE
+    SYNTAX      ErpsPort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the currently transmitted Blocked Port Reference. Only
+         relevant when Tx is active."
+    ::= { erpsStatusEntry 12 }
+
+erpsStatusPort0Blocked OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether ring Port 0 is blocked or not."
+    ::= { erpsStatusEntry 13 }
+
+erpsStatusPort0State OBJECT-TYPE
+    SYNTAX      ErpsPortState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the state of ring Port 0."
+    ::= { erpsStatusEntry 14 }
+
+erpsStatusPort0RxActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies if ring Port0 receives R-APS."
+    ::= { erpsStatusEntry 15 }
+
+erpsStatusPort0RxRequestOrState OBJECT-TYPE
+    SYNTAX      ErpsRequestState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the most recently received request/state on ring Port 0. Only
+         relevant when Rx is active."
+    ::= { erpsStatusEntry 16 }
+
+erpsStatusPort0RxRplBlocked OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the most recently received RPL Blocked flag on ring Port 0.
+         Only relevant when Rx is active."
+    ::= { erpsStatusEntry 17 }
+
+erpsStatusPort0RxDoNotFlush OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the most recently received Do Not Flush flag on ring Port 0.
+         Only relevant when Rx is active."
+    ::= { erpsStatusEntry 18 }
+
+erpsStatusPort0RxBlockedPortReference OBJECT-TYPE
+    SYNTAX      ErpsPort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the most recently received Blocked Port Reference on ring
+         Port 0. Only relevant when Rx is active."
+    ::= { erpsStatusEntry 19 }
+
+erpsStatusPort0RxNodeId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(6))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the most recently received node ID on ring Port 0. Only
+         relevant when Rx is active."
+    ::= { erpsStatusEntry 20 }
+
+erpsStatusPort1Blocked OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether ring Port 1 is blocked or not."
+    ::= { erpsStatusEntry 21 }
+
+erpsStatusPort1State OBJECT-TYPE
+    SYNTAX      ErpsPortState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the state of ring Port 1."
+    ::= { erpsStatusEntry 22 }
+
+erpsStatusPort1RxActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies if ring Port1 receives R-APS."
+    ::= { erpsStatusEntry 23 }
+
+erpsStatusPort1RxRequestOrState OBJECT-TYPE
+    SYNTAX      ErpsRequestState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the most recently received request/state on ring Port 1. Only
+         relevant when Rx is active."
+    ::= { erpsStatusEntry 24 }
+
+erpsStatusPort1RxRplBlocked OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the most recently received RPL Blocked flag on ring Port 1.
+         Only relevant when Rx is active."
+    ::= { erpsStatusEntry 25 }
+
+erpsStatusPort1RxDoNotFlush OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the most recently received Do Not Flush flag on ring Port 1.
+         Only relevant when Rx is active."
+    ::= { erpsStatusEntry 26 }
+
+erpsStatusPort1RxBlockedPortReference OBJECT-TYPE
+    SYNTAX      ErpsPort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the most recently received Blocked Port Reference on ring
+         Port 1. Only relevant when Rx is active."
+    ::= { erpsStatusEntry 27 }
+
+erpsStatusPort1RxNodeId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(6))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the most recently received node ID on ring Port 1. Only
+         relevant when Rx is active."
+    ::= { erpsStatusEntry 28 }
+
+erpsControl OBJECT IDENTIFIER
+    ::= { erpsMibObjects 4 }
+
+erpsControlTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ErpsControlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the ERPS group control table."
+    ::= { erpsControl 1 }
+
+erpsControlEntry OBJECT-TYPE
+    SYNTAX      ErpsControlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents dynamic control elements an ERPS
+         group."
+    INDEX       { erpsControlGroupIndex }
+    ::= { erpsControlTable 1 }
+
+ErpsControlEntry ::= SEQUENCE {
+    erpsControlGroupIndex  Integer32,
+    erpsControlCommand     ErpsControlCmd,
+    erpsControlPort        ErpsPort
+}
+
+erpsControlGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ERPS group index number. Valid range is (1..max groups). The maximum
+         group number is platform-specific and can be retrieved from the ERPS
+         capabilities."
+    ::= { erpsControlEntry 1 }
+
+erpsControlCommand OBJECT-TYPE
+    SYNTAX      ErpsControlCmd
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Control command to execute. Always returns none when read."
+    ::= { erpsControlEntry 2 }
+
+erpsControlPort OBJECT-TYPE
+    SYNTAX      ErpsPort
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ring port affected by control command. Only relevant for administrative
+         commands. Always returns port0 when read."
+    ::= { erpsControlEntry 3 }
+
+erpsStatistics OBJECT IDENTIFIER
+    ::= { erpsMibObjects 5 }
+
+erpsStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ErpsStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains statistics per EPRS group."
+    ::= { erpsStatistics 1 }
+
+erpsStatisticsEntry OBJECT-TYPE
+    SYNTAX      ErpsStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Various PDU and event counters."
+    INDEX       { erpsStatisticsGroupIndex }
+    ::= { erpsStatisticsTable 1 }
+
+ErpsStatisticsEntry ::= SEQUENCE {
+    erpsStatisticsGroupIndex      Integer32,
+    erpsStatisticsRapsTx          Counter64,
+    erpsStatisticsRapsRx          Counter64,
+    erpsStatisticsRapsRxDrop      Counter64,
+    erpsStatisticsLocalSF         Counter64,
+    erpsStatisticsLocalSFCleared  Counter64,
+    erpsStatisticsRemoteSF        Counter64,
+    erpsStatisticsNR              Counter64,
+    erpsStatisticsRemoteMS        Counter64,
+    erpsStatisticsLocalMS         Counter64,
+    erpsStatisticsRemoteFS        Counter64,
+    erpsStatisticsLocalFS         Counter64,
+    erpsStatisticsAdminClear      Counter64
+}
+
+erpsStatisticsGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ERPS group index number. Valid range is (1..max groups). The maximum
+         group number is platform-specific and can be retrieved from the ERPS
+         capabilities."
+    ::= { erpsStatisticsEntry 1 }
+
+erpsStatisticsRapsTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted RAPS PDUs."
+    ::= { erpsStatisticsEntry 2 }
+
+erpsStatisticsRapsRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received RAPS PDUs."
+    ::= { erpsStatisticsEntry 3 }
+
+erpsStatisticsRapsRxDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received RAPS PDUs that were dropped."
+    ::= { erpsStatisticsEntry 4 }
+
+erpsStatisticsLocalSF OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of local SignalFail events."
+    ::= { erpsStatisticsEntry 5 }
+
+erpsStatisticsLocalSFCleared OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of local SignalFail clear events."
+    ::= { erpsStatisticsEntry 6 }
+
+erpsStatisticsRemoteSF OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of remote SignalFail events."
+    ::= { erpsStatisticsEntry 7 }
+
+erpsStatisticsNR OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of NoRequest events."
+    ::= { erpsStatisticsEntry 8 }
+
+erpsStatisticsRemoteMS OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of remote ManualSwitch events."
+    ::= { erpsStatisticsEntry 9 }
+
+erpsStatisticsLocalMS OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of local ManualSwitch events."
+    ::= { erpsStatisticsEntry 10 }
+
+erpsStatisticsRemoteFS OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of remote ForcedSwitch events."
+    ::= { erpsStatisticsEntry 11 }
+
+erpsStatisticsLocalFS OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of local ForcedSwitch events."
+    ::= { erpsStatisticsEntry 12 }
+
+erpsStatisticsAdminClear OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of AdminClear events."
+    ::= { erpsStatisticsEntry 13 }
+
+erpsMibConformance OBJECT IDENTIFIER
+    ::= { erpsMib 2 }
+
+erpsMibCompliances OBJECT IDENTIFIER
+    ::= { erpsMibConformance 1 }
+
+erpsMibGroups OBJECT IDENTIFIER
+    ::= { erpsMibConformance 2 }
+
+erpsCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { erpsCapabilitiesMaxGroups,
+                  erpsCapabilitiesMaxVlansPerGroup }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { erpsMibGroups 1 }
+
+erpsConfigTableInfoGroup OBJECT-GROUP
+    OBJECTS     { erpsConfigRingType, erpsConfigPort0,
+                  erpsConfigPort1,
+                  erpsConfigInterconnectMajorRingGroupIndex,
+                  erpsConfigVirtualChannel,
+                  erpsConfigPort0SignalFailMepIndex,
+                  erpsConfigPort0ApsMepIndex,
+                  erpsConfigPort1SignalFailMepIndex,
+                  erpsConfigPort1ApsMepIndex,
+                  erpsConfigHoldOffTime,
+                  erpsConfigWaitToRestoreTime,
+                  erpsConfigGuardTime, erpsConfigRplMode,
+                  erpsConfigRplPort, erpsConfigRevertive,
+                  erpsConfigVersion, erpsConfigTopologyChange,
+                  erpsConfigProtectedVlans0Kto1K,
+                  erpsConfigProtectedVlans1Kto2K,
+                  erpsConfigProtectedVlans2Kto3K,
+                  erpsConfigProtectedVlans3Kto4K,
+                  erpsConfigAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { erpsMibGroups 2 }
+
+erpsConfigRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { erpsConfigRowEditorGroupIndex,
+                  erpsConfigRowEditorRingType,
+                  erpsConfigRowEditorPort0,
+                  erpsConfigRowEditorPort1,
+                  erpsConfigRowEditorInterconnectMajorRingGroupIndex,
+                  erpsConfigRowEditorVirtualChannel,
+                  erpsConfigRowEditorPort0SignalFailMepIndex,
+                  erpsConfigRowEditorPort0ApsMepIndex,
+                  erpsConfigRowEditorPort1SignalFailMepIndex,
+                  erpsConfigRowEditorPort1ApsMepIndex,
+                  erpsConfigRowEditorHoldOffTime,
+                  erpsConfigRowEditorWaitToRestoreTime,
+                  erpsConfigRowEditorGuardTime,
+                  erpsConfigRowEditorRplMode,
+                  erpsConfigRowEditorRplPort,
+                  erpsConfigRowEditorRevertive,
+                  erpsConfigRowEditorVersion,
+                  erpsConfigRowEditorTopologyChange,
+                  erpsConfigRowEditorProtectedVlans0Kto1K,
+                  erpsConfigRowEditorProtectedVlans1Kto2K,
+                  erpsConfigRowEditorProtectedVlans2Kto3K,
+                  erpsConfigRowEditorProtectedVlans3Kto4K,
+                  erpsConfigRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { erpsMibGroups 3 }
+
+erpsStatusTableInfoGroup OBJECT-GROUP
+    OBJECTS     { erpsStatusActive, erpsStatusProtectionState,
+                  erpsStatusRplBlocked,
+                  erpsStatusWtrRemaining, erpsStatusAdminCmd,
+                  erpsStatusFopAlarm, erpsStatusTxActive,
+                  erpsStatusTxRequestOrState,
+                  erpsStatusTxRplBlocked,
+                  erpsStatusTxDoNotFlush,
+                  erpsStatusBlockedPortReference,
+                  erpsStatusPort0Blocked,
+                  erpsStatusPort0State,
+                  erpsStatusPort0RxActive,
+                  erpsStatusPort0RxRequestOrState,
+                  erpsStatusPort0RxRplBlocked,
+                  erpsStatusPort0RxDoNotFlush,
+                  erpsStatusPort0RxBlockedPortReference,
+                  erpsStatusPort0RxNodeId,
+                  erpsStatusPort1Blocked,
+                  erpsStatusPort1State,
+                  erpsStatusPort1RxActive,
+                  erpsStatusPort1RxRequestOrState,
+                  erpsStatusPort1RxRplBlocked,
+                  erpsStatusPort1RxDoNotFlush,
+                  erpsStatusPort1RxBlockedPortReference,
+                  erpsStatusPort1RxNodeId }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { erpsMibGroups 4 }
+
+erpsControlTableInfoGroup OBJECT-GROUP
+    OBJECTS     { erpsControlCommand, erpsControlPort }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { erpsMibGroups 5 }
+
+erpsStatisticsTableInfoGroup OBJECT-GROUP
+    OBJECTS     { erpsStatisticsRapsTx, erpsStatisticsRapsRx,
+                  erpsStatisticsRapsRxDrop,
+                  erpsStatisticsLocalSF,
+                  erpsStatisticsLocalSFCleared,
+                  erpsStatisticsRemoteSF, erpsStatisticsNR,
+                  erpsStatisticsRemoteMS,
+                  erpsStatisticsLocalMS,
+                  erpsStatisticsRemoteFS,
+                  erpsStatisticsLocalFS,
+                  erpsStatisticsAdminClear }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { erpsMibGroups 6 }
+
+erpsMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { erpsCapabilitiesInfoGroup,
+                       erpsConfigTableInfoGroup,
+                       erpsConfigRowEditorInfoGroup,
+                       erpsStatusTableInfoGroup,
+                       erpsControlTableInfoGroup,
+                       erpsStatisticsTableInfoGroup }
+
+    ::= { erpsMibCompliances 1 }
+
+END

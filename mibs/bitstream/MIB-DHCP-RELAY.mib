@@ -1,0 +1,304 @@
+-- *****************************************************************
+-- MIB-DHCP-RELAY: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-DHCP-RELAY DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    IpAddress FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    ;
+
+dhcpRelayMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of the DHCP Relay MIB"
+    REVISION    "201410100000Z"
+    DESCRIPTION
+        "Editorial changes"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 55 }
+
+
+DhcpRelayInformationPolicyType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration indicates the DHCP relay information policy type."
+    SYNTAX      INTEGER { replace(0), keep(1), drop(2) }
+
+dhcpRelayMibObjects OBJECT IDENTIFIER
+    ::= { dhcpRelayMib 1 }
+
+dhcpRelayConfig OBJECT IDENTIFIER
+    ::= { dhcpRelayMibObjects 2 }
+
+dhcpRelayConfigGlobals OBJECT IDENTIFIER
+    ::= { dhcpRelayConfig 1 }
+
+dhcpRelayConfigGlobalsMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global mode of DHCP relay. true is to enable DHCP relay and false is to
+         disable it."
+    ::= { dhcpRelayConfigGlobals 1 }
+
+dhcpRelayConfigGlobalsServerIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Server IP address. This IP address is for DHCP server where the DHCP
+         relay will relay DHCP packets to."
+    ::= { dhcpRelayConfigGlobals 2 }
+
+dhcpRelayConfigGlobalsInformationMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the DHCP relay information mode option operation. Possible
+         modes are - Enabled: Enable DHCP relay information mode operation. When
+         DHCP relay information mode operation is enabled, the agent inserts
+         specific information (option 82) into a DHCP message when forwarding to
+         DHCP server and removes it from a DHCP message when transferring to
+         DHCP client. It only works when DHCP relay operation mode is enabled.
+         Disabled: Disable DHCP relay information mode operation."
+    ::= { dhcpRelayConfigGlobals 3 }
+
+dhcpRelayConfigGlobalsInformationPolicy OBJECT-TYPE
+    SYNTAX      DhcpRelayInformationPolicyType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the DHCP relay information option policy. When DHCP relay
+         information mode operation is enabled, if the agent receives a DHCP
+         message that already contains relay agent information it will enforce
+         the policy. The 'Replace' policy is invalid when relay information mode
+         is disabled."
+    ::= { dhcpRelayConfigGlobals 4 }
+
+dhcpRelayStatus OBJECT IDENTIFIER
+    ::= { dhcpRelayMibObjects 3 }
+
+dhcpRelayStatusStatistics OBJECT IDENTIFIER
+    ::= { dhcpRelayStatus 1 }
+
+dhcpRelayStatusStatisticsServerPacketsRelayed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Packets relayed from server to client."
+    ::= { dhcpRelayStatusStatistics 1 }
+
+dhcpRelayStatusStatisticsServerPacketErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Errors sending packets to servers."
+    ::= { dhcpRelayStatusStatistics 2 }
+
+dhcpRelayStatusStatisticsClientPacketsRelayed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Packets relayed from client to server."
+    ::= { dhcpRelayStatusStatistics 3 }
+
+dhcpRelayStatusStatisticsClientPacketErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Errors sending packets to clients."
+    ::= { dhcpRelayStatusStatistics 4 }
+
+dhcpRelayStatusStatisticsAgentOptionErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets forwarded without agent options because there was no
+         room."
+    ::= { dhcpRelayStatusStatistics 5 }
+
+dhcpRelayStatusStatisticsMissingAgentOption OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets dropped because no RAI option matching our ID was
+         found."
+    ::= { dhcpRelayStatusStatistics 6 }
+
+dhcpRelayStatusStatisticsBadCircuitId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Circuit ID option in matching RAI option did not match any known
+         circuit ID."
+    ::= { dhcpRelayStatusStatistics 7 }
+
+dhcpRelayStatusStatisticsMissingCircuitId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Circuit ID option in matching RAI option was missing."
+    ::= { dhcpRelayStatusStatistics 8 }
+
+dhcpRelayStatusStatisticsBadRemoteId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote ID option in matching RAI option did not match any known remote
+         ID."
+    ::= { dhcpRelayStatusStatistics 9 }
+
+dhcpRelayStatusStatisticsMissingRemoteId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote ID option in matching RAI option was missing."
+    ::= { dhcpRelayStatusStatistics 10 }
+
+dhcpRelayStatusStatisticsReceiveServerPackets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Receive DHCP message from server."
+    ::= { dhcpRelayStatusStatistics 11 }
+
+dhcpRelayStatusStatisticsReceiveClientPackets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Receive DHCP message from client."
+    ::= { dhcpRelayStatusStatistics 12 }
+
+dhcpRelayStatusStatisticsReceiveClientAgentOption OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Receive relay agent information option from client."
+    ::= { dhcpRelayStatusStatistics 13 }
+
+dhcpRelayStatusStatisticsReplaceAgentOption OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Replace relay agent information option."
+    ::= { dhcpRelayStatusStatistics 14 }
+
+dhcpRelayStatusStatisticsKeepAgentOption OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Keep relay agent information option."
+    ::= { dhcpRelayStatusStatistics 15 }
+
+dhcpRelayStatusStatisticsDropAgentOption OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Drop relay agent information option."
+    ::= { dhcpRelayStatusStatistics 16 }
+
+dhcpRelayControl OBJECT IDENTIFIER
+    ::= { dhcpRelayMibObjects 4 }
+
+dhcpRelayControlClearStatistics OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The action to clear statistics. true is to clear the statistics data.
+         false, then, does nothing."
+    ::= { dhcpRelayControl 1 }
+
+dhcpRelayMibConformance OBJECT IDENTIFIER
+    ::= { dhcpRelayMib 2 }
+
+dhcpRelayMibCompliances OBJECT IDENTIFIER
+    ::= { dhcpRelayMibConformance 1 }
+
+dhcpRelayMibGroups OBJECT IDENTIFIER
+    ::= { dhcpRelayMibConformance 2 }
+
+dhcpRelayConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcpRelayConfigGlobalsMode,
+                  dhcpRelayConfigGlobalsServerIpAddress,
+                  dhcpRelayConfigGlobalsInformationMode,
+                  dhcpRelayConfigGlobalsInformationPolicy }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcpRelayMibGroups 1 }
+
+dhcpRelayStatusStatisticsInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcpRelayStatusStatisticsServerPacketsRelayed,
+                  dhcpRelayStatusStatisticsServerPacketErrors,
+                  dhcpRelayStatusStatisticsClientPacketsRelayed,
+                  dhcpRelayStatusStatisticsClientPacketErrors,
+                  dhcpRelayStatusStatisticsAgentOptionErrors,
+                  dhcpRelayStatusStatisticsMissingAgentOption,
+                  dhcpRelayStatusStatisticsBadCircuitId,
+                  dhcpRelayStatusStatisticsMissingCircuitId,
+                  dhcpRelayStatusStatisticsBadRemoteId,
+                  dhcpRelayStatusStatisticsMissingRemoteId,
+                  dhcpRelayStatusStatisticsReceiveServerPackets,
+                  dhcpRelayStatusStatisticsReceiveClientPackets,
+                  dhcpRelayStatusStatisticsReceiveClientAgentOption,
+                  dhcpRelayStatusStatisticsReplaceAgentOption,
+                  dhcpRelayStatusStatisticsKeepAgentOption,
+                  dhcpRelayStatusStatisticsDropAgentOption }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcpRelayMibGroups 2 }
+
+dhcpRelayControlInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcpRelayControlClearStatistics }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcpRelayMibGroups 3 }
+
+dhcpRelayMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { dhcpRelayConfigGlobalsInfoGroup,
+                       dhcpRelayStatusStatisticsInfoGroup,
+                       dhcpRelayControlInfoGroup }
+
+    ::= { dhcpRelayMibCompliances 1 }
+
+END

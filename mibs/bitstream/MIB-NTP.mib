@@ -1,0 +1,125 @@
+-- *****************************************************************
+-- MIB-NTP: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-NTP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    InetAddress FROM BTS-TC
+    ;
+
+ntpMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of NTP"
+    REVISION    "201410100000Z"
+    DESCRIPTION
+        "Editorial changes"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 57 }
+
+
+ntpMibObjects OBJECT IDENTIFIER
+    ::= { ntpMib 1 }
+
+ntpConfig OBJECT IDENTIFIER
+    ::= { ntpMibObjects 2 }
+
+ntpConfigGlobals OBJECT IDENTIFIER
+    ::= { ntpConfig 1 }
+
+ntpConfigGlobalsMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global config mode of NTP. true is to enable NTP function in the system
+         and false is to disable it."
+    ::= { ntpConfigGlobals 1 }
+
+ntpConfigServerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NtpConfigServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of NTP server."
+    ::= { ntpConfig 2 }
+
+ntpConfigServerEntry OBJECT-TYPE
+    SYNTAX      NtpConfigServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each server has a set of parameters."
+    INDEX       { ntpConfigServerIndex }
+    ::= { ntpConfigServerTable 1 }
+
+NtpConfigServerEntry ::= SEQUENCE {
+    ntpConfigServerIndex    Integer32,
+    ntpConfigServerAddress  InetAddress
+}
+
+ntpConfigServerIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..5)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of NTP servers."
+    ::= { ntpConfigServerEntry 1 }
+
+ntpConfigServerAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Internet address of a NTP server."
+    ::= { ntpConfigServerEntry 2 }
+
+ntpMibConformance OBJECT IDENTIFIER
+    ::= { ntpMib 2 }
+
+ntpMibCompliances OBJECT IDENTIFIER
+    ::= { ntpMibConformance 1 }
+
+ntpMibGroups OBJECT IDENTIFIER
+    ::= { ntpMibConformance 2 }
+
+ntpConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { ntpConfigGlobalsMode }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ntpMibGroups 1 }
+
+ntpConfigServerTableInfoGroup OBJECT-GROUP
+    OBJECTS     { ntpConfigServerAddress }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ntpMibGroups 2 }
+
+ntpMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { ntpConfigGlobalsInfoGroup,
+                       ntpConfigServerTableInfoGroup }
+
+    ::= { ntpMibCompliances 1 }
+
+END

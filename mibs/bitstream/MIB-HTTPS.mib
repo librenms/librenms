@@ -1,0 +1,97 @@
+-- *****************************************************************
+-- MIB-HTTPS: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-HTTPS DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    TruthValue FROM SNMPv2-TC
+    ;
+
+httpsMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of HTTPS"
+    REVISION    "201410100000Z"
+    DESCRIPTION
+        "Editorial changes"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 47 }
+
+
+httpsMibObjects OBJECT IDENTIFIER
+    ::= { httpsMib 1 }
+
+httpsConfig OBJECT IDENTIFIER
+    ::= { httpsMibObjects 2 }
+
+httpsConfigGlobals OBJECT IDENTIFIER
+    ::= { httpsConfig 1 }
+
+httpsConfigGlobalsMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global mode of HTTPS. true is to enable the functions of HTTPS and
+         false is to disable it."
+    ::= { httpsConfigGlobals 1 }
+
+httpsConfigGlobalsTLSVersion OBJECT-TYPE
+    SYNTAX      INTEGER { tls1v2(3), tls1v3(4) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum version of TLS protocol used by the HTTPS server."
+    ::= { httpsConfigGlobals 2 }    
+
+httpsConfigGlobalsRedirectToHttps OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The flag is to enable/disable the automatic redirection from HTTP to
+         HTTPS. true is to enable the redirection and false is to disable the
+         redirection."
+    ::= { httpsConfigGlobals 3 }
+
+httpsMibConformance OBJECT IDENTIFIER
+    ::= { httpsMib 2 }
+
+httpsMibCompliances OBJECT IDENTIFIER
+    ::= { httpsMibConformance 1 }
+
+httpsMibGroups OBJECT IDENTIFIER
+    ::= { httpsMibConformance 2 }
+
+httpsConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { httpsConfigGlobalsMode,
+                  httpsConfigGlobalsTLSVersion,
+                  httpsConfigGlobalsRedirectToHttps }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { httpsMibGroups 1 }
+
+httpsMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { httpsConfigGlobalsInfoGroup }
+
+    ::= { httpsMibCompliances 1 }
+
+END

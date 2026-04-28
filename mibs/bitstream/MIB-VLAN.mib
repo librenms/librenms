@@ -1,0 +1,803 @@
+-- *****************************************************************
+-- MIB-VLAN: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-VLAN DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    TruthValue FROM SNMPv2-TC
+    DisplayString FROM BTS-TC
+    EtherType FROM BTS-TC
+    InterfaceIndex FROM BTS-TC
+    PortList FROM BTS-TC
+    RowEditorState FROM BTS-TC
+    Unsigned16 FROM BTS-TC
+    Vlan FROM BTS-TC
+    VlanListQuarter FROM BTS-TC
+    ;
+
+vlanMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "Private MIB for VLAN."
+    REVISION    "201501160000Z"
+    DESCRIPTION
+        "Added Shared VLAN Learning table"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 13 }
+
+
+VlanEgressTagging ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An integer that indicates how egress tagging occurs."
+    SYNTAX      INTEGER { untagThis(0), tagThis(1), tagAll(2),
+                          untagAll(3) }
+
+VlanIngressAcceptance ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An integer that indicates the type of frames that are not discarded on
+         ingress w.r.t. VLAN tagging."
+    SYNTAX      INTEGER { all(0), tagged(1), untagged(2) }
+
+VlanPortMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Determines the underlying port mode.
+         
+         Access ports are only members of one VLAN, the AccessVlan.
+         
+         Trunk ports are by default members of all VLANs, which can be limited
+         with TrunkVlans.
+         
+         Hybrid ports allow for changing all port VLAN parameters. As trunk
+         ports, hybrid ports are by default members of all VLANs, which can be
+         limited with HybridVlans."
+    SYNTAX      INTEGER { access(0), trunk(1), hybrid(2) }
+
+VlanPortType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An integer that indicates if a port is VLAN aware, and if so, to which
+         EtherType it is sensitive."
+    SYNTAX      INTEGER { unaware(0), c(1), s(2), sCustom(3) }
+
+VlanUserType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An integer that indicates the VLAN user type. A value of 'combined'
+         indicates the VLAN settings as programmed to hardware. A value of
+         'admin' indicates the VLAN settings as programmed by the administrative
+         user, and any other value indicates a software module that changes VLAN
+         settings 'behind the scenes'."
+    SYNTAX      INTEGER { combined(0), admin(1), dot1x(3), mvrp(4),
+                          gvrp(5), mvr(6), voiceVlan(7), mstp(8),
+                          erps(9), mep(10), evc(11), vcl(12),
+                          rmirror(13) }
+
+vlanMibObjects OBJECT IDENTIFIER
+    ::= { vlanMib 1 }
+
+vlanCapabilities OBJECT IDENTIFIER
+    ::= { vlanMibObjects 1 }
+
+vlanCapabilitiesVlanIdMin OBJECT-TYPE
+    SYNTAX      Vlan
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum VLAN ID that can be configured on the device."
+    ::= { vlanCapabilities 1 }
+
+vlanCapabilitiesVlanIdMax OBJECT-TYPE
+    SYNTAX      Vlan
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum VLAN ID that can be configured on the device."
+    ::= { vlanCapabilities 2 }
+
+vlanCapabilitiesFidCnt OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Shared VLAN Learning (SVL) Filter IDs (FIDs) supported by
+         this device. 0 if SVL is not supported."
+    ::= { vlanCapabilities 3 }
+
+vlanConfig OBJECT IDENTIFIER
+    ::= { vlanMibObjects 2 }
+
+vlanConfigGlobals OBJECT IDENTIFIER
+    ::= { vlanConfig 1 }
+
+vlanConfigGlobalsMain OBJECT IDENTIFIER
+    ::= { vlanConfigGlobals 1 }
+
+vlanConfigGlobalsMainCustomSPortEtherType OBJECT-TYPE
+    SYNTAX      EtherType (1536..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TPID (EtherType) for ports marked as Custom-S tag aware."
+    ::= { vlanConfigGlobalsMain 1 }
+
+vlanConfigGlobalsMainAccessVlans0To1K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "First quarter of bit-array indicating the enabled access VLANs."
+    ::= { vlanConfigGlobalsMain 2 }
+
+vlanConfigGlobalsMainAccessVlans1KTo2K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Second quarter of bit-array indicating the enabled access VLANs."
+    ::= { vlanConfigGlobalsMain 3 }
+
+vlanConfigGlobalsMainAccessVlans2KTo3K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Third quarter of bit-array indicating the enabled access VLANs."
+    ::= { vlanConfigGlobalsMain 4 }
+
+vlanConfigGlobalsMainAccessVlans3KTo4K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Last quarter of bit-array indicating the enabled access VLANs."
+    ::= { vlanConfigGlobalsMain 5 }
+
+vlanConfigGlobalsNameTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanConfigGlobalsNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of VLAN names."
+    ::= { vlanConfigGlobals 2 }
+
+vlanConfigGlobalsNameEntry OBJECT-TYPE
+    SYNTAX      VlanConfigGlobalsNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the name of a given VLAN."
+    INDEX       { vlanConfigGlobalsNameVlanId }
+    ::= { vlanConfigGlobalsNameTable 1 }
+
+VlanConfigGlobalsNameEntry ::= SEQUENCE {
+    vlanConfigGlobalsNameVlanId  Vlan,
+    vlanConfigGlobalsNameName    DisplayString
+}
+
+vlanConfigGlobalsNameVlanId OBJECT-TYPE
+    SYNTAX      Vlan
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "VLAN ID. Valid range is 1 - 4095."
+    ::= { vlanConfigGlobalsNameEntry 1 }
+
+vlanConfigGlobalsNameName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "VLAN Name. Default for VLAN 1 is 'default'. Default for any other VLAN
+         is 'VLANxxxx', where 'xxxx' is a decimal representation of the VLAN ID
+         with leading zeroes."
+    ::= { vlanConfigGlobalsNameEntry 2 }
+
+vlanConfigInterfaces OBJECT IDENTIFIER
+    ::= { vlanConfig 2 }
+
+vlanConfigInterfacesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanConfigInterfacesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of per-port configuration."
+    ::= { vlanConfigInterfaces 1 }
+
+vlanConfigInterfacesEntry OBJECT-TYPE
+    SYNTAX      VlanConfigInterfacesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the VLAN configuration for a port interface."
+    INDEX       { vlanConfigInterfacesIfIndex }
+    ::= { vlanConfigInterfacesTable 1 }
+
+VlanConfigInterfacesEntry ::= SEQUENCE {
+    vlanConfigInterfacesIfIndex                  InterfaceIndex,
+    vlanConfigInterfacesMode                     VlanPortMode,
+    vlanConfigInterfacesAccessVlan               Vlan,
+    vlanConfigInterfacesTrunkNativeVlan          Vlan,
+    vlanConfigInterfacesTrunkTagNativeVlan       TruthValue,
+    vlanConfigInterfacesTrunkVlans0KTo1K         VlanListQuarter,
+    vlanConfigInterfacesTrunkVlans1KTo2K         VlanListQuarter,
+    vlanConfigInterfacesTrunkVlans2KTo3K         VlanListQuarter,
+    vlanConfigInterfacesTrunkVlans3KTo4K         VlanListQuarter,
+    vlanConfigInterfacesHybridNativeVlan         Vlan,
+    vlanConfigInterfacesHybridPortType           VlanPortType,
+    vlanConfigInterfacesHybridIngressFiltering   TruthValue,
+    vlanConfigInterfacesHybridIngressAcceptance  VlanIngressAcceptance,
+    vlanConfigInterfacesHybridEgressTagging      VlanEgressTagging,
+    vlanConfigInterfacesHybridVlans0KTo1K        VlanListQuarter,
+    vlanConfigInterfacesHybridVlans1KTo2K        VlanListQuarter,
+    vlanConfigInterfacesHybridVlans2KTo3K        VlanListQuarter,
+    vlanConfigInterfacesHybridVlans3KTo4K        VlanListQuarter,
+    vlanConfigInterfacesForbiddenVlans0KTo1K     VlanListQuarter,
+    vlanConfigInterfacesForbiddenVlans1KTo2K     VlanListQuarter,
+    vlanConfigInterfacesForbiddenVlans2KTo3K     VlanListQuarter,
+    vlanConfigInterfacesForbiddenVlans3KTo4K     VlanListQuarter
+}
+
+vlanConfigInterfacesIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface index."
+    ::= { vlanConfigInterfacesEntry 1 }
+
+vlanConfigInterfacesMode OBJECT-TYPE
+    SYNTAX      VlanPortMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "VLAN mode of the port."
+    ::= { vlanConfigInterfacesEntry 2 }
+
+vlanConfigInterfacesAccessVlan OBJECT-TYPE
+    SYNTAX      Vlan
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The port VLAN ID the port will be assigned when Mode is Access."
+    ::= { vlanConfigInterfacesEntry 3 }
+
+vlanConfigInterfacesTrunkNativeVlan OBJECT-TYPE
+    SYNTAX      Vlan
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The port VLAN ID the port will be assigned when Mode is trunk."
+    ::= { vlanConfigInterfacesEntry 4 }
+
+vlanConfigInterfacesTrunkTagNativeVlan OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls whether frames classified to TrunkNativeVlan get tagged on
+         egress. Used when Mode is trunk."
+    ::= { vlanConfigInterfacesEntry 5 }
+
+vlanConfigInterfacesTrunkVlans0KTo1K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "First quarter of bit-array indicating whether the port is member of a
+         VLAN ('1') or not ('0'). Used when Mode is trunk."
+    ::= { vlanConfigInterfacesEntry 6 }
+
+vlanConfigInterfacesTrunkVlans1KTo2K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Second quarter of bit-array indicating whether the port is member of a
+         VLAN ('1') or not ('0'). Used when Mode is trunk."
+    ::= { vlanConfigInterfacesEntry 7 }
+
+vlanConfigInterfacesTrunkVlans2KTo3K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Third quarter of bit-array indicating whether the port is member of a
+         VLAN ('1') or not ('0'). Used when Mode is trunk."
+    ::= { vlanConfigInterfacesEntry 8 }
+
+vlanConfigInterfacesTrunkVlans3KTo4K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Last quarter of bit-array indicating whether the port is member of a
+         VLAN ('1') or not ('0'). Used when Mode is trunk."
+    ::= { vlanConfigInterfacesEntry 9 }
+
+vlanConfigInterfacesHybridNativeVlan OBJECT-TYPE
+    SYNTAX      Vlan
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The port VLAN ID the port will be assigned when Mode is hybrid."
+    ::= { vlanConfigInterfacesEntry 10 }
+
+vlanConfigInterfacesHybridPortType OBJECT-TYPE
+    SYNTAX      VlanPortType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls awareness and whether it reacts to C-tags, S-tags,
+         Custom-S-tags. Used when Mode is hybrid."
+    ::= { vlanConfigInterfacesEntry 11 }
+
+vlanConfigInterfacesHybridIngressFiltering OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls whether frames classified to a certain VLAN ID get discarded
+         (true) or not (false) if the port is not member of the VLAN ID. Used
+         when Mode is hybrid."
+    ::= { vlanConfigInterfacesEntry 12 }
+
+vlanConfigInterfacesHybridIngressAcceptance OBJECT-TYPE
+    SYNTAX      VlanIngressAcceptance
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls whether frames are accepted on ingress depending on VLAN tag
+         in frame. Used when Mode is hybrid."
+    ::= { vlanConfigInterfacesEntry 13 }
+
+vlanConfigInterfacesHybridEgressTagging OBJECT-TYPE
+    SYNTAX      VlanEgressTagging
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls tagging of frames on egress. tagThis(1) is not allowed. Used
+         when Mode is hybrid."
+    ::= { vlanConfigInterfacesEntry 14 }
+
+vlanConfigInterfacesHybridVlans0KTo1K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "First quarter of bit-array indicating whether the port is member of a
+         VLAN ('1') or not ('0'). Used when Mode is hybrid."
+    ::= { vlanConfigInterfacesEntry 15 }
+
+vlanConfigInterfacesHybridVlans1KTo2K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Second quarter of bit-array indicating whether the port is member of a
+         VLAN ('1') or not ('0'). Used when Mode is hybrid."
+    ::= { vlanConfigInterfacesEntry 16 }
+
+vlanConfigInterfacesHybridVlans2KTo3K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Third quarter of bit-array indicating whether the port is member of a
+         VLAN ('1') or not ('0'). Used when Mode is hybrid."
+    ::= { vlanConfigInterfacesEntry 17 }
+
+vlanConfigInterfacesHybridVlans3KTo4K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Last quarter of bit-array indicating whether the port is member of a
+         VLAN ('1') or not ('0'). Used when Mode is hybrid."
+    ::= { vlanConfigInterfacesEntry 18 }
+
+vlanConfigInterfacesForbiddenVlans0KTo1K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "First quarter of bit-array indicating whether the port can ever become
+         a member of a VLAN ('0') or not ('1'). Used in all modes."
+    ::= { vlanConfigInterfacesEntry 19 }
+
+vlanConfigInterfacesForbiddenVlans1KTo2K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Second quarter of bit-array indicating whether the port can ever become
+         a member of a VLAN ('0') or not ('1'). Used in all modes."
+    ::= { vlanConfigInterfacesEntry 20 }
+
+vlanConfigInterfacesForbiddenVlans2KTo3K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Third quarter of bit-array indicating whether the port can ever become
+         a member of a VLAN ('0') or not ('1'). Used in all modes."
+    ::= { vlanConfigInterfacesEntry 21 }
+
+vlanConfigInterfacesForbiddenVlans3KTo4K OBJECT-TYPE
+    SYNTAX      VlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Last quarter of bit-array indicating whether the port can ever become a
+         member of a VLAN ('0') or not ('1'). Used in all modes."
+    ::= { vlanConfigInterfacesEntry 22 }
+
+vlanConfigInterfacesSvlTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanConfigInterfacesSvlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Shared VLAN Learning (SVL) allows for having one or more VLAN IDs map
+         to the same Filter ID (FID). For a given set of VLANs, if an individual
+         MAC address is learned in one VLAN, that learned information is used in
+         forwarding decisions taken for that address relative to all other VLANs
+         in the given set.
+         
+         fidCnt, which can be found in the capabilities section, indicates the
+         number of FIDs available on this platform. The feature is not available
+         if this number is 0."
+    ::= { vlanConfigInterfaces 2 }
+
+vlanConfigInterfacesSvlEntry OBJECT-TYPE
+    SYNTAX      VlanConfigInterfacesSvlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table is indexed by VLAN ID"
+    INDEX       { vlanConfigInterfacesSvlVlanId }
+    ::= { vlanConfigInterfacesSvlTable 1 }
+
+VlanConfigInterfacesSvlEntry ::= SEQUENCE {
+    vlanConfigInterfacesSvlVlanId    Vlan,
+    vlanConfigInterfacesSvlFilterId  Unsigned16,
+    vlanConfigInterfacesSvlAction    RowEditorState
+}
+
+vlanConfigInterfacesSvlVlanId OBJECT-TYPE
+    SYNTAX      Vlan
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "VLAN ID. Valid range is 1 - 4095."
+    ::= { vlanConfigInterfacesSvlEntry 1 }
+
+vlanConfigInterfacesSvlFilterId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Filter ID (FID) used in Shared VLAN Learning. Zero or more VLANs may
+         map into the same FID."
+    ::= { vlanConfigInterfacesSvlEntry 2 }
+
+vlanConfigInterfacesSvlAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { vlanConfigInterfacesSvlEntry 100 }
+
+vlanConfigInterfacesSvlTableRowEditor OBJECT IDENTIFIER
+    ::= { vlanConfigInterfaces 3 }
+
+vlanConfigInterfacesSvlTableRowEditorVlanId OBJECT-TYPE
+    SYNTAX      Vlan
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "VLAN ID. Valid range is 1 - 4095."
+    ::= { vlanConfigInterfacesSvlTableRowEditor 1 }
+
+vlanConfigInterfacesSvlTableRowEditorFilterId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Filter ID (FID) used in Shared VLAN Learning. Zero or more VLANs may
+         map into the same FID."
+    ::= { vlanConfigInterfacesSvlTableRowEditor 2 }
+
+vlanConfigInterfacesSvlTableRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { vlanConfigInterfacesSvlTableRowEditor 100 }
+
+vlanStatus OBJECT IDENTIFIER
+    ::= { vlanMibObjects 3 }
+
+vlanStatusInterfaces OBJECT IDENTIFIER
+    ::= { vlanStatus 1 }
+
+vlanStatusInterfacesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanStatusInterfacesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of per-interface (port) status."
+    ::= { vlanStatusInterfaces 1 }
+
+vlanStatusInterfacesEntry OBJECT-TYPE
+    SYNTAX      VlanStatusInterfacesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the VLAN configuration for a port interface for a
+         given VLAN user."
+    INDEX       { vlanStatusInterfacesIfIndex,
+                  vlanStatusInterfacesVlanUser }
+    ::= { vlanStatusInterfacesTable 1 }
+
+VlanStatusInterfacesEntry ::= SEQUENCE {
+    vlanStatusInterfacesIfIndex            InterfaceIndex,
+    vlanStatusInterfacesVlanUser           VlanUserType,
+    vlanStatusInterfacesPvid               Vlan,
+    vlanStatusInterfacesUvid               Vlan,
+    vlanStatusInterfacesPortType           VlanPortType,
+    vlanStatusInterfacesIngressFiltering   TruthValue,
+    vlanStatusInterfacesIngressAcceptance  VlanIngressAcceptance,
+    vlanStatusInterfacesEgressTagging      VlanEgressTagging
+}
+
+vlanStatusInterfacesIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface index."
+    ::= { vlanStatusInterfacesEntry 1 }
+
+vlanStatusInterfacesVlanUser OBJECT-TYPE
+    SYNTAX      VlanUserType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "VLAN user."
+    ::= { vlanStatusInterfacesEntry 2 }
+
+vlanStatusInterfacesPvid OBJECT-TYPE
+    SYNTAX      Vlan
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port VLAN ID set by this user."
+    ::= { vlanStatusInterfacesEntry 3 }
+
+vlanStatusInterfacesUvid OBJECT-TYPE
+    SYNTAX      Vlan
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Untagged VLAN ID set by a user. This may only be populated by non-admin
+         users."
+    ::= { vlanStatusInterfacesEntry 4 }
+
+vlanStatusInterfacesPortType OBJECT-TYPE
+    SYNTAX      VlanPortType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VLAN Awareness and tag reaction set by this user."
+    ::= { vlanStatusInterfacesEntry 5 }
+
+vlanStatusInterfacesIngressFiltering OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Ingress filtering enabled or disabled by this user."
+    ::= { vlanStatusInterfacesEntry 6 }
+
+vlanStatusInterfacesIngressAcceptance OBJECT-TYPE
+    SYNTAX      VlanIngressAcceptance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VLAN tagging accepted upon ingress configured by this user."
+    ::= { vlanStatusInterfacesEntry 7 }
+
+vlanStatusInterfacesEgressTagging OBJECT-TYPE
+    SYNTAX      VlanEgressTagging
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Egress tagging configured by this user."
+    ::= { vlanStatusInterfacesEntry 8 }
+
+vlanStatusMemberships OBJECT IDENTIFIER
+    ::= { vlanStatus 2 }
+
+vlanStatusMembershipsVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanStatusMembershipsVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of per-VLAN, per-VLAN user port memberships."
+    ::= { vlanStatusMemberships 1 }
+
+vlanStatusMembershipsVlanEntry OBJECT-TYPE
+    SYNTAX      VlanStatusMembershipsVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains a port list of VLAN memberships for a given VLAN and
+         VLAN user.The table is sparsely populated, so if a VLAN user doesn't
+         contribute, the row is non-existent."
+    INDEX       { vlanStatusMembershipsVlanVlanId,
+                  vlanStatusMembershipsVlanVlanUser }
+    ::= { vlanStatusMembershipsVlanTable 1 }
+
+VlanStatusMembershipsVlanEntry ::= SEQUENCE {
+    vlanStatusMembershipsVlanVlanId    Vlan,
+    vlanStatusMembershipsVlanVlanUser  VlanUserType,
+    vlanStatusMembershipsVlanPortList  PortList
+}
+
+vlanStatusMembershipsVlanVlanId OBJECT-TYPE
+    SYNTAX      Vlan
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "VLAN ID. Valid range is 1 - 4095."
+    ::= { vlanStatusMembershipsVlanEntry 1 }
+
+vlanStatusMembershipsVlanVlanUser OBJECT-TYPE
+    SYNTAX      VlanUserType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "VLAN user."
+    ::= { vlanStatusMembershipsVlanEntry 2 }
+
+vlanStatusMembershipsVlanPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port list."
+    ::= { vlanStatusMembershipsVlanEntry 3 }
+
+vlanMibConformance OBJECT IDENTIFIER
+    ::= { vlanMib 2 }
+
+vlanMibCompliances OBJECT IDENTIFIER
+    ::= { vlanMibConformance 1 }
+
+vlanMibGroups OBJECT IDENTIFIER
+    ::= { vlanMibConformance 2 }
+
+vlanCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { vlanCapabilitiesVlanIdMin,
+                  vlanCapabilitiesVlanIdMax,
+                  vlanCapabilitiesFidCnt }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vlanMibGroups 1 }
+
+vlanConfigGlobalsMainInfoGroup OBJECT-GROUP
+    OBJECTS     { vlanConfigGlobalsMainCustomSPortEtherType,
+                  vlanConfigGlobalsMainAccessVlans0To1K,
+                  vlanConfigGlobalsMainAccessVlans1KTo2K,
+                  vlanConfigGlobalsMainAccessVlans2KTo3K,
+                  vlanConfigGlobalsMainAccessVlans3KTo4K }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vlanMibGroups 2 }
+
+vlanConfigGlobalsNameTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vlanConfigGlobalsNameName }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vlanMibGroups 3 }
+
+vlanConfigInterfacesTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vlanConfigInterfacesMode,
+                  vlanConfigInterfacesAccessVlan,
+                  vlanConfigInterfacesTrunkNativeVlan,
+                  vlanConfigInterfacesTrunkTagNativeVlan,
+                  vlanConfigInterfacesTrunkVlans0KTo1K,
+                  vlanConfigInterfacesTrunkVlans1KTo2K,
+                  vlanConfigInterfacesTrunkVlans2KTo3K,
+                  vlanConfigInterfacesTrunkVlans3KTo4K,
+                  vlanConfigInterfacesHybridNativeVlan,
+                  vlanConfigInterfacesHybridPortType,
+                  vlanConfigInterfacesHybridIngressFiltering,
+                  vlanConfigInterfacesHybridIngressAcceptance,
+                  vlanConfigInterfacesHybridEgressTagging,
+                  vlanConfigInterfacesHybridVlans0KTo1K,
+                  vlanConfigInterfacesHybridVlans1KTo2K,
+                  vlanConfigInterfacesHybridVlans2KTo3K,
+                  vlanConfigInterfacesHybridVlans3KTo4K,
+                  vlanConfigInterfacesForbiddenVlans0KTo1K,
+                  vlanConfigInterfacesForbiddenVlans1KTo2K,
+                  vlanConfigInterfacesForbiddenVlans2KTo3K,
+                  vlanConfigInterfacesForbiddenVlans3KTo4K }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vlanMibGroups 4 }
+
+vlanConfigInterfacesSvlTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vlanConfigInterfacesSvlFilterId,
+                  vlanConfigInterfacesSvlAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vlanMibGroups 5 }
+
+vlanConfigInterfacesSvlTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { vlanConfigInterfacesSvlTableRowEditorVlanId,
+                  vlanConfigInterfacesSvlTableRowEditorFilterId,
+                  vlanConfigInterfacesSvlTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vlanMibGroups 6 }
+
+vlanStatusInterfacesTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vlanStatusInterfacesPvid,
+                  vlanStatusInterfacesUvid,
+                  vlanStatusInterfacesPortType,
+                  vlanStatusInterfacesIngressFiltering,
+                  vlanStatusInterfacesIngressAcceptance,
+                  vlanStatusInterfacesEgressTagging }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vlanMibGroups 7 }
+
+vlanStatusMembershipsVlanTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vlanStatusMembershipsVlanPortList }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vlanMibGroups 8 }
+
+vlanMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { vlanCapabilitiesInfoGroup,
+                       vlanConfigGlobalsMainInfoGroup,
+                       vlanConfigGlobalsNameTableInfoGroup,
+                       vlanConfigInterfacesTableInfoGroup,
+                       vlanConfigInterfacesSvlTableInfoGroup,
+                       vlanConfigInterfacesSvlTableRowEditorInfoGroup,
+                       vlanStatusInterfacesTableInfoGroup,
+                       vlanStatusMembershipsVlanTableInfoGroup }
+
+    ::= { vlanMibCompliances 1 }
+
+END

@@ -1,0 +1,393 @@
+-- *****************************************************************
+-- MIB-DNS: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-DNS DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    DisplayString FROM BTS-TC
+    InterfaceIndex FROM BTS-TC
+    IpAddress FROM BTS-TC
+    ;
+
+dnsMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of the DNS MIB."
+    REVISION    "201411250000Z"
+    DESCRIPTION
+        "Support multiple DNS server settings and default domain name
+         configuration."
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { switchMgmt 53 }
+
+
+DnsConfigType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration indicates the configured DNS server type or default
+         domain name type."
+    SYNTAX      INTEGER { none(0), static(1), dhcpv4(2),
+                          dhcpv4Vlan(3), dhcpv6(4), dhcpv6Vlan(5) }
+
+dnsMibObjects OBJECT IDENTIFIER
+    ::= { dnsMib 1 }
+
+dnsCapabilities OBJECT IDENTIFIER
+    ::= { dnsMibObjects 1 }
+
+dnsCapabilitiesSupportDhcp4ConfigServer OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The capability to support setting DNS server from DHCPv4."
+    ::= { dnsCapabilities 1 }
+
+dnsCapabilitiesSupportDhcp6ConfigServer OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The capability to support setting DNS server from DHCPv6."
+    ::= { dnsCapabilities 2 }
+
+dnsCapabilitiesSupportDefaultDomainName OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The capability to support setting default domain name."
+    ::= { dnsCapabilities 3 }
+
+dnsCapabilitiesSupportDhcp4DomainName OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The capability to support setting default domain name from DHCPv4."
+    ::= { dnsCapabilities 4 }
+
+dnsCapabilitiesSupportDhcp6DomainName OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The capability to support setting default domain name from DHCPv6."
+    ::= { dnsCapabilities 5 }
+
+dnsConfig OBJECT IDENTIFIER
+    ::= { dnsMibObjects 2 }
+
+dnsConfigGlobals OBJECT IDENTIFIER
+    ::= { dnsConfig 1 }
+
+dnsConfigGlobalsProxy OBJECT IDENTIFIER
+    ::= { dnsConfigGlobals 1 }
+
+dnsConfigGlobalsProxyAdminState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable the DNS-Proxy feature."
+    ::= { dnsConfigGlobalsProxy 1 }
+
+dnsConfigGlobalsDefaultDomainName OBJECT IDENTIFIER
+    ::= { dnsConfigGlobals 2 }
+
+dnsConfigGlobalsDefaultDomainNameSetting OBJECT-TYPE
+    SYNTAX      DnsConfigType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Default domain name administrative type. A default domain name is used
+         as the suffix of the given name in DNS lookup. none(0) means no default
+         domain name is used and thus no domain name suffix is appended in DNS
+         lookup. static(1) means the default domain name will be manually set.
+         dhcpv4(2) means default domain name will be determined by DHCPv4
+         discovery. dhcpv4Vlan(3) means default domain name will be determined
+         by DHCPv4 discovery on a specific IP VLAN interface. dhcpv6(4) means
+         default domain name will be determined by DHCPv6 discovery.
+         dhcpv6Vlan(5) means default domain name will be determined by DHCPv6
+         discovery on a specific IP VLAN interface."
+    ::= { dnsConfigGlobalsDefaultDomainName 1 }
+
+dnsConfigGlobalsDefaultDomainNameStaticName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..254))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The static default domain name. It will be a reference only when
+         DomainNameSetting is static(1)."
+    ::= { dnsConfigGlobalsDefaultDomainName 2 }
+
+dnsConfigGlobalsDefaultDomainNameDhcpIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of specific VLAN interface that default domain name will be
+         retrieved from DHCP. It will be a reference only when DomainNameSetting
+         is either dhcpv4Vlan(3) or dhcpv6Vlan(5)."
+    ::= { dnsConfigGlobalsDefaultDomainName 3 }
+
+dnsConfigServers OBJECT IDENTIFIER
+    ::= { dnsConfig 2 }
+
+dnsConfigServersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DnsConfigServersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table for managing DNS server configuration."
+    ::= { dnsConfigServers 1 }
+
+dnsConfigServersEntry OBJECT-TYPE
+    SYNTAX      DnsConfigServersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters."
+    INDEX       { dnsConfigServersPrecedence }
+    ::= { dnsConfigServersTable 1 }
+
+DnsConfigServersEntry ::= SEQUENCE {
+    dnsConfigServersPrecedence       Unsigned32,
+    dnsConfigServersSetting          DnsConfigType,
+    dnsConfigServersStaticIpAddress  IpAddress,
+    dnsConfigServersStaticIfIndex    InterfaceIndex
+}
+
+dnsConfigServersPrecedence OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table index also represents the precedence in selecting target DNS
+         server: less index value means higher priority in round-robin
+         selection. Only one server is working at a time, that is when the
+         chosen server is active, system marks the designated server as target
+         and stops selection. When the active server becomes inactive, system
+         starts another round of selection starting from the next available
+         server setting."
+    ::= { dnsConfigServersEntry 1 }
+
+dnsConfigServersSetting OBJECT-TYPE
+    SYNTAX      DnsConfigType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Per precedence DNS server administrative type. The DNS server setting
+         will be used in DNS lookup. none(0) denotes no DNS server is used and
+         thus domain name lookup always fails. static(1) denotes the DNS server
+         address will be manually set, in either IPv4 or IPv6 address form.
+         dhcpv4(2) denotes DNS server address will be determined by DHCPv4
+         discovery. dhcpv4Vlan(3) denotes DNS server address will be determined
+         by DHCPv4 discovery on a specifc IP VLAN interface. dhcpv6(4) denotes
+         DNS server address will be determined by DHCPv6 discovery.
+         dhcpv6Vlan(5) denotes DNS server address will be determined by DHCPv6
+         discovery on a specifc IP VLAN interface."
+    ::= { dnsConfigServersEntry 2 }
+
+dnsConfigServersStaticIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The static DNS server address. It will be a reference only when Setting
+         is static(1)"
+    ::= { dnsConfigServersEntry 3 }
+
+dnsConfigServersStaticIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of specific VLAN interface that DNS server address will be
+         retrieved from DHCP and where the server resides. It will be a
+         reference only when Setting is either dhcpv4Vlan(3) or dhcpv6Vlan(5)."
+    ::= { dnsConfigServersEntry 4 }
+
+dnsStatus OBJECT IDENTIFIER
+    ::= { dnsMibObjects 3 }
+
+dnsStatusGlobals OBJECT IDENTIFIER
+    ::= { dnsStatus 1 }
+
+dnsStatusGlobalsDefaultDomainName OBJECT IDENTIFIER
+    ::= { dnsStatusGlobals 1 }
+
+dnsStatusGlobalsDefaultDomainNameSuffix OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The suffix of the given domain name used in DNS lookup."
+    ::= { dnsStatusGlobalsDefaultDomainName 1 }
+
+dnsStatusServers OBJECT IDENTIFIER
+    ::= { dnsStatus 2 }
+
+dnsStatusServersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DnsStatusServersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table for displaying DNS server information."
+    ::= { dnsStatusServers 1 }
+
+dnsStatusServersEntry OBJECT-TYPE
+    SYNTAX      DnsStatusServersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters."
+    INDEX       { dnsStatusServersPrecedence }
+    ::= { dnsStatusServersTable 1 }
+
+DnsStatusServersEntry ::= SEQUENCE {
+    dnsStatusServersPrecedence        Unsigned32,
+    dnsStatusServersConfiguredType    DnsConfigType,
+    dnsStatusServersReferenceIfIndex  InterfaceIndex,
+    dnsStatusServersIpAddress         IpAddress
+}
+
+dnsStatusServersPrecedence OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table index also represents the precedence in selecting target DNS
+         server: less index value means higher priority in round-robin
+         selection. Only one server is working at a time, that is when the
+         chosen server is active, system marks the designated server as target
+         and stops selection. When the active server becomes inactive, system
+         starts another round of selection starting from the next available
+         server setting."
+    ::= { dnsStatusServersEntry 1 }
+
+dnsStatusServersConfiguredType OBJECT-TYPE
+    SYNTAX      DnsConfigType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Per precedence DNS server configured type.none(0) denotes no DNS server
+         is used and thus domain name lookup always fails. static(1) denotes the
+         DNS server address will be manually set, in either IPv4 or IPv6 address
+         form. dhcpv4(2) denotes DNS server address will be determined by DHCPv4
+         discovery. dhcpv4Vlan(3) denotes DNS server address will be determined
+         by DHCPv4 discovery on a specifc IP VLAN interface. dhcpv6(4) denotes
+         DNS server address will be determined by DHCPv6 discovery.
+         dhcpv6Vlan(5) denotes DNS server address will be determined by DHCPv6
+         discovery on a specifc IP VLAN interface."
+    ::= { dnsStatusServersEntry 2 }
+
+dnsStatusServersReferenceIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of specific VLAN interface that DNS server address will be
+         retrieved from DHCP and where the server resides. It will be a
+         reference only when Setting is either dhcpv4Vlan(3) or dhcpv6Vlan(5)."
+    ::= { dnsStatusServersEntry 3 }
+
+dnsStatusServersIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The DNS server address that will be used for domain name lookup."
+    ::= { dnsStatusServersEntry 4 }
+
+dnsMibConformance OBJECT IDENTIFIER
+    ::= { dnsMib 2 }
+
+dnsMibCompliances OBJECT IDENTIFIER
+    ::= { dnsMibConformance 1 }
+
+dnsMibGroups OBJECT IDENTIFIER
+    ::= { dnsMibConformance 2 }
+
+dnsCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { dnsCapabilitiesSupportDhcp4ConfigServer,
+                  dnsCapabilitiesSupportDhcp6ConfigServer,
+                  dnsCapabilitiesSupportDefaultDomainName,
+                  dnsCapabilitiesSupportDhcp4DomainName,
+                  dnsCapabilitiesSupportDhcp6DomainName }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dnsMibGroups 1 }
+
+dnsConfigGlobalsProxyInfoGroup OBJECT-GROUP
+    OBJECTS     { dnsConfigGlobalsProxyAdminState }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dnsMibGroups 2 }
+
+dnsConfigGlobalsDefaultDomainNameInfoGroup OBJECT-GROUP
+    OBJECTS     { dnsConfigGlobalsDefaultDomainNameSetting,
+                  dnsConfigGlobalsDefaultDomainNameStaticName,
+                  dnsConfigGlobalsDefaultDomainNameDhcpIfIndex }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dnsMibGroups 3 }
+
+dnsConfigServersTableInfoGroup OBJECT-GROUP
+    OBJECTS     { dnsConfigServersSetting,
+                  dnsConfigServersStaticIpAddress,
+                  dnsConfigServersStaticIfIndex }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dnsMibGroups 4 }
+
+dnsStatusGlobalsDefaultDomainNameInfoGroup OBJECT-GROUP
+    OBJECTS     { dnsStatusGlobalsDefaultDomainNameSuffix }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dnsMibGroups 5 }
+
+dnsStatusServersTableInfoGroup OBJECT-GROUP
+    OBJECTS     { dnsStatusServersConfiguredType,
+                  dnsStatusServersReferenceIfIndex,
+                  dnsStatusServersIpAddress }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dnsMibGroups 6 }
+
+dnsMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { dnsCapabilitiesInfoGroup,
+                       dnsConfigGlobalsProxyInfoGroup,
+                       dnsConfigGlobalsDefaultDomainNameInfoGroup,
+                       dnsConfigServersTableInfoGroup,
+                       dnsStatusGlobalsDefaultDomainNameInfoGroup,
+                       dnsStatusServersTableInfoGroup }
+
+    ::= { dnsMibCompliances 1 }
+
+END

@@ -1,0 +1,574 @@
+-- *****************************************************************
+-- MIB-DHCP-SNOOPING: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-DHCP-SNOOPING DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    IpAddress FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    MacAddress FROM SNMPv2-TC
+    TruthValue FROM SNMPv2-TC
+    InterfaceIndex FROM BTS-TC
+    ;
+
+dhcpSnoopingMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of the DHCP Snooping MIB"
+    REVISION    "201410100000Z"
+    DESCRIPTION
+        "Editorial changes"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 56 }
+
+
+dhcpSnoopingMibObjects OBJECT IDENTIFIER
+    ::= { dhcpSnoopingMib 1 }
+
+dhcpSnoopingConfig OBJECT IDENTIFIER
+    ::= { dhcpSnoopingMibObjects 2 }
+
+dhcpSnoopingConfigGlobals OBJECT IDENTIFIER
+    ::= { dhcpSnoopingConfig 1 }
+
+dhcpSnoopingConfigGlobalsMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the DHCP snooping mode operation. Possible modes are - true:
+         Enable DHCP snooping mode operation. When DHCP snooping mode operation
+         is enabled, the DHCP request messages will be forwarded to trusted
+         ports and only allow reply packets from trusted ports. false: Disable
+         DHCP snooping mode operation."
+    ::= { dhcpSnoopingConfigGlobals 1 }
+
+dhcpSnoopingConfigInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DhcpSnoopingConfigInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of DHCP Snooping port configuration parameters"
+    ::= { dhcpSnoopingConfig 2 }
+
+dhcpSnoopingConfigInterfaceEntry OBJECT-TYPE
+    SYNTAX      DhcpSnoopingConfigInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each port has a set of parameters"
+    INDEX       { dhcpSnoopingConfigInterfaceIfIndex }
+    ::= { dhcpSnoopingConfigInterfaceTable 1 }
+
+DhcpSnoopingConfigInterfaceEntry ::= SEQUENCE {
+    dhcpSnoopingConfigInterfaceIfIndex    InterfaceIndex,
+    dhcpSnoopingConfigInterfaceTrustMode  TruthValue
+}
+
+dhcpSnoopingConfigInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number of the physical port."
+    ::= { dhcpSnoopingConfigInterfaceEntry 1 }
+
+dhcpSnoopingConfigInterfaceTrustMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the DHCP snooping port mode. Possible port modes are - true:
+         Configures the port as trusted source of the DHCP messages. false:
+         Configures the port as untrusted source of the DHCP messages."
+    ::= { dhcpSnoopingConfigInterfaceEntry 2 }
+
+dhcpSnoopingStatus OBJECT IDENTIFIER
+    ::= { dhcpSnoopingMibObjects 3 }
+
+dhcpSnoopingStatusAssignedIpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DhcpSnoopingStatusAssignedIpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of assigned IP information in DHCP Snooping "
+    ::= { dhcpSnoopingStatus 1 }
+
+dhcpSnoopingStatusAssignedIpEntry OBJECT-TYPE
+    SYNTAX      DhcpSnoopingStatusAssignedIpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters"
+    INDEX       { dhcpSnoopingStatusAssignedIpMacAddress,
+                  dhcpSnoopingStatusAssignedIpVlanId }
+    ::= { dhcpSnoopingStatusAssignedIpTable 1 }
+
+DhcpSnoopingStatusAssignedIpEntry ::= SEQUENCE {
+    dhcpSnoopingStatusAssignedIpMacAddress    MacAddress,
+    dhcpSnoopingStatusAssignedIpVlanId        Integer32,
+    dhcpSnoopingStatusAssignedIpIfIndex       InterfaceIndex,
+    dhcpSnoopingStatusAssignedIpIpAddress     IpAddress,
+    dhcpSnoopingStatusAssignedIpNetmask       IpAddress,
+    dhcpSnoopingStatusAssignedIpDhcpServerIp  IpAddress
+}
+
+dhcpSnoopingStatusAssignedIpMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MAC address."
+    ::= { dhcpSnoopingStatusAssignedIpEntry 1 }
+
+dhcpSnoopingStatusAssignedIpVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (1..4095)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VLAN id of the VLAN."
+    ::= { dhcpSnoopingStatusAssignedIpEntry 2 }
+
+dhcpSnoopingStatusAssignedIpIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number of the physical port of the DHCP client."
+    ::= { dhcpSnoopingStatusAssignedIpEntry 3 }
+
+dhcpSnoopingStatusAssignedIpIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP address assigned to DHCP client by DHCP server."
+    ::= { dhcpSnoopingStatusAssignedIpEntry 4 }
+
+dhcpSnoopingStatusAssignedIpNetmask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Netmask assigned to DHCP client by DHCP server."
+    ::= { dhcpSnoopingStatusAssignedIpEntry 5 }
+
+dhcpSnoopingStatusAssignedIpDhcpServerIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP address of the DHCP server that assigns the IP address and netmask."
+    ::= { dhcpSnoopingStatusAssignedIpEntry 6 }
+
+dhcpSnoopingControl OBJECT IDENTIFIER
+    ::= { dhcpSnoopingMibObjects 4 }
+
+dhcpSnoopingControlInterfaceClearStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DhcpSnoopingControlInterfaceClearStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to clear port statistics in DHCP Snooping"
+    ::= { dhcpSnoopingControl 1 }
+
+dhcpSnoopingControlInterfaceClearStatisticsEntry OBJECT-TYPE
+    SYNTAX      DhcpSnoopingControlInterfaceClearStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each port has a set of parameters"
+    INDEX       {                   dhcpSnoopingControlInterfaceClearStatisticsIfIndex }
+    ::= { dhcpSnoopingControlInterfaceClearStatisticsTable 1 }
+
+DhcpSnoopingControlInterfaceClearStatisticsEntry ::= SEQUENCE {
+    dhcpSnoopingControlInterfaceClearStatisticsIfIndex  InterfaceIndex,
+    dhcpSnoopingControlInterfaceClearStatisticsClear    TruthValue
+}
+
+dhcpSnoopingControlInterfaceClearStatisticsIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number of the physical port."
+    ::= { dhcpSnoopingControlInterfaceClearStatisticsEntry 1 }
+
+dhcpSnoopingControlInterfaceClearStatisticsClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "clear statistics per physical port."
+    ::= { dhcpSnoopingControlInterfaceClearStatisticsEntry 2 }
+
+dhcpSnoopingStatistics OBJECT IDENTIFIER
+    ::= { dhcpSnoopingMibObjects 5 }
+
+dhcpSnoopingStatisticsInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DhcpSnoopingStatisticsInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of port statistics in DHCP Snooping "
+    ::= { dhcpSnoopingStatistics 2 }
+
+dhcpSnoopingStatisticsInterfaceEntry OBJECT-TYPE
+    SYNTAX      DhcpSnoopingStatisticsInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters"
+    INDEX       { dhcpSnoopingStatisticsInterfaceIfIndex }
+    ::= { dhcpSnoopingStatisticsInterfaceTable 1 }
+
+DhcpSnoopingStatisticsInterfaceEntry ::= SEQUENCE {
+    dhcpSnoopingStatisticsInterfaceIfIndex             InterfaceIndex,
+    dhcpSnoopingStatisticsInterfaceRxDiscover          Unsigned32,
+    dhcpSnoopingStatisticsInterfaceRxOffer             Unsigned32,
+    dhcpSnoopingStatisticsInterfaceRxRequest           Unsigned32,
+    dhcpSnoopingStatisticsInterfaceRxDecline           Unsigned32,
+    dhcpSnoopingStatisticsInterfaceRxAck               Unsigned32,
+    dhcpSnoopingStatisticsInterfaceRxNak               Unsigned32,
+    dhcpSnoopingStatisticsInterfaceRxRelease           Unsigned32,
+    dhcpSnoopingStatisticsInterfaceRxInform            Unsigned32,
+    dhcpSnoopingStatisticsInterfaceRxLeaseQuery        Unsigned32,
+    dhcpSnoopingStatisticsInterfaceRxLeaseUnassigned   Unsigned32,
+    dhcpSnoopingStatisticsInterfaceRxLeaseUnknown      Unsigned32,
+    dhcpSnoopingStatisticsInterfaceRxLeaseActive       Unsigned32,
+    dhcpSnoopingStatisticsInterfaceRxDiscardChksumErr  Unsigned32,
+    dhcpSnoopingStatisticsInterfaceRxDiscardUntrust    Unsigned32,
+    dhcpSnoopingStatisticsInterfaceTxDiscover          Unsigned32,
+    dhcpSnoopingStatisticsInterfaceTxOffer             Unsigned32,
+    dhcpSnoopingStatisticsInterfaceTxRequest           Unsigned32,
+    dhcpSnoopingStatisticsInterfaceTxDecline           Unsigned32,
+    dhcpSnoopingStatisticsInterfaceTxAck               Unsigned32,
+    dhcpSnoopingStatisticsInterfaceTxNak               Unsigned32,
+    dhcpSnoopingStatisticsInterfaceTxRelease           Unsigned32,
+    dhcpSnoopingStatisticsInterfaceTxInform            Unsigned32,
+    dhcpSnoopingStatisticsInterfaceTxLeaseQuery        Unsigned32,
+    dhcpSnoopingStatisticsInterfaceTxLeaseUnassigned   Unsigned32,
+    dhcpSnoopingStatisticsInterfaceTxLeaseUnknown      Unsigned32,
+    dhcpSnoopingStatisticsInterfaceTxLeaseActive       Unsigned32
+}
+
+dhcpSnoopingStatisticsInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number of the physical port."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 1 }
+
+dhcpSnoopingStatisticsInterfaceRxDiscover OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discover (option 53 with value 1) packets received."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 2 }
+
+dhcpSnoopingStatisticsInterfaceRxOffer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of offer (option 53 with value 2) packets received."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 3 }
+
+dhcpSnoopingStatisticsInterfaceRxRequest OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of request (option 53 with value 3) packets received."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 4 }
+
+dhcpSnoopingStatisticsInterfaceRxDecline OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of decline (option 53 with value 4) packets received."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 5 }
+
+dhcpSnoopingStatisticsInterfaceRxAck OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of ACK (option 53 with value 5) packets received."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 6 }
+
+dhcpSnoopingStatisticsInterfaceRxNak OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of NAK (option 53 with value 6) packets received."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 7 }
+
+dhcpSnoopingStatisticsInterfaceRxRelease OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of release (option 53 with value 7) packets received."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 8 }
+
+dhcpSnoopingStatisticsInterfaceRxInform OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of inform (option 53 with value 8) packets received."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 9 }
+
+dhcpSnoopingStatisticsInterfaceRxLeaseQuery OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lease query (option 53 with value 10) packets received."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 10 }
+
+dhcpSnoopingStatisticsInterfaceRxLeaseUnassigned OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lease unassigned (option 53 with value 11) packets
+         received."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 11 }
+
+dhcpSnoopingStatisticsInterfaceRxLeaseUnknown OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lease unknown (option 53 with value 12) packets received."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 12 }
+
+dhcpSnoopingStatisticsInterfaceRxLeaseActive OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lease active (option 53 with value 13) packets received."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 13 }
+
+dhcpSnoopingStatisticsInterfaceRxDiscardChksumErr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discard packet that IP/UDP checksum is error."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 14 }
+
+dhcpSnoopingStatisticsInterfaceRxDiscardUntrust OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discard packet that are coming from untrusted port."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 15 }
+
+dhcpSnoopingStatisticsInterfaceTxDiscover OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discover (option 53 with value 1) packets transmited."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 16 }
+
+dhcpSnoopingStatisticsInterfaceTxOffer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of offer (option 53 with value 2) packets transmited."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 17 }
+
+dhcpSnoopingStatisticsInterfaceTxRequest OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of request (option 53 with value 3) packets transmited."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 18 }
+
+dhcpSnoopingStatisticsInterfaceTxDecline OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of decline (option 53 with value 4) packets transmited."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 19 }
+
+dhcpSnoopingStatisticsInterfaceTxAck OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of ACK (option 53 with value 5) packets transmited."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 20 }
+
+dhcpSnoopingStatisticsInterfaceTxNak OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of NAK (option 53 with value 6) packets transmited."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 21 }
+
+dhcpSnoopingStatisticsInterfaceTxRelease OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of release (option 53 with value 7) packets transmited."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 22 }
+
+dhcpSnoopingStatisticsInterfaceTxInform OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of inform (option 53 with value 8) packets transmited."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 23 }
+
+dhcpSnoopingStatisticsInterfaceTxLeaseQuery OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lease query (option 53 with value 10) packets transmited."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 24 }
+
+dhcpSnoopingStatisticsInterfaceTxLeaseUnassigned OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lease unassigned (option 53 with value 11) packets
+         transmited."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 25 }
+
+dhcpSnoopingStatisticsInterfaceTxLeaseUnknown OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lease unknown (option 53 with value 12) packets
+         transmited."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 26 }
+
+dhcpSnoopingStatisticsInterfaceTxLeaseActive OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lease active (option 53 with value 13) packets
+         transmited."
+    ::= { dhcpSnoopingStatisticsInterfaceEntry 27 }
+
+dhcpSnoopingMibConformance OBJECT IDENTIFIER
+    ::= { dhcpSnoopingMib 2 }
+
+dhcpSnoopingMibCompliances OBJECT IDENTIFIER
+    ::= { dhcpSnoopingMibConformance 1 }
+
+dhcpSnoopingMibGroups OBJECT IDENTIFIER
+    ::= { dhcpSnoopingMibConformance 2 }
+
+dhcpSnoopingConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcpSnoopingConfigGlobalsMode }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcpSnoopingMibGroups 1 }
+
+dhcpSnoopingConfigInterfaceInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcpSnoopingConfigInterfaceTrustMode }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcpSnoopingMibGroups 2 }
+
+dhcpSnoopingStatusAssignedIpTableInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcpSnoopingStatusAssignedIpIfIndex,
+                  dhcpSnoopingStatusAssignedIpIpAddress,
+                  dhcpSnoopingStatusAssignedIpNetmask,
+                  dhcpSnoopingStatusAssignedIpDhcpServerIp }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcpSnoopingMibGroups 3 }
+
+dhcpSnoopingControlInterfaceClearStatisticsTableInfoGroup OBJECT-GROUP
+    OBJECTS     {                   dhcpSnoopingControlInterfaceClearStatisticsClear }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcpSnoopingMibGroups 4 }
+
+dhcpSnoopingStatisticsInterfaceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcpSnoopingStatisticsInterfaceRxDiscover,
+                  dhcpSnoopingStatisticsInterfaceRxOffer,
+                  dhcpSnoopingStatisticsInterfaceRxRequest,
+                  dhcpSnoopingStatisticsInterfaceRxDecline,
+                  dhcpSnoopingStatisticsInterfaceRxAck,
+                  dhcpSnoopingStatisticsInterfaceRxNak,
+                  dhcpSnoopingStatisticsInterfaceRxRelease,
+                  dhcpSnoopingStatisticsInterfaceRxInform,
+                  dhcpSnoopingStatisticsInterfaceRxLeaseQuery,
+                  dhcpSnoopingStatisticsInterfaceRxLeaseUnassigned,
+                  dhcpSnoopingStatisticsInterfaceRxLeaseUnknown,
+                  dhcpSnoopingStatisticsInterfaceRxLeaseActive,
+                  dhcpSnoopingStatisticsInterfaceRxDiscardChksumErr,
+                  dhcpSnoopingStatisticsInterfaceRxDiscardUntrust,
+                  dhcpSnoopingStatisticsInterfaceTxDiscover,
+                  dhcpSnoopingStatisticsInterfaceTxOffer,
+                  dhcpSnoopingStatisticsInterfaceTxRequest,
+                  dhcpSnoopingStatisticsInterfaceTxDecline,
+                  dhcpSnoopingStatisticsInterfaceTxAck,
+                  dhcpSnoopingStatisticsInterfaceTxNak,
+                  dhcpSnoopingStatisticsInterfaceTxRelease,
+                  dhcpSnoopingStatisticsInterfaceTxInform,
+                  dhcpSnoopingStatisticsInterfaceTxLeaseQuery,
+                  dhcpSnoopingStatisticsInterfaceTxLeaseUnassigned,
+                  dhcpSnoopingStatisticsInterfaceTxLeaseUnknown,
+                  dhcpSnoopingStatisticsInterfaceTxLeaseActive }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcpSnoopingMibGroups 5 }
+
+dhcpSnoopingMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { dhcpSnoopingConfigGlobalsInfoGroup,
+                       dhcpSnoopingConfigInterfaceInfoGroup,
+                       dhcpSnoopingStatusAssignedIpTableInfoGroup,
+                       dhcpSnoopingControlInterfaceClearStatisticsTableInfoGroup,
+                       dhcpSnoopingStatisticsInterfaceTableInfoGroup }
+
+    ::= { dhcpSnoopingMibCompliances 1 }
+
+END

@@ -1,0 +1,309 @@
+-- *****************************************************************
+-- MIB-DAYLIGHT-SAVING: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-DAYLIGHT-SAVING DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    DisplayString FROM BTS-TC
+    Integer16 FROM BTS-TC
+    Unsigned16 FROM BTS-TC
+    Unsigned8 FROM BTS-TC
+    ;
+
+daylightSavingMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of daylight saving. Used to configure system
+         Summer time(Daylight Saving) and Time Zone."
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 97 }
+
+
+DaylightSavingMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the available summer time(Daylight Saving)
+         mode."
+    SYNTAX      INTEGER { disable(0), recurring(1), nonRecurring(2) }
+
+daylightSavingMibObjects OBJECT IDENTIFIER
+    ::= { daylightSavingMib 1 }
+
+daylightSavingConfig OBJECT IDENTIFIER
+    ::= { daylightSavingMibObjects 2 }
+
+daylightSavingConfigGlobals OBJECT IDENTIFIER
+    ::= { daylightSavingConfig 1 }
+
+daylightSavingConfigGlobalsTimeZoneAcronym OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a acronym to identify the time zone."
+    ::= { daylightSavingConfigGlobals 1 }
+
+daylightSavingConfigGlobalsTimeZoneOffset OBJECT-TYPE
+    SYNTAX      Integer16 (-720..720)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "To set the system time zone with respect to UTC in minutes."
+    ::= { daylightSavingConfigGlobals 2 }
+
+daylightSavingConfigGlobalsSummerTimeMode OBJECT-TYPE
+    SYNTAX      DaylightSavingMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a summer time mode.
+         
+         Disabled: The daylight feature is disabled,
+         
+         and no input validation is performed on remaining configurations
+         parameters.
+         
+         Recurring mode: Summer time configuration will repeat every year.
+         
+         To enable this mode requires that the parameters Month, Week and Day
+         are configured with valid
+         
+         values (non zero). The parameters Year and Date must be set to 0,
+         
+         signaling that they are not used.
+         
+         Non recurring mode: Summer time configuration is done once.
+         
+         To enable this feature requires that the following values are
+         configured with valid values
+         
+         (non zero): Year, Month and Date. The parameters Week and Day must be
+         set to 0
+         
+         signaling that they are not used."
+    ::= { daylightSavingConfigGlobals 3 }
+
+daylightSavingConfigGlobalsSummerTimeWeekStart OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..5)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a summer time starting week.
+         
+         This object needs to be set when summer time mode is recurring.
+         
+         Object value 0 means unused object."
+    ::= { daylightSavingConfigGlobals 4 }
+
+daylightSavingConfigGlobalsSummerTimeDayStart OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a summer time starting day.
+         
+         where monday = 1, sunday = 7.
+         
+         This object needs to be set when summer time mode is recurring.
+         
+         Object value 0 means unused object."
+    ::= { daylightSavingConfigGlobals 5 }
+
+daylightSavingConfigGlobalsSummerTimeMonthStart OBJECT-TYPE
+    SYNTAX      Unsigned8 (1..12)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a summer time starting month.
+         
+         This object needs to be set when summer time mode is not disabled."
+    ::= { daylightSavingConfigGlobals 6 }
+
+daylightSavingConfigGlobalsSummerTimeDateStart OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..31)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a summer time starting date.
+         
+         This object needs to be set when summer time mode is non recurring."
+    ::= { daylightSavingConfigGlobals 7 }
+
+daylightSavingConfigGlobalsSummerTimeYearStart OBJECT-TYPE
+    SYNTAX      Unsigned16 (0..2097)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a summer time starting year.
+         
+         This object needs to be set when summer time mode is non recurring.
+         
+         Object value 0 means unused object."
+    ::= { daylightSavingConfigGlobals 8 }
+
+daylightSavingConfigGlobalsSummerTimeHourStart OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a summer time starting hour.
+         
+         This object needs to be set when summer time mode is not disabled."
+    ::= { daylightSavingConfigGlobals 9 }
+
+daylightSavingConfigGlobalsSummerTimeMinuteStart OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a summer time starting minute.
+         
+         This object needs to be set when summer time mode is not disabled."
+    ::= { daylightSavingConfigGlobals 10 }
+
+daylightSavingConfigGlobalsSummerTimeWeekEnd OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..5)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a summer time ending week.
+         
+         This object needs to be set when summer time mode is recurring.
+         
+         Object value 0 means unused object."
+    ::= { daylightSavingConfigGlobals 11 }
+
+daylightSavingConfigGlobalsSummerTimeDayEnd OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a summer time ending day.
+         
+         This object needs to be set when summer time mode is recurring.
+         
+         Object value 0 means unused object."
+    ::= { daylightSavingConfigGlobals 12 }
+
+daylightSavingConfigGlobalsSummerTimeMonthEnd OBJECT-TYPE
+    SYNTAX      Unsigned8 (1..12)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a summer time ending month.
+         
+         This object needs to be set when summer time mode is not disabled."
+    ::= { daylightSavingConfigGlobals 13 }
+
+daylightSavingConfigGlobalsSummerTimeDateEnd OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..31)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a summer time ending date.
+         
+         This object needs to be set when summer time mode is non recurring.
+         
+         Object value 0 means unused object."
+    ::= { daylightSavingConfigGlobals 14 }
+
+daylightSavingConfigGlobalsSummerTimeYearEnd OBJECT-TYPE
+    SYNTAX      Unsigned16 (0..2097)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a summer time ending year.
+         
+         This object needs to be set when summer time mode is non recurring.
+         
+         Object value 0 means unused object."
+    ::= { daylightSavingConfigGlobals 15 }
+
+daylightSavingConfigGlobalsSummerTimeHourEnd OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a summer time ending hour.
+         
+         This object needs to be set when summer time mode is not disabled."
+    ::= { daylightSavingConfigGlobals 16 }
+
+daylightSavingConfigGlobalsSummerTimeMinuteEnd OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a summer time ending minute.
+         
+         This object needs to be set when summer time mode is not disabled."
+    ::= { daylightSavingConfigGlobals 17 }
+
+daylightSavingConfigGlobalsSummerTimeOffset OBJECT-TYPE
+    SYNTAX      Integer16 (1..1440)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of this object indicates
+         
+         the number of minutes to add or to subtract during summertime.
+         
+         This object needs to be set when summer time mode is not disabled."
+    ::= { daylightSavingConfigGlobals 18 }
+
+daylightSavingMibConformance OBJECT IDENTIFIER
+    ::= { daylightSavingMib 2 }
+
+daylightSavingMibCompliances OBJECT IDENTIFIER
+    ::= { daylightSavingMibConformance 1 }
+
+daylightSavingMibGroups OBJECT IDENTIFIER
+    ::= { daylightSavingMibConformance 2 }
+
+daylightSavingConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { daylightSavingConfigGlobalsTimeZoneAcronym,
+                  daylightSavingConfigGlobalsTimeZoneOffset,
+                  daylightSavingConfigGlobalsSummerTimeMode,
+                  daylightSavingConfigGlobalsSummerTimeWeekStart,
+                  daylightSavingConfigGlobalsSummerTimeDayStart,
+                  daylightSavingConfigGlobalsSummerTimeMonthStart,
+                  daylightSavingConfigGlobalsSummerTimeDateStart,
+                  daylightSavingConfigGlobalsSummerTimeYearStart,
+                  daylightSavingConfigGlobalsSummerTimeHourStart,
+                  daylightSavingConfigGlobalsSummerTimeMinuteStart,
+                  daylightSavingConfigGlobalsSummerTimeWeekEnd,
+                  daylightSavingConfigGlobalsSummerTimeDayEnd,
+                  daylightSavingConfigGlobalsSummerTimeMonthEnd,
+                  daylightSavingConfigGlobalsSummerTimeDateEnd,
+                  daylightSavingConfigGlobalsSummerTimeYearEnd,
+                  daylightSavingConfigGlobalsSummerTimeHourEnd,
+                  daylightSavingConfigGlobalsSummerTimeMinuteEnd,
+                  daylightSavingConfigGlobalsSummerTimeOffset }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { daylightSavingMibGroups 1 }
+
+daylightSavingMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { daylightSavingConfigGlobalsInfoGroup }
+
+    ::= { daylightSavingMibCompliances 1 }
+
+END

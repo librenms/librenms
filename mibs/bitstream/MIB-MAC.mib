@@ -1,0 +1,578 @@
+-- *****************************************************************
+-- MIB-MAC: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-MAC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    MacAddress FROM SNMPv2-TC
+    TruthValue FROM SNMPv2-TC
+    InterfaceIndex FROM BTS-TC
+    PortList FROM BTS-TC
+    RowEditorState FROM BTS-TC
+    Unsigned8 FROM BTS-TC
+    Vlan FROM BTS-TC
+    ;
+
+macMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of the MAC MIB"
+    REVISION    "201408200000Z"
+    DESCRIPTION
+        "Updated types"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 12 }
+
+
+MACPortLearnMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The learning mode of the port."
+    SYNTAX      INTEGER { auto(0), disable(1), secure(2) }
+
+macMibObjects OBJECT IDENTIFIER
+    ::= { macMib 1 }
+
+macCapabilities OBJECT IDENTIFIER
+    ::= { macMibObjects 1 }
+
+macCapabilitiesNonVolatileMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Max number of static non-volatile MAC addresses that can be stored in
+         the system."
+    ::= { macCapabilities 1 }
+
+macConfig OBJECT IDENTIFIER
+    ::= { macMibObjects 2 }
+
+macConfigFdbGlobal OBJECT IDENTIFIER
+    ::= { macConfig 1 }
+
+macConfigFdbGlobalAgeTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Mac address aging time in the FDB."
+    ::= { macConfigFdbGlobal 1 }
+
+macConfigFdbTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MacConfigFdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table represents static mac addresses added through the mgmt
+         interface. "
+    ::= { macConfig 2 }
+
+macConfigFdbEntry OBJECT-TYPE
+    SYNTAX      MacConfigFdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters"
+    INDEX       { macConfigFdbVlanId, macConfigFdbMacAddress }
+    ::= { macConfigFdbTable 1 }
+
+MacConfigFdbEntry ::= SEQUENCE {
+    macConfigFdbVlanId      Vlan,
+    macConfigFdbMacAddress  MacAddress,
+    macConfigFdbPortList    PortList,
+    macConfigFdbAction      RowEditorState
+}
+
+macConfigFdbVlanId OBJECT-TYPE
+    SYNTAX      Vlan
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Vlan id used for indexing."
+    ::= { macConfigFdbEntry 1 }
+
+macConfigFdbMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The destination MAC address which this entry applies."
+    ::= { macConfigFdbEntry 2 }
+
+macConfigFdbPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "List of destination ports for which frames with this DMAC is forwarded
+         to."
+    ::= { macConfigFdbEntry 3 }
+
+macConfigFdbAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { macConfigFdbEntry 100 }
+
+macConfigFdbTableRowEditor OBJECT IDENTIFIER
+    ::= { macConfig 3 }
+
+macConfigFdbTableRowEditorVlanId OBJECT-TYPE
+    SYNTAX      Vlan
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vlan id used for indexing."
+    ::= { macConfigFdbTableRowEditor 1 }
+
+macConfigFdbTableRowEditorMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The destination MAC address which this entry applies."
+    ::= { macConfigFdbTableRowEditor 2 }
+
+macConfigFdbTableRowEditorPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "List of destination ports for which frames with this DMAC is forwarded
+         to."
+    ::= { macConfigFdbTableRowEditor 3 }
+
+macConfigFdbTableRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { macConfigFdbTableRowEditor 100 }
+
+macConfigPortLearnTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MacConfigPortLearnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table represents the learning mode of each port"
+    ::= { macConfig 4 }
+
+macConfigPortLearnEntry OBJECT-TYPE
+    SYNTAX      MacConfigPortLearnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters"
+    INDEX       { macConfigPortLearnIfIndex }
+    ::= { macConfigPortLearnTable 1 }
+
+MacConfigPortLearnEntry ::= SEQUENCE {
+    macConfigPortLearnIfIndex        InterfaceIndex,
+    macConfigPortLearnLearnMode      MACPortLearnMode,
+    macConfigPortLearnChangeAllowed  TruthValue
+}
+
+macConfigPortLearnIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface index."
+    ::= { macConfigPortLearnEntry 1 }
+
+macConfigPortLearnLearnMode OBJECT-TYPE
+    SYNTAX      MACPortLearnMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The learn mode of the port. Auto(0) means auto learning. Disable(1)
+         means that learning is disabled. Secure(2) means that learning frames
+         are discarded."
+    ::= { macConfigPortLearnEntry 2 }
+
+macConfigPortLearnChangeAllowed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If internal modules have changed the learned mode then the user is not
+         allowed to change it from this interface. This entry tells you if the
+         LearnMode can be changed (true) or not (false). This is a read only
+         entry - write is ignored."
+    ::= { macConfigPortLearnEntry 3 }
+
+macConfigVlanLearnTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MacConfigVlanLearnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table represents the learning mode of each vlan 1-4095"
+    ::= { macConfig 5 }
+
+macConfigVlanLearnEntry OBJECT-TYPE
+    SYNTAX      MacConfigVlanLearnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters"
+    INDEX       { macConfigVlanLearnVlanId }
+    ::= { macConfigVlanLearnTable 1 }
+
+MacConfigVlanLearnEntry ::= SEQUENCE {
+    macConfigVlanLearnVlanId  Vlan,
+    macConfigVlanLearnMode    TruthValue
+}
+
+macConfigVlanLearnVlanId OBJECT-TYPE
+    SYNTAX      Vlan
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Vlan id used for indexing."
+    ::= { macConfigVlanLearnEntry 1 }
+
+macConfigVlanLearnMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Learn mode of the VLAN, True = Enabled, False = Disabled"
+    ::= { macConfigVlanLearnEntry 2 }
+
+macStatus OBJECT IDENTIFIER
+    ::= { macMibObjects 3 }
+
+macStatusFdbTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MacStatusFdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table represents all mac addresses in the FDB"
+    ::= { macStatus 1 }
+
+macStatusFdbEntry OBJECT-TYPE
+    SYNTAX      MacStatusFdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters"
+    INDEX       { macStatusFdbVlanId, macStatusFdbMacAddress }
+    ::= { macStatusFdbTable 1 }
+
+MacStatusFdbEntry ::= SEQUENCE {
+    macStatusFdbVlanId      Vlan,
+    macStatusFdbMacAddress  MacAddress,
+    macStatusFdbPortList    PortList,
+    macStatusFdbDynamic     Unsigned8,
+    macStatusFdbCopyToCpu   Unsigned8
+}
+
+macStatusFdbVlanId OBJECT-TYPE
+    SYNTAX      Vlan
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Vlan id used for indexing."
+    ::= { macStatusFdbEntry 1 }
+
+macStatusFdbMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The destination MAC address which this entry applies."
+    ::= { macStatusFdbEntry 2 }
+
+macStatusFdbPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "List of destination ports for which frames with this DMAC is forwarded
+         to."
+    ::= { macStatusFdbEntry 3 }
+
+macStatusFdbDynamic OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The entry is dynamically learned (True) or statically added (False)"
+    ::= { macStatusFdbEntry 4 }
+
+macStatusFdbCopyToCpu OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Copy this frame to the CPU (True) or not (False)"
+    ::= { macStatusFdbEntry 5 }
+
+macStatusFdbStaticTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MacStatusFdbStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table represents all static mac addresses in the FDB"
+    ::= { macStatus 2 }
+
+macStatusFdbStaticEntry OBJECT-TYPE
+    SYNTAX      MacStatusFdbStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters"
+    INDEX       { macStatusFdbStaticVlanId,
+                  macStatusFdbStaticMacAddress }
+    ::= { macStatusFdbStaticTable 1 }
+
+MacStatusFdbStaticEntry ::= SEQUENCE {
+    macStatusFdbStaticVlanId      Vlan,
+    macStatusFdbStaticMacAddress  MacAddress,
+    macStatusFdbStaticPortList    PortList,
+    macStatusFdbStaticDynamic     Unsigned8,
+    macStatusFdbStaticCopyToCpu   Unsigned8
+}
+
+macStatusFdbStaticVlanId OBJECT-TYPE
+    SYNTAX      Vlan
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Vlan id used for indexing."
+    ::= { macStatusFdbStaticEntry 1 }
+
+macStatusFdbStaticMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The destination MAC address which this entry applies."
+    ::= { macStatusFdbStaticEntry 2 }
+
+macStatusFdbStaticPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "List of destination ports for which frames with this DMAC is forwarded
+         to."
+    ::= { macStatusFdbStaticEntry 3 }
+
+macStatusFdbStaticDynamic OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The entry is dynamically learned (True) or statically added (False)"
+    ::= { macStatusFdbStaticEntry 4 }
+
+macStatusFdbStaticCopyToCpu OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Copy this frame to the CPU (True) or not (False)"
+    ::= { macStatusFdbStaticEntry 5 }
+
+macStatusFdbPortStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MacStatusFdbPortStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table represent the statistics of the Port interfaces"
+    ::= { macStatus 3 }
+
+macStatusFdbPortStatisticsEntry OBJECT-TYPE
+    SYNTAX      MacStatusFdbPortStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each port has a number of learned addresses"
+    INDEX       { macStatusFdbPortStatisticsIfIndex }
+    ::= { macStatusFdbPortStatisticsTable 1 }
+
+MacStatusFdbPortStatisticsEntry ::= SEQUENCE {
+    macStatusFdbPortStatisticsIfIndex  InterfaceIndex,
+    macStatusFdbPortStatisticsDynamic  Unsigned32
+}
+
+macStatusFdbPortStatisticsIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface index."
+    ::= { macStatusFdbPortStatisticsEntry 1 }
+
+macStatusFdbPortStatisticsDynamic OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of dynamic learned addresses on the port"
+    ::= { macStatusFdbPortStatisticsEntry 2 }
+
+macStatusFdbStatistics OBJECT IDENTIFIER
+    ::= { macStatus 4 }
+
+macStatusFdbStatisticsTotalDynamic OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total dynamic learned addresses in the FDB"
+    ::= { macStatusFdbStatistics 1 }
+
+macStatusFdbStatisticsTotalStatic OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total static addresses in the FDB"
+    ::= { macStatusFdbStatistics 2 }
+
+macControl OBJECT IDENTIFIER
+    ::= { macMibObjects 4 }
+
+macControlFlushAll OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Flush all dynamic learned Mac addresses. Set the value to 'true' to
+         perform the action. Read will always return 'false'."
+    ::= { macControl 1 }
+
+macMibConformance OBJECT IDENTIFIER
+    ::= { macMib 2 }
+
+macMibCompliances OBJECT IDENTIFIER
+    ::= { macMibConformance 1 }
+
+macMibGroups OBJECT IDENTIFIER
+    ::= { macMibConformance 2 }
+
+macCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { macCapabilitiesNonVolatileMax }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { macMibGroups 1 }
+
+macConfigFdbGlobalInfoGroup OBJECT-GROUP
+    OBJECTS     { macConfigFdbGlobalAgeTime }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { macMibGroups 2 }
+
+macConfigFdbTableInfoGroup OBJECT-GROUP
+    OBJECTS     { macConfigFdbPortList, macConfigFdbAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { macMibGroups 3 }
+
+macConfigFdbTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { macConfigFdbTableRowEditorVlanId,
+                  macConfigFdbTableRowEditorMacAddress,
+                  macConfigFdbTableRowEditorPortList,
+                  macConfigFdbTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { macMibGroups 4 }
+
+macConfigPortLearnInfoGroup OBJECT-GROUP
+    OBJECTS     { macConfigPortLearnLearnMode,
+                  macConfigPortLearnChangeAllowed }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { macMibGroups 5 }
+
+macConfigVlanLearnInfoGroup OBJECT-GROUP
+    OBJECTS     { macConfigVlanLearnMode }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { macMibGroups 6 }
+
+macStatusFdbTableInfoGroup OBJECT-GROUP
+    OBJECTS     { macStatusFdbPortList, macStatusFdbDynamic,
+                  macStatusFdbCopyToCpu }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { macMibGroups 7 }
+
+macStatusFdbStaticTableInfoGroup OBJECT-GROUP
+    OBJECTS     { macStatusFdbStaticPortList,
+                  macStatusFdbStaticDynamic,
+                  macStatusFdbStaticCopyToCpu }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { macMibGroups 8 }
+
+macStatusFdbPortStatisticsInfoGroup OBJECT-GROUP
+    OBJECTS     { macStatusFdbPortStatisticsDynamic }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { macMibGroups 9 }
+
+macStatusFdbStatisticsInfoGroup OBJECT-GROUP
+    OBJECTS     { macStatusFdbStatisticsTotalDynamic,
+                  macStatusFdbStatisticsTotalStatic }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { macMibGroups 10 }
+
+macControlInfoGroup OBJECT-GROUP
+    OBJECTS     { macControlFlushAll }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { macMibGroups 11 }
+
+macMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { macCapabilitiesInfoGroup,
+                       macConfigFdbGlobalInfoGroup,
+                       macConfigFdbTableInfoGroup,
+                       macConfigFdbTableRowEditorInfoGroup,
+                       macConfigPortLearnInfoGroup,
+                       macConfigVlanLearnInfoGroup,
+                       macStatusFdbTableInfoGroup,
+                       macStatusFdbStaticTableInfoGroup,
+                       macStatusFdbPortStatisticsInfoGroup,
+                       macStatusFdbStatisticsInfoGroup,
+                       macControlInfoGroup }
+
+    ::= { macMibCompliances 1 }
+
+END

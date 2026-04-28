@@ -1,0 +1,661 @@
+-- *****************************************************************
+-- MIB-ACCESS-MANAGEMENT: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-ACCESS-MANAGEMENT DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    InetAddressIPv6 FROM INET-ADDRESS-MIB
+    Integer32 FROM SNMPv2-SMI
+    IpAddress FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    RowEditorState FROM BTS-TC
+    Unsigned16 FROM BTS-TC
+    ;
+
+accessManagementMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is the BitStream NAS private MIB."
+    REVISION    "202503200000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 51 }
+
+
+accessManagementMibObjects OBJECT IDENTIFIER
+    ::= { accessManagementMib 1 }
+
+accessManagementConfig OBJECT IDENTIFIER
+    ::= { accessManagementMibObjects 2 }
+
+accessManagementConfigGlobals OBJECT IDENTIFIER
+    ::= { accessManagementConfig 1 }
+
+accessManagementConfigGlobalsAdminState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable the Access Management global functionality."
+    ::= { accessManagementConfigGlobals 1 }
+
+accessManagementConfigIpv4Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AccessManagementConfigIpv4Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table for managing Access Management per IPv4 basis"
+    ::= { accessManagementConfig 2 }
+
+accessManagementConfigIpv4Entry OBJECT-TYPE
+    SYNTAX      AccessManagementConfigIpv4Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters"
+    INDEX       { accessManagementConfigIpv4AccessIndex }
+    ::= { accessManagementConfigIpv4Table 1 }
+
+AccessManagementConfigIpv4Entry ::= SEQUENCE {
+    accessManagementConfigIpv4AccessIndex     Integer32,
+    accessManagementConfigIpv4VlanId          Unsigned16,
+    accessManagementConfigIpv4StartAddress    IpAddress,
+    accessManagementConfigIpv4EndAddress      IpAddress,
+    accessManagementConfigIpv4WebServices     TruthValue,
+    accessManagementConfigIpv4SnmpServices    TruthValue,
+    accessManagementConfigIpv4TelnetServices  TruthValue,
+    accessManagementConfigIpv4Action          RowEditorState
+}
+
+accessManagementConfigIpv4AccessIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index for Access Management IPv4/IPv6 table."
+    ::= { accessManagementConfigIpv4Entry 1 }
+
+accessManagementConfigIpv4VlanId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ID of specific VLAN interface that Access Management should take
+         effect for IPv4."
+    ::= { accessManagementConfigIpv4Entry 2 }
+
+accessManagementConfigIpv4StartAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The starting IPv4 address of the range that Access Management performs
+         checking."
+    ::= { accessManagementConfigIpv4Entry 3 }
+
+accessManagementConfigIpv4EndAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ending IPv4 address of the range that Access Management performs
+         checking."
+    ::= { accessManagementConfigIpv4Entry 4 }
+
+accessManagementConfigIpv4WebServices OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable HTTP and HTTPS functionality via Access Management. At
+         least one of WebServices/SnmpServices/TelnetServices has to be enabled
+         for a specific AccessIndex in Access Management IPv4 table."
+    ::= { accessManagementConfigIpv4Entry 5 }
+
+accessManagementConfigIpv4SnmpServices OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable SNMP functionality via Access Management. At least one
+         of WebServices/SnmpServices/TelnetServices has to be enabled for a
+         specific AccessIndex in Access Management IPv4 table."
+    ::= { accessManagementConfigIpv4Entry 6 }
+
+accessManagementConfigIpv4TelnetServices OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable TELNET/SSH functionality via Access Management. At least
+         one of WebServices/SnmpServices/TelnetServices has to be enabled for a
+         specific AccessIndex in Access Management IPv4 table."
+    ::= { accessManagementConfigIpv4Entry 7 }
+
+accessManagementConfigIpv4Action OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { accessManagementConfigIpv4Entry 100 }
+
+accessManagementConfigIpv4TableRowEditor OBJECT IDENTIFIER
+    ::= { accessManagementConfig 3 }
+
+accessManagementConfigIpv4TableRowEditorAccessIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Index for Access Management IPv4/IPv6 table."
+    ::= { accessManagementConfigIpv4TableRowEditor 1 }
+
+accessManagementConfigIpv4TableRowEditorVlanId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ID of specific VLAN interface that Access Management should take
+         effect for IPv4."
+    ::= { accessManagementConfigIpv4TableRowEditor 2 }
+
+accessManagementConfigIpv4TableRowEditorStartAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The starting IPv4 address of the range that Access Management performs
+         checking."
+    ::= { accessManagementConfigIpv4TableRowEditor 3 }
+
+accessManagementConfigIpv4TableRowEditorEndAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ending IPv4 address of the range that Access Management performs
+         checking."
+    ::= { accessManagementConfigIpv4TableRowEditor 4 }
+
+accessManagementConfigIpv4TableRowEditorWebServices OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable HTTP and HTTPS functionality via Access Management. At
+         least one of WebServices/SnmpServices/TelnetServices has to be enabled
+         for a specific AccessIndex in Access Management IPv4 table."
+    ::= { accessManagementConfigIpv4TableRowEditor 5 }
+
+accessManagementConfigIpv4TableRowEditorSnmpServices OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable SNMP functionality via Access Management. At least one
+         of WebServices/SnmpServices/TelnetServices has to be enabled for a
+         specific AccessIndex in Access Management IPv4 table."
+    ::= { accessManagementConfigIpv4TableRowEditor 6 }
+
+accessManagementConfigIpv4TableRowEditorTelnetServices OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable TELNET/SSH functionality via Access Management. At least
+         one of WebServices/SnmpServices/TelnetServices has to be enabled for a
+         specific AccessIndex in Access Management IPv4 table."
+    ::= { accessManagementConfigIpv4TableRowEditor 7 }
+
+accessManagementConfigIpv4TableRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { accessManagementConfigIpv4TableRowEditor 100 }
+
+accessManagementConfigIpv6Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AccessManagementConfigIpv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table for managing Access Management per IPv6 basis"
+    ::= { accessManagementConfig 4 }
+
+accessManagementConfigIpv6Entry OBJECT-TYPE
+    SYNTAX      AccessManagementConfigIpv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters"
+    INDEX       { accessManagementConfigIpv6AccessIndex }
+    ::= { accessManagementConfigIpv6Table 1 }
+
+AccessManagementConfigIpv6Entry ::= SEQUENCE {
+    accessManagementConfigIpv6AccessIndex     Integer32,
+    accessManagementConfigIpv6VlanId          Unsigned16,
+    accessManagementConfigIpv6StartAddress    InetAddressIPv6,
+    accessManagementConfigIpv6EndAddress      InetAddressIPv6,
+    accessManagementConfigIpv6WebServices     TruthValue,
+    accessManagementConfigIpv6SnmpServices    TruthValue,
+    accessManagementConfigIpv6TelnetServices  TruthValue,
+    accessManagementConfigIpv6Action          RowEditorState
+}
+
+accessManagementConfigIpv6AccessIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index for Access Management IPv4/IPv6 table."
+    ::= { accessManagementConfigIpv6Entry 1 }
+
+accessManagementConfigIpv6VlanId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ID of specific VLAN interface that Access Management should take
+         effect for IPv6."
+    ::= { accessManagementConfigIpv6Entry 2 }
+
+accessManagementConfigIpv6StartAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The starting IPv6 address of the range that Access Management performs
+         checking."
+    ::= { accessManagementConfigIpv6Entry 3 }
+
+accessManagementConfigIpv6EndAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ending IPv6 address of the range that Access Management performs
+         checking."
+    ::= { accessManagementConfigIpv6Entry 4 }
+
+accessManagementConfigIpv6WebServices OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable HTTP and HTTPS functionality via Access Management. At
+         least one of WebServices/SnmpServices/TelnetServices has to be enabled
+         for a specific AccessIndex in Access Management IPv6 table."
+    ::= { accessManagementConfigIpv6Entry 5 }
+
+accessManagementConfigIpv6SnmpServices OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable SNMP functionality via Access Management. At least one
+         of WebServices/SnmpServices/TelnetServices has to be enabled for a
+         specific AccessIndex in Access Management IPv6 table."
+    ::= { accessManagementConfigIpv6Entry 6 }
+
+accessManagementConfigIpv6TelnetServices OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable TELNET/SSH functionality via Access Management. At least
+         one of WebServices/SnmpServices/TelnetServices has to be enabled for a
+         specific AccessIndex in Access Management IPv6 table."
+    ::= { accessManagementConfigIpv6Entry 7 }
+
+accessManagementConfigIpv6Action OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { accessManagementConfigIpv6Entry 100 }
+
+accessManagementConfigIpv6TableRowEditor OBJECT IDENTIFIER
+    ::= { accessManagementConfig 5 }
+
+accessManagementConfigIpv6TableRowEditorAccessIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Index for Access Management IPv4/IPv6 table."
+    ::= { accessManagementConfigIpv6TableRowEditor 1 }
+
+accessManagementConfigIpv6TableRowEditorVlanId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ID of specific VLAN interface that Access Management should take
+         effect for IPv6."
+    ::= { accessManagementConfigIpv6TableRowEditor 2 }
+
+accessManagementConfigIpv6TableRowEditorStartAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The starting IPv6 address of the range that Access Management performs
+         checking."
+    ::= { accessManagementConfigIpv6TableRowEditor 3 }
+
+accessManagementConfigIpv6TableRowEditorEndAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ending IPv6 address of the range that Access Management performs
+         checking."
+    ::= { accessManagementConfigIpv6TableRowEditor 4 }
+
+accessManagementConfigIpv6TableRowEditorWebServices OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable HTTP and HTTPS functionality via Access Management. At
+         least one of WebServices/SnmpServices/TelnetServices has to be enabled
+         for a specific AccessIndex in Access Management IPv6 table."
+    ::= { accessManagementConfigIpv6TableRowEditor 5 }
+
+accessManagementConfigIpv6TableRowEditorSnmpServices OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable SNMP functionality via Access Management. At least one
+         of WebServices/SnmpServices/TelnetServices has to be enabled for a
+         specific AccessIndex in Access Management IPv6 table."
+    ::= { accessManagementConfigIpv6TableRowEditor 6 }
+
+accessManagementConfigIpv6TableRowEditorTelnetServices OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable TELNET/SSH functionality via Access Management. At least
+         one of WebServices/SnmpServices/TelnetServices has to be enabled for a
+         specific AccessIndex in Access Management IPv6 table."
+    ::= { accessManagementConfigIpv6TableRowEditor 7 }
+
+accessManagementConfigIpv6TableRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { accessManagementConfigIpv6TableRowEditor 100 }
+
+accessManagementStatus OBJECT IDENTIFIER
+    ::= { accessManagementMibObjects 3 }
+
+accessManagementControl OBJECT IDENTIFIER
+    ::= { accessManagementMibObjects 4 }
+
+accessManagementControlStatistics OBJECT IDENTIFIER
+    ::= { accessManagementControl 1 }
+
+accessManagementControlStatisticsClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "To trigger the control action (only) when TRUE."
+    ::= { accessManagementControlStatistics 1 }
+
+accessManagementStatistics OBJECT IDENTIFIER
+    ::= { accessManagementMibObjects 5 }
+
+accessManagementStatisticsHttpReceivedPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received count of frames via HTTP."
+    ::= { accessManagementStatistics 1 }
+
+accessManagementStatisticsHttpAllowedPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Permit count of frames via HTTP."
+    ::= { accessManagementStatistics 2 }
+
+accessManagementStatisticsHttpDiscardedPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Drop count of frames via HTTP."
+    ::= { accessManagementStatistics 3 }
+
+accessManagementStatisticsHttpsReceivedPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received count of frames via HTTPS."
+    ::= { accessManagementStatistics 4 }
+
+accessManagementStatisticsHttpsAllowedPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Permit count of frames via HTTPS."
+    ::= { accessManagementStatistics 5 }
+
+accessManagementStatisticsHttpsDiscardedPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Drop count of frames via HTTPS."
+    ::= { accessManagementStatistics 6 }
+
+accessManagementStatisticsSnmpReceivedPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received count of frames via SNMP."
+    ::= { accessManagementStatistics 7 }
+
+accessManagementStatisticsSnmpAllowedPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Permit count of frames via SNMP."
+    ::= { accessManagementStatistics 8 }
+
+accessManagementStatisticsSnmpDiscardedPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Drop count of frames via SNMP."
+    ::= { accessManagementStatistics 9 }
+
+accessManagementStatisticsTelnetReceivedPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received count of frames via TELNET."
+    ::= { accessManagementStatistics 10 }
+
+accessManagementStatisticsTelnetAllowedPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Permit count of frames via TELNET."
+    ::= { accessManagementStatistics 11 }
+
+accessManagementStatisticsTelnetDiscardedPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Drop count of frames via TELNET."
+    ::= { accessManagementStatistics 12 }
+
+accessManagementStatisticsSshReceivedPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received count of frames via SSH."
+    ::= { accessManagementStatistics 13 }
+
+accessManagementStatisticsSshAllowedPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Permit count of frames via SSH."
+    ::= { accessManagementStatistics 14 }
+
+accessManagementStatisticsSshDiscardedPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Drop count of frames via SSH."
+    ::= { accessManagementStatistics 15 }
+
+accessManagementMibConformance OBJECT IDENTIFIER
+    ::= { accessManagementMib 2 }
+
+accessManagementMibCompliances OBJECT IDENTIFIER
+    ::= { accessManagementMibConformance 1 }
+
+accessManagementMibGroups OBJECT IDENTIFIER
+    ::= { accessManagementMibConformance 2 }
+
+accessManagementConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { accessManagementConfigGlobalsAdminState }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { accessManagementMibGroups 1 }
+
+accessManagementConfigIpv4TableInfoGroup OBJECT-GROUP
+    OBJECTS     { accessManagementConfigIpv4VlanId,
+                  accessManagementConfigIpv4StartAddress,
+                  accessManagementConfigIpv4EndAddress,
+                  accessManagementConfigIpv4WebServices,
+                  accessManagementConfigIpv4SnmpServices,
+                  accessManagementConfigIpv4TelnetServices,
+                  accessManagementConfigIpv4Action }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { accessManagementMibGroups 2 }
+
+accessManagementConfigIpv4TableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     {                   accessManagementConfigIpv4TableRowEditorAccessIndex,
+                  accessManagementConfigIpv4TableRowEditorVlanId,
+                  accessManagementConfigIpv4TableRowEditorStartAddress,
+                  accessManagementConfigIpv4TableRowEditorEndAddress,
+                  accessManagementConfigIpv4TableRowEditorWebServices,
+                  accessManagementConfigIpv4TableRowEditorSnmpServices,
+                  accessManagementConfigIpv4TableRowEditorTelnetServices,
+                  accessManagementConfigIpv4TableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { accessManagementMibGroups 3 }
+
+accessManagementConfigIpv6TableInfoGroup OBJECT-GROUP
+    OBJECTS     { accessManagementConfigIpv6VlanId,
+                  accessManagementConfigIpv6StartAddress,
+                  accessManagementConfigIpv6EndAddress,
+                  accessManagementConfigIpv6WebServices,
+                  accessManagementConfigIpv6SnmpServices,
+                  accessManagementConfigIpv6TelnetServices,
+                  accessManagementConfigIpv6Action }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { accessManagementMibGroups 4 }
+
+accessManagementConfigIpv6TableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     {                   accessManagementConfigIpv6TableRowEditorAccessIndex,
+                  accessManagementConfigIpv6TableRowEditorVlanId,
+                  accessManagementConfigIpv6TableRowEditorStartAddress,
+                  accessManagementConfigIpv6TableRowEditorEndAddress,
+                  accessManagementConfigIpv6TableRowEditorWebServices,
+                  accessManagementConfigIpv6TableRowEditorSnmpServices,
+                  accessManagementConfigIpv6TableRowEditorTelnetServices,
+                  accessManagementConfigIpv6TableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { accessManagementMibGroups 5 }
+
+accessManagementControlStatisticsInfoGroup OBJECT-GROUP
+    OBJECTS     { accessManagementControlStatisticsClear }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { accessManagementMibGroups 6 }
+
+accessManagementStatisticsInfoGroup OBJECT-GROUP
+    OBJECTS     { accessManagementStatisticsHttpReceivedPkts,
+                  accessManagementStatisticsHttpAllowedPkts,
+                  accessManagementStatisticsHttpDiscardedPkts,
+                  accessManagementStatisticsHttpsReceivedPkts,
+                  accessManagementStatisticsHttpsAllowedPkts,
+                  accessManagementStatisticsHttpsDiscardedPkts,
+                  accessManagementStatisticsSnmpReceivedPkts,
+                  accessManagementStatisticsSnmpAllowedPkts,
+                  accessManagementStatisticsSnmpDiscardedPkts,
+                  accessManagementStatisticsTelnetReceivedPkts,
+                  accessManagementStatisticsTelnetAllowedPkts,
+                  accessManagementStatisticsTelnetDiscardedPkts,
+                  accessManagementStatisticsSshReceivedPkts,
+                  accessManagementStatisticsSshAllowedPkts,
+                  accessManagementStatisticsSshDiscardedPkts }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { accessManagementMibGroups 7 }
+
+accessManagementMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { accessManagementConfigGlobalsInfoGroup,
+                       accessManagementConfigIpv4TableInfoGroup,
+                       accessManagementConfigIpv4TableRowEditorInfoGroup,
+                       accessManagementConfigIpv6TableInfoGroup,
+                       accessManagementConfigIpv6TableRowEditorInfoGroup,
+                       accessManagementControlStatisticsInfoGroup,
+                       accessManagementStatisticsInfoGroup }
+
+    ::= { accessManagementMibCompliances 1 }
+
+END

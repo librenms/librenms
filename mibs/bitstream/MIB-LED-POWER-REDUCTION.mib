@@ -1,0 +1,145 @@
+-- *****************************************************************
+-- MIB-LED-POWER-REDUCTION: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-LED-POWER-REDUCTION DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    Unsigned16 FROM BTS-TC
+    Unsigned8 FROM BTS-TC
+    ;
+
+ledPowerReductionMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of LEDs power reduction. The LEDs power
+         consumption can be reduced by lowering the LEDs intensity"
+    REVISION    "201410100000Z"
+    DESCRIPTION
+        "Editorial changes"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 77 }
+
+
+ledPowerReductionMibObjects OBJECT IDENTIFIER
+    ::= { ledPowerReductionMib 1 }
+
+ledPowerReductionConfig OBJECT IDENTIFIER
+    ::= { ledPowerReductionMibObjects 2 }
+
+ledPowerReductionConfigGlobals OBJECT IDENTIFIER
+    ::= { ledPowerReductionConfig 1 }
+
+ledPowerReductionConfigGlobalsMaintenanceDuration OBJECT-TYPE
+    SYNTAX      Unsigned16 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The switch maintenance duration (in seconds). During switch maintenance
+         LEDs will glow in full intensity after either a port has changed link
+         state or the LED push button has been pushed."
+    ::= { ledPowerReductionConfigGlobals 1 }
+
+ledPowerReductionConfigGlobalsErrorEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Turned on LEDs at full brightness(100% intensity) when LED is blinking
+         in red because of either software error or fatal occurred. true means
+         LEDs will glow in full brightness, false means LEDs will not glow in
+         full brightness."
+    ::= { ledPowerReductionConfigGlobals 2 }
+
+ledPowerReductionConfigGlobalsParamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LedPowerReductionConfigGlobalsParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to assign led intensity level to each clock hour(based
+         on 24-hour time notaion) of the day"
+    ::= { ledPowerReductionConfig 2 }
+
+ledPowerReductionConfigGlobalsParamEntry OBJECT-TYPE
+    SYNTAX      LedPowerReductionConfigGlobalsParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each clock hour of the day associates with led intensity level"
+    INDEX       {                   ledPowerReductionConfigGlobalsParamClockTimeHour }
+    ::= { ledPowerReductionConfigGlobalsParamTable 1 }
+
+LedPowerReductionConfigGlobalsParamEntry ::= SEQUENCE {
+    ledPowerReductionConfigGlobalsParamClockTimeHour   Integer32,
+    ledPowerReductionConfigGlobalsParamIntensityLevel  Unsigned8
+}
+
+ledPowerReductionConfigGlobalsParamClockTimeHour OBJECT-TYPE
+    SYNTAX      Integer32 (0..23)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Clock time hour. Hour is based on 24-hour time notation. If hour is x
+         then LEDs will start glow at clock time x:00 of the day with associated
+         LEDs intensity level."
+    ::= { ledPowerReductionConfigGlobalsParamEntry 1 }
+
+ledPowerReductionConfigGlobalsParamIntensityLevel OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Led power intensity level. The LEDs brightness in percentage. 100 means
+         full intensity(maximum power consumption), 0 means LEDs are off(no
+         power consumption)."
+    ::= { ledPowerReductionConfigGlobalsParamEntry 2 }
+
+ledPowerReductionMibConformance OBJECT IDENTIFIER
+    ::= { ledPowerReductionMib 2 }
+
+ledPowerReductionMibCompliances OBJECT IDENTIFIER
+    ::= { ledPowerReductionMibConformance 1 }
+
+ledPowerReductionMibGroups OBJECT IDENTIFIER
+    ::= { ledPowerReductionMibConformance 2 }
+
+ledPowerReductionConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     {                   ledPowerReductionConfigGlobalsMaintenanceDuration,
+                  ledPowerReductionConfigGlobalsErrorEnable }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ledPowerReductionMibGroups 1 }
+
+ledPowerReductionConfigGlobalsParamTableInfoGroup OBJECT-GROUP
+    OBJECTS     {                   ledPowerReductionConfigGlobalsParamIntensityLevel }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ledPowerReductionMibGroups 2 }
+
+ledPowerReductionMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { ledPowerReductionConfigGlobalsInfoGroup,
+                       ledPowerReductionConfigGlobalsParamTableInfoGroup }
+
+    ::= { ledPowerReductionMibCompliances 1 }
+
+END

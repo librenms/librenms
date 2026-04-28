@@ -1,0 +1,410 @@
+-- *****************************************************************
+-- MIB-PSEC: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-PSEC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    MacAddress FROM SNMPv2-TC
+    TruthValue FROM SNMPv2-TC
+    DisplayString FROM BTS-TC
+    InterfaceIndex FROM BTS-TC
+    Unsigned16 FROM BTS-TC
+    ;
+
+psecMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of the Port Security MIB"
+    REVISION    "201412100000Z"
+    DESCRIPTION
+        "Remove user of DHCP snooping"
+    REVISION    "201412080000Z"
+    DESCRIPTION
+        "Add users in status port table"
+    REVISION    "201410130000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 66 }
+
+
+PsecLimitActionType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the Action type in psec function."
+    SYNTAX      INTEGER { none(0), trap(1), shutdown(2),
+                          trapShutdown(3) }
+
+PsecStateType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the state of Psec config."
+    SYNTAX      INTEGER { forwarding(0), blocked(1) }
+
+psecMibObjects OBJECT IDENTIFIER
+    ::= { psecMib 1 }
+
+psecConfig OBJECT IDENTIFIER
+    ::= { psecMibObjects 2 }
+
+psecConfigGlobals OBJECT IDENTIFIER
+    ::= { psecConfig 1 }
+
+psecConfigGlobalsEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Globally enable/disable aging of secured entries. This doesn't affect
+         aging of addresses secured by other modules."
+    ::= { psecConfigGlobals 1 }
+
+psecConfigGlobalsEnableAging OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If aging is globally enabled, this is the aging period in seconds.
+         Valid range is [10; 10000000] seconds(max is around 115 days)."
+    ::= { psecConfigGlobals 2 }
+
+psecConfigGlobalsAgingPeriodSecs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If aging is globally enabled, this is the aging period in seconds.
+         Valid range is [10; 10000000] seconds(max is around 115 days)."
+    ::= { psecConfigGlobals 3 }
+
+psecConfigPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PsecConfigPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of port configuration per session"
+    ::= { psecConfig 2 }
+
+psecConfigPortEntry OBJECT-TYPE
+    SYNTAX      PsecConfigPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each session has a set of parameters"
+    INDEX       { psecConfigPortIfIndex }
+    ::= { psecConfigPortTable 1 }
+
+PsecConfigPortEntry ::= SEQUENCE {
+    psecConfigPortIfIndex  InterfaceIndex,
+    psecConfigPortEnabled  TruthValue,
+    psecConfigPortLimit    Unsigned32,
+    psecConfigPortAction   PsecLimitActionType
+}
+
+psecConfigPortIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number of the physical port."
+    ::= { psecConfigPortEntry 1 }
+
+psecConfigPortEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls whether Port Security Limit Control is enabled for this port."
+    ::= { psecConfigPortEntry 2 }
+
+psecConfigPortLimit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of MAC addresses allowed on this port.Valid values =
+         [PSEC_LIMIT_MIN; PSEC_LIMIT_MAX]."
+    ::= { psecConfigPortEntry 3 }
+
+psecConfigPortAction OBJECT-TYPE
+    SYNTAX      PsecLimitActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action to take if number of MAC addresses exceeds the limit. NONE(0) Do
+         nothing, except disallowing further clients. TRAP(1) Send an SNMP trap
+         notification. SHUTDOWN(2) Shut-down the port. TRAP_AND_SHUTDOWN(3) Send
+         an SNMP trap notification and shut-down the port."
+    ::= { psecConfigPortEntry 4 }
+
+psecStatus OBJECT IDENTIFIER
+    ::= { psecMibObjects 3 }
+
+psecStatusPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PsecStatusPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of port configuration per session"
+    ::= { psecStatus 1 }
+
+psecStatusPortEntry OBJECT-TYPE
+    SYNTAX      PsecStatusPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each session has a set of parameters"
+    INDEX       { psecStatusPortIfIndex }
+    ::= { psecStatusPortTable 1 }
+
+PsecStatusPortEntry ::= SEQUENCE {
+    psecStatusPortIfIndex       InterfaceIndex,
+    psecStatusPortUsers         Unsigned32,
+    psecStatusPortLimitReached  TruthValue,
+    psecStatusPortShutdown      TruthValue,
+    psecStatusPortMacCount      Unsigned32
+}
+
+psecStatusPortIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number of the physical port."
+    ::= { psecStatusPortEntry 1 }
+
+psecStatusPortUsers OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bit masks to indicate what users currently use port security on this
+         port. Where bit 0 - port security limit, bit 1 - 802.1x, bit 2 - voice
+         VLAN."
+    ::= { psecStatusPortEntry 2 }
+
+psecStatusPortLimitReached OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TRUE if the limit is reached on the port, FALSE otherwise."
+    ::= { psecStatusPortEntry 3 }
+
+psecStatusPortShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TRUE if the port is shut down, FALSE otherwise."
+    ::= { psecStatusPortEntry 4 }
+
+psecStatusPortMacCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of MAC addresses currently assigned to this port. The number
+         does NOT include the number of entries that are held due to a H/W
+         failure or S/W failure."
+    ::= { psecStatusPortEntry 5 }
+
+psecControl OBJECT IDENTIFIER
+    ::= { psecMibObjects 4 }
+
+psecControlPortReopenTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PsecControlPortReopenEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to re-open port and move it to ready state, if it was
+         being disabled after limit was reached."
+    ::= { psecControl 1 }
+
+psecControlPortReopenEntry OBJECT-TYPE
+    SYNTAX      PsecControlPortReopenEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each session has a set of parameters"
+    INDEX       { psecControlPortReopenIfIndex }
+    ::= { psecControlPortReopenTable 1 }
+
+PsecControlPortReopenEntry ::= SEQUENCE {
+    psecControlPortReopenIfIndex     InterfaceIndex,
+    psecControlPortReopenPortReOpen  TruthValue
+}
+
+psecControlPortReopenIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number of the physical port."
+    ::= { psecControlPortReopenEntry 1 }
+
+psecControlPortReopenPortReOpen OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to true to reopen after it is shutdown"
+    ::= { psecControlPortReopenEntry 2 }
+
+psecStatistics OBJECT IDENTIFIER
+    ::= { psecMibObjects 5 }
+
+psecStatisticsPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PsecStatisticsPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of port statistics per session"
+    ::= { psecStatistics 1 }
+
+psecStatisticsPortEntry OBJECT-TYPE
+    SYNTAX      PsecStatisticsPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each session has a set of parameters"
+    INDEX       { psecStatisticsPortIfIndex }
+    ::= { psecStatisticsPortTable 1 }
+
+PsecStatisticsPortEntry ::= SEQUENCE {
+    psecStatisticsPortIfIndex       InterfaceIndex,
+    psecStatisticsPortAgeOrHold     DisplayString,
+    psecStatisticsPortCreationTime  DisplayString,
+    psecStatisticsPortState         PsecStateType,
+    psecStatisticsPortMacId         MacAddress,
+    psecStatisticsPortVlanId        Unsigned16
+}
+
+psecStatisticsPortIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number of the physical port."
+    ::= { psecStatisticsPortEntry 1 }
+
+psecStatisticsPortAgeOrHold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..14))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Down-counter used in block and ageing process."
+    ::= { psecStatisticsPortEntry 5 }
+
+psecStatisticsPortCreationTime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..24))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time when this entry was orignally added."
+    ::= { psecStatisticsPortEntry 6 }
+
+psecStatisticsPortState OBJECT-TYPE
+    SYNTAX      PsecStateType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current State of a entry, expected state can be either FORWARDING or
+         BLOCKED."
+    ::= { psecStatisticsPortEntry 7 }
+
+psecStatisticsPortMacId OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MAC address that this is all about."
+    ::= { psecStatisticsPortEntry 8 }
+
+psecStatisticsPortVlanId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The VID that this is all about."
+    ::= { psecStatisticsPortEntry 9 }
+
+psecMibConformance OBJECT IDENTIFIER
+    ::= { psecMib 2 }
+
+psecMibCompliances OBJECT IDENTIFIER
+    ::= { psecMibConformance 1 }
+
+psecMibGroups OBJECT IDENTIFIER
+    ::= { psecMibConformance 2 }
+
+psecConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { psecConfigGlobalsEnabled,
+                  psecConfigGlobalsEnableAging,
+                  psecConfigGlobalsAgingPeriodSecs }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { psecMibGroups 1 }
+
+psecConfigPortTableInfoGroup OBJECT-GROUP
+    OBJECTS     { psecConfigPortEnabled, psecConfigPortLimit,
+                  psecConfigPortAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { psecMibGroups 2 }
+
+psecStatusPortTableInfoGroup OBJECT-GROUP
+    OBJECTS     { psecStatusPortUsers,
+                  psecStatusPortLimitReached,
+                  psecStatusPortShutdown,
+                  psecStatusPortMacCount }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { psecMibGroups 3 }
+
+psecControlPortReopenTableInfoGroup OBJECT-GROUP
+    OBJECTS     { psecControlPortReopenPortReOpen }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { psecMibGroups 4 }
+
+psecStatisticsPortTableInfoGroup OBJECT-GROUP
+    OBJECTS     { psecStatisticsPortAgeOrHold,
+                  psecStatisticsPortCreationTime,
+                  psecStatisticsPortState,
+                  psecStatisticsPortMacId,
+                  psecStatisticsPortVlanId }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { psecMibGroups 5 }
+
+psecMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { psecConfigGlobalsInfoGroup,
+                       psecConfigPortTableInfoGroup,
+                       psecStatusPortTableInfoGroup,
+                       psecControlPortReopenTableInfoGroup,
+                       psecStatisticsPortTableInfoGroup }
+
+    ::= { psecMibCompliances 1 }
+
+END

@@ -1,0 +1,124 @@
+-- *****************************************************************
+-- MIB-SNTP: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-SNTP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    TruthValue FROM SNMPv2-TC
+    InetAddress FROM BTS-TC
+    ;
+
+sntpMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of SNTP"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 105 }
+
+
+sntpMibObjects OBJECT IDENTIFIER
+    ::= { sntpMib 1 }
+
+sntpCapabilities OBJECT IDENTIFIER
+    ::= { sntpMibObjects 1 }
+
+sntpCapabilitiesServerSupportIPv4 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate if SNTP server supports Internet address type of IPv4 or not.
+         true means supported. false means not supported."
+    ::= { sntpCapabilities 1 }
+
+sntpCapabilitiesServerSupportIPv6 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate if SNTP server supports Internet address type of IPv6 or not.
+         true means supported. false means not supported."
+    ::= { sntpCapabilities 2 }
+
+sntpCapabilitiesServerSupportDns OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate if SNTP server supports Internet address type of DNS domain
+         name or not. true means supported. false means not supported."
+    ::= { sntpCapabilities 3 }
+
+sntpConfig OBJECT IDENTIFIER
+    ::= { sntpMibObjects 2 }
+
+sntpConfigGlobals OBJECT IDENTIFIER
+    ::= { sntpConfig 1 }
+
+sntpConfigGlobalsMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global config mode of SNTP. true is to enable SNTP function in the
+         system and false is to disable it."
+    ::= { sntpConfigGlobals 1 }
+
+sntpConfigGlobalsServerAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Internet address of a SNTP server."
+    ::= { sntpConfigGlobals 2 }
+
+sntpMibConformance OBJECT IDENTIFIER
+    ::= { sntpMib 2 }
+
+sntpMibCompliances OBJECT IDENTIFIER
+    ::= { sntpMibConformance 1 }
+
+sntpMibGroups OBJECT IDENTIFIER
+    ::= { sntpMibConformance 2 }
+
+sntpCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { sntpCapabilitiesServerSupportIPv4,
+                  sntpCapabilitiesServerSupportIPv6,
+                  sntpCapabilitiesServerSupportDns }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { sntpMibGroups 1 }
+
+sntpConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { sntpConfigGlobalsMode,
+                  sntpConfigGlobalsServerAddress }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { sntpMibGroups 2 }
+
+sntpMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { sntpCapabilitiesInfoGroup,
+                       sntpConfigGlobalsInfoGroup }
+
+    ::= { sntpMibCompliances 1 }
+
+END

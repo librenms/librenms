@@ -1,0 +1,1385 @@
+-- *****************************************************************
+-- MIB-PORT: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-PORT DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Counter64 FROM SNMPv2-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    DisplayString FROM BTS-TC
+    InterfaceIndex FROM BTS-TC
+    SfpTransceiver FROM BTS-TC
+    Unsigned8 FROM BTS-TC
+    ;
+
+portMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of the PORT MIB"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 11 }
+
+
+PortFc ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration controls the interface flow control."
+    SYNTAX      INTEGER { off(0), on(1) }
+
+PortMedia ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration controls the interface media type."
+    SYNTAX      INTEGER { rj45(0), sfp(1), dual(2) }
+
+PortPhyVeriPhyStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumerations show the VeriPhy status."
+    SYNTAX      INTEGER { correctlyTerminatedPair(0), openPair(1),
+                          shortPair(2), abnormalTermination(4),
+                          crossPairShortToPairA(8),
+                          crossPairShortToPairB(9),
+                          crossPairShortToPairC(10),
+                          crossPairShortToPairD(11),
+                          abnormalCrossPairCouplingToPairA(12),
+                          abnormalCrossPairCouplingToPairB(13),
+                          abnormalCrossPairCouplingToPairC(14),
+                          abnormalCrossPairCouplingToPairD(15),
+                          unknownResult(16), veriPhyRunning(17) }
+
+PortSpeed ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration controls the interface speed. E.g force10ModeFdx means
+         force 10Mbs full duplex."
+    SYNTAX      INTEGER { force10ModeFdx(0), force10ModeHdx(1),
+                          force100ModeFdx(2), force100ModeHdx(3),
+                          force1GModeFdx(4), autoNegMode(5),
+                          force2G5ModeFdx(6), force5GModeFdx(7),
+                          force10GModeFdx(8), force12GModeFdx(9) }
+
+PortStatusSpeed ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumerations show the current interface speed."
+    SYNTAX      INTEGER { undefined(0), speed10M(1), speed100M(2),
+                          speed1G(3), speed2G5(4), speed5G(5),
+                          speed10G(6), speed12G(7) }
+
+portMibObjects OBJECT IDENTIFIER
+    ::= { portMib 1 }
+
+portConfig OBJECT IDENTIFIER
+    ::= { portMibObjects 2 }
+
+portConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of the port interface parameters"
+    ::= { portConfig 1 }
+
+portConfigEntry OBJECT-TYPE
+    SYNTAX      PortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each port interface has a set of parameters"
+    INDEX       { portConfigIfIndex }
+    ::= { portConfigTable 1 }
+
+PortConfigEntry ::= SEQUENCE {
+    portConfigIfIndex            InterfaceIndex,
+    portConfigShutdown           TruthValue,
+    portConfigSpeed              PortSpeed,
+    portConfigAdvertiseDisabled  Unsigned8,
+    portConfigMediaType          PortMedia,
+    portConfigFC                 PortFc,
+    portConfigMTU                Unsigned32,
+    portConfigExcessiveRestart   TruthValue,
+    portConfigPFC                Unsigned8,
+    portConfigFrameLengthCheck   TruthValue
+}
+
+portConfigIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { portConfigEntry 1 }
+
+portConfigShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls whether interface is shutdown or powered up. Set to TRUE in
+         order to power down the interface."
+    ::= { portConfigEntry 2 }
+
+portConfigSpeed OBJECT-TYPE
+    SYNTAX      PortSpeed
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls the port speed and duplex."
+    ::= { portConfigEntry 3 }
+
+portConfigAdvertiseDisabled OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "In auto mode, bitmask that allows features not to be advertised.
+         
+         Bit 0: Disable half duplex advertising.
+         
+         Bit 1: Disable full duplex advertising.
+         
+         Bit 4: Disable 1G advertising.
+         
+         Bit 6: Disable 100M advertising.
+         
+         Bit 7: Disable 10M advertising.
+         
+         When not in auto mode, the value shall be zero."
+    ::= { portConfigEntry 4 }
+
+portConfigMediaType OBJECT-TYPE
+    SYNTAX      PortMedia
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls the port media type."
+    ::= { portConfigEntry 5 }
+
+portConfigFC OBJECT-TYPE
+    SYNTAX      PortFc
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls the port flow control mode."
+    ::= { portConfigEntry 6 }
+
+portConfigMTU OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls the port's Maximum Transmission Unit."
+    ::= { portConfigEntry 7 }
+
+portConfigExcessiveRestart OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TRUE to restart half-duplex back-off algorithm after 16 collisions.
+         FALSE to discard frame after 16 collisions"
+    ::= { portConfigEntry 8 }
+
+portConfigPFC OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "802.1Qbb Priority Flow Control bitmask, one bit for each prioritet.E.g.
+         0x01 = prio 0, 0x80 = prio 7, 0xFF = prio 0-7"
+    ::= { portConfigEntry 9 }
+
+portConfigFrameLengthCheck OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TRUE to enforce 802.3 frame length check (from Ethertype field). If
+         enabled frames with length that doesn't match the frame length field
+         will be dropped."
+    ::= { portConfigEntry 10 }
+
+portStatus OBJECT IDENTIFIER
+    ::= { portMibObjects 3 }
+
+portStatusInformationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortStatusInformationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table represents the status of the ports"
+    ::= { portStatus 1 }
+
+portStatusInformationEntry OBJECT-TYPE
+    SYNTAX      PortStatusInformationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each port interface has a set of status parameters"
+    INDEX       { portStatusInformationIfIndex }
+    ::= { portStatusInformationTable 1 }
+
+PortStatusInformationEntry ::= SEQUENCE {
+    portStatusInformationIfIndex        InterfaceIndex,
+    portStatusInformationLink           TruthValue,
+    portStatusInformationFdx            TruthValue,
+    portStatusInformationFiber          TruthValue,
+    portStatusInformationSpeed          PortStatusSpeed,
+    portStatusInformationSFPType        SfpTransceiver,
+    portStatusInformationSFPVendorName  DisplayString,
+    portStatusInformationSFPVendorPN    DisplayString,
+    portStatusInformationSFPVendorRev   DisplayString
+}
+
+portStatusInformationIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { portStatusInformationEntry 1 }
+
+portStatusInformationLink OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows whether interface has link."
+    ::= { portStatusInformationEntry 2 }
+
+portStatusInformationFdx OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows whether interface is running in full duplex."
+    ::= { portStatusInformationEntry 3 }
+
+portStatusInformationFiber OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows whether interface is a fiber link (fiber SFP or cu SFP)."
+    ::= { portStatusInformationEntry 4 }
+
+portStatusInformationSpeed OBJECT-TYPE
+    SYNTAX      PortStatusSpeed
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the current interface speed."
+    ::= { portStatusInformationEntry 5 }
+
+portStatusInformationSFPType OBJECT-TYPE
+    SYNTAX      SfpTransceiver
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the current interface SFP type."
+    ::= { portStatusInformationEntry 6 }
+
+portStatusInformationSFPVendorName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..19))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the SFP vendor name."
+    ::= { portStatusInformationEntry 7 }
+
+portStatusInformationSFPVendorPN OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..19))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the SFP vendor Product Number."
+    ::= { portStatusInformationEntry 8 }
+
+portStatusInformationSFPVendorRev OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..5))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the SFP vendor Revision."
+    ::= { portStatusInformationEntry 9 }
+
+portStatusVeriPhyResult OBJECT IDENTIFIER
+    ::= { portStatus 3 }
+
+portStatusVeriPhyResultTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortStatusVeriPhyResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table represents the VeriPhy result from the last VeriPhy run for
+         the interface"
+    ::= { portStatusVeriPhyResult 1 }
+
+portStatusVeriPhyResultEntry OBJECT-TYPE
+    SYNTAX      PortStatusVeriPhyResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each port has a set of VeriPhy results"
+    INDEX       { portStatusVeriPhyResultIfIndex }
+    ::= { portStatusVeriPhyResultTable 1 }
+
+PortStatusVeriPhyResultEntry ::= SEQUENCE {
+    portStatusVeriPhyResultIfIndex                   InterfaceIndex,
+    portStatusVeriPhyResultVeriPhyStatusPairA        PortPhyVeriPhyStatus,
+    portStatusVeriPhyResultVeriPhyStatusPairB        PortPhyVeriPhyStatus,
+    portStatusVeriPhyResultVeriPhyStatusPairC        PortPhyVeriPhyStatus,
+    portStatusVeriPhyResultVeriPhyStatusPairD        PortPhyVeriPhyStatus,
+    portStatusVeriPhyResultVeriPhyLengthStatusPairA  Unsigned8,
+    portStatusVeriPhyResultVeriPhyLengthStatusPairB  Unsigned8,
+    portStatusVeriPhyResultVeriPhyLengthStatusPairC  Unsigned8,
+    portStatusVeriPhyResultVeriPhyLengthStatusPairD  Unsigned8
+}
+
+portStatusVeriPhyResultIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { portStatusVeriPhyResultEntry 1 }
+
+portStatusVeriPhyResultVeriPhyStatusPairA OBJECT-TYPE
+    SYNTAX      PortPhyVeriPhyStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VeriPhy status for the cable pair
+         
+         0 - Cable is Correctly terminated pair
+         
+         1 - Open pair
+         
+         2 - Shorted pair
+         
+         4 - Abnormal termination
+         
+         8 - Cross-pair short to pair A
+         
+         9 - Cross-pair short to pair B
+         
+         10 - Cross-pair short to pair C
+         
+         11 - Cross-pair short to pair D
+         
+         12 - Abnormal cross-pair coupling - pair A
+         
+         13 - Abnormal cross-pair coupling - pair B
+         
+         14 - Abnormal cross-pair coupling - pair C
+         
+         15 - Abnormal cross-pair coupling - pair D"
+    ::= { portStatusVeriPhyResultEntry 2 }
+
+portStatusVeriPhyResultVeriPhyStatusPairB OBJECT-TYPE
+    SYNTAX      PortPhyVeriPhyStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VeriPhy status for the cable pair
+         
+         0 - Cable is Correctly terminated pair
+         
+         1 - Open pair
+         
+         2 - Shorted pair
+         
+         4 - Abnormal termination
+         
+         8 - Cross-pair short to pair A
+         
+         9 - Cross-pair short to pair B
+         
+         10 - Cross-pair short to pair C
+         
+         11 - Cross-pair short to pair D
+         
+         12 - Abnormal cross-pair coupling - pair A
+         
+         13 - Abnormal cross-pair coupling - pair B
+         
+         14 - Abnormal cross-pair coupling - pair C
+         
+         15 - Abnormal cross-pair coupling - pair D"
+    ::= { portStatusVeriPhyResultEntry 3 }
+
+portStatusVeriPhyResultVeriPhyStatusPairC OBJECT-TYPE
+    SYNTAX      PortPhyVeriPhyStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VeriPhy status for the cable pair
+         
+         0 - Cable is Correctly terminated pair
+         
+         1 - Open pair
+         
+         2 - Shorted pair
+         
+         4 - Abnormal termination
+         
+         8 - Cross-pair short to pair A
+         
+         9 - Cross-pair short to pair B
+         
+         10 - Cross-pair short to pair C
+         
+         11 - Cross-pair short to pair D
+         
+         12 - Abnormal cross-pair coupling - pair A
+         
+         13 - Abnormal cross-pair coupling - pair B
+         
+         14 - Abnormal cross-pair coupling - pair C
+         
+         15 - Abnormal cross-pair coupling - pair D"
+    ::= { portStatusVeriPhyResultEntry 4 }
+
+portStatusVeriPhyResultVeriPhyStatusPairD OBJECT-TYPE
+    SYNTAX      PortPhyVeriPhyStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VeriPhy status for the cable pair
+         
+         0 - Cable is Correctly terminated pair
+         
+         1 - Open pair
+         
+         2 - Shorted pair
+         
+         4 - Abnormal termination
+         
+         8 - Cross-pair short to pair A
+         
+         9 - Cross-pair short to pair B
+         
+         10 - Cross-pair short to pair C
+         
+         11 - Cross-pair short to pair D
+         
+         12 - Abnormal cross-pair coupling - pair A
+         
+         13 - Abnormal cross-pair coupling - pair B
+         
+         14 - Abnormal cross-pair coupling - pair C
+         
+         15 - Abnormal cross-pair coupling - pair D"
+    ::= { portStatusVeriPhyResultEntry 5 }
+
+portStatusVeriPhyResultVeriPhyLengthStatusPairA OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VeriPhy status cable length i meters for the cable pair. When VeriPhy
+         is completed, the cable diagnostics results is shown in the VeriPhy
+         status table. Note that VeriPHY is only accurate for cables of length 7
+         - 140 meters.
+         
+         The resolution is 3 meters"
+    ::= { portStatusVeriPhyResultEntry 6 }
+
+portStatusVeriPhyResultVeriPhyLengthStatusPairB OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VeriPhy status cable length i meters for the cable pair. When VeriPhy
+         is completed, the cable diagnostics results is shown in the VeriPhy
+         status table. Note that VeriPHY is only accurate for cables of length 7
+         - 140 meters.
+         
+         The resolution is 3 meters"
+    ::= { portStatusVeriPhyResultEntry 7 }
+
+portStatusVeriPhyResultVeriPhyLengthStatusPairC OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VeriPhy status cable length i meters for the cable pair. When VeriPhy
+         is completed, the cable diagnostics results is shown in the VeriPhy
+         status table. Note that VeriPHY is only accurate for cables of length 7
+         - 140 meters.
+         
+         The resolution is 3 meters"
+    ::= { portStatusVeriPhyResultEntry 8 }
+
+portStatusVeriPhyResultVeriPhyLengthStatusPairD OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VeriPhy status cable length i meters for the cable pair. When VeriPhy
+         is completed, the cable diagnostics results is shown in the VeriPhy
+         status table. Note that VeriPHY is only accurate for cables of length 7
+         - 140 meters.
+         
+         The resolution is 3 meters"
+    ::= { portStatusVeriPhyResultEntry 9 }
+
+portControl OBJECT IDENTIFIER
+    ::= { portMibObjects 4 }
+
+portControlStatisticsClear OBJECT IDENTIFIER
+    ::= { portControl 1 }
+
+portControlStatisticsClearTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortControlStatisticsClearEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to clear port Interface statistics"
+    ::= { portControlStatisticsClear 1 }
+
+portControlStatisticsClearEntry OBJECT-TYPE
+    SYNTAX      PortControlStatisticsClearEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each port has a set of control parameters"
+    INDEX       { portControlStatisticsClearIfIndex }
+    ::= { portControlStatisticsClearTable 1 }
+
+PortControlStatisticsClearEntry ::= SEQUENCE {
+    portControlStatisticsClearIfIndex          InterfaceIndex,
+    portControlStatisticsClearStatisticsClear  TruthValue
+}
+
+portControlStatisticsClearIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { portControlStatisticsClearEntry 1 }
+
+portControlStatisticsClearStatisticsClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to TRUE to clear the statistics of an interface."
+    ::= { portControlStatisticsClearEntry 2 }
+
+portControlVeriPhyStart OBJECT IDENTIFIER
+    ::= { portControl 2 }
+
+portControlVeriPhyStartTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortControlVeriPhyStartEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to start VeriPhy for the interface"
+    ::= { portControlVeriPhyStart 1 }
+
+portControlVeriPhyStartEntry OBJECT-TYPE
+    SYNTAX      PortControlVeriPhyStartEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each port has a set of control parameters"
+    INDEX       { portControlVeriPhyStartIfIndex }
+    ::= { portControlVeriPhyStartTable 1 }
+
+PortControlVeriPhyStartEntry ::= SEQUENCE {
+    portControlVeriPhyStartIfIndex  InterfaceIndex,
+    portControlVeriPhyStartStart    TruthValue
+}
+
+portControlVeriPhyStartIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { portControlVeriPhyStartEntry 1 }
+
+portControlVeriPhyStartStart OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to TRUE to start VeriPHy for the interface.
+         
+         When running 10 and 100 Mbps, ports will be linked down while running
+         VeriPHY. Therefore, running VeriPHY on a 10 or 100 Mbps management port
+         will cause the switch to stop responding until VeriPHY is complete."
+    ::= { portControlVeriPhyStartEntry 2 }
+
+portStatistics OBJECT IDENTIFIER
+    ::= { portMibObjects 5 }
+
+portStatisticsRmonStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortStatisticsRmonStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table represents the port interface RMON statistics counters"
+    ::= { portStatistics 1 }
+
+portStatisticsRmonStatisticsEntry OBJECT-TYPE
+    SYNTAX      PortStatisticsRmonStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each port interface has a set of statistics counters"
+    INDEX       { portStatisticsRmonStatisticsIfIndex }
+    ::= { portStatisticsRmonStatisticsTable 1 }
+
+PortStatisticsRmonStatisticsEntry ::= SEQUENCE {
+    portStatisticsRmonStatisticsIfIndex            InterfaceIndex,
+    portStatisticsRmonStatisticsRxDropEvents       Counter64,
+    portStatisticsRmonStatisticsRxOctets           Counter64,
+    portStatisticsRmonStatisticsRxPkts             Counter64,
+    portStatisticsRmonStatisticsRxBroadcastPkts    Counter64,
+    portStatisticsRmonStatisticsRxMulticastPkts    Counter64,
+    portStatisticsRmonStatisticsRxCrcAlignErrPkts  Counter64,
+    portStatisticsRmonStatisticsRxUndersizePkts    Counter64,
+    portStatisticsRmonStatisticsRxOversizePkts     Counter64,
+    portStatisticsRmonStatisticsRxFragmentsPkts    Counter64,
+    portStatisticsRmonStatisticsRxJabbersPkts      Counter64,
+    portStatisticsRmonStatisticsRx64Pkts           Counter64,
+    portStatisticsRmonStatisticsRx65to127Pkts      Counter64,
+    portStatisticsRmonStatisticsRx128to255Pkts     Counter64,
+    portStatisticsRmonStatisticsRx256to511Pkts     Counter64,
+    portStatisticsRmonStatisticsRx512to1023Pkts    Counter64,
+    portStatisticsRmonStatisticsRx1024to1518Pkts   Counter64,
+    portStatisticsRmonStatisticsRx1519PktsToMax    Counter64,
+    portStatisticsRmonStatisticsTxDropEvents       Counter64,
+    portStatisticsRmonStatisticsTxOctets           Counter64,
+    portStatisticsRmonStatisticsTxPkts             Counter64,
+    portStatisticsRmonStatisticsTxBroadcastPkts    Counter64,
+    portStatisticsRmonStatisticsTxMulticastPkts    Counter64,
+    portStatisticsRmonStatisticsTx64Pkts           Counter64,
+    portStatisticsRmonStatisticsTx65to127Pkts      Counter64,
+    portStatisticsRmonStatisticsTx128to255Pkts     Counter64,
+    portStatisticsRmonStatisticsTx256to511Pkts     Counter64,
+    portStatisticsRmonStatisticsTx512to1023Pkts    Counter64,
+    portStatisticsRmonStatisticsTx1024to1518Pkts   Counter64,
+    portStatisticsRmonStatisticsTx1519PktsToMax    Counter64
+}
+
+portStatisticsRmonStatisticsIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { portStatisticsRmonStatisticsEntry 1 }
+
+portStatisticsRmonStatisticsRxDropEvents OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of frames discarded due to ingress congestion."
+    ::= { portStatisticsRmonStatisticsEntry 2 }
+
+portStatisticsRmonStatisticsRxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of received (good and bad) bytes. Includes FCS, but
+         excludes framing bits."
+    ::= { portStatisticsRmonStatisticsEntry 3 }
+
+portStatisticsRmonStatisticsRxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of received (good and bad) packets."
+    ::= { portStatisticsRmonStatisticsEntry 4 }
+
+portStatisticsRmonStatisticsRxBroadcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of received (good and bad) broadcast packets."
+    ::= { portStatisticsRmonStatisticsEntry 5 }
+
+portStatisticsRmonStatisticsRxMulticastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of received (good and bad) multicast packets."
+    ::= { portStatisticsRmonStatisticsEntry 6 }
+
+portStatisticsRmonStatisticsRxCrcAlignErrPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of frames received with CRC or alignment errors."
+    ::= { portStatisticsRmonStatisticsEntry 7 }
+
+portStatisticsRmonStatisticsRxUndersizePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of short frames (frames that are smaller than 64
+         bytes) received with valid CRC."
+    ::= { portStatisticsRmonStatisticsEntry 8 }
+
+portStatisticsRmonStatisticsRxOversizePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of long frames received with valid CRC."
+    ::= { portStatisticsRmonStatisticsEntry 9 }
+
+portStatisticsRmonStatisticsRxFragmentsPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of short frames (frames that are smaller than 64
+         bytes) received with invalid CRC."
+    ::= { portStatisticsRmonStatisticsEntry 10 }
+
+portStatisticsRmonStatisticsRxJabbersPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of long frames (frames that are longer than the configured
+         maximum frame length for this interface) received with invalid CRC."
+    ::= { portStatisticsRmonStatisticsEntry 11 }
+
+portStatisticsRmonStatisticsRx64Pkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of 64 bytes frames received."
+    ::= { portStatisticsRmonStatisticsEntry 12 }
+
+portStatisticsRmonStatisticsRx65to127Pkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of received frames with size within 65 to 127 bytes."
+    ::= { portStatisticsRmonStatisticsEntry 13 }
+
+portStatisticsRmonStatisticsRx128to255Pkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of received frames with size within 128 to 255 bytes."
+    ::= { portStatisticsRmonStatisticsEntry 14 }
+
+portStatisticsRmonStatisticsRx256to511Pkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of received frames with size within 256 to 511 bytes."
+    ::= { portStatisticsRmonStatisticsEntry 15 }
+
+portStatisticsRmonStatisticsRx512to1023Pkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of received frames with size within 512 to 1023 bytes."
+    ::= { portStatisticsRmonStatisticsEntry 16 }
+
+portStatisticsRmonStatisticsRx1024to1518Pkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of received frames with size within 1024 to 1518 bytes."
+    ::= { portStatisticsRmonStatisticsEntry 17 }
+
+portStatisticsRmonStatisticsRx1519PktsToMax OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of received frames with size larger than 1518 bytes."
+    ::= { portStatisticsRmonStatisticsEntry 18 }
+
+portStatisticsRmonStatisticsTxDropEvents OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of frames discarded due to egress congestion."
+    ::= { portStatisticsRmonStatisticsEntry 19 }
+
+portStatisticsRmonStatisticsTxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of transmitted (good and bad) bytes. Includes FCS, but
+         excludes framing bits."
+    ::= { portStatisticsRmonStatisticsEntry 20 }
+
+portStatisticsRmonStatisticsTxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of transmitted (good and bad) packets."
+    ::= { portStatisticsRmonStatisticsEntry 21 }
+
+portStatisticsRmonStatisticsTxBroadcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of transmitted (good and bad) broadcast packets."
+    ::= { portStatisticsRmonStatisticsEntry 22 }
+
+portStatisticsRmonStatisticsTxMulticastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of transmitted (good and bad) multicast packets."
+    ::= { portStatisticsRmonStatisticsEntry 23 }
+
+portStatisticsRmonStatisticsTx64Pkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of 64 bytes frames transmitted."
+    ::= { portStatisticsRmonStatisticsEntry 24 }
+
+portStatisticsRmonStatisticsTx65to127Pkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of transmitted frames with size within 65 to 127 bytes."
+    ::= { portStatisticsRmonStatisticsEntry 25 }
+
+portStatisticsRmonStatisticsTx128to255Pkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of transmitted frames with size within 128 to 255 bytes."
+    ::= { portStatisticsRmonStatisticsEntry 26 }
+
+portStatisticsRmonStatisticsTx256to511Pkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of transmitted frames with size within 256 to 511 bytes."
+    ::= { portStatisticsRmonStatisticsEntry 27 }
+
+portStatisticsRmonStatisticsTx512to1023Pkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of transmitted frames with size within 512 to 1023 bytes."
+    ::= { portStatisticsRmonStatisticsEntry 28 }
+
+portStatisticsRmonStatisticsTx1024to1518Pkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of transmitted frames with size within 1024 to 1518 bytes."
+    ::= { portStatisticsRmonStatisticsEntry 29 }
+
+portStatisticsRmonStatisticsTx1519PktsToMax OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of transmitted frames with size larger than 1518 bytes."
+    ::= { portStatisticsRmonStatisticsEntry 30 }
+
+portStatisticsIfGroupStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortStatisticsIfGroupStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table represents the port interfaces group (RFC 2863) counters"
+    ::= { portStatistics 2 }
+
+portStatisticsIfGroupStatisticsEntry OBJECT-TYPE
+    SYNTAX      PortStatisticsIfGroupStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each port interface has a set of statistics counters"
+    INDEX       { portStatisticsIfGroupStatisticsIfIndex }
+    ::= { portStatisticsIfGroupStatisticsTable 1 }
+
+PortStatisticsIfGroupStatisticsEntry ::= SEQUENCE {
+    portStatisticsIfGroupStatisticsIfIndex           InterfaceIndex,
+    portStatisticsIfGroupStatisticsRxOctets          Counter64,
+    portStatisticsIfGroupStatisticsRxUnicastPkts     Counter64,
+    portStatisticsIfGroupStatisticsRxMulticastPkts   Counter64,
+    portStatisticsIfGroupStatisticsRxBroadcastPkts   Counter64,
+    portStatisticsIfGroupStatisticsRxNonUnicastPkts  Counter64,
+    portStatisticsIfGroupStatisticsRxDiscards        Counter64,
+    portStatisticsIfGroupStatisticsRxErrors          Counter64,
+    portStatisticsIfGroupStatisticsTxOctets          Counter64,
+    portStatisticsIfGroupStatisticsTxUnicastPkts     Counter64,
+    portStatisticsIfGroupStatisticsTxMulticastPkts   Counter64,
+    portStatisticsIfGroupStatisticsTxBroadcastPkts   Counter64,
+    portStatisticsIfGroupStatisticsTxNonUnicastPkts  Counter64,
+    portStatisticsIfGroupStatisticsTxDiscardPkts     Counter64,
+    portStatisticsIfGroupStatisticsTxErrorPkts       Counter64
+}
+
+portStatisticsIfGroupStatisticsIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { portStatisticsIfGroupStatisticsEntry 1 }
+
+portStatisticsIfGroupStatisticsRxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of bytes received."
+    ::= { portStatisticsIfGroupStatisticsEntry 2 }
+
+portStatisticsIfGroupStatisticsRxUnicastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of uni-cast frames received."
+    ::= { portStatisticsIfGroupStatisticsEntry 3 }
+
+portStatisticsIfGroupStatisticsRxMulticastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of multi-cast frames received."
+    ::= { portStatisticsIfGroupStatisticsEntry 4 }
+
+portStatisticsIfGroupStatisticsRxBroadcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of broad-cast frames received."
+    ::= { portStatisticsIfGroupStatisticsEntry 5 }
+
+portStatisticsIfGroupStatisticsRxNonUnicastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of non uni-cast frames received."
+    ::= { portStatisticsIfGroupStatisticsEntry 6 }
+
+portStatisticsIfGroupStatisticsRxDiscards OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of received frames discarded."
+    ::= { portStatisticsIfGroupStatisticsEntry 7 }
+
+portStatisticsIfGroupStatisticsRxErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of frames with errors received."
+    ::= { portStatisticsIfGroupStatisticsEntry 8 }
+
+portStatisticsIfGroupStatisticsTxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of bytes transmitted."
+    ::= { portStatisticsIfGroupStatisticsEntry 9 }
+
+portStatisticsIfGroupStatisticsTxUnicastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of uni-cast frames transmitted."
+    ::= { portStatisticsIfGroupStatisticsEntry 10 }
+
+portStatisticsIfGroupStatisticsTxMulticastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of multi-cast frames transmitted."
+    ::= { portStatisticsIfGroupStatisticsEntry 11 }
+
+portStatisticsIfGroupStatisticsTxBroadcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of broad-cast frames transmitted."
+    ::= { portStatisticsIfGroupStatisticsEntry 12 }
+
+portStatisticsIfGroupStatisticsTxNonUnicastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of non uni-cast frames transmitted."
+    ::= { portStatisticsIfGroupStatisticsEntry 13 }
+
+portStatisticsIfGroupStatisticsTxDiscardPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of discard frames which should been transmitted."
+    ::= { portStatisticsIfGroupStatisticsEntry 14 }
+
+portStatisticsIfGroupStatisticsTxErrorPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the number of frames transmit with error."
+    ::= { portStatisticsIfGroupStatisticsEntry 15 }
+
+portStatisticsEthernetLikeStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortStatisticsEthernetLikeStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table represents the port Ethernet-like interfaces counters"
+    ::= { portStatistics 3 }
+
+portStatisticsEthernetLikeStatisticsEntry OBJECT-TYPE
+    SYNTAX      PortStatisticsEthernetLikeStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each port interface has a set of statistics counters"
+    INDEX       { portStatisticsEthernetLikeStatisticsIfIndex }
+    ::= { portStatisticsEthernetLikeStatisticsTable 1 }
+
+PortStatisticsEthernetLikeStatisticsEntry ::= SEQUENCE {
+    portStatisticsEthernetLikeStatisticsIfIndex        InterfaceIndex,
+    portStatisticsEthernetLikeStatisticsRxPauseFrames  Counter64,
+    portStatisticsEthernetLikeStatisticsTxPauseFrames  Counter64
+}
+
+portStatisticsEthernetLikeStatisticsIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { portStatisticsEthernetLikeStatisticsEntry 1 }
+
+portStatisticsEthernetLikeStatisticsRxPauseFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of pause frames received."
+    ::= { portStatisticsEthernetLikeStatisticsEntry 2 }
+
+portStatisticsEthernetLikeStatisticsTxPauseFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of pause frames transmitted."
+    ::= { portStatisticsEthernetLikeStatisticsEntry 3 }
+
+portStatisticsQueuesStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortStatisticsQueuesStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table represents the port interfaces queues counters"
+    ::= { portStatistics 4 }
+
+portStatisticsQueuesStatisticsEntry OBJECT-TYPE
+    SYNTAX      PortStatisticsQueuesStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each port interface has a set of statistics counters"
+    INDEX       { portStatisticsQueuesStatisticsIfIndex,
+                  portStatisticsQueuesStatisticsQueue }
+    ::= { portStatisticsQueuesStatisticsTable 1 }
+
+PortStatisticsQueuesStatisticsEntry ::= SEQUENCE {
+    portStatisticsQueuesStatisticsIfIndex  InterfaceIndex,
+    portStatisticsQueuesStatisticsQueue    Integer32,
+    portStatisticsQueuesStatisticsRxPrio   Counter64,
+    portStatisticsQueuesStatisticsTxPrio   Counter64
+}
+
+portStatisticsQueuesStatisticsIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { portStatisticsQueuesStatisticsEntry 1 }
+
+portStatisticsQueuesStatisticsQueue OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Queue index."
+    ::= { portStatisticsQueuesStatisticsEntry 2 }
+
+portStatisticsQueuesStatisticsRxPrio OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of frames received for the queue."
+    ::= { portStatisticsQueuesStatisticsEntry 3 }
+
+portStatisticsQueuesStatisticsTxPrio OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of frames transmitted for the queue."
+    ::= { portStatisticsQueuesStatisticsEntry 4 }
+
+portStatisticsBridgeStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortStatisticsBridgeStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table represents the port interface bridge counters"
+    ::= { portStatistics 5 }
+
+portStatisticsBridgeStatisticsEntry OBJECT-TYPE
+    SYNTAX      PortStatisticsBridgeStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each port interface has a set of statistics counters"
+    INDEX       { portStatisticsBridgeStatisticsIfIndex }
+    ::= { portStatisticsBridgeStatisticsTable 1 }
+
+PortStatisticsBridgeStatisticsEntry ::= SEQUENCE {
+    portStatisticsBridgeStatisticsIfIndex          InterfaceIndex,
+    portStatisticsBridgeStatisticsRxBridgeDiscard  Counter64
+}
+
+portStatisticsBridgeStatisticsIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { portStatisticsBridgeStatisticsEntry 1 }
+
+portStatisticsBridgeStatisticsRxBridgeDiscard OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of bridge frames discarded."
+    ::= { portStatisticsBridgeStatisticsEntry 2 }
+
+portMibConformance OBJECT IDENTIFIER
+    ::= { portMib 2 }
+
+portMibCompliances OBJECT IDENTIFIER
+    ::= { portMibConformance 1 }
+
+portMibGroups OBJECT IDENTIFIER
+    ::= { portMibConformance 2 }
+
+portConfigInfoGroup OBJECT-GROUP
+    OBJECTS     { portConfigShutdown, portConfigSpeed,
+                  portConfigAdvertiseDisabled,
+                  portConfigMediaType, portConfigFC,
+                  portConfigMTU, portConfigExcessiveRestart,
+                  portConfigPFC, portConfigFrameLengthCheck }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { portMibGroups 1 }
+
+portStatusInformationTableInfoGroup OBJECT-GROUP
+    OBJECTS     { portStatusInformationLink,
+                  portStatusInformationFdx,
+                  portStatusInformationFiber,
+                  portStatusInformationSpeed,
+                  portStatusInformationSFPType,
+                  portStatusInformationSFPVendorName,
+                  portStatusInformationSFPVendorPN,
+                  portStatusInformationSFPVendorRev }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { portMibGroups 2 }
+
+portStatusVeriPhyResultTableInfoGroup OBJECT-GROUP
+    OBJECTS     { portStatusVeriPhyResultVeriPhyStatusPairA,
+                  portStatusVeriPhyResultVeriPhyStatusPairB,
+                  portStatusVeriPhyResultVeriPhyStatusPairC,
+                  portStatusVeriPhyResultVeriPhyStatusPairD,
+                  portStatusVeriPhyResultVeriPhyLengthStatusPairA,
+                  portStatusVeriPhyResultVeriPhyLengthStatusPairB,
+                  portStatusVeriPhyResultVeriPhyLengthStatusPairC,
+                  portStatusVeriPhyResultVeriPhyLengthStatusPairD }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { portMibGroups 3 }
+
+portControlStatisticsClearTableInfoGroup OBJECT-GROUP
+    OBJECTS     { portControlStatisticsClearStatisticsClear }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { portMibGroups 4 }
+
+portControlVeriPhyStartTableInfoGroup OBJECT-GROUP
+    OBJECTS     { portControlVeriPhyStartStart }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { portMibGroups 5 }
+
+portStatisticsRmonStatisticsTableInfoGroup OBJECT-GROUP
+    OBJECTS     { portStatisticsRmonStatisticsRxDropEvents,
+                  portStatisticsRmonStatisticsRxOctets,
+                  portStatisticsRmonStatisticsRxPkts,
+                  portStatisticsRmonStatisticsRxBroadcastPkts,
+                  portStatisticsRmonStatisticsRxMulticastPkts,
+                  portStatisticsRmonStatisticsRxCrcAlignErrPkts,
+                  portStatisticsRmonStatisticsRxUndersizePkts,
+                  portStatisticsRmonStatisticsRxOversizePkts,
+                  portStatisticsRmonStatisticsRxFragmentsPkts,
+                  portStatisticsRmonStatisticsRxJabbersPkts,
+                  portStatisticsRmonStatisticsRx64Pkts,
+                  portStatisticsRmonStatisticsRx65to127Pkts,
+                  portStatisticsRmonStatisticsRx128to255Pkts,
+                  portStatisticsRmonStatisticsRx256to511Pkts,
+                  portStatisticsRmonStatisticsRx512to1023Pkts,
+                  portStatisticsRmonStatisticsRx1024to1518Pkts,
+                  portStatisticsRmonStatisticsRx1519PktsToMax,
+                  portStatisticsRmonStatisticsTxDropEvents,
+                  portStatisticsRmonStatisticsTxOctets,
+                  portStatisticsRmonStatisticsTxPkts,
+                  portStatisticsRmonStatisticsTxBroadcastPkts,
+                  portStatisticsRmonStatisticsTxMulticastPkts,
+                  portStatisticsRmonStatisticsTx64Pkts,
+                  portStatisticsRmonStatisticsTx65to127Pkts,
+                  portStatisticsRmonStatisticsTx128to255Pkts,
+                  portStatisticsRmonStatisticsTx256to511Pkts,
+                  portStatisticsRmonStatisticsTx512to1023Pkts,
+                  portStatisticsRmonStatisticsTx1024to1518Pkts,
+                  portStatisticsRmonStatisticsTx1519PktsToMax }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { portMibGroups 6 }
+
+portStatisticsIfGroupStatisticsTableInfoGroup OBJECT-GROUP
+    OBJECTS     { portStatisticsIfGroupStatisticsRxOctets,
+                  portStatisticsIfGroupStatisticsRxUnicastPkts,
+                  portStatisticsIfGroupStatisticsRxMulticastPkts,
+                  portStatisticsIfGroupStatisticsRxBroadcastPkts,
+                  portStatisticsIfGroupStatisticsRxNonUnicastPkts,
+                  portStatisticsIfGroupStatisticsRxDiscards,
+                  portStatisticsIfGroupStatisticsRxErrors,
+                  portStatisticsIfGroupStatisticsTxOctets,
+                  portStatisticsIfGroupStatisticsTxUnicastPkts,
+                  portStatisticsIfGroupStatisticsTxMulticastPkts,
+                  portStatisticsIfGroupStatisticsTxBroadcastPkts,
+                  portStatisticsIfGroupStatisticsTxNonUnicastPkts,
+                  portStatisticsIfGroupStatisticsTxDiscardPkts,
+                  portStatisticsIfGroupStatisticsTxErrorPkts }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { portMibGroups 7 }
+
+portStatisticsEthernetLikeStatisticsTableInfoGroup OBJECT-GROUP
+    OBJECTS     {                   portStatisticsEthernetLikeStatisticsRxPauseFrames,
+                  portStatisticsEthernetLikeStatisticsTxPauseFrames }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { portMibGroups 8 }
+
+portStatisticsQueuesStatisticsTableInfoGroup OBJECT-GROUP
+    OBJECTS     { portStatisticsQueuesStatisticsRxPrio,
+                  portStatisticsQueuesStatisticsTxPrio }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { portMibGroups 9 }
+
+portStatisticsBridgeStatisticsTableInfoGroup OBJECT-GROUP
+    OBJECTS     { portStatisticsBridgeStatisticsRxBridgeDiscard }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { portMibGroups 10 }
+
+portMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { portConfigInfoGroup,
+                       portStatusInformationTableInfoGroup,
+                       portStatusVeriPhyResultTableInfoGroup,
+                       portControlStatisticsClearTableInfoGroup,
+                       portControlVeriPhyStartTableInfoGroup,
+                       portStatisticsRmonStatisticsTableInfoGroup,
+                       portStatisticsIfGroupStatisticsTableInfoGroup,
+                       portStatisticsEthernetLikeStatisticsTableInfoGroup,
+                       portStatisticsQueuesStatisticsTableInfoGroup,
+                       portStatisticsBridgeStatisticsTableInfoGroup }
+
+    ::= { portMibCompliances 1 }
+
+END

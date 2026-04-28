@@ -1,0 +1,131 @@
+-- *****************************************************************
+-- MIB-PRIVILEGE: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-PRIVILEGE DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    DisplayString FROM BTS-TC
+    ;
+
+privilegeMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of Privilege"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 59 }
+
+
+privilegeMibObjects OBJECT IDENTIFIER
+    ::= { privilegeMib 1 }
+
+privilegeConfig OBJECT IDENTIFIER
+    ::= { privilegeMibObjects 2 }
+
+privilegeConfigWebTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrivilegeConfigWebEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to configure web privilege"
+    ::= { privilegeConfig 1 }
+
+privilegeConfigWebEntry OBJECT-TYPE
+    SYNTAX      PrivilegeConfigWebEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each module has a set of parameters"
+    INDEX       { privilegeConfigWebModuleName }
+    ::= { privilegeConfigWebTable 1 }
+
+PrivilegeConfigWebEntry ::= SEQUENCE {
+    privilegeConfigWebModuleName    DisplayString,
+    privilegeConfigWebConfigRoPriv  Unsigned32,
+    privilegeConfigWebConfigRwPriv  Unsigned32,
+    privilegeConfigWebStatusRoPriv  Unsigned32,
+    privilegeConfigWebStatusRwPriv  Unsigned32
+}
+
+privilegeConfigWebModuleName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..31))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Module name."
+    ::= { privilegeConfigWebEntry 1 }
+
+privilegeConfigWebConfigRoPriv OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Web privilege of read-only configuration."
+    ::= { privilegeConfigWebEntry 2 }
+
+privilegeConfigWebConfigRwPriv OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Web privilege of read-write configuration."
+    ::= { privilegeConfigWebEntry 3 }
+
+privilegeConfigWebStatusRoPriv OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Web privilege of read-only status."
+    ::= { privilegeConfigWebEntry 4 }
+
+privilegeConfigWebStatusRwPriv OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Web privilege of read-write status."
+    ::= { privilegeConfigWebEntry 5 }
+
+privilegeMibConformance OBJECT IDENTIFIER
+    ::= { privilegeMib 2 }
+
+privilegeMibCompliances OBJECT IDENTIFIER
+    ::= { privilegeMibConformance 1 }
+
+privilegeMibGroups OBJECT IDENTIFIER
+    ::= { privilegeMibConformance 2 }
+
+privilegeConfigWebInfoGroup OBJECT-GROUP
+    OBJECTS     { privilegeConfigWebConfigRoPriv,
+                  privilegeConfigWebConfigRwPriv,
+                  privilegeConfigWebStatusRoPriv,
+                  privilegeConfigWebStatusRwPriv }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { privilegeMibGroups 1 }
+
+privilegeMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { privilegeConfigWebInfoGroup }
+
+    ::= { privilegeMibCompliances 1 }
+
+END
