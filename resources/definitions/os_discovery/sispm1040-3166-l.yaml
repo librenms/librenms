@@ -1,0 +1,37 @@
+mib: SISPM1040-3166-L-MIB
+modules:
+    os:
+        hardware: '.1.3.6.1.4.1.868.2.80.4.1.1.1.2.0'
+        serial: SISPM1040-3166-L-MIB::sispm10403166lSystemInfoSeriesNumber.0
+        version: SISPM1040-3166-L-MIB::sispm10403166lSystemInfoFirmwareVersion.0
+    processors:
+        data:
+            -
+                oid: sispm10403166lSystemInfo
+                value: sispm10403166lSystemInfoCPULoad
+                num_oid: '.1.3.6.1.4.1.868.2.80.4.1.1.1.24.{{ $index }}'
+                index: '{{ $index }}'
+                type: sispm1040-3166-L
+                descr: '{{ $sispm10403166lSystemInfoModelName }}'
+                usage:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: sispm10403166lTemperature1
+                    value: sispm10403166lTemperature1Celsius
+                    num_oid: '.1.3.6.1.4.1.868.2.80.4.1.13.1.1.{{ $index }}'
+                    low_limit: 0
+                    high_limit: 100
+                    descr: "Temperature 1"
+                    index: 'sispm10403166lTemperature1CelsiusValue.{{ $index }}'
+                -
+                    oid: sispm10403166lTemperature2
+                    value: sispm10403166lTemperature2Celsius
+                    num_oid: '.1.3.6.1.4.1.868.2.80.4.1.13.2.1.{{ $index }}'
+                    low_limit: 0
+                    high_limit: 100
+                    descr: "Temperature 2"
+                    index: 'sispm10403166lTemperature2CelsiusValue.{{ $index }}'
+
+
