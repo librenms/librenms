@@ -16,7 +16,7 @@ IMPORTS
 telemetryMib	OBJECT IDENTIFIER ::= { switchMgmt 7 }
 
 -- the Sensors group
-sensors		OBJECT IDENTIFIER ::= { telemetryMib 1 }
+sensors		OBJECT IDENTIFIER ::= { telemetryMib 6 }
 
 sensor1		OBJECT IDENTIFIER ::= { sensors 1 }
 sensor2		OBJECT IDENTIFIER ::= { sensors 2 }

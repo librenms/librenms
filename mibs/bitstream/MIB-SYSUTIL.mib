@@ -12,7 +12,7 @@ IMPORTS
     Integer32 FROM SNMPv2-SMI
     Unsigned32 FROM SNMPv2-SMI
     TruthValue FROM SNMPv2-TC
-    DisplayString FROM BTS-TC
+    DisplayString FROM MIB-TC
     ;
 
 sysutilMib MODULE-IDENTITY

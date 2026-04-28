@@ -12,13 +12,13 @@ IMPORTS
     Integer32 FROM SNMPv2-SMI
     Unsigned32 FROM SNMPv2-SMI
     TruthValue FROM SNMPv2-TC
-    DisplayString FROM BTS-TC
-    Integer64 FROM BTS-TC
-    InterfaceIndex FROM BTS-TC
-    RowEditorState FROM BTS-TC
-    Unsigned16 FROM BTS-TC
-    Unsigned64 FROM BTS-TC
-    Unsigned8 FROM BTS-TC
+    DisplayString FROM MIB-TC
+    Integer64 FROM MIB-TC
+    InterfaceIndex FROM MIB-TC
+    RowEditorState FROM MIB-TC
+    Unsigned16 FROM MIB-TC
+    Unsigned64 FROM MIB-TC
+    Unsigned8 FROM MIB-TC
     ;
 
 lldpMib MODULE-IDENTITY
