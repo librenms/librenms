@@ -115,11 +115,11 @@ class PortsStack implements Module
      *
      * Used as a fallback for devices that do not implement IF-MIB::ifStackTable.
      * Each entry's index is the member port ifIndex; the value is the ifIndex of
-     * the aggregator (port-channel) the member is configured to join.
+     * the aggregator (port-channel) the member is configured to join. Returns
+     * null when the device exposes neither MIB so the caller can leave any
+     * existing ports_stack rows untouched.
      *
-     * @return \Illuminate\Support\Collection<int, PortStack>|null Collection of
-     *     PortStack models, or null when the device exposes neither MIB so the
-     *     caller can leave existing ports_stack rows untouched.
+     * @return \Illuminate\Support\Collection<int, PortStack>|null
      */
     private function discoverFromLagMib(OS $os): ?\Illuminate\Support\Collection
     {
