@@ -63,12 +63,12 @@ class SslCertificateController extends TableController
 
         $daysUntilExpiry = $sslCertificate->days_until_expiry;
         $daysDisplay = $daysUntilExpiry !== null
-            ? (string) $daysUntilExpiry . ' ' . __('days')
+            ? (string) e($daysUntilExpiry) . ' ' . __('days')
             : '—';
         if ($daysUntilExpiry !== null && $daysUntilExpiry <= $daysDanger) {
-            $daysDisplay = '<span class="text-danger">' . $daysUntilExpiry . ' ' . __('days') . '</span>';
+            $daysDisplay = '<span class="text-danger">' . e($daysUntilExpiry) . ' ' . __('days') . '</span>';
         } elseif ($daysUntilExpiry !== null && $daysUntilExpiry <= $daysWarning) {
-            $daysDisplay = '<span class="text-warning">' . $daysUntilExpiry . ' ' . __('days') . '</span>';
+            $daysDisplay = '<span class="text-warning">' . e($daysUntilExpiry) . ' ' . __('days') . '</span>';
         }
 
         return [
@@ -78,7 +78,7 @@ class SslCertificateController extends TableController
             'subject' => e($sslCertificate->subject),
             'issuer' => e($sslCertificate->issuer),
             'valid_to' => e($validTo),
-            'days_until_expiry' => e($daysDisplay),
+            'days_until_expiry' => $daysDisplay,
             'last_checked_at' => $sslCertificate->last_checked_at !== null ? e($sslCertificate->last_checked_at->format('Y-m-d H:i')) : null,
             'device_id' => $sslCertificate->device_id,
             'device' => $deviceLink,

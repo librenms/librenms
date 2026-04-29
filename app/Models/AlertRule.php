@@ -27,11 +27,26 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\AlertState;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $severity
+ * @property array<string, mixed>|null $extra
+ * @property bool|int $disabled
+ * @property string|null $proc
+ * @property string|null $notes
+ * @property string $query
+ * @property array<string, mixed>|null $builder
+ * @property bool|int $invert_map
+ * @property int|null $alert_operation_id
+ * @property AlertOperation|null $alertOperation
+ */
 class AlertRule extends BaseModel
 {
     public $timestamps = false;
@@ -46,8 +61,6 @@ class AlertRule extends BaseModel
             $rule->devices()->detach();
             $rule->groups()->detach();
             $rule->locations()->detach();
-            $rule->transportSingles()->detach();
-            $rule->transportGroups()->detach();
         });
     }
 
@@ -61,11 +74,13 @@ class AlertRule extends BaseModel
         'query',
         'builder',
         'invert_map',
+        'alert_operation_id',
     ];
 
     protected $casts = [
         'builder' => 'array',
         'extra' => 'array',
+        'alert_operation_id' => 'integer',
     ];
 
     // ---- Query scopes ----
@@ -164,22 +179,37 @@ class AlertRule extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\AlertTransport, $this>
+     * @return BelongsTo<AlertOperation, $this>
      */
-    public function transportSingles(): BelongsToMany
+    public function alertOperation(): BelongsTo
     {
-        return $this->belongsToMany(AlertTransport::class, 'alert_transport_map', 'rule_id', 'transport_or_group_id')
-            ->withPivot('target_type')
-            ->wherePivot('target_type', 'single');
+        return $this->belongsTo(AlertOperation::class, 'alert_operation_id');
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\AlertTransportGroup, $this>
+     * Backwards-compatible shape: one array entry per segment (same as legacy multi-row operations).
+     *
+     * @return array<int, array<string, mixed>>
      */
-    public function transportGroups(): BelongsToMany
+    public function toOperationsApiArray(): array
     {
-        return $this->belongsToMany(AlertTransportGroup::class, 'alert_transport_map', 'rule_id', 'transport_or_group_id')
-            ->withPivot('target_type')
-            ->wherePivot('target_type', 'group');
+        $this->load([
+            'alertOperation.segments.transportSingles:alert_transports.transport_id,transport_type,transport_name',
+            'alertOperation.segments.transportGroups:alert_transport_groups.transport_group_id,transport_group_name',
+        ]);
+
+        if ($this->alertOperation === null) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($this->alertOperation->segments as $segment) {
+            $out[] = array_merge($segment->toApiArray(), [
+                'alert_operation_id' => $this->alertOperation->id,
+                'name' => $this->alertOperation->name,
+            ]);
+        }
+
+        return $out;
     }
 }

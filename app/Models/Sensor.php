@@ -222,6 +222,23 @@ class Sensor extends DeviceRelatedModel implements Keyable
         return $query->where('sensor_alert', 0);
     }
 
+    public function labels(): array
+    {
+        if ($this->poller_type == 'ipmi') {
+            return [
+                'class' => $this->sensor_class,
+                'type' => $this->sensor_type,
+                'descr' => $this->sensor_descr,
+            ];
+        }
+
+        return [
+            'class' => $this->sensor_class,
+            'type' => $this->sensor_type,
+            'index' => $this->sensor_index,
+        ];
+    }
+
     public function __toString(): string
     {
         $data = $this->only([

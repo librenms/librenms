@@ -71,4 +71,8 @@ return [
 
         'rediscover_error' => 'An error occurred setting this device to be rediscovered',
     ],
+
+    'oxidized' => [
+        'connection_error' => "We couldn't retrieve the device information from Oxidized",
+    ],
 ];

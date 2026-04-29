@@ -41,7 +41,10 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.tasklist
   - pymdownx.tilde
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.details
@@ -228,6 +231,7 @@ nav:
 
   - Alerting:
     - Introduction: Alerting/index.md
+    - Operations: Alerting/Operations.md
     - Rules: Alerting/Rules.md
     - Templates: Alerting/Templates.md
     - Transport Overview: Alerting/Transports.md

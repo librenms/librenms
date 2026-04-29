@@ -60,6 +60,10 @@ if (Gate::denies('update', User::class)) {
             }
         }
 
+        if ($action) {
+            Permissions::invalidateCache();
+        }
+
         echo '<div class="row">
            <div class="col-md-4">';
 
@@ -73,9 +77,8 @@ if (Gate::denies('update', User::class)) {
                 <th>Action</th>
               </tr>";
 
-        $device_perms = dbFetchRows('SELECT * from devices_perms as P, devices as D WHERE `user_id` = ? AND D.device_id = P.device_id', [$user_data['user_id']]);
-        foreach ($device_perms as $device_perm) {
-            echo '<tr><td><strong>' . htmlentities(format_hostname($device_perm)) . "</td><td> <a href='edituser/action=deldevperm/user_id=" . $vars['user_id'] . '/device_id=' . $device_perm['device_id'] . "'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a></strong></td></tr>";
+        foreach (Device::hasAccess($user)->get() as $device_perm) {
+            echo '<tr><td><strong>' . htmlentities((string) $device_perm->displayName()) . "</td><td> <a href='edituser/action=deldevperm/user_id=" . $user->user_id . '/device_id=' . $device_perm->device_id . "'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a></strong></td></tr>";
             $access_list[] = $device_perm['device_id'];
             $permdone = 'yes';
         }
@@ -149,21 +152,19 @@ if (Gate::denies('update', User::class)) {
           <div class='col-md-4'>";
         echo '<h3>Interface Access</h3>';
 
-        $interface_perms = dbFetchRows('SELECT * from ports_perms as P, ports as I, devices as D WHERE `user_id` = ? AND I.port_id = P.port_id AND D.device_id = I.device_id', [$user_data['user_id']]);
-
         echo "<div class='panel panel-default panel-condensed'>
             <table class='table table-hover table-condensed table-striped'>
               <tr>
                 <th>Interface name</th>
                 <th>Action</th>
               </tr>";
-        foreach ($interface_perms as $interface_perm) {
+        foreach (Port::hasAccess($user)->with('device')->get() as $interface_perm) {
             echo '<tr>
               <td>
-                <strong>' . $interface_perm['hostname'] . ' - ' . $interface_perm['ifDescr'] . '</strong>' . '' . \LibreNMS\Util\Clean::html($interface_perm['ifAlias'], []) . "
+                <strong>' . htmlentities((string) $interface_perm->device?->displayName()) . ' - ' . htmlentities((string) $interface_perm->getLabel()) . '</strong>' . '' . htmlentities((string) $interface_perm->getDescription()) . "
               </td>
               <td>
-                &nbsp;&nbsp;<a href='edituser/action=delifperm/user_id=" . $user_data['user_id'] . '/port_id=' . $interface_perm['port_id'] . "'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a>
+                &nbsp;&nbsp;<a href='edituser/action=delifperm/user_id=" . $user->user_id . '/port_id=' . $interface_perm->port_id . "'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a>
               </td>
             </tr>";
             $ipermdone = 'yes';
@@ -181,7 +182,7 @@ if (Gate::denies('update', User::class)) {
 
         echo "<form action='' method='post' class='form-horizontal' role='form'>
         " . csrf_field() . "
-        <input type='hidden' value='" . $user_data['user_id'] . "' name='user_id'>
+        <input type='hidden' value='" . $user->user_id . "' name='user_id'>
         <input type='hidden' value='edituser' name='page'>
         <input type='hidden' value='addifperm' name='action'>
         <div class='form-group'>
@@ -207,8 +208,6 @@ if (Gate::denies('update', User::class)) {
           <div class='col-md-4'>";
         echo '<h3>Bill Access</h3>';
 
-        $bill_perms = dbFetchRows('SELECT * from bills AS B, bill_perms AS P WHERE P.user_id = ? AND P.bill_id = B.bill_id', [$user_data['user_id']]);
-
         echo "<div class='panel panel-default panel-condensed'>
             <table class='table table-hover table-condensed table-striped'>
             <tr>
@@ -216,10 +215,10 @@ if (Gate::denies('update', User::class)) {
               <th>Action</th>
             </tr>";
 
-        foreach ($bill_perms as $bill_perm) {
+        foreach (Bill::hasAccess($user)->get() as $bill_perm) {
             echo '<tr>
               <td>
-                <strong>' . htmlentities((string) $bill_perm['bill_name']) . "</strong></td><td width=50>&nbsp;&nbsp;<a href='edituser/action=delbillperm/user_id=" . $vars['user_id'] . '/bill_id=' . $bill_perm['bill_id'] . "'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a>
+                <strong>' . htmlentities((string) $bill_perm->bill_name) . "</strong></td><td width=50>&nbsp;&nbsp;<a href='edituser/action=delbillperm/user_id=" . $user->user_id . '/bill_id=' . $bill_perm->bill_id . "'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a>
               </td>
             </tr>";
             $bill_access_list[] = $bill_perm['bill_id'];
@@ -238,7 +237,7 @@ if (Gate::denies('update', User::class)) {
         echo '<h4>Grant access to new bill</h4>';
         echo "<form method='post' action='' class='form-inline' role='form'>
             " . csrf_field() . "
-            <input type='hidden' value='" . $user_data['user_id'] . "' name='user_id'>
+            <input type='hidden' value='" . $user->user_id . "' name='user_id'>
             <input type='hidden' value='edituser' name='page'>
             <input type='hidden' value='addbillperm' name='action'>
             <div class='form-group'>

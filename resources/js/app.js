@@ -7,6 +7,11 @@
 import "../css/app.css";
 import "./bootstrap";
 
+// Gridstack (bundled by Vite)
+import 'gridstack/dist/gridstack.min.css';
+import { GridStack } from 'gridstack';
+window.GridStack = GridStack;
+
 import Vue from "vue";
 import {i18n} from "./plugins/i18n.js"; // translation
 import ToggleButton from "vue-js-toggle-button";
