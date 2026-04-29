@@ -8,11 +8,14 @@
     endpoint: {{ $endpoint ? "@js($endpoint)" : "current?.endpoint" }},
     params:   {{ $params ? "@js($params)" : "current?.params || {}" }},
     multi:    {{ !is_null($multi) ? "@js($multi)" : "current?.type === 'multi-select'" }}
-})" class="tw:space-y-[1em]">
+})"
+     x-init="$nextTick(() => $refs.searchInput.focus())"
+     class="tw:space-y-[1em]">
 
     {{-- Search Input --}}
     <div class="tw:relative">
         <input type="text" x-model.debounce.300ms="search"
+               x-ref="searchInput"
                placeholder="{{ __('Type to search...') }}"
                class="tw:w-full tw:px-[1em] tw:py-[0.8em] tw:text-[0.95em] tw:bg-neutral-50 tw:dark:bg-dark-gray-400 tw:border tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:rounded-[0.6em] tw:focus:ring-2 tw:focus:ring-blue-500/50 tw:focus:border-blue-500 tw:outline-none tw:text-neutral-900! tw:dark:text-dark-white-100! tw:transition-all" />
 
