@@ -43,7 +43,8 @@ class DeviceController extends SelectController
         return [
             'access' => 'nullable|in:normal,inverted',
             'user' => 'nullable|int',
-            'id' => 'nullable|in:device_id,hostname',
+            'key' => 'nullable|in:device_id,hostname',
+            'id' => 'nullable|int',
             'exclude' => 'nullable|int',
         ];
     }
@@ -55,7 +56,7 @@ class DeviceController extends SelectController
 
     protected function baseQuery(Request $request): Builder
     {
-        $this->id = $request->input('id', 'device_id');
+        $this->id = $request->input('key', 'device_id');
         $user_id = $request->input('user');
 
         // list devices the user does not have access to
@@ -71,6 +72,7 @@ class DeviceController extends SelectController
         }
 
         return Device::hasAccess($request->user())
+            ->when($request->integer('id'), fn ($query, $id) => $query->where('device_id', $id))
             ->when($request->input('exclude'), fn ($query, $exclude) => $query->where('device_id', '!=', $exclude))
             ->select(['device_id', 'hostname', 'sysName', 'display', 'icon'])
             ->orderBy('hostname');

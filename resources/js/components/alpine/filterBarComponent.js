@@ -7,12 +7,12 @@ export default function filterBarComponent({ fields }) {
         current: null,
         op: "",
         value: null,
+        display: "", // Temporary holder for the label in the modal
         highlightedIndex: -1,
         lastFocusedElement: null,
         searchQuery: "",
         remoteOptions: [],
         isLoading: false,
-        display: "", // Holds the human-readable text for the modal selection
 
         OPS: {
             text: [
@@ -101,6 +101,7 @@ export default function filterBarComponent({ fields }) {
                 this.value = existing?.value ?? "";
             }
 
+            // Sync the temporary display text
             this.display = existing?.display ?? this.value;
 
             this.dialog = true;
@@ -164,7 +165,7 @@ export default function filterBarComponent({ fields }) {
                     : isMulti
                     ? [...this.value]
                     : this.value,
-                // Pre-calculate display text for the chip
+                // Finalize the display text for the chip
                 display: isNullary
                     ? ""
                     : this.current.type === "boolean"
@@ -200,6 +201,7 @@ export default function filterBarComponent({ fields }) {
                     this.display = this.display.filter((d) => d !== optText);
                 }
             } else {
+                if (!Array.isArray(this.value)) this.value = [];
                 this.value.push(optValue);
                 if (!Array.isArray(this.display)) this.display = [];
                 this.display.push(optText);
@@ -238,7 +240,7 @@ export default function filterBarComponent({ fields }) {
             });
         },
 
-        async restoreFromUrl() {
+        restoreFromUrl() {
             const params = new URLSearchParams(window.location.search);
             const newFilters = [];
             for (const [fullKey, val] of params.entries()) {
@@ -261,13 +263,12 @@ export default function filterBarComponent({ fields }) {
                             op,
                             sym: opObj?.s || op,
                             value: finalVal,
-                            display: "...", // Placeholder for hydration
+                            display: "...", // Loading state
                         });
                     }
                 }
             }
             this.filters = newFilters;
-            // Resolve names for the chips
             this.filters.forEach((f) => this.hydrate(f));
         },
 
@@ -275,6 +276,8 @@ export default function filterBarComponent({ fields }) {
             const field = this.fields.find((f) => f.key === filter.key);
             if (!field?.endpoint || !filter.value || this.nullary(filter.op)) {
                 if (this.nullary(filter.op)) filter.display = "";
+                else if (field?.type === "boolean")
+                    filter.display = filter.value == 1 ? "Yes" : "No";
                 else filter.display = filter.value;
                 return;
             }
@@ -291,7 +294,9 @@ export default function filterBarComponent({ fields }) {
                 const response = await fetch(url);
                 const data = await response.json();
                 const match = (data.results || data)[0];
+
                 if (match) filter.display = match.text || match;
+                else filter.display = filter.value;
             } catch (e) {
                 filter.display = filter.value;
             }
