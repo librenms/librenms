@@ -55,7 +55,7 @@ foreach ($menu_options as $option => $text) {
     if ($vars['format'] == 'graph_' . $option) {
         $displayLists .= '<span class="pagemenu-selected">';
     }
-    $displayLists .= '<a href="' . \LibreNMS\Util\Url::generate($vars, ['format' => 'graph_' . $option]) . '">' . $text . '</a>';
+    $displayLists .= '<a href="' . request()->fullUrlWithQuery(['format' => 'graph_' . $option]) . '">' . $text . '</a>';
     if ($vars['format'] == 'graph_' . $option) {
         $displayLists .= '</span>';
     }
@@ -66,20 +66,19 @@ if (isset($vars['group']) && $vars['group']) {
 }
 
 $displayLists .= '<div style="float: right;">';
-$displayLists .= '<a href="' . \LibreNMS\Util\Url::generate($vars) . '" title="Update the browser URL to reflect the search criteria.">Update URL</a> | ';
 
 if (isset($vars['searchbar']) && $vars['searchbar'] == 'hide') {
-    $displayLists .= '<a href="' . \LibreNMS\Util\Url::generate($vars, ['searchbar' => '']) . '">Search</a>';
+    $displayLists .= '<a href="' . request()->fullUrlWithoutQuery(['searchbar']) . '">Search</a>';
 } else {
-    $displayLists .= '<a href="' . \LibreNMS\Util\Url::generate($vars, ['searchbar' => 'hide']) . '">Search</a>';
+    $displayLists .= '<a href="' . request()->fullUrlWithQuery(['searchbar' => 'hide']) . '">Search</a>';
 }
 
 $displayLists .= ' | ';
 
 if (isset($vars['bare']) && $vars['bare'] == 'yes') {
-    $displayLists .= '<a href="' . \LibreNMS\Util\Url::generate($vars, ['bare' => '']) . '">Header</a>';
+    $displayLists .= '<a href="' . request()->fullUrlWithoutQuery(['bare' => '']) . '">Header</a>';
 } else {
-    $displayLists .= '<a href="' . \LibreNMS\Util\Url::generate($vars, ['bare' => 'yes']) . '">Header</a>';
+    $displayLists .= '<a href="' . request()->fullUrlWithQuery(['bare' => 'yes']) . '">Header</a>';
 }
 
 $displayLists .= ' | ';
@@ -112,7 +111,11 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
             'key' => 'state',
             'label' => 'Oper Status',
             'type' => 'select',
-            'options' => ['up', 'down', 'shutdown'],
+            'options' => [
+                'up',
+                'down',
+                'shutdown'
+            ],
         ],
         [
             'key' => 'ifSpeed',
@@ -130,6 +133,16 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
             'endpoint' => route('ajax.select.port-field'),
             'params' => [
                 'field' => 'ifType',
+            ],
+        ],
+        [
+            'key' => 'ifDuplex',
+            'label' => 'Duplex',
+            'type' => 'select',
+            'options' => [
+                'fullDuplex' => 'Full',
+                'halfDuplex' => 'Half',
+                'unknown' => 'unknown',
             ],
         ],
         [

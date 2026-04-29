@@ -157,14 +157,25 @@
                             </div>
                         </template>
 
-                        {{-- Static Selects --}}
+                        {{-- Static Selects & Multi-Selects --}}
                         <template x-if="['select', 'multi-select'].includes(current?.type) && !current?.endpoint">
-                            <div class="tw:flex tw:flex-col tw:gap-[0.4em]">
-                                <template x-for="opt in (current?.options ?? [])" :key="opt">
-                                    <button type="button" @click="current.type === 'multi-select' ? toggleMulti(opt, opt) : (value = opt, display = opt, apply())"
-                                            class="tw:relative tw:px-[1.2em] tw:py-[0.7em] tw:rounded-[0.6em] tw:text-[0.9em] tw:font-bold tw:transition-all tw:border tw:text-left tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300"
-                                            :class="(current.type === 'multi-select' ? value.includes(opt) : value === opt) ? 'tw:bg-blue-50 tw:dark:bg-blue-900/30 tw:text-blue-600! tw:dark:text-blue-300! tw:border-blue-200 tw:dark:border-blue-800' : 'tw:bg-neutral-50 tw:dark:bg-dark-gray-400 tw:text-neutral-600! tw:dark:text-dark-white-200! tw:border-transparent'">
-                                        <span x-text="opt"></span>
+                            <div class="tw:flex tw:flex-col tw:gap-[0.5em]">
+                                <template x-for="opt in getNormalizedOptions()" :key="opt.value">
+                                    <button type="button"
+                                            @click="current.type === 'multi-select' ? toggleMulti(opt.value, opt.label) : (value = opt.value, display = opt.label, apply())"
+                                            class="tw:flex tw:items-center tw:justify-between tw:w-full tw:px-[1.2em] tw:py-[0.8em] tw:rounded-[0.6em] tw:text-[0.85em] tw:font-bold tw:transition-all tw:border tw:text-left"
+                                            :class="(current.type === 'multi-select' ? value.includes(opt.value) : value === opt.value)
+                                              ? 'tw:bg-blue-600 tw:text-white! tw:border-blue-600 tw:shadow-md'
+                                              : 'tw:bg-neutral-50 tw:dark:bg-dark-gray-400 tw:text-neutral-600! tw:dark:text-dark-white-200! tw:border-neutral-100 tw:dark:border-dark-gray-300 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300'">
+
+                                        <span x-text="opt.label"></span>
+
+                                        {{-- Clean checkmark aligned to the right --}}
+                                        <svg x-show="current.type === 'multi-select' ? value.includes(opt.value) : value === opt.value"
+                                             class="tw:w-[1.1em] tw:h-[1.1em] tw:transition-transform"
+                                             viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2.5">
+                                            <path d="M1.5 5l3 3 4-5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
                                     </button>
                                 </template>
                             </div>

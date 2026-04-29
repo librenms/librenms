@@ -17,10 +17,10 @@ export default function filterBarComponent({ fields, reload = false }) {
 
         OPS: {
             text: [
-                { v: "eq", s: "=", l: "Equals" },
-                { v: "neq", s: "≠", l: "Not Equals" },
                 { v: "contains", s: "~", l: "Contains" },
                 { v: "not_contains", s: "!~", l: "Not Contains" },
+                { v: "eq", s: "=", l: "Equals" },
+                { v: "neq", s: "≠", l: "Not Equals" },
                 { v: "starts_with", s: "^", l: "Starts With" },
                 { v: "ends_with", s: "$", l: "Ends With" },
                 { v: "is_empty", s: "∅", l: "Is Empty" },
@@ -93,7 +93,9 @@ export default function filterBarComponent({ fields, reload = false }) {
 
                 const existing = this.filters.find((f) => f.key === field.key);
                 this.op = existing?.op || this.ops()[0].v;
-                this.value = existing?.value ?? (field.type === "multi-select" ? [] : "");
+                this.value =
+                    existing?.value ??
+                    (field.type === "multi-select" ? [] : "");
                 this.display = existing?.display ?? this.value;
 
                 this.dialog = true;
@@ -186,18 +188,17 @@ export default function filterBarComponent({ fields, reload = false }) {
             this.syncUrl();
         },
 
-        toggleMulti(optValue, optText) {
+        toggleMulti(optValue, optLabel) {
+            if (!Array.isArray(this.value)) this.value = [];
+            if (!Array.isArray(this.display)) this.display = [];
+
             const i = this.value.indexOf(optValue);
             if (i > -1) {
                 this.value.splice(i, 1);
-                if (Array.isArray(this.display)) {
-                    this.display = this.display.filter((d) => d !== optText);
-                }
+                this.display.splice(i, 1);
             } else {
-                if (!Array.isArray(this.value)) this.value = [];
                 this.value.push(optValue);
-                if (!Array.isArray(this.display)) this.display = [];
-                this.display.push(optText);
+                this.display.push(optLabel);
             }
         },
 
@@ -271,34 +272,81 @@ export default function filterBarComponent({ fields, reload = false }) {
             this.filters.forEach((f) => this.hydrate(f));
         },
 
+        getNormalizedOptions() {
+            const options = this.current?.options;
+            if (!options) return [];
+
+            if (Array.isArray(options)) {
+                return options.map((o) => ({ value: o, label: o }));
+            }
+
+            return Object.keys(options).map((key) => ({
+                value: key,
+                label: options[key],
+            }));
+        },
+
         async hydrate(filter) {
             const field = this.fields.find((f) => f.key === filter.key);
-            if (!field?.endpoint || !filter.value || this.nullary(filter.op)) {
-                if (this.nullary(filter.op)) filter.display = "";
-                else if (field?.type === "boolean")
-                    filter.display = filter.value == 1 ? "Yes" : "No";
-                else filter.display = filter.value;
+
+            if (field?.options) {
+                const options = field.options;
+                const isMap = !Array.isArray(options);
+
+                if (
+                    field.type === "multi-select" &&
+                    Array.isArray(filter.value)
+                ) {
+                    filter.display = filter.value.map((v) =>
+                        isMap ? options[v] || v : v
+                    );
+                } else {
+                    // Single select lookup
+                    filter.display = isMap
+                        ? options[filter.value] || filter.value
+                        : filter.value;
+                }
                 return;
             }
 
-            try {
-                const url = new URL(field.endpoint, window.location.origin);
-                url.searchParams.append("id", filter.value);
-                if (field.params) {
-                    Object.entries(field.params).forEach(([k, v]) =>
-                        url.searchParams.append(k, v)
-                    );
-                }
-
-                const response = await fetch(url);
-                const data = await response.json();
-                const match = (data.results || data)[0];
-
-                if (match) filter.display = match.text || match;
-                else filter.display = filter.value;
-            } catch (e) {
-                filter.display = filter.value;
+            if (field?.type === "boolean") {
+                filter.display = filter.value == 1 ? "Yes" : "No";
+                return;
             }
+
+            if (field?.endpoint && filter.value && !this.nullary(filter.op)) {
+                try {
+                    const url = new URL(field.endpoint, window.location.origin);
+                    url.searchParams.append(
+                        "id",
+                        Array.isArray(filter.value)
+                            ? filter.value.join(",")
+                            : filter.value
+                    );
+                    if (field.params)
+                        Object.entries(field.params).forEach(([k, v]) =>
+                            url.searchParams.append(k, v)
+                        );
+
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    const results = data.data || data.results || data;
+
+                    if (field.type === "multi-select") {
+                        filter.display = results.map((r) => r.text || r);
+                    } else {
+                        const match = results[0];
+                        filter.display = match
+                            ? match.text || match
+                            : filter.value;
+                    }
+                } catch (e) {
+                    filter.display = filter.value;
+                }
+                return;
+            }
+
+            filter.display = filter.value;
         },
     };
 }

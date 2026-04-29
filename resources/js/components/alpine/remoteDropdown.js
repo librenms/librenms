@@ -52,10 +52,10 @@ export default function remoteDropdown({ endpoint, params, multi }) {
         },
 
         select(opt) {
-            this.$dispatch("remote-selected", {
-                id: opt.id || opt,
-                text: opt.text || opt,
-            });
+            const id = opt.id || opt;
+            const text = opt.text || opt;
+
+            this.$dispatch("remote-selected", { id, text });
         },
     };
 }
