@@ -361,9 +361,9 @@ class Ospfv3 implements Module
                 'OSPFV3-MIB::ospfv3AreaTEEnabled.' . $area->ospfv3AreaId,
             ])->valuesByIndex()["$area->ospfv3AreaId"] ?? [];
 
-            $ospf_area['ospfv3AreaScopeLsaCksumSum'] ??= 0;
+        $ospf_area['ospfv3AreaScopeLsaCksumSum'] ??= 0;
 
-            $area->fill($ospf_area);
+        $area->fill($ospf_area);
     }
 
     public function fetchAndFillPort(Ospfv3Port $port): void
