@@ -26,6 +26,7 @@ import Alpine from "alpinejs";
 import popup from "./components/alpine/oldpopup.js";
 import deviceLink from "./components/alpine/deviceLink.js";
 import filterBarComponent from "./components/alpine/filterBarComponent.js";
+import remoteDropdown from "./components/alpine/remoteDropdown.js";
 import LibreNMSDate from "./datetime.js";
 
 window.LibreNMS = window.LibreNMS || {};
@@ -82,6 +83,7 @@ const app = new Vue({
 Alpine.data('popup', popup);
 Alpine.data('deviceLink', deviceLink);
 Alpine.data("filterBarComponent", filterBarComponent);
+Alpine.data("remoteDropdown", remoteDropdown);
 
 window.Alpine = Alpine;
 Alpine.start();

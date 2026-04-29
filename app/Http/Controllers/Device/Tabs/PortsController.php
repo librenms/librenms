@@ -492,7 +492,7 @@ class PortsController implements DeviceTab
                 'options' => ['up', 'down', 'shutdown'],
             ],
             [
-                'key' => 'speed',
+                'key' => 'ifSpeed',
                 'label' => 'Speed',
                 'type' => 'select',
                 'endpoint' => route('ajax.select.port-field'),
@@ -502,7 +502,7 @@ class PortsController implements DeviceTab
                 ],
             ],
             [
-                'key' => 'media',
+                'key' => 'ifType',
                 'label' => 'Media',
                 'type' => 'select',
                 'endpoint' => route('ajax.select.port-field'),

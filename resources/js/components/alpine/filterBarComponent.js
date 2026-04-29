@@ -36,9 +36,7 @@ export default function filterBarComponent({ fields, reload = false }) {
                 { v: "is_empty", s: "∅", l: "Is Empty" },
                 { v: "is_not_empty", s: "∃", l: "Is Not Empty" },
             ],
-            boolean: [
-                { v: "eq", s: "is", l: "Is" },
-            ],
+            boolean: [{ v: "eq", s: "is", l: "Is" }],
             date: [
                 { v: "on", s: "=", l: "On Date" },
                 { v: "before", s: "<", l: "Before" },
@@ -85,33 +83,28 @@ export default function filterBarComponent({ fields, reload = false }) {
 
         open(field) {
             this.lastFocusedElement = document.activeElement;
-            this.current = field;
-            this.searchQuery = "";
-            this.remoteOptions = [];
-            this.highlightedIndex = -1;
-
-            const existing = this.filters.find((f) => f.key === field.key);
-            this.op = existing?.op || this.ops()[0].v;
-
-            if (field.type === "multi-select") {
-                this.value = existing?.value ? [...existing.value] : [];
-            } else if (field.type === "select" && !field.endpoint) {
-                this.value = existing?.value ?? (field.options?.[0] || "");
-            } else {
-                this.value = existing?.value ?? "";
-            }
-
-            // Sync the temporary display text
-            this.display = existing?.display ?? this.value;
-
-            this.dialog = true;
-            this.showAdd = false;
+            this.current = null;
 
             this.$nextTick(() => {
-                const el = field.endpoint
-                    ? this.$refs.remoteSearch
-                    : this.$refs.valInput;
-                el?.focus();
+                this.current = field;
+                this.searchQuery = "";
+                this.remoteOptions = [];
+                this.highlightedIndex = -1;
+
+                const existing = this.filters.find((f) => f.key === field.key);
+                this.op = existing?.op || this.ops()[0].v;
+                this.value = existing?.value ?? (field.type === "multi-select" ? [] : "");
+                this.display = existing?.display ?? this.value;
+
+                this.dialog = true;
+                this.showAdd = false;
+
+                this.$nextTick(() => {
+                    const el = field.endpoint
+                        ? this.$refs.remoteSearch
+                        : this.$refs.valInput;
+                    el?.focus();
+                });
             });
         },
 
