@@ -12,7 +12,7 @@ export default function filterBarComponent({ fields }) {
         searchQuery: "",
         remoteOptions: [],
         isLoading: false,
-        display: "",
+        display: "", // Holds the human-readable text for the modal selection
 
         OPS: {
             text: [
@@ -101,6 +101,8 @@ export default function filterBarComponent({ fields }) {
                 this.value = existing?.value ?? "";
             }
 
+            this.display = existing?.display ?? this.value;
+
             this.dialog = true;
             this.showAdd = false;
 
@@ -124,7 +126,6 @@ export default function filterBarComponent({ fields }) {
                     this.current.endpoint,
                     window.location.origin
                 );
-
                 url.searchParams.append("term", this.searchQuery);
 
                 if (this.current.params) {
@@ -135,7 +136,6 @@ export default function filterBarComponent({ fields }) {
 
                 const response = await fetch(url);
                 const data = await response.json();
-
                 this.remoteOptions = data.results || data;
             } catch (e) {
                 console.error("Fetch failed:", e);
@@ -146,11 +146,12 @@ export default function filterBarComponent({ fields }) {
 
         apply() {
             if (!this.current) return;
+            const isNullary = this.nullary();
             const isMulti = this.current.type === "multi-select";
             const hasVal = isMulti
                 ? this.value.length > 0
                 : this.value !== "" && this.value != null;
-            if (!this.nullary() && !hasVal) return;
+            if (!isNullary && !hasVal) return;
 
             const entry = {
                 key: this.current.key,
@@ -158,11 +159,19 @@ export default function filterBarComponent({ fields }) {
                 type: this.current.type,
                 op: this.op,
                 sym: this.ops().find((o) => o.v === this.op).s,
-                value: this.nullary()
+                value: isNullary
                     ? null
                     : isMulti
                     ? [...this.value]
                     : this.value,
+                // Pre-calculate display text for the chip
+                display: isNullary
+                    ? ""
+                    : this.current.type === "boolean"
+                    ? this.value == 1
+                        ? "Yes"
+                        : "No"
+                    : this.display || this.value,
             };
 
             const i = this.filters.findIndex((f) => f.key === entry.key);
@@ -183,9 +192,18 @@ export default function filterBarComponent({ fields }) {
             this.syncUrl();
         },
 
-        toggleMulti(opt) {
-            const i = this.value.indexOf(opt);
-            i > -1 ? this.value.splice(i, 1) : this.value.push(opt);
+        toggleMulti(optValue, optText) {
+            const i = this.value.indexOf(optValue);
+            if (i > -1) {
+                this.value.splice(i, 1);
+                if (Array.isArray(this.display)) {
+                    this.display = this.display.filter((d) => d !== optText);
+                }
+            } else {
+                this.value.push(optValue);
+                if (!Array.isArray(this.display)) this.display = [];
+                this.display.push(optText);
+            }
         },
 
         close() {
@@ -202,6 +220,7 @@ export default function filterBarComponent({ fields }) {
                 if (key.startsWith("filter[")) keysToDelete.push(key);
             }
             keysToDelete.forEach((k) => url.searchParams.delete(k));
+
             this.filters.forEach((f) => {
                 const val = Array.isArray(f.value)
                     ? f.value.join(",")
@@ -219,7 +238,7 @@ export default function filterBarComponent({ fields }) {
             });
         },
 
-        restoreFromUrl() {
+        async restoreFromUrl() {
             const params = new URLSearchParams(window.location.search);
             const newFilters = [];
             for (const [fullKey, val] of params.entries()) {
@@ -234,6 +253,7 @@ export default function filterBarComponent({ fields }) {
                         let finalVal = val === "" ? null : val;
                         if (field.type === "multi-select" && finalVal)
                             finalVal = finalVal.split(",");
+
                         newFilters.push({
                             key,
                             label: field.label,
@@ -241,11 +261,40 @@ export default function filterBarComponent({ fields }) {
                             op,
                             sym: opObj?.s || op,
                             value: finalVal,
+                            display: "...", // Placeholder for hydration
                         });
                     }
                 }
             }
             this.filters = newFilters;
+            // Resolve names for the chips
+            this.filters.forEach((f) => this.hydrate(f));
+        },
+
+        async hydrate(filter) {
+            const field = this.fields.find((f) => f.key === filter.key);
+            if (!field?.endpoint || !filter.value || this.nullary(filter.op)) {
+                if (this.nullary(filter.op)) filter.display = "";
+                else filter.display = filter.value;
+                return;
+            }
+
+            try {
+                const url = new URL(field.endpoint, window.location.origin);
+                url.searchParams.append("id", filter.value);
+                if (field.params) {
+                    Object.entries(field.params).forEach(([k, v]) =>
+                        url.searchParams.append(k, v)
+                    );
+                }
+
+                const response = await fetch(url);
+                const data = await response.json();
+                const match = (data.results || data)[0];
+                if (match) filter.display = match.text || match;
+            } catch (e) {
+                filter.display = filter.value;
+            }
         },
     };
 }

@@ -93,7 +93,7 @@ trait Filterable
                     });
                 } else {
                     // Standard Local Logic
-                    $this->applyQueryLogic($query, $field, $op, $value, $config, $method);
+                    $this->applyQueryLogic($query, $this->qualifyColumn($field), $op, $value, $config, $method);
                 }
             }
         }

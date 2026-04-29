@@ -27,7 +27,7 @@
                 <span class="tw:font-normal" x-show="filters.length" x-text="filters.length"></span>
             </button>
 
-            {{-- Left Dropdown (Anchored Left) --}}
+            {{-- Left Dropdown --}}
             <div x-show="showAdd && !filters.length" x-cloak x-transition @click.stop
                  class="tw:absolute tw:top-full tw:left-0 tw:mt-[0.5em] tw:w-[15em] tw:bg-white tw:dark:bg-neutral-900 tw:border tw:border-neutral-200 tw:dark:border-neutral-800 tw:rounded-[0.6em] tw:shadow-xl tw:z-50 tw:py-[0.5em]">
                 <div class="tw:px-[1.2em] tw:py-[0.6em] tw:text-[0.7em] tw:font-black tw:text-neutral-400 tw:uppercase tw:tracking-widest">{{ __('Select Field') }}</div>
@@ -50,13 +50,8 @@
                             class="tw:flex tw:items-center tw:h-full tw:px-[1em] tw:gap-[0.5em] tw:transition-colors tw:hover:bg-neutral-50 tw:dark:hover:bg-neutral-900 tw:whitespace-nowrap">
                         <span class="tw:font-bold tw:text-neutral-900! tw:dark:text-neutral-100!" x-text="f.label"></span>
                         <span class="tw:text-neutral-400!" x-text="f.sym"></span>
-                        <span x-show="!nullary(f.op)" class="tw:font-bold tw:text-neutral-700! tw:dark:text-neutral-400!">
-                            <template x-if="fields.find(field => field.key === f.key)?.type === 'boolean'">
-                                <span x-text="f.value == 1 ? '{{ __('Yes') }}' : '{{ __('No') }}'"></span>
-                            </template>
-                            <template x-if="fields.find(field => field.key === f.key)?.type !== 'boolean'">
-                                <span x-text="Array.isArray(f.value) ? f.value.join(', ') : f.value"></span>
-                            </template>
+                        <span x-show="f.display" class="tw:font-bold tw:text-neutral-700! tw:dark:text-neutral-400!"
+                              x-text="Array.isArray(f.display) ? f.display.join(', ') : f.display">
                         </span>
                     </button>
                     <button type="button" title="{{ __('Remove filter') }}" @click.stop="remove(f.key)"
@@ -76,7 +71,6 @@
                 +
             </button>
 
-            {{-- Right Dropdown (Anchored Right) --}}
             <div x-show="showAdd && filters.length" x-cloak x-transition @click.stop
                  class="tw:absolute tw:top-full tw:right-0 tw:mt-[0.5em] tw:w-[15em] tw:bg-white tw:dark:bg-neutral-900 tw:border tw:border-neutral-200 tw:dark:border-neutral-800 tw:rounded-[0.6em] tw:shadow-xl tw:z-50 tw:py-[0.5em]">
                 <div class="tw:px-[1.2em] tw:py-[0.6em] tw:text-[0.7em] tw:font-black tw:text-neutral-400 tw:uppercase tw:tracking-widest">{{ __('Select Field') }}</div>
@@ -126,7 +120,7 @@
 
                         {{-- Text/Number/Date --}}
                         <template x-if="['text','email','number','date'].includes(current?.type) && !current?.endpoint">
-                            <input x-ref="valInput" :type="current?.type" x-model="value" @keydown.enter="apply()"
+                            <input x-ref="valInput" :type="current?.type" x-model="value" @input="display = value" @keydown.enter="apply()"
                                    class="tw:w-full tw:px-[1em] tw:py-[0.8em] tw:text-[0.95em] tw:bg-neutral-50 tw:dark:bg-neutral-800 tw:border tw:border-neutral-200 tw:dark:border-neutral-700 tw:rounded-[0.6em] tw:focus:ring-2 tw:focus:ring-blue-500/50 tw:focus:border-blue-500 tw:outline-none tw:text-neutral-900! tw:dark:text-neutral-100! tw:transition-all" />
                         </template>
 
@@ -143,13 +137,13 @@
                                 <div class="tw:max-h-[12em] tw:overflow-y-auto tw:flex tw:flex-col tw:gap-[0.4em] tw:scrollbar-thin">
                                     <template x-for="opt in remoteOptions" :key="opt.id || opt">
                                         <button type="button"
-                                                @click="current.type === 'multi-select' ? toggleMulti(opt.text || opt) : value = (opt.text || opt)"
+                                                @click="current.type === 'multi-select' ? toggleMulti(opt.id || opt, opt.text || opt) : (value = (opt.id || opt), display = (opt.text || opt), apply())"
                                                 class="tw:relative tw:px-[1.2em] tw:py-[0.7em] tw:rounded-[0.6em] tw:text-[0.9em] tw:font-bold tw:transition-all tw:border tw:text-left tw:hover:bg-neutral-100 tw:dark:hover:bg-neutral-700"
                                                 :class="(current.type === 'multi-select' ? value.includes(opt.id || opt) : value === (opt.id || opt))
                                 ? 'tw:bg-blue-50 tw:dark:bg-blue-900/30 tw:text-blue-600! tw:dark:text-blue-300! tw:border-blue-200 tw:dark:border-blue-800'
                                 : 'tw:bg-neutral-50 tw:dark:bg-neutral-800 tw:text-neutral-600! tw:dark:text-neutral-300! tw:border-transparent'">
                                             <span x-text="opt.text || opt"></span>
-                                            <span x-show="current.type === 'multi-select' ? value.includes(opt.text || opt) : value === (opt.text || opt)"
+                                            <span x-show="current.type === 'multi-select' ? value.includes(opt.id || opt) : value === (opt.id || opt)"
                                                   class="tw:absolute tw:right-[1.2em] tw:top-1/2 tw:-translate-y-1/2 tw:text-[0.85em] tw:text-blue-600! tw:dark:text-blue-400!">&check;</span>
                                         </button>
                                     </template>
@@ -161,7 +155,7 @@
                         <template x-if="['select', 'multi-select'].includes(current?.type) && !current?.endpoint">
                             <div class="tw:flex tw:flex-col tw:gap-[0.4em]">
                                 <template x-for="opt in (current?.options ?? [])" :key="opt">
-                                    <button type="button" @click="current.type === 'multi-select' ? toggleMulti(opt) : value = opt"
+                                    <button type="button" @click="current.type === 'multi-select' ? toggleMulti(opt, opt) : (value = opt, display = opt, apply())"
                                             class="tw:relative tw:px-[1.2em] tw:py-[0.7em] tw:rounded-[0.6em] tw:text-[0.9em] tw:font-bold tw:transition-all tw:border tw:text-left tw:hover:bg-neutral-100 tw:dark:hover:bg-neutral-700"
                                             :class="(current.type === 'multi-select' ? value.includes(opt) : value === opt) ? 'tw:bg-blue-50 tw:dark:bg-blue-900/30 tw:text-blue-600! tw:dark:text-blue-300! tw:border-blue-200 tw:dark:border-blue-800' : 'tw:bg-neutral-50 tw:dark:bg-neutral-800 tw:text-neutral-600! tw:dark:text-neutral-300! tw:border-transparent'">
                                         <span x-text="opt"></span>
@@ -174,8 +168,8 @@
                         {{-- Boolean Toggle --}}
                         <template x-if="current?.type === 'boolean'">
                             <div class="tw:grid tw:grid-cols-2 tw:gap-[0.8em]">
-                                <button type="button" @click="value = 1" class="tw:py-[1em] tw:rounded-[0.6em] tw:font-bold tw:border" :class="value == 1 ? 'tw:bg-blue-50 tw:text-blue-600! tw:border-blue-200' : 'tw:bg-neutral-50 tw:text-neutral-600!'">{{ __('Yes') }}</button>
-                                <button type="button" @click="value = 0" class="tw:py-[1em] tw:rounded-[0.6em] tw:font-bold tw:border" :class="value == 0 && value !== '' ? 'tw:bg-blue-50 tw:text-blue-600! tw:border-blue-200' : 'tw:bg-neutral-50 tw:text-neutral-600!'">{{ __('No') }}</button>
+                                <button type="button" @click="value = 1; display = 'Yes'; apply()" class="tw:py-[1em] tw:rounded-[0.6em] tw:font-bold tw:border" :class="value == 1 ? 'tw:bg-blue-50 tw:text-blue-600! tw:border-blue-200' : 'tw:bg-neutral-50 tw:text-neutral-600!'">{{ __('Yes') }}</button>
+                                <button type="button" @click="value = 0; display = 'No'; apply()" class="tw:py-[1em] tw:rounded-[0.6em] tw:font-bold tw:border" :class="value == 0 && value !== '' ? 'tw:bg-blue-50 tw:text-blue-600! tw:border-blue-200' : 'tw:bg-neutral-50 tw:text-neutral-600!'">{{ __('No') }}</button>
                             </div>
                         </template>
                     </div>
