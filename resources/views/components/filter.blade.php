@@ -1,9 +1,10 @@
 @props([
     'fields' => [],
     'reload' => false,
+    'hide' => false,
 ])
 
-<div {{ $attributes->merge(['class' => 'tw:relative tw:flex tw:items-center tw:text-[13px] tw:max-w-full']) }}
+<div {{ $attributes->merge(['class' => 'tw:relative tw:flex tw:items-center tw:text-[13px] tw:max-w-full' . ($hide ? ' tw:hidden' : '')]) }}
      x-data="filterBarComponent({ fields: @js($fields), reload: @js($reload) })"
      @click.outside="close()"
      @keydown.escape.window="close()">
