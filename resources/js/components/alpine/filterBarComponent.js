@@ -9,6 +9,9 @@ export default function filterBarComponent({ fields }) {
         value: null,
         highlightedIndex: -1,
         lastFocusedElement: null,
+        searchQuery: "",
+        remoteOptions: [],
+        isLoading: false,
 
         OPS: {
             text: [
@@ -30,6 +33,10 @@ export default function filterBarComponent({ fields }) {
                 { v: "lte", s: "≤", l: "Less or Equal" },
                 { v: "is_empty", s: "∅", l: "Is Empty" },
                 { v: "is_not_empty", s: "∃", l: "Is Not Empty" },
+            ],
+            boolean: [
+                { v: "eq", s: "is", l: "Is" },
+                { v: "neq", s: "is not", l: "Is Not" },
             ],
             date: [
                 { v: "on", s: "=", l: "On Date" },
@@ -102,6 +109,63 @@ export default function filterBarComponent({ fields }) {
         toggleMulti(opt) {
             const i = this.value.indexOf(opt);
             i > -1 ? this.value.splice(i, 1) : this.value.push(opt);
+        },
+
+        open(field) {
+            this.lastFocusedElement = document.activeElement;
+            this.current = field;
+            this.searchQuery = "";
+            this.remoteOptions = [];
+
+            const existing = this.filters.find((f) => f.key === field.key);
+            this.op = existing?.op || this.ops()[0].v;
+
+            if (field.type === "multi-select") {
+                this.value = existing?.value ? [...existing.value] : [];
+            } else {
+                this.value = existing?.value ?? "";
+            }
+
+            this.dialog = true;
+            this.showAdd = false;
+
+            // Focus logic: If it's a remote search, focus the search box.
+            // Otherwise, focus the standard input.
+            this.$nextTick(() => {
+                const el = field.endpoint
+                    ? this.$refs.remoteSearch
+                    : this.$refs.valInput;
+                el?.focus();
+            });
+        },
+
+        async fetchRemote() {
+            if (!this.current.endpoint || this.searchQuery.length < 2) {
+                this.remoteOptions = [];
+                return;
+            }
+
+            this.isLoading = true;
+            try {
+                const url = new URL(this.current.endpoint, window.location.origin);
+
+                url.searchParams.append('q', this.searchQuery);
+
+                if (this.current.params && typeof this.current.params === 'object') {
+                    Object.entries(this.current.params).forEach(([key, value]) => {
+                        url.searchParams.append(key, value);
+                    });
+                }
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                this.remoteOptions = data.results || data;
+            } catch (e) {
+                console.error("Filter remote fetch failed", e);
+            } finally {
+                this.isLoading = false;
+            }
         },
 
         apply() {

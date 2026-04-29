@@ -57,8 +57,14 @@
                             class="tw:flex tw:items-center tw:h-full tw:px-[1em] tw:gap-[0.5em] tw:transition-colors tw:hover:bg-neutral-50 tw:dark:hover:bg-neutral-900 tw:whitespace-nowrap">
                         <span class="tw:font-bold tw:text-neutral-900! tw:dark:text-neutral-100!" x-text="f.label"></span>
                         <span class="tw:text-neutral-400!" x-text="f.sym"></span>
-                        <span x-show="!nullary(f.op)" class="tw:font-bold tw:text-neutral-700! tw:dark:text-neutral-400!"
-                              x-text="Array.isArray(f.value) ? f.value.join(', ') : f.value"></span>
+                        <span x-show="!nullary(f.op)" class="tw:font-bold tw:text-neutral-700! tw:dark:text-neutral-400!">
+                            <template x-if="currentField(f.key)?.type === 'boolean'">
+                                <span x-text="f.value == 1 ? '{{ __('Yes') }}' : '{{ __('No') }}'"></span>
+                            </template>
+                            <template x-if="currentField(f.key)?.type !== 'boolean'">
+                                <span x-text="Array.isArray(f.value) ? f.value.join(', ') : f.value"></span>
+                            </template>
+                        </span>
                     </button>
 
                     {{-- Chip Remove Tooltip --}}
@@ -144,12 +150,58 @@
 
                     <div x-show="!nullary()">
                         <span class="tw:block tw:text-[0.75em] tw:font-black tw:text-neutral-400 tw:uppercase tw:tracking-widest tw:mb-[1em]">{{ __('Value') }}</span>
-                        <template x-if="['text','email','number','date'].includes(current?.type)">
+
+                        {{-- Case 1: Standard Inputs --}}
+                        <template x-if="['text','email','number','date'].includes(current?.type) && !current?.endpoint">
                             <input x-ref="valInput" :type="current?.type" x-model="value" @keydown.enter="apply()"
                                    class="tw:w-full tw:px-[1em] tw:py-[0.8em] tw:text-[0.95em] tw:bg-neutral-50 tw:dark:bg-neutral-800 tw:border tw:border-neutral-200 tw:dark:border-neutral-700 tw:rounded-[0.6em] tw:focus:ring-2 tw:focus:ring-blue-500/50 tw:focus:border-blue-500 tw:outline-none tw:text-neutral-900! tw:dark:text-neutral-100! tw:transition-all" />
                         </template>
 
-                        <template x-if="['select', 'multi-select'].includes(current?.type)">
+                        {{-- Case 2: Remote Search --}}
+                        <template x-if="current?.endpoint">
+                            <div class="tw:space-y-[0.8em]">
+                                <div class="tw:relative">
+                                    <input x-ref="remoteSearch"
+                                           type="text"
+                                           x-model.debounce.300ms="searchQuery"
+                                           @input="fetchRemote()"
+                                           placeholder="{{ __('Type to search...') }}"
+                                           class="tw:w-full tw:px-[1em] tw:py-[0.8em] tw:text-[0.95em] tw:bg-neutral-50 tw:dark:bg-neutral-800 tw:border tw:border-neutral-200 tw:dark:border-neutral-700 tw:rounded-[0.6em] tw:focus:ring-2 tw:focus:ring-blue-500/50 tw:focus:border-blue-500 tw:outline-none tw:text-neutral-900! tw:dark:text-neutral-100! tw:transition-all" />
+
+                                    {{-- Spinner --}}
+                                    <div x-show="isLoading" class="tw:absolute tw:right-[1em] tw:top-1/2 tw:-translate-y-1/2">
+                                        <svg class="tw:animate-spin tw:h-[1.2em] tw:w-[1.2em] tw:text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="tw:opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="tw:opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                {{-- Results List --}}
+                                <div class="tw:max-h-[12em] tw:overflow-y-auto tw:flex tw:flex-col tw:gap-[0.4em] tw:scrollbar-thin tw:dark:scrollbar-thumb-neutral-700">
+                                    <template x-for="opt in remoteOptions" :key="opt.id || opt">
+                                        <button type="button"
+                                                @click="current.type === 'multi-select' ? toggleMulti(opt.id || opt) : value = (opt.id || opt)"
+                                                class="tw:relative tw:px-[1.2em] tw:py-[0.7em] tw:rounded-[0.6em] tw:text-[0.9em] tw:font-bold tw:transition-all tw:border tw:text-left tw:hover:bg-neutral-100 tw:dark:hover:bg-neutral-700"
+                                                :class="(current.type === 'multi-select' ? value.includes(opt.id || opt) : value === (opt.id || opt))
+                                ? 'tw:bg-blue-50 tw:dark:bg-blue-900/30 tw:text-blue-600! tw:dark:text-blue-300! tw:border-blue-200 tw:dark:border-blue-800'
+                                : 'tw:bg-neutral-50 tw:dark:bg-neutral-800 tw:text-neutral-600! tw:dark:text-neutral-300! tw:border-transparent'">
+                                            <span x-text="opt.text || opt"></span>
+                                            <span x-show="current.type === 'multi-select' ? value.includes(opt.id || opt) : value === (opt.id || opt)"
+                                                  class="tw:absolute tw:right-[1.2em] tw:top-1/2 tw:-translate-y-1/2 tw:text-[0.85em] tw:text-blue-600! tw:dark:text-blue-400!"
+                                                  aria-hidden="true">&check;</span>
+                                        </button>
+                                    </template>
+                                    <div x-show="searchQuery.length >= 2 && remoteOptions.length === 0 && !isLoading"
+                                         class="tw:text-center tw:py-[1em] tw:text-[0.8em] tw:text-neutral-500! tw:italic">
+                                        {{ __('No results found.') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        {{-- Case 3: Static Selects --}}
+                        <template x-if="['select', 'multi-select'].includes(current?.type) && !current?.endpoint">
                             <div class="tw:flex tw:flex-col tw:gap-[0.4em]">
                                 <template x-for="opt in (current?.options ?? [])" :key="opt">
                                     <button type="button" @click="current.type === 'multi-select' ? toggleMulti(opt) : value = opt"
@@ -164,6 +216,31 @@
                                               aria-hidden="true">&check;</span>
                                     </button>
                                 </template>
+                            </div>
+                        </template>
+
+                        {{-- Case 4: Boolean (Yes/No Toggle) --}}
+                        <template x-if="current?.type === 'boolean'">
+                            <div class="tw:grid tw:grid-cols-2 tw:gap-[0.8em]">
+                                <button type="button"
+                                        @click="value = 1"
+                                        class="tw:flex tw:items-center tw:justify-center tw:gap-[0.5em] tw:px-[1em] tw:py-[1em] tw:rounded-[0.6em] tw:text-[0.95em] tw:font-bold tw:transition-all tw:border"
+                                        :class="value == 1
+                    ? 'tw:bg-blue-50 tw:dark:bg-blue-900/30 tw:text-blue-600! tw:dark:text-blue-300! tw:border-blue-200 tw:dark:border-blue-800'
+                    : 'tw:bg-neutral-50 tw:dark:bg-neutral-800 tw:text-neutral-600! tw:dark:text-neutral-300! tw:border-transparent'">
+                                    <span x-show="value == 1" class="tw:text-blue-600! tw:dark:text-blue-400!">&check;</span>
+                                    {{ __('Yes') }}
+                                </button>
+
+                                <button type="button"
+                                        @click="value = 0"
+                                        class="tw:flex tw:items-center tw:justify-center tw:gap-[0.5em] tw:px-[1em] tw:py-[1em] tw:rounded-[0.6em] tw:text-[0.95em] tw:font-bold tw:transition-all tw:border"
+                                        :class="value == 0 && value !== ''
+                    ? 'tw:bg-blue-50 tw:dark:bg-blue-900/30 tw:text-blue-600! tw:dark:text-blue-300! tw:border-blue-200 tw:dark:border-blue-800'
+                    : 'tw:bg-neutral-50 tw:dark:bg-neutral-800 tw:text-neutral-600! tw:dark:text-neutral-300! tw:border-transparent'">
+                                    <span x-show="value == 0 && value !== ''" class="tw:text-blue-600! tw:dark:text-blue-400!">&check;</span>
+                                    {{ __('No') }}
+                                </button>
                             </div>
                         </template>
                     </div>
