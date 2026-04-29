@@ -12,8 +12,8 @@ modules:
                     descr: FTP Service
                     state_name: ftpdService
                     states:
-                        - { descr: on, graph: 0, value: 1, generic: 0 }
-                        - { descr: off, graph: 0, value: 2, generic: 1 }
+                        - { descr: on, value: 1, generic: 0 }
+                        - { descr: off, value: 2, generic: 1 }
                 -
                     oid: CXR-TS-MIB::system
                     value: CXR-TS-MIB::httpdService
@@ -21,8 +21,8 @@ modules:
                     descr: HTTP Service
                     state_name: httpdService
                     states:
-                        - { descr: on, graph: 0, value: 1, generic: 0 }
-                        - { descr: off, graph: 0, value: 2, generic: 1 }
+                        - { descr: on, value: 1, generic: 0 }
+                        - { descr: off, value: 2, generic: 1 }
                 -
                     oid: CXR-TS-MIB::system
                     value: CXR-TS-MIB::telnetdService
@@ -30,6 +30,6 @@ modules:
                     descr: Telnet Service
                     state_name: telnetdService
                     states:
-                        - { descr: on, graph: 0, value: 1, generic: 0 }
-                        - { descr: off, graph: 0, value: 2, generic: 1 }
+                        - { descr: on, value: 1, generic: 0 }
+                        - { descr: off, value: 2, generic: 1 }
 

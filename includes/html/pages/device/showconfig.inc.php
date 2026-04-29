@@ -335,7 +335,7 @@ if (Gate::allows('showConfig', DeviceCache::getPrimary())) {
             echo '</div>';
         } else {
             echo '<br />';
-            print_error("We couldn't retrieve the device information from Oxidized");
+            print_error(__('device.oxidized.connection_error'));
             if (isset($response) && preg_match('#<title>(.*)</title>#', $response, $error_matches)) {
                 print_error(strip_tags($error_matches[1]));
             }

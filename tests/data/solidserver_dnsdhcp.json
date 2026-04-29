@@ -2371,434 +2371,372 @@
                 {
                     "state_name": "eipHwPsuRedundancy",
                     "state_descr": "not available",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "eipHwPsuRedundancy",
                     "state_descr": "fully redundant",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "eipHwPsuRedundancy",
                     "state_descr": "lost redundancy",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "eipSdsMemberRole",
                     "state_descr": "standalone",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "eipSdsMemberRole",
                     "state_descr": "master",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "eipSdsMemberRole",
                     "state_descr": "hot-standby",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "eipSdsMemberRole",
                     "state_descr": "master-recovered",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "eipSdsMemberStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "eipSdsMemberStatus",
                     "state_descr": "not-configured",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "eipSdsMemberStatus",
                     "state_descr": "upgrading",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "eipSdsMemberStatus",
                     "state_descr": "init-standby",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "eipSdsMemberStatus",
                     "state_descr": "invalid-credentials",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "eipSdsMemberStatus",
                     "state_descr": "remote-managed",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "eipSdsMemberStatus",
                     "state_descr": "timeout",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "eipSdsMemberStatus",
                     "state_descr": "split-brain",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "eipSdsMemberStatus",
                     "state_descr": "replication-stopped",
-                    "state_draw_graph": 1,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "eipSshStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "eipSshStatus",
                     "state_descr": "running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "eipSshStatus",
                     "state_descr": "misconfigured",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "eipSshStatus",
                     "state_descr": "failed",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "eipSvcApacheStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "eipSvcApacheStatus",
                     "state_descr": "running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "eipSvcApacheStatus",
                     "state_descr": "misconfigured",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "eipSvcApacheStatus",
                     "state_descr": "failed",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "eipSvcDatabaseStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "eipSvcDatabaseStatus",
                     "state_descr": "running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "eipSvcDatabaseStatus",
                     "state_descr": "misconfigured",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "eipSvcDatabaseStatus",
                     "state_descr": "failed",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "eipSvcDhcpMsStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "eipSvcDhcpMsStatus",
                     "state_descr": "running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "eipSvcDhcpStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "eipSvcDhcpStatus",
                     "state_descr": "running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "eipSvcDhcpStatus",
                     "state_descr": "misconfigured",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "eipSvcDhcpStatus",
                     "state_descr": "failed",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "eipSvcDnsStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "eipSvcDnsStatus",
                     "state_descr": "running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "eipSvcDnsStatus",
                     "state_descr": "misconfigured",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "eipSvcDnsStatus",
                     "state_descr": "failed",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "eipSvcIpmServerStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "eipSvcIpmServerStatus",
                     "state_descr": "running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "eipSvcIpmServerStatus",
                     "state_descr": "misconfigured",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "eipSvcIpmServerStatus",
                     "state_descr": "failed",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "eipSvcNtpStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "eipSvcNtpStatus",
                     "state_descr": "running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "eipSvcNtpStatus",
                     "state_descr": "misconfigured",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "eipSvcNtpStatus",
                     "state_descr": "failed",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "eipSvcQuaggaStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "eipSvcQuaggaStatus",
                     "state_descr": "running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "eipSvcQuaggaStatus",
                     "state_descr": "misconfigured",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "eipSvcQuaggaStatus",
                     "state_descr": "failed",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "eipSvcSendmailStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "eipSvcSendmailStatus",
                     "state_descr": "running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "eipSvcSendmailStatus",
                     "state_descr": "misconfigured",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "eipSvcSendmailStatus",
                     "state_descr": "failed",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "eipSvcTftpStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "eipSvcTftpStatus",
                     "state_descr": "running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "eipSvcTftpStatus",
                     "state_descr": "misconfigured",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "eipSvcTftpStatus",
                     "state_descr": "failed",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "eipSyslogStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "eipSyslogStatus",
                     "state_descr": "running",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "eipSyslogStatus",
                     "state_descr": "misconfigured",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "eipSyslogStatus",
                     "state_descr": "failed",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 }

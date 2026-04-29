@@ -139,7 +139,7 @@ class DeviceController extends TableController
     private function isDetailed()
     {
         if (is_null($this->detailed)) {
-            $this->detailed = \Request::get('format', 'list_detail') == 'list_detail';
+            $this->detailed = \Request::input('format', 'list_detail') == 'list_detail';
         }
 
         return $this->detailed;
@@ -147,7 +147,7 @@ class DeviceController extends TableController
 
     /**
      * @param  Device  $device
-     * @return array|\Illuminate\Database\Eloquent\Model|\Illuminate\Support\Collection
+     * @return array|\Illuminate\Database\Eloquent\Model|\Illuminate\Support\Collection<string, mixed>
      */
     public function formatItem($device)
     {
@@ -306,6 +306,7 @@ class DeviceController extends TableController
             'title' => 'Telnet to ' . $device->hostname,
             'href' => 'telnet://' . $device->hostname,
             'icon' => 'fa-terminal',
+            'external' => false,
         ];
 
         $ssh_href = 'ssh://' . $device->hostname;
@@ -319,6 +320,7 @@ class DeviceController extends TableController
             'title' => 'SSH to ' . $device->hostname,
             'href' => $ssh_href,
             'icon' => 'fa-lock',
+            'external' => false,
         ];
 
         $actions[$row][] = [

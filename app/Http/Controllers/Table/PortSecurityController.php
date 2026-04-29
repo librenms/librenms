@@ -69,8 +69,8 @@ class PortSecurityController extends TableController
      */
     protected function search($search, $query, $fields = [])
     {
-        if ($search = trim(\Request::get('searchPhrase') ?? '')) {
-            return match (\Request::get('searchby') ?? '') {
+        if ($search = trim(\Request::input('searchPhrase') ?? '')) {
+            return match (\Request::input('searchby') ?? '') {
                 'device' => $query->whereHas('device', function ($q) use ($search): void {
                     $q->where('hostname', 'like', "%$search%");
                 }),

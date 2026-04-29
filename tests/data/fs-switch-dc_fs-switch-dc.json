@@ -2348,105 +2348,90 @@
                 {
                     "state_name": "fsFiberTempStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "fsFiberTempStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "fsFiberTempStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "fsSystemElectricalInformationStatus",
                     "state_descr": "noexist",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "fsSystemElectricalInformationStatus",
                     "state_descr": "existnopower",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "fsSystemElectricalInformationStatus",
                     "state_descr": "existreadypower",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "fsSystemElectricalInformationStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "fsSystemElectricalInformationStatus",
                     "state_descr": "powerbutabnormal",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "fsSystemElectricalInformationStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "fsSystemFanStatus",
                     "state_descr": "noexist",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "fsSystemFanStatus",
                     "state_descr": "existnopower",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "fsSystemFanStatus",
                     "state_descr": "existreadypower",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "fsSystemFanStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "fsSystemFanStatus",
                     "state_descr": "powerbutabnormal",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "fsSystemFanStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 }

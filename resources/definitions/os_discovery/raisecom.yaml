@@ -17,6 +17,11 @@ modules:
                 num_oid: '.1.3.6.1.4.1.8886.1.1.1.3.1.2.1.2.{{ $index }}'
                 descr: 'Processor'
     sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - IF-MIB::ifDescr
         fanspeed:
             data:
                 -
@@ -36,6 +41,83 @@ modules:
                     divisor: 1000
                     low_limit: RAISECOM-SYSTEM-MIB::raisecomVoltThresholdLow
                     high_limit: RAISECOM-SYSTEM-MIB::raisecomVoltThresholdHigh
+        temperature:
+            data:
+                -
+                    oid: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverDDMTable
+                    value: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverParameterValue
+                    num_oid: '.1.3.6.1.4.1.8886.1.18.2.2.1.1.2.{{ $index }}'
+                    divisor: 1000
+                    index: 'tx-{{ $subindex0 }}'
+                    descr: '{{ IF-MIB::ifDescr:0 }} Transceiver Temperature'
+                    high_limit: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverParamHighAlarmThresh
+                    warn_limit: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverParamHighWarningThresh
+                    low_limit: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverParamLowAlarmThresh
+                    low_warn_limit: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverParamLowWarningThresh
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: index
+                            op: 'not_ends'
+                            value: '.1'  # transceiverTemperature
+                        -
+                            oid: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverDDMValidStatus
+                            op: '!='
+                            value: 1
+                -
+                    oid: RAISECOM-SYSTEM-MIB::raisecomTemperatureValue
+                    value: RAISECOM-SYSTEM-MIB::raisecomTemperatureValue
+                    num_oid: '.1.3.6.1.4.1.8886.1.1.4.2.1.{{ $index }}'
+                    descr: 'System Temperature'
+                    low_limit: RAISECOM-SYSTEM-MIB::raisecomTemperatureThresholdLow
+                    high_limit: RAISECOM-SYSTEM-MIB::raisecomTemperatureThresholdHigh
+        dbm:
+            data:
+                -
+                    oid: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverDDMTable
+                    value: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverParameterValue
+                    num_oid: '.1.3.6.1.4.1.8886.1.18.2.2.1.1.2.{{ $index }}'
+                    divisor: 1000
+                    index: 'tx-{{ $subindex0 }}'
+                    descr: '{{ IF-MIB::ifDescr:0 }} Transmit Power'
+                    high_limit: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverParamHighAlarmThresh
+                    warn_limit: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverParamHighWarningThresh
+                    low_limit: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverParamLowAlarmThresh
+                    low_warn_limit: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverParamLowWarningThresh
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: index
+                            op: 'not_ends'
+                            value: '.3'  # txPower
+                        -
+                            oid: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverDDMValidStatus
+                            op: '!='
+                            value: 1
+                -
+                    oid: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverDDMTable
+                    value: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverParameterValue
+                    num_oid: '.1.3.6.1.4.1.8886.1.18.2.2.1.1.2.{{ $index }}'
+                    divisor: 1000
+                    index: 'rx-{{ $subindex0 }}'
+                    descr: '{{ IF-MIB::ifDescr:0 }} Receive Power'
+                    high_limit: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverParamHighAlarmThresh
+                    warn_limit: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverParamHighWarningThresh
+                    low_limit: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverParamLowAlarmThresh
+                    low_warn_limit: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverParamLowWarningThresh
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: index
+                            op: 'not_ends'
+                            value: '.4'  # rxPower
+                        -
+                            oid: RAISECOM-OPTICAL-TRANSCEIVER-MIB::raisecomOpticalTransceiverDDMValidStatus
+                            op: '!='
+                            value: 1
         state:
             data:
                 -
@@ -45,10 +127,10 @@ modules:
                     descr: 'Config {{ $index }} Load  State'
                     state_name: raisecomConfigLoadState
                     states:
-                        - { descr: ready, graph: 0, value: 1, generic: 1 }
-                        - { descr: running, graph: 0, value: 2, generic: 1 }
-                        - { descr: successful, graph: 0, value: 3, generic: 0 }
-                        - { descr: failed, graph: 0, value: 4, generic: 2 }
+                        - { descr: ready, value: 1, generic: 1 }
+                        - { descr: running, value: 2, generic: 1 }
+                        - { descr: successful, value: 3, generic: 0 }
+                        - { descr: failed, value: 4, generic: 2 }
                 -
                     oid: RAISECOM-FANMONITOR-MIB::raisecomFanMonitorStateTable
                     value: RAISECOM-FANMONITOR-MIB::raisecomFanWorkState
@@ -56,8 +138,8 @@ modules:
                     descr: 'Fan {{ $index }} State'
                     state_name: raisecomFanMonitorStateTable
                     states:
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: abnormal, graph: 0, value: 2, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: abnormal, value: 2, generic: 2 }
                 -
                     oid: RAISECOM-POWERMONITOR-MIB::raisecomPowerMonitorStateTable
                     value: RAISECOM-POWERMONITOR-MIB::raisecomPowerStatus
@@ -65,6 +147,6 @@ modules:
                     descr: 'Power Supply {{ $index }} State'
                     state_name: raisecomPowerMonitorStateTable
                     states:
-                        - { descr: offline, graph: 0, value: 1, generic: 2 }
-                        - { descr: online, graph: 0, value: 2, generic: 0 }
-                        - { descr: power-on, graph: 0, value: 3, generic: 0 }
+                        - { descr: offline, value: 1, generic: 2 }
+                        - { descr: online, value: 2, generic: 0 }
+                        - { descr: power-on, value: 3, generic: 0 }

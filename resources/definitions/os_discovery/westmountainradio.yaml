@@ -51,33 +51,33 @@ modules:
                     num_oid: '.1.3.6.1.4.1.15117.1.2.66.{{ $index }}'
                     descr: "Outlet 1 State"
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: outletOff }
-                        - { value: 1, generic: 0, graph: 0, descr: outletOn }
+                        - { value: 0, generic: 3, descr: outletOff }
+                        - { value: 1, generic: 0, descr: outletOn }
                 -
                     oid: RMCU::digout2val
                     num_oid: '.1.3.6.1.4.1.15117.1.2.68.{{ $index }}'
                     descr: "Outlet 2 State"
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: outletOff }
-                        - { value: 1, generic: 0, graph: 0, descr: outletOn }
+                        - { value: 0, generic: 3, descr: outletOff }
+                        - { value: 1, generic: 0, descr: outletOn }
                 -
                     oid: RMCU::digout3val
                     num_oid: '.1.3.6.1.4.1.15117.1.2.70.{{ $index }}'
                     descr: "Outlet 3 State"
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: outletOff }
-                        - { value: 1, generic: 0, graph: 0, descr: outletOn }
+                        - { value: 0, generic: 3, descr: outletOff }
+                        - { value: 1, generic: 0, descr: outletOn }
                 -
                     oid: RMCU::digout4val
                     num_oid: '.1.3.6.1.4.1.15117.1.2.72.{{ $index }}'
                     descr: "Outlet 4 State"
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: outletOff }
-                        - { value: 1, generic: 0, graph: 0, descr: outletOn }
+                        - { value: 0, generic: 3, descr: outletOff }
+                        - { value: 1, generic: 0, descr: outletOn }
                 -
                     oid: RMCU::digout5val
                     num_oid: '.1.3.6.1.4.1.15117.1.2.74.{{ $index }}'
                     descr: "Outlet 5 State"
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: outletOff }
-                        - { value: 1, generic: 0, graph: 0, descr: outletOn }
+                        - { value: 0, generic: 3, descr: outletOff }
+                        - { value: 1, generic: 0, descr: outletOn }

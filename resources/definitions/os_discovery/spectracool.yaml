@@ -127,8 +127,8 @@ modules:
                     index: 'faState.{{ $index }}'
                     state_name: faState
                     states:
-                        - { descr: 'Alarm', graph: 0, value: 1, generic: 2 }
-                        - { descr: 'Clear', graph: 0, value: 2, generic: 0 }
+                        - { descr: 'Alarm', value: 1, generic: 2 }
+                        - { descr: 'Clear', value: 2, generic: 0 }
                     skip_values:
                         -
                             oid: COMM-BOARD-MIB::faEnable
@@ -142,8 +142,8 @@ modules:
                     index: 'htaState.{{ $index }}'
                     state_name: htaState
                     states:
-                        - { descr: 'Alarm', graph: 0, value: 1, generic: 2 }
-                        - { descr: 'Clear', graph: 0, value: 2, generic: 0 }
+                        - { descr: 'Alarm', value: 1, generic: 2 }
+                        - { descr: 'Clear', value: 2, generic: 0 }
                     skip_values:
                         -
                             oid: COMM-BOARD-MIB::htaEnable
@@ -157,8 +157,8 @@ modules:
                     index: 'ltaState.{{ $index }}'
                     state_name: ltaState
                     states:
-                        - { descr: 'Alarm', graph: 0, value: 1, generic: 2 }
-                        - { descr: 'Clear', graph: 0, value: 2, generic: 0 }
+                        - { descr: 'Alarm', value: 1, generic: 2 }
+                        - { descr: 'Clear', value: 2, generic: 0 }
                     skip_values:
                         -
                             oid: COMM-BOARD-MIB::ltaEnable
@@ -172,8 +172,8 @@ modules:
                     index: 'isfaState.{{ $index }}'
                     state_name: isfaState
                     states:
-                        - { descr: 'Alarm', graph: 0, value: 1, generic: 2 }
-                        - { descr: 'Clear', graph: 0, value: 2, generic: 0 }
+                        - { descr: 'Alarm', value: 1, generic: 2 }
+                        - { descr: 'Clear', value: 2, generic: 0 }
                     skip_values:
                         -
                             oid: COMM-BOARD-MIB::isfaEnable
@@ -187,8 +187,8 @@ modules:
                     index: 'osfaState.{{ $index }}'
                     state_name: osfaState
                     states:
-                        - { descr: 'Alarm', graph: 0, value: 1, generic: 2 }
-                        - { descr: 'Clear', graph: 0, value: 2, generic: 0 }
+                        - { descr: 'Alarm', value: 1, generic: 2 }
+                        - { descr: 'Clear', value: 2, generic: 0 }
                     skip_values:
                         -
                             oid: COMM-BOARD-MIB::osfaEnable
@@ -202,8 +202,8 @@ modules:
                     index: 'dsaState.{{ $index }}'
                     state_name: dsaState
                     states:
-                        - { descr: 'Alarm', graph: 0, value: 1, generic: 2 }
-                        - { descr: 'Clear', graph: 0, value: 2, generic: 0 }
+                        - { descr: 'Alarm', value: 1, generic: 2 }
+                        - { descr: 'Clear', value: 2, generic: 0 }
                     skip_values:
                         -
                             oid: COMM-BOARD-MIB::dsaEnable
@@ -217,8 +217,8 @@ modules:
                     index: 'hpaState.{{ $index }}'
                     state_name: hpaState
                     states:
-                        - { descr: 'Alarm', graph: 0, value: 1, generic: 2 }
-                        - { descr: 'Clear', graph: 0, value: 2, generic: 0 }
+                        - { descr: 'Alarm', value: 1, generic: 2 }
+                        - { descr: 'Clear', value: 2, generic: 0 }
                     skip_values:
                         -
                             oid: COMM-BOARD-MIB::hpaEnable
@@ -232,8 +232,8 @@ modules:
                     index: 'ccfaState.{{ $index }}'
                     state_name: ccfaState
                     states:
-                        - { descr: 'Alarm', graph: 0, value: 1, generic: 2 }
-                        - { descr: 'Clear', graph: 0, value: 2, generic: 0 }
+                        - { descr: 'Alarm', value: 1, generic: 2 }
+                        - { descr: 'Clear', value: 2, generic: 0 }
                     skip_values:
                         -
                             oid: COMM-BOARD-MIB::ccfaEnable

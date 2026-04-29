@@ -32,7 +32,6 @@
     <link href="{{ asset('css/vis.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/fontawesome.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/v4-shims.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/jquery.gridster.min.css?ver=09292021') }}" rel="stylesheet">
     <link href="{{ asset('css/leaflet.css') }}" rel="stylesheet">
     <link href="{{ asset('css/MarkerCluster.css') }}" rel="stylesheet">
     <link href="{{ asset('css/MarkerCluster.Default.css') }}" rel="stylesheet">
@@ -121,7 +120,7 @@
     </script>
 @endif
 
-@if(Request::get('bare') == 'yes')
+@if(request()->input('bare') == 'yes')
     <style>body { padding-top: 0 !important; padding-bottom: 0 !important; }</style>
 @elseif($show_menu)
     @include('layouts.menu')

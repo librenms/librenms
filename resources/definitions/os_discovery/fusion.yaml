@@ -96,8 +96,8 @@ modules:
                     index: 'switchFanStatus.{{ $index }}'
                     state_name: switchFanStatus
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: ok }
-                        - { value: 2, generic: 2, graph: 1, descr: failure }
+                        - { value: 1, generic: 0, descr: ok }
+                        - { value: 2, generic: 2, descr: failure }
                 -
                     oid: ES4552BH2-MIB::switchInfoTable
                     value: ES4552BH2-MIB::swPowerStatus
@@ -106,9 +106,9 @@ modules:
                     index: 'swPowerStatus.{{ $index }}'
                     state_name: swPowerStatus
                     states:
-                        - { value: 1, generic: 1, graph: 1, descr: internalPower }
-                        - { value: 2, generic: 0, graph: 1, descr: redundantPower }
-                        - { value: 3, generic: 0, graph: 1, descr: internalAndRedundantPower }
+                        - { value: 1, generic: 1, descr: internalPower }
+                        - { value: 2, generic: 0, descr: redundantPower }
+                        - { value: 3, generic: 0, descr: internalAndRedundantPower }
                 -
                     oid: ES4552BH2-MIB::switchInfoTable
                     value: ES4552BH2-MIB::swRoleInSystem
@@ -117,6 +117,6 @@ modules:
                     index: 'swRoleInSystem.{{ $index }}'
                     state_name: swRoleInSystem
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: master }
-                        - { value: 2, generic: 0, graph: 1, descr: backupMaster }
-                        - { value: 3, generic: 0, graph: 1, descr: slave }
+                        - { value: 1, generic: 0, descr: master }
+                        - { value: 2, generic: 0, descr: backupMaster }
+                        - { value: 3, generic: 0, descr: slave }

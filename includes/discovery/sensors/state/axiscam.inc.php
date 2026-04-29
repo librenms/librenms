@@ -15,9 +15,9 @@ if (isset($oids) && is_array($oids)) {
     //Create State Index
     $state_name = 'tempSensorStatusState';
     $states = [
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Normal'],
-        ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'Failed'],
-        ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'Out Of Boundary'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'Normal'],
+        ['value' => 2, 'generic' => 2, 'descr' => 'Failed'],
+        ['value' => 3, 'generic' => 2, 'descr' => 'Out Of Boundary'],
     ];
     create_state_index($state_name, $states);
 
@@ -35,8 +35,8 @@ if (is_array($oids)) {
     //Create State Index
     $state_name = 'storageDisruptionDetectedState';
     $states = [
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Normal'],
-        ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'Failed'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'Normal'],
+        ['value' => 2, 'generic' => 2, 'descr' => 'Failed'],
     ];
     create_state_index($state_name, $states);
 

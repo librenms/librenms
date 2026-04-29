@@ -162,9 +162,9 @@ modules:
                     index: 'psuStatus.{{ $index }}'
                     state_name: psuStatus
                     states:
-                        - { value: 0, descr: "Not Present",  graph: 1, generic: 2 }
-                        - { value: 1, descr: "Present: OK" , graph: 1, generic: 0  }
-                        - { value: 3, descr: "Present: Failed" , graph: 1, generic: 2  }
+                        - { value: 0, descr: "Not Present",  generic: 2 }
+                        - { value: 1, descr: "Present: OK" , generic: 0  }
+                        - { value: 3, descr: "Present: Failed" , generic: 2  }
                 -
                     oid: ATEN-IPMI-MIB::sensorTable
                     value: ATEN-IPMI-MIB::sensorReading
@@ -178,8 +178,8 @@ modules:
                             value: "Chassis Intru"
                     state_name: "Chassis Intru"
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "General Chassis Intrusion." , graph: 1, generic: 2  }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "General Chassis Intrusion." , generic: 2  }
                 -
                     oid: ATEN-IPMI-MIB::sensorTable
                     value: ATEN-IPMI-MIB::sensorReading
@@ -193,9 +193,9 @@ modules:
                             value: "VBAT"
                     state_name: "VBAT"
                     states:
-                        - { value: 0, descr: "Not Present", graph: 1, generic: 2 }
-                        - { value: 2, descr: "Present: Failed", graph: 1, generic: 2 }
-                        - { value: 4, descr: "Present: OK" , graph: 1, generic: 0  }
+                        - { value: 0, descr: "Not Present", generic: 2 }
+                        - { value: 2, descr: "Present: Failed", generic: 2 }
+                        - { value: 4, descr: "Present: OK" , generic: 0  }
                 -
                     oid: ATEN-IPMI-MIB::sensorTable
                     value: ATEN-IPMI-MIB::sensorReading
@@ -213,8 +213,8 @@ modules:
                             op: 'regex'
                             value: "/^PS. Status/"
                     states:
-                        - { descr: On, graph: 1, value: 1, generic: 0 }
-                        - { descr: Off, graph: 1, value: 0, generic: 2 }
+                        - { descr: On, value: 1, generic: 0 }
+                        - { descr: Off, value: 0, generic: 2 }
                 -
                     oid: ATEN-IPMI-MIB::powerStatus
                     value: ATEN-IPMI-MIB::powerStatus
@@ -223,6 +223,6 @@ modules:
                     index: powerStatusSensorNr.{{ $index }}
                     state_name: smPowerState
                     states:
-                        - { descr: On, graph: 1, value: 1, generic: 0 }
-                        - { descr: Off, graph: 1, value: 0, generic: 2 }
-                        - { descr: Reset, graph: 1, value: 2, generic: 1 }
+                        - { descr: On, value: 1, generic: 0 }
+                        - { descr: Off, value: 0, generic: 2 }
+                        - { descr: Reset, value: 2, generic: 1 }

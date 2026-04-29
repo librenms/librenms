@@ -87,12 +87,12 @@ modules:
                     index: 'hpicfFanState.{{ $index }}'
                     state_name: hpicfFanState
                     states:
-                        - { descr: removed, graph: 1, value: 1, generic: 3 }
-                        - { descr: off, graph: 1, value: 2, generic: 3 }
-                        - { descr: underspeed, graph: 1, value: 3, generic: 1 }
-                        - { descr: overspeed, graph: 1, value: 4, generic: 1 }
-                        - { descr: ok, graph: 1, value: 5, generic: 0 }
-                        - { descr: maxstate, graph: 1, value: 6, generic: 3 }
+                        - { descr: removed, value: 1, generic: 3 }
+                        - { descr: off, value: 2, generic: 3 }
+                        - { descr: underspeed, value: 3, generic: 1 }
+                        - { descr: overspeed, value: 4, generic: 1 }
+                        - { descr: ok, value: 5, generic: 0 }
+                        - { descr: maxstate, value: 6, generic: 3 }
                 -
                     oid: POWERSUPPLY-MIB::hpicfPsTable
                     value: POWERSUPPLY-MIB::hpicfPsState
@@ -101,12 +101,12 @@ modules:
                     index: 'hpicfPsState.{{ $index }}'
                     state_name: hpicfPsState
                     states:
-                        - { descr: psNotPresent, graph: 1, value: 1, generic: 3 }
-                        - { descr: psNotPlugged, graph: 1, value: 2, generic: 2 }
-                        - { descr: psPowered, graph: 1, value: 3, generic: 0 }
-                        - { descr: psFailed, graph: 1, value: 4, generic: 2 }
-                        - { descr: psPermFailure, graph: 1, value: 5, generic: 2 }
-                        - { descr: psMax, graph: 1, value: 6, generic: 3 }
+                        - { descr: psNotPresent, value: 1, generic: 3 }
+                        - { descr: psNotPlugged, value: 2, generic: 2 }
+                        - { descr: psPowered, value: 3, generic: 0 }
+                        - { descr: psFailed, value: 4, generic: 2 }
+                        - { descr: psPermFailure, value: 5, generic: 2 }
+                        - { descr: psMax, value: 6, generic: 3 }
                 -
                     oid:  HP-STACK-MIB::hpStackConfig
                     value: HP-STACK-MIB::hpStackOperStatus
@@ -114,11 +114,11 @@ modules:
                     descr: 'Stack State'
                     state_name: hpStackOperStatus
                     states:
-                        - { descr: disabled, graph: 1, value: 1, generic: 0 }
-                        - { descr: active, graph: 1, value: 2, generic: 0 }
-                        - { descr: fragmentInactive, graph: 1, value: 3, generic: 2 }
-                        - { descr: unAvailable, graph: 1, value: 0, generic: 0 }
-                        - { descr: fragmentActive, graph: 1, value: 4, generic: 2 }
+                        - { descr: disabled, value: 1, generic: 0 }
+                        - { descr: active, value: 2, generic: 0 }
+                        - { descr: fragmentInactive, value: 3, generic: 2 }
+                        - { descr: unAvailable, value: 0, generic: 0 }
+                        - { descr: fragmentActive, value: 4, generic: 2 }
                 -
                     oid:  HP-STACK-MIB::hpStackConfig
                     value: HP-STACK-MIB::hpStackTopology
@@ -131,11 +131,11 @@ modules:
                           op: '=='
                           value: 1
                     states:
-                        - { descr: unKnown, graph: 1, value: 0, generic: 0 }
-                        - { descr: chain, graph: 1, value: 1, generic: 0 }
-                        - { descr: ring, graph: 1, value: 2, generic: 0 }
-                        - { descr: mesh, graph: 1, value: 3, generic: 0 }
-                        - { descr: partialMesh, graph: 1, value: 4, generic: 1 }
+                        - { descr: unKnown, value: 0, generic: 0 }
+                        - { descr: chain, value: 1, generic: 0 }
+                        - { descr: ring, value: 2, generic: 0 }
+                        - { descr: mesh, value: 3, generic: 0 }
+                        - { descr: partialMesh, value: 4, generic: 1 }
                 -
                     oid: HP-STACK-MIB::hpStackMemberTable
                     value: HP-STACK-MIB::hpStackMemberState
@@ -144,18 +144,18 @@ modules:
                     index: 'hpStackMemberState.{{ $index }}'
                     state_name: hpStackMemberState
                     states:
-                        - { descr: unusedID, graph: 1, value: 0, generic: 0 }
-                        - { descr: missing, graph: 1, value: 1, generic: 3 }
-                        - { descr: provision, graph: 1, value: 2, generic: 0 }
-                        - { descr: commander, graph: 1, value: 3, generic: 0 }
-                        - { descr: standby, graph: 1, value: 4, generic: 0 }
-                        - { descr: member, graph: 1, value: 5, generic: 0 }
-                        - { descr: shutdown, graph: 1, value: 6, generic: 3 }
-                        - { descr: booting, graph: 1, value: 7, generic: 3 }
-                        - { descr: communicationFailure, graph: 1, value: 8, generic: 3 }
-                        - { descr: incompatibleOs , graph: 1, value: 9, generic: 3 }
-                        - { descr: unknownState , graph: 1, value: 10, generic: 3 }
-                        - { descr: standbyBooting , graph: 1, value: 11, generic: 3 }
+                        - { descr: unusedID, value: 0, generic: 0 }
+                        - { descr: missing, value: 1, generic: 3 }
+                        - { descr: provision, value: 2, generic: 0 }
+                        - { descr: commander, value: 3, generic: 0 }
+                        - { descr: standby, value: 4, generic: 0 }
+                        - { descr: member, value: 5, generic: 0 }
+                        - { descr: shutdown, value: 6, generic: 3 }
+                        - { descr: booting, value: 7, generic: 3 }
+                        - { descr: communicationFailure, value: 8, generic: 3 }
+                        - { descr: incompatibleOs , value: 9, generic: 3 }
+                        - { descr: unknownState , value: 10, generic: 3 }
+                        - { descr: standbyBooting , value: 11, generic: 3 }
                 -
                     oid: ENTITY-STATE-MIB::entStateOper
                     value: ENTITY-STATE-MIB::entStateOper
@@ -164,10 +164,10 @@ modules:
                     index: 'entStateOper.{{ $index }}'
                     state_name: entStateOper
                     states:
-                        - { descr: notPresent, graph: 1, value: 1, generic: 3 }
-                        - { descr: unknown, graph: 1, value: 2, generic: 1 }
-                        - { descr: ok, graph: 1, value: 3, generic: 0 }
-                        - { descr: failed, graph: 1, value: 4, generic: 2 }
+                        - { descr: notPresent, value: 1, generic: 3 }
+                        - { descr: unknown, value: 2, generic: 1 }
+                        - { descr: ok, value: 3, generic: 0 }
+                        - { descr: failed, value: 4, generic: 2 }
                     skip_values:
                         -
                             oid: ENTITY-MIB::entPhysicalClass

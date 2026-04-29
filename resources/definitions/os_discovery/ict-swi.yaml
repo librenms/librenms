@@ -32,8 +32,8 @@ modules:
                     descr: 'Inverter Status'
                     index: 'inverterStatus.{{ $index }}'
                     states:
-                        - { graph: 0, value: 1, generic: 0, descr: enabled }
-                        - { graph: 0, value: 2, generic: 1, descr: disabled }
+                        - { value: 1, generic: 0, descr: enabled }
+                        - { value: 2, generic: 1, descr: disabled }
                 -
                     oid: ICT-INVERTER-MIB::inverterControl
                     value: ICT-INVERTER-MIB::inverterControl
@@ -42,8 +42,8 @@ modules:
                     descr: 'Inverter Control'
                     index: 'inverterControl.{{ $index }}'
                     states:
-                        - { graph: 0, value: 1, generic: 0, descr: enabled }
-                        - { graph: 0, value: 2, generic: 1, descr: disabled }
+                        - { value: 1, generic: 0, descr: enabled }
+                        - { value: 2, generic: 1, descr: disabled }
                 -
                     oid: ICT-INVERTER-MIB::transferRelayStatus
                     value: ICT-INVERTER-MIB::transferRelayStatus
@@ -52,5 +52,5 @@ modules:
                     descr: 'Transfer Relay Status'
                     index: 'transferRelayStatus.{{ $index }}'
                     states:
-                        - { graph: 0, value: 1, generic: 0, descr: inverter }
-                        - { graph: 0, value: 2, generic: 1, descr: grid }
+                        - { value: 1, generic: 0, descr: inverter }
+                        - { value: 2, generic: 1, descr: grid }

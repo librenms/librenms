@@ -1206,490 +1206,420 @@
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "Auto",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "Line1",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "Line2",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "AoIP",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "Tuner",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "MPX1",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "MPX2",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "AoIP1",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "AoIP2",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "Tuner1",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "Tuner2",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "Player",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "Generator",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "MPX3",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "MPX4",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "AES1",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "AES2",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "AES3",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeCurrentAudio",
                     "state_descr": "ANA1",
-                    "state_draw_graph": 0,
                     "state_value": 20,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "Auto",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "Line1",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "Line2",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "AoIP",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "Tuner",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "MPX1",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "MPX2",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "AoIP1",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "AoIP2",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "Tuner1",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "Tuner2",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "Player",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "Generator",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "MPX3",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "MPX4",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "AES1",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "AES2",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "AES3",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::inSeSelectAudio",
                     "state_descr": "ANA1",
-                    "state_draw_graph": 0,
                     "state_value": 20,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::maMoCoAlExcTemp",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::maMoCoAlExcTemp",
                     "state_descr": "Alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::maMoCoAlExcTemp",
                     "state_descr": "Ok",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::maMoCoAlIntTemp",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::maMoCoAlIntTemp",
                     "state_descr": "Alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::maMoCoAlIntTemp",
                     "state_descr": "Ok",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::maMoCoAlPsuTemp",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::maMoCoAlPsuTemp",
                     "state_descr": "Alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::maMoCoAlPsuTemp",
                     "state_descr": "Ok",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnAl1dB",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnAl1dB",
                     "state_descr": "Alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnAl1dB",
                     "state_descr": "Ok",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnAl3dB",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnAl3dB",
                     "state_descr": "Alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnAl3dB",
                     "state_descr": "Ok",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnAlFault",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnAlFault",
                     "state_descr": "Fault",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnAlFault",
                     "state_descr": "Ok",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnAlWarning",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnAlWarning",
                     "state_descr": "Alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnAlWarning",
                     "state_descr": "Ok",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnGlLocalMode",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnGlLocalMode",
                     "state_descr": "Local",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnGlLocalMode",
                     "state_descr": "Remote",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnGlStandby",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnGlStandby",
                     "state_descr": "On",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnGlStandby",
                     "state_descr": "Off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnRfOpmode",
                     "state_descr": "Undefined",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnRfOpmode",
                     "state_descr": "On",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ECRESO-FM-TRANS-MIB::txGnRfOpmode",
                     "state_descr": "Off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 }

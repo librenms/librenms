@@ -109,7 +109,7 @@ abstract class PaginatedAjaxController extends Controller
      * Format an item for display.  Default is pass-through
      *
      * @param  Model  $model
-     * @return array|Collection|Model
+     * @return array|Collection<string, mixed>|Model
      */
     public function formatItem($model)
     {

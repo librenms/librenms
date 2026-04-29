@@ -1,6 +1,9 @@
 <?php
 
+use App\Facades\DeviceCache;
+use App\Facades\PortCache;
 use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Url;
 
 /*
  * This program is free software: you can redistribute it and/or modify it
@@ -74,10 +77,10 @@ if ($rowCount != -1) {
 $sql = "SELECT `E`.*,DATE_FORMAT(datetime, '" . \App\Facades\LibrenmsConfig::get('dateformat.mysql.compact') . "') as humandate,severity $sql";
 
 foreach (dbFetchRows($sql, $param) as $eventlog) {
-    $dev = device_by_id_cache($eventlog['device_id']);
+    $device = DeviceCache::get($eventlog['device_id']);
     if ($eventlog['type'] == 'interface') {
-        $this_if = cleanPort(get_port_by_id($eventlog['reference']));
-        $type = '<b>' . generate_port_link($this_if, Rewrite::shortenIfName(strtolower((string) $this_if['label']))) . '</b>';
+        $port = PortCache::get((int) $eventlog['reference']);
+        $type = '<b>' . Url::portLink($port, Rewrite::shortenIfName(strtolower((string) $port->getLabel()))) . '</b>';
     } else {
         $type = $eventlog['type'];
     }
@@ -89,7 +92,7 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
 
     $response[] = [
         'datetime' => "<span class='alert-status " . eventlog_severity($severity_colour) . " eventlog-status'></span>" . $eventlog['humandate'],
-        'hostname' => generate_device_link($dev, shorthost($dev['hostname'])),
+        'hostname' => Url::deviceLink($device, shorthost($device->hostname)),
         'type' => $type,
         'message' => htmlspecialchars((string) $eventlog['message']),
         'username' => $eventlog['username'],

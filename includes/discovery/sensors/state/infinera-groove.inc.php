@@ -27,9 +27,9 @@
 // create state index
 $state_name = 'cardMode';
 $states = [
-    ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'notapplicable'],
-    ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'normal'],
-    ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'regen'],
+    ['value' => 0, 'generic' => 3, 'descr' => 'notapplicable'],
+    ['value' => 1, 'generic' => 0, 'descr' => 'normal'],
+    ['value' => 2, 'generic' => 1, 'descr' => 'regen'],
 ];
 create_state_index($state_name, $states);
 

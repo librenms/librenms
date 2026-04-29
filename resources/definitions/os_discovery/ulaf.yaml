@@ -11,10 +11,10 @@ modules:
                     descr: 'Module {{ $index }} State - {{ ULAF2-MIB::deviceLinkName }}'
                     state_name: deviceLinkAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'no Alarm' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'UA' }
-                        - { value: 2, generic: 1, graph: 0, descr: 'NUA' }
-                        - { value: 3, generic: 1, graph: 0, descr: 'AIS' }
-                        - { value: 4, generic: 3, graph: 0, descr: 'unknown' }
-                        - { value: 5, generic: 3, graph: 0, descr: 'unknown' }
+                        - { value: 0, generic: 0, descr: 'no Alarm' }
+                        - { value: 1, generic: 2, descr: 'UA' }
+                        - { value: 2, generic: 1, descr: 'NUA' }
+                        - { value: 3, generic: 1, descr: 'AIS' }
+                        - { value: 4, generic: 3, descr: 'unknown' }
+                        - { value: 5, generic: 3, descr: 'unknown' }
                     group: 'Modules'

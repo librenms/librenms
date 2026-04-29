@@ -70,8 +70,8 @@ modules:
                     low_limit: 0
                     descr: 'PSU {{ $index }}'
                     states:
-                        - { descr: Offline, graph: 0, value: 0, generic: 2 }
-                        - { descr: Online, graph: 0, value: 1, generic: 0 }
+                        - { descr: Offline, value: 0, generic: 2 }
+                        - { descr: Online, value: 1, generic: 0 }
                 -
                     oid: UBNT-EdgeMAX-MIB::ubntPsuCharging
                     value: UBNT-EdgeMAX-MIB::ubntPsuCharging
@@ -80,9 +80,9 @@ modules:
                     descr: 'Charge status PSU {{ $index }}'
                     index: '{{ $index }}'
                     states:
-                        - { descr: unknown, graph: 0, value: 0, generic: 1 }
-                        - { descr: Charging, graph: 0, value: 1, generic: 0 }
-                        - { descr: Charging Off, graph: 0, value: 2, generic: 0 }
+                        - { descr: unknown, value: 0, generic: 1 }
+                        - { descr: Charging, value: 1, generic: 0 }
+                        - { descr: Charging Off, value: 2, generic: 0 }
                 -
                     oid: UBNT-EdgeMAX-MIB::ubntPsuStatus
                     value: UBNT-EdgeMAX-MIB::ubntPsuStatus
@@ -91,10 +91,10 @@ modules:
                     descr: 'PSU status {{ $index }}'
                     index: '{{ $index }}'
                     states:
-                        - { descr: unknown, graph: 0, value: 0, generic: 1 }
-                        - { descr: On, graph: 0, value: 1, generic: 0 }
-                        - { descr: Off, graph: 0, value: 2, generic: 2 }
-                        - { descr: Standby, graph: 0, value: 3, generic: 0 }
+                        - { descr: unknown, value: 0, generic: 1 }
+                        - { descr: On, value: 1, generic: 0 }
+                        - { descr: Off, value: 2, generic: 2 }
+                        - { descr: Standby, value: 3, generic: 0 }
                 -
                     oid: UBNT-EdgeMAX-MIB::ubntPsuType
                     value: UBNT-EdgeMAX-MIB::ubntPsuType
@@ -103,10 +103,10 @@ modules:
                     descr: 'PSU type {{ $index }}'
                     index: '{{ $index }}'
                     states:
-                        - { descr: unknown, graph: 0, value: 0, generic: 1 }
-                        - { descr: AC, graph: 0, value: 1, generic: 0 }
-                        - { descr: DC, graph: 0, value: 2, generic: 0 }
-                        - { descr: POE, graph: 0, value: 3, generic: 0 }
+                        - { descr: unknown, value: 0, generic: 1 }
+                        - { descr: AC, value: 1, generic: 0 }
+                        - { descr: DC, value: 2, generic: 0 }
+                        - { descr: POE, value: 3, generic: 0 }
                 -
                     oid: UBNT-EdgeMAX-MIB::ubntPsuBatteryReplaceIndicator
                     value: UBNT-EdgeMAX-MIB::ubntPsuBatteryReplaceIndicator
@@ -115,9 +115,9 @@ modules:
                     descr: 'Battery indicator PSU {{ $index }}'
                     index: '{{ $index }}'
                     states:
-                        - { descr: unknown, graph: 0, value: 0, generic: 1 }
-                        - { descr: OK, graph: 0, value: 1, generic: 0 }
-                        - { descr: REPLACE, graph: 0, value: 2, generic: 1 }
+                        - { descr: unknown, value: 0, generic: 1 }
+                        - { descr: OK, value: 1, generic: 0 }
+                        - { descr: REPLACE, value: 2, generic: 1 }
         temperature:
             data:
                 -

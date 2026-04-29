@@ -34,17 +34,17 @@ modules:
           group: '{{ IF-MIB::ifName }} [{{ TERRAGRAPH-RADIO-MIB::remoteMacAddr }}]'
           index: 'mcs.{{ $index }}'
           states:
-            - { value: 0, descr: mcs0, graph: 1, generic: 1 }
-            - { value: 1, descr: mcs1, graph: 1, generic: 1 }
-            - { value: 2, descr: mcs2, graph: 1, generic: 1 }
-            - { value: 3, descr: mcs3, graph: 1, generic: 1 }
-            - { value: 4, descr: mcs4, graph: 1, generic: 2 }
-            - { value: 5, descr: mcs5, graph: 1, generic: 2 }
-            - { value: 6, descr: mcs6, graph: 1, generic: 2 }
-            - { value: 7, descr: mcs7, graph: 1, generic: 2 }
-            - { value: 8, descr: mcs8, graph: 1, generic: 0 }
-            - { value: 9, descr: mcs9, graph: 1, generic: 0 }
-            - { value: 10, descr: mcs10, graph: 1, generic: 0 }
-            - { value: 11, descr: mcs10, graph: 1, generic: 0 }
-            - { value: 12, descr: mcs12, graph: 1, generic: 0 }
-            - { value: 13, descr: mcs13, graph: 1, generic: 0 }
+            - { value: 0, descr: mcs0, generic: 1 }
+            - { value: 1, descr: mcs1, generic: 1 }
+            - { value: 2, descr: mcs2, generic: 1 }
+            - { value: 3, descr: mcs3, generic: 1 }
+            - { value: 4, descr: mcs4, generic: 2 }
+            - { value: 5, descr: mcs5, generic: 2 }
+            - { value: 6, descr: mcs6, generic: 2 }
+            - { value: 7, descr: mcs7, generic: 2 }
+            - { value: 8, descr: mcs8, generic: 0 }
+            - { value: 9, descr: mcs9, generic: 0 }
+            - { value: 10, descr: mcs10, generic: 0 }
+            - { value: 11, descr: mcs10, generic: 0 }
+            - { value: 12, descr: mcs12, generic: 0 }
+            - { value: 13, descr: mcs13, generic: 0 }

@@ -17,7 +17,7 @@ class DeviceController
     public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
     {
         $device = str_replace('device=', '', $device);
-        $device = is_numeric($device) ? DeviceCache::get((int) $device) : DeviceCache::getByHostname($device);
+        $device = DeviceCache::get($device);
         $device_id = $device->device_id;
 
         if (! $device->exists) {

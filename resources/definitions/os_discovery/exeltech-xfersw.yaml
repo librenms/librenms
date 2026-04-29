@@ -183,18 +183,18 @@ modules:
                     descr: "Source 1 Alarms"
                     index: source1Alarms.{{ $index }}
                     states:
-                        - { descr: 'OK', graph: 0, value: 0, generic: 0 }
-                        - { descr: 'Power Module Overtemp', graph: 1, value: 1, generic: 2 }
-                        - { descr: 'Power Module Fail', graph: 1, value: 2, generic: 2 }
-                        - { descr: 'Control Card Fail', graph: 1, value: 4, generic: 2 }
-                        - { descr: 'One Source has failed or are not phase locked', graph: 1, value: 8, generic: 2 }
-                        - { descr: 'LvAlarm', graph: 1, value: 16, generic: 2 }
-                        - { descr: 'Control Card Overtemp', graph: 1, value: 32, generic: 2 }
-                        - { descr: 'SCRs are Warm', graph: 1, value: 64, generic: 1 }
-                        - { descr: 'Low DCV', graph: 1, value: 128, generic: 1 }
-                        - { descr: 'Popk alarm - System not redunant', graph: 1, value: 512, generic: 1 }
-                        - { descr: 'Both sources are dead', graph: 1, value: 1024, generic: 2 }
-                        - { descr: 'Fan Failed or Hot Temperature', graph: 1, value: 2048, generic: 2 }
+                        - { descr: 'OK', value: 0, generic: 0 }
+                        - { descr: 'Power Module Overtemp', value: 1, generic: 2 }
+                        - { descr: 'Power Module Fail', value: 2, generic: 2 }
+                        - { descr: 'Control Card Fail', value: 4, generic: 2 }
+                        - { descr: 'One Source has failed or are not phase locked', value: 8, generic: 2 }
+                        - { descr: 'LvAlarm', value: 16, generic: 2 }
+                        - { descr: 'Control Card Overtemp', value: 32, generic: 2 }
+                        - { descr: 'SCRs are Warm', value: 64, generic: 1 }
+                        - { descr: 'Low DCV', value: 128, generic: 1 }
+                        - { descr: 'Popk alarm - System not redunant', value: 512, generic: 1 }
+                        - { descr: 'Both sources are dead', value: 1024, generic: 2 }
+                        - { descr: 'Fan Failed or Hot Temperature', value: 2048, generic: 2 }
                 -
                     oid: EXELTECH-XFERSW::source2Alarms
                     value: EXELTECH-XFERSW::source2Alarms
@@ -203,18 +203,18 @@ modules:
                     descr: "Source 2 Alarms"
                     index: source2Alarms.{{ $index }}
                     states:
-                        - { descr: 'OK', graph: 0, value: 0, generic: 0 }
-                        - { descr: 'Power Module Overtemp', graph: 1, value: 1, generic: 2 }
-                        - { descr: 'Power Module Fail', graph: 1, value: 2, generic: 2 }
-                        - { descr: 'Control Card Fail', graph: 1, value: 4, generic: 2 }
-                        - { descr: 'One Source has failed or are not phase locked', graph: 1, value: 8, generic: 2 }
-                        - { descr: 'LvAlarm', graph: 1, value: 16, generic: 2 }
-                        - { descr: 'Control Card Overtemp', graph: 1, value: 32, generic: 2 }
-                        - { descr: 'SCRs are Warm', graph: 1, value: 64, generic: 1 }
-                        - { descr: 'Low DCV', graph: 1, value: 128, generic: 1 }
-                        - { descr: 'Popk alarm - System not redunant', graph: 1, value: 512, generic: 1 }
-                        - { descr: 'Both sources are dead', graph: 1, value: 1024, generic: 2 }
-                        - { descr: 'Fan Failed or Hot Temperature', graph: 1, value: 2048, generic: 2 }
+                        - { descr: 'OK', value: 0, generic: 0 }
+                        - { descr: 'Power Module Overtemp', value: 1, generic: 2 }
+                        - { descr: 'Power Module Fail', value: 2, generic: 2 }
+                        - { descr: 'Control Card Fail', value: 4, generic: 2 }
+                        - { descr: 'One Source has failed or are not phase locked', value: 8, generic: 2 }
+                        - { descr: 'LvAlarm', value: 16, generic: 2 }
+                        - { descr: 'Control Card Overtemp', value: 32, generic: 2 }
+                        - { descr: 'SCRs are Warm', value: 64, generic: 1 }
+                        - { descr: 'Low DCV', value: 128, generic: 1 }
+                        - { descr: 'Popk alarm - System not redunant', value: 512, generic: 1 }
+                        - { descr: 'Both sources are dead', value: 1024, generic: 2 }
+                        - { descr: 'Fan Failed or Hot Temperature', value: 2048, generic: 2 }
                 -
                     oid: EXELTECH-XFERSW::source3Alarms
                     value: EXELTECH-XFERSW::source3Alarms
@@ -223,18 +223,18 @@ modules:
                     descr: "Source 3 Alarms"
                     index: source3Alarms.{{ $index }}
                     states:
-                        - { descr: 'OK', graph: 0, value: 0, generic: 0 }
-                        - { descr: 'Power Module Overtemp', graph: 1, value: 1, generic: 2 }
-                        - { descr: 'Power Module Fail', graph: 1, value: 2, generic: 2 }
-                        - { descr: 'Control Card Fail', graph: 1, value: 4, generic: 2 }
-                        - { descr: 'One Source has failed or are not phase locked', graph: 1, value: 8, generic: 2 }
-                        - { descr: 'LvAlarm', graph: 1, value: 16, generic: 2 }
-                        - { descr: 'Control Card Overtemp', graph: 1, value: 32, generic: 2 }
-                        - { descr: 'SCRs are Warm', graph: 1, value: 64, generic: 1 }
-                        - { descr: 'Low DCV', graph: 1, value: 128, generic: 1 }
-                        - { descr: 'Popk alarm - System not redunant', graph: 1, value: 512, generic: 1 }
-                        - { descr: 'Both sources are dead', graph: 1, value: 1024, generic: 2 }
-                        - { descr: 'Fan Failed or Hot Temperature', graph: 1, value: 2048, generic: 2 }
+                        - { descr: 'OK', value: 0, generic: 0 }
+                        - { descr: 'Power Module Overtemp', value: 1, generic: 2 }
+                        - { descr: 'Power Module Fail', value: 2, generic: 2 }
+                        - { descr: 'Control Card Fail', value: 4, generic: 2 }
+                        - { descr: 'One Source has failed or are not phase locked', value: 8, generic: 2 }
+                        - { descr: 'LvAlarm', value: 16, generic: 2 }
+                        - { descr: 'Control Card Overtemp', value: 32, generic: 2 }
+                        - { descr: 'SCRs are Warm', value: 64, generic: 1 }
+                        - { descr: 'Low DCV', value: 128, generic: 1 }
+                        - { descr: 'Popk alarm - System not redunant', value: 512, generic: 1 }
+                        - { descr: 'Both sources are dead', value: 1024, generic: 2 }
+                        - { descr: 'Fan Failed or Hot Temperature', value: 2048, generic: 2 }
                 -
                     oid: EXELTECH-XFERSW::MinorAlarm
                     value: EXELTECH-XFERSW::MinorAlarm
@@ -243,8 +243,8 @@ modules:
                     descr: "Minor Alarm"
                     index: MinorAlarm.{{ $index }}
                     states:
-                        - { descr: 'OK', graph: 0, value: 0, generic: 0 }
-                        - { descr: 'Alarm', graph: 1, value: 1, generic: 1 }
+                        - { descr: 'OK', value: 0, generic: 0 }
+                        - { descr: 'Alarm', value: 1, generic: 1 }
                 -
                     oid: EXELTECH-XFERSW::MajorAlarm
                     value: EXELTECH-XFERSW::MajorAlarm
@@ -253,5 +253,5 @@ modules:
                     descr: "Major Alarm"
                     index: MajorAlarm.{{ $index }}
                     states:
-                        - { descr: 'OK', graph: 0, value: 0, generic: 0 }
-                        - { descr: 'Alarm', graph: 1, value: 1, generic: 2 }
+                        - { descr: 'OK', value: 0, generic: 0 }
+                        - { descr: 'Alarm', value: 1, generic: 2 }

@@ -65,12 +65,12 @@ modules:
                     descr: 'Global Status'
                     state_name: productIDGlobalStatus
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: noncritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: recoverable, graph: 1, generic: 1 }
+                        - { value: 1, descr: other, generic: 3 }
+                        - { value: 2, descr: unknown, generic: 3 }
+                        - { value: 3, descr: ok, generic: 0 }
+                        - { value: 4, descr: noncritical, generic: 1 }
+                        - { value: 5, descr: critical, generic: 2 }
+                        - { value: 6, descr: recoverable, generic: 1 }
                 -
                     oid: DELL-STORAGE-SC-MIB::scDiskTable
                     value: DELL-STORAGE-SC-MIB::scDiskStatus
@@ -79,9 +79,9 @@ modules:
                     index: scDiskStatus.{{ $index }}
                     state_name: scDiskStatus
                     states:
-                        - { value: 1, descr: up, graph: 1, generic: 0 }
-                        - { value: 2, descr: down, graph: 1, generic: 2 }
-                        - { value: 3, descr: degraded, graph: 1, generic: 1 }
+                        - { value: 1, descr: up, generic: 0 }
+                        - { value: 2, descr: down, generic: 2 }
+                        - { value: 3, descr: degraded, generic: 1 }
                 -
                     oid: DELL-STORAGE-SC-MIB::scDiskTable
                     value: DELL-STORAGE-SC-MIB::scDiskHealthy
@@ -90,8 +90,8 @@ modules:
                     index: scDiskHealthy.{{ $index }}
                     state_name: scDiskHealthy
                     states:
-                        - { value: 1, descr: healthy, graph: 1, generic: 0 }
-                        - { value: 2, descr: notHealthy, graph: 1, generic: 1 }
+                        - { value: 1, descr: healthy, generic: 0 }
+                        - { value: 2, descr: notHealthy, generic: 1 }
                 -
                     oid: DELL-STORAGE-SC-MIB::scEnclTable
                     value: DELL-STORAGE-SC-MIB::scEnclStatus
@@ -100,9 +100,9 @@ modules:
                     index: scEnclStatus.{{ $index }}
                     state_name: scEnclStatus
                     states:
-                        - { value: 1, descr: up, graph: 1, generic: 0 }
-                        - { value: 2, descr: down, graph: 1, generic: 2 }
-                        - { value: 3, descr: degraded, graph: 1, generic: 1 }
+                        - { value: 1, descr: up, generic: 0 }
+                        - { value: 2, descr: down, generic: 2 }
+                        - { value: 3, descr: degraded, generic: 1 }
                 -
                     oid: DELL-STORAGE-SC-MIB::scCtlrPowerTable
                     value: DELL-STORAGE-SC-MIB::scCtlrPowerStatus
@@ -111,9 +111,9 @@ modules:
                     index: scCtlrPowerStatus.{{ $index }}
                     state_name: scCtlrPowerStatus
                     states:
-                        - { value: 1, descr: up, graph: 1, generic: 0 }
-                        - { value: 2, descr: down, graph: 1, generic: 2 }
-                        - { value: 3, descr: degraded, graph: 1, generic: 1 }
+                        - { value: 1, descr: up, generic: 0 }
+                        - { value: 2, descr: down, generic: 2 }
+                        - { value: 3, descr: degraded, generic: 1 }
                 -
                     oid: DELL-STORAGE-SC-MIB::scEnclFanTable
                     value: DELL-STORAGE-SC-MIB::scEnclFanStatus
@@ -122,9 +122,9 @@ modules:
                     index: scEnclFanStatus.{{ $index }}
                     state_name: scEnclFanStatus
                     states:
-                        - { value: 1, descr: up, graph: 1, generic: 0 }
-                        - { value: 2, descr: down, graph: 1, generic: 2 }
-                        - { value: 3, descr: degraded, graph: 1, generic: 1 }
+                        - { value: 1, descr: up, generic: 0 }
+                        - { value: 2, descr: down, generic: 2 }
+                        - { value: 3, descr: degraded, generic: 1 }
                 -
                     oid: DELL-STORAGE-SC-MIB::scEnclPowerTable
                     value: DELL-STORAGE-SC-MIB::scEnclPowerStatus
@@ -133,9 +133,9 @@ modules:
                     index: scEnclPowerStatus.{{ $index }}
                     state_name: scEnclPowerStatus
                     states:
-                        - { value: 1, descr: up, graph: 1, generic: 0 }
-                        - { value: 2, descr: down, graph: 1, generic: 2 }
-                        - { value: 3, descr: degraded, graph: 1, generic: 1 }
+                        - { value: 1, descr: up, generic: 0 }
+                        - { value: 2, descr: down, generic: 2 }
+                        - { value: 3, descr: degraded, generic: 1 }
                 -
                     oid: DELL-STORAGE-SC-MIB::scEnclIoModTable
                     value: DELL-STORAGE-SC-MIB::scEnclIoModStatus
@@ -144,9 +144,9 @@ modules:
                     index: scEnclIoModStatus.{{ $index }}
                     state_name: scEnclIoModStatus
                     states:
-                        - { value: 1, descr: up, graph: 1, generic: 0 }
-                        - { value: 2, descr: down, graph: 1, generic: 2 }
-                        - { value: 3, descr: degraded, graph: 1, generic: 1 }
+                        - { value: 1, descr: up, generic: 0 }
+                        - { value: 2, descr: down, generic: 2 }
+                        - { value: 3, descr: degraded, generic: 1 }
                 -
                     oid: DELL-STORAGE-SC-MIB::scEnclTempTable
                     value: DELL-STORAGE-SC-MIB::scEnclTempStatus
@@ -155,9 +155,9 @@ modules:
                     index: scEnclTempStatus.{{ $index }}
                     state_name: scEnclTempStatus
                     states:
-                        - { value: 1, descr: up, graph: 1, generic: 0 }
-                        - { value: 2, descr: down, graph: 1, generic: 2 }
-                        - { value: 3, descr: degraded, graph: 1, generic: 1 }
+                        - { value: 1, descr: up, generic: 0 }
+                        - { value: 2, descr: down, generic: 2 }
+                        - { value: 3, descr: degraded, generic: 1 }
                 -
                     oid: DELL-STORAGE-SC-MIB::scEnclAlarmTable
                     value: DELL-STORAGE-SC-MIB::scEnclAlarmStatus
@@ -166,9 +166,9 @@ modules:
                     index: scEnclAlarmStatus.{{ $index }}
                     state_name: scEnclAlarmStatus
                     states:
-                        - { value: 1, descr: up, graph: 1, generic: 0 }
-                        - { value: 2, descr: down, graph: 1, generic: 2 }
-                        - { value: 3, descr: degraded, graph: 1, generic: 1 }
+                        - { value: 1, descr: up, generic: 0 }
+                        - { value: 2, descr: down, generic: 2 }
+                        - { value: 3, descr: degraded, generic: 1 }
                 -
                     oid: DELL-STORAGE-SC-MIB::scDiskFolderTable
                     value: DELL-STORAGE-SC-MIB::scDiskFolderStatus
@@ -177,9 +177,9 @@ modules:
                     index: scDiskFolderStatus.{{ $index }}
                     state_name: scDiskFolderStatus
                     states:
-                        - { value: 1, descr: up, graph: 1, generic: 0 }
-                        - { value: 2, descr: down, graph: 1, generic: 2 }
-                        - { value: 3, descr: degraded, graph: 1, generic: 1 }
+                        - { value: 1, descr: up, generic: 0 }
+                        - { value: 2, descr: down, generic: 2 }
+                        - { value: 3, descr: degraded, generic: 1 }
                 -
                     oid: DELL-STORAGE-SC-MIB::scVolumeTable
                     value: DELL-STORAGE-SC-MIB::scVolumeStatus
@@ -188,9 +188,9 @@ modules:
                     index: scVolumeStatus.{{ $index }}
                     state_name: scVolumeStatus
                     states:
-                        - { value: 1, descr: up, graph: 1, generic: 0 }
-                        - { value: 2, descr: down, graph: 1, generic: 2 }
-                        - { value: 3, descr: degraded, graph: 1, generic: 1 }
+                        - { value: 1, descr: up, generic: 0 }
+                        - { value: 2, descr: down, generic: 2 }
+                        - { value: 3, descr: degraded, generic: 1 }
                 -
                     oid: DELL-STORAGE-SC-MIB::scServerTable
                     value: DELL-STORAGE-SC-MIB::scServerStatus
@@ -199,9 +199,9 @@ modules:
                     index: scServerStatus.{{ $index }}
                     state_name: scServerStatus
                     states:
-                        - { value: 1, descr: up, graph: 1, generic: 0 }
-                        - { value: 2, descr: down, graph: 1, generic: 2 }
-                        - { value: 3, descr: degraded, graph: 1, generic: 1 }
+                        - { value: 1, descr: up, generic: 0 }
+                        - { value: 2, descr: down, generic: 2 }
+                        - { value: 3, descr: degraded, generic: 1 }
                 -
                     oid: DELL-STORAGE-SC-MIB::scServerTable
                     value: DELL-STORAGE-SC-MIB::scServerCnctvy
@@ -210,9 +210,9 @@ modules:
                     index: scServerCnctvy.{{ $index }}
                     state_name: scServerCnctvy
                     states:
-                        - { value: 1, descr: up, graph: 1, generic: 0 }
-                        - { value: 2, descr: down, graph: 1, generic: 2 }
-                        - { value: 3, descr: partial, graph: 1, generic: 1 }
+                        - { value: 1, descr: up, generic: 0 }
+                        - { value: 2, descr: down, generic: 2 }
+                        - { value: 3, descr: partial, generic: 1 }
                 -
                     oid: DELL-STORAGE-SC-MIB::scCacheTable
                     value: DELL-STORAGE-SC-MIB::scCacheStatus
@@ -221,10 +221,10 @@ modules:
                     index: scCacheStatus.{{ $index }}
                     state_name: scCacheStatus
                     states:
-                        - { value: 0, descr: noBattery, graph: 1, generic: 3 }
-                        - { value: 1, descr: normal, graph: 1, generic: 0 }
-                        - { value: 2, descr: expirationPending, graph: 1, generic: 1 }
-                        - { value: 3, descr: expired, graph: 1, generic: 2 }
+                        - { value: 0, descr: noBattery, generic: 3 }
+                        - { value: 1, descr: normal, generic: 0 }
+                        - { value: 2, descr: expirationPending, generic: 1 }
+                        - { value: 3, descr: expired, generic: 2 }
         temperature:
             data:
                 -

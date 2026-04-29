@@ -8,9 +8,9 @@ modules:
                   descr: 'System Status'
                   state_name: psHighestSeverityLevel
                   states:
-                        - { descr: normal, graph: 1, value: 0, generic: 0 }
-                        - { descr: minor, graph: 1, value: 1, generic: 1 }
-                        - { descr: major, graph: 1, value: 2, generic: 2 }
+                        - { descr: normal, value: 0, generic: 0 }
+                        - { descr: minor, value: 1, generic: 1 }
+                        - { descr: major, value: 2, generic: 2 }
        voltage:
             data:
                 -

@@ -9,9 +9,9 @@ modules:
                     descr: NTP Client Lock Status
                     state_name: genEquipUnitInfoNtpStatusLockState
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: None }
-                        - { value: 1, generic: 0, graph: 0, descr: Local }
-                        - { value: 2, generic: 0, graph: 0, descr: Locked }
+                        - { value: 0, generic: 0, descr: None }
+                        - { value: 1, generic: 0, descr: Local }
+                        - { value: 2, generic: 0, descr: Locked }
                 -
                     oid: MWRM-RADIO-MIB::genEquipRfuStatusTxMute
                     value: MWRM-RADIO-MIB::genEquipRfuStatusTxMute
@@ -19,8 +19,8 @@ modules:
                     descr: TX Mute Status
                     state_name: genEquipRfuStatusTxMute
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: Disabled }
-                        - { value: 1, generic: 0, graph: 0, descr: Enabled }
+                        - { value: 0, generic: 0, descr: Disabled }
+                        - { value: 1, generic: 0, descr: Enabled }
                 -
                     oid: MWRM-RADIO-MIB::genEquipRadioCfgRadioOperationalStatus
                     value: MWRM-RADIO-MIB::genEquipRadioCfgRadioOperationalStatus
@@ -28,8 +28,8 @@ modules:
                     descr: Radio Operational Status
                     state_name: genEquipRadioCfgRadioOperationalStatus
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: Inactive }
-                        - { value: 1, generic: 0, graph: 0, descr: Active }
+                        - { value: 0, generic: 0, descr: Inactive }
+                        - { value: 1, generic: 0, descr: Active }
                 -
                     oid: MWRM-RADIO-MIB::genEquipRemoteRadioRemoteCommunication
                     value: MWRM-RADIO-MIB::genEquipRemoteRadioRemoteCommunication
@@ -37,8 +37,8 @@ modules:
                     descr: Remote Radio Operational Status
                     state_name: genEquipRemoteRadioRemoteCommunication
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: Inactive }
-                        - { value: 1, generic: 0, graph: 0, descr: Active }
+                        - { value: 0, generic: 0, descr: Inactive }
+                        - { value: 1, generic: 0, descr: Active }
         temperature:
             data:
                 -

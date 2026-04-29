@@ -29,18 +29,19 @@ namespace LibreNMS\Tests;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Enum\IntegerType;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\StringHelpers;
 
 final class FunctionsTest extends TestCase
 {
-    public function testHex2Str(): void
+    public function testHex2Bin(): void
     {
-        $this->assertEquals('Big 10 UP', hex2str('426967203130205550'));
+        $this->assertEquals('Big 10 UP', hex2bin('426967203130205550'));
     }
 
     public function testSnmpHexstring(): void
     {
         $input = '4c 61 72 70 69 6e 67 20 34 20 55 00 0a';
-        $this->assertEquals("Larping 4 U\n", snmp_hexstring($input));
+        $this->assertEquals("Larping 4 U\n", StringHelpers::hexToAscii($input, ' '));
     }
 
     public function testDynamicDiscoveryGetValue(): void

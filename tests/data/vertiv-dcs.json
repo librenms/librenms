@@ -2578,553 +2578,474 @@
                 {
                     "state_name": "envFirefighting2FireAlarmStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "envFirefighting2FireAlarmStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "envFirefighting2FireAlarmStatus",
                     "state_descr": "uninstalled",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "envFirefighting2FireAlarmStatus",
                     "state_descr": "leave",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "envFirefighting3FireSensor4DICommStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "envFirefighting3FireSensor4DICommStatus",
                     "state_descr": "failure",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "envTdicom4FrontDoor",
                     "state_descr": "close",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "envTdicom4FrontDoor",
                     "state_descr": "open",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "envTdicom4FrontDoor",
                     "state_descr": "uninstalled",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "envTdicom4FrontDoor",
                     "state_descr": "leave",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "envTdicom5RearDoor",
                     "state_descr": "close",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "envTdicom5RearDoor",
                     "state_descr": "open",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "envTdicom5RearDoor",
                     "state_descr": "uninstalled",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "envTdicom5RearDoor",
                     "state_descr": "leave",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "envTdicom6Water",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "envTdicom6Water",
                     "state_descr": "alarm",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "envTdicom6Water",
                     "state_descr": "uninstalled",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "envTdicom6Water",
                     "state_descr": "leave",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mpduMpscom2ProductType",
                     "state_descr": "undefined",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mpduMpscom2ProductType",
                     "state_descr": "bitcurrentipswitch",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom2ProductType",
                     "state_descr": "totalcurrentcomswitch",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom2ProductType",
                     "state_descr": "totalcurrentipmeter",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom2ProductType",
                     "state_descr": "totalcurrentipswitch",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom2ProductType",
                     "state_descr": "bitcurrentcommeter",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom2ProductType",
                     "state_descr": "bitcurrentcomswitch",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom2ProductType",
                     "state_descr": "bitcurrentipmeter",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom51CommunicateStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom51CommunicateStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mpduMpscom52Outlet1Status",
                     "state_descr": "poweroff",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mpduMpscom52Outlet1Status",
                     "state_descr": "poweron",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom53Outlet2Status",
                     "state_descr": "poweroff",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mpduMpscom53Outlet2Status",
                     "state_descr": "poweron",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom54Outlet3Status",
                     "state_descr": "poweroff",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mpduMpscom54Outlet3Status",
                     "state_descr": "poweron",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom55Outlet4Status",
                     "state_descr": "poweroff",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mpduMpscom55Outlet4Status",
                     "state_descr": "poweron",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom56Outlet5Status",
                     "state_descr": "poweroff",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mpduMpscom56Outlet5Status",
                     "state_descr": "poweron",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom57Outlet6Status",
                     "state_descr": "poweroff",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mpduMpscom57Outlet6Status",
                     "state_descr": "poweron",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom58Outlet7Status",
                     "state_descr": "poweroff",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mpduMpscom58Outlet7Status",
                     "state_descr": "poweron",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom59Outlet8Status",
                     "state_descr": "poweroff",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mpduMpscom59Outlet8Status",
                     "state_descr": "poweron",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom60Outlet9Status",
                     "state_descr": "poweroff",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mpduMpscom60Outlet9Status",
                     "state_descr": "poweron",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom61Outlet10Status",
                     "state_descr": "poweroff",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mpduMpscom61Outlet10Status",
                     "state_descr": "poweron",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom62Outlet11Status",
                     "state_descr": "poweroff",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mpduMpscom62Outlet11Status",
                     "state_descr": "poweron",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom63Outlet12Status",
                     "state_descr": "poweroff",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mpduMpscom63Outlet12Status",
                     "state_descr": "poweron",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom64Outlet13Status",
                     "state_descr": "poweroff",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mpduMpscom64Outlet13Status",
                     "state_descr": "poweron",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom65Outlet14Status",
                     "state_descr": "poweroff",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mpduMpscom65Outlet14Status",
                     "state_descr": "poweron",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom66Outlet15Status",
                     "state_descr": "poweroff",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mpduMpscom66Outlet15Status",
                     "state_descr": "poweron",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mpduMpscom67Outlet16Status",
                     "state_descr": "poweroff",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mpduMpscom67Outlet16Status",
                     "state_descr": "poweron",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsIta2com75PowerSupply",
                     "state_descr": "upsshutdown",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsIta2com75PowerSupply",
                     "state_descr": "utilityonline",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsIta2com75PowerSupply",
                     "state_descr": "onbypass",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsIta2com75PowerSupply",
                     "state_descr": "upsonunionmode",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsIta2com76InputPowerStatus",
                     "state_descr": "utilityonline",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsIta2com76InputPowerStatus",
                     "state_descr": "onbat",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsIta2com76InputPowerStatus",
                     "state_descr": "upsonunionmode",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsIta2com76InputPowerStatus",
                     "state_descr": "upsshutdown",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "upsIta2com77BatStatus",
                     "state_descr": "idle",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsIta2com77BatStatus",
                     "state_descr": "floatcharging",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsIta2com77BatStatus",
                     "state_descr": "equalizationcharging",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsIta2com77BatStatus",
                     "state_descr": "discharging",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsIta2com77BatStatus",
                     "state_descr": "selftesting",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsIta2com77BatStatus",
                     "state_descr": "nobat",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "upsIta2com77BatStatus",
                     "state_descr": "full",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsIta2com77BatStatus",
                     "state_descr": "precharge",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsIta2com77BatStatus",
                     "state_descr": "fastcharging",
-                    "state_draw_graph": 1,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsIta2com79ChargerStatus",
                     "state_descr": "chargeron",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsIta2com79ChargerStatus",
                     "state_descr": "chargeroff",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 }

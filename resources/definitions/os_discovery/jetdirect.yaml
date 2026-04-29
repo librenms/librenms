@@ -24,11 +24,11 @@ modules:
                     descr: 'Default Paper {{ $index }}'
                     state_name: defaultMediaSize
                     states:
-                        - { graph: 0, value: 1, generic: 0, descr: US_Executive }
-                        - { graph: 0, value: 2, generic: 0, descr: US_Letter }
-                        - { graph: 0, value: 2, generic: 0, descr: US_Legal }
-                        - { graph: 0, value: 25, generic: 0, descr: ISO_A5 }
-                        - { graph: 0, value: 26, generic: 0, descr: ISO_A4 }
+                        - { value: 1, generic: 0, descr: US_Executive }
+                        - { value: 2, generic: 0, descr: US_Letter }
+                        - { value: 2, generic: 0, descr: US_Legal }
+                        - { value: 25, generic: 0, descr: ISO_A5 }
+                        - { value: 26, generic: 0, descr: ISO_A4 }
 
         count:
             data:

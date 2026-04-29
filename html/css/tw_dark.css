@@ -1281,7 +1281,8 @@
     color: #d61818
 }
 
-.dark .gridster .gs-w {
+.dark .gs-w,
+.dark .grid-stack .grid-stack-item-content {
     color: var(--color-light2);
     background-color: #353a41;
 }

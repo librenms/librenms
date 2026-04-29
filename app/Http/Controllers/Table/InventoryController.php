@@ -84,7 +84,7 @@ class InventoryController extends TableController
 
     /**
      * @param  EntPhysical  $entPhysical
-     * @return array|Model|Collection
+     * @return array|Model|Collection<string, mixed>
      */
     public function formatItem($entPhysical)
     {

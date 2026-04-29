@@ -8,10 +8,10 @@
             @endforeach
             <div class="form-group" style="margin-right: 10px;">
                 <input type="text" class="form-control" id="searchPort" name="searchPort" 
-                       value="{{ $request->get('searchPort') }}" placeholder="search ..." style="width: 250px;">
+                       value="{{ $request->input('searchPort') }}" placeholder="search ..." style="width: 250px;">
             </div>
             <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-search"></i> Filter</button>
-            @if($request->get('searchPort'))
+            @if($request->input('searchPort'))
                 <a href="{{ $request->url() }}?{{ http_build_query($request->except(['searchPort', 'page'])) }}" 
                    class="btn btn-default btn-sm" style="margin-left: 5px;"><i class="fa fa-times"></i> Clear</a>
             @endif

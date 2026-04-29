@@ -35,7 +35,7 @@ function printEntPhysical($device, $ent, $level, $class)
         }
 
         if ($ent['entPhysicalParentRelPos'] > '-1') {
-            echo '<strong>' . $ent['entPhysicalParentRelPos'] . '.</strong> ';
+            echo '<strong>' . e($ent['entPhysicalParentRelPos']) . '.</strong> ';
         }
 
         $display_entPhysicalName = $ent['entPhysicalName'];
@@ -45,17 +45,17 @@ function printEntPhysical($device, $ent, $level, $class)
         }
 
         if ($ent['entPhysicalModelName'] && $display_entPhysicalName) {
-            echo '<strong>' . $ent['entPhysicalModelName'] . '</strong> (' . $display_entPhysicalName . ')';
+            echo '<strong>' . e($ent['entPhysicalModelName']) . '</strong> (' . e($display_entPhysicalName) . ')';
         } elseif ($ent['entPhysicalModelName']) {
-            echo '<strong>' . $ent['entPhysicalModelName'] . '</strong>';
+            echo '<strong>' . e($ent['entPhysicalModelName']) . '</strong>';
         } elseif (is_numeric($ent['entPhysicalName']) && $ent['entPhysicalVendorType']) {
-            echo '<strong>' . $ent['entPhysicalName'] . ' ' . $ent['entPhysicalVendorType'] . '</strong>';
+            echo '<strong>' . e($ent['entPhysicalName']) . ' ' . e($ent['entPhysicalVendorType']) . '</strong>';
         } elseif ($display_entPhysicalName) {
-            echo '<strong>' . $display_entPhysicalName . '</strong>';
+            echo '<strong>' . e($display_entPhysicalName) . '</strong>';
         } elseif ($ent['entPhysicalDescr']) {
-            echo '<strong>' . $ent['entPhysicalDescr'] . '</strong>';
+            echo '<strong>' . e($ent['entPhysicalDescr']) . '</strong>';
         } elseif ($ent['entPhysicalClass']) {
-            echo '<strong>' . $ent['entPhysicalClass'] . '</strong>';
+            echo '<strong>' . e($ent['entPhysicalClass']) . '</strong>';
         }
 
         // Display matching sensor value (without descr, as we have only one)
@@ -102,18 +102,18 @@ function printEntPhysical($device, $ent, $level, $class)
             }
         }
 
-        echo "<br /><div class='interface-desc' style='margin-left: 20px;'>" . $ent['entPhysicalDescr'];
+        echo "<br /><div class='interface-desc' style='margin-left: 20px;'>" . e($ent['entPhysicalDescr']);
 
         if ($ent['entPhysicalAlias'] && $ent['entPhysicalAssetID']) {
-            echo ' <br />Alias: ' . $ent['entPhysicalAlias'] . ' - AssetID: ' . $ent['entPhysicalAssetID'];
+            echo ' <br />Alias: ' . e($ent['entPhysicalAlias']) . ' - AssetID: ' . e($ent['entPhysicalAssetID']);
         } elseif ($ent['entPhysicalAlias']) {
-            echo ' <br />Alias: ' . $ent['entPhysicalAlias'];
+            echo ' <br />Alias: ' . e($ent['entPhysicalAlias']);
         } elseif ($ent['entPhysicalAssetID']) {
-            echo ' <br />AssetID: ' . $ent['entPhysicalAssetID'];
+            echo ' <br />AssetID: ' . e($ent['entPhysicalAssetID']);
         }
 
         if ($ent['entPhysicalSerialNum']) {
-            echo " <br /><span class='text-info'>Serial No. " . $ent['entPhysicalSerialNum'] . '</span> ';
+            echo " <br /><span class='text-info'>Serial No. " . e($ent['entPhysicalSerialNum']) . '</span> ';
         }
 
         // Display sensors values with their descr, as we have more than one attached to this entPhysical
@@ -122,7 +122,7 @@ function printEntPhysical($device, $ent, $level, $class)
             foreach ($sensors as $sensor) {
                 $disp_name = str_replace([$ent['entPhysicalDescr'], $ent['entPhysicalName']], ['', ''], $sensor->sensor_descr);
                 echo "<a href='graphs/id=" . $sensor->sensor_id . '/type=sensor_' . $sensor->sensor_class . "/' onmouseover=\"return overlib('<img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2d&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'><img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2w&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'>', LEFT,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\">";
-                echo "<span class='text-info'>" . $disp_name . ' ' . $sensor->sensor_class . '</span>';
+                echo "<span class='text-info'>" . e($disp_name) . ' ' . e($sensor->sensor_class) . '</span>';
                 echo ' ';
                 echo Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue());
                 echo '</a><br>';

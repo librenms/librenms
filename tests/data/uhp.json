@@ -3356,413 +3356,354 @@
                 {
                     "state_name": "Current redundancy state",
                     "state_descr": "no RX lock",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Current redundancy state",
                     "state_descr": "absence of coordinates",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Current redundancy state",
                     "state_descr": "absence of TX status",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Current TX status",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Current TX status",
                     "state_descr": "on",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "init",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "noConfig",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "useConfig",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "redundant",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "startRX",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "cotmPointing",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "startHubTX",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "noRX",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "identify",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "getNetConfig",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "calcDelays",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "startTDMA",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "startTX",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "acquisition",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "adjustment",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "noStations",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "operation",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "init",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "noConfig",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "useConfig",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "redundant",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "startRX",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "cotmPointing",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "startHubTX",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "noRX",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "identify",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "getNetConfig",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "calcDelays",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "startTDMA",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "startTX",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "acquisition",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "adjustment",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "noStations",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "operation",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "init",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "noConfig",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "useConfig",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "redundant",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "startRX",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "cotmPointing",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "startHubTX",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "noRX",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "identify",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "getNetConfig",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "calcDelays",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "startTDMA",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "startTX",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "acquisition",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "adjustment",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "noStations",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "operation",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 0
                 }
@@ -6075,413 +6016,354 @@
                 {
                     "state_name": "Current redundancy state",
                     "state_descr": "no RX lock",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Current redundancy state",
                     "state_descr": "absence of coordinates",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Current redundancy state",
                     "state_descr": "absence of TX status",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Current TX status",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Current TX status",
                     "state_descr": "on",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "init",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "noConfig",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "useConfig",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "redundant",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "startRX",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "cotmPointing",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "startHubTX",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "noRX",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "identify",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "getNetConfig",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "calcDelays",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "startTDMA",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "startTX",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "acquisition",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "adjustment",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "noStations",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Operation sequence level",
                     "state_descr": "operation",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "init",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "noConfig",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "useConfig",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "redundant",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "startRX",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "cotmPointing",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "startHubTX",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "noRX",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "identify",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "getNetConfig",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "calcDelays",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "startTDMA",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "startTX",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "acquisition",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "adjustment",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "noStations",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Remote initialization sequence level",
                     "state_descr": "operation",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "init",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "noConfig",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "useConfig",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "redundant",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "startRX",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "cotmPointing",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "startHubTX",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "noRX",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "identify",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "getNetConfig",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "calcDelays",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "startTDMA",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "startTX",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "acquisition",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "adjustment",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "noStations",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Server reply status",
                     "state_descr": "operation",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 0
                 }

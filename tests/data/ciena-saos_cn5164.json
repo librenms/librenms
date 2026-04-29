@@ -13487,301 +13487,258 @@
                 {
                     "state_name": "cienaCesModuleAdminState",
                     "state_descr": "enabled",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleAdminState",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleAdminState",
                     "state_descr": "shutdown",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "snmp",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "pwrFail",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "appLoad",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "errorHandler",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "watchdog",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "upgrade",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "cli",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "resetButton",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "failOver",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "faultManager",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "communicationFailure",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "configurationRevert",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "unprotectedFailure",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "bootFailure",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "softwareRevert",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "processorWarmRestart",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "coldRestart",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "primaryRestart",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "uninstalled",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "unequipped",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "init",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "enabled",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "hotswap",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "poweroff",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "hitlessInit",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "fastReload",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "krnInit",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "unsupported",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "installing",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "failed",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "krnDisable",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "appFault",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "booting",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "powerdown",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesPortXcvrFecMode",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesPortXcvrFecMode",
                     "state_descr": "generic",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesPortXcvrFecMode",
                     "state_descr": "enhanced",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 }

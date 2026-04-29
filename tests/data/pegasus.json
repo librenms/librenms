@@ -11038,336 +11038,288 @@
                 {
                     "state_name": "dataCardCommState",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dataCardCommState",
                     "state_descr": "init",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dataCardCommState",
                     "state_descr": "identification",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dataCardCommState",
                     "state_descr": "checkHw",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dataCardCommState",
                     "state_descr": "hwAdaption",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dataCardCommState",
                     "state_descr": "checkHwVers",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dataCardCommState",
                     "state_descr": "wrongProgramm",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dataCardCommState",
                     "state_descr": "checkConfig",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dataCardCommState",
                     "state_descr": "downloadConfig",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dataCardCommState",
                     "state_descr": "uploadConfig",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dataCardCommState",
                     "state_descr": "statusSynch",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dataCardCommState",
                     "state_descr": "resetting",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dataCardCommState",
                     "state_descr": "inactive",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dataCardCommState",
                     "state_descr": "active",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dataCardOperState",
                     "state_descr": "enabled",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dataCardOperState",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "dslCardCommState",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dslCardCommState",
                     "state_descr": "init",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dslCardCommState",
                     "state_descr": "identification",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dslCardCommState",
                     "state_descr": "checkHw",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dslCardCommState",
                     "state_descr": "hwAdaption",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dslCardCommState",
                     "state_descr": "checkHwVers",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dslCardCommState",
                     "state_descr": "wrongProgramm",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dslCardCommState",
                     "state_descr": "checkConfig",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dslCardCommState",
                     "state_descr": "downloadConfig",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dslCardCommState",
                     "state_descr": "uploadConfig",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dslCardCommState",
                     "state_descr": "statusSynch",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dslCardCommState",
                     "state_descr": "resetting",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dslCardCommState",
                     "state_descr": "inactive",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dslCardCommState",
                     "state_descr": "active",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dslCardOperState",
                     "state_descr": "enabled",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "dslCardOperState",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "v5CardCommState",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "v5CardCommState",
                     "state_descr": "init",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "v5CardCommState",
                     "state_descr": "identification",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "v5CardCommState",
                     "state_descr": "checkHw",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "v5CardCommState",
                     "state_descr": "hwAdaption",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "v5CardCommState",
                     "state_descr": "checkHwVers",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "v5CardCommState",
                     "state_descr": "wrongProgramm",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "v5CardCommState",
                     "state_descr": "checkConfig",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "v5CardCommState",
                     "state_descr": "downloadConfig",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "v5CardCommState",
                     "state_descr": "uploadConfig",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "v5CardCommState",
                     "state_descr": "statusSynch",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "v5CardCommState",
                     "state_descr": "resetting",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "v5CardCommState",
                     "state_descr": "inactive",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "v5CardCommState",
                     "state_descr": "active",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "v5CardOperState",
                     "state_descr": "enabled",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "v5CardOperState",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 }

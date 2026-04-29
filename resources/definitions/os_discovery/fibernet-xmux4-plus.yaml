@@ -52,9 +52,9 @@ modules:
                     index: 'muxLeftPower.{{ $index }}'
                     state_name: muxLeftPower
                     states:
-                        - { descr: PowerOn, graph: 0, value: 0, generic: 0 }
-                        - { descr: PowerOff, graph: 0, value: 1, generic: 2 }
-                        - { descr: Unknown, graph: 0, value: 8, generic: 3 }
+                        - { descr: PowerOn, value: 0, generic: 0 }
+                        - { descr: PowerOff, value: 1, generic: 2 }
+                        - { descr: Unknown, value: 8, generic: 3 }
                 -
                     oid: XMUX4-PLUS::muxRightPower
                     value: XMUX4-PLUS::muxRightPower
@@ -63,9 +63,9 @@ modules:
                     index: 'muxRightPower.{{ $index }}'
                     state_name: muxRightPower
                     states:
-                        - { descr: PowerOn, graph: 0, value: 0, generic: 0 }
-                        - { descr: PowerOff, graph: 0, value: 1, generic: 2 }
-                        - { descr: Unknown, graph: 0, value: 8, generic: 3 }
+                        - { descr: PowerOn, value: 0, generic: 0 }
+                        - { descr: PowerOff, value: 1, generic: 2 }
+                        - { descr: Unknown, value: 8, generic: 3 }
                 -
                     oid: XMUX4-PLUS::channelTable
                     value: XMUX4-PLUS::channelPresent
@@ -75,8 +75,8 @@ modules:
                     group: 'Channel {{ $subindex1 }}'
                     state_name: channelPresent
                     states:
-                        - { descr: Missing, graph: 0, value: 0, generic: 1 }
-                        - { descr: Present, graph: 0, value: 1, generic: 0 }
+                        - { descr: Missing, value: 0, generic: 1 }
+                        - { descr: Present, value: 1, generic: 0 }
                 -
                     oid: XMUX4-PLUS::channelTable
                     value: XMUX4-PLUS::channelLocalTx
@@ -86,9 +86,9 @@ modules:
                     group: 'Channel {{ $subindex1 }}'
                     state_name: channelLocalTx
                     states:
-                        - { descr: Off, graph: 0, value: 0, generic: 1 }
-                        - { descr: On, graph: 0, value: 1, generic: 0 }
-                        - { descr: Unknown, graph: 0, value: 8, generic: 3 }
+                        - { descr: Off, value: 0, generic: 1 }
+                        - { descr: On, value: 1, generic: 0 }
+                        - { descr: Unknown, value: 8, generic: 3 }
                 -
                     oid: XMUX4-PLUS::channelTable
                     value: XMUX4-PLUS::channelLocalRx
@@ -98,9 +98,9 @@ modules:
                     group: 'Channel {{ $subindex1 }}'
                     state_name: channelLocalRx
                     states:
-                        - { descr: Off, graph: 0, value: 0, generic: 1 }
-                        - { descr: On, graph: 0, value: 1, generic: 0 }
-                        - { descr: Unknown, graph: 0, value: 8, generic: 3 }
+                        - { descr: Off, value: 0, generic: 1 }
+                        - { descr: On, value: 1, generic: 0 }
+                        - { descr: Unknown, value: 8, generic: 3 }
                 -
                     oid: XMUX4-PLUS::channelTable
                     value: XMUX4-PLUS::channelRemoteTx
@@ -110,9 +110,9 @@ modules:
                     group: 'Channel {{ $subindex1 }}'
                     state_name: channelRemoteTx
                     states:
-                        - { descr: Off, graph: 0, value: 0, generic: 1 }
-                        - { descr: On, graph: 0, value: 1, generic: 0 }
-                        - { descr: Unknown, graph: 0, value: 8, generic: 3 }
+                        - { descr: Off, value: 0, generic: 1 }
+                        - { descr: On, value: 1, generic: 0 }
+                        - { descr: Unknown, value: 8, generic: 3 }
                 -
                     oid: XMUX4-PLUS::channelTable
                     value: XMUX4-PLUS::channelRemoteRx
@@ -122,9 +122,9 @@ modules:
                     group: 'Channel {{ $subindex1 }}'
                     state_name: channelRemoteRx
                     states:
-                        - { descr: Off, graph: 0, value: 0, generic: 1 }
-                        - { descr: On, graph: 0, value: 1, generic: 0 }
-                        - { descr: Unknown, graph: 0, value: 8, generic: 3 }
+                        - { descr: Off, value: 0, generic: 1 }
+                        - { descr: On, value: 1, generic: 0 }
+                        - { descr: Unknown, value: 8, generic: 3 }
                 -
                     oid: XMUX4-PLUS::channelTable
                     value: XMUX4-PLUS::channelLocalSfpPresent
@@ -134,8 +134,8 @@ modules:
                     group: 'Channel {{ $subindex1 }}'
                     state_name: channelLocalSfpPresent
                     states:
-                        - { descr: Missing, graph: 0, value: 0, generic: 1 }
-                        - { descr: Present, graph: 0, value: 1, generic: 0 }
+                        - { descr: Missing, value: 0, generic: 1 }
+                        - { descr: Present, value: 1, generic: 0 }
                 -
                     oid: XMUX4-PLUS::channelTable
                     value: XMUX4-PLUS::channelRemoteXfpPresent
@@ -145,8 +145,8 @@ modules:
                     group: 'Channel {{ $subindex1 }}'
                     state_name: channelRemoteXfpPresent
                     states:
-                        - { descr: Missing, graph: 0, value: 0, generic: 1 }
-                        - { descr: Present, graph: 0, value: 1, generic: 0 }
+                        - { descr: Missing, value: 0, generic: 1 }
+                        - { descr: Present, value: 1, generic: 0 }
                 -
                     oid: XMUX4-PLUS::channelTable
                     value: XMUX4-PLUS::channelLocalByPass
@@ -156,7 +156,7 @@ modules:
                     group: 'Channel {{ $subindex1 }}'
                     state_name: channelRemoteRx
                     states:
-                        - { descr: Off, graph: 0, value: 0, generic: 1 }
-                        - { descr: On, graph: 0, value: 1, generic: 0 }
-                        - { descr: Unknown, graph: 0, value: 8, generic: 3 }
+                        - { descr: Off, value: 0, generic: 1 }
+                        - { descr: On, value: 1, generic: 0 }
+                        - { descr: Unknown, value: 8, generic: 3 }
 

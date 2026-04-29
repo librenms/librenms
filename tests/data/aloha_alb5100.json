@@ -4054,49 +4054,42 @@
                 {
                     "state_name": "alBackendStatus",
                     "state_descr": "UP",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "alBackendStatus",
                     "state_descr": "DOWN",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "alFrontendStatus",
                     "state_descr": "no",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "alFrontendStatus",
                     "state_descr": "OPEN",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "alServerStatus",
                     "state_descr": "MAINT",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "alServerStatus",
                     "state_descr": "UP",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "alServerStatus",
                     "state_descr": "DOWN",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 }

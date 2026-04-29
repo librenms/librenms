@@ -176,9 +176,9 @@ modules:
                     group: SL-EDFA-MIB::edfaFreeDescription
                     state_name: edfaRedBlueType
                     states:
-                        - { descr: Red, graph: 1, value: 1, generic: 0 }
-                        - { descr: Blue, graph: 1, value: 2, generic: 0 }
-                        - { descr: None, graph: 1, value: 3, generic: 0 }
+                        - { descr: Red, value: 1, generic: 0 }
+                        - { descr: Blue, value: 2, generic: 0 }
+                        - { descr: None, value: 3, generic: 0 }
                 -
                     oid: SL-EDFA-MIB::edfaConfigTable
                     value: SL-EDFA-MIB::edfaRole
@@ -187,10 +187,10 @@ modules:
                     group: SL-EDFA-MIB::edfaFreeDescription
                     state_name: edfaRole
                     states:
-                        - { descr: booster, graph: 1, value: 1, generic: 0 }
-                        - { descr: boosterInline, graph: 1, value: 2, generic: 0 }
-                        - { descr: preamp, graph: 1, value: 3, generic: 0 }
-                        - { descr: inline, graph: 1, value: 4, generic: 0 }
-                        - { descr: raman, graph: 1, value: 5, generic: 0 }
-                        - { descr: other, graph: 1, value: 6, generic: 0 }
+                        - { descr: booster, value: 1, generic: 0 }
+                        - { descr: boosterInline, value: 2, generic: 0 }
+                        - { descr: preamp, value: 3, generic: 0 }
+                        - { descr: inline, value: 4, generic: 0 }
+                        - { descr: raman, value: 5, generic: 0 }
+                        - { descr: other, value: 6, generic: 0 }
 

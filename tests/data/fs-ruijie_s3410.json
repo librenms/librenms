@@ -323,91 +323,78 @@
                 {
                     "state_name": "FS-POE-MIB::fsIfPoeTable",
                     "state_descr": "On",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "FS-POE-MIB::fsIfPoeTable",
                     "state_descr": "Off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "FS-SYSTEM-MIB::fsSystemFanIsNormalTable",
                     "state_descr": "Unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "FS-SYSTEM-MIB::fsSystemFanIsNormalTable",
                     "state_descr": "Green",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "FS-SYSTEM-MIB::fsSystemFanIsNormalTable",
                     "state_descr": "Yellow",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "FS-SYSTEM-MIB::fsSystemFanIsNormalTable",
                     "state_descr": "Normal",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "FS-SYSTEM-MIB::fsSystemFanIsNormalTable",
                     "state_descr": "Abnormal",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "fsSystemElectricalSourceIsNormal",
                     "state_descr": "noexist",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "fsSystemElectricalSourceIsNormal",
                     "state_descr": "existnopower",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "fsSystemElectricalSourceIsNormal",
                     "state_descr": "existreadypower",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "fsSystemElectricalSourceIsNormal",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "fsSystemElectricalSourceIsNormal",
                     "state_descr": "powerbutabnormal",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "fsSystemElectricalSourceIsNormal",
                     "state_descr": "unknow",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 3
                 }
