@@ -518,7 +518,7 @@ if (! empty($peers)) {
                         $ip_address = IP::parse($peer_data['bgpPeerLocalAddr']);
                         $family = $ip_address->getFamily();
                         $peer_data['bgpPeerIface'] = DB::table('ports')->join("{$family}_addresses", 'ports.port_id', '=', "{$family}_addresses.port_id")->where("{$family}_address", '=', $ip_address->uncompressed())->sole('ports.ifIndex')->ifIndex;
-                    } catch (InvalidIpException | \Illuminate\Database\MultipleRecordsFoundException | \Illuminate\Database\RecordsNotFoundException) {
+                    } catch (InvalidIpException|\Illuminate\Database\MultipleRecordsFoundException|\Illuminate\Database\RecordsNotFoundException) {
                         $peer_data['bgpPeerIface'] = null;
                     }
                 } elseif (isset($peer_data['bgpLocalAddr']) && IP::isValid($peer_data['bgpLocalAddr'])) {
@@ -528,12 +528,12 @@ if (! empty($peers)) {
                         $ip_address = IP::parse($peer_data['bgpLocalAddr']);
                         $family = $ip_address->getFamily();
                         $peer_data['bgpPeerIface'] = DB::table('ports')->join("{$family}_addresses", 'ports.port_id', '=', "{$family}_addresses.port_id")->where("{$family}_address", '=', $ip_address->uncompressed())->sole('ports.ifIndex')->ifIndex;
-                    } catch (InvalidIpException | \Illuminate\Database\MultipleRecordsFoundException | \Illuminate\Database\RecordsNotFoundException) {
+                    } catch (InvalidIpException|\Illuminate\Database\MultipleRecordsFoundException|\Illuminate\Database\RecordsNotFoundException) {
                         $peer_data['bgpPeerIface'] = null;
                     }
                 } else {
                     $peer_data['bgpPeerIface'] = null;
-                }
+                    }
               }
         } catch (InvalidIpException) {
             // ignore
