@@ -58,6 +58,19 @@ class PortsController extends TableController
             'location' => 'nullable|integer',
             'port_descr_type' => 'nullable|string',
             'state' => 'nullable|in:up,down,admindown',
+            'filter' => ['nullable', 'array'],
+            'filter.*' => [
+                'array',
+                function ($attribute, $value, $fail) {
+                    $allowedOps = ['eq', 'neq', 'contains', 'starts_with', 'gt', 'lt', 'in', 'not_in', 'is_empty'];
+                    $operator = array_key_first($value);
+
+                    if (!in_array($operator, $allowedOps)) {
+                        $fail("The operator '{$operator}' is not supported.");
+                    }
+                }
+            ],
+            'filter.*.*' => ['nullable', 'max:255'],
         ];
     }
 
@@ -105,6 +118,7 @@ class PortsController extends TableController
         $query = Port::hasAccess($request->user())
             ->with(['device', 'device.location'])
             ->leftJoin('devices', 'ports.device_id', 'devices.device_id')
+            ->when($request->array('filter'), fn($q, $filter) => $q->applyFilters($filter))
             ->where('deleted', $request->input('deleted', 0)) // always filter deleted
             ->when($request->input('hostname'), function (Builder $query, $hostname): void {
                 $query->where(function (Builder $query) use ($hostname): void {

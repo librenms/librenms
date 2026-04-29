@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\Filterable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,10 +20,36 @@ use LibreNMS\Util\Rewrite;
 class Port extends DeviceRelatedModel
 {
     use HasFactory;
+    use Filterable;
 
     public $timestamps = false;
     protected $primaryKey = 'port_id';
     protected $guarded = [];
+    protected array $filterable = [
+        'device_id',
+        'ifName',
+        'ifDescr',
+        'portName',
+        'ifSpeed',
+        'ifIndex',
+        'ifOperStatus',
+        'ifAdminStatus',
+        'ifDuplex',
+        'ifMtu',
+        'ifType',
+        'ifAlias',
+        'ifPhysAddress',
+        'ifLastChange',
+        'ifVlan',
+        'ifTrunk',
+        'ifVrf',
+        'ignore',
+        'disabled',
+        'deleted',
+        'state',
+        'search',
+        'device.hostname',
+    ];
 
     /**
      * @return array{ifOperStatus: 'LibreNMS\Enum\IfOperStatus', ifOperStatus_prev: 'LibreNMS\Enum\IfOperStatus', ifAdminStatus: 'LibreNMS\Enum\IfOperStatus', ifAdminStatus_prev: 'LibreNMS\Enum\IfOperStatus'}
@@ -311,6 +338,44 @@ class Port extends DeviceRelatedModel
             $query->select('port_id')
                 ->from('port_group_port')
                 ->where('port_group_id', $portGroup);
+        });
+    }
+
+    /**
+     * Handle the "State" filter.
+     * up: Admin Up + Oper Up
+     * down: Admin Up + Oper NOT Up
+     * shutdown: Admin NOT Up
+     */
+    public function filterState(Builder $query, string $op, mixed $value): void
+    {
+        // Use 'whereNot' for 'neq' to automatically invert the internal logic
+        $query->{$op === 'neq' ? 'whereNot' : 'where'}(function ($q) use ($value) {
+            if ($value === 'shutdown') {
+                return $q->where('ifAdminStatus', '!=', 'up');
+            }
+
+            $q->where('ifAdminStatus', 'up')
+                ->where('ifOperStatus', $value === 'up' ? '=' : '!=', 'up');
+        });
+    }
+
+    /**
+     * Handle a global text search across multiple port fields
+     */
+    public function filterSearch(Builder $query, string $op, mixed $value, array $config): void
+    {
+        // Apply the wildcard if the operator is 'contains'
+        if (isset($config['wildcard'])) {
+            $value = str_replace('?', $value, $config['wildcard']);
+        }
+
+        $operator = $config['operator'] ?? '=';
+
+        $query->where(function($q) use ($value, $operator) {
+            $q->where('ifName', $operator, $value)
+                ->orWhere('ifAlias', $operator, $value)
+                ->orWhere('ifDescr', $operator, $value);
         });
     }
 

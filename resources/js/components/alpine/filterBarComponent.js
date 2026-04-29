@@ -12,6 +12,7 @@ export default function filterBarComponent({ fields }) {
         searchQuery: "",
         remoteOptions: [],
         isLoading: false,
+        display: "",
 
         OPS: {
             text: [
@@ -62,9 +63,11 @@ export default function filterBarComponent({ fields }) {
         ops() {
             return this.OPS[this.current?.type] || this.OPS.text;
         },
+
         nullary(operator) {
-            return (operator || this.op) === "is_empty";
+            return ["is_empty", "is_not_empty"].includes(operator || this.op);
         },
+
         isActive(key) {
             return this.filters.some((f) => f.key === key);
         },
@@ -83,12 +86,16 @@ export default function filterBarComponent({ fields }) {
         open(field) {
             this.lastFocusedElement = document.activeElement;
             this.current = field;
+            this.searchQuery = "";
+            this.remoteOptions = [];
+            this.highlightedIndex = -1;
+
             const existing = this.filters.find((f) => f.key === field.key);
             this.op = existing?.op || this.ops()[0].v;
 
             if (field.type === "multi-select") {
                 this.value = existing?.value ? [...existing.value] : [];
-            } else if (field.type === "select") {
+            } else if (field.type === "select" && !field.endpoint) {
                 this.value = existing?.value ?? (field.options?.[0] || "");
             } else {
                 this.value = existing?.value ?? "";
@@ -96,41 +103,7 @@ export default function filterBarComponent({ fields }) {
 
             this.dialog = true;
             this.showAdd = false;
-            this.highlightedIndex = -1;
-            setTimeout(() => this.$refs.valInput?.focus(), 100);
-        },
 
-        close() {
-            this.dialog = false;
-            this.showAdd = false;
-            this.$nextTick(() => this.lastFocusedElement?.focus());
-        },
-
-        toggleMulti(opt) {
-            const i = this.value.indexOf(opt);
-            i > -1 ? this.value.splice(i, 1) : this.value.push(opt);
-        },
-
-        open(field) {
-            this.lastFocusedElement = document.activeElement;
-            this.current = field;
-            this.searchQuery = "";
-            this.remoteOptions = [];
-
-            const existing = this.filters.find((f) => f.key === field.key);
-            this.op = existing?.op || this.ops()[0].v;
-
-            if (field.type === "multi-select") {
-                this.value = existing?.value ? [...existing.value] : [];
-            } else {
-                this.value = existing?.value ?? "";
-            }
-
-            this.dialog = true;
-            this.showAdd = false;
-
-            // Focus logic: If it's a remote search, focus the search box.
-            // Otherwise, focus the standard input.
             this.$nextTick(() => {
                 const el = field.endpoint
                     ? this.$refs.remoteSearch
@@ -140,20 +113,23 @@ export default function filterBarComponent({ fields }) {
         },
 
         async fetchRemote() {
-            if (!this.current.endpoint || this.searchQuery.length < 2) {
+            if (!this.current?.endpoint || this.searchQuery.length < 2) {
                 this.remoteOptions = [];
                 return;
             }
 
             this.isLoading = true;
             try {
-                const url = new URL(this.current.endpoint, window.location.origin);
+                const url = new URL(
+                    this.current.endpoint,
+                    window.location.origin
+                );
 
-                url.searchParams.append('q', this.searchQuery);
+                url.searchParams.append("term", this.searchQuery);
 
-                if (this.current.params && typeof this.current.params === 'object') {
-                    Object.entries(this.current.params).forEach(([key, value]) => {
-                        url.searchParams.append(key, value);
+                if (this.current.params) {
+                    Object.entries(this.current.params).forEach(([k, v]) => {
+                        url.searchParams.append(k, v);
                     });
                 }
 
@@ -162,7 +138,7 @@ export default function filterBarComponent({ fields }) {
 
                 this.remoteOptions = data.results || data;
             } catch (e) {
-                console.error("Filter remote fetch failed", e);
+                console.error("Fetch failed:", e);
             } finally {
                 this.isLoading = false;
             }
@@ -207,9 +183,21 @@ export default function filterBarComponent({ fields }) {
             this.syncUrl();
         },
 
+        toggleMulti(opt) {
+            const i = this.value.indexOf(opt);
+            i > -1 ? this.value.splice(i, 1) : this.value.push(opt);
+        },
+
+        close() {
+            this.dialog = false;
+            this.showAdd = false;
+            this.$nextTick(() => this.lastFocusedElement?.focus());
+        },
+
         syncUrl() {
             const url = new URL(window.location);
             const keysToDelete = [];
+            const formatted = {};
             for (const key of url.searchParams.keys()) {
                 if (key.startsWith("filter[")) keysToDelete.push(key);
             }
@@ -219,13 +207,16 @@ export default function filterBarComponent({ fields }) {
                     ? f.value.join(",")
                     : f.value ?? "";
                 url.searchParams.set(`filter[${f.key}][${f.op}]`, val);
+
+                if (!formatted[f.key]) formatted[f.key] = {};
+                formatted[f.key][f.op] = val;
             });
             window.history.pushState({}, "", url);
-            window.dispatchEvent(
-                new CustomEvent("filter:apply", {
-                    detail: { filters: this.filters },
-                })
-            );
+
+            this.$dispatch("filter:apply", {
+                filters: this.filters,
+                formatted: formatted,
+            });
         },
 
         restoreFromUrl() {

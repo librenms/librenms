@@ -91,6 +91,8 @@ if (isset($vars['errors'])) {
         return parseFloat((units / Math.pow(base, i)).toFixed(dm)) + display[i];
     }
 
+    var filter = <?php echo \Illuminate\Support\Js::from(request('filter')); ?>;
+
     var grid = $("#ports").bootgrid({
         ajax: true,
         rowCount: [50, 100, 250, -1],
@@ -113,7 +115,7 @@ if (isset($vars['errors'])) {
             },
             'port': function (column, row) {
                 return row.port
-            },			
+            },
             'duplex': function (column, row) {
                 const duplexValue = (row.ifDuplex || '').toLowerCase().trim();
                 switch (duplexValue) {
@@ -131,27 +133,23 @@ if (isset($vars['errors'])) {
         },
         post: function () {
             return {
-                device_id: '<?php echo htmlspecialchars($vars['device_id'] ?? ''); ?>',
-                hostname: '<?php echo htmlspecialchars($vars['hostname'] ?? ''); ?>',
-                state: '<?php echo htmlspecialchars($vars['state'] ?? ''); ?>',
-                ifSpeed: '<?php echo htmlspecialchars($vars['ifSpeed'] ?? ''); ?>',
-                ifType: '<?php echo htmlspecialchars($vars['ifType'] ?? ''); ?>',
-                port_descr_type: '<?php echo htmlspecialchars($vars['port_descr_type'] ?? ''); ?>',
-                ifAlias: '<?php echo htmlspecialchars($vars['ifAlias'] ?? ''); ?>',
-                location: '<?php echo htmlspecialchars($vars['location'] ?? '') ?>',
-                disabled: '<?php echo htmlspecialchars($vars['disabled'] ?? ''); ?>',
-                ignore: '<?php echo htmlspecialchars($vars['ignore'] ?? ''); ?>',
-                deleted: '<?php echo htmlspecialchars($vars['deleted'] ?? ''); ?>',
-                errors: '<?php echo htmlspecialchars($vars['errors'] ?? ''); ?>',
-                group: '<?php echo htmlspecialchars($vars['group'] ?? ''); ?>',
-                devicegroup: '<?php echo htmlspecialchars($vars['devicegroup'] ?? ''); ?>',
+                filter: filter
             };
         },
     });
 
-    $(".actionBar").append("<div class=\"pull-left\"><?php echo $output; ?></div>");
+    const $template = $('#port-filter-template');
+    if ($template.length) {
+        const $content = $($template[0].content.cloneNode(true));
 
-    init_select2('#device_id', 'device', {}, <?php echo $device_selected ?>, 'All Devices');
-    init_select2('#location', 'location', {}, <?php echo $location_selected ?>, 'All Locations');
+        const $wrapper = $('<div class="pull-left"></div>');
+        $wrapper.append($content);
 
+        $(".actionBar").append($wrapper);
+    }
+
+    $(window).on('filter:apply', function (event) {
+        filter = event.originalEvent.detail.formatted;
+        grid.bootgrid('reload');
+    });
 </script>

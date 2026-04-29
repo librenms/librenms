@@ -41,7 +41,7 @@ class PortFieldController extends SelectController
     protected function rules(): array
     {
         return [
-            'field' => 'required|in:ifType',
+            'field' => 'required|in:ifType,ifSpeed,port_descr_type',
             'device' => 'nullable|int',
         ];
     }

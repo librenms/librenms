@@ -347,16 +347,31 @@ class Url
      * @param  string  $prefix
      * @return string
      */
-    private static function urlParams($vars, $prefix = '/')
+    private static function urlParams(array $vars, string $prefix = '/', string $parentKey = ''): string
     {
-        $url = empty($vars) ? '' : $prefix;
-        foreach ($vars as $var => $value) {
-            if ($value == '0' || $value != '' && ! Str::contains($var, 'opt') && ! is_numeric($var)) {
-                $url .= urlencode((string) $var) . '=' . urlencode((string) $value) . '/';
-            }
+        $filtered = collect($vars)
+            ->reject(fn ($value, $var) => $parentKey === '' && (str_contains((string) $var, 'opt') || is_numeric($var)))
+            ->map(function ($value, $var) use ($parentKey) {
+                $key = $parentKey === '' ? (string) $var : "{$parentKey}[$var]";
+
+                if (is_array($value)) {
+                    return self::urlParams($value, '', $key);
+                }
+
+                if ($value !== '' && ! is_null($value)) {
+                    return urlencode($key) . '=' . urlencode((string) $value);
+                }
+
+                return null;
+            })
+            ->filter()
+            ->implode('/');
+
+        if ($filtered === '') {
+            return '';
         }
 
-        return $url;
+        return $parentKey !== '' ? $filtered . '/' : $prefix . $filtered . '/';
     }
 
     /**
