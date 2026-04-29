@@ -1,180 +1,76 @@
 <?php
 
+use App\Models\Port;
+use Illuminate\Database\Eloquent\Builder;
+use LibreNMS\Util\Url;
+
+/** @var string $displayLists */
+/** @var bool $hideSearch */
+/** @var array $filterFields */
+/** @var string $subformat */
+
 echo '<div class="panel panel-default panel-condensed">';
 echo '<div class="panel-heading">';
 echo $displayLists;
 echo '</div>';
 echo '<div class="panel-body">';
-echo '<div style="padding-bottom: 10px;">';
-echo stripcslashes((string) $output);
-echo '</div>';
 
-$param = [];
-$where = '';
-$ignore_filter = 0;
-$disabled_filter = 0;
-$device = DeviceCache::get((int) ($vars['device_id'] ?? 0));
+echo Blade::render('<x-filter :fields="$fields" id="port-filter" :hide="$hide" :reload="true" class="tw:mb-3"/>', [
+    'hide' => $hideSearch,
+    'fields' => $filterFields,
+]);
 
-$device_selected = json_encode($device->exists ? ['id' => $device->device_id, 'text' => $device->displayName()] : '');
-echo '<script>init_select2("#device_id", "device", {field: "device_id"}, ' . $device_selected . ' , "All Devices")</script>';
-
-foreach ($vars as $var => $value) {
-    if ($value != '') {
-        switch ($var) {
-            case 'hostname':
-                $where .= ' AND D.hostname LIKE ?';
-                $param[] = '%' . $value . '%';
-                break;
-            case 'location':
-                if (is_int($value)) {
-                    $where .= ' AND L.id = ?';
-                    $param[] = $value;
-                } else {
-                    $where .= ' AND L.location LIKE ?';
-                    $param[] = '%' . $value . '%';
-                }
-                break;
-            case 'device_id':
-                $where .= ' AND D.device_id = ?';
-                $param[] = $value;
-                break;
-            case 'deleted':
-                if ($value == 1 || $value == 'yes') {
-                    $where .= ' AND `I`.`deleted` = 1';
-                    $ignore_filter = 1;
-                }
-                break;
-            case 'ignore':
-                if ($value == 1 || $value == 'yes') {
-                    $where .= ' AND (I.ignore = 1 OR D.ignore = 1) AND I.deleted = 0';
-                    $ignore_filter = 1;
-                }
-                break;
-            case 'disabled':
-                if ($value == 1 || $value == 'yes') {
-                    $where .= ' AND `I`.`disabled` = 1 AND `I`.`deleted` = 0';
-                    $disabled_filter = 1;
-                }
-                break;
-            case 'ifSpeed':
-                if (is_numeric($value)) {
-                    $where .= " AND I.$var = ?";
-                    $param[] = $value;
-                }
-                break;
-            case 'ifType':
-                $where .= " AND I.$var = ?";
-                $param[] = $value;
-                break;
-            case 'ifAlias':
-            case 'port_descr_type':
-                $where .= " AND I.$var LIKE ?";
-                $param[] = '%' . $value . '%';
-                break;
-            case 'errors':
-                if ($value == 1 || $value == 'yes') {
-                    $where .= " AND (I.`ifInErrors_delta` > '0' OR I.`ifOutErrors_delta` > '0')";
-                }
-                break;
-            case 'state':
-                if ($value == 'down') {
-                    $where .= ' AND I.ifAdminStatus = ? AND I.ifOperStatus = ?';
-                    $param[] = 'up';
-                    $param[] = 'down';
-                } elseif ($value == 'up') {
-                    $where .= ' AND I.ifAdminStatus = ? AND I.ifOperStatus = ?';
-                    $param[] = 'up';
-                    $param[] = 'up';
-                } elseif ($value == 'admindown') {
-                    $where .= ' AND I.ifAdminStatus = ? AND D.ignore = 0';
-                    $param[] = 'down';
-                }
-                break;
-            case 'group':
-                $where .= ' AND port_id IN (SELECT `port_id` FROM `port_group_port` WHERE `port_group_id` = ?)';
-                $param[] = $vars['group'];
-                break;
-        }
-    }
-}
-
-if ($ignore_filter == 0 && $disabled_filter == 0) {
-    $where .= ' AND `I`.`ignore` = 0 AND `I`.`disabled` = 0 AND `I`.`deleted` = 0';
-}
-
-$query = 'SELECT * FROM `ports` AS I, `devices` AS D LEFT JOIN `locations` AS L ON D.location_id = L.id WHERE I.device_id = D.device_id' . $where;
-
-// only grab list of ports for graph pages, table uses ajax
-$ports = array_map(fn ($value) => (array) $value, DB::select($query, $param));
+$ports = Port::hasAccess(request()->user())
+    ->with(['device', 'device.location'])
+    ->isValid()
+    ->when(request()->array('filter'), fn(Builder $query, $filters) => $query->applyFilters($filters))
+    ->leftJoin('devices', 'ports.device_id', 'devices.device_id')
+    ->orderBy('hostname')
+    ->orderBy('ifIndex')
+    ->get(['ports.*']);
 
 $ports = match ($vars['sort'] ?? '') {
-    'traffic' => collect($ports)->sortBy('ifOctets_rate', descending: true),
-    'traffic_in' => collect($ports)->sortBy('ifInOctets_rate', descending: true),
-    'traffic_out' => collect($ports)->sortBy('ifOutOctets_rate', descending: true),
-    'packets' => collect($ports)->sortBy('ifUcastPkts_rate', descending: true),
-    'packets_in' => collect($ports)->sortBy('ifInUcastOctets_rate', descending: true),
-    'packets_out' => collect($ports)->sortBy('ifOutUcastOctets_rate', descending: true),
-    'errors' => collect($ports)->sortBy('ifErrors_rate', descending: true),
-    'speed' => collect($ports)->sortBy('ifSpeed', descending: true),
-    'port' => collect($ports)->sortBy('ifDescr'),
-    'media' => collect($ports)->sortBy('ifType'),
-    'descr' => collect($ports)->sortBy('ifAlias'),
-    default => collect($ports)->sortBy('hostname'),
+    'traffic' => $ports->sortBy('ifOctets_rate', descending: true),
+    'traffic_in' => $ports->sortBy('ifInOctets_rate', descending: true),
+    'traffic_out' => $ports->sortBy('ifOutOctets_rate', descending: true),
+    'packets' => $ports->sortBy('ifUcastPkts_rate', descending: true),
+    'packets_in' => $ports->sortBy('ifInUcastOctets_rate', descending: true),
+    'packets_out' => $ports->sortBy('ifOutUcastOctets_rate', descending: true),
+    'errors' => $ports->sortBy('ifErrors_rate', descending: true),
+    'speed' => $ports->sortBy('ifSpeed', descending: true),
+    'port' => $ports->sortBy('ifDescr'),
+    'media' => $ports->sortBy('ifType'),
+    'descr' => $ports->sortBy('ifAlias'),
+    default => $ports,
 };
 
 foreach ($ports as $port) {
-    $speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 0, 'bps');
-    $type = \LibreNMS\Util\Rewrite::normalizeIfType($port['ifType']);
+    $graph_type = 'port_' . $subformat;
 
-    $port['in_rate'] = \LibreNMS\Util\Number::formatSi($port['ifInOctets_rate'] * 8, 2, 0, 'bps');
-    $port['out_rate'] = \LibreNMS\Util\Number::formatSi($port['ifOutOctets_rate'] * 8, 2, 0, 'bps');
-
-    if ($port['ifInErrors_delta'] > 0 || $port['ifOutErrors_delta'] > 0) {
-        $error_img = generate_port_link($port, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'errors');
+    if (session('widescreen')) {
+        $width = 357;
+        $width_div = 438;
     } else {
-        $error_img = '';
+        $width = 315;
+        $width_div = 393;
     }
 
-    if (port_permitted($port['port_id'], $port['device_id'])) {
-        $port = cleanPort($port, $device ?? null);
+    $graph_array = [
+        'height' => 100,
+        'width' => $width,
+        'id' => $port->port_id,
+        'type' => $graph_type,
+        'from' => '-1d',
+        'legend' => 'no',
+        'title' => 'yes',
+    ];
 
-        $graph_type = 'port_' . $subformat;
+    $link = Url::graphPageUrl($graph_type, Arr::except($graph_array, ['height', 'width', 'legend', 'title']));
+    $graph = Url::lazyGraphTag($graph_array);
 
-        if (session('widescreen')) {
-            $width = 357;
-        } else {
-            $width = 315;
-        }
-
-        if (session('widescreen')) {
-            $width_div = 438;
-        } else {
-            $width_div = 393;
-        }
-
-        $graph_array = [];
-        $graph_array['height'] = 100;
-        $graph_array['width'] = 210;
-        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
-        $graph_array['id'] = $port['port_id'];
-        $graph_array['type'] = $graph_type;
-        $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
-        $graph_array['legend'] = 'no';
-
-        $link_array = $graph_array;
-        $link_array['page'] = 'graphs';
-        unset($link_array['height'], $link_array['width'], $link_array['legend']);
-        $link = \LibreNMS\Util\Url::generate($link_array);
-        $overlib_content = generate_overlib_content($graph_array, $port['hostname'] . ' - ' . $port['label']);
-        $graph_array['title'] = 'yes';
-        $graph_array['width'] = $width;
-        $graph_array['height'] = 119;
-        $graph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
-
-        echo "<div class='graph-all-common' style='min-width: " . $width_div . 'px;max-width:' . $width_div . "px;'>";
-        echo \LibreNMS\Util\Url::overlibLink($link, $graph, $overlib_content);
-        echo '</div>';
-    }
+    echo "<div class='graph-all-common'>";
+    echo Url::portLink($port, $graph, $graph_type, url: $link);
+    echo '</div>';
 }
 
 echo '</div>';

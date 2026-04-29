@@ -16,7 +16,6 @@
 
 use App\Models\Port;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Blade;
 
 $pagetitle[] = 'Ports';
 
@@ -36,7 +35,7 @@ foreach ($menu_options as $option => $text) {
     if ($vars['format'] == 'list_' . $option) {
         $displayLists .= '<span class="pagemenu-selected">';
     }
-    $displayLists .= '<a href="' . request()->fullUrlWithQuery(['format' => 'list_' . $option]) . '">' . $text . '</a>';
+    $displayLists .= '<a href="' . request()->fullUrlWithQuery(['format' => 'list_' . $option]) . '" class="sync-url">' . $text . '</a>';
     if ($vars['format'] == 'list_' . $option) {
         $displayLists .= '</span>';
     }
@@ -55,7 +54,7 @@ foreach ($menu_options as $option => $text) {
     if ($vars['format'] == 'graph_' . $option) {
         $displayLists .= '<span class="pagemenu-selected">';
     }
-    $displayLists .= '<a href="' . request()->fullUrlWithQuery(['format' => 'graph_' . $option]) . '">' . $text . '</a>';
+    $displayLists .= '<a href="' . request()->fullUrlWithQuery(['format' => 'graph_' . $option]) . '" class="sync-url">' . $text . '</a>';
     if ($vars['format'] == 'graph_' . $option) {
         $displayLists .= '</span>';
     }
@@ -69,110 +68,107 @@ $displayLists .= '<div style="float: right;">';
 
 $hideSearch = isset($vars['searchbar']) && $vars['searchbar'] == 'hide';
 if ($hideSearch) {
-    $displayLists .= '<a href="' . request()->fullUrlWithoutQuery('searchbar') . '">Search</a>';
+    $displayLists .= '<a href="' . request()->fullUrlWithoutQuery('searchbar') . '" class="sync-url">Search</a>';
 } else {
-    $displayLists .= '<a href="' . request()->fullUrlWithQuery(['searchbar' => 'hide']) . '">Search</a>';
+    $displayLists .= '<a href="' . request()->fullUrlWithQuery(['searchbar' => 'hide']) . '" class="sync-url">Search</a>';
 }
 
 $displayLists .= ' | ';
 
 if (isset($vars['bare']) && $vars['bare'] == 'yes') {
-    $displayLists .= '<a href="' . request()->fullUrlWithoutQuery('bare') . '">Header</a>';
+    $displayLists .= '<a href="' . request()->fullUrlWithoutQuery('bare') . '" class="sync-url">Header</a>';
 } else {
-    $displayLists .= '<a href="' . request()->fullUrlWithQuery(['bare' => 'yes']) . '">Header</a>';
+    $displayLists .= '<a href="' . request()->fullUrlWithQuery(['bare' => 'yes']) . '" class="sync-url">Header</a>';
 }
 
 $displayLists .= ' | ';
 $displayLists .= '<span style="font-weight: bold;">Bulk actions</span> &#187';
 
-$displayLists .= '<a href="ports/deleted=1/purge=all" title="Delete ports"> Purge all deleted</a>';
+$displayLists .= '<a href="' . request()->fullUrlWithQuery(['filter' => ['deleted' => 1], 'purge' => 'all']) . '" class="sync-url" title="Delete ports"> Purge all deleted</a>';
 
 $displayLists .= '</div>';
 
-echo Blade::render('<template id="port-filter-template"><x-filter :fields="$fields" id="port-filter" :hide="$hide"/></template>', [
-    'hide' => $hideSearch,
-    'fields' => [
-        [
-            'key' => 'device_id',
-            'label' => __('Device'),
-            'type' => 'select',
-            'endpoint' => route('ajax.select.device'),
-        ],
-        [
-            'key' => 'device.location_id',
-            'label' => __('Location'),
-            'type' => 'select',
-            'endpoint' => route('ajax.select.location'),
-        ],
-        [
-            'key' => 'search',
-            'label' => 'Description',
-            'type' => 'text',
-        ],
-        [
-            'key' => 'state',
-            'label' => 'Oper Status',
-            'type' => 'select',
-            'options' => [
-                'up',
-                'down',
-                'shutdown'
-            ],
-        ],
-        [
-            'key' => 'ifSpeed',
-            'label' => 'Speed',
-            'type' => 'select',
-            'endpoint' => route('ajax.select.port-field'),
-            'params' => [
-                'field' => 'ifSpeed',
-            ],
-        ],
-        [
-            'key' => 'ifType',
-            'label' => 'Media',
-            'type' => 'select',
-            'endpoint' => route('ajax.select.port-field'),
-            'params' => [
-                'field' => 'ifType',
-            ],
-        ],
-        [
-            'key' => 'ifDuplex',
-            'label' => 'Duplex',
-            'type' => 'select',
-            'options' => [
-                'fullDuplex' => 'Full',
-                'halfDuplex' => 'Half',
-                'unknown' => 'unknown',
-            ],
-        ],
-        [
-            'key' => 'port_type',
-            'label' => 'Port Type',
-            'type' => 'select',
-            'endpoint' => route('ajax.select.port-field'),
-            'params' => [
-                'field' => 'port_descr_type',
-            ],
-        ],
-        [
-            'key' => 'ignore',
-            'label' => 'Ignored',
-            'type' => 'boolean',
-        ],
-        [
-            'key' => 'disabled',
-            'label' => 'Disabled',
-            'type' => 'boolean',
-        ],
-        [
-            'key' => 'deleted',
-            'label' => 'Deleted',
-            'type' => 'boolean',
+$filterFields = [
+    [
+        'key' => 'device_id',
+        'label' => __('Device'),
+        'type' => 'select',
+        'endpoint' => route('ajax.select.device'),
+    ],
+    [
+        'key' => 'device.location_id',
+        'label' => __('Location'),
+        'type' => 'select',
+        'endpoint' => route('ajax.select.location'),
+    ],
+    [
+        'key' => 'search',
+        'label' => 'Description',
+        'type' => 'text',
+    ],
+    [
+        'key' => 'state',
+        'label' => 'Oper Status',
+        'type' => 'select',
+        'options' => [
+            'up',
+            'down',
+            'shutdown'
         ],
     ],
-]);
+    [
+        'key' => 'ifSpeed',
+        'label' => 'Speed',
+        'type' => 'select',
+        'endpoint' => route('ajax.select.port-field'),
+        'params' => [
+            'field' => 'ifSpeed',
+        ],
+    ],
+    [
+        'key' => 'ifType',
+        'label' => 'Media',
+        'type' => 'select',
+        'endpoint' => route('ajax.select.port-field'),
+        'params' => [
+            'field' => 'ifType',
+        ],
+    ],
+    [
+        'key' => 'ifDuplex',
+        'label' => 'Duplex',
+        'type' => 'select',
+        'options' => [
+            'fullDuplex' => 'Full',
+            'halfDuplex' => 'Half',
+            'unknown' => 'unknown',
+        ],
+    ],
+    [
+        'key' => 'port_type',
+        'label' => 'Port Type',
+        'type' => 'select',
+        'endpoint' => route('ajax.select.port-field'),
+        'params' => [
+            'field' => 'port_descr_type',
+        ],
+    ],
+    [
+        'key' => 'ignore',
+        'label' => 'Ignored',
+        'type' => 'boolean',
+    ],
+    [
+        'key' => 'disabled',
+        'label' => 'Disabled',
+        'type' => 'boolean',
+    ],
+    [
+        'key' => 'deleted',
+        'label' => 'Deleted',
+        'type' => 'boolean',
+    ],
+];
 
 if (isset($vars['purge'])) {
     if ($vars['purge'] === 'all') {
@@ -197,3 +193,25 @@ if (isset($vars['purge'])) {
 if (file_exists('includes/html/pages/ports/' . $format . '.inc.php')) {
     require 'includes/html/pages/ports/' . $format . '.inc.php';
 }
+echo <<<'HTML'
+<script>
+$(window).on('filter:apply', function (event) {
+    const serializedFilter = $.param({ filter: event.originalEvent.detail.formatted });
+
+    // update navigation links
+    $('a.sync-url').each(function () {
+        const url = new URL($(this).attr('href'), window.location.origin);
+
+        // Remove existing filter keys
+        [...url.searchParams.keys()]
+            .filter(key => key.startsWith('filter'))
+            .forEach(key => url.searchParams.delete(key));
+
+        // Build new href, appending new filter params
+        const base = url.origin + url.pathname;
+        const existing = url.searchParams.toString();
+        $(this).attr('href', `${base}?${existing}${existing ? '&' : ''}${serializedFilter}`);
+    });
+});
+</script>
+HTML;

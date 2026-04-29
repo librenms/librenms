@@ -13,6 +13,9 @@
  * @author     LibreNMS Contributors
 */
 
+/** @var bool $hideSearch */
+/** @var array $filterFields */
+
 $details_visible = var_export($vars['format'] == 'list_detail', 1);
 $errors_visible = var_export($vars['format'] == 'list_detail' || isset($vars['errors']), 1);
 $no_refresh = true;
@@ -28,6 +31,11 @@ if (isset($vars['errors'])) {
     $error_sort = '';
     $sort = ' data-order="asc"';
 }
+
+echo Blade::render('<template id="port-filter-template"><x-filter :fields="$fields" id="port-filter" :hide="$hide"/></template>', [
+    'hide' => $hideSearch,
+    'fields' => $filterFields,
+]);
 ?>
 <div class="panel panel-default panel-condensed">
     <div class="panel-heading">

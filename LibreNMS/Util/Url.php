@@ -154,18 +154,10 @@ class Url
         return $link;
     }
 
-    /**
-     * @param  Port  $port
-     * @param  string  $text
-     * @param  string  $type
-     * @param  bool  $overlib
-     * @param  bool  $single_graph
-     * @return mixed|string
-     */
-    public static function portLink($port, $text = null, $type = null, $overlib = true, $single_graph = false)
+    public static function portLink(?Port $port, ?string $text = null, ?string $type = null, bool $overlib = true, bool $single_graph = false, ?string $url = null): string
     {
         if ($port === null) {
-            return $text;
+            return (string) $text;
         }
 
         $label = Rewrite::normalizeIfName($port->getLabel());
@@ -205,7 +197,7 @@ class Url
         if (! $overlib) {
             return $content;
         } elseif (Gate::allows('view', $port)) {
-            return self::overlibLink(self::portUrl($port), $text, $content, self::portLinkDisplayClass($port));
+            return self::overlibLink($url ?? self::portUrl($port), $text, $content, self::portLinkDisplayClass($port));
         }
 
         return Rewrite::normalizeIfName($text);
@@ -375,7 +367,7 @@ class Url
 
     public static function graphPageUrl(string $type, array $args = []): string
     {
-        return url('graphs', ['type' => $type, ...$args]);
+        return url()->query('graphs', ['type' => $type, ...$args]);
     }
 
     /**
