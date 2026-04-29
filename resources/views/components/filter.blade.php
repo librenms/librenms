@@ -1,7 +1,10 @@
-@props(['fields' => []])
+@props([
+    'fields' => [],
+    'reload' => false,
+])
 
 <div {{ $attributes->merge(['class' => 'tw:relative tw:flex tw:items-center tw:text-[13px] tw:max-w-full']) }}
-     x-data="filterBarComponent({ fields: @js($fields) })"
+     x-data="filterBarComponent({ fields: @js($fields), reload: @js($reload) })"
      @click.outside="close()"
      @keydown.escape.window="close()">
 

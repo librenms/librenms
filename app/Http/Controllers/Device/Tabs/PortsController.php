@@ -107,6 +107,7 @@ class PortsController implements DeviceTab
         return array_merge([
             'tab' => $tab,
             'details' => $this->detail,
+            'filterFields' => $this->filterFields(),
             'submenu' => [
                 $this->getTabs($device),
                 __('Graphs') => $this->getGraphLinks(),
@@ -408,6 +409,7 @@ class PortsController implements DeviceTab
         return Port::where('device_id', $device->device_id)
             ->isNotDeleted()
             ->hasAccess(Auth::user())->with($relationships)
+            ->when($request->array('filter'), fn (Builder $q, $filters) => $q->applyFilters($filters))
             ->when(! $this->settings['disabled'], fn (Builder $q, $disabled) => $q->where('disabled', 0))
             ->when(! $this->settings['ignored'], fn (Builder $q, $disabled) => $q->where('ignore', 0))
             ->when($this->settings['admin'] != 'any', fn (Builder $q, $admin) => $q->where('ifAdminStatus', $this->settings['admin']))
@@ -471,6 +473,65 @@ class PortsController implements DeviceTab
                 'url' => $request->fullUrlWithQuery(['ignored' => ! $ignored]),
                 'title' => __('port.filters.ignored'),
                 'external' => false,
+            ],
+        ];
+    }
+
+    private function filterFields()
+    {
+        return [
+            [
+                'key' => 'search',
+                'label' => 'Description',
+                'type' => 'text',
+            ],
+            [
+                'key' => 'state',
+                'label' => 'Oper Status',
+                'type' => 'select',
+                'options' => ['up', 'down', 'shutdown'],
+            ],
+            [
+                'key' => 'speed',
+                'label' => 'Speed',
+                'type' => 'select',
+                'endpoint' => route('ajax.select.port-field'),
+                'params' => [
+                    'field' => 'ifSpeed',
+                ],
+            ],
+            [
+                'key' => 'media',
+                'label' => 'Media',
+                'type' => 'select',
+                'endpoint' => route('ajax.select.port-field'),
+                'params' => [
+                    'field' => 'ifType',
+                ],
+            ],
+            [
+                'key' => 'port_type',
+                'label' => 'Port Type',
+                'type' => 'select',
+                'endpoint' => route('ajax.select.port-field'),
+                'params' => [
+                    'field' => 'port_descr_type',
+                ],
+            ],
+            [
+                'key' => 'ignore',
+                'label' => 'Ignored',
+                'type' => 'boolean',
+            ],
+            [
+                'key' => 'disabled',
+                'label' => 'Disabled',
+                'type' => 'boolean',
+            ],
+            [
+                'key' => 'deleted',
+                'label' => 'Deleted',
+                'type' => 'boolean',
             ],
         ];
     }

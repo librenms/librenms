@@ -1,6 +1,7 @@
-export default function filterBarComponent({ fields }) {
+export default function filterBarComponent({ fields, reload = false }) {
     return {
         fields,
+        reload,
         filters: [],
         showAdd: false,
         dialog: false,
@@ -233,10 +234,16 @@ export default function filterBarComponent({ fields }) {
             });
             window.history.pushState({}, "", url);
 
-            this.$dispatch("filter:apply", {
-                filters: this.filters,
-                formatted: formatted,
-            });
+            if (this.reload) {
+                window.location.href = url.href;
+            } else {
+                window.history.pushState({}, "", url);
+
+                this.$dispatch("filter:apply", {
+                    filters: this.filters,
+                    formatted: formatted,
+                });
+            }
         },
 
         restoreFromUrl() {
