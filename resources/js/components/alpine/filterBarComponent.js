@@ -37,7 +37,6 @@ export default function filterBarComponent({ fields }) {
             ],
             boolean: [
                 { v: "eq", s: "is", l: "Is" },
-                { v: "neq", s: "is not", l: "Is Not" },
             ],
             date: [
                 { v: "on", s: "=", l: "On Date" },
