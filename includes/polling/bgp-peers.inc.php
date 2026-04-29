@@ -533,8 +533,8 @@ if (! empty($peers)) {
                     }
                 } else {
                     $peer_data['bgpPeerIface'] = null;
-                    }
-              }
+                }
+            }
         } catch (InvalidIpException) {
             // ignore
         }
