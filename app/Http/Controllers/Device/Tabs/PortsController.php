@@ -477,7 +477,7 @@ class PortsController implements DeviceTab
         ];
     }
 
-    private function filterFields()
+    private function filterFields(int $device_id): array
     {
         return [
             [
@@ -498,6 +498,7 @@ class PortsController implements DeviceTab
                 'endpoint' => route('ajax.select.port-field'),
                 'params' => [
                     'field' => 'ifSpeed',
+                    'device' => $device_id,
                 ],
             ],
             [
@@ -507,6 +508,7 @@ class PortsController implements DeviceTab
                 'endpoint' => route('ajax.select.port-field'),
                 'params' => [
                     'field' => 'ifType',
+                    'device' => $device_id,
                 ],
             ],
             [
@@ -516,6 +518,7 @@ class PortsController implements DeviceTab
                 'endpoint' => route('ajax.select.port-field'),
                 'params' => [
                     'field' => 'port_descr_type',
+                    'device' => $device_id,
                 ],
             ],
             [
