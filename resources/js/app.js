@@ -13,7 +13,7 @@ import { GridStack } from 'gridstack';
 window.GridStack = GridStack;
 
 import Vue from "vue";
-import {i18n} from "./plugins/i18n.js"; // translation
+import { i18n } from "./plugins/i18n.js"; // translation
 import ToggleButton from "vue-js-toggle-button";
 import VTooltip from "v-tooltip";
 import vSelect from "vue-select";
@@ -25,7 +25,8 @@ import Alpine from "alpinejs";
 // import popup from './components/alpine/popup.js'
 import popup from "./components/alpine/oldpopup.js";
 import deviceLink from "./components/alpine/deviceLink.js";
-import LibreNMSDate from './datetime.js';
+import filterBarComponent from "./components/alpine/filterBarComponent.js";
+import LibreNMSDate from "./datetime.js";
 
 window.LibreNMS = window.LibreNMS || {};
 window.LibreNMS.Date = LibreNMSDate;
@@ -80,6 +81,7 @@ const app = new Vue({
 
 Alpine.data('popup', popup);
 Alpine.data('deviceLink', deviceLink);
+Alpine.data("filterBarComponent", filterBarComponent);
 
 window.Alpine = Alpine;
 Alpine.start();
