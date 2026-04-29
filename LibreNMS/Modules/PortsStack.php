@@ -70,80 +70,52 @@ class PortsStack implements Module
      */
     public function discover(OS $os): void
     {
+        $device = $os->getDevice();
         $data = \SnmpQuery::enumStrings()->walk('IF-MIB::ifStackStatus');
 
         if ($data->isValid()) {
-            $portStacks = $data->mapTable(function ($data, $lowIfIndex, $highIfIndex = null) use ($os) {
+            $portStacks = $data->mapTable(function ($data, $lowIfIndex, $highIfIndex = null) use ($device) {
                 if ($highIfIndex === null) {
                     Log::debug('Skipping ' . $lowIfIndex . ' due to bad table index from the device');
 
                     return null;
                 }
-
                 if ($lowIfIndex == '0' || $highIfIndex == '0') {
                     return null;  // we don't care about the default entries for ports that have stacking enabled
                 }
 
                 return new PortStack([
                     'high_ifIndex' => $highIfIndex,
-                    'high_port_id' => PortCache::getIdFromIfIndex($highIfIndex, $os->getDevice()),
+                    'high_port_id' => PortCache::getIdFromIfIndex($highIfIndex, $device),
                     'low_ifIndex' => $lowIfIndex,
-                    'low_port_id' => PortCache::getIdFromIfIndex($lowIfIndex, $os->getDevice()),
+                    'low_port_id' => PortCache::getIdFromIfIndex($lowIfIndex, $device),
                     'ifStackStatus' => $data['IF-MIB::ifStackStatus'],
                 ]);
             });
         } else {
-            // IF-MIB::ifStackTable is the standard mechanism for discovering port-channel
-            // (link-aggregation) topology, but some platforms - notably Cisco NX-OS - do not
-            // expose it. For those, fall back to the IEEE 802.3ad LAG-MIB, which NX-OS and
-            // most other modern switches do implement. dot3adAggPortSelectedAggID returns the
-            // ifIndex of the aggregator each member port is configured to join (0 = not a
-            // member), which gives us the same parent/child relationship ifStackTable would.
-            $portStacks = $this->discoverFromLagMib($os);
-
-            if ($portStacks === null) {
+            // Fall back to IEEE 802.3ad LAG-MIB; ifStackTable is not implemented on some platforms (e.g. Cisco NX-OS).
+            $data = \SnmpQuery::walk('IEEE8023-LAG-MIB::dot3adAggPortSelectedAggID');
+            if (! $data->isValid()) {
                 return;
             }
+            $portStacks = $data->mapTable(function ($row, $memberIfIndex) use ($device) {
+                $aggregator = (int) ($row['IEEE8023-LAG-MIB::dot3adAggPortSelectedAggID'] ?? 0);
+                if ($aggregator === 0) {
+                    return null;
+                }
+
+                return new PortStack([
+                    'high_ifIndex' => $aggregator,
+                    'high_port_id' => PortCache::getIdFromIfIndex($aggregator, $device),
+                    'low_ifIndex' => $memberIfIndex,
+                    'low_port_id' => PortCache::getIdFromIfIndex($memberIfIndex, $device),
+                    'ifStackStatus' => 'active',
+                ]);
+            });
         }
 
         ModuleModelObserver::observe(PortStack::class);
-        $this->syncModels($os->getDevice(), 'portsStack', $portStacks->filter());
-    }
-
-    /**
-     * Build PortStack models from IEEE8023-LAG-MIB::dot3adAggPortTable.
-     *
-     * Used as a fallback for devices that do not implement IF-MIB::ifStackTable.
-     * Each entry's index is the member port ifIndex; the value is the ifIndex of
-     * the aggregator (port-channel) the member is configured to join. Returns
-     * null when the device exposes neither MIB so the caller can leave any
-     * existing ports_stack rows untouched.
-     *
-     * @return \Illuminate\Support\Collection<int, PortStack>|null
-     */
-    private function discoverFromLagMib(OS $os): ?\Illuminate\Support\Collection
-    {
-        $data = \SnmpQuery::walk('IEEE8023-LAG-MIB::dot3adAggPortSelectedAggID');
-
-        if (! $data->isValid()) {
-            return null;
-        }
-
-        return $data->mapTable(function ($row, $memberIfIndex) use ($os) {
-            $aggregatorIfIndex = (int) ($row['IEEE8023-LAG-MIB::dot3adAggPortSelectedAggID'] ?? 0);
-
-            if ($aggregatorIfIndex === 0) {
-                return null;  // port is not configured as a member of any aggregator
-            }
-
-            return new PortStack([
-                'high_ifIndex' => $aggregatorIfIndex,
-                'high_port_id' => PortCache::getIdFromIfIndex($aggregatorIfIndex, $os->getDevice()),
-                'low_ifIndex' => $memberIfIndex,
-                'low_port_id' => PortCache::getIdFromIfIndex($memberIfIndex, $os->getDevice()),
-                'ifStackStatus' => 'active',
-            ]);
-        });
+        $this->syncModels($device, 'portsStack', $portStacks->filter());
     }
 
     /**
