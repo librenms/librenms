@@ -3917,15 +3917,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbSyncRelationship\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: includes/html/api_functions.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbUpdate\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
 			'''
