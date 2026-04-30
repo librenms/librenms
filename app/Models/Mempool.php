@@ -36,9 +36,6 @@ class Mempool extends DeviceRelatedModel implements Keyable
         'mempool_largestfree',
         'mempool_lowestfree',
     ];
-    protected $attributes = [
-        'mempool_precision' => 1,
-    ];
 
     public function __construct(array $attributes = [])
     {

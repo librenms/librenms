@@ -32,11 +32,6 @@ class User extends Authenticatable
     protected $primaryKey = 'user_id';
     protected $fillable = ['realname', 'username', 'email', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id', 'enabled'];
     protected $hidden = ['password', 'remember_token', 'pivot'];
-    protected $attributes = [ // default values
-        'descr' => '',
-        'realname' => '',
-        'email' => '',
-    ];
     protected $dispatchesEvents = [
         'created' => UserCreated::class,
     ];

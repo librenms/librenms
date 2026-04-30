@@ -21,9 +21,6 @@ class Sla extends DeviceRelatedModel implements Keyable
         'opstatus',
         'deleted',
     ];
-    protected $attributes = [ // default values
-        'deleted' => 0,
-    ];
 
     public function getCompositeKey(): string
     {

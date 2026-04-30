@@ -53,11 +53,6 @@ class ServiceTemplate extends BaseModel
         'name',
     ];
 
-    protected $attributes = [ // default values
-        'ignore' => '0',
-        'disabled' => '0',
-    ];
-
     public static function boot()
     {
         parent::boot();
