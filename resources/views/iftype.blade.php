@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container-fluid">
-    <x-graph-row type="multiport_bits_separate" :port=$allPortIds columns="responsive">
+    <x-graph-row type="multiport_bits_separate" :port="$ports->pluck('port_id')->toArray()" columns="responsive">
         <x-slot name="title">
             <div class="row">
                 <div class=col-md-12><span class=list-large>Total Graph for ports of type : {{implode(' + ', $types)}}</span></div>
