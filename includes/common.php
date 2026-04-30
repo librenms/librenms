@@ -130,11 +130,6 @@ function print_message($text)
     }
 }
 
-function get_sensor_rrd($device, $sensor)
-{
-    return Rrd::name($device['hostname'], get_sensor_rrd_name($device, $sensor));
-}
-
 function get_sensor_rrd_name($device, $sensor)
 {
     // For IPMI, sensors tend to change order, and there is no index, so we prefer to use the description as key here.
@@ -150,44 +145,18 @@ function get_port_rrdfile_path($hostname, $port_id, $suffix = '')
     return Rrd::name($hostname, Rrd::portName($port_id, $suffix));
 }
 
-function get_port_by_id($port_id): array|false
-{
-    if (is_numeric($port_id)) {
-        $port = PortCache::get($port_id);
-        if ($port !== null) {
-            return $port->toArray();
-        }
-    }
-
-    return false;
-}
-
 function ifclass($ifOperStatus, $ifAdminStatus)
 {
     // fake a port model
-    return \LibreNMS\Util\Url::portLinkDisplayClass((object) ['ifOperStatus' => $ifOperStatus, 'ifAdminStatus' => $ifAdminStatus]);
+    return \LibreNMS\Util\Url::portLinkDisplayClass((object) [
+        'ifOperStatus' => $ifOperStatus instanceof \LibreNMS\Enum\IfOperStatus ? $ifOperStatus : \LibreNMS\Enum\IfOperStatus::tryFrom($ifOperStatus),
+        'ifAdminStatus' => $ifAdminStatus instanceof \LibreNMS\Enum\IfOperStatus ? $ifAdminStatus : \LibreNMS\Enum\IfOperStatus::tryFrom($ifAdminStatus),
+    ]);
 }
 
-function device_by_name($name)
+function device_by_id_cache($device_id)
 {
-    return device_by_id_cache(getidbyname($name));
-}
-
-function device_by_id_cache($device_id, $refresh = false)
-{
-    $model = $refresh ? DeviceCache::refresh((int) $device_id) : DeviceCache::get((int) $device_id);
-
-    $device = $model->toArray();
-    $device['location'] = $model->location->location ?? null;
-    $device['lat'] = $model->location->lat ?? null;
-    $device['lng'] = $model->location->lng ?? null;
-
-    return $device;
-}
-
-function gethostbyid($device_id)
-{
-    return DeviceCache::get((int) $device_id)->hostname;
+    return DeviceCache::get((int) $device_id)->toArray();
 }
 
 function getidbyname($hostname)
@@ -203,11 +172,6 @@ function set_dev_attrib($device, $attrib_type, $attrib_value)
 function get_dev_attrib($device, $attrib_type)
 {
     return DeviceCache::get((int) $device['device_id'])->getAttrib($attrib_type);
-}
-
-function del_dev_attrib($device, $attrib_type)
-{
-    return DeviceCache::get((int) $device['device_id'])->forgetAttrib($attrib_type);
 }
 
 /**

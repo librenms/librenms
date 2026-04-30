@@ -8871,7 +8871,7 @@
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "FS",
                     "entPhysicalMfgDate": null,
-                    "ifIndex": 10262
+                    "ifIndex": 10254
                 },
                 {
                     "entPhysicalIndex": 10023,
@@ -8891,7 +8891,7 @@
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "FS",
                     "entPhysicalMfgDate": null,
-                    "ifIndex": 10041
+                    "ifIndex": 10033
                 },
                 {
                     "entPhysicalIndex": 10024,
@@ -8911,7 +8911,7 @@
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "FS",
                     "entPhysicalMfgDate": null,
-                    "ifIndex": 10049
+                    "ifIndex": 10041
                 },
                 {
                     "entPhysicalIndex": 10029,
@@ -8931,7 +8931,7 @@
                     "entPhysicalParentRelPos": 29,
                     "entPhysicalMfgName": "FS",
                     "entPhysicalMfgDate": null,
-                    "ifIndex": 10089
+                    "ifIndex": 10081
                 },
                 {
                     "entPhysicalIndex": 10030,
@@ -8951,7 +8951,7 @@
                     "entPhysicalParentRelPos": 30,
                     "entPhysicalMfgName": "FS",
                     "entPhysicalMfgDate": null,
-                    "ifIndex": 10097
+                    "ifIndex": 10089
                 },
                 {
                     "entPhysicalIndex": 10031,
@@ -8971,7 +8971,7 @@
                     "entPhysicalParentRelPos": 31,
                     "entPhysicalMfgName": "FS",
                     "entPhysicalMfgDate": null,
-                    "ifIndex": 10105
+                    "ifIndex": 10097
                 },
                 {
                     "entPhysicalIndex": 10032,
@@ -8991,7 +8991,7 @@
                     "entPhysicalParentRelPos": 32,
                     "entPhysicalMfgName": "FS",
                     "entPhysicalMfgDate": null,
-                    "ifIndex": 10113
+                    "ifIndex": 10105
                 },
                 {
                     "entPhysicalIndex": 10035,
@@ -9011,7 +9011,7 @@
                     "entPhysicalParentRelPos": 35,
                     "entPhysicalMfgName": "FS",
                     "entPhysicalMfgDate": null,
-                    "ifIndex": null
+                    "ifIndex": 10129
                 },
                 {
                     "entPhysicalIndex": 10036,
@@ -9057,7 +9057,7 @@
                     "wavelength": null,
                     "connector": "MPO-12",
                     "channels": 4,
-                    "ifIndex": 10262
+                    "ifIndex": 10254
                 },
                 {
                     "index": "1.23",
@@ -9076,7 +9076,7 @@
                     "wavelength": null,
                     "connector": "MPO-12",
                     "channels": 4,
-                    "ifIndex": 10041
+                    "ifIndex": 10033
                 },
                 {
                     "index": "1.24",
@@ -9095,7 +9095,7 @@
                     "wavelength": null,
                     "connector": "MPO-12",
                     "channels": 4,
-                    "ifIndex": 10049
+                    "ifIndex": 10041
                 },
                 {
                     "index": "1.29",
@@ -9114,7 +9114,7 @@
                     "wavelength": null,
                     "connector": "LC",
                     "channels": 4,
-                    "ifIndex": 10089
+                    "ifIndex": 10081
                 },
                 {
                     "index": "1.30",
@@ -9133,7 +9133,7 @@
                     "wavelength": null,
                     "connector": "LC",
                     "channels": 4,
-                    "ifIndex": 10097
+                    "ifIndex": 10089
                 },
                 {
                     "index": "1.31",
@@ -9152,7 +9152,7 @@
                     "wavelength": null,
                     "connector": "LC",
                     "channels": 4,
-                    "ifIndex": 10105
+                    "ifIndex": 10097
                 },
                 {
                     "index": "1.32",
@@ -9171,7 +9171,7 @@
                     "wavelength": null,
                     "connector": "LC",
                     "channels": 4,
-                    "ifIndex": 10113
+                    "ifIndex": 10105
                 },
                 {
                     "index": "1.35",
@@ -9190,7 +9190,7 @@
                     "wavelength": null,
                     "connector": "MPO-12",
                     "channels": 4,
-                    "ifIndex": null
+                    "ifIndex": 10129
                 },
                 {
                     "index": "1.36",

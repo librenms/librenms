@@ -1,0 +1,1545 @@
+CUBO-MINI-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+         FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32
+        FROM SNMPv2-SMI
+    cmini-cube
+        FROM CUBO-MIB
+;
+
+cubo-mini MODULE-IDENTITY
+    LAST-UPDATED
+        "202502241608Z"
+    ORGANIZATION
+        "HUBER+SUHNER Cube Optics AG"
+    CONTACT-INFO
+        "HUBER+SUHNER Cube Optics
+        Customer Service
+        http://support.cubeoptics.com
+
+        Postal: Eindhoven-Allee 3
+                55129 Mainz
+                Germany
+        E-mail: cs.cubo@hubersuhner.com
+        Tel: +49-6131-4995-520"
+    DESCRIPTION
+        "This is the MIB module for objects used to manage the Cubo Mini device. "
+    REVISION
+        "202502241608Z"
+    DESCRIPTION
+        "Initial revision."
+::= { cmini-cube 241} --27894.11.241
+
+
+
+-- ----------------------------------------------------
+-- MIB Groups
+-- ----------------------------------------------------
+cubominiObjects OBJECT IDENTIFIER ::= {cubo-mini 1}  -- 27894.11.241.1
+cubominiTraps OBJECT IDENTIFIER ::= {cubo-mini 2}  -- 27894.11.241.2
+cubominiGeneralGroup OBJECT IDENTIFIER ::= {cubominiObjects 1}  -- 27894.11.241.1.1
+cubominiFanGroup OBJECT IDENTIFIER ::= {cubominiObjects 3}  -- 27894.11.241.1.3
+cubominiManagementGroup OBJECT IDENTIFIER ::= {cubominiObjects 4}  -- 27894.11.241.1.4
+cubominiNetworkIfGroup OBJECT IDENTIFIER ::= {cubominiObjects 5}  -- 27894.11.241.1.5
+cubominiXcvrGroup OBJECT IDENTIFIER ::= {cubominiObjects 9}  -- 27894.11.241.1.9
+cubominiNtpServerGroup OBJECT IDENTIFIER ::= {cubominiNetworkIfGroup 5}  -- 27894.11.241.1.5.5
+-- ----------------------------------------------------
+
+
+-- ----------------------------------------------------
+-- MIB Tables
+-- ----------------------------------------------------
+cubominiSystemDataTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CubominiSystemDataEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table with general information and configuration of the Chassis.
+"
+::= { cubominiGeneralGroup 1 } -- 27894.11.241.1.1.1
+
+cubominiSystemDataEntry OBJECT-TYPE
+    SYNTAX CubominiSystemDataEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis identifiers are used as table indexes."
+    INDEX
+        { cubominiSystemDataChassisId }
+::= { cubominiSystemDataTable 1 }
+
+CubominiSystemDataEntry ::= SEQUENCE {
+    cubominiSystemDataChassisId Integer32,
+    cubominiSystemDataSerialNumber OCTET STRING,
+    cubominiSystemDataDeviceName OCTET STRING,
+    cubominiSystemDataSwVersion OCTET STRING,
+    cubominiSystemDataFwVersion OCTET STRING,
+    cubominiSystemDataHwVersion OCTET STRING
+}
+
+cubominiSystemDataChassisId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis number."
+::= { cubominiSystemDataEntry 1 }
+
+cubominiSystemDataSerialNumber OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The serial number of the device."
+::= { cubominiSystemDataEntry 2 }
+
+cubominiSystemDataDeviceName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(255))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The device name."
+::= { cubominiSystemDataEntry 3 }
+
+cubominiSystemDataSwVersion OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The software version of the device."
+::= { cubominiSystemDataEntry 4 }
+
+cubominiSystemDataFwVersion OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The firmware version of the device."
+::= { cubominiSystemDataEntry 5 }
+
+cubominiSystemDataHwVersion OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The hardware version of the device."
+::= { cubominiSystemDataEntry 6 }
+
+
+
+-- ----------------------------------------------------
+cubominiSnmpManagersTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CubominiSnmpManagersEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table with information about the SNMP trap managers.
+"
+::= { cubominiManagementGroup 1 } -- 27894.11.241.1.4.1
+
+cubominiSnmpManagersEntry OBJECT-TYPE
+    SYNTAX CubominiSnmpManagersEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis, snmpIndex identifiers are used as table indexes."
+    INDEX
+        { cubominiSnmpManagersChassisId, cubominiSnmpManagersSnmpindexId }
+::= { cubominiSnmpManagersTable 1 }
+
+CubominiSnmpManagersEntry ::= SEQUENCE {
+    cubominiSnmpManagersChassisId Integer32,
+    cubominiSnmpManagersSnmpindexId Integer32,
+    cubominiSnmpManagersIp OCTET STRING
+}
+
+cubominiSnmpManagersChassisId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis number."
+::= { cubominiSnmpManagersEntry 1 }
+
+cubominiSnmpManagersSnmpindexId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The snmpIndex number."
+::= { cubominiSnmpManagersEntry 2 }
+
+cubominiSnmpManagersIp OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(15))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP address of the SNMP manager."
+::= { cubominiSnmpManagersEntry 3 }
+
+
+
+-- ----------------------------------------------------
+cubominiEmsManagersTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CubominiEmsManagersEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table with information about the EMS trap managers.
+"
+::= { cubominiManagementGroup 2 } -- 27894.11.241.1.4.2
+
+cubominiEmsManagersEntry OBJECT-TYPE
+    SYNTAX CubominiEmsManagersEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis, emsIndex identifiers are used as table indexes."
+    INDEX
+        { cubominiEmsManagersChassisId, cubominiEmsManagersEmsindexId }
+::= { cubominiEmsManagersTable 1 }
+
+CubominiEmsManagersEntry ::= SEQUENCE {
+    cubominiEmsManagersChassisId Integer32,
+    cubominiEmsManagersEmsindexId Integer32,
+    cubominiEmsManagersIp OCTET STRING
+}
+
+cubominiEmsManagersChassisId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis number."
+::= { cubominiEmsManagersEntry 1 }
+
+cubominiEmsManagersEmsindexId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The emsIndex number."
+::= { cubominiEmsManagersEntry 2 }
+
+cubominiEmsManagersIp OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(15))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP address of the EMS manager."
+::= { cubominiEmsManagersEntry 3 }
+
+
+
+-- ----------------------------------------------------
+cubominiNetworkIfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CubominiNetworkIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table with the configuration IP addresses for the network connections.
+"
+::= { cubominiNetworkIfGroup 1 } -- 27894.11.241.1.5.1
+
+cubominiNetworkIfEntry OBJECT-TYPE
+    SYNTAX CubominiNetworkIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis, netIndex identifiers are used as table indexes."
+    INDEX
+        { cubominiNetworkIfChassisId, cubominiNetworkIfNetindexId }
+::= { cubominiNetworkIfTable 1 }
+
+CubominiNetworkIfEntry ::= SEQUENCE {
+    cubominiNetworkIfChassisId Integer32,
+    cubominiNetworkIfNetindexId Integer32,
+    cubominiNetworkIfIPAddress OCTET STRING,
+    cubominiNetworkIfNetMask OCTET STRING,
+    cubominiNetworkIfGateway OCTET STRING
+}
+
+cubominiNetworkIfChassisId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis number."
+::= { cubominiNetworkIfEntry 1 }
+
+cubominiNetworkIfNetindexId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The netIndex number."
+::= { cubominiNetworkIfEntry 2 }
+
+cubominiNetworkIfIPAddress OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(15))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP address for this connnection."
+::= { cubominiNetworkIfEntry 3 }
+
+cubominiNetworkIfNetMask OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(15))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Subnet mask for this connnection."
+::= { cubominiNetworkIfEntry 4 }
+
+cubominiNetworkIfGateway OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(15))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP address of the network gateway for this connnection."
+::= { cubominiNetworkIfEntry 5 }
+
+
+
+-- ----------------------------------------------------
+cubominiOptGeneralTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CubominiOptGeneralEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table with configuration and status information about the transceivers at the card.
+"
+::= { cubominiNetworkIfGroup 2 } -- 27894.11.241.1.5.2
+
+cubominiOptGeneralEntry OBJECT-TYPE
+    SYNTAX CubominiOptGeneralEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis, monIndex, port identifiers are used as table indexes."
+    INDEX
+        { cubominiOptGeneralChassisId, cubominiOptGeneralMonindexId, cubominiOptGeneralPortId }
+::= { cubominiOptGeneralTable 1 }
+
+CubominiOptGeneralEntry ::= SEQUENCE {
+    cubominiOptGeneralChassisId Integer32,
+    cubominiOptGeneralMonindexId Integer32,
+    cubominiOptGeneralPortId Integer32,
+    cubominiOptGeneralIsInserted INTEGER,
+    cubominiOptGeneralEventsStatus OCTET STRING,
+    cubominiOptGeneralTxForce INTEGER
+}
+
+cubominiOptGeneralChassisId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis number."
+::= { cubominiOptGeneralEntry 1 }
+
+cubominiOptGeneralMonindexId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The monIndex number."
+::= { cubominiOptGeneralEntry 2 }
+
+cubominiOptGeneralPortId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The port number."
+::= { cubominiOptGeneralEntry 3 }
+
+cubominiOptGeneralIsInserted OBJECT-TYPE
+    SYNTAX INTEGER {notInserted(2), inserted(3)}
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates if there is a transceiver inserted in the given port."
+::= { cubominiOptGeneralEntry 4 }
+
+cubominiOptGeneralEventsStatus OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(10))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "It indicates the status of the Transceiver alarm flags. Each byte corresponds to an alarm, where: 0x00:Alarm OFF, 0x01:Alarm ON, 0x02:Alarm Inhibited/Not Applicable
+        Byte 0: Transceiver Loss Of Signal (ID: 289)
+        Byte 1: Transceiver Tx Failure (ID: 290)
+        Byte 2: Transceiver Laser Off (ID: 291)
+        Byte 3: Transceiver Low Rx Power Alarm (ID: 296)
+        Byte 4: Transceiver High Rx Power Alarm (ID: 297)
+        Byte 5: Transceiver Low Tx Power Alarm (ID: 298)
+        Byte 6: Transceiver High Tx Power Alarm (ID: 299)
+        Byte 7: Transceiver Low Temperature Alarm (ID: 301)
+        Byte 8: Transceiver High Temperature Alarm (ID: 302)
+        Byte 9: Port Regulator Failure (ID: 259)
+        ."
+::= { cubominiOptGeneralEntry 5 }
+
+cubominiOptGeneralTxForce OBJECT-TYPE
+    SYNTAX INTEGER {off(2), on(3)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Force the state of the laser trasmitter:
+        Off: The laser trasmitter is disabled
+        On: The laser trasmitter is enabled
+        ."
+    DEFVAL { on }
+::= { cubominiOptGeneralEntry 6 }
+
+
+
+-- ----------------------------------------------------
+cubominiOptIdentTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CubominiOptIdentEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table with the static identifiers of the the inserted transceivers.
+"
+::= { cubominiNetworkIfGroup 3 } -- 27894.11.241.1.5.3
+
+cubominiOptIdentEntry OBJECT-TYPE
+    SYNTAX CubominiOptIdentEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis, monIndex, port identifiers are used as table indexes."
+    INDEX
+        { cubominiOptIdentChassisId, cubominiOptIdentMonindexId, cubominiOptIdentPortId }
+::= { cubominiOptIdentTable 1 }
+
+CubominiOptIdentEntry ::= SEQUENCE {
+    cubominiOptIdentChassisId Integer32,
+    cubominiOptIdentMonindexId Integer32,
+    cubominiOptIdentPortId Integer32,
+    cubominiOptIdentVendorName OCTET STRING,
+    cubominiOptIdentVendorPartNumber OCTET STRING,
+    cubominiOptIdentVendorSerialNumber OCTET STRING,
+    cubominiOptIdentNominalWavelength Integer32
+}
+
+cubominiOptIdentChassisId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis number."
+::= { cubominiOptIdentEntry 1 }
+
+cubominiOptIdentMonindexId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The monIndex number."
+::= { cubominiOptIdentEntry 2 }
+
+cubominiOptIdentPortId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The port number."
+::= { cubominiOptIdentEntry 3 }
+
+cubominiOptIdentVendorName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transceiver vendor name."
+::= { cubominiOptIdentEntry 4 }
+
+cubominiOptIdentVendorPartNumber OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Part number provided by the transceiver vendor."
+::= { cubominiOptIdentEntry 5 }
+
+cubominiOptIdentVendorSerialNumber OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial number provided by the transceiver vendor."
+::= { cubominiOptIdentEntry 6 }
+
+cubominiOptIdentNominalWavelength OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "Hundredths (1/100) of a nanometer"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transceiver nominal wavelength. Zero for a copper adapter. 
+        Expressed in hundredths (1/100) of a nanometer."
+::= { cubominiOptIdentEntry 7 }
+
+
+
+-- ----------------------------------------------------
+cubominiDnsServerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CubominiDnsServerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table with the IP addresses of the DNS servers used.
+"
+::= { cubominiNetworkIfGroup 4 } -- 27894.11.241.1.5.4
+
+cubominiDnsServerEntry OBJECT-TYPE
+    SYNTAX CubominiDnsServerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis, dnsIndex identifiers are used as table indexes."
+    INDEX
+        { cubominiDnsServerChassisId, cubominiDnsServerDnsindexId }
+::= { cubominiDnsServerTable 1 }
+
+CubominiDnsServerEntry ::= SEQUENCE {
+    cubominiDnsServerChassisId Integer32,
+    cubominiDnsServerDnsindexId Integer32,
+    cubominiDnsServerIpAddress OCTET STRING
+}
+
+cubominiDnsServerChassisId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis number."
+::= { cubominiDnsServerEntry 1 }
+
+cubominiDnsServerDnsindexId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The dnsIndex number."
+::= { cubominiDnsServerEntry 2 }
+
+cubominiDnsServerIpAddress OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(15))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP address of the DNS server."
+::= { cubominiDnsServerEntry 3 }
+
+
+
+-- ----------------------------------------------------
+cubominiNtpServerParamsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CubominiNtpServerParamsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table with parameters for the use of the NTP service.
+"
+::= { cubominiNtpServerGroup 1 } -- 27894.11.241.1.5.5.1
+
+cubominiNtpServerParamsEntry OBJECT-TYPE
+    SYNTAX CubominiNtpServerParamsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis identifiers are used as table indexes."
+    INDEX
+        { cubominiNtpServerParamsChassisId }
+::= { cubominiNtpServerParamsTable 1 }
+
+CubominiNtpServerParamsEntry ::= SEQUENCE {
+    cubominiNtpServerParamsChassisId Integer32,
+    cubominiNtpServerParamsActive INTEGER
+}
+
+cubominiNtpServerParamsChassisId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis number."
+::= { cubominiNtpServerParamsEntry 1 }
+
+cubominiNtpServerParamsActive OBJECT-TYPE
+    SYNTAX INTEGER {inactive(2), active(3)}
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates if the NTP server is used:
+        2: Not active. The date and time is not synchronized from the NTP server (manual mode)
+        3: Active. The date and time is synchronized from the NTP server."
+::= { cubominiNtpServerParamsEntry 2 }
+
+
+
+-- ----------------------------------------------------
+cubominiNtpServerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CubominiNtpServerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table with the IP addresses of the NTP servers used.
+"
+::= { cubominiNtpServerGroup 2 } -- 27894.11.241.1.5.5.2
+
+cubominiNtpServerEntry OBJECT-TYPE
+    SYNTAX CubominiNtpServerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis, ntpIndex identifiers are used as table indexes."
+    INDEX
+        { cubominiNtpServerChassisId, cubominiNtpServerNtpindexId }
+::= { cubominiNtpServerTable 1 }
+
+CubominiNtpServerEntry ::= SEQUENCE {
+    cubominiNtpServerChassisId Integer32,
+    cubominiNtpServerNtpindexId Integer32,
+    cubominiNtpServerIPAddress OCTET STRING
+}
+
+cubominiNtpServerChassisId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis number."
+::= { cubominiNtpServerEntry 1 }
+
+cubominiNtpServerNtpindexId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The ntpIndex number."
+::= { cubominiNtpServerEntry 2 }
+
+cubominiNtpServerIPAddress OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(15))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP address of the NTP server."
+::= { cubominiNtpServerEntry 3 }
+
+
+
+-- ----------------------------------------------------
+cubominiFanTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CubominiFanEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table with information status and configuration for the inserted fan cards.
+"
+::= { cubominiFanGroup 1 } -- 27894.11.241.1.3.1
+
+cubominiFanEntry OBJECT-TYPE
+    SYNTAX CubominiFanEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis, slot, fanslotmini identifiers are used as table indexes."
+    INDEX
+        { cubominiFanChassisId, cubominiFanSlotId, cubominiFanFanslotminiId }
+::= { cubominiFanTable 1 }
+
+CubominiFanEntry ::= SEQUENCE {
+    cubominiFanChassisId Integer32,
+    cubominiFanSlotId Integer32,
+    cubominiFanFanslotminiId Integer32,
+    cubominiFanStatus INTEGER,
+    cubominiFanSpeed Integer32
+}
+
+cubominiFanChassisId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis number."
+::= { cubominiFanEntry 1 }
+
+cubominiFanSlotId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The slot number."
+::= { cubominiFanEntry 2 }
+
+cubominiFanFanslotminiId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The fanslotmini number."
+::= { cubominiFanEntry 3 }
+
+cubominiFanStatus OBJECT-TYPE
+    SYNTAX INTEGER {fail(2), ok(3)}
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates the status of the fan card:
+        2: Fail. There is a failure in some fan
+        3: OK. Every fan is working correctly."
+::= { cubominiFanEntry 4 }
+
+cubominiFanSpeed OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "r.p.m."
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Measured fan speed. 
+        Expressed in r.p.m.."
+::= { cubominiFanEntry 5 }
+
+
+
+-- ----------------------------------------------------
+cubominiXcvrCommonConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CubominiXcvrCommonConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table with the diagnostic monitoring elements.
+"
+::= { cubominiXcvrGroup 1 } -- 27894.11.241.1.9.1
+
+cubominiXcvrCommonConfigEntry OBJECT-TYPE
+    SYNTAX CubominiXcvrCommonConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis, slot identifiers are used as table indexes."
+    INDEX
+        { cubominiXcvrCommonConfigChassisId, cubominiXcvrCommonConfigSlotId }
+::= { cubominiXcvrCommonConfigTable 1 }
+
+CubominiXcvrCommonConfigEntry ::= SEQUENCE {
+    cubominiXcvrCommonConfigChassisId Integer32,
+    cubominiXcvrCommonConfigSlotId Integer32,
+    cubominiXcvrCommonConfigLoopbackOperation INTEGER,
+    cubominiXcvrCommonConfigLoopbackTimeout Integer32,
+    cubominiXcvrCommonConfigDataRateSet INTEGER,
+    cubominiXcvrCommonConfigLinkLossFwd INTEGER
+}
+
+cubominiXcvrCommonConfigChassisId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis number."
+::= { cubominiXcvrCommonConfigEntry 1 }
+
+cubominiXcvrCommonConfigSlotId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The slot number."
+::= { cubominiXcvrCommonConfigEntry 2 }
+
+cubominiXcvrCommonConfigLoopbackOperation OBJECT-TYPE
+    SYNTAX INTEGER {off(2), on(3)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Force the loopback state of both QSFP ports:
+        Off: The loopback is disabled
+        On: The loopback is enabled
+        ."
+    DEFVAL { off }
+::= { cubominiXcvrCommonConfigEntry 3 }
+
+cubominiXcvrCommonConfigLoopbackTimeout OBJECT-TYPE
+    SYNTAX Integer32(1..2147483)
+    UNITS "Seconds"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable the loopback for a given period of time. 
+        Expressed in seconds."
+::= { cubominiXcvrCommonConfigEntry 4 }
+
+cubominiXcvrCommonConfigDataRateSet OBJECT-TYPE
+    SYNTAX INTEGER {dr40gbps(2), dr100gbps(3), drotu4(4)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Select the data rate of the QSFP ports:
+        dr40gbps: The data rate is set to 40 Gbps
+        dr100gbps: The data rate is set to 100 Gbps
+        drotu4: The data rate is set to the OTU-4 standard (112 Gbps)
+        ."
+    DEFVAL { dr100gbps }
+::= { cubominiXcvrCommonConfigEntry 5 }
+
+cubominiXcvrCommonConfigLinkLossFwd OBJECT-TYPE
+    SYNTAX INTEGER {llfOff(1), llfLn2Cl(2), llfCl2Ln(3), llfBidir(4)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Select the link loss forward mode for the QSFP ports:
+        llfOff: The link loss forward is not active
+        llfLn2Cl: A loss of signal at the line RX switches off the client TX
+        llfCl2Ln: A loss of signal at the client RX switches off the line TX
+        llfBidir: Both directions, line RX to client TX and client RX to line TX, are active
+        ."
+    DEFVAL { llfOff }
+::= { cubominiXcvrCommonConfigEntry 6 }
+
+
+
+-- ----------------------------------------------------
+cubominiXcvrGeneralTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CubominiXcvrGeneralEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table with configuration and status information about the transceivers at the card.
+"
+::= { cubominiXcvrGroup 2 } -- 27894.11.241.1.9.2
+
+cubominiXcvrGeneralEntry OBJECT-TYPE
+    SYNTAX CubominiXcvrGeneralEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis, slot, port identifiers are used as table indexes."
+    INDEX
+        { cubominiXcvrGeneralChassisId, cubominiXcvrGeneralSlotId, cubominiXcvrGeneralPortId }
+::= { cubominiXcvrGeneralTable 1 }
+
+CubominiXcvrGeneralEntry ::= SEQUENCE {
+    cubominiXcvrGeneralChassisId Integer32,
+    cubominiXcvrGeneralSlotId Integer32,
+    cubominiXcvrGeneralPortId Integer32,
+    cubominiXcvrGeneralIsInserted INTEGER,
+    cubominiXcvrGeneralEventsStatusAll OCTET STRING,
+    cubominiXcvrGeneralCDRPortEventsStatusAll OCTET STRING,
+    cubominiXcvrGeneralTxForceMode INTEGER
+}
+
+cubominiXcvrGeneralChassisId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis number."
+::= { cubominiXcvrGeneralEntry 1 }
+
+cubominiXcvrGeneralSlotId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The slot number."
+::= { cubominiXcvrGeneralEntry 2 }
+
+cubominiXcvrGeneralPortId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The port number."
+::= { cubominiXcvrGeneralEntry 3 }
+
+cubominiXcvrGeneralIsInserted OBJECT-TYPE
+    SYNTAX INTEGER {notInserted(2), inserted(3)}
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates if there is a transceiver inserted in the given port."
+::= { cubominiXcvrGeneralEntry 4 }
+
+cubominiXcvrGeneralEventsStatusAll OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(10))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "It indicates the status of the Transceiver alarm flags. Each byte corresponds to an alarm, where: 0x00:Alarm OFF, 0x01:Alarm ON, 0x02:Alarm Inhibited/Not Applicable
+        Byte 0: Transceiver Loss Of Signal (ID: 289)
+        Byte 1: Transceiver Tx Failure (ID: 290)
+        Byte 2: Transceiver Laser Off (ID: 291)
+        Byte 3: Transceiver Low Rx Power Alarm (ID: 296)
+        Byte 4: Transceiver High Rx Power Alarm (ID: 297)
+        Byte 5: Transceiver Low Tx Power Alarm (ID: 298)
+        Byte 6: Transceiver High Tx Power Alarm (ID: 299)
+        Byte 7: Transceiver Low Temperature Alarm (ID: 301)
+        Byte 8: Transceiver High Temperature Alarm (ID: 302)
+        Byte 9: Port Regulator Failure (ID: 259)
+        ."
+::= { cubominiXcvrGeneralEntry 5 }
+
+cubominiXcvrGeneralCDRPortEventsStatusAll OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(2))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "It indicates the status of the CDR alarm flags. Each byte corresponds to an alarm, where: 0x00:Alarm OFF, 0x01:Alarm ON, 0x02:Alarm Inhibited/Not Applicable
+        Byte 0: Cdr Rx Loss Of Lock (ID: 292)
+        Byte 1: Cdr Tx Loss Of Lock (ID: 293)
+        ."
+::= { cubominiXcvrGeneralEntry 6 }
+
+cubominiXcvrGeneralTxForceMode OBJECT-TYPE
+    SYNTAX INTEGER {off(2), on(3)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Force the state of the laser trasmitter:
+        Off: The laser trasmitter is disabled
+        On: The laser trasmitter is enabled
+        ."
+    DEFVAL { on }
+::= { cubominiXcvrGeneralEntry 7 }
+
+
+
+-- ----------------------------------------------------
+cubominiXcvrIdentTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CubominiXcvrIdentEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table with the static identifiers of the the inserted transceivers.
+"
+::= { cubominiXcvrGroup 3 } -- 27894.11.241.1.9.3
+
+cubominiXcvrIdentEntry OBJECT-TYPE
+    SYNTAX CubominiXcvrIdentEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis, slot, port identifiers are used as table indexes."
+    INDEX
+        { cubominiXcvrIdentChassisId, cubominiXcvrIdentSlotId, cubominiXcvrIdentPortId }
+::= { cubominiXcvrIdentTable 1 }
+
+CubominiXcvrIdentEntry ::= SEQUENCE {
+    cubominiXcvrIdentChassisId Integer32,
+    cubominiXcvrIdentSlotId Integer32,
+    cubominiXcvrIdentPortId Integer32,
+    cubominiXcvrIdentVendorName OCTET STRING,
+    cubominiXcvrIdentVendorPartNumber OCTET STRING,
+    cubominiXcvrIdentVendorSerialNumber OCTET STRING,
+    cubominiXcvrIdentNominalWavelength Integer32
+}
+
+cubominiXcvrIdentChassisId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis number."
+::= { cubominiXcvrIdentEntry 1 }
+
+cubominiXcvrIdentSlotId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The slot number."
+::= { cubominiXcvrIdentEntry 2 }
+
+cubominiXcvrIdentPortId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The port number."
+::= { cubominiXcvrIdentEntry 3 }
+
+cubominiXcvrIdentVendorName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transceiver vendor name."
+::= { cubominiXcvrIdentEntry 4 }
+
+cubominiXcvrIdentVendorPartNumber OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Part number provided by the transceiver vendor."
+::= { cubominiXcvrIdentEntry 5 }
+
+cubominiXcvrIdentVendorSerialNumber OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial number provided by the transceiver vendor."
+::= { cubominiXcvrIdentEntry 6 }
+
+cubominiXcvrIdentNominalWavelength OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "Hundredths (1/100) of a nanometer"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transceiver nominal wavelength. Zero for a copper adapter. 
+        Expressed in hundredths (1/100) of a nanometer."
+::= { cubominiXcvrIdentEntry 7 }
+
+
+
+-- ----------------------------------------------------
+cubominiXcvrEvThresholdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CubominiXcvrEvThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table with the event power thresholds.
+"
+::= { cubominiXcvrGroup 4 } -- 27894.11.241.1.9.4
+
+cubominiXcvrEvThresholdEntry OBJECT-TYPE
+    SYNTAX CubominiXcvrEvThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis, slot, port identifiers are used as table indexes."
+    INDEX
+        { cubominiXcvrEvThresholdChassisId, cubominiXcvrEvThresholdSlotId, cubominiXcvrEvThresholdPortId }
+::= { cubominiXcvrEvThresholdTable 1 }
+
+CubominiXcvrEvThresholdEntry ::= SEQUENCE {
+    cubominiXcvrEvThresholdChassisId Integer32,
+    cubominiXcvrEvThresholdSlotId Integer32,
+    cubominiXcvrEvThresholdPortId Integer32,
+    cubominiXcvrEvThresholdMinInputPower Integer32,
+    cubominiXcvrEvThresholdMaxInputPower Integer32,
+    cubominiXcvrEvThresholdMinOutputPower Integer32,
+    cubominiXcvrEvThresholdMaxOutputPower Integer32
+}
+
+cubominiXcvrEvThresholdChassisId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis number."
+::= { cubominiXcvrEvThresholdEntry 1 }
+
+cubominiXcvrEvThresholdSlotId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The slot number."
+::= { cubominiXcvrEvThresholdEntry 2 }
+
+cubominiXcvrEvThresholdPortId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The port number."
+::= { cubominiXcvrEvThresholdEntry 3 }
+
+cubominiXcvrEvThresholdMinInputPower OBJECT-TYPE
+    SYNTAX Integer32(-400..82)
+    UNITS "Tenths (1/10) of dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Threshold for the event 'Low RX power'. 
+        Expressed in tenths (1/10) of dBm."
+::= { cubominiXcvrEvThresholdEntry 4 }
+
+cubominiXcvrEvThresholdMaxInputPower OBJECT-TYPE
+    SYNTAX Integer32(-400..82)
+    UNITS "Tenths (1/10) of dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Threshold for the event 'High RX power'. 
+        Expressed in tenths (1/10) of dBm."
+::= { cubominiXcvrEvThresholdEntry 5 }
+
+cubominiXcvrEvThresholdMinOutputPower OBJECT-TYPE
+    SYNTAX Integer32(-400..82)
+    UNITS "Tenths (1/10) of dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Threshold for the event 'Low TX power'. 
+        Expressed in tenths (1/10) of dBm."
+::= { cubominiXcvrEvThresholdEntry 6 }
+
+cubominiXcvrEvThresholdMaxOutputPower OBJECT-TYPE
+    SYNTAX Integer32(-400..82)
+    UNITS "Tenths (1/10) of dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Threshold for the event 'High TX power'. 
+        Expressed in tenths (1/10) of dBm."
+::= { cubominiXcvrEvThresholdEntry 7 }
+
+
+
+-- ----------------------------------------------------
+cubominiXcvrDiagnosticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CubominiXcvrDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table with the diagnostic monitoring elements.
+"
+::= { cubominiXcvrGroup 5 } -- 27894.11.241.1.9.5
+
+cubominiXcvrDiagnosticsEntry OBJECT-TYPE
+    SYNTAX CubominiXcvrDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis, slot, port identifiers are used as table indexes."
+    INDEX
+        { cubominiXcvrDiagnosticsChassisId, cubominiXcvrDiagnosticsSlotId, cubominiXcvrDiagnosticsPortId }
+::= { cubominiXcvrDiagnosticsTable 1 }
+
+CubominiXcvrDiagnosticsEntry ::= SEQUENCE {
+    cubominiXcvrDiagnosticsChassisId Integer32,
+    cubominiXcvrDiagnosticsSlotId Integer32,
+    cubominiXcvrDiagnosticsPortId Integer32,
+    cubominiXcvrDiagnosticsTemperature Integer32,
+    cubominiXcvrDiagnosticsTxPowerAll Integer32,
+    cubominiXcvrDiagnosticsRxPowerAll Integer32
+}
+
+cubominiXcvrDiagnosticsChassisId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis number."
+::= { cubominiXcvrDiagnosticsEntry 1 }
+
+cubominiXcvrDiagnosticsSlotId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The slot number."
+::= { cubominiXcvrDiagnosticsEntry 2 }
+
+cubominiXcvrDiagnosticsPortId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The port number."
+::= { cubominiXcvrDiagnosticsEntry 3 }
+
+cubominiXcvrDiagnosticsTemperature OBJECT-TYPE
+    SYNTAX Integer32(-1280..1279)
+    UNITS "Tenths (1/10) of Celsius degrees"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Calilbrated transceiver temperature. 
+        Expressed in tenths (1/10) of Celsius degrees."
+::= { cubominiXcvrDiagnosticsEntry 4 }
+
+cubominiXcvrDiagnosticsTxPowerAll OBJECT-TYPE
+    SYNTAX Integer32(-400..82)
+    UNITS "Tenths (1/10) of dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Calilbrated transmitted optical power by the transceiver. 
+        Expressed in tenths (1/10) of dBm."
+::= { cubominiXcvrDiagnosticsEntry 5 }
+
+cubominiXcvrDiagnosticsRxPowerAll OBJECT-TYPE
+    SYNTAX Integer32(-400..82)
+    UNITS "Tenths (1/10) of dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Calilbrated received optical power by the transceiver. 
+        Expressed in tenths (1/10) of dBm."
+::= { cubominiXcvrDiagnosticsEntry 6 }
+
+
+
+-- ----------------------------------------------------
+cubominiXcvrOptChannelsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CubominiXcvrOptChannelsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table with the optical powers of the QSFP individual channels.
+"
+::= { cubominiXcvrGroup 6 } -- 27894.11.241.1.9.6
+
+cubominiXcvrOptChannelsEntry OBJECT-TYPE
+    SYNTAX CubominiXcvrOptChannelsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis, slot, port, channel identifiers are used as table indexes."
+    INDEX
+        { cubominiXcvrOptChannelsChassisId, cubominiXcvrOptChannelsSlotId, cubominiXcvrOptChannelsPortId, cubominiXcvrOptChannelsChannelId }
+::= { cubominiXcvrOptChannelsTable 1 }
+
+CubominiXcvrOptChannelsEntry ::= SEQUENCE {
+    cubominiXcvrOptChannelsChassisId Integer32,
+    cubominiXcvrOptChannelsSlotId Integer32,
+    cubominiXcvrOptChannelsPortId Integer32,
+    cubominiXcvrOptChannelsChannelId Integer32,
+    cubominiXcvrOptChannelsTxPower Integer32,
+    cubominiXcvrOptChannelsRxPower Integer32
+}
+
+cubominiXcvrOptChannelsChassisId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The chassis number."
+::= { cubominiXcvrOptChannelsEntry 1 }
+
+cubominiXcvrOptChannelsSlotId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The slot number."
+::= { cubominiXcvrOptChannelsEntry 2 }
+
+cubominiXcvrOptChannelsPortId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The port number."
+::= { cubominiXcvrOptChannelsEntry 3 }
+
+cubominiXcvrOptChannelsChannelId OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The channel number."
+::= { cubominiXcvrOptChannelsEntry 4 }
+
+cubominiXcvrOptChannelsTxPower OBJECT-TYPE
+    SYNTAX Integer32(-400..82)
+    UNITS "Tenths (1/10) of dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Calilbrated transmitted optical power of the single QSFP channel. 
+        Expressed in tenths (1/10) of dBm."
+::= { cubominiXcvrOptChannelsEntry 5 }
+
+cubominiXcvrOptChannelsRxPower OBJECT-TYPE
+    SYNTAX Integer32(-400..82)
+    UNITS "Tenths (1/10) of dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Calilbrated received optical power of the single QSFP channel. 
+        Expressed in tenths (1/10) of dBm."
+::= { cubominiXcvrOptChannelsEntry 6 }
+
+
+
+-- ----------------------------------------------------
+cubominiNotification NOTIFICATION-TYPE
+    OBJECTS  { cubominiCardId, cubominiChassis, cubominiSlot, cubominiPort, cubominiNotificationId, cubominiShortDescription, cubominiLongDescription, cubominiSeverity, cubominiData, cubominiLabel, cubominiEventTime }
+    STATUS current
+    DESCRIPTION
+        "A notification from the card."
+::= { cubominiTraps 2 } -- 27894.11.241.2.2
+
+cubominiCardId OBJECT-TYPE
+    SYNTAX INTEGER { cuboMini(241) }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The unique identifier of the card sending the notification."
+::= { cubominiTraps 3 } -- 27894.11.241.2.3
+
+cubominiChassis OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The identifier of the chassis sending the notification."
+::= { cubominiTraps 4 } -- 27894.11.241.2.4
+
+cubominiSlot OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The identifier of the slot sending the notification.
+        If a slot is not relevant to the notification, the slot number is 255."
+::= { cubominiTraps 5 } -- 27894.11.241.2.5
+
+cubominiPort OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The identifier of the port sending the notification.
+        If a port is not relevant to the notification, the port number is 255."
+::= { cubominiTraps 6 } -- 27894.11.241.2.6
+
+cubominiNotificationId OBJECT-TYPE
+    SYNTAX INTEGER {
+        alarmChassisFanFailure(3),
+        eventMonitorReset(5),
+        alarmPortRegulatorFailure(259),
+        eventTransceiverExtracted(288),
+        alarmTransceiverLossOfSignal(289),
+        alarmTransceiverTxFailure(290),
+        eventTransceiverLaserOff(291),
+        alarmCdrRxLossOfLock(292),
+        alarmTransceiverLowRxPowerAlarm(296),
+        alarmTransceiverHighRxPowerAlarm(297),
+        alarmTransceiverLowTxPowerAlarm(298),
+        alarmTransceiverHighTxPowerAlarm(299),
+        alarmTransceiverLowTemperatureAlarm(301),
+        alarmTransceiverHighTemperatureAlarm(302),
+        eventTransceiverLoopbackOn(336)
+        }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The identifier of the event/alarm."
+::= { cubominiTraps 7 } -- 27894.11.241.2.7
+
+cubominiShortDescription OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(20))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Information about the notification. Short Description."
+::= { cubominiTraps 8 } -- 27894.11.241.2.8
+
+cubominiLongDescription OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(128))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Information about the notification. Long Description."
+::= { cubominiTraps 9 } -- 27894.11.241.2.9
+
+cubominiSeverity OBJECT-TYPE
+    SYNTAX INTEGER { normal(1), notification(2), minor(3), major(4), critical(5) }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Information about the notification. Severity level."
+::= { cubominiTraps 10 } -- 27894.11.241.2.10
+
+cubominiData OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(32))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Notification raw data. It depends on the notification ID
+        (see the cubominiNotificationId column):
+        "
+::= { cubominiTraps 11 } -- 27894.11.241.2.11
+
+
+cubominiLabel OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(200))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Label of the element sending the notification."
+::= { cubominiTraps 12 } -- 27894.11.241.2.12
+
+
+
+
+cubominiEventTime OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(32))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Time at which the event took place expressed in RFC 3339 format."
+::= { cubominiTraps 13 } -- 27894.11.241.2.13
+
+
+
+-- ----------------------------------------------------
+cubominiConformance OBJECT IDENTIFIER ::= { cubo-mini 3 }
+
+cubominiCompliances OBJECT IDENTIFIER ::= { cubominiConformance 1 }
+
+cubominiCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for the SNMPv2 entities that implement the
+        CUBO-MINI-MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS  {
+        cubo-miniGeneralGroup,
+        cubo-miniFanGroup,
+        cubo-miniManagementGroup,
+        cubo-miniNetworkIfGroup,
+        cubo-miniNtpServerGroup,
+        cubo-miniXcvrGroup
+    }
+
+    GROUP cubo-miniNotificationObjectsGroup
+    DESCRIPTION
+        "This group is optional, but recommendable."
+
+    GROUP cubo-miniNotificationGroup
+    DESCRIPTION
+        "Notifications are optional."
+
+::= { cubominiCompliances 1 }
+
+cubominiGroups OBJECT IDENTIFIER ::= { cubominiConformance 2 }
+
+cubo-miniGeneralGroup OBJECT-GROUP
+    OBJECTS  {
+        cubominiSystemDataSerialNumber,
+        cubominiSystemDataDeviceName,
+        cubominiSystemDataSwVersion,
+        cubominiSystemDataFwVersion,
+        cubominiSystemDataHwVersion
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing general information about the device"
+::= { cubominiGroups 1 }
+
+cubo-miniFanGroup OBJECT-GROUP
+    OBJECTS  {
+        cubominiFanStatus,
+        cubominiFanSpeed
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing configuration and status information about the fans"
+::= { cubominiGroups 2 }
+
+cubo-miniManagementGroup OBJECT-GROUP
+    OBJECTS  {
+        cubominiSnmpManagersIp,
+        cubominiEmsManagersIp
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing information about the IP addresses to send the traps"
+::= { cubominiGroups 3 }
+
+cubo-miniNetworkIfGroup OBJECT-GROUP
+    OBJECTS  {
+        cubominiNetworkIfIPAddress,
+        cubominiNetworkIfNetMask,
+        cubominiNetworkIfGateway,
+        cubominiOptGeneralIsInserted,
+        cubominiOptGeneralEventsStatus,
+        cubominiOptGeneralTxForce,
+        cubominiOptIdentVendorName,
+        cubominiOptIdentVendorPartNumber,
+        cubominiOptIdentVendorSerialNumber,
+        cubominiOptIdentNominalWavelength,
+        cubominiDnsServerIpAddress
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing configuration for the Ethernet network interface"
+::= { cubominiGroups 4 }
+
+cubo-miniNtpServerGroup OBJECT-GROUP
+    OBJECTS  {
+        cubominiNtpServerParamsActive,
+        cubominiNtpServerIPAddress
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing configuration for the NTP service"
+::= { cubominiGroups 5 }
+
+cubo-miniXcvrGroup OBJECT-GROUP
+    OBJECTS  {
+        cubominiXcvrCommonConfigLoopbackOperation,
+        cubominiXcvrCommonConfigLoopbackTimeout,
+        cubominiXcvrCommonConfigDataRateSet,
+        cubominiXcvrCommonConfigLinkLossFwd,
+        cubominiXcvrGeneralIsInserted,
+        cubominiXcvrGeneralEventsStatusAll,
+        cubominiXcvrGeneralCDRPortEventsStatusAll,
+        cubominiXcvrGeneralTxForceMode,
+        cubominiXcvrIdentVendorName,
+        cubominiXcvrIdentVendorPartNumber,
+        cubominiXcvrIdentVendorSerialNumber,
+        cubominiXcvrIdentNominalWavelength,
+        cubominiXcvrEvThresholdMinInputPower,
+        cubominiXcvrEvThresholdMaxInputPower,
+        cubominiXcvrEvThresholdMinOutputPower,
+        cubominiXcvrEvThresholdMaxOutputPower,
+        cubominiXcvrDiagnosticsTemperature,
+        cubominiXcvrDiagnosticsTxPowerAll,
+        cubominiXcvrDiagnosticsRxPowerAll,
+        cubominiXcvrOptChannelsTxPower,
+        cubominiXcvrOptChannelsRxPower
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing configuration and status information about the QSFP transceivers"
+::= { cubominiGroups 6 }
+
+
+
+cubo-miniNotificationObjectsGroup OBJECT-GROUP
+    OBJECTS  {
+        cubominiCardId,
+        cubominiChassis,
+        cubominiSlot,
+        cubominiPort,
+        cubominiNotificationId,
+        cubominiShortDescription,
+        cubominiLongDescription,
+        cubominiSeverity,
+        cubominiData,
+        cubominiLabel,
+        cubominiEventTime
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects related to or included in CUBO-MINI notifications."
+::= { cubominiGroups 7 }
+
+cubo-miniNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        cubominiNotification
+    }
+    STATUS  current
+    DESCRIPTION
+        "Notifications generated by an CUBO-MINI card. By default all the
+        notifications are enabled."
+::= { cubominiGroups 8 }
+END
+
+-- ----------------------------------------------------

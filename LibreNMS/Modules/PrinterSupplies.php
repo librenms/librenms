@@ -36,6 +36,7 @@ use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\StringHelpers;
 
 class PrinterSupplies implements Module
 {
@@ -189,7 +190,7 @@ class PrinterSupplies implements Module
                 $new_descr = '';
                 foreach (explode("\n", (string) $descr) as $line) {
                     if (preg_match('/^([A-F\d]{2} )*[A-F\d]{1,2} ?$/', $line)) {
-                        $line = snmp_hexstring($line);
+                        $line = StringHelpers::hexToAscii($line, ' ');
                     }
                     $new_descr .= $line;
                 }

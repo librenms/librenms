@@ -4129,15 +4129,6 @@ parameters:
 			'''
 			identifier: function.deprecated
 			count: 1
-			path: includes/html/forms/token-item-create.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbInsert\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 1
 			path: includes/html/forms/transport-groups.inc.php
 
 		-

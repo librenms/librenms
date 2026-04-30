@@ -876,6 +876,26 @@
     "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"virtualDiskState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"}],"valid":true}
   },
   {
+    "name": "Dell DRAC power supply status critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"powerSupplyStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[5-6]"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell DRAC power supply status warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"powerSupplyStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell DRAC RAID controller state critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"controllerState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[2,6]"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell DRAC RAID controller state warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"controllerState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
     "name": "Dell OME-M blade status critical",
     "severity": "critical",
     "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmBladeCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[5-6]"}],"valid":true}
@@ -1034,5 +1054,45 @@
     "name": "Expiring SSL Certificates",
     "severity": "warning",
     "builder": {"condition":"AND","rules":[{"id":"ssl_certificates.days_until_expiry","field":"ssl_certificates.days_until_expiry","type":"integer","input":"text","operator":"less","value":"14"},{"id":"ssl_certificates.disabled","field":"ssl_certificates.disabled","type":"integer","input":"text","operator":"equal","value":"0"}],"valid":true}
+  },
+  {
+    "name": "Windows High CPU Usage, >= 90%",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"processors.processor_usage","field":"processors.processor_usage","type":"string","input":"text","operator":"greater_or_equal","value":"90"},{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"windows"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Windows High CPU Usage, >= 95%",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"processors.processor_usage","field":"processors.processor_usage","type":"string","input":"text","operator":"greater_or_equal","value":"95"},{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"windows"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Windows High Memory Usage, >= 90% in use",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"mempools.mempool_class","field":"mempools.mempool_class","type":"string","input":"text","operator":"equal","value":"system"},{"id":"mempools.mempool_perc","field":"mempools.mempool_perc","type":"string","input":"number","operator":"greater_or_equal","value":"90"},{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"windows"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Windows High Memory Usage, >= 95% in use",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"mempools.mempool_class","field":"mempools.mempool_class","type":"string","input":"text","operator":"equal","value":"system"},{"id":"mempools.mempool_perc","field":"mempools.mempool_perc","type":"string","input":"number","operator":"greater_or_equal","value":"95"},{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"windows"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Windows Disk Usage, >= 90% and < 95% in use",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"storage.storage_perc","field":"storage.storage_perc","type":"string","input":"text","operator":"greater_or_equal","value":"90"},{"id":"storage.storage_perc","field":"storage.storage_perc","type":"string","input":"text","operator":"less","value":"95"},{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"windows"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Windows Disk Usage, >= 95% in use",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"storage.storage_perc","field":"storage.storage_perc","type":"string","input":"text","operator":"greater_or_equal","value":"95"},{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"windows"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Zebra Printer Trap: Warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"eventlog.type","field":"eventlog.type","type":"string","input":"text","operator":"equal","value":"trap"},{"id":"eventlog.severity","field":"eventlog.severity","type":"string","input":"text","operator":"equal","value":"4"},{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"zebra"},{"id":"eventlog.datetime","field":"eventlog.datetime","type":"datetime","input":"text","operator":"greater_or_equal","value":"`DATE_SUB(NOW(),INTERVAL 5 MINUTE)`"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Zebra Printer Trap: Critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"eventlog.type","field":"eventlog.type","type":"string","input":"text","operator":"equal","value":"trap"},{"id":"eventlog.severity","field":"eventlog.severity","type":"string","input":"text","operator":"equal","value":"5"},{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"zebra"},{"id":"eventlog.datetime","field":"eventlog.datetime","type":"datetime","input":"text","operator":"greater_or_equal","value":"`DATE_SUB(NOW(),INTERVAL 5 MINUTE)`"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
   }
 ]
