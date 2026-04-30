@@ -71,6 +71,12 @@ class AlertRule extends BaseModel
         'extra' => 'array',
     ];
 
+    protected $attributes = [
+        'extra' => '{}',
+        'builder' => '{}',
+        'query' => '',
+    ];
+
     // ---- Query scopes ----
 
     /**

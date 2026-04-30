@@ -24,10 +24,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\ApiToken;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Laravel\Sanctum\PersonalAccessToken;
 use LibreNMS\Authentication\LegacyAuth;
 
 class ApiAccessController extends Controller
@@ -46,8 +48,15 @@ class ApiAccessController extends Controller
             ->orderBy('id')
             ->get();
 
+        $v1Tokens = PersonalAccessToken::query()
+            ->where('tokenable_type', User::class)
+            ->where('tokenable_id', $user->user_id)
+            ->orderBy('id')
+            ->get();
+
         return view('user.api-access', [
             'tokens' => $tokens,
+            'v1_tokens' => $v1Tokens,
             'legacy_auth_type' => LegacyAuth::getType(),
         ]);
     }

@@ -80,6 +80,7 @@ use App\Restify\VlanRepository;
 use App\Restify\VrfLiteRepository;
 use App\Restify\VrfRepository;
 use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\V1\OpenApiController;
 use App\Http\Controllers\Api\V1\SystemController;
 use Binaryk\LaravelRestify\Bootstrap\RoutesBoot;
 use Binaryk\LaravelRestify\Restify;
@@ -105,6 +106,8 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
             Route::get('system', SystemController::class)
                 ->middleware(['auth:sanctum', 'can:settings.view'])
                 ->name('v1.system');
+            Route::get('openapi.json', [OpenApiController::class, 'spec'])->name('v1.openapi');
+            Route::get('docs', [OpenApiController::class, 'docs'])->name('v1.docs');
         });
 
         parent::routes();

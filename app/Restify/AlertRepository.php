@@ -21,6 +21,8 @@ class AlertRepository extends Repository
 
     public static string $title = 'id';
 
+    protected static array $disabledActions = ['update'];
+
 
 
 

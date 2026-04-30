@@ -91,6 +91,66 @@
                 {{ __('Create API access token') }}
             </button>
         </div>
+
+        <hr>
+
+        <legend>{{ __('API v1 tokens') }}</legend>
+
+        <div id="v1-token-plain-alert" class="alert alert-warning hidden">
+            <p><strong>{{ __('Copy this v1 token now; it will not be shown again.') }}</strong></p>
+            <div class="form-group">
+                <label for="v1-token-once" class="control-label">{{ __('Your v1 API token') }}</label>
+                <input type="text" class="form-control" id="v1-token-once" readonly value="">
+            </div>
+        </div>
+
+        <p class="text-muted">
+            {{ __('Use these with the v1 REST API via the') }} <code>Authorization: Bearer &lt;token&gt;</code> {{ __('header.') }}
+            <a href="{{ url('api/v1/docs') }}" target="_blank" rel="noopener">{{ __('Browse the interactive API reference') }}</a>.
+        </p>
+
+        <table class="table table-bordered table-condensed" id="v1-tokens-table">
+            <thead>
+                <tr>
+                    <th>{{ __('Name') }}</th>
+                    <th>{{ __('Created') }}</th>
+                    <th>{{ __('Expires') }}</th>
+                    <th>{{ __('Last used') }}</th>
+                    <th>{{ __('Renew') }}</th>
+                    <th>{{ __('Remove') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($v1_tokens as $v1)
+                    <tr id="v1-token-row-{{ $v1->id }}">
+                        <td>{{ $v1->name }}</td>
+                        <td>{{ $v1->created_at?->diffForHumans() ?? '—' }}</td>
+                        <td class="v1-token-expires">{{ $v1->expires_at?->diffForHumans() ?? __('Never') }}</td>
+                        <td>{{ $v1->last_used_at?->diffForHumans() ?? __('Never') }}</td>
+                        <td>
+                            <button type="button" class="btn btn-warning btn-xs"
+                                    data-token_id="{{ $v1->id }}"
+                                    data-toggle="modal"
+                                    data-target="#v1-renew-token">{{ __('Renew') }}</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-xs"
+                                    data-token_id="{{ $v1->id }}"
+                                    data-toggle="modal"
+                                    data-target="#v1-confirm-delete">{{ __('Delete') }}</button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr id="v1-tokens-empty"><td colspan="6">{{ __('No v1 API tokens yet.') }}</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+
+        <div class="text-center">
+            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#v1-create-token">
+                {{ __('Create v1 API token') }}
+            </button>
+        </div>
 </div>
 
 <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="modal-delete-title" aria-hidden="true">
@@ -135,6 +195,85 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('Cancel') }}</button>
                     <button type="submit" class="btn btn-success">{{ __('Create API token') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="v1-create-token" tabindex="-1" role="dialog" aria-labelledby="v1-create-title" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="v1-create-token-form" class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h5 class="modal-title" id="v1-create-title">{{ __('Create v1 API token') }}</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="v1-token-name" class="col-sm-3 control-label">{{ __('Name') }}</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="v1-token-name" name="token_name" required maxlength="255">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="v1-token-expires" class="col-sm-3 control-label">{{ __('Expires in (days)') }}</label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" id="v1-token-expires" name="expires_in" min="1" placeholder="{{ __('Leave blank for never') }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('Cancel') }}</button>
+                    <button type="submit" class="btn btn-success">{{ __('Create') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="v1-renew-token" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="v1-renew-token-form" class="form-horizontal">
+                <input type="hidden" name="v1_token_id" value="">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h5 class="modal-title">{{ __('Renew v1 API token') }}</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="v1-token-extend" class="col-sm-4 control-label">{{ __('Extend by (days)') }}</label>
+                        <div class="col-sm-8">
+                            <input type="number" class="form-control" id="v1-token-extend" name="extend_days" min="1" value="30" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('Cancel') }}</button>
+                    <button type="submit" class="btn btn-warning">{{ __('Renew') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="v1-confirm-delete" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <form id="v1-remove-token-form">
+                <input type="hidden" name="v1_token_id" value="">
+                <input type="hidden" name="confirm" value="yes">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h5 class="modal-title">{{ __('Confirm delete') }}</h5>
+                </div>
+                <div class="modal-body">
+                    <p>{{ __('Delete this v1 API token? This cannot be undone.') }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('Cancel') }}</button>
+                    <button type="submit" class="btn btn-danger">{{ __('Delete') }}</button>
                 </div>
             </form>
         </div>
@@ -249,6 +388,97 @@
     $('#confirm-delete').on('show.bs.modal', function(event) {
       var token_id = $(event.relatedTarget).data('token_id');
       $('#remove_token_form').attr('action', baseUrl + '/' + token_id);
+    });
+
+    var v1FormUrl = "{{ url('ajax_form.php') }}";
+
+    function v1Post(type, data) {
+      return $.post(v1FormUrl, $.extend({ type: type }, data), null, 'json');
+    }
+
+    function v1ToastError(msg) {
+      if (typeof toastr !== 'undefined') {
+        toastr.error(msg);
+      } else {
+        alert(msg);
+      }
+    }
+
+    function v1EscapeHtml(s) {
+      return $('<div>').text(s == null ? '' : String(s)).html();
+    }
+
+    $('#v1-create-token-form').on('submit', function (e) {
+      e.preventDefault();
+      var $form = $(this);
+      v1Post('v1-token-item-create', {
+        token_name: $form.find('[name=token_name]').val(),
+        expires_in: $form.find('[name=expires_in]').val()
+      }).done(function (data) {
+        if (data.status !== 'ok') { v1ToastError(data.message || 'Error'); return; }
+
+        $('#v1-tokens-empty').remove();
+        $('#v1-tokens-table tbody').append(
+          '<tr id="v1-token-row-' + data.token_id + '">' +
+            '<td>' + v1EscapeHtml(data.token_name) + '</td>' +
+            '<td>' + v1EscapeHtml(data.created_at) + '</td>' +
+            '<td class="v1-token-expires">' + v1EscapeHtml(data.expires_at) + '</td>' +
+            '<td>' + @json(__('Never')) + '</td>' +
+            '<td><button type="button" class="btn btn-warning btn-xs" data-token_id="' + data.token_id + '" data-toggle="modal" data-target="#v1-renew-token">' + @json(__('Renew')) + '</button></td>' +
+            '<td><button type="button" class="btn btn-danger btn-xs" data-token_id="' + data.token_id + '" data-toggle="modal" data-target="#v1-confirm-delete">' + @json(__('Delete')) + '</button></td>' +
+          '</tr>'
+        );
+
+        $('#v1-token-once').val(data.token);
+        $('#v1-token-plain-alert').removeClass('hidden');
+        $('#v1-create-token').modal('hide');
+        $form[0].reset();
+      }).fail(function () {
+        v1ToastError(@json(__('Could not create token.')));
+      });
+    });
+
+    $('#v1-renew-token').on('show.bs.modal', function (event) {
+      $(this).find('[name=v1_token_id]').val($(event.relatedTarget).data('token_id'));
+    });
+
+    $('#v1-renew-token-form').on('submit', function (e) {
+      e.preventDefault();
+      var $form = $(this);
+      var tokenId = $form.find('[name=v1_token_id]').val();
+      v1Post('v1-token-item-renew', {
+        v1_token_id: tokenId,
+        extend_days: $form.find('[name=extend_days]').val()
+      }).done(function (data) {
+        if (data.status !== 'ok') { v1ToastError(data.message || 'Error'); return; }
+        $('#v1-token-row-' + tokenId).find('.v1-token-expires').text(data.expires_at);
+        $('#v1-renew-token').modal('hide');
+      }).fail(function () {
+        v1ToastError(@json(__('Could not renew token.')));
+      });
+    });
+
+    $('#v1-confirm-delete').on('show.bs.modal', function (event) {
+      $(this).find('[name=v1_token_id]').val($(event.relatedTarget).data('token_id'));
+    });
+
+    $('#v1-remove-token-form').on('submit', function (e) {
+      e.preventDefault();
+      var $form = $(this);
+      var tokenId = $form.find('[name=v1_token_id]').val();
+      v1Post('v1-token-item-remove', {
+        v1_token_id: tokenId,
+        confirm: 'yes'
+      }).done(function (data) {
+        if (data.status !== 'ok') { v1ToastError(data.message || 'Error'); return; }
+        $('#v1-token-row-' + tokenId).remove();
+        if ($('#v1-tokens-table tbody tr').length === 0) {
+          $('#v1-tokens-table tbody').append('<tr id="v1-tokens-empty"><td colspan="6">' + @json(__('No v1 API tokens yet.')) + '</td></tr>');
+        }
+        $('#v1-confirm-delete').modal('hide');
+      }).fail(function () {
+        v1ToastError(@json(__('Could not delete token.')));
+      });
     });
   })();
 </script>
