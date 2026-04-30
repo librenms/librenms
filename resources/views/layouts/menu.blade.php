@@ -195,7 +195,7 @@
                                                               aria-hidden="true"></i> {{ __('Add Device') }}</a></li>
                         @endcan
                         @can('delete', \App\Models\Device::class)
-                        <li><a href="{{ url('delhost') }}"><i class="fa fa-trash fa-fw fa-lg"
+                        <li><a href="{{ route('device.delete') }}"><i class="fa fa-trash fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Delete Device') }}</a></li>
                         @endcan
                     </ul>
