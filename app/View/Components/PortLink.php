@@ -72,7 +72,7 @@ class PortLink extends Component
 
     private function status(): string
     {
-        if ($this->port->ifAdminStatus == IfOperStatus::Down || $this->port->device->disabled) {
+        if ($this->port->ifAdminStatus == IfOperStatus::Down) {
             return 'disabled';
         }
 
