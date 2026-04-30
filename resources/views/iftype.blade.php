@@ -23,6 +23,11 @@
                 <div class="row">
                     <div class=col-md-12><x-device-link :device="$port->device" /> - <x-port-link :port="$port" :basic=true /></div>
                 </div>
+                @if($port->macAccounting_count > 0)
+                    <div class="row">
+                        <div class=col-md-12><x-port-link :port="$port" :vars="['view' => 'macaccounting']" :basic=true><i class='fa fa-pie-chart fa-lg icon-theme' aria-hidden='true'></i> MAC Accounting</x-port-link></div>
+                    </div>
+                @endif
             </x-slot>
         </x-graph-row>
     @endforeach

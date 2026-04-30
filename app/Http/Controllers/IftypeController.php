@@ -55,7 +55,7 @@ class IftypeController extends Controller
         } else {
             return view('iftype', ['types' => [], 'ports' => [], 'allPortIds' => []]);
         }
-        $ports = $ports->hasAccess(Auth::user())->with('device')->get();
+        $ports = $ports->hasAccess(Auth::user())->with('device')->withCount('macAccounting')->get();
         $allPortIds = array_map(fn ($port) => $port['port_id'], $ports->toArray());
 
         return view('iftype', ['types' => $types, 'ports' => $ports, 'allPortIds' => $allPortIds]);
