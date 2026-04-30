@@ -34,6 +34,9 @@ use LibreNMS\OS;
 
 class Fortiswitch extends OS implements FdbTableDiscovery
 {
+    /**
+     * @return \Illuminate\Support\Collection<int, \App\Models\PortsFdb>
+     */
     public function discoverFdbTable(): Collection
     {
         $fdbt = new Collection;

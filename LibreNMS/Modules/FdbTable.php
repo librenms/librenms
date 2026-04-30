@@ -43,9 +43,7 @@ class FdbTable implements Module
 {
     use SyncsModels;
 
-    /**
-     * @inheritDoc
-     */
+    /** @return array<mixed> */
     public function dependencies(): array
     {
         return ['ports', 'vlans'];
@@ -136,9 +134,7 @@ class FdbTable implements Module
         return $device->portsFdb()->delete();
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @return array<mixed> */
     public function dump(Device $device, string $type): ?array
     {
         if ($type == 'polling') {
