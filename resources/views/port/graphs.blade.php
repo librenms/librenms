@@ -6,14 +6,18 @@
         <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:lg:grid-cols-4 tw:gap-4">
             @foreach($ports as $port)
                 @php
+                    /** @var \App\Models\Port $port */
                     $graph_array = $graphTemplate;
                     $graph_array['id'] = $port->port_id;
                     $link = \LibreNMS\Util\Url::graphPageUrl($graph_array['type'], Arr::except($graph_array, ['height', 'width', 'legend', 'title']));
                     $graphTag = \LibreNMS\Util\Url::lazyGraphTag($graph_array, 'tw:w-full tw:h-auto');
+                    $portLinkOptions = ['port_id' => $port->port_id, 'params' => ['type' => $graph_array['type']]];
                 @endphp
 
                 <div>
-                    {!! \LibreNMS\Util\Url::portLink($port, $graphTag, $graph_array['type'], url: $link) !!}
+                    <a href="{{ $link }}" class="{{ \LibreNMS\Util\Url::portLinkDisplayClass($port) }}" x-data="portLink(@js($portLinkOptions))">
+                        {!! $graphTag !!}
+                    </a>
                 </div>
             @endforeach
         </div>

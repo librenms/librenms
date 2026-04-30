@@ -56,10 +56,32 @@ class Url
             DeviceStatus::Disabled => 'device-link-disabled',
         };
 
-        return sprintf('<a href="%s" class="%s" x-data="deviceLink()">%s</a>%s',
-            route('device', $device->device_id),
+        return sprintf('<a href="%s" class="%s" x-data="deviceLink({device_id: %d})">%s</a>%s',
+            self::deviceUrl($device),
             $class,
+            $device->device_id,
             e($text ?: $device->displayName()),
+            $extra ? '<br />' . e($extra) : $extra
+        );
+    }
+
+    /**
+     * Provisional port link generation
+     */
+    public static function modernPortLink(?Port $port, string $text = '', string $extra = ''): string
+    {
+        if ($port === null) {
+            return e($text);
+        }
+
+        $label = Rewrite::normalizeIfName($port->getLabel());
+        $text = $text ?: $label;
+
+        return sprintf('<a href="%s" class="%s" x-data="portLink({port_id: %d})">%s</a>%s',
+            self::portUrl($port),
+            self::portLinkDisplayClass($port),
+            $port->port_id,
+            e($text),
             $extra ? '<br />' . e($extra) : $extra
         );
     }
