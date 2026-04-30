@@ -17,10 +17,12 @@ class PortsController extends Controller
         $request->validate([
             'view' => 'in:list_basic,list_detail,graph_bits,graph_upkts,graph_nupkts,graph_errors', // legacy
             'errors' => 'nullable|boolean',
-            'bare' => 'nullable|boolean',
-            'searchbar' => 'nullable|boolean',
+            'bare' => 'nullable|in:yes',
+            'searchbar' => 'nullable|in:hide',
             'per_page' => 'nullable|integer',
             'page' => 'nullable|integer',
+            'to' => ['nullable', 'date_or_relative'],
+            'from' => ['nullable', 'date_or_relative'],
             'filter' => ['nullable', 'array'],
             'filter.*' => ['array'],
             'filter.*.*' => ['nullable', 'max:255'],
@@ -54,7 +56,18 @@ class PortsController extends Controller
             $graph = substr($view, 6);
         }
 
-
+        $graphTemplate = [
+            'height' => 100,
+            'width' => session('widescreen') ? 357 : 315,
+            'id' => 0,
+            'type' => 'port_' . $graph,
+            'from' => $request->input('from', '-1d'),
+            'legend' => 'no',
+            'title' => 'yes',
+        ];
+        if ($request->input('to')) {
+            $graphTemplate['to'] = $request->input('to');
+        }
 
         return view('port.index', [
             'view' => $view,
@@ -81,15 +94,7 @@ class PortsController extends Controller
             'hideFilterLink' => $hideFilter ? $request->fullUrlWithoutQuery('searchbar') : $request->fullUrlWithQuery(['searchbar' => 'hide']),
             'hideFilter' => $hideFilter,
             'filterFields' => $this->filterFields(),
-            'graphTemplate' => [
-                'height' => 100,
-                'width' => session('widescreen') ? 357 : 315,
-                'id' => 0,
-                'type' => 'port_' . $graph,
-                'from' => '-1d',
-                'legend' => 'no',
-                'title' => 'yes',
-            ],
+            'graphTemplate' => $graphTemplate,
         ]);
     }
 
