@@ -70,74 +70,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('test', function () {
-//
-//    $filterFields = [
-//        ['key' => 'status',     'label' => 'Status',     'type' => 'select', 'options' => ['active','inactive','pending']],
-//        ['key' => 'created_at', 'label' => 'Created At', 'type' => 'date'],
-//        ['key' => 'name',       'label' => 'Name',       'type' => 'text'],
-//        ['key' => 'amount',     'label' => 'Amount',     'type' => 'number'],
-//        ['key' => 'email',      'label' => 'Email',      'type' => 'email'],
-//    ];
-
-    $filterFields = [
-        // Text search for specific interface identifiers
-        ['key' => 'ifName',  'label' => 'Interface', 'type' => 'text'],
-        ['key' => 'ifAlias', 'label' => 'Alias',     'type' => 'text'],
-
-        // Multi-select for complex operational states
-        [
-            'key' => 'status',
-            'label' => 'Oper Status',
-            'type' => 'multi-select',
-            'options' => ['up', 'down', 'lowerLayerDown', 'testing', 'dormant']
-        ],
-
-        // Single select for binary states
-        [
-            'key' => 'admin',
-            'label' => 'Admin State',
-            'type' => 'select',
-            'options' => ['up', 'down']
-        ],
-
-        // Multi-select for logical flags
-        [
-            'key' => 'flags',
-            'label' => 'Status Flags',
-            'type' => 'multi-select',
-            'options' => ['disabled', 'ignored', 'deleted']
-        ],
-        [
-            'key' => 'search',
-            'label' => 'Search',
-            'type' => 'text'
-        ],
-    ];
-
-
-    $html = <<<'HTML'
-@extends('layouts.librenmsv1')
-
-@section('content')
-
-<div class="tw:text-red-600 tw:uppercase tw:mb-4">
-test
-</div>
-
-<x-filter :fields="$fields" class="tw:ml-3"></x-filter>
-
-<pre class="tw:mt-5">
-@json(request('filter'))
-</pre>
-
-@endsection
-
-HTML;
-
-    return \Illuminate\Support\Facades\Blade::render($html, ['fields' => $filterFields]);
-});
-
 // Auth
 AuthFacade::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
@@ -161,6 +93,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('inventory/purge', [App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
     Route::get('outages', [OutagesController::class, 'index'])->name('outages');
     Route::resource('port', PortController::class)->only('update');
+    Route::get('port/{port}/popup', App\Http\Controllers\PortPopupController::class)->name('port.popup');
     Route::get('vlans', [App\Http\Controllers\VlansController::class, 'index'])->name('vlans.index');
     Route::prefix('poller')->group(function (): void {
         Route::get('', [PollerController::class, 'pollerTab'])->name('poller.index');
@@ -170,6 +103,8 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('performance', [PollerController::class, 'performanceTab'])->name('poller.performance');
         Route::resource('{id}/settings', PollerSettingsController::class, ['as' => 'poller'])->only(['update', 'destroy']);
     });
+    Route::delete('ports/purge', [\App\Http\Controllers\PortsController::class, 'purge'])->name('ports.purge');
+    Route::get('ports/{view?}/{graph?}', [\App\Http\Controllers\PortsController::class, 'index'])->name('ports');
     Route::prefix('services')->name('services.')->group(function (): void {
         Route::resource('templates', ServiceTemplateController::class);
         Route::post('templates/applyAll', [ServiceTemplateController::class, 'applyAll'])->name('templates.applyAll');

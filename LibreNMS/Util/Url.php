@@ -414,7 +414,7 @@ class Url
         return self::overlibLink($args['link'], $graph, $popup, null);
     }
 
-    public static function lazyGraphTag($args)
+    public static function lazyGraphTag($args, string $class = 'img-responsive'): string
     {
         $urlargs = [];
 
@@ -422,7 +422,7 @@ class Url
             $urlargs[] = $key . '=' . ($arg === null ? '' : urlencode($arg));
         }
 
-        $tag = '<img class="graph-image img-responsive" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;"';
+        $tag = '<img class="graph-image ' . $class . '" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;"';
 
         if (LibrenmsConfig::get('enable_lazy_load', true)) {
             return $tag . ' loading="lazy" />';
