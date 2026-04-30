@@ -6,7 +6,7 @@
         <thead>
         <tr>
             <th data-column-id="hostname" data-formatter="device">Device</th>
-            <th data-column-id="ifDescr" data-order="asc" data-formatter="port">Port</th>
+            <th data-column-id="ifDescr" @if(! $errors) data-order="asc" @endif data-formatter="port">Port</th>
             <th data-column-id="secondsIfLastChange" data-converter="duration">Status Changed</th>
             <th data-column-id="ifConnectorPresent" data-visible="false">Connected</th>
             <th data-column-id="ifSpeed" data-converter="human-bps">Speed</th>
@@ -40,7 +40,7 @@
         return parseFloat((units / Math.pow(base, i)).toFixed(dm)) + display[i];
     }
 
-    var filter = <?php echo \Illuminate\Support\Js::from(request('filter')); ?>;
+    var filter = @js($filter);
 
     var grid = $("#ports").bootgrid({
         ajax: true,
@@ -85,6 +85,14 @@
                 filter: filter
             };
         },
+        requestHandler: function (request) {
+            @if($errors)
+            if (request.sort === undefined || Object.keys(request.sort).length === 0) {
+                request.sort = { errors: 'desc'};
+            }
+            @endif
+            return request;
+        }
     });
 
     const $template = $('#port-filter-template');

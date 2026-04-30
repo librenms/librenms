@@ -95,6 +95,7 @@ class PortsController extends TableController
             'hostname',
             'ifIndex',
             'ifDescr',
+            'errors' => DB::raw('ifInErrors_rate + ifOutErrors_rate'),
             'secondsIfLastChange',
             'ifConnectorPresent',
             'ifInErrors',

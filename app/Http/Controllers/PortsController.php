@@ -15,8 +15,16 @@ class PortsController extends Controller
     public function index(Request $request, ?string $view = null, ?string $graph = null)
     {
         $request->validate([
+            'view' => 'in:list_basic,list_detail,graph_bits,graph_upkts,graph_nupkts,graph_errors', // legacy
             'errors' => 'nullable|boolean',
-            'sort' => Rule::in([
+            'bare' => 'nullable|boolean',
+            'searchbar' => 'nullable|boolean',
+            'per_page' => 'nullable|integer',
+            'page' => 'nullable|integer',
+            'filter' => ['nullable', 'array'],
+            'filter.*' => ['array'],
+            'filter.*.*' => ['nullable', 'max:255'],
+            'sort' => Rule::in([ // oddly inconsistent between list and graph views
                 'traffic',
                 'traffic_in',
                 'traffic_out',
@@ -34,6 +42,11 @@ class PortsController extends Controller
 
         $errors = $request->boolean('errors');
         $view ??= $request->input('view', 'basic');
+        $bare = $request->input('bare') === 'yes';
+        $hideFilter = $request->input('searchbar') === 'hide';
+        $perPage = $request->integer('per_page', 48);
+        $sort = $request->string('sort', $errors ? 'errors' : 'device');
+
         if (str_starts_with($view, 'list_')) {
             $view = substr($view, 5);
         } elseif (str_starts_with($view, 'graph_')) {
@@ -41,16 +54,15 @@ class PortsController extends Controller
             $graph = substr($view, 6);
         }
 
-        $bare = $request->input('bare') === 'yes';
-        $hideFilter = $request->input('searchbar') === 'hide';
-        $perPage = $request->integer('per_page', 48);
+
 
         return view('port.index', [
             'view' => $view,
             'graph' => $graph,
+            'errors' => $errors,
             'show_detail' => $view === 'detail' ? 'true' : 'false',
             'show_errors' => $view === 'detail' || $errors ? 'true' : 'false',
-            'ports' => $this->getPorts($view, $perPage),
+            'ports' => $this->getPorts($view, $perPage, $sort),
             'perPage' => $perPage,
             'paginationOptions' => [12, 24, 48, 128, 568, 4096],
             'nav' => [
@@ -195,7 +207,7 @@ class PortsController extends Controller
         ];
     }
 
-    private function getPorts(string $view, int $perPage): ?LengthAwarePaginator
+    private function getPorts(string $view, int $perPage, string $sort): ?LengthAwarePaginator
     {
         if ($view !== 'graph') {
             return null;
@@ -207,7 +219,7 @@ class PortsController extends Controller
             ->whereHas('device') // a device is required for graphs to work
             ->when(request()->array('filter'), fn(Builder $query, $filters) => $query->applyFilters($filters));
 
-        $portsQuery = match (request()->string('sort')) {
+        $portsQuery = match ($sort) {
             'traffic' => $portsQuery->orderByRaw('ifInOctets_rate + ifOutOctets_rate desc'),
             'traffic_in' => $portsQuery->orderBy('ifInOctets_rate', 'desc'),
             'traffic_out' => $portsQuery->orderBy('ifOutOctets_rate', 'desc'),
