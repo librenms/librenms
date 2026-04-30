@@ -13,7 +13,8 @@ class Panel extends Component
     public function __construct(
         public ?string $type = 'default',
         public mixed $title = null,
-    ) {}
+    ) {
+    }
 
     /**
      * Determine if the title is a slot with attributes or just a string.
@@ -28,7 +29,7 @@ class Panel extends Component
      */
     public function panelClass(): string
     {
-        return match($this->type) {
+        return match ($this->type) {
             'primary' => 'panel panel-primary',
             'success' => 'panel panel-success',
             'info' => 'panel panel-info',
