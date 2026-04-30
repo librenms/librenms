@@ -19,7 +19,7 @@
                             <ul class="dropdown-menu dropdown-menu-right">
                                 <li><a href="{{ $hideFilterLink }}"><i class="fa fa-regular @if($hideFilter) fa-square @else fa-square-check @endif fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ __('Show Filter') }}</a></li>
                                 <li><a href="{{ $bareLink }}"><i class="fa fa-regular @if($bare) fa-square @else fa-square-check @endif fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ __('Show Header') }}</a></li>
-                                <li><a href="#" @click.prevent="purgeDeleted($el)">
+                                <li><a href="#" @click.prevent="purgeDeleted()">
                                     <i x-show="!loading" class="fa fa-trash fa-lg fa-fw icon-theme" aria-hidden="true"></i>
                                     <i x-show="loading" class="fa fa-refresh fa-spin fa-lg fa-fw icon-theme" aria-hidden="true"></i>
                                     <span x-text="loading ? '{{ __('Processing...') }}' : '{{ __('Purge all deleted') }}'"></span>
@@ -39,14 +39,12 @@
     </div>
 @endsection
 
-
-
 @push('scripts')
     <script>
         function portPurge() {
             return {
                 loading: false,
-                async purgeDeleted(el) {
+                async purgeDeleted() {
                     if (this.loading) return; // Prevent double-clicks
                     this.loading = true;
 
@@ -78,19 +76,17 @@
             }
         }
 
+        // update all links with the sync-url class to the current filter
         $(window).on('filter:apply', function (event) {
             const serializedFilter = $.param({ filter: event.originalEvent.detail.formatted });
 
-            // update navigation links
             $('a.sync-url').each(function () {
                 const url = new URL($(this).attr('href'), window.location.origin);
 
-                // Remove existing filter keys
                 [...url.searchParams.keys()]
                     .filter(key => key.startsWith('filter'))
                     .forEach(key => url.searchParams.delete(key));
 
-                // Build new href, appending new filter params
                 const base = url.origin + url.pathname;
                 const existing = url.searchParams.toString();
                 $(this).attr('href', `${base}?${existing}${existing ? '&' : ''}${serializedFilter}`);
