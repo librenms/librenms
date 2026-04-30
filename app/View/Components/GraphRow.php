@@ -21,7 +21,7 @@ class GraphRow extends Component
      * @param  int|string  $columns  Either a number or 'responsive' aka auto columns
      * @param  array  $graphs
      * @param  Device|int|null  $device
-     * @param  Port|int|null  $port
+     * @param  Port|int|array<int>|null  $port
      */
     public function __construct(
         public string $type = '',
@@ -31,7 +31,7 @@ class GraphRow extends Component
         public int|string $columns = 2,
         public array $graphs = [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']],
         public int|Device|null $device = null,
-        public int|Port|null $port = null)
+        public int|Port|array|null $port = null)
     {
         $this->responsive = $columns == 'responsive';
         $this->rowWidth = $this->calculateRowWidth((int) $columns);
