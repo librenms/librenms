@@ -20,7 +20,7 @@ if (Gate::denies('update', User::class)) {
         $user = User::find($vars['user_id']);
         $user_data = $user->toArray(); // for compatibility with current code
 
-        echo '<p><h2>' . $user_data['realname'] . '</h2></p>';
+        echo '<p><h2>' . e($user_data['realname']) . '</h2></p>';
         // Perform actions if requested
         if ($action == 'deldevperm') {
             \App\Models\DevicePerm::where('device_id', $vars['device_id'])->where('user_id', $user_data['user_id'])->delete();
