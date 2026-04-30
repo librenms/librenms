@@ -8,16 +8,31 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Validation\Rule;
 
 class PortsController extends Controller
 {
     public function index(Request $request, ?string $view = null, ?string $graph = null)
     {
         $request->validate([
-            // TODO
+            'errors' => 'nullable|boolean',
+            'sort' => Rule::in([
+                'traffic',
+                'traffic_in',
+                'traffic_out',
+                'packets',
+                'packets_in',
+                'packets_out',
+                'errors',
+                'speed',
+                'port',
+                'media',
+                'descr',
+                'device',
+            ])
         ]);
 
-        $errors = $request->input('errors');
+        $errors = $request->boolean('errors');
         $view ??= $request->input('view', 'basic');
         if (str_starts_with($view, 'list_')) {
             $view = substr($view, 5);
@@ -187,12 +202,12 @@ class PortsController extends Controller
         }
 
         $portsQuery = Port::hasAccess(request()->user())
-            ->with(['device'])
+            ->with(['device' => fn ($query) => $query->select(['device_id', 'hostname', 'sysName', 'display', 'ip', 'overwrite_ip'])])
             ->isValid()
             ->whereHas('device') // a device is required for graphs to work
             ->when(request()->array('filter'), fn(Builder $query, $filters) => $query->applyFilters($filters));
 
-        $portsQuery = match ($vars['sort'] ?? '') {
+        $portsQuery = match (request()->string('sort')) {
             'traffic' => $portsQuery->orderByRaw('ifInOctets_rate + ifOutOctets_rate desc'),
             'traffic_in' => $portsQuery->orderBy('ifInOctets_rate', 'desc'),
             'traffic_out' => $portsQuery->orderBy('ifOutOctets_rate', 'desc'),
