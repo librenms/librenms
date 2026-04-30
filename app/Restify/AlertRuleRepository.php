@@ -80,10 +80,9 @@ class AlertRuleRepository extends Repository
                     }
                 })
                 ->rules('required', 'boolean'),
-            field('rule')->readonly(),
-            field('query')->readonly(),
-            field('builder')->readonly(),
-            field('extra')->readonly(),
+            field('query')->rules('nullable', 'string'),
+            field('builder')->rules('nullable'),
+            field('extra')->rules('nullable'),
             field('procedure', fn ($value, $model) => $model->proc)
                 ->fillCallback(function ($request, $model, $attribute) {
                     if ($request->exists($attribute)) {
