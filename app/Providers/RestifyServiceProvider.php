@@ -7,6 +7,8 @@ use App\Restify\ApplicationRepository;
 use App\Restify\BgpPeerRepository;
 use App\Restify\BillRepository;
 use App\Restify\AlertLogRepository;
+use App\Restify\AlertOperationRepository;
+use App\Restify\AlertOperationSegmentRepository;
 use App\Restify\AlertRepository;
 use App\Restify\AlertRuleRepository;
 use App\Restify\AlertScheduleRepository;
@@ -125,6 +127,8 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
 
         Restify::repositories([
             AlertLogRepository::class,
+            AlertOperationRepository::class,
+            AlertOperationSegmentRepository::class,
             AlertRepository::class,
             AlertRuleRepository::class,
             AlertScheduleRepository::class,

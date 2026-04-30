@@ -4,11 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AlertOperationRequest;
 use App\Models\AlertOperation;
+use App\Services\Alerting\AlertOperationSyncer;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Str;
-use LibreNMS\Enum\AlertRuleOperationPhase;
 
 class AlertOperationController extends Controller
 {
@@ -59,7 +58,7 @@ class AlertOperationController extends Controller
             $op->default_operation_step_duration_seconds = $validated['default_operation_step_duration_seconds'] ?? null;
             $op->notifications_suppressed = (bool) ($validated['notifications_suppressed'] ?? false);
             $op->save();
-            $this->syncSegments($op, $request);
+            AlertOperationSyncer::sync($op, $request->validated('segments') ?? []);
 
             return response()->json([
                 'status' => 'ok',
@@ -84,7 +83,7 @@ class AlertOperationController extends Controller
             $alertOperation->default_operation_step_duration_seconds = $validated['default_operation_step_duration_seconds'] ?? null;
             $alertOperation->notifications_suppressed = (bool) ($validated['notifications_suppressed'] ?? false);
             $alertOperation->save();
-            $this->syncSegments($alertOperation, $request);
+            AlertOperationSyncer::sync($alertOperation, $request->validated('segments') ?? []);
 
             return response()->json([
                 'status' => 'ok',
@@ -112,48 +111,5 @@ class AlertOperationController extends Controller
         $alertOperation->delete();
 
         return response()->json(['status' => 'ok', 'message' => __('Operation deleted')]);
-    }
-
-    private function syncSegments(AlertOperation $op, AlertOperationRequest $request): void
-    {
-        $rows = $request->validated('segments');
-        $op->segments()->delete();
-
-        foreach (array_values($rows) as $idx => $row) {
-            $from = max(1, (int) ($row['escalation_step_from'] ?? 1));
-            $toRaw = $row['escalation_step_to'] ?? null;
-            $to = ($toRaw === '' || $toRaw === null) ? null : max($from, (int) $toRaw);
-
-            $seg = $op->segments()->create([
-                'position' => (int) ($row['position'] ?? $idx),
-                'operation_phase' => AlertRuleOperationPhase::PROBLEM,
-                'escalation_step_from' => $from,
-                'escalation_step_to' => $to,
-                'start_in_seconds' => max(0, (int) ($row['start_in_seconds'] ?? 0)),
-                'step_duration_seconds' => max(0, (int) ($row['step_duration_seconds'] ?? 0)),
-            ]);
-
-            $transportsRaw = $row['transports'] ?? [];
-            if (! is_array($transportsRaw)) {
-                $transportsRaw = [];
-            }
-            $transportsRaw = array_values(array_filter($transportsRaw, fn ($t) => $t !== null && $t !== ''));
-            if ($transportsRaw === []) {
-                throw new \InvalidArgumentException('Each segment must have at least one transport or transport group.');
-            }
-
-            $transportIds = [];
-            $transportGroupIds = [];
-            foreach ($transportsRaw as $transport) {
-                if (Str::startsWith((string) $transport, 'g')) {
-                    $transportGroupIds[] = (int) substr((string) $transport, 1);
-                } else {
-                    $transportIds[] = (int) $transport;
-                }
-            }
-
-            $seg->transportSingles()->syncWithPivotValues($transportIds, ['target_type' => 'single']);
-            $seg->transportGroups()->syncWithPivotValues($transportGroupIds, ['target_type' => 'group']);
-        }
     }
 }

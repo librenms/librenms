@@ -5,6 +5,7 @@ namespace LibreNMS\Tests\Feature\Api;
 use App\Http\Middleware\EnforceJsonApi;
 use App\Models\Alert;
 use App\Models\AlertLog;
+use App\Models\AlertOperation;
 use App\Models\AlertRule;
 use App\Models\AlertSchedule;
 use App\Models\AlertTemplate;
@@ -4759,5 +4760,232 @@ class RestifyApiTest extends DBTestCase
 
         $this->postJsonApi('/api/v1/cef-switching', ['path' => 'receive'])
             ->assertStatus(403);
+    }
+
+    // ── Alert Operations ────────────────────────────────────
+
+    public function testAdminCanListAlertOperations(): void
+    {
+        $user = User::factory()->admin()->create();
+        $existing = AlertOperation::count();
+        AlertOperation::create(['name' => 'Op A']);
+        AlertOperation::create(['name' => 'Op B']);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/alert-operations')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', $existing + 2);
+    }
+
+    public function testAdminCanShowAlertOperation(): void
+    {
+        $user = User::factory()->admin()->create();
+        $op = AlertOperation::create(['name' => 'Escalation']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/alert-operations/{$op->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.name', 'Escalation')
+            ->assertJsonPath('data.attributes.notificationsSuppressed', false);
+    }
+
+    public function testAdminCanCreateAlertOperationWithSegments(): void
+    {
+        $user = User::factory()->admin()->create();
+        $transport = AlertTransport::factory()->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->postJsonApi('/api/v1/alert-operations', [
+            'name' => 'Pager Then Email',
+            'notificationsSuppressed' => false,
+            'segments' => [
+                [
+                    'escalation_step_from' => 1,
+                    'escalation_step_to' => 1,
+                    'start_in_seconds' => 0,
+                    'step_duration_seconds' => 300,
+                    'transports' => [(string) $transport->transport_id],
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('data.attributes.name', 'Pager Then Email');
+
+        $created = AlertOperation::where('name', 'Pager Then Email')->firstOrFail();
+        $this->assertCount(1, $created->segments);
+        $this->assertSame(1, $created->segments->first()->escalation_step_from);
+        $this->assertTrue($created->segments->first()->transportSingles->contains($transport));
+    }
+
+    public function testAlertOperationCreateRejectsEmptySegments(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/alert-operations', [
+            'name' => 'No Segments',
+            'segments' => [],
+        ])->assertStatus(422);
+    }
+
+    public function testAlertOperationCreateRejectsSegmentWithoutTransport(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/alert-operations', [
+            'name' => 'Missing Transport',
+            'segments' => [[
+                'escalation_step_from' => 1,
+                'start_in_seconds' => 0,
+                'step_duration_seconds' => 300,
+                'transports' => [],
+            ]],
+        ])->assertStatus(422);
+    }
+
+    public function testAdminCanUpdateAlertOperation(): void
+    {
+        $user = User::factory()->admin()->create();
+        $transport = AlertTransport::factory()->create();
+        $op = AlertOperation::create(['name' => 'Initial']);
+        Sanctum::actingAs($user);
+
+        $this->putJsonApi("/api/v1/alert-operations/{$op->id}", [
+            'name' => 'Renamed',
+            'notificationsSuppressed' => true,
+            'segments' => [[
+                'escalation_step_from' => 1,
+                'start_in_seconds' => 60,
+                'step_duration_seconds' => 600,
+                'transports' => [(string) $transport->transport_id],
+            ]],
+        ])->assertStatus(200)
+            ->assertJsonPath('data.attributes.name', 'Renamed')
+            ->assertJsonPath('data.attributes.notificationsSuppressed', true);
+
+        $op->refresh();
+        $this->assertCount(1, $op->segments);
+        $this->assertSame(60, $op->segments->first()->start_in_seconds);
+    }
+
+    public function testAdminCanDeleteUnusedAlertOperation(): void
+    {
+        $user = User::factory()->admin()->create();
+        $op = AlertOperation::create(['name' => 'Disposable']);
+        Sanctum::actingAs($user);
+
+        $this->deleteJsonApi("/api/v1/alert-operations/{$op->id}")
+            ->assertStatus(204);
+
+        $this->assertDatabaseMissing('alert_operations', ['id' => $op->id]);
+    }
+
+    public function testAlertOperationDeleteIsBlockedWhenReferenced(): void
+    {
+        $user = User::factory()->admin()->create();
+        $op = AlertOperation::create(['name' => 'Referenced']);
+        AlertRule::factory()->create(['alert_operation_id' => $op->id]);
+        Sanctum::actingAs($user);
+
+        $this->deleteJsonApi("/api/v1/alert-operations/{$op->id}")
+            ->assertStatus(422);
+
+        $this->assertDatabaseHas('alert_operations', ['id' => $op->id]);
+    }
+
+    public function testReadOnlyUserCannotCreateAlertOperation(): void
+    {
+        $user = User::factory()->read()->create();
+        $transport = AlertTransport::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/alert-operations', [
+            'name' => 'Should Be Rejected',
+            'segments' => [[
+                'escalation_step_from' => 1,
+                'start_in_seconds' => 0,
+                'step_duration_seconds' => 300,
+                'transports' => [(string) $transport->transport_id],
+            ]],
+        ])->assertStatus(403);
+    }
+
+    public function testReadOnlyUserCanShowAlertOperation(): void
+    {
+        $user = User::factory()->read()->create();
+        $op = AlertOperation::create(['name' => 'Visible']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/alert-operations/{$op->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.name', 'Visible');
+    }
+
+    public function testAlertOperationSegmentsAreReadOnly(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/alert-operation-segments', [
+            'alert_operation_id' => 1,
+            'escalation_step_from' => 1,
+        ])->assertStatus(403);
+    }
+
+    public function testAlertOperationSegmentShowExposesFields(): void
+    {
+        $user = User::factory()->admin()->create();
+        $transport = AlertTransport::factory()->create();
+        $op = AlertOperation::create(['name' => 'WithSegments']);
+        \App\Services\Alerting\AlertOperationSyncer::sync($op, [[
+            'escalation_step_from' => 2,
+            'start_in_seconds' => 60,
+            'step_duration_seconds' => 300,
+            'transports' => [(string) $transport->transport_id],
+        ]]);
+        $segment = $op->segments()->firstOrFail();
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/alert-operation-segments/{$segment->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.escalationStepFrom', 2)
+            ->assertJsonPath('data.attributes.startInSeconds', 60)
+            ->assertJsonPath('data.attributes.stepDurationSeconds', 300)
+            ->assertJsonPath('data.attributes.alertOperationId', $op->id);
+    }
+
+    public function testAlertRuleCanReferenceAlertOperation(): void
+    {
+        $user = User::factory()->admin()->create();
+        $op = AlertOperation::create(['name' => 'Op']);
+        Sanctum::actingAs($user);
+
+        $response = $this->postJsonApi('/api/v1/alert-rules', [
+            'name' => 'With Operation',
+            'severity' => 'warning',
+            'isEnabled' => true,
+            'alertOperationId' => $op->id,
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('data.attributes.alertOperationId', $op->id);
+
+        $rule = AlertRule::where('name', 'With Operation')->firstOrFail();
+        $this->assertSame($op->id, $rule->alert_operation_id);
+    }
+
+    public function testAlertRuleRejectsUnknownAlertOperationId(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/alert-rules', [
+            'name' => 'Bad FK',
+            'severity' => 'warning',
+            'isEnabled' => true,
+            'alertOperationId' => 999999,
+        ])->assertStatus(422);
     }
 }

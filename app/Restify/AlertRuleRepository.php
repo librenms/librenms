@@ -3,6 +3,7 @@
 namespace App\Restify;
 
 use App\Models\AlertRule;
+use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Fields\BelongsToMany;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
@@ -26,6 +27,7 @@ class AlertRuleRepository extends Repository
             'devices' => BelongsToMany::make('devices', DeviceRepository::class),
             'groups' => BelongsToMany::make('groups', DeviceGroupRepository::class),
             'locations' => BelongsToMany::make('locations', LocationRepository::class),
+            'alertOperation' => BelongsTo::make('alertOperation', AlertOperationRepository::class),
         ];
     }
 
@@ -49,6 +51,7 @@ class AlertRuleRepository extends Repository
             'procedure' => MatchFilter::make()->setType('text')->setColumn('proc'),
             'notes' => MatchFilter::make()->setType('text')->setColumn('notes'),
             'isInverted' => MatchFilter::make()->setType('bool')->setColumn('invert_map'),
+            'alertOperationId' => MatchFilter::make()->setType('integer')->setColumn('alert_operation_id'),
         ];
     }
 
@@ -65,6 +68,7 @@ class AlertRuleRepository extends Repository
             'procedure' => SortableFilter::make()->setColumn('proc'),
             'notes' => SortableFilter::make()->setColumn('notes'),
             'isInverted' => SortableFilter::make()->setColumn('invert_map'),
+            'alertOperationId' => SortableFilter::make()->setColumn('alert_operation_id'),
         ];
     }
 
@@ -98,6 +102,13 @@ class AlertRuleRepository extends Repository
                     }
                 })
                 ->rules('boolean'),
+            field('alertOperationId', fn ($value, $model) => $model->alert_operation_id)
+                ->fillCallback(function ($request, $model, $attribute) {
+                    if ($request->exists($attribute)) {
+                        $model->alert_operation_id = $request->input($attribute);
+                    }
+                })
+                ->rules('nullable', 'integer', 'exists:alert_operations,id'),
         ];
     }
 }
