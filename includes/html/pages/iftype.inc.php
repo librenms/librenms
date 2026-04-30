@@ -1,8 +1,16 @@
 <table class="table table-condensed table-hover table-striped">
 <?php
 
+use App\Models\PortGroup;
+
 $types_array = explode(',', strip_tags((string) $vars['type']));
-$ports = get_ports_from_type($types_array);
+$port_group = $vars['group'] ? PortGroup::find($vars['group'])
+                                        ->ports()
+                                        ->join('devices', 'ports.device_id', 'devices.device_id')
+                                        ->select('devices.*', 'ports.*')
+                                        ->get()
+                                        ->toArray() : null;
+$ports = $port_group ?? get_ports_from_type($types_array);
 
 $if_list = implode(',', array_map(fn ($port) => $port['port_id'], $ports));
 

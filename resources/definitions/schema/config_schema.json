@@ -127,6 +127,7 @@
                                     "float",
                                     "graph",
                                     "snmp3auth",
+                                    "password-array",
                                     "ad-groups",
                                     "oxidized-maps",
                                     "executable",

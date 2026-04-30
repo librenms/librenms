@@ -89,6 +89,10 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                                     <div class='col-sm-2' title="Alert when this rule doesn't match.">
                                         <input type='checkbox' name='invert' id='invert'>
                                     </div>
+                                    <label for='mute' class='col-sm-3 col-md-3 control-label' title="Suppress all notifications for this rule (alerts still appear in the Web UI)." style="vertical-align: top;">Mute alerts </label>
+                                    <div class='col-sm-2' title="Suppress all notifications for this rule (alerts still appear in the Web UI).">
+                                        <input type='checkbox' name='mute' id='mute'>
+                                    </div>
                                 </div>
                                 <div class="form-group form-inline">
                                     <label for='recovery' class='col-sm-3 col-md-2 control-label' title="Issue recovery alerts.">Recovery alerts </label>
@@ -326,6 +330,7 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                 $severity.val($severity.find("option[selected]").val());
                 $("#invert").bootstrapSwitch('state', <?=$default_invert_rule_match?>);
                 $("#recovery").bootstrapSwitch('state', <?=$default_recovery_alerts?>);
+                $("#mute").bootstrapSwitch('state', false);
                 $("#acknowledgement").bootstrapSwitch('state', <?=$default_acknowledgement_alerts?>);
                 $("#override_query").bootstrapSwitch('state', false);
                 $("#invert_map").bootstrapSwitch('state', <?=$default_invert_map?>);
@@ -392,6 +397,7 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                     extra.options.override_query = false;
                 }
                 $("[name='recovery']").bootstrapSwitch('state', extra.recovery);
+                $("[name='mute']").bootstrapSwitch('state', !!extra.mute);
                 $("[name='acknowledgement']").bootstrapSwitch('state', extra.acknowledgement);
 
                 if (rule.invert_map == 1) {
