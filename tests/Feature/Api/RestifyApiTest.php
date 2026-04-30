@@ -566,6 +566,88 @@ class RestifyApiTest extends DBTestCase
             ->assertJsonPath('data.attributes.notes', 'Check port status');
     }
 
+    public function testAdminCanCreateAlertRule(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $builder = [
+            'condition' => 'AND',
+            'rules' => [['id' => 'devices.status', 'operator' => 'equal', 'value' => 0]],
+        ];
+        $extra = ['mute' => false, 'count' => '-1', 'delay' => 300, 'interval' => 300];
+        $query = 'devices.status = 0';
+
+        $response = $this->postJsonApi('/api/v1/alert-rules', [
+            'name' => 'Device Unreachable',
+            'severity' => 'critical',
+            'isEnabled' => true,
+            'procedure' => 'Page on-call',
+            'notes' => 'Triggered when ICMP fails for 5m',
+            'isInverted' => false,
+            'builder' => $builder,
+            'extra' => $extra,
+            'query' => $query,
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('data.attributes.name', 'Device Unreachable')
+            ->assertJsonPath('data.attributes.severity', 'critical')
+            ->assertJsonPath('data.attributes.isEnabled', true)
+            ->assertJsonPath('data.attributes.procedure', 'Page on-call')
+            ->assertJsonPath('data.attributes.notes', 'Triggered when ICMP fails for 5m')
+            ->assertJsonPath('data.attributes.isInverted', false)
+            ->assertJsonPath('data.attributes.builder', $builder)
+            ->assertJsonPath('data.attributes.query', $query);
+
+        $created = AlertRule::where('name', 'Device Unreachable')->firstOrFail();
+        $this->assertSame($builder, $created->builder);
+        $this->assertSame($extra, $created->extra);
+        $this->assertSame($query, $created->query);
+        $this->assertSame('Page on-call', $created->proc);
+        $this->assertSame(0, (int) $created->disabled);
+        $this->assertSame(0, (int) $created->invert_map);
+    }
+
+    public function testAlertRuleCreateUsesDefaultsForOptionalFields(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/alert-rules', [
+            'name' => 'Bare Minimum Rule',
+            'severity' => 'warning',
+            'isEnabled' => true,
+        ])->assertStatus(201);
+
+        $created = AlertRule::where('name', 'Bare Minimum Rule')->firstOrFail();
+        $this->assertSame([], $created->builder);
+        $this->assertSame([], $created->extra);
+        $this->assertSame('', $created->query);
+    }
+
+    public function testAlertRuleCreateRejectsMissingRequiredFields(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/alert-rules', [
+            'notes' => 'no name, no severity',
+        ])->assertStatus(422);
+    }
+
+    public function testReadOnlyUserCannotCreateAlertRule(): void
+    {
+        $user = User::factory()->read()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/alert-rules', [
+            'name' => 'Should Be Rejected',
+            'severity' => 'warning',
+            'isEnabled' => true,
+        ])->assertStatus(403);
+    }
+
     public function testAdminCanUpdateAlertRuleSeverity(): void
     {
         $user = User::factory()->admin()->create();
@@ -1034,6 +1116,23 @@ class RestifyApiTest extends DBTestCase
             ->assertJsonPath('data.attributes.notes', 'Router upgrade');
     }
 
+    public function testAdminCanCreateAlertSchedule(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/alert-schedules', [
+            'title' => 'Weekend Maintenance',
+            'notes' => 'Scheduled router upgrade',
+            'isRecurring' => false,
+        ])->assertStatus(201)
+            ->assertJsonPath('data.attributes.title', 'Weekend Maintenance')
+            ->assertJsonPath('data.attributes.notes', 'Scheduled router upgrade')
+            ->assertJsonPath('data.attributes.isRecurring', false);
+
+        $this->assertDatabaseHas('alert_schedule', ['title' => 'Weekend Maintenance']);
+    }
+
     public function testAdminCanDeleteAlertSchedule(): void
     {
         $user = User::factory()->admin()->create();
@@ -1095,6 +1194,23 @@ class RestifyApiTest extends DBTestCase
             ->assertJsonPath('data.attributes.name', 'Email Alert')
             ->assertJsonPath('data.attributes.category', 'mail')
             ->assertJsonPath('data.attributes.isDefault', true);
+    }
+
+    public function testAdminCanCreateAlertTransport(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/alert-transports', [
+            'name' => 'Email Alerts',
+            'category' => 'mail',
+            'isDefault' => true,
+        ])->assertStatus(201)
+            ->assertJsonPath('data.attributes.name', 'Email Alerts')
+            ->assertJsonPath('data.attributes.category', 'mail')
+            ->assertJsonPath('data.attributes.isDefault', true);
+
+        $this->assertDatabaseHas('alert_transports', ['transport_name' => 'Email Alerts']);
     }
 
     public function testAdminCanDeleteAlertTransport(): void
@@ -1161,6 +1277,25 @@ class RestifyApiTest extends DBTestCase
             ->assertJsonPath('data.attributes.check', 'dns')
             ->assertJsonPath('data.attributes.category', 'static')
             ->assertJsonPath('data.attributes.description', 'Monitor DNS servers');
+    }
+
+    public function testAdminCanCreateServiceTemplate(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/service-templates', [
+            'name' => 'HTTP Monitor',
+            'check' => 'http',
+            'category' => 'static',
+            'description' => 'Monitor HTTP endpoints',
+        ])->assertStatus(201)
+            ->assertJsonPath('data.attributes.name', 'HTTP Monitor')
+            ->assertJsonPath('data.attributes.check', 'http')
+            ->assertJsonPath('data.attributes.category', 'static')
+            ->assertJsonPath('data.attributes.description', 'Monitor HTTP endpoints');
+
+        $this->assertDatabaseHas('service_templates', ['name' => 'HTTP Monitor']);
     }
 
     public function testAdminCanDeleteServiceTemplate(): void
