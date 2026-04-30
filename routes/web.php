@@ -3,6 +3,7 @@
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Ajax;
 use App\Http\Controllers\AlertController;
+use App\Http\Controllers\AlertOperationController;
 use App\Http\Controllers\AlertRuleController;
 use App\Http\Controllers\AlertRuleTemplateController;
 use App\Http\Controllers\AlertTransportController;
@@ -201,6 +202,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::post('unregister', [PushNotificationController::class, 'unregister'])->name('push.unregister');
     });
 
+    Route::get('alert-operations', [AlertOperationController::class, 'index'])->name('alert-operations.index');
     // admin pages
     Route::middleware('can:admin')->group(function (): void {
         Route::get('settings/{tab?}/{section?}', [SettingsController::class, 'index'])->name('settings');
@@ -211,6 +213,7 @@ Route::middleware(['auth'])->group(function (): void {
 
         Route::post('alert/transports/{transport}/test', [AlertTransportController::class, 'test'])->name('alert.transports.test');
         Route::resource('alert-rule', AlertRuleController::class)->only(['show', 'store', 'update', 'destroy']);
+        Route::resource('alert-operation', AlertOperationController::class)->only(['show', 'store', 'update', 'destroy']);
         Route::put('alert-rule/{alert_rule}/toggle', [AlertRuleController::class, 'toggle'])->name('alert-rule.toggle');
         Route::get('alert-rule-from-template/{template_id}', [AlertRuleTemplateController::class, 'template'])->name('alert-rule-template');
         Route::get('alert-rule-from-rule/{alert_rule}', [AlertRuleTemplateController::class, 'rule'])->name('alert-rule-template.rule');
@@ -279,6 +282,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('alert-transport', Select\AlertTransportController::class)->name('ajax.select.alert-transport');
             Route::get('alert-transport-group', Select\AlertTransportGroupController::class)->name('ajax.select.alert-transport-group');
             Route::get('alert-transports-groups', Select\AlertTransportsAndGroupsController::class)->name('ajax.select.alert-transports-groups');
+            Route::get('alert-operation', Select\AlertOperationController::class)->name('ajax.select.alert-operation');
             Route::get('application', Select\ApplicationController::class)->name('ajax.select.application');
             Route::get('bill', Select\BillController::class)->name('ajax.select.bill');
             Route::get('custom-map', Select\CustomMapController::class)->name('ajax.select.custom-map');

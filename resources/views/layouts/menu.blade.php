@@ -80,8 +80,8 @@
                                 </li>
                                 @endconfig
                                 @can('viewAny', \App\Models\SslCertificate::class)
-                                <li><a href="{{ url('ssl-certificates') }}"><i class="fa fa-lock fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span
-                                    class="tw:md:hidden tw:2xl:inline-block">{{ __('SSL Certificates') }}</span></a>
+                                <li><a href="{{ url('ssl-certificates') }}"><i class="fa fa-lock fa-fw fa-lg fa-nav-icons"
+                                    aria-hidden="true"></i> {{ __('SSL Certificates') }}</a>
                                 </li>
                                 @endcan
                             </ul>
@@ -591,6 +591,10 @@
                         <li><a href="{{ url('alert-rules') }}"><i class="fa fa-list fa-fw fa-lg"
                                                                   aria-hidden="true"></i> {{ __('Alert Rules') }}</a></li>
                         @endcan
+                        @can('viewAny', \App\Models\AlertOperation::class)
+                        <li><a href="{{ route('alert-operations.index') }}"><i class="fa fa-sliders fa-fw fa-lg"
+                                                                       aria-hidden="true"></i> {{ __('Operations') }}</a></li>
+                        @endcan
                         @can('viewAny', \App\Models\AlertSchedule::class)
                         <li><a href="{{ url('alert-schedule') }}"><i class="fa fa-calendar fa-fw fa-lg"
                                                                      aria-hidden="true"></i> {{ __('Scheduled Maintenance') }}
@@ -851,15 +855,6 @@
             success: function () {
                 hideDashboardEditor = hideDashboardEditor ? 0 : 1;
                 $('#toggle-dashboard-editor-text').text(hideDashboardEditor ? '{{ __('Show Dashboard Editor') }}' : '{{ __('Hide Dashboard Editor') }}')
-
-                // disable and hide editing
-                if (typeof gridster !== 'undefined') {
-                    gridster.disable();
-                    gridster.disable_resize();
-                    gridster_state = 0;
-                    $('.fade-edit').fadeOut();
-                    dashboard_collapse("#hide_edit");
-                }
 
                 $('#dashboard-editor').collapse(hideDashboardEditor ? 'hide' : 'show');
             }

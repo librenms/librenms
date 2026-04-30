@@ -135,21 +135,21 @@ return [
                 'description' => 'Severity',
                 'help' => 'Severity for an Alert',
             ],
-            'max_alerts' => [
-                'description' => 'Max Alerts',
-                'help' => 'Count of Alerts to be sent',
+            'default_operation_steps_to' => [
+                'description' => 'Default operation: Steps to',
+                'help' => 'Default escalation end step for created operation rows (-1 means no limit)',
             ],
-            'delay' => [
-                'description' => 'Delay',
-                'help' => 'Delay before an Alert will be sent',
+            'default_operation_start_in' => [
+                'description' => 'Default operation: Start in',
+                'help' => 'Default delay before an operation notification is sent',
             ],
-            'interval' => [
-                'description' => 'Interval',
-                'help' => 'Interval to be checked for this Alert',
+            'default_operation_step_duration' => [
+                'description' => 'Default operation: Step duration',
+                'help' => 'Default operation step duration (minutes)',
             ],
-            'mute_alerts' => [
-                'description' => 'Mute Alerts',
-                'help' => 'Should Alert only be seen in WebUI',
+            'default_operation_notifications_suppressed' => [
+                'description' => 'Default operation: Suppress notifications',
+                'help' => 'Suppress notifications by default for created operation rows',
             ],
             'invert_rule_match' => [
                 'description' => 'Invert Rule Match',
@@ -580,6 +580,16 @@ return [
         'authlog_purge' => [
             'description' => 'Auth log entries older than',
             'help' => 'Cleanup done by daily.sh',
+        ],
+        'availablity' => [
+            'threshold_ok' => [
+                'description' => 'Availability Ok Threshold',
+                'help' => 'Threshold for green color',
+            ],
+            'threshold_warning' => [
+                'description' => 'Availablilty Warning Threshold',
+                'help' => 'Threshold for orange color',
+            ],
         ],
         'bad_entity_sensor_regex' => [
             'description' => 'Bad Entity Sensor Regex',
@@ -2536,6 +2546,7 @@ return [
         'days' => 'days',
         'ms' => 'ms',
         'seconds' => 'seconds',
+        'percent' => '%',
     ],
     'validate' => [
         'boolean' => ':value is not a valid boolean',
@@ -2547,6 +2558,7 @@ return [
         'select' => ':value is not an allowed value',
         'text' => ':value is not allowed',
         'array' => 'Invalid format',
+        'password-array' => 'Invalid format',
         'executable' => ':value is not a valid executable',
         'directory' => ':value is not a valid directory',
     ],
