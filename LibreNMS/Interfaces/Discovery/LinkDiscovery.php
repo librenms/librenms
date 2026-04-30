@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 interface LinkDiscovery
 {
     /**
-     * @return Collection<\App\Models\Link>
+     * @return Collection<int, \App\Models\Link>
      */
     public function discoverLinks(): Collection;
 }

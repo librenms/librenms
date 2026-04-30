@@ -24,9 +24,7 @@ class Links implements Module
 {
     use SyncsModels;
 
-    /**
-     * @inheritDoc
-     */
+    /** @return array<mixed> */
     public function dependencies(): array
     {
         return ['ports'];
@@ -120,9 +118,7 @@ class Links implements Module
         return $device->links()->delete();
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @return array<mixed> */
     public function dump(Device $device, string $type): ?array
     {
         if ($type == 'polling') {
@@ -135,6 +131,9 @@ class Links implements Module
         ];
     }
 
+    /**
+     * @return Collection<int, \App\Models\PortsFdb>
+     */
     private function discoverLldp(Device $device): Collection
     {
         $links = new Collection;
@@ -306,7 +305,20 @@ class Links implements Module
         return $links->filter();
     }
 
-    private function array_depth($array): int
+    /**
+     * @param array<int, array<int, array<int, array{
+     *     lldpRemChassisIdSubtype: string,
+     *     lldpRemChassisId: string,
+     *     lldpRemPortIdSubtype: string,
+     *     lldpRemPortId: string,
+     *     lldpRemPortDesc: string,
+     *     lldpRemSysName: string,
+     *     lldpRemSysDesc: string,
+     *     lldpRemSysCapSupported: int|string,
+     *     lldpRemSysCapEnabled: int|string
+     * }>>> $array
+     */
+    private function array_depth(array $array): int
     {
         $max_indentation = 1;
         $array_str = print_r($array, true);
