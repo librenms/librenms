@@ -435,7 +435,7 @@ It is up the IdP to provide the relevant details that you will need for configur
 
 === "Azure"
 
-    ![LibreNMS-SAML-Azure](https://user-images.githubusercontent.com/8980985/222431219-af2369dc-1abd-4943-8dfb-5a21d8b9976c.png)
+    ![LibreNMS-SAML-Azure](../img/socialite-azure-1.png)
     ```bash
     echo "SESSION_SAME_SITE=none" >> .env
     lnms plugin:add socialiteproviders/saml2
