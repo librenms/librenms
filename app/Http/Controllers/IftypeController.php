@@ -47,7 +47,7 @@ class IftypeController extends Controller
         );
 
         if (isset($vars['type'])) {
-            $types = explode(',', $vars['type']);
+            $types = explode(',', (string) $vars['type']);
             $ports = Port::whereIn('port_descr_type', $types);
         } elseif (isset($vars['group'])) {
             $types = ['Group ' . $vars['group']];

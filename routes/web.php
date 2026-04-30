@@ -16,7 +16,7 @@ use App\Http\Controllers\Device;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\DeviceGroupController;
 use App\Http\Controllers\GraphController;
-use App\Http\Controllers\IftypesController;
+use App\Http\Controllers\IftypeController;
 use App\Http\Controllers\Install;
 use App\Http\Controllers\LegacyController;
 use App\Http\Controllers\LocationController;
