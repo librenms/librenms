@@ -112,7 +112,8 @@ class PortsController implements DeviceTab
                 $this->getTabs($device),
                 __('Graphs') => $this->getGraphLinks(),
             ],
-            'dropdownLinks' => $this->pageLinks($request),
+            'dropdownLinks' => [],
+            'filter' => $this->loadSavedFilter(),
             'perPage' => $this->settings['perPage'],
             'sort' => $this->settings['sort'],
             'next_order' => $this->settings['order'] == 'asc' ? 'desc' : 'asc',
@@ -442,39 +443,35 @@ class PortsController implements DeviceTab
         return $request->route('vars', LibrenmsConfig::get('ports_page_default')); // fourth segment is called vars to handle legacy urls
     }
 
-    private function pageLinks(Request $request): array
+    private function loadSavedFilter(): array
     {
-        $disabled = $this->settings['disabled'];
-        $ignored = $this->settings['ignored'];
-        $admin = $this->settings['admin'] == 'any';
-        $status = $this->settings['status'] == 'up';
+        $prefernce = UserPref::getPref(request()->user(), 'filters.device.ports');
+        if ($prefernce !== null) {
+            return $prefernce;
+        }
 
-        return [
-            [
-                'icon' => $status ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
-                'url' => $request->fullUrlWithQuery(['status' => $status ? $this->defaults['status'] : 'up']),
-                'title' => __('port.filters.status_up'),
-                'external' => false,
-            ],
-            [
-                'icon' => $admin ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
-                'url' => $request->fullUrlWithQuery(['admin' => $admin ? $this->defaults['admin'] : 'any']),
-                'title' => __('port.filters.admin_down'),
-                'external' => false,
-            ],
-            [
-                'icon' => $disabled ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
-                'url' => $request->fullUrlWithQuery(['disabled' => ! $disabled]),
-                'title' => __('port.filters.disabled'),
-                'external' => false,
-            ],
-            [
-                'icon' => $ignored ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
-                'url' => $request->fullUrlWithQuery(['ignored' => ! $ignored]),
-                'title' => __('port.filters.ignored'),
-                'external' => false,
-            ],
-        ];
+        return $this->parseLegacyToFilter();
+    }
+
+    private function parseLegacyToFilter(): array
+    {
+        $filter = [];
+
+        if (! $this->settings['disabled']) {  // 0: disabled hidden 1: not filtered
+            $filter['disabled'] = ['eq' => 0];
+        }
+
+        if (! $this->settings['ignored']) { // 0: ignored hidden 1: not filtered
+            $filter['ignore'] = ['eq' => 0];
+        }
+
+        if ($this->settings['status'] == 'up') { // up: only status up, any: not filtered
+            $filter['state'] = ['eq' => 'up'];
+        } elseif ($this->settings['admin'] == 'up') { // up: only != shutdown, any: not filtered
+            $filter['state'] = ['neq' => 'shutdown'];
+        }
+
+        return $filter;
     }
 
     private function filterFields(int $device_id): array

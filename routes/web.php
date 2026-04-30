@@ -113,7 +113,7 @@ Route::middleware(['auth'])->group(function (): void {
     });
     Route::get('locations', [LocationController::class, 'index']);
     Route::resource('ssl-certificates', SslCertificateController::class)->except(['edit']);
-    Route::resource('preferences', UserPreferencesController::class)->only('index', 'store');
+    Route::resource('preferences', UserPreferencesController::class)->only('index', 'store', 'update');
     Route::middleware('can:api.access')->group(function (): void {
         Route::get('api-access', [ApiAccessController::class, 'index'])->name('api-access.index');
         Route::post('api-access', [ApiAccessController::class, 'store'])->name('api-access.store');

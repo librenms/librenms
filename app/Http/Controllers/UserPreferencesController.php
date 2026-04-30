@@ -134,6 +134,18 @@ class UserPreferencesController extends Controller
         return response()->json(['status' => 'success']);
     }
 
+    public function update(Request $request, string $preference) {
+        $request->validate([
+            'table' => ['required', 'string'],
+            'filters' => ['array'],
+        ]);
+
+        if ($preference == 'filters') {
+            $name = 'filters.' . $request->string('table');
+            $this->updatePreference($name, json_encode($request->array('filters')));
+        }
+    }
+
     private function getValidLocales()
     {
         return array_reduce(glob(base_path('lang') . '/*', GLOB_ONLYDIR), function ($locales, $locale) {
