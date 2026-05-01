@@ -68,12 +68,12 @@
                         });
 
                         if (response.ok) {
-                            toastr.success(@js(__('port.purged_message')), @js(__('port.purged'));
+                            toastr.success(@js(__('port.purged_message')), @js(__('port.purged')));
                         } else {
-                            toastr.error(@js(__('port.server_error')), @js(__('port.purge_failed'));
+                            toastr.error(@js(__('port.server_error')), @js(__('port.purge_failed')));
                         }
                     } catch (error) {
-                        toastr.error(@js(__('port.network_error')), @js(__('port.purge_failed'));
+                        toastr.error(@js(__('port.network_error')), @js(__('port.purge_failed')));
                     } finally {
                         this.loading = false;
                     }
