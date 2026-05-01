@@ -72,6 +72,7 @@ class PortFieldController extends SelectController
     protected function baseQuery(Request $request): Builder
     {
         $this->idField = $request->string('field');
+
         return Port::hasAccess($request->user())
             ->whereNotNull($this->idField)
             ->select($this->idField)
@@ -91,7 +92,7 @@ class PortFieldController extends SelectController
 
         return [
             'id' => $value,
-            'text' => match($field) {
+            'text' => match ($field) {
                 'ifSpeed' => Number::formatSi($value, suffix: 'bps'),
                 'ifType' => Rewrite::normalizeIfType($value),
                 default => $value,

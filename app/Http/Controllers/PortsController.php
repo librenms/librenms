@@ -39,7 +39,7 @@ class PortsController extends Controller
                 'media',
                 'descr',
                 'device',
-            ])
+            ]),
         ]);
 
         $errors = $request->boolean('errors');
@@ -102,7 +102,7 @@ class PortsController extends Controller
     public function purge(Request $request): JsonResponse
     {
         $request->validate([
-            'purge' => ['required', 'regex:/^(\d+|all)$/']
+            'purge' => ['required', 'regex:/^(\d+|all)$/'],
         ]);
 
         $purge = $request->input('purge');
@@ -126,7 +126,6 @@ class PortsController extends Controller
 
         return response()->json(['message' => 'Successfully purged port ID ' . ((int) $purge)]);
     }
-
 
     private function filterFields(): array
     {
@@ -155,7 +154,7 @@ class PortsController extends Controller
                 'options' => [
                     'up',
                     'down',
-                    'shutdown'
+                    'shutdown',
                 ],
             ],
             [
@@ -229,7 +228,7 @@ class PortsController extends Controller
             ->with(['device' => fn ($query) => $query->select(['device_id', 'hostname', 'sysName', 'display', 'ip', 'overwrite_ip'])])
             ->isValid()
             ->whereHas('device') // a device is required for graphs to work
-            ->when(request()->array('filter'), fn(Builder $query, $filters) => $query->applyFilters($filters));
+            ->when(request()->array('filter'), fn (Builder $query, $filters) => $query->applyFilters($filters));
 
         $portsQuery = match ($sort) {
             'traffic' => $portsQuery->orderByRaw('ifInOctets_rate + ifOutOctets_rate desc'),

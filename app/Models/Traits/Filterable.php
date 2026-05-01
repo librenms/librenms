@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Filterable.php
  *
@@ -65,11 +66,17 @@ trait Filterable
         $allowed = $this->filterable ?? [];
 
         foreach ($filters as $field => $operators) {
-            if (!in_array($field, $allowed)) continue;
-            if (!is_array($operators)) continue;
+            if (! in_array($field, $allowed)) {
+                continue;
+            }
+            if (! is_array($operators)) {
+                continue;
+            }
 
             foreach ($operators as $op => $value) {
-                if (!isset($this->operatorMap[$op])) continue;
+                if (! isset($this->operatorMap[$op])) {
+                    continue;
+                }
 
                 $config = $this->operatorMap[$op];
                 $method = $config['method'];
@@ -105,12 +112,14 @@ trait Filterable
     {
         if (in_array($op, ['is_empty', 'is_not_empty'])) {
             $query->$method($field);
+
             return;
         }
 
         if (in_array($op, ['in', 'not_in'])) {
             $values = is_array($value) ? $value : explode(',', $value);
             $query->$method($field, $values);
+
             return;
         }
 

@@ -65,10 +65,10 @@ class PortsController extends TableController
                     $allowedOps = ['eq', 'neq', 'contains', 'starts_with', 'gt', 'lt', 'in', 'not_in', 'is_empty'];
                     $operator = array_key_first($value);
 
-                    if (!in_array($operator, $allowedOps)) {
+                    if (! in_array($operator, $allowedOps)) {
                         $fail("The operator '{$operator}' is not supported.");
                     }
-                }
+                },
             ],
             'filter.*.*' => ['nullable', 'max:255'],
         ];
@@ -119,7 +119,7 @@ class PortsController extends TableController
         $query = Port::hasAccess($request->user())
             ->with(['device', 'device.location'])
             ->leftJoin('devices', 'ports.device_id', 'devices.device_id')
-            ->when($request->array('filter'), fn($q, $filter) => $q->applyFilters($filter))
+            ->when($request->array('filter'), fn ($q, $filter) => $q->applyFilters($filter))
             ->unless($request->has('filter.deleted'), function ($q) use ($request) {
                 return $q->where('ports.deleted', $request->input('deleted', 0));
             })

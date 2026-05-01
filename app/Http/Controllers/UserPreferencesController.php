@@ -134,7 +134,8 @@ class UserPreferencesController extends Controller
         return response()->json(['status' => 'success']);
     }
 
-    public function update(Request $request, string $preference) {
+    public function update(Request $request, string $preference)
+    {
         $request->validate([
             'name' => ['required', 'string'],
             'filters' => ['array'],

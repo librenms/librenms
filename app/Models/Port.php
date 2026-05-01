@@ -391,7 +391,7 @@ class Port extends DeviceRelatedModel
 
         $operator = $config['operator'] ?? '=';
 
-        $query->where(function($q) use ($value, $operator) {
+        $query->where(function ($q) use ($value, $operator) {
             $q->where('ports.ifName', $operator, $value)
                 ->orWhere('ifAlias', $operator, $value)
                 ->orWhere('ifDescr', $operator, $value);
@@ -422,7 +422,7 @@ class Port extends DeviceRelatedModel
 
         $has = match ($op) {
             'neq', 'not_in' => 'whereDoesntHave',
-            default          => 'whereHas',
+            default => 'whereHas',
         };
 
         $query->{$has}('groups', function ($q) use ($op, $ids) {
