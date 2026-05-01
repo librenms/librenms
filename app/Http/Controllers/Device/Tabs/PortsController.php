@@ -136,8 +136,7 @@ class PortsController implements DeviceTab
         /** @var Collection<int, Port>|LengthAwarePaginator<Port> $ports */
         $ports = $this->getFilteredPortsQuery($device, $relationships, $request)
             ->paginate(fn ($total) => $this->settings['perPage'] == 'all' ? $total : (int) $this->settings['perPage']) // @phpstan-ignore-line missing closure type
-            ->appends('perPage', $this->settings['perPage'])
-            ->appends('searchPort', $request->input('searchPort'));
+            ->appends('perPage', $this->settings['perPage']);
 
         $data = [
             'ports' => $ports,
@@ -293,8 +292,8 @@ class PortsController implements DeviceTab
     private function getTabs(Device $device): array
     {
         $tabs = [
-            ['name' => __('Basic'), 'url' => 'basic'],
-            ['name' => __('Detail'), 'url' => 'detail'],
+            ['name' => __('Basic'), 'url' => 'basic', 'class' => 'sync-filter-url'],
+            ['name' => __('Detail'), 'url' => 'detail', 'class' => 'sync-filter-url'],
         ];
 
         if ($device->macs()->exists()) {
@@ -337,24 +336,28 @@ class PortsController implements DeviceTab
             [
                 'name' => __('port.graphs.bits'),
                 'url' => 'graphs?type=bits',
+                'class' => 'sync-filter-url',
                 'sub_name' => __('Mini'),
                 'sub_url' => 'mini_graphs?type=bits',
             ],
             [
                 'name' => __('port.graphs.upkts'),
                 'url' => 'graphs?type=upkts',
+                'class' => 'sync-filter-url',
                 'sub_name' => __('Mini'),
                 'sub_url' => 'mini_graphs?type=upkts',
             ],
             [
                 'name' => __('port.graphs.nupkts'),
                 'url' => 'graphs?type=nupkts',
+                'class' => 'sync-filter-url',
                 'sub_name' => __('Mini'),
                 'sub_url' => 'mini_graphs?type=nupkts',
             ],
             [
                 'name' => __('port.graphs.errors'),
                 'url' => 'graphs?type=errors',
+                'class' => 'sync-filter-url',
                 'sub_name' => __('Mini'),
                 'sub_url' => 'mini_graphs?type=errors',
             ],
@@ -404,9 +407,6 @@ class PortsController implements DeviceTab
             'port' => 'ifName',
             default => 'ifIndex',
         };
-
-        // Get search parameter
-        $searchPort = $request?->input('searchPort');
 
         return Port::where('device_id', $device->device_id)
             ->isNotDeleted()

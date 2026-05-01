@@ -1,9 +1,11 @@
 export default function filterBarComponent({
+    name,
     fields,
     reload = false,
     initial = [],
 }) {
     return {
+        name,
         fields,
         reload,
         initial,
@@ -317,10 +319,30 @@ export default function filterBarComponent({
             } else {
                 window.history.pushState({}, "", url);
                 this.$dispatch("filter:apply", {
-                    filters: this.filters,
-                    formatted: formatted,
+                    filters: formatted,
                 });
             }
+
+            this.syncPageUrls(formatted);
+        },
+
+        syncPageUrls(formatted) {
+            // update urls
+            const serializedFilter = new URLSearchParams({ filter: formatted}).toString();
+            document.querySelectorAll("a.sync-filter-url").forEach(function (el) {
+                const url = new URL(
+                    el.getAttribute("href"),
+                    window.location.origin
+                );
+
+                [...url.searchParams.keys()]
+                    .filter((key) => key.startsWith("filter"))
+                    .forEach((key) => url.searchParams.delete(key));
+
+                const base = url.origin + url.pathname;
+                const existing = url.searchParams.toString();
+                el.setAttribute("href", `${base}?${existing}${existing ? "&" : ""}${serializedFilter}`);
+            });
         },
 
         getNormalizedOptions() {

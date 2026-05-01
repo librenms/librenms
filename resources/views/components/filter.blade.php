@@ -1,13 +1,7 @@
-@props([
-    'fields' => [],
-    'reload' => false,
-    'hide' => false,
-    'initial' => [],
-])
-
 <div
     {{ $attributes->merge(['class' => 'tw:relative tw:flex tw:items-center tw:text-[13px] tw:max-w-full' . ($hide ? ' tw:hidden' : '')]) }}
     x-data="filterBarComponent({
+        name: @js($name),
         fields: @js($fields),
         reload: @js($reload),
         initial: @js($initial)
@@ -26,10 +20,7 @@
                     @click.stop="showAdd = false; showOptions = !showOptions"
                     class="tw:shrink-0 tw:flex tw:items-center tw:gap-[0.5em] tw:px-[1em] tw:h-full tw:transition-colors tw:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:tracking-widest tw:rounded-l-[0.5em] tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400">
                 <div class="tw:relative tw:flex tw:items-center">
-                    {{-- Restored Original Filter Icon --}}
-                    <svg class="tw:w-[1.1em] tw:h-[1.1em] tw:text-neutral-500! tw:dark:text-dark-white-400!" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M1 2.5h10M3 6h6M5 9.5h2" stroke-linecap="round"/>
-                    </svg>
+                    <i class="fas fa-filter"></i>
                     <span x-show="filters.length"
                           class="tw:absolute tw:top-[-0.2em] tw:right-[-0.3em] tw:w-[0.5em] tw:h-[0.5em] tw:bg-neutral-600 tw:dark:bg-dark-white-300 tw:rounded-full tw:ring-1 tw:ring-white tw:dark:ring-dark-gray-500"></span>
                 </div>

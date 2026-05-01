@@ -8,8 +8,8 @@
             <x-slot name="heading">
                 <div class="tw:flex tw:justify-between">
                     <div class="tw:min-h-8">
-                        <x-option-bar :options="$nav" name="{{ __('Ports') }}" :selected="$view" linkClass="sync-url" border="none" class="tw:inline-block tw:p-1"></x-option-bar>
-                        <x-option-bar :options="$graphNav" name="{{ __('Graphs') }}" :selected="$view" linkClass="sync-url" border="none" class="tw:inline-block tw:p-1"></x-option-bar>
+                        <x-option-bar :options="$nav" name="{{ __('Ports') }}" :selected="$view" linkClass="sync-filter-url" border="none" class="tw:inline-block tw:p-1"></x-option-bar>
+                        <x-option-bar :options="$graphNav" name="{{ __('Graphs') }}" :selected="$view" linkClass="sync-filter-url" border="none" class="tw:inline-block tw:p-1"></x-option-bar>
                     </div>
                     <div class="btn-group pull-right" role="group">
                         <div class="btn-group" role="group" x-data="portPurge()">
@@ -75,22 +75,5 @@
                 }
             }
         }
-
-        // update all links with the sync-url class to the current filter
-        $(window).on('filter:apply', function (event) {
-            const serializedFilter = $.param({ filter: event.originalEvent.detail.formatted });
-
-            $('a.sync-url').each(function () {
-                const url = new URL($(this).attr('href'), window.location.origin);
-
-                [...url.searchParams.keys()]
-                    .filter(key => key.startsWith('filter'))
-                    .forEach(key => url.searchParams.delete(key));
-
-                const base = url.origin + url.pathname;
-                const existing = url.searchParams.toString();
-                $(this).attr('href', `${base}?${existing}${existing ? '&' : ''}${serializedFilter}`);
-            });
-        });
     </script>
 @endpush
