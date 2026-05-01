@@ -349,12 +349,30 @@ class Port extends DeviceRelatedModel
      */
     public function filterState(Builder $query, string $op, mixed $value): void
     {
-        // Use 'whereNot' for 'neq' to automatically invert the internal logic
+        if ($op === 'in' || $op === 'not_in') {
+            $values = (array) $value;
+            $query->{$op === 'not_in' ? 'whereNot' : 'where'}(function ($q) use ($values) {
+                $q->where(function ($inner) use ($values) {
+                    foreach ($values as $i => $v) {
+                        $method = $i === 0 ? 'where' : 'orWhere';
+                        $inner->{$method}(function ($cond) use ($v) {
+                            if ($v === 'shutdown') {
+                                return $cond->where('ifAdminStatus', '!=', 'up');
+                            }
+                            $cond->where('ifAdminStatus', 'up')
+                                ->where('ifOperStatus', $v === 'up' ? '=' : '!=', 'up');
+                        });
+                    }
+                });
+            });
+
+            return;
+        }
+
         $query->{$op === 'neq' ? 'whereNot' : 'where'}(function ($q) use ($value) {
             if ($value === 'shutdown') {
                 return $q->where('ifAdminStatus', '!=', 'up');
             }
-
             $q->where('ifAdminStatus', 'up')
                 ->where('ifOperStatus', $value === 'up' ? '=' : '!=', 'up');
         });
