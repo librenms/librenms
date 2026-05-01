@@ -136,12 +136,12 @@ class UserPreferencesController extends Controller
 
     public function update(Request $request, string $preference) {
         $request->validate([
-            'table' => ['required', 'string'],
+            'name' => ['required', 'string'],
             'filters' => ['array'],
         ]);
 
         if ($preference == 'filters') {
-            $name = 'filters.' . $request->string('table');
+            $name = 'filters.' . $request->string('name');
             $filters = $request->array('filters');
             $this->updatePreference($name, $filters ? json_encode($filters) : 'default');
         }

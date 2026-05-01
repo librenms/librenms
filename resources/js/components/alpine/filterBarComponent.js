@@ -9,20 +9,8 @@ export default function filterBarComponent({
         fields,
         reload,
         initial,
-        filters: [],
-        showAdd: false,
-        showOptions: false,
-        dialog: false,
-        current: null,
-        op: "",
-        value: null,
-        display: "",
-        highlightedIndex: -1,
-        lastFocusedElement: null,
-        searchQuery: "",
-        remoteOptions: [],
-        isLoading: false,
 
+        // --- Static Configuration ---
         OPS: {
             text: [
                 { v: "contains", s: "~", l: "Contains" },
@@ -61,153 +49,295 @@ export default function filterBarComponent({
             ],
         },
 
+        // --- State ---
+        filters: [],
+        showAdd: false,
+        showOptions: false,
+        dialog: false,
+        current: null,
+
+        // Mapping HTML refs to these legacy property names to ensure HTML compatibility
+        op: "",
+        value: null,
+        display: "",
+        highlightedIndex: -1,
+        lastFocusedElement: null,
+        searchQuery: "",
+        remoteOptions: [],
+        isLoading: false,
+
+        // --- Initialization ---
         async init() {
-            const hasUrlFilters = Array.from(
-                new URLSearchParams(window.location.search).keys()
-            ).some((key) => key.startsWith("filter["));
+            const params = new URLSearchParams(window.location.search);
+            const hasUrlFilters = Array.from(params.keys()).some((k) =>
+                k.startsWith("filter[")
+            );
 
-            let source = "none";
-
-            // URL state overrides Saved state
             if (hasUrlFilters) {
-                await this.restoreFromUrl();
-                source = "url";
-            } else if (this.initial && Object.keys(this.initial).length > 0) {
+                await this.restoreFromUrl(params);
+            } else if (Object.keys(this.initial || {}).length > 0) {
                 await this.restoreFromData(this.initial);
-                source = "initial";
             }
 
-            // Dispatch the final loaded state
+            // Sync external links on load
+            this.syncPageUrls();
+
             this.$dispatch("filter:loaded", {
                 filters: this.filters,
-                source: source,
+                source: hasUrlFilters ? "url" : "initial",
             });
 
-            window.addEventListener("popstate", () => this.restoreFromUrl());
+            window.addEventListener("popstate", () =>
+                this.restoreFromUrl(new URLSearchParams(window.location.search))
+            );
         },
 
-        async restoreFromUrl() {
-            const params = new URLSearchParams(window.location.search);
+        // --- Data Restoration ---
+        async restoreFromUrl(params) {
             const newFilters = [];
             for (const [fullKey, val] of params.entries()) {
                 const match = fullKey.match(/^filter\[(.+)\]\[(.+)\]$/);
                 if (match) {
                     const [_, key, op] = match;
                     const field = this.fields.find((f) => f.key === key);
-                    if (field) {
-                        const opObj = (
-                            this.OPS[field.type] || this.OPS.text
-                        ).find((o) => o.v === op);
-                        let finalVal = val === "" ? null : val;
-                        if (field.type === "multi-select" && finalVal)
-                            finalVal = finalVal.split(",");
-
-                        newFilters.push({
-                            key,
-                            label: field.label,
-                            type: field.type,
-                            op,
-                            sym: opObj?.s || op,
-                            value: finalVal,
-                            display: "...",
-                        });
-                    }
+                    if (field)
+                        newFilters.push(
+                            this.createFilterObject(field, op, val)
+                        );
                 }
             }
             this.filters = newFilters;
-            // Wait for all hydration fetches to complete
-            await Promise.all(this.filters.map((f) => this.hydrate(f)));
+            await this.hydrateAll();
         },
 
         async restoreFromData(data) {
             const newFilters = [];
             Object.entries(data).forEach(([key, ops]) => {
                 const field = this.fields.find((f) => f.key === key);
-                if (!field) return;
-
-                Object.entries(ops).forEach(([op, val]) => {
-                    const opObj = (this.OPS[field.type] || this.OPS.text).find(
-                        (o) => o.v === op
-                    );
-                    let finalVal = val === "" ? null : val;
-                    if (
-                        field.type === "multi-select" &&
-                        typeof finalVal === "string"
-                    ) {
-                        finalVal = finalVal.split(",");
-                    }
-
-                    newFilters.push({
-                        key,
-                        label: field.label,
-                        type: field.type,
-                        op,
-                        sym: opObj?.s || op,
-                        value: finalVal,
-                        display: "...",
+                if (field) {
+                    Object.entries(ops).forEach(([op, val]) => {
+                        newFilters.push(
+                            this.createFilterObject(field, op, val)
+                        );
                     });
+                }
+            });
+            this.filters = newFilters;
+            await this.hydrateAll();
+        },
+
+        createFilterObject(field, op, val) {
+            const ops = this.OPS[field.type] || this.OPS.text;
+            const opObj = ops.find((o) => o.v === op);
+            return {
+                key: field.key,
+                label: field.label,
+                type: field.type,
+                op,
+                sym: opObj?.s || op,
+                value: this.decodeValue(field.type, val),
+                display: "...",
+            };
+        },
+
+        // --- Syncing & Persistence ---
+        getFormattedFilters() {
+            const formatted = {};
+            this.filters.forEach((f) => {
+                if (!formatted[f.key]) formatted[f.key] = {};
+                formatted[f.key][f.op] = this.encodeValue(f.value);
+            });
+            return formatted;
+        },
+
+        syncUrl() {
+            const url = new URL(window.location);
+            [...url.searchParams.keys()].forEach((k) => {
+                if (k.startsWith("filter[")) url.searchParams.delete(k);
+            });
+
+            const formatted = this.getFormattedFilters();
+            Object.entries(formatted).forEach(([key, ops]) => {
+                Object.entries(ops).forEach(([op, val]) => {
+                    url.searchParams.set(`filter[${key}][${op}]`, val);
                 });
             });
 
-            this.filters = newFilters;
-            // Wait for all hydration fetches to complete
-            await Promise.all(this.filters.map((f) => this.hydrate(f)));
+            if (this.reload) {
+                window.location.href = url.href;
+            } else {
+                window.history.pushState({}, "", url);
+                this.$dispatch("filter:apply", { filters: formatted });
+                this.syncPageUrls();
+            }
         },
 
-        ops() {
-            return this.OPS[this.current?.type] || this.OPS.text;
+        syncPageUrls() {
+            const formatted = this.getFormattedFilters();
+            const serializedFilter = new URLSearchParams({
+                filter: formatted,
+            }).toString();
+            document.querySelectorAll("a.sync-filter-url").forEach((el) => {
+                const url = new URL(
+                    el.getAttribute("href"),
+                    window.location.origin
+                );
+                [...url.searchParams.keys()]
+                    .filter((k) => k.startsWith("filter"))
+                    .forEach((k) => url.searchParams.delete(k));
+
+                const base = url.origin + url.pathname;
+                const existing = url.searchParams.toString();
+                el.setAttribute(
+                    "href",
+                    `${base}?${existing}${
+                        existing ? "&" : ""
+                    }${serializedFilter}`
+                );
+            });
         },
 
+        async savePreferences() {
+            try {
+                await fetch("/preferences/filters", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector(
+                            'meta[name="csrf-token"]'
+                        ).content,
+                    },
+                    body: JSON.stringify({
+                        name: this.name,
+                        filters: this.getFormattedFilters(),
+                    }),
+                });
+            } catch (e) {
+                console.error("Failed to save preferences", e);
+            }
+        },
+
+        // --- Helpers ---
+        decodeValue: (type, val) =>
+            val === "" || val === null
+                ? null
+                : type === "multi-select" && typeof val === "string"
+                ? val.split(",")
+                : val,
+        encodeValue: (val) => (Array.isArray(val) ? val.join(",") : val ?? ""),
         nullary(operator) {
             return ["is_empty", "is_not_empty"].includes(operator || this.op);
         },
-
+        isEmpty(val) {
+            return Array.isArray(val)
+                ? val.length === 0
+                : val === "" || val == null;
+        },
         isActive(key) {
             return this.filters.some((f) => f.key === key);
         },
-
-        navDropdown(dir) {
-            if (!this.showAdd) return;
-            if (dir === "next")
-                this.highlightedIndex =
-                    (this.highlightedIndex + 1) % this.fields.length;
-            if (dir === "prev")
-                this.highlightedIndex =
-                    (this.highlightedIndex - 1 + this.fields.length) %
-                    this.fields.length;
+        ops() {
+            return this.OPS[this.current?.type] || this.OPS.text;
+        },
+        toggleOptions() {
+            this.showAdd = false;
+            this.showOptions = !this.showOptions;
+        },
+        toggleAdd() {
+            this.showOptions = false;
+            this.showAdd = !this.showAdd;
+        },
+        handleRemoteSelect(event) {
+            const { id, text } = event.detail;
+            if (this.current.type === 'multi-select') {
+                this.toggleMulti(id, text);
+            } else {
+                this.value = id;
+                this.display = text;
+                this.apply();
+            }
+        },
+        selectOption(value, label) {
+            if (this.current.type === 'multi-select') {
+                this.toggleMulti(value, label);
+            } else {
+                this.value = value;
+                this.display = label;
+                this.apply();
+            }
+        },
+        setBoolean(val, label) {
+            this.value = val;
+            this.display = label;
+            this.apply();
         },
 
+        async hydrateAll() {
+            await Promise.all(this.filters.map((f) => this.hydrate(f)));
+        },
+
+        async hydrate(filter) {
+            const field = this.fields.find((f) => f.key === filter.key);
+            if (!field || this.nullary(filter.op)) {
+                filter.display = "";
+                return;
+            }
+
+            if (field.options) {
+                const isMap = !Array.isArray(field.options);
+                const lookup = (v) => (isMap ? field.options[v] || v : v);
+                filter.display = Array.isArray(filter.value)
+                    ? filter.value.map(lookup)
+                    : lookup(filter.value);
+            } else if (field.endpoint && filter.value) {
+                try {
+                    const url = new URL(field.endpoint, window.location.origin);
+                    url.searchParams.append(
+                        "id",
+                        this.encodeValue(filter.value)
+                    );
+                    if (field.params)
+                        Object.entries(field.params).forEach(([k, v]) =>
+                            url.searchParams.append(k, v)
+                        );
+                    const res = await fetch(url);
+                    const data = await res.json();
+                    const results = data.data || data.results || data;
+                    filter.display =
+                        field.type === "multi-select"
+                            ? results.map((r) => r.text || r)
+                            : results[0]?.text || results[0] || filter.value;
+                } catch {
+                    filter.display = filter.value;
+                }
+            } else {
+                filter.display = filter.value;
+            }
+        },
+
+        // --- UI Actions ---
         open(field) {
             this.lastFocusedElement = document.activeElement;
-            this.current = null;
-            this.showOptions = false;
+            const existing = this.filters.find((f) => f.key === field.key);
+
+            this.current = field;
+            this.op = existing?.op || this.ops()[0].v;
+            this.value =
+                existing?.value ?? (field.type === "multi-select" ? [] : "");
+            this.display = existing?.display ?? this.value;
+            this.searchQuery = "";
+            this.remoteOptions = [];
+            this.highlightedIndex = -1;
+
+            this.dialog = true;
             this.showAdd = false;
-
-            this.$nextTick(() => {
-                this.current = field;
-                this.searchQuery = "";
-                this.remoteOptions = [];
-                this.highlightedIndex = -1;
-
-                const existing = this.filters.find((f) => f.key === field.key);
-                this.op = existing?.op || this.ops()[0].v;
-                this.value =
-                    existing?.value ??
-                    (field.type === "multi-select" ? [] : "");
-                this.display = existing?.display ?? this.value;
-
-                this.dialog = true;
-            });
+            this.showOptions = false;
         },
 
         apply() {
             if (!this.current) return;
             const isNullary = this.nullary();
-            const isMulti = this.current.type === "multi-select";
-            const hasVal = isMulti
-                ? this.value.length > 0
-                : this.value !== "" && this.value != null;
-            if (!isNullary && !hasVal) return;
+            if (!isNullary && this.isEmpty(this.value)) return;
 
             const entry = {
                 key: this.current.key,
@@ -217,7 +347,7 @@ export default function filterBarComponent({
                 sym: this.ops().find((o) => o.v === this.op).s,
                 value: isNullary
                     ? null
-                    : isMulti
+                    : Array.isArray(this.value)
                     ? [...this.value]
                     : this.value,
                 display: isNullary
@@ -237,44 +367,6 @@ export default function filterBarComponent({
             this.close();
         },
 
-        remove(key) {
-            this.filters = this.filters.filter((f) => f.key !== key);
-            this.syncUrl();
-        },
-
-        clearAll() {
-            this.filters = [];
-            this.syncUrl();
-        },
-
-        async savePreferences() {
-            const formatted = {};
-            this.filters.forEach((f) => {
-                if (!formatted[f.key]) formatted[f.key] = {};
-                formatted[f.key][f.op] = Array.isArray(f.value)
-                    ? f.value.join(",")
-                    : f.value;
-            });
-
-            try {
-                await fetch("/preferences/filters", {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": document.querySelector(
-                            'meta[name="csrf-token"]'
-                        ).content,
-                    },
-                    body: JSON.stringify({
-                        table: 'device.ports', // FIXME
-                        filters: formatted,
-                    }),
-                });
-            } catch (e) {
-                console.error("Failed to save preferences", e);
-            }
-        },
-
         toggleMulti(optValue, optLabel) {
             if (!Array.isArray(this.value)) this.value = [];
             if (!Array.isArray(this.display)) this.display = [];
@@ -289,60 +381,23 @@ export default function filterBarComponent({
             }
         },
 
+        remove(key) {
+            this.filters = this.filters.filter((f) => f.key !== key);
+            this.syncUrl();
+        },
+
+        clearAll() {
+            this.filters = [];
+            this.syncUrl();
+            this.showOptions = false;
+        },
+
         close() {
             this.dialog = false;
             this.showAdd = false;
             this.showOptions = false;
+            this.current = null;
             this.$nextTick(() => this.lastFocusedElement?.focus());
-        },
-
-        syncUrl() {
-            const url = new URL(window.location);
-            const keysToDelete = [];
-            const formatted = {};
-            for (const key of url.searchParams.keys()) {
-                if (key.startsWith("filter[")) keysToDelete.push(key);
-            }
-            keysToDelete.forEach((k) => url.searchParams.delete(k));
-
-            this.filters.forEach((f) => {
-                const val = Array.isArray(f.value)
-                    ? f.value.join(",")
-                    : f.value ?? "";
-                url.searchParams.set(`filter[${f.key}][${f.op}]`, val);
-                if (!formatted[f.key]) formatted[f.key] = {};
-                formatted[f.key][f.op] = val;
-            });
-
-            if (this.reload) {
-                window.location.href = url.href;
-            } else {
-                window.history.pushState({}, "", url);
-                this.$dispatch("filter:apply", {
-                    filters: formatted,
-                });
-            }
-
-            this.syncPageUrls(formatted);
-        },
-
-        syncPageUrls(formatted) {
-            // update urls
-            const serializedFilter = new URLSearchParams({ filter: formatted}).toString();
-            document.querySelectorAll("a.sync-filter-url").forEach(function (el) {
-                const url = new URL(
-                    el.getAttribute("href"),
-                    window.location.origin
-                );
-
-                [...url.searchParams.keys()]
-                    .filter((key) => key.startsWith("filter"))
-                    .forEach((key) => url.searchParams.delete(key));
-
-                const base = url.origin + url.pathname;
-                const existing = url.searchParams.toString();
-                el.setAttribute("href", `${base}?${existing}${existing ? "&" : ""}${serializedFilter}`);
-            });
         },
 
         getNormalizedOptions() {
@@ -356,59 +411,15 @@ export default function filterBarComponent({
             }));
         },
 
-        async hydrate(filter) {
-            const field = this.fields.find((f) => f.key === filter.key);
-            if (field?.options) {
-                const options = field.options;
-                const isMap = !Array.isArray(options);
-                if (
-                    field.type === "multi-select" &&
-                    Array.isArray(filter.value)
-                ) {
-                    filter.display = filter.value.map((v) =>
-                        isMap ? options[v] || v : v
-                    );
-                } else {
-                    filter.display = isMap
-                        ? options[filter.value] || filter.value
-                        : filter.value;
-                }
-                return;
-            }
-            if (field?.type === "boolean") {
-                filter.display = filter.value == 1 ? "Yes" : "No";
-                return;
-            }
-            if (field?.endpoint && filter.value && !this.nullary(filter.op)) {
-                try {
-                    const url = new URL(field.endpoint, window.location.origin);
-                    url.searchParams.append(
-                        "id",
-                        Array.isArray(filter.value)
-                            ? filter.value.join(",")
-                            : filter.value
-                    );
-                    if (field.params)
-                        Object.entries(field.params).forEach(([k, v]) =>
-                            url.searchParams.append(k, v)
-                        );
-                    const response = await fetch(url);
-                    const data = await response.json();
-                    const results = data.data || data.results || data;
-                    if (field.type === "multi-select") {
-                        filter.display = results.map((r) => r.text || r);
-                    } else {
-                        const match = results[0];
-                        filter.display = match
-                            ? match.text || match
-                            : filter.value;
-                    }
-                } catch (e) {
-                    filter.display = filter.value;
-                }
-                return;
-            }
-            filter.display = filter.value;
+        navDropdown(dir) {
+            if (!this.showAdd) return;
+            if (dir === "next")
+                this.highlightedIndex =
+                    (this.highlightedIndex + 1) % this.fields.length;
+            if (dir === "prev")
+                this.highlightedIndex =
+                    (this.highlightedIndex - 1 + this.fields.length) %
+                    this.fields.length;
         },
     };
 }
