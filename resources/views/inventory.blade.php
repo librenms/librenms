@@ -4,16 +4,15 @@
 
 @section('content')
     <div class="container-fluid">
-        <x-panel body-class="tw:p-0!">
-            <x-slot name="heading">
+        <x-panel>
+            <x-slot:heading class="tw:flex tw:justify-between">
                 <h3 class="panel-title">@lang('Inventory')</h3>
                 @if($show_purge)
-                    <div class="tw:float-right">
                         <a href="{{ route('inventory.purge') }}"><i class="fa fa-trash"></i> @lang('inventory.purge')</a>
-                    </div>
                 @endif
             </x-slot>
 
+            <x-slot:slot class="tw:p-0!">
             <table id="inventory" class="table table-hover table-condensed table-striped"
                 data-url="{{ route('table.inventory') }}">
                 <thead>
@@ -26,6 +25,7 @@
                 </tr>
                 </thead>
             </table>
+            </x-slot:slot>
         </x-panel>
     </div>
 @endsection

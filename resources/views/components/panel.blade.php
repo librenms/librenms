@@ -1,27 +1,23 @@
-<div {{ $attributes->merge(['class' => 'panel panel-default']) }}>
-@if (isset($heading))
-  <div {{ $heading->attributes->class('panel-heading') }}>
-    {{ $heading }}
-  </div>
-@elseif ($title)
-  <div class="panel-heading">
-    <h3 class="panel-title">{{ $title }}</h3>
-  </div>
-@endif
+<div {{ $attributes->merge(['class' => $panelClass()]) }}>
+    @if (isset($heading))
+        <div {{ $heading->attributes->class(['panel-heading']) }}>
+            {{ $heading }}
+        </div>
+    @elseif ($title)
+        <div {{ $titleIsSlot() ? $title->attributes->class(['panel-heading']) : 'class=panel-heading' }}>
+            <h3 class="panel-title">{{ $title }}</h3>
+        </div>
+    @endif
 
-@if (isset($slot) && !empty($slot->toHtml()))
-  <div class="panel-body {{ $bodyClass }}">
-    {{ $slot }}
-  </div>
-@endif
+    @if ($slot->isNotEmpty())
+        <div {{ $slot->attributes->class(['panel-body']) }}>
+            {{ $slot }}
+        </div>
+    @endif
 
-@isset($table)
-{{ $table }}
-@endisset
-
-@isset($footer)
-  <div {{ $footer->attributes->class('panel-footer') }}>
-    {{ $footer }}
-  </div>
-@endisset
+    @isset($footer)
+        <div {{ $footer->attributes->class(['panel-footer']) }}>
+            {{ $footer }}
+        </div>
+    @endisset
 </div>
