@@ -72,9 +72,13 @@ export default function filterBarComponent({
             const hasUrlFilters = Array.from(params.keys()).some((k) =>
                 k.startsWith("filter[")
             );
+            const sessionData = sessionStorage.getItem(`filter-cache-${this.name}`);
 
             if (hasUrlFilters) {
                 await this.restoreFromUrl(params);
+            } else if (sessionData !== null) {
+                this.filters = JSON.parse(sessionData);
+                await this.hydrateAll();
             } else if (Object.keys(this.initial || {}).length > 0) {
                 await this.restoreFromData(this.initial);
             }
@@ -150,56 +154,47 @@ export default function filterBarComponent({
             return formatted;
         },
 
+        applyFiltersToUrl(url) {
+            [...url.searchParams.keys()]
+                .filter((k) => k.startsWith("filter["))
+                .forEach((k) => url.searchParams.delete(k));
+
+            this.filters.forEach((f) => {
+                url.searchParams.set(
+                    `filter[${f.key}][${f.op}]`,
+                    this.encodeValue(f.value)
+                );
+            });
+
+            return url;
+        },
+
         syncUrl() {
-            const url = new URL(window.location);
-            [...url.searchParams.keys()].forEach((k) => {
-                if (k.startsWith("filter[")) url.searchParams.delete(k);
-            });
-
-            const formatted = this.getFormattedFilters();
-            Object.entries(formatted).forEach(([key, ops]) => {
-                Object.entries(ops).forEach(([op, val]) => {
-                    url.searchParams.set(`filter[${key}][${op}]`, val);
-                });
-            });
-
+            const url = this.applyFiltersToUrl(new URL(window.location));
+            sessionStorage.setItem(`filter-cache-${this.name}`, JSON.stringify(this.filters));
             if (this.reload) {
                 window.location.href = url.href;
             } else {
                 window.history.pushState({}, "", url);
-                this.$dispatch("filter:apply", { filters: formatted });
                 this.syncPageUrls();
+                this.$dispatch("filter:apply", {
+                    filters: this.getFormattedFilters(),
+                });
             }
         },
 
         syncPageUrls() {
-            const formatted = this.getFormattedFilters();
-            const serializedFilter = new URLSearchParams({
-                filter: formatted,
-            }).toString();
             document.querySelectorAll("a.sync-filter-url").forEach((el) => {
-                const url = new URL(
-                    el.getAttribute("href"),
-                    window.location.origin
+                const url = this.applyFiltersToUrl(
+                    new URL(el.getAttribute("href"), window.location.origin)
                 );
-                [...url.searchParams.keys()]
-                    .filter((k) => k.startsWith("filter"))
-                    .forEach((k) => url.searchParams.delete(k));
-
-                const base = url.origin + url.pathname;
-                const existing = url.searchParams.toString();
-                el.setAttribute(
-                    "href",
-                    `${base}?${existing}${
-                        existing ? "&" : ""
-                    }${serializedFilter}`
-                );
+                el.setAttribute("href", url.href);
             });
         },
 
         async savePreferences() {
             try {
-                await fetch("/preferences/filters", {
+                await fetch(route("preferences.update", "filters"), {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
@@ -212,6 +207,7 @@ export default function filterBarComponent({
                         filters: this.getFormattedFilters(),
                     }),
                 });
+                this.showOptions = false;
             } catch (e) {
                 console.error("Failed to save preferences", e);
             }
@@ -249,7 +245,7 @@ export default function filterBarComponent({
         },
         handleRemoteSelect(event) {
             const { id, text } = event.detail;
-            if (this.current.type === 'multi-select') {
+            if (this.current.type === "multi-select") {
                 this.toggleMulti(id, text);
             } else {
                 this.value = id;
@@ -258,7 +254,7 @@ export default function filterBarComponent({
             }
         },
         selectOption(value, label) {
-            if (this.current.type === 'multi-select') {
+            if (this.current.type === "multi-select") {
                 this.toggleMulti(value, label);
             } else {
                 this.value = value;
@@ -396,7 +392,6 @@ export default function filterBarComponent({
             this.dialog = false;
             this.showAdd = false;
             this.showOptions = false;
-            this.current = null;
             this.$nextTick(() => this.lastFocusedElement?.focus());
         },
 

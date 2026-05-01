@@ -233,3 +233,7 @@
         </div>
     </template>
 </div>
+
+@push('scripts')
+    @routes
+@endpush
