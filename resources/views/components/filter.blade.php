@@ -94,7 +94,8 @@
 
             {{-- Fields Selector (Pinned to Right) --}}
             <div x-show="showAdd" x-cloak x-transition @click.stop
-                 class="tw:absolute tw:top-full tw:right-0 tw:mt-[0.5em] tw:w-[15em] tw:max-w-[90vw] tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-neutral-200 tw:dark:border-dark-gray-200 tw:rounded-[0.6em] tw:shadow-xl tw:z-50 tw:py-[0.5em]">
+                 :class="filters.length > 0 ? 'tw:right-0' : 'tw:left-0'"
+                 class="tw:absolute tw:top-full tw:mt-[0.5em] tw:w-[15em] tw:max-w-[90vw] tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-neutral-200 tw:dark:border-dark-gray-200 tw:rounded-[0.6em] tw:shadow-xl tw:z-50 tw:py-[0.5em]">
                 <div
                     class="tw:px-[1.2em] tw:py-[0.6em] tw:text-[0.7em] tw:font-black tw:text-neutral-400 tw:dark:text-dark-white-400 tw:uppercase tw:tracking-widest">{{ __('Select Field') }}</div>
                 <template x-for="(field, index) in fields" :key="field.key">
