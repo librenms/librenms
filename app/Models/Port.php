@@ -48,7 +48,8 @@ class Port extends DeviceRelatedModel
         'deleted',
         'state',
         'search',
-        'group',
+        'groups.id',
+        'device.groups.id',
         'device.hostname',
     ];
 
@@ -414,24 +415,6 @@ class Port extends DeviceRelatedModel
 
         $method = $config['method'];
         $this->applyQueryLogic($query, 'ports.ifDuplex', $op, $value, $config, $method);
-    }
-
-    public function filterGroup(Builder $query, string $op, mixed $value): void
-    {
-        $ids = (array) $value;
-
-        $has = match ($op) {
-            'neq', 'not_in' => 'whereDoesntHave',
-            default => 'whereHas',
-        };
-
-        $query->{$has}('groups', function ($q) use ($op, $ids): void {
-            if ($op === 'eq' || $op === 'neq') {
-                $q->where('id', $ids[0]);
-            } else {
-                $q->whereIn('id', $ids);
-            }
-        });
     }
 
     // ---- Define Relationships ----

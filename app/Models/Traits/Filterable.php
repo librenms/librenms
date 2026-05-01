@@ -95,8 +95,22 @@ trait Filterable
                     $column = array_pop($parts);
                     $relation = implode('.', $parts);
 
-                    $query->whereHas($relation, function (Builder $q) use ($column, $op, $value, $config, $method): void {
-                        $this->applyQueryLogic($q, $column, $op, $value, $config, $method);
+                    $negated = in_array($op, ['neq', 'not_contains', 'not_in', 'is_not_empty']);
+                    $hasMethod = $negated ? 'whereDoesntHave' : 'whereHas';
+
+                    // Map negated operators to their positive equivalents for the inner clause
+                    $innerOp = match ($op) {
+                        'neq' => 'eq',
+                        'not_contains' => 'contains',
+                        'not_in' => 'in',
+                        'is_not_empty' => 'is_empty',
+                        default => $op,
+                    };
+                    $innerConfig = $this->operatorMap[$innerOp];
+                    $innerMethod = $innerConfig['method'];
+
+                    $query->{$hasMethod}($relation, function (Builder $q) use ($column, $innerOp, $value, $innerConfig, $innerMethod): void {
+                        $this->applyQueryLogic($q, $column, $innerOp, $value, $innerConfig, $innerMethod);
                     });
                 } else {
                     // Standard Local Logic
@@ -107,7 +121,6 @@ trait Filterable
 
         return $query;
     }
-
     protected function applyQueryLogic($query, $field, $op, $value, $config, $method): void
     {
         if (in_array($op, ['is_empty', 'is_not_empty'])) {

@@ -187,10 +187,16 @@ class PortsController extends Controller
                 ],
             ],
             [
-                'key' => 'group',
+                'key' => 'groups.id',
                 'label' => 'Group',
                 'type' => 'select',
                 'endpoint' => route('ajax.select.port-group'),
+            ],
+            [
+                'key' => 'device.groups.id',
+                'label' => 'Device Group',
+                'type' => 'select',
+                'endpoint' => route('ajax.select.device-group'),
             ],
             [
                 'key' => 'port_type',
@@ -219,6 +225,12 @@ class PortsController extends Controller
         ];
     }
 
+    /**
+     * @param  string  $view
+     * @param  int  $perPage
+     * @param  string  $sort
+     * @return LengthAwarePaginator<Port>|null
+     */
     private function getPorts(string $view, int $perPage, string $sort): ?LengthAwarePaginator
     {
         if ($view !== 'graph') {
