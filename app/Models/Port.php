@@ -373,10 +373,28 @@ class Port extends DeviceRelatedModel
         $operator = $config['operator'] ?? '=';
 
         $query->where(function($q) use ($value, $operator) {
-            $q->where('ifName', $operator, $value)
+            $q->where('ports.ifName', $operator, $value)
                 ->orWhere('ifAlias', $operator, $value)
                 ->orWhere('ifDescr', $operator, $value);
         });
+    }
+
+    /**
+     * Custom filter for ifDuplex to handle "unknown" as both 'unknown' and NULL.
+     */
+    public function filterIfDuplex(Builder $query, string $op, mixed $value, array $config): void
+    {
+        if ($value === 'unknown') {
+            $query->where(function ($q) {
+                $q->whereIn('ports.ifDuplex', ['unknown', ''])
+                    ->orWhereNull('ports.ifDuplex');
+            });
+
+            return;
+        }
+
+        $method = $config['method'];
+        $this->applyQueryLogic($query, 'ports.ifDuplex', $op, $value, $config, $method);
     }
 
     // ---- Define Relationships ----

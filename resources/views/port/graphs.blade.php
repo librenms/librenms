@@ -1,5 +1,5 @@
 <div class="@if($hideFilter) tw:hidden @else tw:flex tw:justify-between @endif">
-    <x-filter :fields="$filterFields" id="port-filter" :hide="$hideFilter" :reload="true"/>
+    <x-filter name="ports" :fields="$filterFields" id="port-filter" :hide="$hideFilter" :reload="true"/>
     <x-date-range-picker :start="$graphTemplate['from'] ?? null" :end="$graphTemplate['to'] ?? null"></x-date-range-picker>
 </div>
 <hr class="tw:my-5 @if($hideFilter) tw:hidden @endif"/>

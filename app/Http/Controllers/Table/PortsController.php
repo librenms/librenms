@@ -120,14 +120,16 @@ class PortsController extends TableController
             ->with(['device', 'device.location'])
             ->leftJoin('devices', 'ports.device_id', 'devices.device_id')
             ->when($request->array('filter'), fn($q, $filter) => $q->applyFilters($filter))
-            ->where('deleted', $request->input('deleted', 0)) // always filter deleted
+            ->unless($request->has('filter.deleted'), function ($q) use ($request) {
+                return $q->where('ports.deleted', $request->input('deleted', 0));
+            })
             ->when($request->input('hostname'), function (Builder $query, $hostname): void {
                 $query->where(function (Builder $query) use ($hostname): void {
                     $query->where('devices.hostname', 'like', "%$hostname%")
                         ->orWhere('devices.sysName', 'like', "%$hostname%");
                 });
             })
-            ->when($request->input('ifAlias'), fn (Builder $query, $ifAlias) => $query->where('ifAlias', 'like', "%$ifAlias%"))
+            ->when($request->input('ifAlias'), fn (Builder $query, $ifAlias) => $query->where('ports.ifAlias', 'like', "%$ifAlias%"))
             ->when($request->input('errors'), fn (Builder $query) => $query->hasErrors())
             ->when($request->input('state'), fn (Builder $query, $state) => match ($state) {
                 'down' => $query->isDown(),
