@@ -159,26 +159,26 @@
 
                         {{-- Remote Search --}}
                         <template x-if="current && current?.endpoint">
-                            <div @remote-selected.stop="current?.type === 'multi-select' ? toggleMulti($event.detail.id, $event.detail.text) : (value = $event.detail.id, display = $event.detail.text, apply())">
-                                <x-remote-dropdown ::endpoint="current.endpoint" ::params="current.params || {}" ::multi="isMulti"/>
+                            <div @remote-selected.stop="isMulti() ? toggleMulti($event.detail.id, $event.detail.text) : (value = $event.detail.id, display = $event.detail.text, apply())">
+                                <x-remote-dropdown :multi="null" />
                             </div>
                         </template>
 
-                        {{-- Static Selects & Multi-Selects --}}
-                        <template x-if="current && ['select', 'multi-select'].includes(current.type) && !current?.endpoint">
+                        {{-- Static Selects --}}
+                        <template x-if="current && current.type === 'select' && !current?.endpoint">
                             <div class="tw:flex tw:flex-col tw:gap-[0.5em]">
                                 <template x-for="opt in getNormalizedOptions()" :key="opt.value">
                                     <button type="button"
                                             @click="selectOption(opt.value, opt.label)"
                                             class="tw:flex tw:items-center tw:justify-between tw:w-full tw:px-[1.2em] tw:py-[0.8em] tw:rounded-[0.6em] tw:text-[0.85em] tw:font-bold tw:transition-all tw:border tw:text-left"
-                                            :class="(current?.type === 'multi-select' ? value.includes(opt.value) : value === opt.value)
+                                            :class="(isMulti() ? value.includes(opt.value) : value === opt.value)
                                               ? 'tw:bg-blue-600 tw:text-white! tw:border-blue-600 tw:shadow-md'
                                               : 'tw:bg-neutral-50 tw:dark:bg-dark-gray-400 tw:text-neutral-600! tw:dark:text-dark-white-200! tw:border-neutral-100 tw:dark:border-dark-gray-300 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300'">
 
                                         <span x-text="opt.label"></span>
 
                                         <svg
-                                            x-show="current?.type === 'multi-select' ? value.includes(opt.value) : value === opt.value"
+                                            x-show="isMulti() ? value.includes(opt.value) : value === opt.value"
                                             class="tw:w-[1.1em] tw:h-[1.1em] tw:transition-transform"
                                             viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2.5">
                                             <path d="M1.5 5l3 3 4-5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -224,7 +224,7 @@
                             {{ __('Cancel') }}
                         </button>
                         <button type="button" @click="apply()"
-                                :disabled="!isNullary() && (current?.type === 'multi-select' ? !value.length : value === '' || value === null)"
+                                :disabled="!isNullary() && (isMulti() ? !value.length : value === '' || value === null)"
                                 class="tw:h-[2.6em] tw:px-[1.8em] tw:text-[0.8em] tw:font-bold tw:bg-blue-600 tw:text-white! tw:rounded-[0.6em] tw:transition-all tw:hover:bg-blue-700 tw:dark:hover:bg-blue-500 tw:disabled:opacity-20">
                             {{ __('Apply') }}
                         </button>

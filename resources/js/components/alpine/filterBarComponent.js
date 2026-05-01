@@ -45,10 +45,6 @@ export default function filterBarComponent({
                 { v: "in", s: "∈", l: "Is Any Of" },
                 { v: "not_in", s: "∉", l: "Is Not Any Of" },
             ],
-            "multi-select": [
-                { v: "in", s: "∈", l: "Is Any Of" },
-                { v: "not_in", s: "∉", l: "Is Not Any Of" },
-            ],
         },
 
         // --- State ---
@@ -70,6 +66,27 @@ export default function filterBarComponent({
 
         // --- Initialization ---
         async init() {
+            this.$watch("op", (newOp, oldOp) => {
+                const wasMulti = ["in", "not_in"].includes(oldOp);
+                const isMulti = ["in", "not_in"].includes(newOp);
+
+                if (wasMulti && !isMulti) {
+                    // Switching from multi to single
+                    if (Array.isArray(this.value)) {
+                        this.value = this.value[0] ?? "";
+                        this.display = this.display[0] ?? "";
+                    }
+                } else if (!wasMulti && isMulti) {
+                    // Switching from single to multi
+                    if (!Array.isArray(this.value)) {
+                        const hasVal = this.value !== "" && this.value !== null;
+                        this.value = hasVal ? [this.value] : [];
+                        const hasDisp = this.display !== "" && this.display !== null;
+                        this.display = hasDisp ? [this.display] : [];
+                    }
+                }
+            });
+
             const params = new URLSearchParams(window.location.search);
             const hasUrlFilters = Array.from(params.keys()).some((k) =>
                 k.startsWith("filter[")
@@ -143,7 +160,7 @@ export default function filterBarComponent({
                 type: field.type,
                 op,
                 sym: opObj?.s || op,
-                value: this.decodeValue(field.type, val),
+                value: this.decodeValue(field.type, op, val),
                 display: "...",
             };
         },
@@ -221,10 +238,10 @@ export default function filterBarComponent({
         },
 
         // --- Helpers ---
-        decodeValue: (type, val) =>
+        decodeValue: (type, op, val) =>
             val === "" || val === null
                 ? null
-                : type === "multi-select" && typeof val === "string"
+                : ["in", "not_in"].includes(op) && typeof val === "string"
                 ? val.split(",")
                 : val,
         encodeValue: (val) => (Array.isArray(val) ? val.join(",") : val ?? ""),
@@ -232,7 +249,7 @@ export default function filterBarComponent({
             return ["is_empty", "is_not_empty"].includes(operator || this.op);
         },
         isMulti() {
-            return this.current?.type === "multi-select";
+            return ["in", "not_in"].includes(this.op);
         },
         isEmpty(val) {
             return Array.isArray(val)
@@ -255,7 +272,7 @@ export default function filterBarComponent({
         },
         handleRemoteSelect(event) {
             const { id, text } = event.detail;
-            if (this.current.type === "multi-select") {
+            if (this.isMulti()) {
                 this.toggleMulti(id, text);
             } else {
                 this.value = id;
@@ -264,7 +281,7 @@ export default function filterBarComponent({
             }
         },
         selectOption(value, label) {
-            if (this.current.type === "multi-select") {
+            if (this.isMulti()) {
                 this.toggleMulti(value, label);
             } else {
                 this.value = value;
@@ -309,8 +326,7 @@ export default function filterBarComponent({
                     const res = await fetch(url);
                     const data = await res.json();
                     const results = data.data || data.results || data;
-                    filter.display =
-                        field.type === "multi-select"
+                    filter.display = ["in", "not_in"].includes(filter.op)
                             ? results.map((r) => r.text || r)
                             : results[0]?.text || results[0] || filter.value;
                 } catch {
@@ -329,7 +345,7 @@ export default function filterBarComponent({
             this.current = field;
             this.op = existing?.op || this.ops()[0].v;
             this.value =
-                existing?.value ?? (field.type === "multi-select" ? [] : "");
+                existing?.value ?? (this.isMulti() ? [] : "");
             this.display = existing?.display ?? this.value;
             this.searchQuery = "";
             this.remoteOptions = [];

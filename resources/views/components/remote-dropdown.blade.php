@@ -7,7 +7,7 @@
 <div x-data="remoteDropdown({
     endpoint: {{ $endpoint ? "@js($endpoint)" : "current?.endpoint" }},
     params:   {{ $params ? "@js($params)" : "current?.params || {}" }},
-    multi:    {{ !is_null($multi) ? "@js($multi)" : "current?.type === 'multi-select'" }}
+    multi:    {{ !is_null($multi) ? "@js($multi)" : "isMulti()" }}
 })"
      x-init="$nextTick(() => $refs.searchInput.focus())"
      class="tw:space-y-[1em]">
