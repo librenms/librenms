@@ -42,6 +42,8 @@ export default function filterBarComponent({
             select: [
                 { v: "eq", s: "=", l: "Is" },
                 { v: "neq", s: "≠", l: "Is Not" },
+                { v: "in", s: "∈", l: "Is Any Of" },
+                { v: "not_in", s: "∉", l: "Is Not Any Of" },
             ],
             "multi-select": [
                 { v: "in", s: "∈", l: "Is Any Of" },
@@ -72,7 +74,9 @@ export default function filterBarComponent({
             const hasUrlFilters = Array.from(params.keys()).some((k) =>
                 k.startsWith("filter[")
             );
-            const sessionData = sessionStorage.getItem(`filter-cache-${this.name}`);
+            const sessionData = sessionStorage.getItem(
+                `filter-cache-${this.name}`
+            );
 
             if (hasUrlFilters) {
                 await this.restoreFromUrl(params);
@@ -171,7 +175,10 @@ export default function filterBarComponent({
 
         syncUrl() {
             const url = this.applyFiltersToUrl(new URL(window.location));
-            sessionStorage.setItem(`filter-cache-${this.name}`, JSON.stringify(this.filters));
+            sessionStorage.setItem(
+                `filter-cache-${this.name}`,
+                JSON.stringify(this.filters)
+            );
             if (this.reload) {
                 window.location.href = url.href;
             } else {
@@ -221,8 +228,11 @@ export default function filterBarComponent({
                 ? val.split(",")
                 : val,
         encodeValue: (val) => (Array.isArray(val) ? val.join(",") : val ?? ""),
-        nullary(operator) {
+        isNullary(operator) {
             return ["is_empty", "is_not_empty"].includes(operator || this.op);
+        },
+        isMulti() {
+            return this.current?.type === "multi-select";
         },
         isEmpty(val) {
             return Array.isArray(val)
@@ -274,7 +284,7 @@ export default function filterBarComponent({
 
         async hydrate(filter) {
             const field = this.fields.find((f) => f.key === filter.key);
-            if (!field || this.nullary(filter.op)) {
+            if (!field || this.isNullary(filter.op)) {
                 filter.display = "";
                 return;
             }
@@ -332,7 +342,7 @@ export default function filterBarComponent({
 
         apply() {
             if (!this.current) return;
-            const isNullary = this.nullary();
+            const isNullary = this.isNullary();
             if (!isNullary && this.isEmpty(this.value)) return;
 
             const entry = {

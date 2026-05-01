@@ -145,7 +145,7 @@
                         </div>
                     </div>
 
-                    <div x-show="!nullary()">
+                    <div x-show="!isNullary()">
                         <span
                             class="tw:block tw:text-[0.75em] tw:font-black tw:text-neutral-400 tw:dark:text-dark-white-400 tw:uppercase tw:tracking-widest tw:mb-[1em]">{{ __('Value') }}</span>
 
@@ -160,7 +160,7 @@
                         {{-- Remote Search --}}
                         <template x-if="current && current?.endpoint">
                             <div @remote-selected.stop="current?.type === 'multi-select' ? toggleMulti($event.detail.id, $event.detail.text) : (value = $event.detail.id, display = $event.detail.text, apply())">
-                                <x-remote-dropdown ::endpoint="current.endpoint" ::params="current.params || {}" ::multi="current.type === 'multi-select'"/>
+                                <x-remote-dropdown ::endpoint="current.endpoint" ::params="current.params || {}" ::multi="isMulti"/>
                             </div>
                         </template>
 
@@ -224,7 +224,7 @@
                             {{ __('Cancel') }}
                         </button>
                         <button type="button" @click="apply()"
-                                :disabled="!nullary() && (current?.type === 'multi-select' ? !value.length : value === '' || value === null)"
+                                :disabled="!isNullary() && (current?.type === 'multi-select' ? !value.length : value === '' || value === null)"
                                 class="tw:h-[2.6em] tw:px-[1.8em] tw:text-[0.8em] tw:font-bold tw:bg-blue-600 tw:text-white! tw:rounded-[0.6em] tw:transition-all tw:hover:bg-blue-700 tw:dark:hover:bg-blue-500 tw:disabled:opacity-20">
                             {{ __('Apply') }}
                         </button>
