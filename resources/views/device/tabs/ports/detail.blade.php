@@ -1,7 +1,5 @@
-<div class="row" style="margin-bottom: 15px;">
-    <div class="col-md-12">
-        <x-filter name="device.ports" :fields="$data['filterFields']"  :initial="$data['filter']" :reload="true"/>
-    </div>
+<div class="tw:pb-4 tw:-mt-4">
+    <x-filter name="device.ports" :fields="$data['filterFields']"  :initial="$data['filter']" :reload="true"/>
 </div>
 
 <x-panel>
