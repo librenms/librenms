@@ -17,13 +17,13 @@
             <button type="button"
                     :title="filters.length ? '{{ __('Filter options') }}' : '{{ __('Open filter menu') }}'"
                     @click.stop="toggleOptions()"
-                    class="tw:shrink-0 tw:flex tw:items-center tw:gap-[0.5em] tw:px-[1em] tw:h-full tw:transition-colors tw:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:tracking-widest tw:rounded-l-[0.5em] tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400">
+                    class="tw:shrink-0 tw:flex tw:items-center tw:gap-[0.5em] tw:px-[1em] tw:h-full tw:transition-colors tw:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:rounded-l-[0.5em] tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400">
                 <div class="tw:relative tw:flex tw:items-center">
-                    <i class="fas fa-filter"></i>
+                    <i class="fas fa-filter tw:text-[1.125em]"></i>
                     <span x-show="filters.length"
                           class="tw:absolute tw:top-[-0.2em] tw:right-[-0.3em] tw:w-[0.5em] tw:h-[0.5em] tw:bg-neutral-600 tw:dark:bg-dark-white-300 tw:rounded-full tw:ring-1 tw:ring-white tw:dark:ring-dark-gray-500"></span>
                 </div>
-                <span class="tw:uppercase tw:font-bold" x-show="!filters.length">{{ __('Filter') }}</span>
+                <span class="tw:font-bold" x-show="!filters.length">{{ __('Filter') }}</span>
                 <span class="tw:text-[0.85em]" x-show="filters.length" x-text="filters.length"></span>
             </button>
 
