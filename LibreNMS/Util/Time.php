@@ -161,19 +161,19 @@ class Time
 
     public static function durationToSeconds(string $duration): int
     {
-        if (preg_match('/(\d+)([mhd]?)/', $duration, $matches)) {
-            $multipliers = [
-                'm' => 60,
-                'h' => 3600,
-                'd' => 86400,
-            ];
-
-            $multiplier = $multipliers[$matches[2]] ?? 1;
-
-            return $matches[1] * $multiplier;
+        if (! preg_match('/(\d+)([mhd]?)/', $duration, $matches)) {
+            return $duration === '' ? 0 : 300;
         }
 
-        return $duration === '' ? 0 : 300;
+        $multipliers = [
+            'm' => 60,
+            'h' => 3600,
+            'd' => 86400,
+        ];
+
+        $multiplier = $multipliers[$matches[2]] ?? 1;
+
+        return $matches[1] * $multiplier;
     }
 
     /**
@@ -217,8 +217,8 @@ class Time
         }
 
         $format = match ($format) {
-            'long', 'compact', 'byminute', 'time' => LibrenmsConfig::get("dateformat.$format"),
-            default => throw new \Exception('Format needs to be one of log, compact, byminute or time'),
+            'long', 'compact', 'byminute', 'time', 'date' => LibrenmsConfig::get("dateformat.$format"),
+            default => throw new \Exception('Format needs to be one of log, compact, byminute, date or time'),
         };
 
         $timezone = session('preferences.timezone');
@@ -227,5 +227,10 @@ class Time
         }
 
         return $input->format($format);
+    }
+
+    public static function now(): Carbon
+    {
+        return Carbon::now(session('preferences.timezone'));
     }
 }

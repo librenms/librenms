@@ -24,76 +24,83 @@
  * @copyright  2026 Palerm0 <Palerm0@outlook.com>
  * @author     Palerm0 <Palerm0@outlook.com>
  */
+
+use App\Facades\LibrenmsConfig;
+use App\Models\DeviceOutage;
+use Carbon\CarbonInterval;
+use LibreNMS\Util\Time;
+
 $device_obj = DeviceCache::getPrimary();
 $device_id = $device_obj->device_id;
-$now = time();
 $days = 90;
-$start = $now - ($days * 86400);
+$now = Time::now();
+$start = $now->copy()->subDays($days);
+$start_ts = $start->timestamp;
+$now_ts = $now->timestamp;
 
-// Determine when the device was added
-$inserted = $device_obj->inserted
-    ? $device_obj->inserted->timestamp
-    : $now;
-
-$outages = \App\Models\DeviceOutage::where('device_id', $device_id)
-    ->where(function ($q) use ($start): void {
-        $q->where('going_down', '>=', $start)
-          ->orWhere(function ($q2) use ($start): void {
-              $q2->where('going_down', '<', $start)
-                 ->where(function ($q3) use ($start): void {
-                     $q3->whereNull('up_again')
-                        ->orWhere('up_again', '>', $start);
-                 });
-          });
+$outages = DeviceOutage::where('device_id', $device_id)
+    ->where(function ($q) use ($start_ts): void {
+        $q->whereNull('up_again')
+          ->orWhere('up_again', '>', $start_ts);
     })
     ->orderBy('going_down')
-    ->get();
+    ->toBase()
+    ->get(['going_down', 'up_again']);
 
-// Thresholds (configurable via config.php)
-$threshold_good = \App\Facades\LibrenmsConfig::get('availability_bar.threshold_good', 99);
-$threshold_medium = \App\Facades\LibrenmsConfig::get('availability_bar.threshold_medium', 95);
+// Determine when the device was added
+$inserted = $device_obj->inserted->timestamp ?? min(array_filter([
+    $now_ts - $device_obj->uptime,
+    $outages->first()?->going_down,
+], fn ($v) => $v !== null));
+
+// Thresholds
+$threshold_ok = LibrenmsConfig::get('availablity.threshold_ok', 99.9);
+$threshold_medium = LibrenmsConfig::get('availablity.threshold_warning', 95);
 
 // Build per-day availability data
 $day_data = [];
+$current_day_start = $start->copy()->startOfDay();
+
 for ($i = 0; $i < $days; $i++) {
-    $day_start = $start + ($i * 86400);
-    $day_end = $day_start + 86400;
+    $day_start = $current_day_start->timestamp;
+    $current_day_start->addDay();
+    $day_end = $current_day_start->timestamp;
     $outage_seconds = 0;
     $outage_lines = [];
 
     foreach ($outages as $outage) {
         $down = max($outage->going_down, $day_start);
-        $up = min($outage->up_again ?: $now, $day_end);
+        $up = min($outage->up_again ?: $now_ts, $day_end);
 
         if ($up > $down) {
             $duration = $up - $down;
             $outage_seconds += $duration;
-            $hours = (int) floor($duration / 3600);
-            $minutes = (int) floor(($duration % 3600) / 60);
-            $time_str = date('H:i', $outage->going_down);
-            $duration_str = $hours > 0
-                ? "{$hours} hrs {$minutes} mins"
-                : "{$minutes} mins";
+            $time_str = Time::format($outage->going_down, 'time');
+            $duration_str = CarbonInterval::seconds($duration)->cascade()->forHumans(['short' => true, 'parts' => 2]);
 
-            $outage_lines[] = 'Outage at ' . $time_str
-                . ' &bull; ' . $duration_str;
+            $outage_lines[] = "Outage at $time_str &bull; $duration_str";
         }
     }
 
-    $availability = max(0, min(100, 100 - ($outage_seconds / 86400 * 100)));
+    $time_period = min(86400, $now_ts - $day_start);
+    if ($time_period <= 0) {
+        $availability = 100;
+    } else {
+        $availability = max(0, min(100, 100 - ($outage_seconds / $time_period * 100)));
+    }
 
     if ($day_start < $inserted) {
-        $color = '#cccccc';
+        $color = 'tw:bg-gray-300';
         $outage_lines = ['no_data'];
-    } elseif ($availability >= $threshold_good) {
-        $color = '#2ecc71';
+    } elseif ($availability >= $threshold_ok) {
+        $color = 'tw:bg-green-400';
     } elseif ($availability >= $threshold_medium) {
-        $color = '#f39c12';
+        $color = 'tw:bg-orange-400';
     } else {
-        $color = '#e74c3c';
+        $color = 'tw:bg-red-500';
     }
     $day_data[] = [
-        'date' => date('d M Y', $day_start),
+        'date' => Time::format($day_start, 'date'),
         'avail' => round($availability, 2),
         'color' => $color,
         'outages' => $outage_lines,
@@ -101,61 +108,74 @@ for ($i = 0; $i < $days; $i++) {
 }
 
 // Calculate total availability over the full period.
-$total_outage = 0;
-foreach ($outages as $outage) {
-    $down = max($outage->going_down, $start);
-    $up = min($outage->up_again ?: $now, $now);
+$total_outage = $outages->reduce(function ($carry, $outage) use ($start_ts, $now_ts) {
+    $down = max($outage->going_down, $start_ts);
+    $up = min($outage->up_again ?: $now_ts, $now_ts);
 
-    if ($up > $down) {
-        $total_outage += ($up - $down);
+    return $carry + max(0, (int) $up - (int) $down);
+}, 0);
+
+echo <<<'HTML'
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default panel-condensed">
+            <div class="panel-heading">
+                <i class="fa fa-check-circle fa-lg icon-theme" aria-hidden="true"></i>
+                <strong> Availability (90 days)</strong>
+            </div>
+            <div class="panel-body tw:px-4 tw:py-2.5">
+                <div class="tw:flex tw:gap-px tw:items-center">
+HTML;
+
+foreach ($day_data as $day) {
+    $tipLines = [];
+    $tipLines[] = '<div class="tw:font-bold tw:mb-1 tw:text-gray-800">' . $day['date'] . '</div>';
+
+    if ($day['outages'] === ['no_data']) {
+        $tipLines[] = '<div class="tw:text-gray-400">— No data</div>';
+    } elseif (empty($day['outages'])) {
+        $tipLines[] = '<div class="tw:text-green-600">&#10003; No outage</div>';
+    } else {
+        foreach ($day['outages'] as $line) {
+            $tipLines[] = '<div class="tw:text-red-500">&#10007; ' . $line . '</div>';
+        }
     }
+    $tip = implode('', $tipLines);
+
+    echo <<<HTML
+    <div x-data="{ open:false, x:0, y:0, place(){ const r=this.\$el.getBoundingClientRect(); this.x=r.left+r.width/2; this.y=r.top; this.\$nextTick(()=>{ const w=this.\$refs.tip?.offsetWidth||0; const pad=8; this.x=Math.max(pad+w/2, Math.min(window.innerWidth-pad-w/2, this.x)); }); } }"
+         @mouseenter="open=true; place()" @mouseleave="open=false" @scroll.window="open && place()" @resize.window="open && place()"
+         class="tw:flex-1 tw:h-12 tw:rounded-sm tw:cursor-pointer tw:relative {$day['color']}">
+        <div x-ref="tip" x-show="open" x-cloak :style="`left:\${x}px; top:\${y - 8}px; transform: translate(-50%, -100%);`"
+             class="tw:fixed tw:bg-white tw:border tw:border-gray-300 tw:rounded tw:min-w-70 tw:px-8 tw:py-5 tw:text-xl tw:font-medium tw:whitespace-nowrap tw:z-9999 tw:shadow-md tw:pointer-events-none">
+            $tip
+        </div>
+    </div>
+HTML;
 }
 
 $total_avail = round(
-    max(0, min(100, 100 - ($total_outage / ($days * 86400) * 100))),
-    2
+    max(0, min(100, 100 - ($total_outage / ($now_ts - $start_ts) * 100))),
+    3
 );
 
-// Render the availability bar panel
-echo '<div class="row">';
-echo '<div class="col-md-12">';
-echo '<div class="panel panel-default panel-condensed">';
-echo '<div class="panel-heading">';
-echo '<i class="fa fa-check-circle fa-lg icon-theme" aria-hidden="true">';
-echo '</i><strong> Availability (90 days)</strong>';
-echo '</div>';
-echo '<div class="panel-body tw:px-4 tw:py-2.5">';
-echo '<div class="tw:flex tw:gap-0.5 tw:items-center">';
-
-foreach ($day_data as $day) {
-    $tip = '<div class="tw:font-bold tw:mb-1 tw:text-gray-800">' . $day['date'] . '</div>';
-
-    if ($day['outages'] === ['no_data']) {
-        $tip .= '<div class="tw:text-gray-400">— No data</div>';
-    } elseif (empty($day['outages'])) {
-        $tip .= '<div class="tw:text-green-600">&#10003; No outage</div>';
-    } else {
-        foreach ($day['outages'] as $line) {
-            $tip .= '<div class="tw:text-red-500">&#10007; ' . $line . '</div>';
-        }
-    }
-
-    echo '<div x-data="{ open:false, x:0, y:0, place(){ const r=this.$el.getBoundingClientRect(); this.x=r.left+r.width/2; this.y=r.top; this.$nextTick(()=>{ const w=this.$refs.tip?.offsetWidth||0; const pad=8; this.x=Math.max(pad+w/2, Math.min(window.innerWidth-pad-w/2, this.x)); }); } }" @mouseenter="open=true; place()" @mouseleave="open=false" @scroll.window="open && place()" @resize.window="open && place()"';
-    echo ' class="tw:flex-1 tw:h-[34px] tw:rounded-sm tw:cursor-pointer tw:relative" style="background:' . $day['color'] . ';">';
-    echo '<div x-ref="tip" x-show="open" x-cloak :style="`left:${x}px; top:${y - 8}px; transform: translate(-50%, -100%);`"';
-    echo ' class="tw:fixed tw:bg-white tw:border tw:border-gray-300 tw:rounded tw:min-w-[280px] tw:px-8 tw:py-5 tw:text-xl tw:font-medium tw:whitespace-nowrap tw:z-[9999] tw:shadow-md tw:pointer-events-none">';
-    echo $tip;
-    echo '</div>';
-    echo '</div>';
+if ($total_avail >= $threshold_ok) {
+    $total_color = '';
+} elseif ($total_avail >= $threshold_medium) {
+    $total_color = 'tw:text-orange-400';
+} else {
+    $total_color = 'tw:text-red-500';
 }
 
-echo '</div>';
-echo '<div class="tw:flex tw:justify-between tw:text-[11px] tw:text-gray-400 tw:mt-1">';
-echo '<span>90 days ago</span>';
-echo '<span><strong>' . $total_avail . '% uptime</strong></span>';
-echo '<span>Today</span>';
-echo '</div>';
-echo '</div>';
-echo '</div>';
-echo '</div>';
-echo '</div>';
+echo <<<HTML
+                </div>
+                <div class="tw:flex tw:justify-between tw:text-[11px] tw:text-gray-400 tw:mt-1">
+                    <span>90 days ago</span>
+                    <span><strong class="$total_color">$total_avail% uptime</strong></span>
+                    <span>Today</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+HTML;

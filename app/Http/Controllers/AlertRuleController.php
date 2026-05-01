@@ -167,11 +167,11 @@ class AlertRuleController extends Controller
             }
         }
 
-        // extra json (no delay/interval/count/mute — those live on operations)
         $extra = $request->safe([
             'invert',
             'acknowledgement',
             'recovery',
+            'mute',
         ]);
         $extra['options'] = ['override_query' => $overrideQuery];
         $alertRule->extra = array_merge($alertRule->extra ?? [], $extra);
