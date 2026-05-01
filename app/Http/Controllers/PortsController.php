@@ -16,11 +16,11 @@ class PortsController extends Controller
     {
         $request->validate([
             'view' => 'in:list_basic,list_detail,graph_bits,graph_upkts,graph_nupkts,graph_errors', // legacy
-            'errors' => 'nullable|boolean',
-            'bare' => 'nullable|in:yes',
-            'searchbar' => 'nullable|in:hide',
-            'per_page' => 'nullable|integer',
-            'page' => 'nullable|integer',
+            'errors' => ['nullable', 'in:yes'],
+            'bare' => ['nullable', 'in:yes'],
+            'searchbar' => ['nullable', 'in:hide'],
+            'per_page' => ['nullable', 'integer'],
+            'page' => ['nullable', 'integer'],
             'to' => ['nullable', 'date_or_relative'],
             'from' => ['nullable', 'date_or_relative'],
             'filter' => ['nullable', 'array'],
@@ -76,6 +76,7 @@ class PortsController extends Controller
             'show_detail' => $view === 'detail' ? 'true' : 'false',
             'show_errors' => $view === 'detail' || $errors ? 'true' : 'false',
             'ports' => $this->getPorts($view, $perPage, $sort),
+            'group' => $request->input('filter.group.eq'),
             'perPage' => $perPage,
             'paginationOptions' => [12, 24, 48, 128, 568, 4096],
             'nav' => [
@@ -184,6 +185,12 @@ class PortsController extends Controller
                     'halfDuplex' => 'Half',
                     'unknown' => 'unknown',
                 ],
+            ],
+            [
+                'key' => 'group',
+                'label' => 'Group',
+                'type' => 'select',
+                'endpoint' => route('ajax.select.port-group'),
             ],
             [
                 'key' => 'port_type',
