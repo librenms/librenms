@@ -29,12 +29,14 @@ namespace App\Http\Controllers;
 use App\Facades\LibrenmsConfig;
 use App\Models\Port;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class PortPopupController
 {
-    public function __invoke(Request $request, Port $port)
+    public function __invoke(Request $request, Port $port): View|Response
     {
         if (! LibrenmsConfig::get('web_mouseover', true)) {
             return response('Disabled');

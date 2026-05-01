@@ -90,12 +90,12 @@ trait Filterable
                 }
 
                 // Relational Logic (dots)
-                if (str_contains($field, '.')) {
-                    $parts = explode('.', $field);
+                if (str_contains((string) $field, '.')) {
+                    $parts = explode('.', (string) $field);
                     $column = array_pop($parts);
                     $relation = implode('.', $parts);
 
-                    $query->whereHas($relation, function (Builder $q) use ($column, $op, $value, $config, $method) {
+                    $query->whereHas($relation, function (Builder $q) use ($column, $op, $value, $config, $method): void {
                         $this->applyQueryLogic($q, $column, $op, $value, $config, $method);
                     });
                 } else {
@@ -117,7 +117,7 @@ trait Filterable
         }
 
         if (in_array($op, ['in', 'not_in'])) {
-            $values = is_array($value) ? $value : explode(',', $value);
+            $values = is_array($value) ? $value : explode(',', (string) $value);
             $query->$method($field, $values);
 
             return;

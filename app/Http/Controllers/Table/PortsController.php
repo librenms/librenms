@@ -61,7 +61,7 @@ class PortsController extends TableController
             'filter' => ['nullable', 'array'],
             'filter.*' => [
                 'array',
-                function ($attribute, $value, $fail) {
+                function ($attribute, $value, $fail): void {
                     $allowedOps = ['eq', 'neq', 'contains', 'starts_with', 'gt', 'lt', 'in', 'not_in', 'is_empty'];
                     $operator = array_key_first($value);
 
@@ -120,9 +120,7 @@ class PortsController extends TableController
             ->with(['device', 'device.location'])
             ->leftJoin('devices', 'ports.device_id', 'devices.device_id')
             ->when($request->array('filter'), fn ($q, $filter) => $q->applyFilters($filter))
-            ->unless($request->has('filter.deleted'), function ($q) use ($request) {
-                return $q->where('ports.deleted', $request->input('deleted', 0));
-            })
+            ->unless($request->has('filter.deleted'), fn($q) => $q->where('ports.deleted', $request->input('deleted', 0)))
             ->when($request->input('hostname'), function (Builder $query, $hostname): void {
                 $query->where(function (Builder $query) use ($hostname): void {
                     $query->where('devices.hostname', 'like', "%$hostname%")

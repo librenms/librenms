@@ -352,8 +352,8 @@ class Port extends DeviceRelatedModel
     {
         if ($op === 'in' || $op === 'not_in') {
             $values = (array) $value;
-            $query->{$op === 'not_in' ? 'whereNot' : 'where'}(function ($q) use ($values) {
-                $q->where(function ($inner) use ($values) {
+            $query->{$op === 'not_in' ? 'whereNot' : 'where'}(function ($q) use ($values): void {
+                $q->where(function ($inner) use ($values): void {
                     foreach ($values as $i => $v) {
                         $method = $i === 0 ? 'where' : 'orWhere';
                         $inner->{$method}(function ($cond) use ($v) {
@@ -391,7 +391,7 @@ class Port extends DeviceRelatedModel
 
         $operator = $config['operator'] ?? '=';
 
-        $query->where(function ($q) use ($value, $operator) {
+        $query->where(function ($q) use ($value, $operator): void {
             $q->where('ports.ifName', $operator, $value)
                 ->orWhere('ifAlias', $operator, $value)
                 ->orWhere('ifDescr', $operator, $value);
@@ -404,7 +404,7 @@ class Port extends DeviceRelatedModel
     public function filterIfDuplex(Builder $query, string $op, mixed $value, array $config): void
     {
         if ($value === 'unknown') {
-            $query->where(function ($q) {
+            $query->where(function ($q): void {
                 $q->whereIn('ports.ifDuplex', ['unknown', ''])
                     ->orWhereNull('ports.ifDuplex');
             });
@@ -425,7 +425,7 @@ class Port extends DeviceRelatedModel
             default => 'whereHas',
         };
 
-        $query->{$has}('groups', function ($q) use ($op, $ids) {
+        $query->{$has}('groups', function ($q) use ($op, $ids): void {
             if ($op === 'eq' || $op === 'neq') {
                 $q->where('id', $ids[0]);
             } else {

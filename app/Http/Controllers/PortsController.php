@@ -9,10 +9,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
 class PortsController extends Controller
 {
-    public function index(Request $request, ?string $view = null, ?string $graph = null)
+    public function index(Request $request, ?string $view = null, ?string $graph = null): View
     {
         $request->validate([
             'view' => 'in:list_basic,list_detail,graph_bits,graph_upkts,graph_nupkts,graph_errors', // legacy
@@ -49,9 +50,9 @@ class PortsController extends Controller
         $perPage = $request->integer('per_page', 48);
         $sort = $request->string('sort', $errors ? 'errors' : 'device');
 
-        if (str_starts_with($view, 'list_')) {
-            $view = substr($view, 5);
-        } elseif (str_starts_with($view, 'graph_')) {
+        if (str_starts_with((string) $view, 'list_')) {
+            $view = substr((string) $view, 5);
+        } elseif (str_starts_with((string) $view, 'graph_')) {
             $view = 'graph';
             $graph = substr($view, 6);
         }
