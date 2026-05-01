@@ -34,7 +34,7 @@
                     {{ __('Cancel') }}
                 </a>
 
-                <form action="{{ route('device.destroy', $device) }}">
+                <form action="{{ route('device.destroy', $device) }}" method="POST">
                     @csrf
                     @method('DELETE')
                     <button
