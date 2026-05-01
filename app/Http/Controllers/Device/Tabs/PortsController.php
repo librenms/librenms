@@ -36,10 +36,12 @@ use App\Models\UserPref;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use function request;
 
 class PortsController implements DeviceTab
 {
@@ -49,10 +51,6 @@ class PortsController implements DeviceTab
         'perPage' => 32,
         'sort' => 'ifIndex',
         'order' => 'asc',
-        'disabled' => false,
-        'ignored' => false,
-        'admin' => 'up',
-        'status' => 'any',
     ];
 
     public function visible(Device $device): bool
@@ -82,14 +80,11 @@ class PortsController implements DeviceTab
             'perPage' => ['regex:/^(\d+|all)$/'],
             'sort' => 'in:media,mac,port,traffic,speed,index',
             'order' => 'in:asc,desc',
-            'disabled' => 'in:0,1',
-            'ignored' => 'in:0,1',
-            'admin' => 'in:up,down,testing,any',
-            'status' => 'in:up,down,testing,unknown,dormant,notPresent,lowerLayerDown,any',
-            'type' => 'in:bits,upkts,nupkts,errors,etherlike',
             'from' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
             'to' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
-            'searchPort' => 'nullable|string|max:255',
+            'filter' => ['nullable', 'array'],
+            'filter.*' => ['array'],
+            'filter.*.*' => ['nullable', 'max:255'],
         ]);
 
         $this->loadSettings($request);
@@ -113,7 +108,7 @@ class PortsController implements DeviceTab
                 __('Graphs') => $this->getGraphLinks(),
             ],
             'dropdownLinks' => [],
-            'filter' => $this->loadSavedFilter(),
+            'filter' => UserPref::getPref($request->user(), 'filters.device.ports') ?: [],
             'perPage' => $this->settings['perPage'],
             'sort' => $this->settings['sort'],
             'next_order' => $this->settings['order'] == 'asc' ? 'desc' : 'asc',
@@ -379,8 +374,14 @@ class PortsController implements DeviceTab
 
     private function loadSettings(Request $request): void
     {
-        $input = $request->only(['perPage', 'sort', 'order', 'disabled', 'ignored', 'admin', 'status']);
-        $saved = UserPref::getPref($request->user(), 'ports_ui_settings') ?? [];
+        $input = $request->only(['perPage', 'sort', 'order']);
+        $saved = UserPref::getPref($request->user(), 'ports_ui_settings');
+
+        if ($saved === null) {
+            $saved = [];
+        } elseif (array_key_exists('admin', $saved)) {
+            $saved = $this->migrateFilterSettings($saved);
+        }
 
         $this->settings = $input + $saved + $this->defaults;
 
@@ -411,15 +412,6 @@ class PortsController implements DeviceTab
             ->isNotDeleted()
             ->hasAccess(Auth::user())->with($relationships)
             ->when($request->array('filter'), fn (Builder $q, $filters) => $q->applyFilters($filters))
-            ->when(! $this->settings['disabled'], fn (Builder $q, $disabled) => $q->where('disabled', 0))
-            ->when(! $this->settings['ignored'], fn (Builder $q, $disabled) => $q->where('ignore', 0))
-            ->when($this->settings['admin'] != 'any', fn (Builder $q, $admin) => $q->where('ifAdminStatus', $this->settings['admin']))
-            ->when($this->settings['status'] != 'any', fn (Builder $q, $admin) => $q->where('ifOperStatus', $this->settings['status']))
-            ->when($searchPort, fn (Builder $q) => $q->where(function (Builder $q) use ($searchPort): void {
-                $q->where('ifName', 'LIKE', '%' . $searchPort . '%')
-                    ->orWhere('ifDescr', 'LIKE', '%' . $searchPort . '%')
-                    ->orWhere('ifAlias', 'LIKE', '%' . $searchPort . '%');
-            }))
             ->when($this->settings['sort'] == 'port', fn (Builder $q, $sort) => $q
                 ->orderByRaw('SOUNDEX(ifName) ' . $this->settings['order'])
                 ->orderByRaw('CHAR_LENGTH(ifName) ' . $this->settings['order'])
@@ -443,35 +435,29 @@ class PortsController implements DeviceTab
         return $request->route('vars', LibrenmsConfig::get('ports_page_default')); // fourth segment is called vars to handle legacy urls
     }
 
-    private function loadSavedFilter(): array
-    {
-        $prefernce = UserPref::getPref(request()->user(), 'filters.device.ports');
-        if ($prefernce !== null) {
-            return $prefernce;
-        }
-
-        return $this->parseLegacyToFilter();
-    }
-
-    private function parseLegacyToFilter(): array
+    private function migrateFilterSettings(array $saved): array
     {
         $filter = [];
 
-        if (! $this->settings['disabled']) {  // 0: disabled hidden 1: not filtered
+        if (! $saved['disabled']) {  // 0: disabled hidden 1: not filtered
             $filter['disabled'] = ['eq' => 0];
         }
 
-        if (! $this->settings['ignored']) { // 0: ignored hidden 1: not filtered
+        if (! $saved['ignored']) { // 0: ignored hidden 1: not filtered
             $filter['ignore'] = ['eq' => 0];
         }
 
-        if ($this->settings['status'] == 'up') { // up: only status up, any: not filtered
+        if ($saved['status'] == 'up') { // up: only status up, any: not filtered
             $filter['state'] = ['eq' => 'up'];
-        } elseif ($this->settings['admin'] == 'up') { // up: only != shutdown, any: not filtered
+        } elseif ($saved['admin'] == 'up') { // up: only != shutdown, any: not filtered
             $filter['state'] = ['neq' => 'shutdown'];
         }
 
-        return $filter;
+        Arr::forget($saved, ['admin', 'status', 'disabled', 'ignored']);
+        UserPref::setPref(request()->user(), 'ports_ui_settings', $saved);
+        UserPref::setPref(request()->user(), 'filters.device.ports', $filter);
+
+        return $saved;
     }
 
     private function filterFields(int $device_id): array

@@ -142,7 +142,8 @@ class UserPreferencesController extends Controller
 
         if ($preference == 'filters') {
             $name = 'filters.' . $request->string('table');
-            $this->updatePreference($name, json_encode($request->array('filters')));
+            $filters = $request->array('filters');
+            $this->updatePreference($name, $filters ? json_encode($filters) : 'default');
         }
     }
 

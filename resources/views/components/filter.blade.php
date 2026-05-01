@@ -31,7 +31,7 @@
                         <path d="M1 2.5h10M3 6h6M5 9.5h2" stroke-linecap="round"/>
                     </svg>
                     <span x-show="filters.length"
-                          class="tw:absolute tw:-top-[0.2em] tw:-right-[0.3em] tw:w-[0.5em] tw:h-[0.5em] tw:bg-neutral-600 tw:dark:bg-dark-white-300 tw:rounded-full tw:ring-1 tw:ring-white tw:dark:ring-dark-gray-500"></span>
+                          class="tw:absolute tw:top-[-0.2em] tw:right-[-0.3em] tw:w-[0.5em] tw:h-[0.5em] tw:bg-neutral-600 tw:dark:bg-dark-white-300 tw:rounded-full tw:ring-1 tw:ring-white tw:dark:ring-dark-gray-500"></span>
                 </div>
                 <span class="tw:uppercase tw:font-bold" x-show="!filters.length">{{ __('Filter') }}</span>
                 <span class="tw:text-[0.85em]" x-show="filters.length" x-text="filters.length"></span>
@@ -46,18 +46,14 @@
                 {{-- Clear (Top) --}}
                 <button type="button" @click="clearAll(); showOptions = false"
                         class="tw:flex tw:items-center tw:gap-[0.7em] tw:w-full tw:px-[1.2em] tw:py-[0.7em] tw:text-left tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-300 tw:transition-colors tw:text-red-600! tw:dark:text-red-400! tw:font-bold">
-                    <svg class="tw:w-[1.2em] tw:h-[1.2em]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                    <i class="fas fa-trash-alt"></i>
                     <span>{{ __('Clear All') }}</span>
                 </button>
 
                 {{-- Save (Bottom) --}}
                 <button type="button" @click="savePreferences(); showOptions = false"
                         class="tw:flex tw:items-center tw:gap-[0.7em] tw:w-full tw:px-[1.2em] tw:py-[0.7em] tw:text-left tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-300 tw:transition-colors tw:text-neutral-600! tw:dark:text-dark-white-200! tw:font-bold">
-                    <svg class="tw:w-[1.2em] tw:h-[1.2em]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                    <i class="fas fa-save"></i>
                     <span>{{ __('Save Preferences') }}</span>
                 </button>
             </div>
