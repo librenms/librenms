@@ -53,6 +53,7 @@ export default function filterBarComponent({
         showOptions: false,
         dialog: false,
         current: null,
+        snapshot: null,
 
         // Mapping HTML refs to these legacy property names to ensure HTML compatibility
         op: "",
@@ -348,6 +349,13 @@ export default function filterBarComponent({
             this.value =
                 existing?.value ?? (this.isMulti() ? [] : "");
             this.display = existing?.display ?? this.value;
+
+            this.snapshot = {
+                op: this.op,
+                value: Array.isArray(this.value) ? [...this.value] : this.value,
+                display: Array.isArray(this.display) ? [...this.display] : this.display,
+            };
+
             this.searchQuery = "";
             this.remoteOptions = [];
             this.highlightedIndex = -1;
@@ -386,13 +394,14 @@ export default function filterBarComponent({
             i >= 0
                 ? this.filters.splice(i, 1, entry)
                 : this.filters.push(entry);
+            this.snapshot = null;
             this.syncUrl();
             this.close();
         },
 
         toggleMulti(optValue, optLabel) {
-            if (!Array.isArray(this.value)) this.value = [];
-            if (!Array.isArray(this.display)) this.display = [];
+            this.value = Array.isArray(this.value) ? [...this.value] : [];
+            this.display = Array.isArray(this.display) ? [...this.display] : [];
 
             const i = this.value.indexOf(optValue);
             if (i > -1) {
@@ -406,7 +415,8 @@ export default function filterBarComponent({
 
         remove(key) {
             this.filters = this.filters.filter((f) => f.key !== key);
-            this.dialog = false;
+            this.snapshot = null;
+            this.close();
             this.syncUrl();
         },
 
@@ -417,11 +427,21 @@ export default function filterBarComponent({
         },
 
         close() {
+            this.revert();
             this.dialog = false;
             this.showAdd = false;
             this.showOptions = false;
             this.current = null;
             this.$nextTick(() => this.lastFocusedElement?.focus());
+        },
+
+        revert() {
+            if (this.snapshot) {
+                this.op = this.snapshot.op;
+                this.value = Array.isArray(this.snapshot.value) ? [...this.snapshot.value] : this.snapshot.value;
+                this.display = Array.isArray(this.snapshot.display) ? [...this.snapshot.display] : this.snapshot.display;
+                this.snapshot = null;
+            }
         },
 
         getNormalizedOptions() {
