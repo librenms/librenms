@@ -44,7 +44,6 @@ class DeviceController extends SelectController
             'access' => 'nullable|in:normal,inverted',
             'user' => 'nullable|int',
             'key' => 'nullable|in:device_id,hostname',
-            'id' => 'nullable|int',
             'exclude' => 'nullable|int',
         ];
     }
@@ -72,7 +71,6 @@ class DeviceController extends SelectController
         }
 
         return Device::hasAccess($request->user())
-            ->when($request->integer('id'), fn ($query, $id) => $query->where('device_id', $id))
             ->when($request->input('exclude'), fn ($query, $exclude) => $query->where('device_id', '!=', $exclude))
             ->select(['device_id', 'hostname', 'sysName', 'display', 'icon'])
             ->orderBy('hostname');

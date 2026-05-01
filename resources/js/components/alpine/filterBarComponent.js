@@ -326,9 +326,10 @@ export default function filterBarComponent({
                     const res = await fetch(url);
                     const data = await res.json();
                     const results = data.data || data.results || data;
+                    const getLabel = (r) => r.text || r.name || r.label || r;
                     filter.display = ["in", "not_in"].includes(filter.op)
-                            ? results.map((r) => r.text || r)
-                            : results[0]?.text || results[0] || filter.value;
+                            ? (Array.isArray(results) ? results.map(getLabel) : getLabel(results))
+                            : (Array.isArray(results) ? getLabel(results[0]) : getLabel(results)) || filter.value;
                 } catch {
                     filter.display = filter.value;
                 }
