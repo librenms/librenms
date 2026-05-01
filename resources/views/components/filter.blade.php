@@ -150,34 +150,35 @@
                             class="tw:block tw:text-[0.75em] tw:font-black tw:text-neutral-400 tw:dark:text-dark-white-400 tw:uppercase tw:tracking-widest tw:mb-[1em]">{{ __('Value') }}</span>
 
                         {{-- Text/Number/Date --}}
-                        <template x-if="['text','email','number','date'].includes(current?.type) && !current?.endpoint">
+                        <template x-if="current && ['text','email','number','date'].includes(current?.type) && !current?.endpoint">
                             <input x-ref="valInput" :type="current?.type" x-model="value" @input="display = value"
+                                   x-init="$nextTick(() => $el.focus())"
                                    @keydown.enter="apply()"
                                    class="tw:w-full tw:px-[1em] tw:py-[0.8em] tw:text-[0.95em] tw:bg-neutral-50 tw:dark:bg-dark-gray-400 tw:border tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:rounded-[0.6em] tw:focus:ring-2 tw:focus:ring-blue-500/50 tw:focus:border-blue-500 tw:outline-none tw:text-neutral-900! tw:dark:text-dark-white-100! tw:transition-all"/>
                         </template>
 
                         {{-- Remote Search --}}
-                        <template x-if="current?.endpoint">
-                            <div @remote-selected.stop="current.type === 'multi-select' ? toggleMulti($event.detail.id, $event.detail.text) : (value = $event.detail.id, display = $event.detail.text, apply())">
+                        <template x-if="current && current?.endpoint">
+                            <div @remote-selected.stop="current?.type === 'multi-select' ? toggleMulti($event.detail.id, $event.detail.text) : (value = $event.detail.id, display = $event.detail.text, apply())">
                                 <x-remote-dropdown ::endpoint="current.endpoint" ::params="current.params || {}" ::multi="current.type === 'multi-select'"/>
                             </div>
                         </template>
 
                         {{-- Static Selects & Multi-Selects --}}
-                        <template x-if="['select', 'multi-select'].includes(current?.type) && !current?.endpoint">
+                        <template x-if="current && ['select', 'multi-select'].includes(current.type) && !current?.endpoint">
                             <div class="tw:flex tw:flex-col tw:gap-[0.5em]">
                                 <template x-for="opt in getNormalizedOptions()" :key="opt.value">
                                     <button type="button"
                                             @click="selectOption(opt.value, opt.label)"
                                             class="tw:flex tw:items-center tw:justify-between tw:w-full tw:px-[1.2em] tw:py-[0.8em] tw:rounded-[0.6em] tw:text-[0.85em] tw:font-bold tw:transition-all tw:border tw:text-left"
-                                            :class="(current.type === 'multi-select' ? value.includes(opt.value) : value === opt.value)
+                                            :class="(current?.type === 'multi-select' ? value.includes(opt.value) : value === opt.value)
                                               ? 'tw:bg-blue-600 tw:text-white! tw:border-blue-600 tw:shadow-md'
                                               : 'tw:bg-neutral-50 tw:dark:bg-dark-gray-400 tw:text-neutral-600! tw:dark:text-dark-white-200! tw:border-neutral-100 tw:dark:border-dark-gray-300 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300'">
 
                                         <span x-text="opt.label"></span>
 
                                         <svg
-                                            x-show="current.type === 'multi-select' ? value.includes(opt.value) : value === opt.value"
+                                            x-show="current?.type === 'multi-select' ? value.includes(opt.value) : value === opt.value"
                                             class="tw:w-[1.1em] tw:h-[1.1em] tw:transition-transform"
                                             viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2.5">
                                             <path d="M1.5 5l3 3 4-5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -188,7 +189,7 @@
                         </template>
 
                         {{-- Boolean Toggle --}}
-                        <template x-if="current?.type === 'boolean'">
+                        <template x-if="current && current.type === 'boolean'">
                             <div class="tw:grid tw:grid-cols-2 tw:gap-[0.8em]">
                                 <button type="button" @click="setBoolean(1, 'Yes')"
                                         class="tw:py-[1em] tw:rounded-[0.6em] tw:font-bold tw:border tw:transition-all"

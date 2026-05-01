@@ -379,6 +379,7 @@ export default function filterBarComponent({
 
         remove(key) {
             this.filters = this.filters.filter((f) => f.key !== key);
+            this.dialog = false;
             this.syncUrl();
         },
 
@@ -392,6 +393,7 @@ export default function filterBarComponent({
             this.dialog = false;
             this.showAdd = false;
             this.showOptions = false;
+            this.current = null;
             this.$nextTick(() => this.lastFocusedElement?.focus());
         },
 

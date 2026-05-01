@@ -10,10 +10,7 @@ export default function remoteDropdown({ endpoint, params, multi }) {
         isLoading: false,
 
         init() {
-            // No need to watch endpoint if using :key on the component
             this.fetch(true);
-
-            // Still watch search for live filtering within the current field
             this.$watch("search", () => this.fetch(true));
         },
 
