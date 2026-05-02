@@ -32,8 +32,8 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
         $transceivers = new Collection;
 
         // OLT PON SFP transceivers
-        $ponData = SnmpQuery::cache()->mibs(['V1600D'])->hideMib()
-            ->walk('ponTransceiverTable')->table(1);
+        $ponData = SnmpQuery::cache()->hideMib()
+            ->walk('V1600D::ponTransceiverTable')->table(1);
 
         foreach ($ponData as $ponIdx => $data) {
             $ifIndex = $this->ponIfMap[$ponIdx] ?? null;
@@ -58,8 +58,8 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
         }
 
         // GE uplink SFP transceivers
-        $uplinkData = SnmpQuery::cache()->mibs(['V1600GSwitch'])->hideMib()
-            ->walk('upLinkOpticalTransceiverTable')->table(1);
+        $uplinkData = SnmpQuery::cache()->hideMib()
+            ->walk('V1600GSwitch::upLinkOpticalTransceiverTable')->table(1);
 
         foreach ($uplinkData as $geIdx => $data) {
             $temp = $data['upLinktempperature'] ?? 'N/A';
@@ -91,10 +91,10 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
         }
 
         // ONU transceivers
-        $onuData = SnmpQuery::cache()->mibs(['V1600G'])->hideMib()
-            ->walk(['gOnuAuthInfoTable', 'gOnuDetailInfoTable'])->table(2);
-        $rttData = SnmpQuery::cache()->mibs(['V1600G'])->hideMib()
-            ->walk('gOnuRttTable')->table(2);
+        $onuData = SnmpQuery::cache()->hideMib()
+            ->walk(['V1600G::gOnuAuthInfoTable', 'V1600G::gOnuDetailInfoTable'])->table(2);
+        $rttData = SnmpQuery::cache()->hideMib()
+            ->walk('V1600G::gOnuRttTable')->table(2);
 
         foreach ($onuData as $ponIdx => $onus) {
             foreach ($onus as $onuIdx => $data) {
@@ -142,10 +142,10 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
         $this->buildPortMaps();
 
         // --- OLT PON SFP sensors ---
-        $ponData = SnmpQuery::cache()->mibs(['V1600D'])->hideMib()
-            ->walk('ponTransceiverTable')->table(1);
-        $ponDescrs = SnmpQuery::cache()->mibs(['V1600D'])->hideMib()
-            ->walk('ponPortDescr')->pluck();
+        $ponData = SnmpQuery::cache()->hideMib()
+            ->walk('V1600D::ponTransceiverTable')->table(1);
+        $ponDescrs = SnmpQuery::cache()->hideMib()
+            ->walk('V1600D::ponPortDescr')->pluck();
 
         $ponOidBase = '.1.3.6.1.4.1.37950.1.1.5.10.13.1.1';
 
@@ -201,8 +201,8 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
         }
 
         // --- GE uplink SFP sensors ---
-        $uplinkData = SnmpQuery::cache()->mibs(['V1600GSwitch'])->hideMib()
-            ->walk('upLinkOpticalTransceiverTable')->table(1);
+        $uplinkData = SnmpQuery::cache()->hideMib()
+            ->walk('V1600GSwitch::upLinkOpticalTransceiverTable')->table(1);
         $uplinkOidBase = '.1.3.6.1.4.1.37950.1.1.5.10.13.7.1';
 
         foreach ($uplinkData as $geIdx => $data) {
@@ -255,8 +255,8 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
         }
 
         // --- Per-ONU optical sensors ---
-        $authData = SnmpQuery::cache()->mibs(['V1600G'])->hideMib()
-            ->walk('gOnuAuthInfoAuthInfo')->pluck();
+        $authData = SnmpQuery::cache()->hideMib()
+            ->walk('V1600G::gOnuAuthInfoAuthInfo')->pluck();
 
         $serials = [];
         foreach ($authData as $oid => $serial) {
@@ -265,8 +265,8 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
             }
         }
 
-        $opticalData = SnmpQuery::cache()->mibs(['V1600G'])->hideMib()
-            ->walk('gOnuOpticalInfoTable')->table(2);
+        $opticalData = SnmpQuery::cache()->hideMib()
+            ->walk('V1600G::gOnuOpticalInfoTable')->table(2);
 
         $oidBase = '.1.3.6.1.4.1.37950.1.1.6.1.1.3.1';
 
@@ -335,8 +335,8 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
 
     public function discoverVlans(): Collection
     {
-        return SnmpQuery::cache()->mibs(['V1600GSwitch'])->hideMib()
-            ->walk('vlanTable')
+        return SnmpQuery::cache()->hideMib()
+            ->walk('V1600GSwitch::vlanTable')
             ->mapTable(fn ($data, $vlanId) => new Vlan([
                 'vlan_vlan' => (int) $vlanId,
                 'vlan_domain' => 1,
