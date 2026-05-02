@@ -7,11 +7,6 @@ modules:
           index: 'phaseActivePower.{{ $index }}'
           group: Phase
           descr: 'Phase {{ $index }} Active Power'
-          low_limit: 0
-          warn_limit_low: 2500
-          warn_limit: 3300
-          high_limit: 3600
-          graph: 1
 
         - oid: PDUMIBV07::outletStatusActivePower
           value: PDUMIBV07::outletStatusActivePower
@@ -19,12 +14,6 @@ modules:
           index: 'outletActivePower.{{ $index }}'
           group: Outlet
           descr: 'Outlet {{ $index }} Active Power'
-          low_limit: 0
-          warn_limit_low: 1500
-          warn_limit: 2000
-          high_limit: 2300
-          graph: 1
-
     energy:
       data:
         - oid: PDUMIBV07::phaseStatusActiveEnergy
@@ -50,11 +39,6 @@ modules:
           divisor: 10
           group: Phase
           descr: 'Phase {{ $index }} Voltage'
-          low_limit: 210
-          warn_limit_low: 216
-          warn_limit: 253
-          high_limit: 270
-          graph: 1
 
         - oid: PDUMIBV07::outletStatusVoltage
           value: PDUMIBV07::outletStatusVoltage
@@ -63,11 +47,6 @@ modules:
           divisor: 10
           group: Outlet
           descr: 'Outlet {{ $index }} Voltage'
-          low_limit: 210
-          warn_limit_low: 216
-          warn_limit: 253
-          high_limit: 270
-          graph: 1
 
     current:
       data:
@@ -78,11 +57,6 @@ modules:
           divisor: 100
           group: Phase
           descr: 'Phase {{ $index }} Current'
-          low_limit: 0
-          warn_limit_low: 12
-          warn_limit: 14
-          high_limit: 16
-          graph: 1
 
         - oid: PDUMIBV07::outletStatusCurrent
           value: PDUMIBV07::outletStatusCurrent
@@ -91,41 +65,6 @@ modules:
           divisor: 100
           group: Outlet
           descr: 'Outlet {{ $index }} Current'
-          low_limit: 0
-          warn_limit_low: 7
-          warn_limit: 9
-          high_limit: 10
-          graph: 1
-
-    temperature:
-      data:
-        - oid: PDUMIBV07::sensorStatusTemperature
-          value: PDUMIBV07::sensorStatusTemperature
-          num_oid: '.1.3.6.1.4.1.23280.12.1.2'
-          index: 'ambientTemperature.0'
-          divisor: 10
-          group: Environment
-          descr: 'Ambient Temperature'
-          low_limit: 0
-          warn_limit_low: 10
-          warn_limit: 35
-          high_limit: 45
-          graph: 1
-
-    humidity:
-      data:
-        - oid: PDUMIBV07::sensorStatusHumidity
-          value: PDUMIBV07::sensorStatusHumidity
-          num_oid: '.1.3.6.1.4.1.23280.12.1.3'
-          index: 'ambientHumidity.0'
-          divisor: 10
-          group: Environment
-          descr: 'Ambient Humidity'
-          low_limit: 10
-          warn_limit_low: 20
-          warn_limit: 70
-          high_limit: 85
-          graph: 1
 
     state:
       data:
@@ -135,11 +74,10 @@ modules:
           index: 'outletState.{{ $index }}'
           group: Outlet
           descr: 'Outlet {{ $index }} State'
-          state_name: digitus_outlet_state
-          low_limit: 1 
+          state_name: outletStatusState
           states:
-            - { value: 1, descr: Off, generic: 0, graph: 0 }
-            - { value: 2, descr: On,  generic: 0, graph: 1 }
+            - { value: 1, descr: Off, generic: 0 }
+            - { value: 2, descr: On,  generic: 0 }
 
         - oid: PDUMIBV07::phaseStatusVoltageLimitState
           value: PDUMIBV07::phaseStatusVoltageLimitState
@@ -147,13 +85,11 @@ modules:
           index: 'phaseVoltageAlarm.{{ $index }}'
           group: Phase
           descr: 'Phase {{ $index }} Voltage Alarm'
-          state_name: digitus_phase_voltage_alarm
-          high_limit: 2
-          low_limit: 3
+          state_name: phaseVoltageAlarm
           states:
-            - { value: 1, descr: Normal, generic: 0, graph: 0 }
-            - { value: 2, descr: High,   generic: 2, graph: 0 }
-            - { value: 3, descr: Low,    generic: 2, graph: 0 }
+            - { value: 1, descr: Normal, generic: 0 }
+            - { value: 2, descr: High,   generic: 2 }
+            - { value: 3, descr: Low,    generic: 2 }
 
         - oid: PDUMIBV07::phaseStatusCurrentLimitState
           value: PDUMIBV07::phaseStatusCurrentLimitState
@@ -161,46 +97,8 @@ modules:
           index: 'phaseCurrentAlarm.{{ $index }}'
           group: Phase
           descr: 'Phase {{ $index }} Current Alarm'
-          state_name: digitus_phase_current_alarm
-          high_limit: 2
-          low_limit: 3
+          state_name: phaseCurrentAlarm
           states:
-            - { value: 1, descr: Normal, generic: 0, graph: 0 }
-            - { value: 2, descr: High,   generic: 2, graph: 0 }
-            - { value: 3, descr: Low,    generic: 2, graph: 0 }
-
-        - oid: PDUMIBV07::sensorStatusTemperatureLimitState
-          value: PDUMIBV07::sensorStatusTemperatureLimitState
-          num_oid: '.1.3.6.1.4.1.23280.12.1.4'
-          index: 'temperatureAlarm.0'
-          group: Environment
-          descr: 'Temperature Alarm'
-          state_name: digitus_temperature_alarm
-          high_limit: 2
-          low_limit: 1
-          states:
-            - { value: 1, descr: Normal, generic: 0, graph: 0 }
-            - { value: 2, descr: High,   generic: 2, graph: 0 }
-            - { value: 3, descr: Low,    generic: 2, graph: 0 }
-
-        - oid: PDUMIBV07::sensorStatusHumidityLimitState
-          value: PDUMIBV07::sensorStatusHumidityLimitState
-          num_oid: '.1.3.6.1.4.1.23280.12.1.5'
-          index: 'humidityAlarm.0'
-          group: Environment
-          descr: 'Humidity Alarm'
-          state_name: digitus_humidity_alarm
-          states:
-            - { value: 1, descr: Normal, generic: 0, graph: 0 }
-            - { value: 2, descr: Alarm,  generic: 2, graph: 0 }
-
-        - oid: PDUMIBV07::sensorStatusIOSensorState
-          value: PDUMIBV07::sensorStatusIOSensorState
-          num_oid: '.1.3.6.1.4.1.23280.12.1.6'
-          index: 'ioSensorState.0'
-          group: Environment
-          descr: 'IO Sensor State'
-          state_name: digitus_io_sensor_state
-          states:
-            - { value: 1, descr: Normal, generic: 0, graph: 0 }
-            - { value: 2, descr: Alarm,  generic: 2, graph: 0 }
+            - { value: 1, descr: Normal, generic: 0 }
+            - { value: 2, descr: High,   generic: 2 }
+            - { value: 3, descr: Low,    generic: 2 }
