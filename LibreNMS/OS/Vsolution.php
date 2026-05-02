@@ -289,11 +289,11 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
                     ['class' => 'voltage', 'col' => 4, 'key' => 'gOnuOpticalInfoVolt', 'types' => ['voltage']],
                     ['class' => 'current', 'col' => 5, 'key' => 'gOnuOpticalInfoBias', 'types' => ['current']],
                     ['class' => 'dbm', 'col' => 6, 'key' => 'gOnuOpticalInfoTxPwr', 'types' => ['dbm'], 'suffix' => ' TX',
-                        'low' => 0.5, 'low_warn' => 1.0, 'high_warn' => 5.0, 'high' => 6.0],
+                        'low' => 0.5, 'low_warn' => 1.0, 'high_warn' => 5.0, 'high' => 6.0, ],
                     ['class' => 'dbm', 'col' => 7, 'key' => 'gOnuOpticalInfoRxPwr', 'types' => ['dbm'], 'suffix' => ' RX',
-                        'low' => -27, 'low_warn' => -24, 'high_warn' => -8, 'high' => -6],
+                        'low' => -27, 'low_warn' => -24, 'high_warn' => -8, 'high' => -6, ],
                     ['class' => 'dbm', 'col' => 8, 'key' => 'gOnuOpticalInfoRxOptLevOlt', 'types' => ['dbm'], 'suffix' => ' OLT-RX',
-                        'low' => -28, 'low_warn' => -25, 'high_warn' => -8, 'high' => -6],
+                        'low' => -28, 'low_warn' => -25, 'high_warn' => -8, 'high' => -6, ],
                 ];
 
                 foreach ($sensorDefs as $def) {
