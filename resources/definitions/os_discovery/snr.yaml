@@ -17,11 +17,6 @@ modules:
                 used: '.1.3.6.1.4.1.40418.7.100.1.11.7.0'
                 descr: 'Memory'
                 index: 0
-                skip_values:
-                    -
-                        oid: '.1.3.6.1.4.1.40418.7.100.1.11.6.0'
-                        op: '<'
-                        value: 1048576
             # Legacy table .1.8.1.7/8 slot 1 — populated on S2990X (both 2019
             # and 2023 firmwares) and other older models. Always bytes.
             -
@@ -38,8 +33,20 @@ modules:
                 index: 2
     processors:
         data:
+            # Legacy table .1.8.1.11 — populated on S2990X (both 2019 and 2023
+            # firmwares) and other older models. Reports CPU usage as a
+            # percentage 0-100.
             -
-                oid: NAG-MIB::switchCpuUsage
+                oid: 'NAG-MIB::sysCpuUsage'
+                num_oid: '.1.3.6.1.4.1.40418.7.100.1.8.1.11.{{ $index }}'
+                descr: 'CPU'
+            # New scalar branch .1.11.10 — populated on most current SNR families
+            # (S2985G, S2995G, S300X, S400X, S5210X). Reports CPU usage as a
+            # percentage 0-100. S2990X 2023 firmware exposes both branches and
+            # will produce duplicate processor rows; this is accepted as an OS
+            # support trade-off in line with the dual mempool entries above.
+            -
+                oid: 'NAG-MIB::switchCpuUsage'
                 num_oid: '.1.3.6.1.4.1.40418.7.100.1.11.10.{{ $index }}'
                 descr: 'CPU'
     additional_oids:
