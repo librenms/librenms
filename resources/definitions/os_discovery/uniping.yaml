@@ -21,10 +21,10 @@ modules:
                     index: 'npSmokeStatus.{{ $index }}'
                     state_name: npSmokeStatus
                     states:
-                        - { descr: ok, graph: 0, value: 0, generic: 0 }
-                        - { descr: alarm, graph: 0, value: 1, generic: 2 }
-                        - { descr: off, graph: 0, value: 4, generic: 1 }
-                        - { descr: failed, graph: 0, value: 5, generic: 2 }
+                        - { descr: ok, value: 0, generic: 0 }
+                        - { descr: alarm, value: 1, generic: 2 }
+                        - { descr: off, value: 4, generic: 1 }
+                        - { descr: failed, value: 5, generic: 2 }
                 -
                     oid: DKSF-70-6-X-X-1::npCurLoopTable
                     value: DKSF-70-6-X-X-1::npCurLoopStatus
@@ -33,11 +33,11 @@ modules:
                     index: 'npCurLoopStatus.{{ $index }}'
                     state_name: npCurLoopStatus
                     states:
-                        - { descr: ok, graph: 0, value: 0, generic: 0 }
-                        - { descr: alert, graph: 0, value: 1, generic: 2 }
-                        - { descr: cut, graph: 0, value: 2, generic: 2 }
-                        - { descr: short, graph: 0, value: 3, generic: 1 }
-                        - { descr: notPowered, graph: 0, value: 4, generic: 3 }
+                        - { descr: ok, value: 0, generic: 0 }
+                        - { descr: alert, value: 1, generic: 2 }
+                        - { descr: cut, value: 2, generic: 2 }
+                        - { descr: short, value: 3, generic: 1 }
+                        - { descr: notPowered, value: 4, generic: 3 }
                 -
                     oid: DKSF-70-6-X-X-1::npRelayTable
                     value: DKSF-70-6-X-X-1::npRelayState
@@ -46,8 +46,8 @@ modules:
                     index: 'npRelayState.{{ $index }}'
                     state_name: npRelayState
                     states:
-                        - { descr: off, graph: 0, value: 0, generic: 2 }
-                        - { descr: on, graph: 0, value: 1, generic: 0 }
+                        - { descr: off, value: 0, generic: 2 }
+                        - { descr: on, value: 1, generic: 0 }
                 -
                     oid: DKSF-70-6-X-X-1::npThermoTable
                     value: DKSF-70-6-X-X-1::npThermoStatus
@@ -57,10 +57,10 @@ modules:
                     index: 'npThermoStatus.{{ $index }}'
                     state_name: npThermoStatus
                     states:
-                        - { descr: failed, graph: 0, value: 0, generic: 2 }
-                        - { descr: low, graph: 0, value: 1, generic: 1 }
-                        - { descr: norm, graph: 0, value: 2, generic: 0 }
-                        - { descr: high, graph: 0, value: 3, generic: 2 }
+                        - { descr: failed, value: 0, generic: 2 }
+                        - { descr: low, value: 1, generic: 1 }
+                        - { descr: norm, value: 2, generic: 0 }
+                        - { descr: high, value: 3, generic: 2 }
                 -
                     oid: DKSF-70-6-X-X-1::npRelHumTable
                     value: DKSF-70-6-X-X-1::npRelHumStatus
@@ -70,10 +70,10 @@ modules:
                     index: 'npRelHumStatus.{{ $index }}'
                     state_name: npRelHumStatus
                     states:
-                        - { descr: sensorFailed, graph: 0, value: 0, generic: 2 }
-                        - { descr: belowSafeRange, graph: 0, value: 1, generic: 1 }
-                        - { descr: inSafeRange, graph: 0, value: 2, generic: 0 }
-                        - { descr: aboveSafeRange, graph: 0, value: 3, generic: 2 }
+                        - { descr: sensorFailed, value: 0, generic: 2 }
+                        - { descr: belowSafeRange, value: 1, generic: 1 }
+                        - { descr: inSafeRange, value: 2, generic: 0 }
+                        - { descr: aboveSafeRange, value: 3, generic: 2 }
                 -
                     oid: DKSF-70-6-X-X-1::npRelHumTable
                     value: DKSF-70-6-X-X-1::npRelHumTempStatus
@@ -83,10 +83,10 @@ modules:
                     index: 'npRelHumTempStatus.{{ $index }}'
                     state_name: npRelHumTempStatus
                     states:
-                        - { descr: sensorFailed, graph: 0, value: 0, generic: 2 }
-                        - { descr: belowSafeRange, graph: 0, value: 1, generic: 1 }
-                        - { descr: inSafeRange, graph: 0, value: 2, generic: 0 }
-                        - { descr: aboveSafeRange, graph: 0, value: 3, generic: 2 }
+                        - { descr: sensorFailed, value: 0, generic: 2 }
+                        - { descr: belowSafeRange, value: 1, generic: 1 }
+                        - { descr: inSafeRange, value: 2, generic: 0 }
+                        - { descr: aboveSafeRange, value: 3, generic: 2 }
         temperature:
             data:
                 -

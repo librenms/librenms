@@ -10,8 +10,8 @@ modules:
                     index: 'sdbMgmtStsRingState.{{ $index }}'
                     state_name: sdbMgmtStsRingState
                     states:
-                        - { value: 0, generic: 2, graph: 0, descr: open }
-                        - { value: 1, generic: 0, graph: 1, descr: closed }
+                        - { value: 0, generic: 2, descr: open }
+                        - { value: 1, generic: 0, descr: closed }
         count:
             data:
                 -

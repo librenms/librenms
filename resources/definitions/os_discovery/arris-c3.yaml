@@ -45,8 +45,8 @@ modules:
                     index: 'dcxFPDFan1Status.{{ $index }}'
                     state_name: dcxFPDFan1Status
                     states:
-                        - { descr: rotating, graph: 0, value: 1, generic: 0 }
-                        - { descr: bad Rotating, graph: 0, value: 2, generic: 2 }
+                        - { descr: rotating, value: 1, generic: 0 }
+                        - { descr: bad Rotating, value: 2, generic: 2 }
                 -
                     oid: ARRIS-C3-FPD-MIB::dcxFPDFan2Status
                     value: ARRIS-C3-FPD-MIB::dcxFPDFan2Status
@@ -55,8 +55,8 @@ modules:
                     index: 'dcxFPDFan2Status.{{ $index }}'
                     state_name: dcxFPDFan2Status
                     states:
-                        - { descr: rotating, graph: 0, value: 1, generic: 0 }
-                        - { descr: bad Rotating, graph: 0, value: 2, generic: 2 }
+                        - { descr: rotating, value: 1, generic: 0 }
+                        - { descr: bad Rotating, value: 2, generic: 2 }
                 -
                     oid: ARRIS-C3-FPD-MIB::dcxFPDFan3Status
                     value: ARRIS-C3-FPD-MIB::dcxFPDFan3Status
@@ -65,8 +65,8 @@ modules:
                     index: 'dcxFPDFan3Status.{{ $index }}'
                     state_name: dcxFPDFan3Status
                     states:
-                        - { descr: rotating, graph: 0, value: 1, generic: 0 }
-                        - { descr: bad Rotating, graph: 0, value: 2, generic: 2 }
+                        - { descr: rotating, value: 1, generic: 0 }
+                        - { descr: bad Rotating, value: 2, generic: 2 }
                 -
                     oid: ARRIS-C3-FPD-MIB::dcxFPDFan4Status
                     value: ARRIS-C3-FPD-MIB::dcxFPDFan4Status
@@ -75,8 +75,8 @@ modules:
                     index: 'dcxFPDFan4Status.{{ $index }}'
                     state_name: dcxFPDFan4Status
                     states:
-                        - { descr: rotating, graph: 0, value: 1, generic: 0 }
-                        - { descr: bad Rotating, graph: 0, value: 2, generic: 2 }
+                        - { descr: rotating, value: 1, generic: 0 }
+                        - { descr: bad Rotating, value: 2, generic: 2 }
                 -
                     oid: ARRIS-C3-FPD-MIB::dcxFPDFan5Status
                     value: ARRIS-C3-FPD-MIB::dcxFPDFan5Status
@@ -85,8 +85,8 @@ modules:
                     index: 'dcxFPDFan5Status.{{ $index }}'
                     state_name: dcxFPDFan5Status
                     states:
-                        - { descr: rotating, graph: 0, value: 1, generic: 0 }
-                        - { descr: bad Rotating, graph: 0, value: 2, generic: 2 }
+                        - { descr: rotating, value: 1, generic: 0 }
+                        - { descr: bad Rotating, value: 2, generic: 2 }
                 -
                     oid: ARRIS-C3-FPD-MIB::dcxFPDFan6Status
                     value: ARRIS-C3-FPD-MIB::dcxFPDFan6Status
@@ -95,8 +95,8 @@ modules:
                     index: 'dcxFPDFan6Status.{{ $index }}'
                     state_name: dcxFPDFan6Status
                     states:
-                        - { descr: rotating, graph: 0, value: 1, generic: 0 }
-                        - { descr: bad Rotating, graph: 0, value: 2, generic: 2 }
+                        - { descr: rotating, value: 1, generic: 0 }
+                        - { descr: bad Rotating, value: 2, generic: 2 }
                 -
                     oid: ARRIS-C3-FPD-MIB::dcxFPDPowerStatus2
                     value: ARRIS-C3-FPD-MIB::dcxFPDPowerStatus2
@@ -105,8 +105,8 @@ modules:
                     index: 'dcxFPDPowerStatus2.{{ $index }}'
                     state_name: dcxFPDPowerStatus2
                     states:
-                        - { descr: on, graph: 0, value: 1, generic: 0 }
-                        - { descr: off, graph: 0, value: 2, generic: 2 }
+                        - { descr: on, value: 1, generic: 0 }
+                        - { descr: off, value: 2, generic: 2 }
                 -
                     oid: ARRIS-C3-FPD-MIB::dcxFPDAttachedStatus
                     value: ARRIS-C3-FPD-MIB::dcxFPDAttachedStatus
@@ -115,8 +115,8 @@ modules:
                     index: 'dcxFPDAttachedStatus.{{ $index }}'
                     state_name: dcxFPDAttachedStatus
                     states:
-                        - { descr: attached, graph: 0, value: 1, generic: 0 }
-                        - { descr: detached, graph: 0, value: 2, generic: 2 }
+                        - { descr: attached, value: 1, generic: 0 }
+                        - { descr: detached, value: 2, generic: 2 }
         snr:
             data:
                 -

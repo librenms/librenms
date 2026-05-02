@@ -49,15 +49,15 @@ modules:
                     value: LCOS-SX-GENERAL-MIB::lcsMonitoringFanState
                     state_name: LcsMonitoringFansTableEntry
                     states:
-                        - { value: 1, descr: notpresent, graph: 1, generic: 0 }
-                        - { value: 2, descr: operational, graph: 1, generic: 0 }
-                        - { value: 3, descr: failed, graph: 1, generic: 2 }
-                        - { value: 4, descr: powering, graph: 1, generic: 0 }
-                        - { value: 5, descr: nopower, graph: 1, generic: 2 }
-                        - { value: 6, descr: notpowering, graph: 1, generic: 2 }
-                        - { value: 7, descr: incompatible, graph: 1, generic: 1 }
-                        - { value: 8, descr: warning, graph: 1, generic: 1 }
-                        - { value: 9, descr: present, graph: 1, generic: 0 }
+                        - { value: 1, descr: notpresent, generic: 0 }
+                        - { value: 2, descr: operational, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                        - { value: 4, descr: powering, generic: 0 }
+                        - { value: 5, descr: nopower, generic: 2 }
+                        - { value: 6, descr: notpowering, generic: 2 }
+                        - { value: 7, descr: incompatible, generic: 1 }
+                        - { value: 8, descr: warning, generic: 1 }
+                        - { value: 9, descr: present, generic: 0 }
                 -
                     oid: LCOS-SX-GENERAL-MIB::lcsMonitoringPSUTable
                     num_oid: '.1.3.6.1.4.1.2356.100.1.1.4.1.5.{{ $index }}'
@@ -66,15 +66,15 @@ modules:
                     value: LCOS-SX-GENERAL-MIB::lcsMonitoringPSUState
                     state_name: lcsMonitoringPSUTable
                     states:
-                        - { value: 1, descr: notpresent, graph: 1, generic: 0 }
-                        - { value: 2, descr: operational, graph: 1, generic: 0 }
-                        - { value: 3, descr: failed, graph: 1, generic: 2 }
-                        - { value: 4, descr: powering, graph: 1, generic: 0 }
-                        - { value: 5, descr: nopower, graph: 1, generic: 2 }
-                        - { value: 6, descr: notpowering, graph: 1, generic: 2 }
-                        - { value: 7, descr: incompatible, graph: 1, generic: 1 }
-                        - { value: 8, descr: warning, graph: 1, generic: 1 }
-                        - { value: 9, descr: present, graph: 1, generic: 0 }
+                        - { value: 1, descr: notpresent, generic: 0 }
+                        - { value: 2, descr: operational, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                        - { value: 4, descr: powering, generic: 0 }
+                        - { value: 5, descr: nopower, generic: 2 }
+                        - { value: 6, descr: notpowering, generic: 2 }
+                        - { value: 7, descr: incompatible, generic: 1 }
+                        - { value: 8, descr: warning, generic: 1 }
+                        - { value: 9, descr: present, generic: 0 }
         temperature:
             data:
                 -

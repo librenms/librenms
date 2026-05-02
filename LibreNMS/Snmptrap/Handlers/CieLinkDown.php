@@ -33,6 +33,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
@@ -60,13 +61,13 @@ class CieLinkDown implements SnmptrapHandler
             return;
         }
 
-        $port->ifOperStatus = $trap->getOidData("IF-MIB::ifOperStatus.$ifIndex") ?: 'down';
+        $port->ifOperStatus = IfOperStatus::tryFrom($trap->getOidData("IF-MIB::ifOperStatus.$ifIndex")) ?? IfOperStatus::Down;
 
-        $trapAdminStatus = $trap->getOidData("IF-MIB::ifAdminStatus.$ifIndex");
+        $trapAdminStatus = IfOperStatus::tryFrom($trap->getOidData("IF-MIB::ifAdminStatus.$ifIndex"));
         if ($trapAdminStatus) {
             $port->ifAdminStatus = $trapAdminStatus;
         }
-        $trap->log("Cisco cieLinkDown Trap: $port->ifDescr AdminStatus: $port->ifAdminStatus, OperStatus: $port->ifOperStatus", Severity::Error, 'interface', $port->port_id);
+        $trap->log("Cisco cieLinkDown Trap: $port->ifDescr AdminStatus: {$port->ifAdminStatus?->value}, OperStatus: {$port->ifOperStatus?->value}", Severity::Error, 'interface', $port->port_id);
 
         if ($port->isDirty('ifAdminStatus')) {
             $trap->log("Interface Disabled : $port->ifDescr (TRAP)", Severity::Notice, 'interface', $port->port_id);

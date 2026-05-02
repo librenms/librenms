@@ -10,10 +10,10 @@ modules:
                     index: 'mgnt2IndexBoards.{{ $index }}'
                     state_name: Mgnt2SlotStatus
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: 'slot open' }
-                        - { value:  1, generic: 0, graph: 1, descr: 'pmReady' }
-                        - { value:  2, generic: 2, graph: 1, descr: 'pmReset' }
-                        - { value:  3, generic: 1, graph: 1, descr: 'pmLoad' }
-                        - { value:  4, generic: 0, graph: 1, descr: 'pmPassive' }
-                        - { value:  5, generic: 3, graph: 1, descr: 'pmUnknown' }
-                        - { value:  6, generic: 1, graph: 1, descr: 'pmNotReady' }
+                        - { value: 0, generic: 0, descr: 'slot open' }
+                        - { value:  1, generic: 0, descr: 'pmReady' }
+                        - { value:  2, generic: 2, descr: 'pmReset' }
+                        - { value:  3, generic: 1, descr: 'pmLoad' }
+                        - { value:  4, generic: 0, descr: 'pmPassive' }
+                        - { value:  5, generic: 3, descr: 'pmUnknown' }
+                        - { value:  6, generic: 1, descr: 'pmNotReady' }

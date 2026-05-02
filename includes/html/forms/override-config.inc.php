@@ -12,6 +12,7 @@
  * the source code distribution for details.
 */
 
+use App\Facades\DeviceCache;
 use App\Models\Device;
 use Illuminate\Support\Facades\Gate;
 
@@ -38,7 +39,7 @@ if (empty($device['device_id'])) {
     if ($state == true) {
         set_dev_attrib($device, $attrib, $state);
     } else {
-        del_dev_attrib($device, $attrib);
+        DeviceCache::get((int) $device['device_id'])->forgetAttrib($attrib);
     }
     $status = 'ok';
     $message = 'Config has been updated';

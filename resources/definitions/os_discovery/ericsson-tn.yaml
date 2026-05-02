@@ -62,10 +62,10 @@ modules:
                     index: 'xfRFTxOperStatus.{{ $index }}'
                     state_name: Operational status
                     states:
-                        - { value: 4, generic: 3, graph: 0, descr: 'Stand-by' }
-                        - { value:  3, generic: 0, graph: 0, descr: TX On }
-                        - { value:  2, generic: 2, graph: 0, descr: TX Off }
-                        - { value:  1, generic: 3, graph: 0, descr: Other }
+                        - { value: 4, generic: 3, descr: 'Stand-by' }
+                        - { value:  3, generic: 0, descr: TX On }
+                        - { value:  2, generic: 2, descr: TX Off }
+                        - { value:  1, generic: 3, descr: Other }
 
                 -
                     oid: XF-RADIOLINK-PTP-RADIO-MIB::xfRFTxAdminStatus
@@ -76,7 +76,7 @@ modules:
                     index: 'xfRFTxAdminStatus.{{ $index }}'
                     state_name: Admin status
                     states:
-                        - { value: 4, generic: 3, graph: 0, descr: 'Stand-by' }
-                        - { value:  3, generic: 0, graph: 0, descr: TX On }
-                        - { value:  2, generic: 2, graph: 0, descr: TX Off }
-                        - { value:  1, generic: 3, graph: 0, descr: Other }
+                        - { value: 4, generic: 3, descr: 'Stand-by' }
+                        - { value:  3, generic: 0, descr: TX On }
+                        - { value:  2, generic: 2, descr: TX Off }
+                        - { value:  1, generic: 3, descr: Other }

@@ -15,10 +15,10 @@ modules:
                     descr: 'Probe Status'
                     group: Probes
                     states:
-                        - { descr: noStatus, graph: 1, value: 1, generic: 3 }
-                        - { descr: normal, graph: 1, value: 2, generic: 0 }
-                        - { descr: critical, graph: 1, value: 4, generic: 2 }
-                        - { descr: sensorError, graph: 1, value: 7, generic: 3 }
+                        - { descr: noStatus, value: 1, generic: 3 }
+                        - { descr: normal, value: 2, generic: 0 }
+                        - { descr: critical, value: 4, generic: 2 }
+                        - { descr: sensorError, value: 7, generic: 3 }
                 -
                     oid: SPAGENT-MIB::sensorProbeSwitchTable
                     value: SPAGENT-MIB::sensorProbeSwitchStatus
@@ -33,10 +33,10 @@ modules:
                             op: '!='
                             value: 2
                     states:
-                        - { descr: noStatus, graph: 1, value: 1, generic: 3 }
-                        - { descr: normal, graph: 1, value: 2, generic: 0 }
-                        - { descr: critical, graph: 1, value: 4, generic: 2 }
-                        - { descr: sensorError, graph: 1, value: 7, generic: 3 }
+                        - { descr: noStatus, value: 1, generic: 3 }
+                        - { descr: normal, value: 2, generic: 0 }
+                        - { descr: critical, value: 4, generic: 2 }
+                        - { descr: sensorError, value: 7, generic: 3 }
         humidity:
             data:
                 -

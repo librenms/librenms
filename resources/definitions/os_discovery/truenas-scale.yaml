@@ -143,9 +143,9 @@ modules:
                     index: zpoolHealth.{{ $index }}
                     state_name: zpoolTable
                     states:
-                        - { value: 0, descr: ONLINE, graph: 1, generic: 0 }
-                        - { value: 1, descr: DEGRADED, graph: 1, generic: 1 }
-                        - { value: 2, descr: FAULTED, graph: 1, generic: 2 }
-                        - { value: 3, descr: OFFLINE, graph: 1, generic: 2 }
-                        - { value: 4, descr: UNAVAIL, graph: 1, generic: 2 }
-                        - { value: 5, descr: REMOVED, graph: 1, generic: 2 }
+                        - { value: 0, descr: ONLINE, generic: 0 }
+                        - { value: 1, descr: DEGRADED, generic: 1 }
+                        - { value: 2, descr: FAULTED, generic: 2 }
+                        - { value: 3, descr: OFFLINE, generic: 2 }
+                        - { value: 4, descr: UNAVAIL, generic: 2 }
+                        - { value: 5, descr: REMOVED, generic: 2 }

@@ -15,13 +15,13 @@ modules:
                     index: 'infoTransmitterStatus.{{ $index }}'
                     state_name: infoTransmitterStatus
                     states:
-                        - { descr: unknown, graph: 1, value: 0, generic: 3 }
-                        - { descr: unconfigured, graph: 1, value: 1, generic: 3 }
-                        - { descr: untuned, graph: 1, value: 2, generic: 1 }
-                        - { descr: idle, graph: 1, value: 3, generic: 3 }
-                        - { descr: transmitting, graph: 1, value: 4, generic: 0 }
-                        - { descr: calibrating, graph: 1, value: 5, generic: 3 }
-                        - { descr: fault, graph: 1, value: 6, generic: 2 }
+                        - { descr: unknown, value: 0, generic: 3 }
+                        - { descr: unconfigured, value: 1, generic: 3 }
+                        - { descr: untuned, value: 2, generic: 1 }
+                        - { descr: idle, value: 3, generic: 3 }
+                        - { descr: transmitting, value: 4, generic: 0 }
+                        - { descr: calibrating, value: 5, generic: 3 }
+                        - { descr: fault, value: 6, generic: 2 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::health
                     value: TAIT-INFRA93SERIES-MIB::healthRunMode
@@ -31,9 +31,9 @@ modules:
                     index: 'healthRunMode.{{ $index }}'
                     state_name: healthRunMode
                     states:
-                        - { descr: offline, graph: 1, value: 0, generic: 3 }
-                        - { descr: online, graph: 1, value: 1, generic: 0 }
-                        - { descr: unknown, graph: 1, value: 2, generic: 1 }
+                        - { descr: offline, value: 0, generic: 3 }
+                        - { descr: online, value: 1, generic: 0 }
+                        - { descr: unknown, value: 2, generic: 1 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::health
                     value: TAIT-INFRA93SERIES-MIB::healthNetworkConnLogChan1State
@@ -43,13 +43,13 @@ modules:
                     index: 'healthNetworkConnLogChan1State.{{ $index }}'
                     state_name: healthNetworkConnLogChan1State
                     states:
-                        - { descr: inactive, graph: 1, value: 0, generic: 3 }
-                        - { descr: idle, graph: 1, value: 1, generic: 3 }
-                        - { descr: traffic, graph: 1, value: 2, generic: 0 }
-                        - { descr: control, graph: 1, value: 3, generic: 0 }
-                        - { descr: test, graph: 1, value: 4, generic: 3 }
-                        - { descr: poll, graph: 1, value: 5, generic: 3 }
-                        - { descr: invalid, graph: 1, value: 255, generic: 2 }
+                        - { descr: inactive, value: 0, generic: 3 }
+                        - { descr: idle, value: 1, generic: 3 }
+                        - { descr: traffic, value: 2, generic: 0 }
+                        - { descr: control, value: 3, generic: 0 }
+                        - { descr: test, value: 4, generic: 3 }
+                        - { descr: poll, value: 5, generic: 3 }
+                        - { descr: invalid, value: 255, generic: 2 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::health
                     value: TAIT-INFRA93SERIES-MIB::healthNetworkConnLogChan2State
@@ -59,13 +59,13 @@ modules:
                     index: 'healthNetworkConnLogChan2State.{{ $index }}'
                     state_name: healthNetworkConnLogChan2State
                     states:
-                        - { descr: inactive, graph: 1, value: 0, generic: 3 }
-                        - { descr: idle, graph: 1, value: 1, generic: 3 }
-                        - { descr: traffic, graph: 1, value: 2, generic: 0 }
-                        - { descr: control, graph: 1, value: 3, generic: 0 }
-                        - { descr: test, graph: 1, value: 4, generic: 3 }
-                        - { descr: poll, graph: 1, value: 5, generic: 3 }
-                        - { descr: invalid, graph: 1, value: 255, generic: 2 }
+                        - { descr: inactive, value: 0, generic: 3 }
+                        - { descr: idle, value: 1, generic: 3 }
+                        - { descr: traffic, value: 2, generic: 0 }
+                        - { descr: control, value: 3, generic: 0 }
+                        - { descr: test, value: 4, generic: 3 }
+                        - { descr: poll, value: 5, generic: 3 }
+                        - { descr: invalid, value: 255, generic: 2 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::pmuState
                     value: TAIT-INFRA93SERIES-MIB::pmuStateMainsInState
@@ -75,9 +75,9 @@ modules:
                     index: 'pmuStateMainsInState.{{ $index }}'
                     state_name: pmuStateMainsInState
                     states:
-                        - { descr: bad, graph: 1, value: 0, generic: 1 }
-                        - { descr: good, graph: 1, value: 1, generic: 0 }
-                        - { descr: not fitted, graph: 1, value: 2, generic: 3 }
+                        - { descr: bad, value: 0, generic: 1 }
+                        - { descr: good, value: 1, generic: 0 }
+                        - { descr: not fitted, value: 2, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::pmuState
                     value: TAIT-INFRA93SERIES-MIB::pmuStateOutStatus
@@ -87,9 +87,9 @@ modules:
                     index: 'pmuStateOutStatus.{{ $index }}'
                     state_name: pmuStateOutStatus
                     states:
-                        - { descr: bad, graph: 1, value: 0, generic: 1 }
-                        - { descr: good, graph: 1, value: 1, generic: 0 }
-                        - { descr: not fitted, graph: 1, value: 2, generic: 3 }
+                        - { descr: bad, value: 0, generic: 1 }
+                        - { descr: good, value: 1, generic: 0 }
+                        - { descr: not fitted, value: 2, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::pmuState
                     value: TAIT-INFRA93SERIES-MIB::pmuStateAuxOutState
@@ -99,9 +99,9 @@ modules:
                     index: 'pmuStateAuxOutState.{{ $index }}'
                     state_name: pmuStateAuxOutState
                     states:
-                        - { descr: bad, graph: 1, value: 0, generic: 1 }
-                        - { descr: good, graph: 1, value: 1, generic: 0 }
-                        - { descr: not fitted, graph: 1, value: 2, generic: 3 }
+                        - { descr: bad, value: 0, generic: 1 }
+                        - { descr: good, value: 1, generic: 0 }
+                        - { descr: not fitted, value: 2, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::pmuState
                     value: TAIT-INFRA93SERIES-MIB::pmuStateBatteryInState
@@ -111,9 +111,9 @@ modules:
                     index: 'pmuStateBatteryInState.{{ $index }}'
                     state_name: pmuStateBatteryInState
                     states:
-                        - { descr: bad, graph: 1, value: 0, generic: 1 }
-                        - { descr: good, graph: 1, value: 1, generic: 0 }
-                        - { descr: not fitted, graph: 1, value: 2, generic: 3 }
+                        - { descr: bad, value: 0, generic: 1 }
+                        - { descr: good, value: 1, generic: 0 }
+                        - { descr: not fitted, value: 2, generic: 3 }
                     skip_values:
                         -
                             oid: TAIT-INFRA93SERIES-MIB::pmuStateBusConnect
@@ -128,8 +128,8 @@ modules:
                     index: 'pmuStateBusConnect.{{ $index }}'
                     state_name: pmuStateBusConnect
                     states:
-                        - { descr: connected, graph: 1, value: 1, generic: 0 }
-                        - { descr: not connected, graph: 1, value: 2, generic: 3 }
+                        - { descr: connected, value: 1, generic: 0 }
+                        - { descr: not connected, value: 2, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::linkInfo
                     value: TAIT-INFRA93SERIES-MIB::linkInfoCtrlProtocolStatus
@@ -139,16 +139,16 @@ modules:
                     index: 'linkInfoCtrlProtocolStatus.{{ $index }}'
                     state_name: linkInfoCtrlProtocolStatus
                     states:
-                        - { descr: unconnected, graph: 1, value: 0, generic: 1 }
-                        - { descr: deprecatedUnconnected, graph: 1, value: 1, generic: 1 }
-                        - { descr: standby, graph: 1, value: 2, generic: 3 }
-                        - { descr: dmr-aligned, graph: 1, value: 3, generic: 0 }
-                        - { descr: dmr-offset, graph: 1, value: 4, generic: 3 }
-                        - { descr: dmr-two-slot-data, graph: 1, value: 5, generic: 0 }
-                        - { descr: dmr-hibernate, graph: 1, value: 6, generic: 3 }
-                        - { descr: analogue, graph: 1, value: 7, generic: 3 }
-                        - { descr: test-mode, graph: 1, value: 8, generic: 3 }
-                        - { descr: dmr-tier2-aligned, graph: 1, value: 9, generic: 0 }
+                        - { descr: unconnected, value: 0, generic: 1 }
+                        - { descr: deprecatedUnconnected, value: 1, generic: 1 }
+                        - { descr: standby, value: 2, generic: 3 }
+                        - { descr: dmr-aligned, value: 3, generic: 0 }
+                        - { descr: dmr-offset, value: 4, generic: 3 }
+                        - { descr: dmr-two-slot-data, value: 5, generic: 0 }
+                        - { descr: dmr-hibernate, value: 6, generic: 3 }
+                        - { descr: analogue, value: 7, generic: 3 }
+                        - { descr: test-mode, value: 8, generic: 3 }
+                        - { descr: dmr-tier2-aligned, value: 9, generic: 0 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::alarmSummary
                     value: TAIT-INFRA93SERIES-MIB::alarmSummaryBaseStation
@@ -158,10 +158,10 @@ modules:
                     index: 'alarmSummaryBaseStation.{{ $index }}'
                     state_name: alarmSummaryBaseStation
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::alarmSummary
                     value: TAIT-INFRA93SERIES-MIB::alarmSummaryReciter
@@ -171,10 +171,10 @@ modules:
                     index: 'alarmSummaryReciter.{{ $index }}'
                     state_name: alarmSummaryReciter
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::alarmSummary
                     value: TAIT-INFRA93SERIES-MIB::alarmSummaryPowerAmplifier
@@ -184,10 +184,10 @@ modules:
                     index: 'alarmSummaryPowerAmplifier.{{ $index }}'
                     state_name: alarmSummaryPowerAmplifier
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::alarmSummary
                     value: TAIT-INFRA93SERIES-MIB::alarmSummaryPowerManagementUnit
@@ -197,10 +197,10 @@ modules:
                     index: 'alarmSummaryPowerManagementUnit.{{ $index }}'
                     state_name: alarmSummaryPowerManagementUnit
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::alarmSummary
                     value: TAIT-INFRA93SERIES-MIB::alarmSummaryCustomAlarms
@@ -210,10 +210,10 @@ modules:
                     index: 'alarmSummaryCustomAlarms.{{ $index }}'
                     state_name: alarmSummaryCustomAlarms
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::alarmSummary
                     value: TAIT-INFRA93SERIES-MIB::alarmSummaryFrontPanel
@@ -223,10 +223,10 @@ modules:
                     index: 'alarmSummaryFrontPanel.{{ $index }}'
                     state_name: alarmSummaryFrontPanel
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::alarmSummary
                     value: TAIT-INFRA93SERIES-MIB::alarmSummarySystem
@@ -236,10 +236,10 @@ modules:
                     index: 'alarmSummarySystem.{{ $index }}'
                     state_name: alarmSummarySystem
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::alarmSummary
                     value: TAIT-INFRA93SERIES-MIB::alarmSummaryMinor
@@ -249,10 +249,10 @@ modules:
                     index: 'alarmSummaryMinor.{{ $index }}'
                     state_name: alarmSummaryMinor
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::alarmSummary
                     value: TAIT-INFRA93SERIES-MIB::alarmSummaryMajor
@@ -262,10 +262,10 @@ modules:
                     index: 'alarmSummaryMajor.{{ $index }}'
                     state_name: alarmSummaryMajor
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
                     value: TAIT-INFRA93SERIES-MIB::rctAlarmRxSynthOutOfLock
@@ -275,10 +275,10 @@ modules:
                     index: 'rctAlarmRxSynthOutOfLock.{{ $index }}'
                     state_name: rctAlarmRxSynthOutOfLock
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
                     value: TAIT-INFRA93SERIES-MIB::rctAlarmInvalidChannelSelected
@@ -288,10 +288,10 @@ modules:
                     index: 'rctAlarmInvalidChannelSelected.{{ $index }}'
                     state_name: rctAlarmInvalidChannelSelected
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
                     value: TAIT-INFRA93SERIES-MIB::rctAlarmOverTemperature
@@ -301,10 +301,10 @@ modules:
                     index: 'rctAlarmOverTemperature.{{ $index }}'
                     state_name: rctAlarmOverTemperature
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
                     value: TAIT-INFRA93SERIES-MIB::rctAlarmTxCalibrationInvalid
@@ -314,10 +314,10 @@ modules:
                     index: 'rctAlarmTxCalibrationInvalid.{{ $index }}'
                     state_name: rctAlarmTxCalibrationInvalid
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
                     value: TAIT-INFRA93SERIES-MIB::rctAlarmRxCalibrationInvalid
@@ -327,10 +327,10 @@ modules:
                     index: 'rctAlarmRxCalibrationInvalid.{{ $index }}'
                     state_name: rctAlarmRxCalibrationInvalid
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
                     value: TAIT-INFRA93SERIES-MIB::rctAlarmInvalidConfiguration
@@ -340,10 +340,10 @@ modules:
                     index: 'rctAlarmInvalidConfiguration.{{ $index }}'
                     state_name: rctAlarmInvalidConfiguration
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
                     value: TAIT-INFRA93SERIES-MIB::rctAlarm25MHzSynthOutOfLock
@@ -353,10 +353,10 @@ modules:
                     index: 'rctAlarm25MHzSynthOutOfLock.{{ $index }}'
                     state_name: rctAlarm25MHzSynthOutOfLock
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
                     value: TAIT-INFRA93SERIES-MIB::rctAlarm6144MHzSynthOutOfLock
@@ -366,10 +366,10 @@ modules:
                     index: 'rctAlarm6144MHzSynthOutOfLock.{{ $index }}'
                     state_name: rctAlarm6144MHzSynthOutOfLock
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
                     value: TAIT-INFRA93SERIES-MIB::rctAlarmTxFSynthOutOfLock
@@ -379,10 +379,10 @@ modules:
                     index: 'rctAlarmTxFSynthOutOfLock.{{ $index }}'
                     state_name: rctAlarmTxFSynthOutOfLock
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
                     value: TAIT-INFRA93SERIES-MIB::rctAlarmSimulcastSynch
@@ -392,10 +392,10 @@ modules:
                     index: 'rctAlarmSimulcastSynch.{{ $index }}'
                     state_name: rctAlarmSimulcastSynch
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
                     value: TAIT-INFRA93SERIES-MIB::rctAlarmReceiverSynch
@@ -405,10 +405,10 @@ modules:
                     index: 'rctAlarmReceiverSynch.{{ $index }}'
                     state_name: rctAlarmReceiverSynch
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
                     value: TAIT-INFRA93SERIES-MIB::rctAlarmTxRSynthOutOfLock
@@ -418,10 +418,10 @@ modules:
                     index: 'rctAlarmTxRSynthOutOfLock.{{ $index }}'
                     state_name: rctAlarmTxRSynthOutOfLock
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::paAlarms
                     value: TAIT-INFRA93SERIES-MIB::paAlarmNoPADetected
@@ -431,10 +431,10 @@ modules:
                     index: 'paAlarmNoPADetected.{{ $index }}'
                     state_name: paAlarmNoPADetected
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::paAlarms
                     value: TAIT-INFRA93SERIES-MIB::paAlarmInvalidFirmware
@@ -444,10 +444,10 @@ modules:
                     index: 'paAlarmInvalidFirmware.{{ $index }}'
                     state_name: paAlarmInvalidFirmware
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::paAlarms
                     value: TAIT-INFRA93SERIES-MIB::paAlarmInvalidCalibration
@@ -457,10 +457,10 @@ modules:
                     index: 'paAlarmInvalidCalibration.{{ $index }}'
                     state_name: paAlarmInvalidCalibration
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::paAlarms
                     value: TAIT-INFRA93SERIES-MIB::paAlarmForwardPowerLow
@@ -470,10 +470,10 @@ modules:
                     index: 'paAlarmForwardPowerLow.{{ $index }}'
                     state_name: paAlarmForwardPowerLow
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::paAlarms
                     value: TAIT-INFRA93SERIES-MIB::paAlarmPowerFoldback
@@ -483,10 +483,10 @@ modules:
                     index: 'paAlarmPowerFoldback.{{ $index }}'
                     state_name: paAlarmPowerFoldback
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::paAlarms
                     value: TAIT-INFRA93SERIES-MIB::paAlarmReversePowerHigh
@@ -496,10 +496,10 @@ modules:
                     index: 'paAlarmReversePowerHigh.{{ $index }}'
                     state_name: paAlarmReversePowerHigh
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::paAlarms
                     value: TAIT-INFRA93SERIES-MIB::paAlarmShutdownImminent
@@ -509,10 +509,10 @@ modules:
                     index: 'paAlarmShutdownImminent.{{ $index }}'
                     state_name: paAlarmShutdownImminent
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::paAlarms
                     value: TAIT-INFRA93SERIES-MIB::paAlarmVSWRFault
@@ -522,10 +522,10 @@ modules:
                     index: 'paAlarmVSWRFault.{{ $index }}'
                     state_name: paAlarmVSWRFault
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::paAlarms
                     value: TAIT-INFRA93SERIES-MIB::paAlarmDriverCurrentHigh
@@ -535,10 +535,10 @@ modules:
                     index: 'paAlarmDriverCurrentHigh.{{ $index }}'
                     state_name: paAlarmDriverCurrentHigh
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::paAlarms
                     value: TAIT-INFRA93SERIES-MIB::paAlarmFinal1CurrentHigh
@@ -548,10 +548,10 @@ modules:
                     index: 'paAlarmFinal1CurrentHigh.{{ $index }}'
                     state_name: paAlarmFinal1CurrentHigh
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::paAlarms
                     value: TAIT-INFRA93SERIES-MIB::paAlarmFinal2CurrentHigh
@@ -561,10 +561,10 @@ modules:
                     index: 'paAlarmFinal2CurrentHigh.{{ $index }}'
                     state_name: paAlarmFinal2CurrentHigh
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::paAlarms
                     value: TAIT-INFRA93SERIES-MIB::paAlarmCurrentImbalance
@@ -574,10 +574,10 @@ modules:
                     index: 'paAlarmCurrentImbalance.{{ $index }}'
                     state_name: paAlarmCurrentImbalance
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::paAlarms
                     value: TAIT-INFRA93SERIES-MIB::paAlarmSupplyVoltageLow
@@ -587,10 +587,10 @@ modules:
                     index: 'paAlarmSupplyVoltageLow.{{ $index }}'
                     state_name: paAlarmSupplyVoltageLow
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::paAlarms
                     value: TAIT-INFRA93SERIES-MIB::paAlarmSupplyVoltageHigh
@@ -600,10 +600,10 @@ modules:
                     index: 'paAlarmSupplyVoltageHigh.{{ $index }}'
                     state_name: paAlarmSupplyVoltageHigh
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::paAlarms
                     value: TAIT-INFRA93SERIES-MIB::paAlarmDriverTemperatureHigh
@@ -613,10 +613,10 @@ modules:
                     index: 'paAlarmDriverTemperatureHigh.{{ $index }}'
                     state_name: paAlarmDriverTemperatureHigh
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::paAlarms
                     value: TAIT-INFRA93SERIES-MIB::paAlarmFinal1TemperatureHigh
@@ -626,10 +626,10 @@ modules:
                     index: 'paAlarmFinal1TemperatureHigh.{{ $index }}'
                     state_name: paAlarmFinal1TemperatureHigh
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::paAlarms
                     value: TAIT-INFRA93SERIES-MIB::paAlarmFinal2TemperatureHigh
@@ -639,10 +639,10 @@ modules:
                     index: 'paAlarmFinal2TemperatureHigh.{{ $index }}'
                     state_name: paAlarmFinal2TemperatureHigh
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
                     value: TAIT-INFRA93SERIES-MIB::pmuAlarmNoPMUDetected
@@ -652,10 +652,10 @@ modules:
                     index: 'pmuAlarmNoPMUDetected.{{ $index }}'
                     state_name: pmuAlarmNoPMUDetected
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
                     value: TAIT-INFRA93SERIES-MIB::pmuAlarmInvalidFirmware
@@ -665,10 +665,10 @@ modules:
                     index: 'pmuAlarmInvalidFirmware.{{ $index }}'
                     state_name: pmuAlarmInvalidFirmware
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
                     value: TAIT-INFRA93SERIES-MIB::pmuAlarmMainsFailure
@@ -678,10 +678,10 @@ modules:
                     index: 'pmuAlarmMainsFailure.{{ $index }}'
                     state_name: pmuAlarmMainsFailure
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
                     value: TAIT-INFRA93SERIES-MIB::pmuAlarmMainsFailure
@@ -691,10 +691,10 @@ modules:
                     index: 'pmuAlarmMainsFailure.{{ $index }}'
                     state_name: pmuAlarmMainsFailure
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
                     value: TAIT-INFRA93SERIES-MIB::pmuAlarmSelfTestFailure
@@ -704,10 +704,10 @@ modules:
                     index: 'pmuAlarmSelfTestFailure.{{ $index }}'
                     state_name: pmuAlarmSelfTestFailure
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
                     value: TAIT-INFRA93SERIES-MIB::pmuAlarmShutdownImminent
@@ -717,10 +717,10 @@ modules:
                     index: 'pmuAlarmShutdownImminent.{{ $index }}'
                     state_name: pmuAlarmShutdownImminent
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
                     value: TAIT-INFRA93SERIES-MIB::pmuAlarmTemperatureHigh
@@ -730,10 +730,10 @@ modules:
                     index: 'pmuAlarmTemperatureHigh.{{ $index }}'
                     state_name: pmuAlarmTemperatureHigh
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
                     value: TAIT-INFRA93SERIES-MIB::pmuAlarmBatteryProtect
@@ -743,10 +743,10 @@ modules:
                     index: 'pmuAlarmBatteryProtect.{{ $index }}'
                     state_name: pmuAlarmBatteryProtect
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
                     value: TAIT-INFRA93SERIES-MIB::pmuAlarmBatteryVoltageLow
@@ -756,10 +756,10 @@ modules:
                     index: 'pmuAlarmBatteryVoltageLow.{{ $index }}'
                     state_name: pmuAlarmBatteryVoltageLow
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
                     value: TAIT-INFRA93SERIES-MIB::pmuAlarmBatteryVoltageHigh
@@ -769,10 +769,10 @@ modules:
                     index: 'pmuAlarmBatteryVoltageHigh.{{ $index }}'
                     state_name: pmuAlarmBatteryVoltageHigh
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
                     value: TAIT-INFRA93SERIES-MIB::pmuAlarmCurrentOutHigh
@@ -782,10 +782,10 @@ modules:
                     index: 'pmuAlarmCurrentOutHigh.{{ $index }}'
                     state_name: pmuAlarmCurrentOutHigh
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
                     value: TAIT-INFRA93SERIES-MIB::pmuAlarmVoltageOutLow
@@ -795,10 +795,10 @@ modules:
                     index: 'pmuAlarmVoltageOutLow.{{ $index }}'
                     state_name: pmuAlarmVoltageOutLow
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
                     value: TAIT-INFRA93SERIES-MIB::pmuAlarmVoltageOutHigh
@@ -808,10 +808,10 @@ modules:
                     index: 'pmuAlarmVoltageOutHigh.{{ $index }}'
                     state_name: pmuAlarmVoltageOutHigh
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::systemAlarms
                     value: TAIT-INFRA93SERIES-MIB::systemAlarmAmbientTempLow
@@ -821,10 +821,10 @@ modules:
                     index: 'systemAlarmAmbientTempLow.{{ $index }}'
                     state_name: systemAlarmAmbientTempLow
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::systemAlarms
                     value: TAIT-INFRA93SERIES-MIB::systemAlarmAmbientTempHigh
@@ -834,10 +834,10 @@ modules:
                     index: 'systemAlarmAmbientTempHigh.{{ $index }}'
                     state_name: systemAlarmAmbientTempHigh
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::systemAlarms
                     value: TAIT-INFRA93SERIES-MIB::systemAlarmExternalRefAbsent
@@ -847,10 +847,10 @@ modules:
                     index: 'systemAlarmExternalRefAbsent.{{ $index }}'
                     state_name: systemAlarmExternalRefAbsent
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::systemAlarms
                     value: TAIT-INFRA93SERIES-MIB::systemAlarmQoSJitter
@@ -860,10 +860,10 @@ modules:
                     index: 'systemAlarmQoSJitter.{{ $index }}'
                     state_name: systemAlarmQoSJitter
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::systemAlarms
                     value: TAIT-INFRA93SERIES-MIB::systemAlarmQoSLostPackets
@@ -873,10 +873,10 @@ modules:
                     index: 'systemAlarmQoSLostPackets.{{ $index }}'
                     state_name: systemAlarmQoSLostPackets
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::systemAlarms
                     value: TAIT-INFRA93SERIES-MIB::systemAlarmFallbackControlled
@@ -886,10 +886,10 @@ modules:
                     index: 'systemAlarmFallbackControlled.{{ $index }}'
                     state_name: systemAlarmFallbackControlled
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::systemAlarms
                     value: TAIT-INFRA93SERIES-MIB::systemAlarmDuplicateNodePriority
@@ -899,10 +899,10 @@ modules:
                     index: 'systemAlarmDuplicateNodePriority.{{ $index }}'
                     state_name: systemAlarmDuplicateNodePriority
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::systemAlarms
                     value: TAIT-INFRA93SERIES-MIB::systemAlarmNTPSynchronisation
@@ -912,10 +912,10 @@ modules:
                     index: 'systemAlarmNTPSynchronisation.{{ $index }}'
                     state_name: systemAlarmNTPSynchronisation
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::systemAlarms
                     value: TAIT-INFRA93SERIES-MIB::systemAlarm1PPSAbsent
@@ -925,10 +925,10 @@ modules:
                     index: 'systemAlarm1PPSAbsent.{{ $index }}'
                     state_name: systemAlarm1PPSAbsent
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::systemAlarms
                     value: TAIT-INFRA93SERIES-MIB::systemAlarmQoSTransmitBuffer
@@ -938,10 +938,10 @@ modules:
                     index: 'systemAlarmQoSTransmitBuffer.{{ $index }}'
                     state_name: systemAlarmQoSTransmitBuffer
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 1 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 1 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::systemAlarms
                     value: TAIT-INFRA93SERIES-MIB::systemAlarmCartesianLoopUnstable
@@ -951,10 +951,10 @@ modules:
                     index: 'systemAlarmCartesianLoopUnstable.{{ $index }}'
                     state_name: systemAlarmCartesianLoopUnstable
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::systemAlarms
                     value: TAIT-INFRA93SERIES-MIB::systemAlarmTxRCableAbsent
@@ -964,10 +964,10 @@ modules:
                     index: 'systemAlarmTxRCableAbsent.{{ $index }}'
                     state_name: systemAlarmTxRCableAbsent
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::fpAlarms
                     value: TAIT-INFRA93SERIES-MIB::fpAlarmFan1
@@ -977,10 +977,10 @@ modules:
                     index: 'fpAlarmFan1.{{ $index }}'
                     state_name: fpAlarmFan1
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::fpAlarms
                     value: TAIT-INFRA93SERIES-MIB::fpAlarmFan2
@@ -990,10 +990,10 @@ modules:
                     index: 'fpAlarmFan2.{{ $index }}'
                     state_name: fpAlarmFan2
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::fpAlarms
                     value: TAIT-INFRA93SERIES-MIB::fpAlarmFan3
@@ -1003,10 +1003,10 @@ modules:
                     index: 'fpAlarmFan3.{{ $index }}'
                     state_name: fpAlarmFan3
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::fpAlarms
                     value: TAIT-INFRA93SERIES-MIB::fpAlarmNoFPDetected
@@ -1016,10 +1016,10 @@ modules:
                     index: 'fpAlarmNoFPDetected.{{ $index }}'
                     state_name: fpAlarmNoFPDetected
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
                 -
                     oid: TAIT-INFRA93SERIES-MIB::fpAlarms
                     value: TAIT-INFRA93SERIES-MIB::fpAlarmInvalidFirmware
@@ -1029,10 +1029,10 @@ modules:
                     index: 'fpAlarmInvalidFirmware.{{ $index }}'
                     state_name: fpAlarmInvalidFirmware
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 3 }
-                        - { descr: cleared, graph: 1, value: 1, generic: 0 }
-                        - { descr: raised, graph: 1, value: 2, generic: 2 }
-                        - { descr: disabled, graph: 1, value: 3, generic: 3 }
+                        - { descr: unavailable, value: 0, generic: 3 }
+                        - { descr: cleared, value: 1, generic: 0 }
+                        - { descr: raised, value: 2, generic: 2 }
+                        - { descr: disabled, value: 3, generic: 3 }
         frequency:
             data:
                 -

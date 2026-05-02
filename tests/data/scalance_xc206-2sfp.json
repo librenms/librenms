@@ -2858,77 +2858,66 @@
                 {
                     "state_name": "C-Plug",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "C-Plug",
                     "state_descr": "notAccepted",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "C-Plug",
                     "state_descr": "accepted",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "C-Plug",
                     "state_descr": "factory",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "C-Plug",
                     "state_descr": "missing",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "Faults",
                     "state_descr": "noFault",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Faults",
                     "state_descr": "fault",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "Power Supply 1",
                     "state_descr": "active",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Power Supply 1",
                     "state_descr": "inactive",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "Power Supply 2",
                     "state_descr": "active",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Power Supply 2",
                     "state_descr": "inactive",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 }

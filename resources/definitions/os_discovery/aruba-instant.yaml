@@ -29,8 +29,8 @@ modules:
                     group: 'Cluster APs'
                     state_name: aiAPStatus
                     states:
-                          - { value:  1, generic: 0, graph: 0, descr: up }
-                          - { value:  2, generic: 2, graph: 0, descr: down }
+                          - { value:  1, generic: 0, descr: up }
+                          - { value:  2, generic: 2, descr: down }
                 -
                     oid: AI-AP-MIB::aiRadioStatus
                     value: AI-AP-MIB::aiRadioStatus
@@ -39,5 +39,5 @@ modules:
                     group: 'Cluster Radios'
                     state_name: aiRadioStatus
                     states:
-                          - { value:  1, generic: 0, graph: 0, descr: up }
-                          - { value:  2, generic: 3, graph: 0, descr: down }
+                          - { value:  1, generic: 0, descr: up }
+                          - { value:  2, generic: 3, descr: down }

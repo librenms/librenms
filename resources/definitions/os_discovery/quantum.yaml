@@ -74,13 +74,13 @@ modules:
                     group: 'drives'
                     descr: 'Service: {{ ADIC-MANAGEMENT-MIB::phDriveSerialNumber }}'
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: good }
-                        - { value: 2, generic: 2, graph: 0, descr: failed }
-                        - { value: 3, generic: 2, graph: 0, descr: degraded }
-                        - { value: 4, generic: 1, graph: 0, descr: warning }
-                        - { value: 5, generic: 0, graph: 0, descr: informational }
-                        - { value: 6, generic: 3, graph: 0, descr: unknown }
-                        - { value: 7, generic: 3, graph: 0, descr: invalid }
+                        - { value: 1, generic: 0, descr: good }
+                        - { value: 2, generic: 2, descr: failed }
+                        - { value: 3, generic: 2, descr: degraded }
+                        - { value: 4, generic: 1, descr: warning }
+                        - { value: 5, generic: 0, descr: informational }
+                        - { value: 6, generic: 3, descr: unknown }
+                        - { value: 7, generic: 3, descr: invalid }
                 -
                     oid: ADIC-MANAGEMENT-MIB::phIeStationTable
                     value: ADIC-MANAGEMENT-MIB::phIeStationDoorStatus
@@ -90,13 +90,13 @@ modules:
                     state_name: phIeStationTable
                     descr: 'Import/Export Door: {{ ADIC-MANAGEMENT-MIB::phIeStationNumber }}'
                     states:
-                        - { value: 1, generic: 1, graph: 0, descr: open }
-                        - { value: 2, generic: 0, graph: 0, descr: closed }
-                        - { value: 3, generic: 0, graph: 0, descr: closed and locked }
-                        - { value: 4, generic: 0, graph: 0, descr: closed and unlocked }
-                        - { value: 5, generic: 2, graph: 0, descr: controller failed }
-                        - { value: 6, generic: 4, graph: 0, descr: not installed }
-                        - { value: 7, generic: 3, graph: 0, descr: no data }
+                        - { value: 1, generic: 1, descr: open }
+                        - { value: 2, generic: 0, descr: closed }
+                        - { value: 3, generic: 0, descr: closed and locked }
+                        - { value: 4, generic: 0, descr: closed and unlocked }
+                        - { value: 5, generic: 2, descr: controller failed }
+                        - { value: 6, generic: 4, descr: not installed }
+                        - { value: 7, generic: 3, descr: no data }
                     skip_values:
                         -
                             oid: ADIC-MANAGEMENT-MIB::phIeStationDoorStatus
@@ -112,13 +112,13 @@ modules:
                     group: '{{ ADIC-MANAGEMENT-MIB::rasStatusGroupIndex }}'
                     descr: 'summary'
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: good }
-                        - { value: 2, generic: 2, graph: 0, descr: failed }
-                        - { value: 3, generic: 2, graph: 0, descr: degraded }
-                        - { value: 4, generic: 1, graph: 0, descr: warning }
-                        - { value: 5, generic: 0, graph: 0, descr: informational }
-                        - { value: 6, generic: 3, graph: 0, descr: unknown }
-                        - { value: 7, generic: 3, graph: 0, descr: invalid }
+                        - { value: 1, generic: 0, descr: good }
+                        - { value: 2, generic: 2, descr: failed }
+                        - { value: 3, generic: 2, descr: degraded }
+                        - { value: 4, generic: 1, descr: warning }
+                        - { value: 5, generic: 0, descr: informational }
+                        - { value: 6, generic: 3, descr: unknown }
+                        - { value: 7, generic: 3, descr: invalid }
                 -
                     oid: ADIC-INTELLIGENT-STORAGE-MIB::powerSupplyTable
                     value: ADIC-INTELLIGENT-STORAGE-MIB::powerSupplyStatus
@@ -129,11 +129,11 @@ modules:
                     group: 'powerAndCooling'
                     descr: '{{ ADIC-INTELLIGENT-STORAGE-MIB::powerSupplyLocation }}'
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 4, graph: 0, descr: not installed }
-                        - { value: 3, generic: 0, graph: 0, descr: ok }
-                        - { value: 4, generic: 1, graph: 0, descr: powered off }
-                        - { value: 5, generic: 2, graph: 0, descr: failed}
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 4, descr: not installed }
+                        - { value: 3, generic: 0, descr: ok }
+                        - { value: 4, generic: 1, descr: powered off }
+                        - { value: 5, generic: 2, descr: failed}
                     skip_values:
                         -
                             oid: ADIC-INTELLIGENT-STORAGE-MIB::powerSupplyStatus

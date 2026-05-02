@@ -32,10 +32,10 @@ modules:
                     index: 0
                     state_name: systemHealth
                     states:
-                        - { descr: healthy, graph: 1, value: 10000, generic: 0 }
-                        - { descr: degraded, graph: 1, value: 30000, generic: 1 }
-                        - { descr: admissionControl, graph: 1, value: 31000, generic: 1 }
-                        - { descr: critical, graph: 1, value: 50000, generic: 2 }
+                        - { descr: healthy, value: 10000, generic: 0 }
+                        - { descr: degraded, value: 30000, generic: 1 }
+                        - { descr: admissionControl, value: 31000, generic: 1 }
+                        - { descr: critical, value: 50000, generic: 2 }
                 -
                     oid: STEELHEAD-MIB::optServiceStatus
                     value: STEELHEAD-MIB::optServiceStatus
@@ -44,12 +44,12 @@ modules:
                     index: 0
                     state_name: optServiceStatus
                     states:
-                        - { descr: none, graph: 1, value: 0, generic: 3 }
-                        - { descr: unmanaged, graph: 1, value: 1, generic: 3 }
-                        - { descr: running, graph: 1, value: 2, generic: 0 }
-                        - { descr: sentCom1, graph: 1, value: 3, generic: 1 }
-                        - { descr: sentTerm1, graph: 1, value: 4, generic: 1 }
-                        - { descr: sentTerm2, graph: 1, value: 5, generic: 1 }
-                        - { descr: sentTerm3, graph: 1, value: 6, generic: 1 }
-                        - { descr: pending, graph: 1, value: 7, generic: 1 }
-                        - { descr: stopped, graph: 1, value: 8, generic: 2 }
+                        - { descr: none, value: 0, generic: 3 }
+                        - { descr: unmanaged, value: 1, generic: 3 }
+                        - { descr: running, value: 2, generic: 0 }
+                        - { descr: sentCom1, value: 3, generic: 1 }
+                        - { descr: sentTerm1, value: 4, generic: 1 }
+                        - { descr: sentTerm2, value: 5, generic: 1 }
+                        - { descr: sentTerm3, value: 6, generic: 1 }
+                        - { descr: pending, value: 7, generic: 1 }
+                        - { descr: stopped, value: 8, generic: 2 }

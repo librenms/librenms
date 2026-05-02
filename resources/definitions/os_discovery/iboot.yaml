@@ -66,5 +66,5 @@ modules:
                     descr: '{{ IBOOTPDU-MIB::outletName }} (ID {{ $index }})'
                     group: 'Actual Status'
                     states:
-                        - { value: 1, generic: 0, descr: on, graph: 0 }
-                        - { value: 0, generic: 3, descr: off, graph: 0 }
+                        - { value: 1, generic: 0, descr: on,  }
+                        - { value: 0, generic: 3, descr: off,  }

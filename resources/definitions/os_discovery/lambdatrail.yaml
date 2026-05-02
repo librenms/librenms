@@ -210,8 +210,8 @@ modules:
                     group: Link
                     state_name: lt2sClientLink
                     states:
-                        - { descr: Down, graph: 1, value: 1, generic: 3 }
-                        - { descr: Up, graph: 1, value: 2, generic: 0 }
+                        - { descr: Down, value: 1, generic: 3 }
+                        - { descr: Up, value: 2, generic: 0 }
                 -
                     oid: Lambdatrail2s-MIB::lt2sPortTable
                     value: Lambdatrail2s-MIB::lt2sLineLink
@@ -220,8 +220,8 @@ modules:
                     group: Link
                     state_name: lt2sLineLink
                     states:
-                        - { descr: Down, graph: 1, value: 1, generic: 3 }
-                        - { descr: Up, graph: 1, value: 2, generic: 0 }
+                        - { descr: Down, value: 1, generic: 3 }
+                        - { descr: Up, value: 2, generic: 0 }
                 -
                     oid: Lambdatrail2s-MIB::lt2sPowerFanStatus
                     value: Lambdatrail2s-MIB::lt2sPowerFanStatus
@@ -230,9 +230,9 @@ modules:
                     group: Fan
                     state_name: lt2sPowerFanStatus
                     states:
-                        - { descr: failed, graph: 0, value: 1, generic: 0 }
-                        - { descr: On, graph: 0, value: 2, generic: 0 }
-                        - { descr: Off, graph: 0, value: 3, generic: 0 }
+                        - { descr: failed, value: 1, generic: 0 }
+                        - { descr: On, value: 2, generic: 0 }
+                        - { descr: Off, value: 3, generic: 0 }
                 -
                     oid: Lambdatrail2s-MIB::lt2sPowerFanMode
                     value: Lambdatrail2s-MIB::lt2sPowerFanMode
@@ -241,9 +241,9 @@ modules:
                     group: Fan
                     state_name: lt2sPowerFanMode
                     states:
-                        - { descr: alwaysOff, graph: 0, value: 1, generic: 0 }
-                        - { descr: alwaysOn, graph: 0, value: 2, generic: 0 }
-                        - { descr: byTemperature, graph: 0, value: 3, generic: 0 }
+                        - { descr: alwaysOff, value: 1, generic: 0 }
+                        - { descr: alwaysOn, value: 2, generic: 0 }
+                        - { descr: byTemperature, value: 3, generic: 0 }
                 #HS Variant
                 -
                     oid: LAMBDATRAIL-MIB::systemFan1
@@ -253,9 +253,9 @@ modules:
                     group: Fan
                     state_name: systemFan1
                     states:
-                        - { descr: failed, graph: 0, value: 1, generic: 0 }
-                        - { descr: Off, graph: 0, value: 2, generic: 0 }
-                        - { descr: On, graph: 0, value: 3, generic: 0 }
+                        - { descr: failed, value: 1, generic: 0 }
+                        - { descr: Off, value: 2, generic: 0 }
+                        - { descr: On, value: 3, generic: 0 }
                 -
                     oid: LAMBDATRAIL-MIB::systemFan2
                     value: LAMBDATRAIL-MIB::systemFan2
@@ -264,9 +264,9 @@ modules:
                     group: Fan
                     state_name: systemFan2
                     states:
-                        - { descr: failed, graph: 0, value: 1, generic: 0 }
-                        - { descr: Off, graph: 0, value: 2, generic: 0 }
-                        - { descr: On, graph: 0, value: 3, generic: 0 }
+                        - { descr: failed, value: 1, generic: 0 }
+                        - { descr: Off, value: 2, generic: 0 }
+                        - { descr: On, value: 3, generic: 0 }
                 -
                     oid: LAMBDATRAIL-MIB::systemPower1
                     value: LAMBDATRAIL-MIB::systemPower1
@@ -275,9 +275,9 @@ modules:
                     group: Power
                     state_name: systemPower1
                     states:
-                        - { descr: notplugged, graph: 0, value: 1, generic: 0 }
-                        - { descr: Off, graph: 0, value: 2, generic: 0 }
-                        - { descr: On, graph: 0, value: 3, generic: 0 }
+                        - { descr: notplugged, value: 1, generic: 0 }
+                        - { descr: Off, value: 2, generic: 0 }
+                        - { descr: On, value: 3, generic: 0 }
                 -
                     oid: LAMBDATRAIL-MIB::systemPower2
                     value: LAMBDATRAIL-MIB::systemPower2
@@ -286,9 +286,9 @@ modules:
                     group: Power
                     state_name: systemPower2
                     states:
-                        - { descr: notplugged, graph: 0, value: 1, generic: 0 }
-                        - { descr: Off, graph: 0, value: 2, generic: 0 }
-                        - { descr: On, graph: 0, value: 3, generic: 0 }
+                        - { descr: notplugged, value: 1, generic: 0 }
+                        - { descr: Off, value: 2, generic: 0 }
+                        - { descr: On, value: 3, generic: 0 }
         fanspeed:
             data:
                 -

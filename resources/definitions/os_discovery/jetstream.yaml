@@ -144,9 +144,9 @@ modules:
                     index: '{{ $index }}'
                     skip_values: 2
                     states: &ddm_states
-                        - {value: 0, generic: 0, graph: 0, descr: 'False'}
-                        - {value: 1, generic: 2, graph: 1, descr: 'True'}
-                        - {value: 2, generic: 2, graph: 2, descr: N/A}
+                        - {value: 0, generic: 0, descr: 'False'}
+                        - {value: 1, generic: 2, descr: 'True'}
+                        - {value: 2, generic: 2, descr: N/A}
                     state_name: ddmStatusDataReady
                 -
                     oid: TPLINK-DDMSTATUS-MIB::ddmStatusTable
@@ -182,16 +182,16 @@ modules:
                     group: PoE_Ports
                     index: 'tpPoePowerStatus.{{ $index }}'
                     states:
-                        - {value: 0, generic: 3, graph: 1, descr: 'Off'}
-                        - {value: 1, generic: 1, graph: 1, descr: 'Turning-on'}
-                        - {value: 2, generic: 0, graph: 1, descr: 'On'}
-                        - {value: 3, generic: 2, graph: 1, descr: 'Overload'}
-                        - {value: 4, generic: 2, graph: 1, descr: 'Short'}
-                        - {value: 5, generic: 1, graph: 1, descr: 'Nonstandard'}
-                        - {value: 6, generic: 2, graph: 1, descr: 'VoltageHigh'}
-                        - {value: 7, generic: 2, graph: 1, descr: 'VoltageLow'}
-                        - {value: 8, generic: 2, graph: 1, descr: 'HardwareFault'}
-                        - {value: 9, generic: 2, graph: 1, descr: 'OverTemperature'}
+                        - {value: 0, generic: 3, descr: 'Off'}
+                        - {value: 1, generic: 1, descr: 'Turning-on'}
+                        - {value: 2, generic: 0, descr: 'On'}
+                        - {value: 3, generic: 2, descr: 'Overload'}
+                        - {value: 4, generic: 2, descr: 'Short'}
+                        - {value: 5, generic: 1, descr: 'Nonstandard'}
+                        - {value: 6, generic: 2, descr: 'VoltageHigh'}
+                        - {value: 7, generic: 2, descr: 'VoltageLow'}
+                        - {value: 8, generic: 2, descr: 'HardwareFault'}
+                        - {value: 9, generic: 2, descr: 'OverTemperature'}
                     state_name: tpPoePowerStatus
         temperature:
             data:

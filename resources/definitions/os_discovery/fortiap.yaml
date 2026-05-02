@@ -44,11 +44,11 @@ modules:
                     descr: 'Operating PoE Mode'
                     value: FORTINET-FORTIAP-MIB::fapPoeModeOper
                     states:
-                        - { value: 0, descr: 'Autodetect', graph: 1, generic: 0 }
-                        - { value: 1, descr: '802.3af', graph: 1, generic: 1 }
-                        - { value: 2, descr: '802.3at', graph: 1, generic: 0 }
-                        - { value: 3, descr: 'Power Adapter', graph: 1, generic: 0 }
-                        - { value: 4, descr: 'Controlled by AC', graph: 1, generic: 0 }
-                        - { value: 5, descr: 'Full Power', graph: 1, generic: 0 }
-                        - { value: 6, descr: 'High Power', graph: 1, generic: 0 }
-                        - { value: 7, descr: 'Low Power', graph: 1, generic: 2 }
+                        - { value: 0, descr: 'Autodetect', generic: 0 }
+                        - { value: 1, descr: '802.3af', generic: 1 }
+                        - { value: 2, descr: '802.3at', generic: 0 }
+                        - { value: 3, descr: 'Power Adapter', generic: 0 }
+                        - { value: 4, descr: 'Controlled by AC', generic: 0 }
+                        - { value: 5, descr: 'Full Power', generic: 0 }
+                        - { value: 6, descr: 'High Power', generic: 0 }
+                        - { value: 7, descr: 'Low Power', generic: 2 }

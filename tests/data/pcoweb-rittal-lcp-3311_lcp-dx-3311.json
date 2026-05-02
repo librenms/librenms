@@ -1673,637 +1673,546 @@
                 {
                     "state_name": "compressorDeltaPressureAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "compressorDeltaPressureAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "compressorDischargePressureProbeAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "compressorDischargePressureProbeAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "compressorDischargeTemperatureProbeAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "compressorDischargeTemperatureProbeAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "compressorEnvelopeAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "compressorEnvelopeAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "compressorOverloadAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "compressorOverloadAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "compressorStartupFailureAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "compressorStartupFailureAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "compressorSuctionPressureProbeAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "compressorSuctionPressureProbeAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "compressorSuctionTemperatureProbeAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "compressorSuctionTemperatureProbeAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALA02 - Probe B2 faulty or disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALA03 - Probe B3 faulty or disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALA04 - Probe B4 faulty or disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALA05 - Probe B5 faulty or disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALA06 - Probe B6 faulty or disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALA07 - Probe B7 faulty or disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALA08 - Probe B8 faulty or disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALA09 - Probe B9 faulty or disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALA10 - Probe B10 faulty or disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALA11 - Probe B11 faulty or disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALA12 - Probe B12 faulty or disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALB01 - High pressure",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALB02 - High pressure compressor 1 by transducer",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALB03 - Low pressure compressor/compressors by transducer",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALC01 - Compressor 1 overload or inverter alarm",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALC03 - Envelope alarm zone",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALC04 - Compressor start failure",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALC05 - High discharge gas temperature",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALC06 - Low pressure differential (insufficient lubrication)",
-                    "state_draw_graph": 0,
                     "state_value": 20,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALF01 - Fan overload",
-                    "state_draw_graph": 0,
                     "state_value": 21,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALD02 - Sensor failure",
-                    "state_draw_graph": 0,
                     "state_value": 22,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALD03 - EEV motor error",
-                    "state_draw_graph": 0,
                     "state_value": 23,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALD04 - Low superheat",
-                    "state_draw_graph": 0,
                     "state_value": 24,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALD05 - Low suction temperature",
-                    "state_draw_graph": 0,
                     "state_value": 25,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALD06 - Low evaporation temperature",
-                    "state_draw_graph": 0,
                     "state_value": 26,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALD07 - High evaporation temperature",
-                    "state_draw_graph": 0,
                     "state_value": 27,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALD08 - High condensing temperature",
-                    "state_draw_graph": 0,
                     "state_value": 28,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALD09 - Driver offline",
-                    "state_draw_graph": 0,
                     "state_value": 29,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALL01 - Power+ offline",
-                    "state_draw_graph": 0,
                     "state_value": 30,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALL02 - Power+ Generic Alarm",
-                    "state_draw_graph": 0,
                     "state_value": 31,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALL99 - Unexpected inverter stop",
-                    "state_draw_graph": 0,
                     "state_value": 32,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "currentErrorCode",
                     "state_descr": "ALW04 - Max temperature (warning)",
-                    "state_draw_graph": 0,
                     "state_value": 33,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "driveAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "driveAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "driverPowerStatus",
                     "state_descr": "stop",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "driverPowerStatus",
                     "state_descr": "run",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "driverPowerStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "envelopeZone",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "envelopeZone",
                     "state_descr": "maximum compression ratio",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "envelopeZone",
                     "state_descr": "maximum discharge power",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "envelopeZone",
                     "state_descr": "current limit",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "envelopeZone",
                     "state_descr": "maximum suction power",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "envelopeZone",
                     "state_descr": "minimum compression ratio",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "envelopeZone",
                     "state_descr": "minimum delta power",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "envelopeZone",
                     "state_descr": "minimum discharge power",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "envelopeZone",
                     "state_descr": "minimum suction power",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "generalAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "generalAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "highPressureAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "highPressureAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "inputTemperatureBottomProbeAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "inputTemperatureBottomProbeAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "inputTemperatureMidProbeAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "inputTemperatureMidProbeAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "inputTemperatureTopProbeAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "inputTemperatureTopProbeAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "inverterAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "inverterAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "inverterOnOff",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "inverterOnOff",
                     "state_descr": "on",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "maxDischargeTemperatureAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "maxDischargeTemperatureAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "oilReturnAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "oilReturnAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "outputTemperatureBottomProbeAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "outputTemperatureBottomProbeAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "outputTemperatureMidProbeAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "outputTemperatureMidProbeAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "outputTemperatureTopProbeAlarm",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "outputTemperatureTopProbeAlarm",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "unitOnOff",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "unitOnOff",
                     "state_descr": "on",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "unitOnOff",
                     "state_descr": "energy-save",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "unitOnOff",
                     "state_descr": "auto",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 }

@@ -94,8 +94,8 @@ modules:
                     descr: '{{ DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvFanDescr }}'
                     index: 'dEntityExtEnvFanStatus.{{ $index }}'
                     states:
-                        - { value: 1, descr: Ok, graph: 1, generic: 0 }
-                        - { value: 2, descr: Fault, graph: 1, generic: 2 }
+                        - { value: 1, descr: Ok, generic: 0 }
+                        - { value: 2, descr: Fault, generic: 2 }
                 -
                     oid: DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvPowerTable
                     value: DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvPowerStatus
@@ -104,9 +104,9 @@ modules:
                     descr: '{{ DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvPowerDescr }}'
                     index: 'dEntityExtEnvPowerStatus.{{ $index }}'
                     states:
-                        - { descr: In Operation, graph: 1, value: 1, generic: 0 }
-                        - { descr: Failed, graph: 1, value: 2, generic: 2 }
-                        - { descr: Empty, graph: 1, value: 3, generic: 3 }
+                        - { descr: In Operation, value: 1, generic: 0 }
+                        - { descr: Failed, value: 2, generic: 2 }
+                        - { descr: Empty, value: 3, generic: 3 }
                 -
                     oid: DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvTempTable
                     value: DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvTempStatus
@@ -115,8 +115,8 @@ modules:
                     descr: '{{ DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvTempDescr }}'
                     index: 'dEntityExtEnvTempStatus.{{ $index }}'
                     states:
-                        - { descr: Ok, graph: 1, value: 1, generic: 0 }
-                        - { descr: Abnormal, graph: 1, value: 2, generic: 2 }
+                        - { descr: Ok, value: 1, generic: 0 }
+                        - { descr: Abnormal, value: 2, generic: 2 }
                 -
                     oid: DLINKSW-DDM-MIB::dDdmIfInfoTable
                     value: DLINKSW-DDM-MIB::dDdmIfInfoTemperatureState
@@ -125,11 +125,11 @@ modules:
                     descr: 'SFP {{ $index }} Temp'
                     index: 'dDdmIfInfoTemperatureState.{{ $index }}'
                     states:
-                        - { descr: Normal, graph: 1, value: 0, generic: 0 }
-                        - { descr: HiAlarm, graph: 1, value: 1, generic: 2 }
-                        - { descr: HiWarning, graph: 1, value: 2, generic: 1 }
-                        - { descr: LoWarning, graph: 1, value: 3, generic: 1 }
-                        - { descr: LoAlarm, graph: 1, value: 4, generic: 2 }
+                        - { descr: Normal, value: 0, generic: 0 }
+                        - { descr: HiAlarm, value: 1, generic: 2 }
+                        - { descr: HiWarning, value: 2, generic: 1 }
+                        - { descr: LoWarning, value: 3, generic: 1 }
+                        - { descr: LoAlarm, value: 4, generic: 2 }
                 -
                     oid: DLINKSW-DDM-MIB::dDdmIfInfoTable
                     value: DLINKSW-DDM-MIB::dDdmIfInfoVoltageState
@@ -138,11 +138,11 @@ modules:
                     descr: 'SFP {{ $index }} Voltage'
                     index: 'dDdmIfInfoVoltageState.{{ $index }}'
                     states:
-                        - { descr: Normal, graph: 1, value: 0, generic: 0 }
-                        - { descr: HiAlarm, graph: 1, value: 1, generic: 2 }
-                        - { descr: HiWarning, graph: 1, value: 2, generic: 1 }
-                        - { descr: LoWarning, graph: 1, value: 3, generic: 1 }
-                        - { descr: LoAlarm, graph: 1, value: 4, generic: 2 }
+                        - { descr: Normal, value: 0, generic: 0 }
+                        - { descr: HiAlarm, value: 1, generic: 2 }
+                        - { descr: HiWarning, value: 2, generic: 1 }
+                        - { descr: LoWarning, value: 3, generic: 1 }
+                        - { descr: LoAlarm, value: 4, generic: 2 }
                 -
                     oid: DLINKSW-DDM-MIB::dDdmIfInfoTable
                     value: DLINKSW-DDM-MIB::dDdmIfInfoBiasCurrentState
@@ -151,11 +151,11 @@ modules:
                     descr: 'SFP {{ $index }} Bias'
                     index: 'dDdmIfInfoBiasCurrentState.{{ $index }}'
                     states:
-                        - { descr: Normal, graph: 1, value: 0, generic: 0 }
-                        - { descr: HiAlarm, graph: 1, value: 1, generic: 2 }
-                        - { descr: HiWarning, graph: 1, value: 2, generic: 1 }
-                        - { descr: LoWarning, graph: 1, value: 3, generic: 1 }
-                        - { descr: LoAlarm, graph: 1, value: 4, generic: 2 }
+                        - { descr: Normal, value: 0, generic: 0 }
+                        - { descr: HiAlarm, value: 1, generic: 2 }
+                        - { descr: HiWarning, value: 2, generic: 1 }
+                        - { descr: LoWarning, value: 3, generic: 1 }
+                        - { descr: LoAlarm, value: 4, generic: 2 }
                 -
                     oid: DLINKSW-DDM-MIB::dDdmIfInfoTable
                     value: DLINKSW-DDM-MIB::dDdmIfInfoTxPowerState
@@ -164,11 +164,11 @@ modules:
                     descr: 'SFP {{ $index }} TX Power'
                     index: 'dDdmIfInfoTxPowerState.{{ $index }}'
                     states:
-                        - { descr: Normal, graph: 1, value: 0, generic: 0 }
-                        - { descr: HiAlarm, graph: 1, value: 1, generic: 2 }
-                        - { descr: HiWarning, graph: 1, value: 2, generic: 1 }
-                        - { descr: LoWarning, graph: 1, value: 3, generic: 1 }
-                        - { descr: LoAlarm, graph: 1, value: 4, generic: 2 }
+                        - { descr: Normal, value: 0, generic: 0 }
+                        - { descr: HiAlarm, value: 1, generic: 2 }
+                        - { descr: HiWarning, value: 2, generic: 1 }
+                        - { descr: LoWarning, value: 3, generic: 1 }
+                        - { descr: LoAlarm, value: 4, generic: 2 }
                 -
                     oid: DLINKSW-DDM-MIB::dDdmIfInfoTable
                     value: DLINKSW-DDM-MIB::dDdmIfInfoRxPowerState
@@ -177,8 +177,8 @@ modules:
                     descr: 'SFP {{ $index }} RX Power'
                     index: 'dDdmIfInfoRxPowerState.{{ $index }}'
                     states:
-                        - { descr: Normal, graph: 1, value: 0, generic: 0 }
-                        - { descr: HiAlarm, graph: 1, value: 1, generic: 2 }
-                        - { descr: HiWarning, graph: 1, value: 2, generic: 1 }
-                        - { descr: LoWarning, graph: 1, value: 3, generic: 1 }
-                        - { descr: LoAlarm, graph: 1, value: 4, generic: 2 }
+                        - { descr: Normal, value: 0, generic: 0 }
+                        - { descr: HiAlarm, value: 1, generic: 2 }
+                        - { descr: HiWarning, value: 2, generic: 1 }
+                        - { descr: LoWarning, value: 3, generic: 1 }
+                        - { descr: LoAlarm, value: 4, generic: 2 }

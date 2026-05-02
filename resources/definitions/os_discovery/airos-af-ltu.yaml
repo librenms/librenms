@@ -19,8 +19,8 @@ modules:
                     descr: Radio Role
                     state_name: afLTURole
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: AP }
-                        - { value: 1, generic: 0, graph: 0, descr: CPE }
+                        - { value: 0, generic: 0, descr: AP }
+                        - { value: 1, generic: 0, descr: CPE }
                 -
                     oid: UBNT-AFLTU-MIB::afLTUgpsStatus
                     value: UBNT-AFLTU-MIB::afLTUgpsStatus
@@ -28,9 +28,9 @@ modules:
                     state_name: afLTUgpsStatus
                     descr: GPS Status
                     states:
-                        - { value: 0, generic: 1, graph: 0, descr: Absent }
-                        - { value: 1, generic: 1, graph: 0, descr: Off }
-                        - { value: 2, generic: 0, graph: 0, descr: On }
+                        - { value: 0, generic: 1, descr: Absent }
+                        - { value: 1, generic: 1, descr: Off }
+                        - { value: 2, generic: 0, descr: On }
                 -
                     oid: UBNT-AFLTU-MIB::afLTUgpsDimensions
                     value: UBNT-AFLTU-MIB::afLTUgpsDimensions
@@ -38,10 +38,10 @@ modules:
                     state_name: afLTUgpsDimensions
                     descr: GPS fix
                     states:
-                        - { value: 0, generic: 1, graph: 0, descr: Unknown }
-                        - { value: 1, generic: 1, graph: 0, descr: Nofix }
-                        - { value: 2, generic: 0, graph: 0, descr: Fix2d }
-                        - { value: 3, generic: 0, graph: 0, descr: Fix3d }
+                        - { value: 0, generic: 1, descr: Unknown }
+                        - { value: 1, generic: 1, descr: Nofix }
+                        - { value: 2, generic: 0, descr: Fix2d }
+                        - { value: 3, generic: 0, descr: Fix3d }
         count:
             data:
                 -

@@ -278,17 +278,17 @@ modules:
                     state_name: nmsSysErrorNum
                     descr: 'Sys Errors'
                     states:
-                        - { descr: sys_ok, graph: 0, value: 0, generic: 0 }
-                        - { descr: TLB_modification_exception, graph: 0, value: 1, generic: 1 }
-                        - { descr: load_or_instruction_fetch_TLB_miss_exception, graph: 0, value: 2, generic: 2 }
-                        - { descr: store_TLB_miss_exception, graph: 0, value: 3, generic: 2 }
-                        - { descr: load_instruction_fetch_address_error_exception, graph: 0, value: 4, generic: 2 }
-                        - { descr: store_address_error_exception, graph: 0, value: 5, generic: 2 }
-                        - { descr: for_instruction_fetch_bus_error, graph: 0, value: 6, generic: 2 }
-                        - { descr: data_load_or_store_bus_error, graph: 0, value: 7, generic: 2 }
-                        - { descr: arithmetic_overflow_exception, graph: 0, value: 12, generic: 2 }
-                        - { descr: trap_exception, graph: 0, value: 13, generic: 2 }
-                        - { descr: deadlock_software_exception, graph: 0, value: 16, generic: 2 }
+                        - { descr: sys_ok, value: 0, generic: 0 }
+                        - { descr: TLB_modification_exception, value: 1, generic: 1 }
+                        - { descr: load_or_instruction_fetch_TLB_miss_exception, value: 2, generic: 2 }
+                        - { descr: store_TLB_miss_exception, value: 3, generic: 2 }
+                        - { descr: load_instruction_fetch_address_error_exception, value: 4, generic: 2 }
+                        - { descr: store_address_error_exception, value: 5, generic: 2 }
+                        - { descr: for_instruction_fetch_bus_error, value: 6, generic: 2 }
+                        - { descr: data_load_or_store_bus_error, value: 7, generic: 2 }
+                        - { descr: arithmetic_overflow_exception, value: 12, generic: 2 }
+                        - { descr: trap_exception, value: 13, generic: 2 }
+                        - { descr: deadlock_software_exception, value: 16, generic: 2 }
                 -
                     oid: NMS-IF-MIB::ifSfpParameterTable
                     value: NMS-IF-MIB::sfpLostStatus
@@ -300,8 +300,8 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     states:
-                        - { descr: normal, graph: 1, value: 1, generic: 0 }
-                        - { descr: lost, graph: 2, value: 2, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: lost, value: 2, generic: 2 }
                     skip_values:
                         - # skip ports with no tansceiver inserted
                             oid: NMS-IF-MIB::sfpPresentStatus
@@ -313,19 +313,19 @@ modules:
                     descr: 'Fan {{ $index }} status'
                     state_name: FanStatus
                     states:
-                        - { descr: Normal, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stop, graph: 1, value: 2, generic: 2 }
-                        - { descr: Unused, graph: 1, value: 3, generic: 1 }
+                        - { descr: Normal, value: 1, generic: 0 }
+                        - { descr: Stop, value: 2, generic: 2 }
+                        - { descr: Unused, value: 3, generic: 1 }
                 -
                     oid: NMS-POWER-MIB::powerStatus
                     num_oid: '.1.3.6.1.4.1.52642.9.189.1.{{ $index }}'
                     descr: 'Power status'
                     state_name: powerStatus
                     states:
-                        - { descr: power-A-normal, graph: 1, value: 1, generic: 2 }
-                        - { descr: power-B-normal, graph: 1, value: 2, generic: 2 }
-                        - { descr: power-A-B-normal, graph: 1, value: 3, generic: 0 }
-                        - { descr: other, graph: 1, value: 4, generic: 3 }
+                        - { descr: power-A-normal, value: 1, generic: 2 }
+                        - { descr: power-B-normal, value: 2, generic: 2 }
+                        - { descr: power-A-B-normal, value: 3, generic: 0 }
+                        - { descr: other, value: 4, generic: 3 }
         count:
             data:
                 -

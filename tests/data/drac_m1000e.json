@@ -3938,994 +3938,852 @@
                 {
                     "state_name": "amperageProbeStatus",
                     "state_descr": "other",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "amperageProbeStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "amperageProbeStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "amperageProbeStatus",
                     "state_descr": "nonCriticalUpper",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "amperageProbeStatus",
                     "state_descr": "criticalUpper",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "amperageProbeStatus",
                     "state_descr": "nonRecoverableUpper",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "amperageProbeStatus",
                     "state_descr": "nonCriticalLower",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "amperageProbeStatus",
                     "state_descr": "criticalLower",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "amperageProbeStatus",
                     "state_descr": "nonRecoverableLower",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "amperageProbeStatus",
                     "state_descr": "failed",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "controllerState",
                     "state_descr": "other",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "controllerState",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "controllerState",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "controllerState",
                     "state_descr": "nonCritical",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "controllerState",
                     "state_descr": "critical",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "controllerState",
                     "state_descr": "nonrecoverable",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsBladeCurrStatus",
                     "state_descr": "other",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsBladeCurrStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsBladeCurrStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsBladeCurrStatus",
                     "state_descr": "nonCritical",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsBladeCurrStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsBladeCurrStatus",
                     "state_descr": "nonRecoverable",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsCMCCurrStatus",
                     "state_descr": "other",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsCMCCurrStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsCMCCurrStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsCMCCurrStatus",
                     "state_descr": "nonCritical",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsCMCCurrStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsCMCCurrStatus",
                     "state_descr": "nonRecoverable",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsKVMCurrStatus",
                     "state_descr": "other",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsKVMCurrStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsKVMCurrStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsKVMCurrStatus",
                     "state_descr": "nonCritical",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsKVMCurrStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsKVMCurrStatus",
                     "state_descr": "nonRecoverable",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsPowerCurrStatus",
                     "state_descr": "other",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsPowerCurrStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsPowerCurrStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsPowerCurrStatus",
                     "state_descr": "nonCritical",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsPowerCurrStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsPowerCurrStatus",
                     "state_descr": "nonRecoverable",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsTempCurrStatus",
                     "state_descr": "other",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsTempCurrStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsTempCurrStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsTempCurrStatus",
                     "state_descr": "nonCritical",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsTempCurrStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "DELL-RAC-MIB::drsTempCurrStatus",
                     "state_descr": "nonRecoverable",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "drsFanCurrStatus",
                     "state_descr": "other",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "drsFanCurrStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "drsFanCurrStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "drsFanCurrStatus",
                     "state_descr": "nonCritical",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "drsFanCurrStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "drsFanCurrStatus",
                     "state_descr": "nonRecoverable",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "drsGlobalSystemStatus",
                     "state_descr": "other",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "drsGlobalSystemStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "drsGlobalSystemStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "drsGlobalSystemStatus",
                     "state_descr": "nonCritical",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "drsGlobalSystemStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "drsGlobalSystemStatus",
                     "state_descr": "nonRecoverable",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "drsIOMCurrStatus",
                     "state_descr": "other",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "drsIOMCurrStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "drsIOMCurrStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "drsIOMCurrStatus",
                     "state_descr": "nonCritical",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "drsIOMCurrStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "drsIOMCurrStatus",
                     "state_descr": "nonRecoverable",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "drsRedCurrStatus",
                     "state_descr": "other",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "drsRedCurrStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "drsRedCurrStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "drsRedCurrStatus",
                     "state_descr": "nonCritical",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "drsRedCurrStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "drsRedCurrStatus",
                     "state_descr": "nonRecoverable",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "drsServerMonitoringCapable",
                     "state_descr": "absent",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "drsServerMonitoringCapable",
                     "state_descr": "none",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "drsServerMonitoringCapable",
                     "state_descr": "basic",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "drsServerMonitoringCapable",
                     "state_descr": "off l",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "intrusionReading",
                     "state_descr": "chassisNotBreached",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "intrusionReading",
                     "state_descr": "chassisBreached",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "intrusionReading",
                     "state_descr": "chassisBreachedPrior",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "intrusionReading",
                     "state_descr": "chassisBreachSensorFailure",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "intrusionStatus",
                     "state_descr": "other",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "intrusionStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "intrusionStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "intrusionStatus",
                     "state_descr": "nonCritical",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "intrusionStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "intrusionStatus",
                     "state_descr": "nonRecoverable",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "memoryDeviceStatus",
                     "state_descr": "other",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "memoryDeviceStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "memoryDeviceStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "memoryDeviceStatus",
                     "state_descr": "nonCritical",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "memoryDeviceStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "memoryDeviceStatus",
                     "state_descr": "nonRecoverable",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "physicalDiskState",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "physicalDiskState",
                     "state_descr": "ready",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "physicalDiskState",
                     "state_descr": "online",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "physicalDiskState",
                     "state_descr": "foreign",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "physicalDiskState",
                     "state_descr": "offline",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "physicalDiskState",
                     "state_descr": "blocked",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "physicalDiskState",
                     "state_descr": "failed",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "physicalDiskState",
                     "state_descr": "nonraid",
-                    "state_draw_graph": 1,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "physicalDiskState",
                     "state_descr": "removed",
-                    "state_draw_graph": 1,
                     "state_value": 9,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "physicalDiskState",
                     "state_descr": "readonly",
-                    "state_draw_graph": 1,
                     "state_value": 10,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "processorDeviceStatus",
                     "state_descr": "other",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "processorDeviceStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "processorDeviceStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "processorDeviceStatus",
                     "state_descr": "nonCritical",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "processorDeviceStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "processorDeviceStatus",
                     "state_descr": "nonRecoverable",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "systemBatteryStatus",
                     "state_descr": "other",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "systemBatteryStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "systemBatteryStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemBatteryStatus",
                     "state_descr": "nonCriticalUpper",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "systemBatteryStatus",
                     "state_descr": "criticalUpper",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "systemBatteryStatus",
                     "state_descr": "nonRecoverableUpper",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "systemBatteryStatus",
                     "state_descr": "nonCriticalLower",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "systemBatteryStatus",
                     "state_descr": "criticalLower",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "systemBatteryStatus",
                     "state_descr": "nonRecoverableLower",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "systemBatteryStatus",
                     "state_descr": "failed",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "systemStateIDSDMCardDeviceStatusCombined",
                     "state_descr": "other",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "systemStateIDSDMCardDeviceStatusCombined",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "systemStateIDSDMCardDeviceStatusCombined",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemStateIDSDMCardDeviceStatusCombined",
                     "state_descr": "nonCritical",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "systemStateIDSDMCardDeviceStatusCombined",
                     "state_descr": "critical",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "systemStateIDSDMCardDeviceStatusCombined",
                     "state_descr": "nonRecoverable",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "systemStateIDSDMCardUnitStatusCombined",
                     "state_descr": "other",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "systemStateIDSDMCardUnitStatusCombined",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "systemStateIDSDMCardUnitStatusCombined",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemStateIDSDMCardUnitStatusCombined",
                     "state_descr": "nonCritical",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "systemStateIDSDMCardUnitStatusCombined",
                     "state_descr": "critical",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "systemStateIDSDMCardUnitStatusCombined",
                     "state_descr": "nonRecoverable",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "virtualDiskState",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "virtualDiskState",
                     "state_descr": "online",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "virtualDiskState",
                     "state_descr": "failed",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "virtualDiskState",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "voltageProbeStatus",
                     "state_descr": "other",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "voltageProbeStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "voltageProbeStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "voltageProbeStatus",
                     "state_descr": "nonCriticalUpper",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "voltageProbeStatus",
                     "state_descr": "criticalUpper",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "voltageProbeStatus",
                     "state_descr": "nonRecoverableUpper",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "voltageProbeStatus",
                     "state_descr": "nonCriticalLower",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "voltageProbeStatus",
                     "state_descr": "criticalLower",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "voltageProbeStatus",
                     "state_descr": "nonRecoverableLower",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "voltageProbeStatus",
                     "state_descr": "failed",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 }

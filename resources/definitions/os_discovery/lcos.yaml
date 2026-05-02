@@ -26,10 +26,10 @@ modules:
                     descr: 'Keying {{ LCOS-MIB::lcsStatusWlanInterpointsAccesspointListEntryInterpointPeerName }}'
                     state_name: KeyingState
                     states:
-                        - { graph: 0, value: 0, generic: 0, descr: Idle }
-                        - { graph: 0, value: 1, generic: 1, descr: Pending }
-                        - { graph: 0, value: 2, generic: 0, descr: Done }
-                        - { graph: 0, value: 3, generic: 1, descr: SaePending }
+                        - { value: 0, generic: 0, descr: Idle }
+                        - { value: 1, generic: 1, descr: Pending }
+                        - { value: 2, generic: 0, descr: Done }
+                        - { value: 3, generic: 1, descr: SaePending }
                 -
                     oid: LCOS-MIB::lcsStatusWlanInterpointsAccesspointListTable
                     value: LCOS-MIB::lcsStatusWlanInterpointsAccesspointListEntryWpaVersion
@@ -37,10 +37,10 @@ modules:
                     descr: 'WPA Version {{ LCOS-MIB::lcsStatusWlanInterpointsAccesspointListEntryInterpointPeerName }}'
                     state_name: WpaVersion
                     states:
-                        - { graph: 0, value: 0, generic: 1, descr: None }
-                        - { graph: 0, value: 1, generic: 0, descr: Wpa1 }
-                        - { graph: 0, value: 2, generic: 0, descr: Wpa2 }
-                        - { graph: 0, value: 3, generic: 0, descr: Wpa3 }
+                        - { value: 0, generic: 1, descr: None }
+                        - { value: 1, generic: 0, descr: Wpa1 }
+                        - { value: 2, generic: 0, descr: Wpa2 }
+                        - { value: 3, generic: 0, descr: Wpa3 }
                 -
                     oid: LCOS-MIB::lcsStatusWlanInterpointsAccesspointListTable
                     value: LCOS-MIB::lcsStatusWlanInterpointsAccesspointListEntryLinkActive
@@ -48,8 +48,8 @@ modules:
                     descr: 'Link Active {{ LCOS-MIB::lcsStatusWlanInterpointsAccesspointListEntryInterpointPeerName }}'
                     state_name: LinkActive
                     states:
-                        - { graph: 0, value: 0, generic: 2, descr: No }
-                        - { graph: 0, value: 1, generic: 0, descr: Yes }
+                        - { value: 0, generic: 2, descr: No }
+                        - { value: 1, generic: 0, descr: Yes }
                 -
                     oid: LCOS-MIB::lcsStatusWlanInterpointsAccesspointListTable
                     value: LCOS-MIB::lcsStatusWlanInterpointsAccesspointListEntryRemoteStatus
@@ -57,6 +57,6 @@ modules:
                     descr: 'Remote Status {{ LCOS-MIB::lcsStatusWlanInterpointsAccesspointListEntryInterpointPeerName }}'
                     state_name: RemoteStatus
                     states:
-                        - { graph: 0, value: 0, generic: 3, descr: Unknown }
-                        - { graph: 0, value: 1, generic: 2, descr: NotOK }
-                        - { graph: 0, value: 2, generic: 0, descr: OK }
+                        - { value: 0, generic: 3, descr: Unknown }
+                        - { value: 1, generic: 2, descr: NotOK }
+                        - { value: 2, generic: 0, descr: OK }

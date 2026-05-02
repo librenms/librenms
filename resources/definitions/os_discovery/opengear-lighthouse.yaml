@@ -41,10 +41,10 @@ modules:
           group: 'Nodes'
           state_name: OG-LIGHTHOUSE-MIB::ogLhNodeConnStatus
           states:
-            - { value: 0, descr: notAvailable, generic: 3, graph: 0 }
-            - { value: 1, descr: connected,    generic: 0, graph: 0 }
-            - { value: 2, descr: disconnected, generic: 2, graph: 0 }
-            - { value: 3, descr: unknown,      generic: 3, graph: 0 }
+            - { value: 0, descr: notAvailable, generic: 3,  }
+            - { value: 1, descr: connected,    generic: 0,  }
+            - { value: 2, descr: disconnected, generic: 2,  }
+            - { value: 3, descr: unknown,      generic: 3,  }
 
         - oid: OG-LIGHTHOUSE-MIB::ogLhNodesTable
           value: OG-LIGHTHOUSE-MIB::ogLhNodeCellularHealth
@@ -54,10 +54,10 @@ modules:
           group: 'Lighthouse Nodes'
           state_name: OG-LIGHTHOUSE-MIB::ogLhNodeCellularHealth
           states:
-            - { value: 0, descr: unknown,                generic: 3, graph: 0 }
-            - { value: 1, descr: pending,                generic: 1, graph: 0 }
-            - { value: 2, descr: bad,                    generic: 2, graph: 0 }
-            - { value: 3, descr: moderate,               generic: 1, graph: 0 }
-            - { value: 4, descr: good,                   generic: 0, graph: 0 }
-            - { value: 5, descr: simissues,              generic: 2, graph: 0 }
-            - { value: 6, descr: connectivitytestfailed, generic: 2, graph: 0 }
+            - { value: 0, descr: unknown,                generic: 3,  }
+            - { value: 1, descr: pending,                generic: 1,  }
+            - { value: 2, descr: bad,                    generic: 2,  }
+            - { value: 3, descr: moderate,               generic: 1,  }
+            - { value: 4, descr: good,                   generic: 0,  }
+            - { value: 5, descr: simissues,              generic: 2,  }
+            - { value: 6, descr: connectivitytestfailed, generic: 2,  }

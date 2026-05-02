@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\SslCertificate;
 use Illuminate\Http\Request;
@@ -87,8 +88,12 @@ class SslCertificateController extends Controller
     {
         $this->authorize('viewAny', SslCertificate::class);
         $ssl_certificate->load('device');
+        $options = [
+            'days_until_expiry_warning' => (int) LibrenmsConfig::get('ssl_certificates.days_until_expiry_warning', 30),
+            'days_until_expiry_danger' => (int) LibrenmsConfig::get('ssl_certificates.days_until_expiry_danger', 0),
+        ];
 
-        return view('ssl-certificates.show', ['certificate' => $ssl_certificate]);
+        return view('ssl-certificates.show', ['certificate' => $ssl_certificate, 'options' => $options]);
     }
 
     /**

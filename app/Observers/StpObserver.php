@@ -25,8 +25,8 @@ class StpObserver
             Eventlog::log('STP root port changed: ' . $stp->getOriginal('rootPort') . ' > ' . $stp->rootPort, $stp->device_id, 'stp', Severity::Warning);
         }
 
-        if ($stp->isDirty('rootPort')) {
-            $time = Time::formatInterval((int) $stp->timeSinceTopologyChange);
+        if ($stp->isDirty('timeSinceTopologyChange') && $stp->timeSinceTopologyChange < $stp->getOriginal('timeSinceTopologyChange')) {
+            $time = Time::formatInterval((int) $stp->getOriginal('timeSinceTopologyChange'));
             Eventlog::log('STP topology changed after: ' . $time, $stp->device_id, 'stp', Severity::Warning);
         }
     }

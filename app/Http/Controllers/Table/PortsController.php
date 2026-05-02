@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
+use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
@@ -134,8 +135,8 @@ class PortsController extends TableController
      */
     public function formatItem($port)
     {
-        $status = $port->ifOperStatus == 'down'
-            ? ($port->ifAdminStatus == 'up' ? 'label-danger' : 'label-warning')
+        $status = $port->ifOperStatus == IfOperStatus::Down
+            ? ($port->ifAdminStatus == IfOperStatus::Up ? 'label-danger' : 'label-warning')
             : 'label-success';
 
         return [
@@ -199,8 +200,8 @@ class PortsController extends TableController
      */
     protected function formatExportRow($port)
     {
-        $status = $port->ifOperStatus;
-        $adminStatus = $port->ifAdminStatus;
+        $status = $port->ifOperStatus?->value;
+        $adminStatus = $port->ifAdminStatus?->value;
         $speed = Number::formatSi($port->ifSpeed);
 
         return [

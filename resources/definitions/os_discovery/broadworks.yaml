@@ -138,10 +138,10 @@ modules:
           state_name: bwAdminState
           descr: 'Broadworks lock status'
           states:
-            - {value: 0, generic: 1, graph: 0, descr: 'Lock'}
-            - {value: 1, generic: 1, graph: 0, descr: 'Locking'}
-            - {value: 2, generic: 0, graph: 0, descr: 'Unlock'}
-            - {value: 3, generic: 2, graph: 0, descr: 'ShuttingDown'}
-            - {value: 4, generic: 2, graph: 0, descr: 'Stopped'}
-            - {value: 5, generic: 1, graph: 0, descr: 'Forced Lock'}
+            - {value: 0, generic: 1, descr: 'Lock'}
+            - {value: 1, generic: 1, descr: 'Locking'}
+            - {value: 2, generic: 0, descr: 'Unlock'}
+            - {value: 3, generic: 2, descr: 'ShuttingDown'}
+            - {value: 4, generic: 2, descr: 'Stopped'}
+            - {value: 5, generic: 1, descr: 'Forced Lock'}
 

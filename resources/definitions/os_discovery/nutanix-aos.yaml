@@ -10,8 +10,8 @@ modules:
                     descr: 'Disk {{ NUTANIX-MIB::dstDiskId }}'
                     state_name: diskStatusTable
                     states:
-                        - { descr: ok , graph: 0, value: 1, generic: 0 }
-                        - { descr: error  , graph: 0, value: 2, generic: 1 }
+                        - { descr: ok , value: 1, generic: 0 }
+                        - { descr: error  , value: 2, generic: 1 }
         count:
             data:
                 -

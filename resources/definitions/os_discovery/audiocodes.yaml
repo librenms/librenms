@@ -31,12 +31,12 @@ modules:
                     descr: 'System Account Status {{ $index }}'
                     state_name: accountRowStatus
                     states:
-                        - { descr: active, graph: 0, value: 1, generic: 0 }
-                        - { descr: notInService, graph: 0, value: 2, generic: 2 }
-                        - { descr: notReady, graph: 0, value: 3, generic: 2 }
-                        - { descr: createAndGo, graph: 0, value: 4, generic: 1 }
-                        - { descr: createAndWait, graph: 0, value: 5, generic: 1 }
-                        - { descr: destroy, graph: 0, value: 6, generic: 2 }
+                        - { descr: active, value: 1, generic: 0 }
+                        - { descr: notInService, value: 2, generic: 2 }
+                        - { descr: notReady, value: 3, generic: 2 }
+                        - { descr: createAndGo, value: 4, generic: 1 }
+                        - { descr: createAndWait, value: 5, generic: 1 }
+                        - { descr: destroy, value: 6, generic: 2 }
                 -
                     oid: AC-SYSTEM-MIB::acSysStateOperational
                     value: AC-SYSTEM-MIB::acSysStateOperational
@@ -44,8 +44,8 @@ modules:
                     descr: 'System operational'
                     state_name: acSysStateOperational
                     states:
-                        - { descr: disabled, graph: 0, value: 1, generic: 2 }
-                        - { descr: enabled, graph: 0, value: 2, generic: 0 }
+                        - { descr: disabled, value: 1, generic: 2 }
+                        - { descr: enabled, value: 2, generic: 0 }
                 -
                     oid: AC-SYSTEM-MIB::acSysStateGWSeverity
                     value: AC-SYSTEM-MIB::acSysStateGWSeverity
@@ -53,12 +53,12 @@ modules:
                     descr: 'System GW status'
                     state_name: acSysStateGWSeverity
                     states:
-                        - { descr: noAlarm, graph: 0, value: 0, generic: 0 }
-                        - { descr: indeterminate, graph: 0, value: 1, generic: 0 }
-                        - { descr: warning, graph: 0, value: 2, generic: 1 }
-                        - { descr: minor, graph: 0, value: 3, generic: 1 }
-                        - { descr: major, graph: 0, value: 4, generic: 2 }
-                        - { descr: critical, graph: 0, value: 5, generic: 2 }
+                        - { descr: noAlarm, value: 0, generic: 0 }
+                        - { descr: indeterminate, value: 1, generic: 0 }
+                        - { descr: warning, value: 2, generic: 1 }
+                        - { descr: minor, value: 3, generic: 1 }
+                        - { descr: major, value: 4, generic: 2 }
+                        - { descr: critical, value: 5, generic: 2 }
                 -
                     oid: AC-SYSTEM-MIB::acSysHAStatusReady
                     value: AC-SYSTEM-MIB::acSysHAStatusReady
@@ -66,9 +66,9 @@ modules:
                     descr: 'System HA status ready'
                     state_name: acSysHAStatusReady
                     states:
-                        - { descr: no, graph: 0, value: 3, generic: 2 }
-                        - { descr: yes, graph: 0, value: 2, generic: 0 }
-                        - { descr: notApplicable, graph: 0, value: 1, generic: 3 }
+                        - { descr: no, value: 3, generic: 2 }
+                        - { descr: yes, value: 2, generic: 0 }
+                        - { descr: notApplicable, value: 1, generic: 3 }
                 -
                     oid: AcBoard::channelStatusTable
                     value: AcBoard::rTPActive
@@ -77,8 +77,8 @@ modules:
                     index: 'hookStatus{{ $index }}'
                     state_name: channelHookState
                     states:
-                        - { descr: offHook, graph: 0, value: 0, generic: 0 }
-                        - { descr: onHook, graph: 0, value: 1, generic: 0 }
+                        - { descr: offHook, value: 0, generic: 0 }
+                        - { descr: onHook, value: 1, generic: 0 }
                 -
                     oid: AC-ANALOG-MIB::acAnalogFxsFxoTable
                     value: AC-ANALOG-MIB::acAnalogFxsFxoHookState
@@ -87,8 +87,8 @@ modules:
                     index: 'hookStatus{{ $index }}'
                     state_name: acAnalogFxsFxoHookState
                     states:
-                        - { descr: offHook, graph: 0, value: 0, generic: 0 }
-                        - { descr: onHook, graph: 0, value: 1, generic: 0 }
+                        - { descr: offHook, value: 0, generic: 0 }
+                        - { descr: onHook, value: 1, generic: 0 }
                     skip_values:
                         -
                             oid: AC-ANALOG-MIB::acAnalogFxsFxoType
@@ -103,8 +103,8 @@ modules:
                     index: 'hookStatus{{ $index }}'
                     state_name: acAnalogFxsFxoHookState
                     states:
-                        - { descr: offHook, graph: 0, value: 0, generic: 0 }
-                        - { descr: onHook, graph: 0, value: 1, generic: 0 }
+                        - { descr: offHook, value: 0, generic: 0 }
+                        - { descr: onHook, value: 1, generic: 0 }
                     skip_values:
                         -
                             oid: AC-ANALOG-MIB::acAnalogFxsFxoType
@@ -118,8 +118,8 @@ modules:
                     index: 'hookStatus{{ $index }}'
                     state_name: acAnalogFxsFxoHookState
                     states:
-                        - { descr: offHook, graph: 0, value: 0, generic: 0 }
-                        - { descr: onHook, graph: 0, value: 1, generic: 0 }
+                        - { descr: offHook, value: 0, generic: 0 }
+                        - { descr: onHook, value: 1, generic: 0 }
                     skip_values:
                         -
                             oid: AC-ANALOG-MIB::acAnalogFxsFxoType
@@ -133,8 +133,8 @@ modules:
                     index: 'trunkAdminStatus{{ $index }}'
                     state_name: acTrunkAdministrativeState
                     states:
-                        - { descr: locked, graph: 0, value: 0, generic: 0 }
-                        - { descr: unLocked, graph: 0, value: 1, generic: 0 }
+                        - { descr: locked, value: 0, generic: 0 }
+                        - { descr: unLocked, value: 1, generic: 0 }
                 -
                     oid: AC-PSTN-MIB::acTrunkTable
                     value: AC-PSTN-MIB::acTrunkProtocolType
@@ -143,51 +143,51 @@ modules:
                     index: 'trunkProtocolType{{ $index }}'
                     state_name: acTrunkProtocolType
                     states:
-                        - { descr: NONE , graph: 0, value: 0 , generic: 0 }
-                        - { descr: E1_EURO_ISDN , graph: 0, value: 1 , generic: 0 }
-                        - { descr: T1_CAS , graph: 0, value: 2 , generic: 0 }
-                        - { descr: T1_RAW_CAS , graph: 0, value: 3 , generic: 0 }
-                        - { descr: T1_TRANSPARENT , graph: 0, value: 4 , generic: 0 }
-                        - { descr: E1_TRANSPARENT_31 , graph: 0, value: 5 , generic: 0 }
-                        - { descr: E1_TRANSPARENT_30 , graph: 0, value: 6 , generic: 0 }
-                        - { descr: E1_MFCR2 , graph: 0, value: 7 , generic: 0 }
-                        - { descr: E1_CAS , graph: 0, value: 8 , generic: 0 }
-                        - { descr: E1_RAW_CAS , graph: 0, value: 9 , generic: 0 }
-                        - { descr: T1_NI2_ISDN , graph: 0, value: 10 , generic: 0 }
-                        - { descr: T1_4ESS_ISDN , graph: 0, value: 11 , generic: 0 }
-                        - { descr: T1_5ESS_9_ISDN , graph: 0, value: 12 , generic: 0 }
-                        - { descr: T1_5ESS_10_ISDN , graph: 0, value: 13 , generic: 0 }
-                        - { descr: T1_DMS100_ISDN , graph: 0, value: 14 , generic: 0 }
-                        - { descr: J1_TRANSPARENT , graph: 0, value: 15 , generic: 0 }
-                        - { descr: T1_NTT_ISDN , graph: 0, value: 16 , generic: 0 }
-                        - { descr: E1_AUSTEL_ISDN , graph: 0, value: 17 , generic: 0 }
-                        - { descr: E1_HKT_ISDN , graph: 0, value: 18 , generic: 0 }
-                        - { descr: E1_KOR_ISDN , graph: 0, value: 19 , generic: 0 }
-                        - { descr: T1_HKT_ISDN , graph: 0, value: 20 , generic: 0 }
-                        - { descr: E1_QSIG , graph: 0, value: 21 , generic: 0 }
-                        - { descr: E1_TNZ_ISDN , graph: 0, value: 22 , generic: 0 }
-                        - { descr: T1_QSIG , graph: 0, value: 23 , generic: 0 }
-                        - { descr: T1_IUA , graph: 0, value: 28 , generic: 0 }
-                        - { descr: E1_IUA , graph: 0, value: 29 , generic: 0 }
-                        - { descr: E1_FRENCH_VN6_ISDN , graph: 0, value: 30 , generic: 0 }
-                        - { descr: E1_FRENCH_VN3_ISDN , graph: 0, value: 31 , generic: 0 }
-                        - { descr: T1_EURO_ISDN , graph: 0, value: 34 , generic: 0 }
-                        - { descr: T1_DMS100_MERIDIAN_ISDN , graph: 0, value: 35 , generic: 0 }
-                        - { descr: T1_NI1_ISDN , graph: 0, value: 36 , generic: 0 }
-                        - { descr: E1_DUA , graph: 0, value: 37 , generic: 0 }
-                        - { descr: E1_Q931_PACKETS , graph: 0, value: 38 , generic: 0 }
-                        - { descr: T1_Q931_PACKETS , graph: 0, value: 39 , generic: 0 }
-                        - { descr: E1_NI2_ISDN , graph: 0, value: 40 , generic: 0 }
-                        - { descr: E1-CAS-R15 , graph: 0, value: 41 , generic: 0 }
-                        - { descr: V5 , graph: 0, value: 43 , generic: 0 }
-                        - { descr: BRI-EURO-ISDN, graph: 0, value: 50 , generic: 0 }
-                        - { descr: BRI-NI-2, graph: 0, value: 51 , generic: 0 }
-                        - { descr: BRI-DMS100, graph: 0, value: 52 , generic: 0 }
-                        - { descr: BRI-5ESS, graph: 0, value: 53 , generic: 0 }
-                        - { descr: BRI-QSIG , graph: 0, value: 54 , generic: 0 }
-                        - { descr: BRI-VNG, graph: 0, value: 55 , generic: 0 }
-                        - { descr: BRI-NTT, graph: 0, value: 56 , generic: 0 }
-                        - { descr: BRI-IUA, graph: 0, value: 57 , generic: 0 }
+                        - { descr: NONE , value: 0 , generic: 0 }
+                        - { descr: E1_EURO_ISDN , value: 1 , generic: 0 }
+                        - { descr: T1_CAS , value: 2 , generic: 0 }
+                        - { descr: T1_RAW_CAS , value: 3 , generic: 0 }
+                        - { descr: T1_TRANSPARENT , value: 4 , generic: 0 }
+                        - { descr: E1_TRANSPARENT_31 , value: 5 , generic: 0 }
+                        - { descr: E1_TRANSPARENT_30 , value: 6 , generic: 0 }
+                        - { descr: E1_MFCR2 , value: 7 , generic: 0 }
+                        - { descr: E1_CAS , value: 8 , generic: 0 }
+                        - { descr: E1_RAW_CAS , value: 9 , generic: 0 }
+                        - { descr: T1_NI2_ISDN , value: 10 , generic: 0 }
+                        - { descr: T1_4ESS_ISDN , value: 11 , generic: 0 }
+                        - { descr: T1_5ESS_9_ISDN , value: 12 , generic: 0 }
+                        - { descr: T1_5ESS_10_ISDN , value: 13 , generic: 0 }
+                        - { descr: T1_DMS100_ISDN , value: 14 , generic: 0 }
+                        - { descr: J1_TRANSPARENT , value: 15 , generic: 0 }
+                        - { descr: T1_NTT_ISDN , value: 16 , generic: 0 }
+                        - { descr: E1_AUSTEL_ISDN , value: 17 , generic: 0 }
+                        - { descr: E1_HKT_ISDN , value: 18 , generic: 0 }
+                        - { descr: E1_KOR_ISDN , value: 19 , generic: 0 }
+                        - { descr: T1_HKT_ISDN , value: 20 , generic: 0 }
+                        - { descr: E1_QSIG , value: 21 , generic: 0 }
+                        - { descr: E1_TNZ_ISDN , value: 22 , generic: 0 }
+                        - { descr: T1_QSIG , value: 23 , generic: 0 }
+                        - { descr: T1_IUA , value: 28 , generic: 0 }
+                        - { descr: E1_IUA , value: 29 , generic: 0 }
+                        - { descr: E1_FRENCH_VN6_ISDN , value: 30 , generic: 0 }
+                        - { descr: E1_FRENCH_VN3_ISDN , value: 31 , generic: 0 }
+                        - { descr: T1_EURO_ISDN , value: 34 , generic: 0 }
+                        - { descr: T1_DMS100_MERIDIAN_ISDN , value: 35 , generic: 0 }
+                        - { descr: T1_NI1_ISDN , value: 36 , generic: 0 }
+                        - { descr: E1_DUA , value: 37 , generic: 0 }
+                        - { descr: E1_Q931_PACKETS , value: 38 , generic: 0 }
+                        - { descr: T1_Q931_PACKETS , value: 39 , generic: 0 }
+                        - { descr: E1_NI2_ISDN , value: 40 , generic: 0 }
+                        - { descr: E1-CAS-R15 , value: 41 , generic: 0 }
+                        - { descr: V5 , value: 43 , generic: 0 }
+                        - { descr: BRI-EURO-ISDN, value: 50 , generic: 0 }
+                        - { descr: BRI-NI-2, value: 51 , generic: 0 }
+                        - { descr: BRI-DMS100, value: 52 , generic: 0 }
+                        - { descr: BRI-5ESS, value: 53 , generic: 0 }
+                        - { descr: BRI-QSIG , value: 54 , generic: 0 }
+                        - { descr: BRI-VNG, value: 55 , generic: 0 }
+                        - { descr: BRI-NTT, value: 56 , generic: 0 }
+                        - { descr: BRI-IUA, value: 57 , generic: 0 }
                 -
                     oid: AC-PSTN-MIB::acTrunkStatusTable
                     value: AC-PSTN-MIB::acTrunkStatusAlarm
@@ -198,13 +198,13 @@ modules:
                     low_limit: -1
                     state_name: acTrunkUtilization
                     states:
-                        - { descr: Disabled , graph: 0, value: 0 , generic: 3 }
-                        - { descr: Active , graph: 0, value: 1 , generic: 0 }
-                        - { descr: LosLof , graph: 0, value: 2 , generic: 2 }
-                        - { descr: Ais , graph: 0, value: 3 , generic: 2 }
-                        - { descr: Rai , graph: 0, value: 4 , generic: 2 }
-                        - { descr: DChannel , graph: 0, value: 5 , generic: 2 }
-                        - { descr: LowerLayerDown , graph: 0, value: 6 , generic: 2 }
+                        - { descr: Disabled , value: 0 , generic: 3 }
+                        - { descr: Active , value: 1 , generic: 0 }
+                        - { descr: LosLof , value: 2 , generic: 2 }
+                        - { descr: Ais , value: 3 , generic: 2 }
+                        - { descr: Rai , value: 4 , generic: 2 }
+                        - { descr: DChannel , value: 5 , generic: 2 }
+                        - { descr: LowerLayerDown , value: 6 , generic: 2 }
                 -
                     oid: DS1-MIB::dsx1ConfigTable
                     value: DS1-MIB::dsx1LoopbackConfig
@@ -213,9 +213,9 @@ modules:
                     index: 'DS1loopback{{ $index }}'
                     state_name: dsx1LoopbackConfig
                     states:
-                        - { descr: No Loop , graph: 0, value: 1 , generic: 0 }
-                        - { descr: Payload Loop , graph: 0, value: 2 , generic: 3 }
-                        - { descr: Line Loop , graph: 0, value: 3 , generic: 3 }
-                        - { descr: Other Loop , graph: 0, value: 4 , generic: 3 }
-                        - { descr: Inward Loop , graph: 0, value: 5 , generic: 3 }
-                        - { descr: Dual Loop , graph: 0, value: 6 , generic: 3 }
+                        - { descr: No Loop , value: 1 , generic: 0 }
+                        - { descr: Payload Loop , value: 2 , generic: 3 }
+                        - { descr: Line Loop , value: 3 , generic: 3 }
+                        - { descr: Other Loop , value: 4 , generic: 3 }
+                        - { descr: Inward Loop , value: 5 , generic: 3 }
+                        - { descr: Dual Loop , value: 6 , generic: 3 }

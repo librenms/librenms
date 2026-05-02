@@ -26,7 +26,7 @@ modules:
                     group: 'Status'
                     state_name: license-status
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        - { value: 0, generic: 0, descr: 'OK' }
                 -
                     oid: QUANTASTOR-SYS-STATS::hwDiskTable
                     value: QUANTASTOR-SYS-STATS::hwDisk-State
@@ -36,8 +36,8 @@ modules:
                     group: 'HDD'
                     state_name: hwDisk-status
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }
-                        - { value: 1, generic: 1, graph: 1, descr: 'Rebuilding' }
+                        - { value: 0, generic: 0, descr: 'OK' }
+                        - { value: 1, generic: 1, descr: 'Rebuilding' }
                 -
                     oid: QUANTASTOR-SYS-STATS::hwUnitTable
                     value: QUANTASTOR-SYS-STATS::hwUnit-State
@@ -47,7 +47,7 @@ modules:
                     group: 'Array(s)'
                     state_name: hwUnit-status
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        - { value: 0, generic: 0, descr: 'OK' }
                 -
                     oid: QUANTASTOR-SYS-STATS::hwEnclosureTable
                     value: QUANTASTOR-SYS-STATS::hwEnclosure-State
@@ -57,7 +57,7 @@ modules:
                     group: 'Enclosure(s)'
                     state_name: hwEnclosure-status
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        - { value: 0, generic: 0, descr: 'OK' }
                 -
                     oid: QUANTASTOR-SYS-STATS::hwEnclosureTable
                     value: QUANTASTOR-SYS-STATS::hwEnclosure-AlarmCount
@@ -67,7 +67,7 @@ modules:
                     group: 'Enclosure(s)'
                     state_name: hwEnclosure-alarms
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        - { value: 0, generic: 0, descr: 'OK' }
                 -
                     oid: QUANTASTOR-SYS-STATS::fcTargetPortTable
                     value: QUANTASTOR-SYS-STATS::fcTargetPort-State
@@ -77,7 +77,7 @@ modules:
                     group: 'FC ports'
                     state_name: fctarget-state
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        - { value: 0, generic: 0, descr: 'OK' }
                 -
                     oid: QUANTASTOR-SYS-STATS::fcTargetPortTable
                     value: QUANTASTOR-SYS-STATS::fcTargetPort-IsTargetModeEnabled
@@ -87,7 +87,7 @@ modules:
                     group: 'FC ports'
                     state_name: fctarget-enablestate
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: 'Enabled' }
+                        - { value: 1, generic: 0, descr: 'Enabled' }
                 -
                     oid: QUANTASTOR-SYS-STATS::hwEnclosureTable
                     value: QUANTASTOR-SYS-STATS::hwEnclosure-TempSensorUnits
@@ -97,7 +97,7 @@ modules:
                     group: 'Temp sensor(s)'
                     state_name: hwEnclosure-tempsens
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        - { value: 0, generic: 0, descr: 'OK' }
                 -
                     oid: QUANTASTOR-SYS-STATS::hwEnclosureTable
                     value: QUANTASTOR-SYS-STATS::hwEnclosure-PowerSupplyUnits
@@ -107,7 +107,7 @@ modules:
                     group: 'PSU sensor(s)'
                     state_name: hwEnclosure-psusens
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        - { value: 0, generic: 0, descr: 'OK' }
                 -
                     oid: QUANTASTOR-SYS-STATS::storagePoolTable
                     value: QUANTASTOR-SYS-STATS::storagePool-State
@@ -117,7 +117,7 @@ modules:
                     group: 'Pools'
                     state_name: storagePool
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        - { value: 0, generic: 0, descr: 'OK' }
                 -
                     oid: QUANTASTOR-SYS-STATS::storageVolumeTable
                     value: QUANTASTOR-SYS-STATS::storageVolume-State
@@ -127,4 +127,4 @@ modules:
                     group: 'Volumes'
                     state_name: storageVolume
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        - { value: 0, generic: 0, descr: 'OK' }

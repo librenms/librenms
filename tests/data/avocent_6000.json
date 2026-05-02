@@ -2099,63 +2099,54 @@
                 {
                     "state_name": "acsPowerSupplyStatePw1",
                     "state_descr": "Power On",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "acsPowerSupplyStatePw1",
                     "state_descr": "Power Off",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "acsPowerSupplyStatePw1",
                     "state_descr": "Not Installed",
-                    "state_draw_graph": 1,
                     "state_value": 9999,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "acsPowerSupplyStatePw2",
                     "state_descr": "Power On",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "acsPowerSupplyStatePw2",
                     "state_descr": "Power Off",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "acsPowerSupplyStatePw2",
                     "state_descr": "Not Installed",
-                    "state_draw_graph": 1,
                     "state_value": 9999,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "acsSerialPortTable",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "acsSerialPortTable",
                     "state_descr": "Idle",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "acsSerialPortTable",
                     "state_descr": "In Use",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 }

@@ -5,11 +5,11 @@
        @if(isset($primaryDeviceLink['onclick']))onclick="{{ $primaryDeviceLink['onclick'] }}" @endif
        @if($primaryDeviceLink['external'])target="_blank" rel="noopener" @endif
        title="{{ $primaryDeviceLink['title'] }}"
-    >&nbsp;<i class="fa {{ $primaryDeviceLink['icon'] }} fa-lg icon-theme"></i>
+    ><i class="fa {{ $primaryDeviceLink['icon'] }} fa-lg icon-theme"></i>
     </a>
     <div class="btn-group" role="group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            &nbsp;<i class="fa fa-ellipsis-v fa-lg icon-theme"></i>&nbsp;
+            <i class="fa fa-ellipsis-v fa-lg fa-fw icon-theme"></i>
         </button>
         <ul class="dropdown-menu dropdown-menu-right">
             @foreach($deviceLinks as $link)

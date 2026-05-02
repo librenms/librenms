@@ -53,9 +53,9 @@ modules:
                     group: Alarm
                     state_name: status-evaporator-fan.0
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value:  0, generic: 0, graph: 0, descr: OK }
-                        - { value:  1, generic: 2, graph: 0, descr: Error }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  0, generic: 0, descr: OK }
+                        - { value:  1, generic: 2, descr: Error }
 
                 -
                     oid: SCS-ks-MIB::status-condenser-fan.0
@@ -65,9 +65,9 @@ modules:
                     group: Alarm
                     state_name: status-condenser-fan.0
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value:  0, generic: 0, graph: 0, descr: OK }
-                        - { value:  1, generic: 2, graph: 0, descr: Error }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  0, generic: 0, descr: OK }
+                        - { value:  1, generic: 2, descr: Error }
 
                 -
                     oid: SCS-ks-MIB::status-compressor.0
@@ -77,9 +77,9 @@ modules:
                     group: Alarm
                     state_name: status-compressor.0
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value:  0, generic: 0, graph: 0, descr: OK }
-                        - { value:  1, generic: 2, graph: 0, descr: Error }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  0, generic: 0, descr: OK }
+                        - { value:  1, generic: 2, descr: Error }
 
                 -
                     oid: SCS-ks-MIB::status-heater-thermal-protection.0
@@ -89,9 +89,9 @@ modules:
                     group: Alarm
                     state_name: status-heater-thermal-protection.0
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value:  0, generic: 0, graph: 0, descr: OK }
-                        - { value:  1, generic: 2, graph: 0, descr: Error }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  0, generic: 0, descr: OK }
+                        - { value:  1, generic: 2, descr: Error }
 
 
                 -
@@ -102,9 +102,9 @@ modules:
                     group: Alarm
                     state_name: status-exhaust-air-sensor.0
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value:  0, generic: 0, graph: 0, descr: OK }
-                        - { value:  1, generic: 2, graph: 0, descr: Error }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  0, generic: 0, descr: OK }
+                        - { value:  1, generic: 2, descr: Error }
 
 
                 -
@@ -115,9 +115,9 @@ modules:
                     group: Alarm
                     state_name: status-supply-air-sensor.0
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value:  0, generic: 0, graph: 0, descr: OK }
-                        - { value:  1, generic: 2, graph: 0, descr: Error }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  0, generic: 0, descr: OK }
+                        - { value:  1, generic: 2, descr: Error }
 
 
                 -
@@ -128,9 +128,9 @@ modules:
                     group: Alarm
                     state_name: status-outside-sensor.0
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value:  0, generic: 0, graph: 0, descr: OK }
-                        - { value:  1, generic: 2, graph: 0, descr: Error }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  0, generic: 0, descr: OK }
+                        - { value:  1, generic: 2, descr: Error }
 
                 -
                     oid: SCS-ks-MIB::status-room-temperature-sensor.0
@@ -140,9 +140,9 @@ modules:
                     group: Alarm
                     state_name: status-room-temperature-sensor.0
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value:  0, generic: 0, graph: 0, descr: OK }
-                        - { value:  1, generic: 2, graph: 0, descr: Error }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  0, generic: 0, descr: OK }
+                        - { value:  1, generic: 2, descr: Error }
 
                 -
                     oid: SCS-ks-MIB::status-room-humidity-sensor.0
@@ -152,9 +152,9 @@ modules:
                     group: Alarm
                     state_name: status-room-humidity-sensor.0
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value:  0, generic: 0, graph: 0, descr: OK }
-                        - { value:  1, generic: 2, graph: 0, descr: Error }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  0, generic: 0, descr: OK }
+                        - { value:  1, generic: 2, descr: Error }
 
                 -
                     oid: SCS-ks-MIB::status-min-exhaust-air-temperature.0
@@ -164,9 +164,9 @@ modules:
                     group: Alarm
                     state_name: status-min-exhaust-air-temperature.0
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value:  0, generic: 0, graph: 0, descr: OK }
-                        - { value:  1, generic: 2, graph: 0, descr: Error }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  0, generic: 0, descr: OK }
+                        - { value:  1, generic: 2, descr: Error }
 
                 -
                     oid: SCS-ks-MIB::status-max-exhaust-air-temperature.0
@@ -176,9 +176,9 @@ modules:
                     group: Alarm
                     state_name: status-max-exhaust-air-temperature.0
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value:  0, generic: 0, graph: 0, descr: OK }
-                        - { value:  1, generic: 2, graph: 0, descr: Error }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  0, generic: 0, descr: OK }
+                        - { value:  1, generic: 2, descr: Error }
 
                 -
                     oid: SCS-ks-MIB::status-min-supply-air-temperature.0
@@ -188,9 +188,9 @@ modules:
                     group: Alarm
                     state_name: status-min-supply-air-temperature.0
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value:  0, generic: 0, graph: 0, descr: OK }
-                        - { value:  1, generic: 2, graph: 0, descr: Error }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  0, generic: 0, descr: OK }
+                        - { value:  1, generic: 2, descr: Error }
 
                 -
                     oid: SCS-ks-MIB::status-water-sensor.0
@@ -200,9 +200,9 @@ modules:
                     group: Alarm
                     state_name: status-water-sensor.0
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value:  0, generic: 0, graph: 0, descr: OK }
-                        - { value:  1, generic: 2, graph: 0, descr: Error }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  0, generic: 0, descr: OK }
+                        - { value:  1, generic: 2, descr: Error }
 
                 -
                     oid: SCS-ks-MIB::status-filter-monitoring.0
@@ -212,9 +212,9 @@ modules:
                     group: Alarm
                     state_name: status-filter-monitoring.0
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value:  0, generic: 0, graph: 0, descr: OK }
-                        - { value:  1, generic: 2, graph: 0, descr: Error }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  0, generic: 0, descr: OK }
+                        - { value:  1, generic: 2, descr: Error }
 
                 -
                     oid: SCS-ks-MIB::status-operational-status.0
@@ -224,9 +224,9 @@ modules:
                     group: Status
                     state_name: status-operational-status.0
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value:  0, generic: 2, graph: 0, descr: Shut Down }
-                        - { value:  1, generic: 0, graph: 0, descr: Running }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  0, generic: 2, descr: Shut Down }
+                        - { value:  1, generic: 0, descr: Running }
 
                 -
                     oid: SCS-ks-MIB::status-collective-fault.0
@@ -236,6 +236,6 @@ modules:
                     group: Alarm
                     state_name: status-collective-fault.0
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value:  0, generic: 0, graph: 0, descr: OK }
-                        - { value:  1, generic: 2, graph: 0, descr: Error }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  0, generic: 0, descr: OK }
+                        - { value:  1, generic: 2, descr: Error }

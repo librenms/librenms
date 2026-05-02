@@ -19,9 +19,9 @@ foreach ($aos6_fan_oids as $index => $data) {
         $indexName = strrev($revindex);
         $descr = 'Chassis-' . ($chassis - 568) . " Fan $indexName";
         $states = [
-            ['value' => 0, 'generic' => 1, 'graph' => 1, 'descr' => 'noStatus'],
-            ['value' => 1, 'generic' => 1, 'graph' => 1, 'descr' => 'notRunning'],
-            ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'running'],
+            ['value' => 0, 'generic' => 1, 'descr' => 'noStatus'],
+            ['value' => 1, 'generic' => 1, 'descr' => 'notRunning'],
+            ['value' => 2, 'generic' => 0, 'descr' => 'running'],
         ];
         if (! empty($current)) {
             create_state_index($state_name, $states);
@@ -45,8 +45,8 @@ if (($stack_left < $stacking) && ($stack_alone < $stacking_non)) {
             $stack_state_namea = 'alaStackMgrLocalLinkStateA';
             $descr_stacka = 'Stack Port A Chassis-' . "$stackindexa";
             $states_stacka = [
-                ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'Connected'],
-                ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'Disconnected'],
+                ['value' => 1, 'generic' => 0, 'descr' => 'Connected'],
+                ['value' => 2, 'generic' => 2, 'descr' => 'Disconnected'],
             ];
             create_state_index($stack_state_namea, $states_stacka);
             discover_sensor(null, 'state', $device, $oid_stackport_a, $stackindexa, $stack_state_namea, $descr_stacka, 1, 1, null, null, null, null, $current_stacka);
@@ -62,8 +62,8 @@ if (($stack_left < $stacking) && ($stack_alone < $stacking_non)) {
             $stack_state_nameb = 'alaStackMgrLocalLinkStateB';
             $descr_stackb = 'Stack Port B Chassis-' . "$stackindexb";
             $states_stackb = [
-                ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'Connected'],
-                ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'Disconnected'],
+                ['value' => 1, 'generic' => 0, 'descr' => 'Connected'],
+                ['value' => 2, 'generic' => 2, 'descr' => 'Disconnected'],
             ];
             create_state_index($stack_state_nameb, $states_stackb);
             discover_sensor(null, 'state', $device, $oid_stackport_b, $stackindexb, $stack_state_nameb, $descr_stackb, 1, 1, null, null, null, null, $current_stackb);

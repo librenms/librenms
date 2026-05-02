@@ -205,7 +205,7 @@ abstract class TableController extends PaginatedAjaxController
     /**
      * Generate CSV response from data
      *
-     * @param  \Illuminate\Support\Collection  $data
+     * @param  \Illuminate\Support\Collection<int, mixed>  $data
      * @param  array  $headers
      * @param  string  $filename
      * @return \Symfony\Component\HttpFoundation\StreamedResponse

@@ -1478,1400 +1478,1200 @@
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "event",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "valueVolt",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "valueAmp",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "valueTemp",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "valueUnit",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "valuePerCent",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "event",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "valueVolt",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "valueAmp",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "valueTemp",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "valueUnit",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "valuePerCent",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "event",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "valueVolt",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "valueAmp",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "valueTemp",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "valueUnit",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "valuePerCent",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "event",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "valueVolt",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "valueAmp",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "valueTemp",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "valueUnit",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "valuePerCent",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "event",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "valueVolt",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "valueAmp",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "valueTemp",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "valueUnit",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "valuePerCent",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "event",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "valueVolt",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "valueAmp",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "valueTemp",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "valueUnit",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "valuePerCent",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "outputStatus",
                     "state_descr": "notenergized",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "outputStatus",
                     "state_descr": "energized",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "outputStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "outputStatus",
                     "state_descr": "connected",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "powerSystemMode",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "powerSystemMode",
                     "state_descr": "test",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "powerSystemMode",
                     "state_descr": "boost",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "powerSystemMode",
                     "state_descr": "float",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "event",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "valueVolt",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "valueAmp",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "valueTemp",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "valueUnit",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "valuePerCent",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "event",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "valueVolt",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "valueAmp",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "valueTemp",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "valueUnit",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "valuePerCent",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "event",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "valueVolt",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "valueAmp",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "valueTemp",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "valueUnit",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "valuePerCent",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 1
                 }
@@ -4334,1400 +4134,1200 @@
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "event",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "valueVolt",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "valueAmp",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "valueTemp",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "valueUnit",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "valuePerCent",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryBankStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "event",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "valueVolt",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "valueAmp",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "valueTemp",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "valueUnit",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "valuePerCent",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "batteryStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "event",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "valueVolt",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "valueAmp",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "valueTemp",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "valueUnit",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "valuePerCent",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ioInputStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "event",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "valueVolt",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "valueAmp",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "valueTemp",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "valueUnit",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "valuePerCent",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFusesStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "loadFuseStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "event",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "valueVolt",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "valueAmp",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "valueTemp",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "valueUnit",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "valuePerCent",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsMainsFailureStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "event",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "valueVolt",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "valueAmp",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "valueTemp",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "valueUnit",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "valuePerCent",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mainsStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "outputStatus",
                     "state_descr": "notenergized",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "outputStatus",
                     "state_descr": "energized",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "outputStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "outputStatus",
                     "state_descr": "connected",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "powerSystemMode",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "powerSystemMode",
                     "state_descr": "test",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "powerSystemMode",
                     "state_descr": "boost",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "powerSystemMode",
                     "state_descr": "float",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "event",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "valueVolt",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "valueAmp",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "valueTemp",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "valueUnit",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "valuePerCent",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "powerSystemStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "event",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "valueVolt",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "valueAmp",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "valueTemp",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "valueUnit",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "valuePerCent",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifiersStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "error",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "minorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "majorAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "minorAndMajor",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "majorLow",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "minorLow",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "majorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "minorHigh",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "event",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "valueVolt",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "valueAmp",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "valueTemp",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "valueUnit",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "valuePerCent",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "rectifierStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 1
                 }

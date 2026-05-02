@@ -13,9 +13,9 @@ modules:
                     index: 'connUnitState.{{ $index }}'
                     state_name: connUnitState
                     states:
-                        - { value: 2, generic: 0, graph: 0, descr: Online }
-                        - { value: 3, generic: 2, graph: 0, descr: Offline }
-                        - { value: 1, generic: 3, graph: 0, descr: none }
+                        - { value: 2, generic: 0, descr: Online }
+                        - { value: 3, generic: 2, descr: Offline }
+                        - { value: 1, generic: 3, descr: none }
                 -
                     oid: FCMGMT-MIB::connUnitStatus
                     value: FCMGMT-MIB::connUnitStatus
@@ -24,11 +24,11 @@ modules:
                     index: 'connUnitStatus.{{ $index }}'
                     state_name: connUnitStatus
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: none }
-                        - { value: 2, generic: 3, graph: 0, descr: Unused }
-                        - { value: 3, generic: 0, graph: 0, descr: Ok }
-                        - { value: 4, generic: 1, graph: 0, descr: Warning }
-                        - { value: 5, generic: 2, graph: 0, descr: Failed }
+                        - { value: 1, generic: 3, descr: none }
+                        - { value: 2, generic: 3, descr: Unused }
+                        - { value: 3, generic: 0, descr: Ok }
+                        - { value: 4, generic: 1, descr: Warning }
+                        - { value: 5, generic: 2, descr: Failed }
                 -
                     oid: FCMGMT-MIB::connUnitPrincipal
                     value: FCMGMT-MIB::connUnitPrincipal
@@ -42,9 +42,9 @@ modules:
                             op: '='
                             value: 1
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: Unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: No }
-                        - { value: 3, generic: 0, graph: 0, descr: Yes }
+                        - { value: 1, generic: 3, descr: Unknown }
+                        - { value: 2, generic: 0, descr: No }
+                        - { value: 3, generic: 0, descr: Yes }
                 -
                     oid: FCMGMT-MIB::connUnitSensorTable
                     value: FCMGMT-MIB::connUnitSensorStatus
@@ -53,8 +53,8 @@ modules:
                     index: 'connUnitSensorName.{{ $index }}'
                     state_name: connUnitSensorName
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: Unknown }
-                        - { value: 2, generic: 3, graph: 0, descr: Other }
-                        - { value: 3, generic: 0, graph: 0, descr: Ok }
-                        - { value: 4, generic: 1, graph: 0, descr: Warning }
-                        - { value: 5, generic: 2, graph: 0, descr: Failed }
+                        - { value: 1, generic: 3, descr: Unknown }
+                        - { value: 2, generic: 3, descr: Other }
+                        - { value: 3, generic: 0, descr: Ok }
+                        - { value: 4, generic: 1, descr: Warning }
+                        - { value: 5, generic: 2, descr: Failed }

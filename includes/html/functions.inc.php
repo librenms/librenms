@@ -16,6 +16,7 @@ use App\Facades\PortCache;
 use App\Models\Bill;
 use App\Models\Device;
 use App\Models\Port;
+use App\Models\Sensor;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
@@ -254,7 +255,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port = cleanPort($port);
     }
 
-    $content = '<div class=list-large>' . ($port['hostname'] ?? '') . ' - ' . Rewrite::normalizeIfName(addslashes(\LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
+    $content = '<div class="overlib-text">' . ($port['hostname'] ?? '') . ' - ' . Rewrite::normalizeIfName(addslashes(\LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
     $content .= addslashes(\LibreNMS\Util\Clean::html($port['ifAlias'], [])) . '<br />';
 
     $content .= "<div style=\'width: 850px\'>";
@@ -287,52 +288,6 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         return Rewrite::normalizeIfName($text);
     }
 }//end generate_port_link()
-
-function generate_sensor_link($args, $text = null, $type = null)
-{
-    if (! $text) {
-        $text = $args['sensor_descr'];
-    }
-
-    if (! $type) {
-        $args['graph_type'] = 'sensor_' . $args['sensor_class'];
-    } else {
-        $args['graph_type'] = 'sensor_' . $type;
-    }
-
-    if (! isset($args['hostname'])) {
-        $args = array_merge($args, device_by_id_cache($args['device_id']));
-    }
-
-    $content = '<div class=list-large>' . $text . '</div>';
-
-    $content .= "<div style=\'width: 850px\'>";
-    $graph_array = [
-        'type' => $args['graph_type'],
-        'legend' => 'yes',
-        'height' => '100',
-        'width' => '340',
-        'to' => LibrenmsConfig::get('time.now'),
-        'from' => LibrenmsConfig::get('time.day'),
-        'id' => $args['sensor_id'],
-    ];
-    $content .= Url::graphTag($graph_array);
-
-    $graph_array['from'] = LibrenmsConfig::get('time.week');
-    $content .= Url::graphTag($graph_array);
-
-    $graph_array['from'] = LibrenmsConfig::get('time.month');
-    $content .= Url::graphTag($graph_array);
-
-    $graph_array['from'] = LibrenmsConfig::get('time.year');
-    $content .= Url::graphTag($graph_array);
-
-    $content .= '</div>';
-
-    $url = Url::generate(['page' => 'graphs', 'id' => $args['sensor_id'], 'type' => $args['graph_type'], 'from' => \App\Facades\LibrenmsConfig::get('time.day')], []);
-
-    return Url::overlibLink($url, $text, $content);
-}//end generate_sensor_link()
 
 function generate_port_url($port, $vars = [])
 {
@@ -390,31 +345,6 @@ function print_optionbar_end()
         </div>
         ';
 }//end print_optionbar_end()
-
-/**
- * Get the recursive file size and count for a directory
- *
- * @param  string  $path
- * @return array [size, file count]
- */
-function foldersize($path)
-{
-    $total_size = 0;
-    $total_files = 0;
-
-    foreach (glob(rtrim($path, '/') . '/*', GLOB_NOSORT) as $item) {
-        if (is_dir($item)) {
-            [$folder_size, $file_count] = foldersize($item);
-            $total_size += $folder_size;
-            $total_files += $file_count;
-        } else {
-            $total_size += filesize($item);
-            $total_files++;
-        }
-    }
-
-    return [$total_size, $total_files];
-}
 
 function generate_ap_link($args, $text = null, $type = null)
 {
@@ -503,17 +433,6 @@ function generate_pagination($count, $limit, $page, $links = 2)
 
     return $return;
 }//end generate_pagination()
-
-function get_client_ip()
-{
-    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        $client_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-    } else {
-        $client_ip = $_SERVER['REMOTE_ADDR'];
-    }
-
-    return $client_ip;
-}//end get_client_ip()
 
 function clean_bootgrid($string)
 {
@@ -616,30 +535,25 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     }
 
     if (isset($tmp_alerts['sensor_id'])) {
-        if ($tmp_alerts['sensor_class'] == 'state') {
+        $sensor = new Sensor($tmp_alerts);
+        if ($sensor->sensor_class == 'state') {
             // Give more details for a state (textual form)
-            $details = 'State: ' . ($tmp_alerts['state_descr'] ?? '') . ' (numerical ' . $tmp_alerts['sensor_current'] . ')<br>  ';
+            $details = 'State: ' . ($sensor->state_descr ?? '') . ' (numerical ' . $sensor->sensor_current . ')<br>  ';
         } else {
             // Other sensors
-            $details = 'Value: ' . $tmp_alerts['sensor_current'] . ' (' . $tmp_alerts['sensor_class'] . ')<br>  ';
+            $details = 'Value: ' . $sensor->sensor_current . ' (' . $sensor->sensor_class . ')<br>  ';
         }
-        $details_a = [];
 
-        if ($tmp_alerts['sensor_limit_low']) {
-            $details_a[] = 'low: ' . $tmp_alerts['sensor_limit_low'];
-        }
-        if ($tmp_alerts['sensor_limit_low_warn']) {
-            $details_a[] = 'low_warn: ' . $tmp_alerts['sensor_limit_low_warn'];
-        }
-        if ($tmp_alerts['sensor_limit_warn']) {
-            $details_a[] = 'high_warn: ' . $tmp_alerts['sensor_limit_warn'];
-        }
-        if ($tmp_alerts['sensor_limit']) {
-            $details_a[] = 'high: ' . $tmp_alerts['sensor_limit'];
-        }
-        $details .= implode(', ', $details_a);
+        $details .= collect([
+            'low' => $sensor->sensor_limit_low,
+            'low_warn' => $sensor->sensor_limit_low_warn,
+            'high_warn' => $sensor->sensor_limit_warn,
+            'high' => $sensor->sensor_limit,
+        ])->filter()
+          ->map(fn ($value, $key) => "$key: $value")
+          ->implode(', ');
 
-        $fault_detail .= generate_sensor_link($tmp_alerts, $tmp_alerts['name'] ?? '') . ';&nbsp; <br>' . $details;
+        $fault_detail .= Url::sensorLink($sensor, $sensor->name) . ';&nbsp; <br>' . $details;
         $fallback = false;
     }
 
@@ -840,17 +754,10 @@ function search_oxidized_config($search_in_conf_textbox)
     $nodes = json_decode(file_get_contents($oxidized_search_url, false, $context), true);
     // Look up Oxidized node names to LibreNMS devices for a link
     foreach ($nodes as &$n) {
-        $dev = device_by_name($n['node']);
-        $n['dev_id'] = $dev ? $dev['device_id'] : false;
-        $n['full_name'] = $n['dev_id'] ? DeviceCache::get($n['dev_id'])->displayName() : $n['full_name'];
+        $dev = DeviceCache::getByHostname($n['node']);
+        $n['dev_id'] = $dev ? $dev->device_id : false;
+        $n['full_name'] = $dev ? $dev->displayName() : $n['full_name'];
     }
-
-    /*
-    // Filter nodes we don't have access too
-    $nodes = array_filter($nodes, function($device) {
-        return \Permissions::canAccessDevice($device['dev_id'], Auth::id());
-    });
-    */
 
     return $nodes;
 }
@@ -882,8 +789,8 @@ function get_oxidized_nodes_list()
     $data = json_decode(file_get_contents(LibrenmsConfig::get('oxidized.url') . '/nodes?format=json', false, $context), true);
 
     foreach ($data as $object) {
-        $device = device_by_name($object['name']);
-        if (! device_permitted($device['device_id'])) {
+        $device = DeviceCache::getByHostname($object['name']);
+        if (! device_permitted($device->device_id)) {
             //user cannot see this device, so let's skip it.
             continue;
         }
@@ -901,9 +808,9 @@ function get_oxidized_nodes_list()
             $formatted_local_time = $object['time'];
         }
         echo '<tr>
-        <td>' . $device['device_id'] . '</td>
+        <td>' . $device->device_id . '</td>
         <td>' . $object['name'] . '</td>
-        <td>' . $device['sysName'] . '</td>
+        <td>' . $device->sysName . '</td>
         <td>' . $object['status'] . '</td>
         <td>' . $formatted_local_time . '</td>
         <td>' . $object['model'] . '</td>

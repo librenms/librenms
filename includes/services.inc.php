@@ -49,17 +49,6 @@ function delete_service($service = null)
     return Service::query()->where('service_id', $service)->delete();
 }
 
-function discover_service($device, $service)
-{
-    $created = \LibreNMS\Services::discover($device, $service);
-
-    if ($created) {
-        echo '+';
-    }
-
-    echo "$service ";
-}
-
 function poll_service($service)
 {
     $update = [];

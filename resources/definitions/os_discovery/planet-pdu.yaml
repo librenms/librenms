@@ -64,6 +64,6 @@ modules:
                     descr: "Switch status {{ $index }}"
                     state_name: outSwitchStatus
                     states:
-                        - { descr: Off, graph: 1, value: 0, generic: 0 }
-                        - { descr: On, graph: 1, value: 1, generic: 0 } 
+                        - { descr: Off, value: 0, generic: 0 }
+                        - { descr: On, value: 1, generic: 0 } 
         

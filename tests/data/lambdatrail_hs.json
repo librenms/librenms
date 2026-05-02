@@ -478,84 +478,72 @@
                 {
                     "state_name": "systemFan1",
                     "state_descr": "failed",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemFan1",
                     "state_descr": "Off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemFan1",
                     "state_descr": "On",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemFan2",
                     "state_descr": "failed",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemFan2",
                     "state_descr": "Off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemFan2",
                     "state_descr": "On",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemPower1",
                     "state_descr": "notplugged",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemPower1",
                     "state_descr": "Off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemPower1",
                     "state_descr": "On",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemPower2",
                     "state_descr": "notplugged",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemPower2",
                     "state_descr": "Off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemPower2",
                     "state_descr": "On",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 }
@@ -1018,84 +1006,72 @@
                 {
                     "state_name": "systemFan1",
                     "state_descr": "failed",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemFan1",
                     "state_descr": "Off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemFan1",
                     "state_descr": "On",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemFan2",
                     "state_descr": "failed",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemFan2",
                     "state_descr": "Off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemFan2",
                     "state_descr": "On",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemPower1",
                     "state_descr": "notplugged",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemPower1",
                     "state_descr": "Off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemPower1",
                     "state_descr": "On",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemPower2",
                     "state_descr": "notplugged",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemPower2",
                     "state_descr": "Off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemPower2",
                     "state_descr": "On",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 }
