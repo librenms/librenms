@@ -32,7 +32,6 @@
     <link href="{{ asset('css/vis.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/fontawesome.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/v4-shims.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/jquery.gridster.min.css?ver=09292021') }}" rel="stylesheet">
     <link href="{{ asset('css/leaflet.css') }}" rel="stylesheet">
     <link href="{{ asset('css/MarkerCluster.css') }}" rel="stylesheet">
     <link href="{{ asset('css/MarkerCluster.Default.css') }}" rel="stylesheet">
@@ -41,7 +40,7 @@
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet">
-    <link href="{{ asset(LibrenmsConfig::get('stylesheet', 'css/styles.css')) }}?ver=02132026" rel="stylesheet">
+    <link href="{{ asset(LibrenmsConfig::get('stylesheet', 'css/styles.css')) }}?ver=04212026" rel="stylesheet">
     <link href="{{ asset('css/tw_dark.css?ver=19112025') }}" rel="stylesheet">
     @if(!in_array(session('applied_site_style', 'light'), ['light', 'dark']))
     <link href="{{ asset('css/' . session('applied_site_style') . '.css?ver=732417643') }}" rel="stylesheet">

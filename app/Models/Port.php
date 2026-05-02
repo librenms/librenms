@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
@@ -22,6 +23,19 @@ class Port extends DeviceRelatedModel
     public $timestamps = false;
     protected $primaryKey = 'port_id';
     protected $guarded = [];
+
+    /**
+     * @return array{ifOperStatus: 'LibreNMS\Enum\IfOperStatus', ifOperStatus_prev: 'LibreNMS\Enum\IfOperStatus', ifAdminStatus: 'LibreNMS\Enum\IfOperStatus', ifAdminStatus_prev: 'LibreNMS\Enum\IfOperStatus'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'ifOperStatus' => IfOperStatus::class,
+            'ifOperStatus_prev' => IfOperStatus::class,
+            'ifAdminStatus' => IfOperStatus::class,
+            'ifAdminStatus_prev' => IfOperStatus::class,
+        ];
+    }
 
     /**
      * Initialize this class
@@ -200,7 +214,7 @@ class Port extends DeviceRelatedModel
             [$this->qualifyColumn('deleted'), '=', 0],
             [$this->qualifyColumn('ignore'), '=', 0],
             [$this->qualifyColumn('disabled'), '=', 0],
-            [$this->qualifyColumn('ifOperStatus'), '=', 'up'],
+            [$this->qualifyColumn('ifOperStatus'), '=', IfOperStatus::Up],
         ]);
     }
 
@@ -214,8 +228,8 @@ class Port extends DeviceRelatedModel
             [$this->qualifyColumn('deleted'), '=', 0],
             [$this->qualifyColumn('ignore'), '=', 0],
             [$this->qualifyColumn('disabled'), '=', 0],
-            [$this->qualifyColumn('ifOperStatus'), '!=', 'up'],
-            [$this->qualifyColumn('ifAdminStatus'), '=', 'up'],
+            [$this->qualifyColumn('ifOperStatus'), '!=', IfOperStatus::Up],
+            [$this->qualifyColumn('ifAdminStatus'), '=', IfOperStatus::Up],
         ]);
     }
 
@@ -229,7 +243,7 @@ class Port extends DeviceRelatedModel
             [$this->qualifyColumn('deleted'), '=', 0],
             [$this->qualifyColumn('ignore'), '=', 0],
             [$this->qualifyColumn('disabled'), '=', 0],
-            [$this->qualifyColumn('ifAdminStatus'), '=', 'down'],
+            [$this->qualifyColumn('ifAdminStatus'), '=', IfOperStatus::Down],
         ]);
     }
 

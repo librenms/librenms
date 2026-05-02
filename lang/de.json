@@ -107,7 +107,7 @@
     "Validate Config": "Konfiguration überprüfen",
     "Auth History": "Authentifizierungshistorie",
     "Peering": "Peering",
-    "API Settings": "API-Einstellungen",
+    "API Tokens": "API-Tokens",
     "API Docs": "API-Dokumentation",
     "The :attribute must a valid IP address\/network or hostname.": ":attribute muss eine gültige IP Adresse\/Netzwerk oder ein gültiger Hostname sein.",
     "Never polled": "Noch nie gepollt",

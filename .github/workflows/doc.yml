@@ -31,7 +31,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           sparse-checkout-cone-mode: false
@@ -51,7 +51,7 @@ jobs:
           echo "Problems found:" && (grep -F 'no such' output.log && exit 1 || echo "None, Good job :)")
       -
         name: Check GitHub Pages status
-        uses: crazy-max/ghaction-github-status@v4
+        uses: crazy-max/ghaction-github-status@v5
         with:
           pages_threshold: major_outage
       -

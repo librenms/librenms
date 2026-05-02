@@ -42,7 +42,7 @@ class DevicePolicy
         }
 
         return $this->hasGlobalPermission($user, 'view')
-            || Permissions::canAccessDevice($device, $user);
+            && Permissions::canAccessDevice($device, $user);
     }
 
     /**

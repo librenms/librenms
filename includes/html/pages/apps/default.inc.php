@@ -27,7 +27,7 @@ foreach ($apps as $app) {
         <h3 class="panel-title">' .
         $app_state_info .
         Url::deviceLink($app->device, null, ['tab' => 'apps', 'app' => $app->app_type]) . '
-        <div class="pull-right"><small class="muted">' . $app->app_instance . ' ' . $app->app_status . '</small></div>
+        <div class="pull-right"><small class="muted">' . e($app->app_instance) . ' ' . e($app->app_status) . '</small></div>
         </h3>
         </div>
         <div class="panel-body">

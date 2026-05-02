@@ -15,6 +15,7 @@ enum WirelessSensorType: string
     case Capacity = 'capacity';
     case Utilization = 'utilization';
     case Rate = 'rate';
+    case Mcs = 'mcs';
     case Ccq = 'ccq';
     case Snr = 'snr';
     case Sinr = 'sinr';
@@ -61,6 +62,7 @@ enum WirelessSensorType: string
             self::Distance => 'space-shuttle',
             self::Cell => 'line-chart',
             self::Channel => 'line-chart',
+            self::Mcs => 'signal',
         };
     }
 }
