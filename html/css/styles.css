@@ -2599,3 +2599,13 @@ label {
   right: auto;
   left: 1px;
 }
+
+.rules-group-header .btn-primary {
+  background-color: #424548;
+  border-color: #1f2022;
+}
+
+.rules-group-header .active {
+  background-color: #5cb85c;
+  border-color: #4cae4c;
+}

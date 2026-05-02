@@ -16,11 +16,12 @@
 
         <div class="row">
             <div class="col-sm-6 col-sm-offset-2 tw:justify-between tw:flex tw:flex-wrap">
-                <form id="delete_host" name="delete_host" method="post" action="delhost/" role="form" class="tw:inline-block">
-                    @csrf
-                    <input type="hidden" name="id" value="{{ $device->device_id }}">
-                    <button type="submit" class="btn btn-danger" name="Submit"><i class="fa fa-trash"></i> {{ __('device.edit.delete_device') }}</button>
-                </form>
+                @can('delete', $device)
+                <a href="{{ route('device.delete.confirm', ['device' => $device->device_id]) }}"
+                   class="btn btn-danger tw:inline-block">
+                    <i class="fa fa-trash"></i> {{ __('device.edit.delete_device') }}
+                </a>
+                @endcan
 
                 @if(LibrenmsConfig::get('enable_clear_discovery') && ! $device->snmp_disable)
                     <button type="submit" id="rediscover" data-device_id="{{ $device->device_id }}"
