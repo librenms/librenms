@@ -1,12 +1,8 @@
-mib: PDUMIBV07:SNMPv2-SMI
-
 modules:
-  sensors:
-
     power:
       data:
-        - oid: phaseStatusActivePower
-          value: phaseStatusActivePower
+        - oid: PDUMIBV07::phaseStatusActivePower
+          value: PDUMIBV07::phaseStatusActivePower
           num_oid: '.1.3.6.1.4.1.23280.6.1.4.{{ $index }}'
           index: 'phaseActivePower.{{ $index }}'
           group: Phase
@@ -17,8 +13,8 @@ modules:
           high_limit: 3600
           graph: 1
 
-        - oid: outletStatusActivePower
-          value: outletStatusActivePower
+        - oid: PDUMIBV07::outletStatusActivePower
+          value: PDUMIBV07::outletStatusActivePower
           num_oid: '.1.3.6.1.4.1.23280.8.1.5.{{ $index }}'
           index: 'outletActivePower.{{ $index }}'
           group: Outlet
@@ -31,15 +27,15 @@ modules:
 
     energy:
       data:
-        - oid: phaseStatusActiveEnergy
-          value: phaseStatusActiveEnergy
+        - oid: PDUMIBV07::phaseStatusActiveEnergy
+          value: PDUMIBV07::phaseStatusActiveEnergy
           num_oid: '.1.3.6.1.4.1.23280.6.1.8.{{ $index }}'
           index: 'phaseEnergy.{{ $index }}'
           group: Phase
           descr: 'Phase {{ $index }} Energy'
 
-        - oid: outletStatusActiveEnergy
-          value: outletStatusActiveEnergy
+        - oid: PDUMIBV07::outletStatusActiveEnergy
+          value: PDUMIBV07::outletStatusActiveEnergy
           num_oid: '.1.3.6.1.4.1.23280.8.1.7.{{ $index }}'
           index: 'outletEnergy.{{ $index }}'
           group: Outlet
@@ -47,8 +43,8 @@ modules:
 
     voltage:
       data:
-        - oid: phaseStatusVoltage
-          value: phaseStatusVoltage
+        - oid: PDUMIBV07::phaseStatusVoltage
+          value: PDUMIBV07::phaseStatusVoltage
           num_oid: '.1.3.6.1.4.1.23280.6.1.2.{{ $index }}'
           index: 'phaseVoltage.{{ $index }}'
           divisor: 10
@@ -60,8 +56,8 @@ modules:
           high_limit: 270
           graph: 1
 
-        - oid: outletStatusVoltage
-          value: outletStatusVoltage
+        - oid: PDUMIBV07::outletStatusVoltage
+          value: PDUMIBV07::outletStatusVoltage
           num_oid: '.1.3.6.1.4.1.23280.8.1.3.{{ $index }}'
           index: 'outletVoltage.{{ $index }}'
           divisor: 10
@@ -75,8 +71,8 @@ modules:
 
     current:
       data:
-        - oid: phaseStatusCurrent
-          value: phaseStatusCurrent
+        - oid: PDUMIBV07::phaseStatusCurrent
+          value: PDUMIBV07::phaseStatusCurrent
           num_oid: '.1.3.6.1.4.1.23280.6.1.3.{{ $index }}'
           index: 'phaseCurrent.{{ $index }}'
           divisor: 100
@@ -88,8 +84,8 @@ modules:
           high_limit: 16
           graph: 1
 
-        - oid: outletStatusCurrent
-          value: outletStatusCurrent
+        - oid: PDUMIBV07::outletStatusCurrent
+          value: PDUMIBV07::outletStatusCurrent
           num_oid: '.1.3.6.1.4.1.23280.8.1.4.{{ $index }}'
           index: 'outletCurrent.{{ $index }}'
           divisor: 100
@@ -103,8 +99,8 @@ modules:
 
     temperature:
       data:
-        - oid: sensorStatusTemperature
-          value: sensorStatusTemperature
+        - oid: PDUMIBV07::sensorStatusTemperature
+          value: PDUMIBV07::sensorStatusTemperature
           num_oid: '.1.3.6.1.4.1.23280.12.1.2'
           index: 'ambientTemperature.0'
           divisor: 10
@@ -118,8 +114,8 @@ modules:
 
     humidity:
       data:
-        - oid: sensorStatusHumidity
-          value: sensorStatusHumidity
+        - oid: PDUMIBV07::sensorStatusHumidity
+          value: PDUMIBV07::sensorStatusHumidity
           num_oid: '.1.3.6.1.4.1.23280.12.1.3'
           index: 'ambientHumidity.0'
           divisor: 10
@@ -133,8 +129,8 @@ modules:
 
     state:
       data:
-        - oid: outletStatusState
-          value: outletStatusState
+        - oid: PDUMIBV07::outletStatusState
+          value: PDUMIBV07::outletStatusState
           num_oid: '.1.3.6.1.4.1.23280.8.1.2.{{ $index }}'
           index: 'outletState.{{ $index }}'
           group: Outlet
@@ -145,8 +141,8 @@ modules:
             - { value: 1, descr: Off, generic: 0, graph: 0 }
             - { value: 2, descr: On,  generic: 0, graph: 1 }
 
-        - oid: phaseStatusVoltageLimitState
-          value: phaseStatusVoltageLimitState
+        - oid: PDUMIBV07::phaseStatusVoltageLimitState
+          value: PDUMIBV07::phaseStatusVoltageLimitState
           num_oid: '.1.3.6.1.4.1.23280.6.1.10.1.{{ $index }}'
           index: 'phaseVoltageAlarm.{{ $index }}'
           group: Phase
@@ -159,8 +155,8 @@ modules:
             - { value: 2, descr: High,   generic: 2, graph: 0 }
             - { value: 3, descr: Low,    generic: 2, graph: 0 }
 
-        - oid: phaseStatusCurrentLimitState
-          value: phaseStatusCurrentLimitState
+        - oid: PDUMIBV07::phaseStatusCurrentLimitState
+          value: PDUMIBV07::phaseStatusCurrentLimitState
           num_oid: '.1.3.6.1.4.1.23280.6.1.11.1.{{ $index }}'
           index: 'phaseCurrentAlarm.{{ $index }}'
           group: Phase
@@ -173,8 +169,8 @@ modules:
             - { value: 2, descr: High,   generic: 2, graph: 0 }
             - { value: 3, descr: Low,    generic: 2, graph: 0 }
 
-        - oid: sensorStatusTemperatureLimitState
-          value: sensorStatusTemperatureLimitState
+        - oid: PDUMIBV07::sensorStatusTemperatureLimitState
+          value: PDUMIBV07::sensorStatusTemperatureLimitState
           num_oid: '.1.3.6.1.4.1.23280.12.1.4'
           index: 'temperatureAlarm.0'
           group: Environment
@@ -187,8 +183,8 @@ modules:
             - { value: 2, descr: High,   generic: 2, graph: 0 }
             - { value: 3, descr: Low,    generic: 2, graph: 0 }
 
-        - oid: sensorStatusHumidityLimitState
-          value: sensorStatusHumidityLimitState
+        - oid: PDUMIBV07::sensorStatusHumidityLimitState
+          value: PDUMIBV07::sensorStatusHumidityLimitState
           num_oid: '.1.3.6.1.4.1.23280.12.1.5'
           index: 'humidityAlarm.0'
           group: Environment
@@ -198,8 +194,8 @@ modules:
             - { value: 1, descr: Normal, generic: 0, graph: 0 }
             - { value: 2, descr: Alarm,  generic: 2, graph: 0 }
 
-        - oid: sensorStatusIOSensorState
-          value: sensorStatusIOSensorState
+        - oid: PDUMIBV07::sensorStatusIOSensorState
+          value: PDUMIBV07::sensorStatusIOSensorState
           num_oid: '.1.3.6.1.4.1.23280.12.1.6'
           index: 'ioSensorState.0'
           group: Environment
