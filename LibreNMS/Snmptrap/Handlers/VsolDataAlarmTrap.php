@@ -22,15 +22,13 @@ class VsolDataAlarmTrap implements SnmptrapHandler
         50 => 'onu-pon-txpower-low', 84 => 'rogue-onu',
     ];
 
-    private const OID_BASE = '.1.3.6.1.4.1.37950.1.1.5.10.13.2';
-
     public function handle(Device $device, Trap $trap): void
     {
-        $pon = $trap->getOidData(self::OID_BASE . '.2.0');
-        $onu = $trap->getOidData(self::OID_BASE . '.3.0');
-        $alarmLevel = (int) $trap->getOidData(self::OID_BASE . '.9.0');
-        $alarmTypeId = (int) $trap->getOidData(self::OID_BASE . '.11.0');
-        $value = $trap->getOidData(self::OID_BASE . '.10.0');
+        $pon = $trap->getOidData($trap->findOid('V1600GSwitch::dataPon'));
+        $onu = $trap->getOidData($trap->findOid('V1600GSwitch::dataOnu'));
+        $alarmLevel = (int) $trap->getOidData($trap->findOid('V1600GSwitch::dateAlarmLevel'));
+        $alarmTypeId = (int) $trap->getOidData($trap->findOid('V1600GSwitch::dataAlarmType'));
+        $value = $trap->getOidData($trap->findOid('V1600GSwitch::dataValue'));
 
         $alarmName = self::ALARM_NAMES[$alarmTypeId] ?? "alarm-$alarmTypeId";
 
