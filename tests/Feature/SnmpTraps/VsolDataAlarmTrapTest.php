@@ -21,7 +21,7 @@ V1600GSwitch::dataTrapOID.0 ""
 V1600GSwitch::dataTrapClass.0 ""
 V1600GSwitch::dataMac.0 ""
 V1600GSwitch::dataTime.0 ""
-V1600GSwitch::dateAlarmLevel.0 5
+V1600GSwitch::dateAlarmLevel.0 criterr
 V1600GSwitch::dataValue.0 ""
 V1600GSwitch::dataAlarmType.0 19
 V1600GSwitch::dataSynOID.0 ""
@@ -47,7 +47,7 @@ V1600GSwitch::dataTrapOID.0 ""
 V1600GSwitch::dataTrapClass.0 ""
 V1600GSwitch::dataMac.0 ""
 V1600GSwitch::dataTime.0 ""
-V1600GSwitch::dateAlarmLevel.0 1
+V1600GSwitch::dateAlarmLevel.0 info
 V1600GSwitch::dataValue.0 ""
 V1600GSwitch::dataAlarmType.0 41
 V1600GSwitch::dataSynOID.0 ""
@@ -73,7 +73,7 @@ V1600GSwitch::dataTrapOID.0 ""
 V1600GSwitch::dataTrapClass.0 ""
 V1600GSwitch::dataMac.0 ""
 V1600GSwitch::dataTime.0 ""
-V1600GSwitch::dateAlarmLevel.0 4
+V1600GSwitch::dateAlarmLevel.0 major
 V1600GSwitch::dataValue.0 ""
 V1600GSwitch::dataAlarmType.0 18
 V1600GSwitch::dataSynOID.0 ""
@@ -99,7 +99,7 @@ V1600GSwitch::dataTrapOID.0 ""
 V1600GSwitch::dataTrapClass.0 ""
 V1600GSwitch::dataMac.0 ""
 V1600GSwitch::dataTime.0 ""
-V1600GSwitch::dateAlarmLevel.0 3
+V1600GSwitch::dateAlarmLevel.0 warning
 V1600GSwitch::dataValue.0 -29.5
 V1600GSwitch::dataAlarmType.0 48
 V1600GSwitch::dataSynOID.0 ""

@@ -928,10 +928,10 @@
 				del(2),
 				activate(3),
 				deactivate(4),
-				del_offline(5),
-				del_all(6),
-				pon_activate(7),
-				pon_deactivate(8)
+				delOffline(5),
+				delAll(6),
+				ponActivate(7),
+				ponDeactivate(8)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -2027,17 +2027,17 @@
 			SYNTAX INTEGER
 				{
 				auto(1),
-				half-10(2),
-				full-10(3),
-				half-100(4),
-				full-100(5),
-				full-1000(6),
-				half-1000(7),
-				full-10g(8),
-				full-2point5g(9),
-				full-5g(10),
-				full-25g(11),
-				full-40g(12)
+				half10(2),
+				full10(3),
+				half100(4),
+				full100(5),
+				full1000(6),
+				half1000(7),
+				full10g(8),
+				full2point5g(9),
+				full5g(10),
+				full25g(11),
+				full40g(12)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -2124,7 +2124,7 @@
 			SYNTAX INTEGER
 				{
 				dhcp(1),
-				static_ip(2)
+				staticIp(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -2803,18 +2803,18 @@
 			SYNTAX INTEGER
 				{
 				auto(0),
-				full-10(1),
-				full-100(2),
-				full-1000(3),
-				half-10(4),
-				half-100(5),
-				half-1000(6),
+				full10(1),
+				full100(2),
+				full1000(3),
+				half10(4),
+				half100(5),
+				half1000(6),
 				unknown(7),
-				full-10g(8),
-				full-2point5g(9),
-				full-5g(10),
-				full-25g(11),
-				full-40g(12)
+				full10g(8),
+				full2point5g(9),
+				full5g(10),
+				full25g(11),
+				full40g(12)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -2829,18 +2829,18 @@
 			SYNTAX INTEGER
 				{
 				auto(0),
-				full-10(1),
-				full-100(2),
-				full-1000(3),
-				half-10(4),
-				half-100(5),
-				half-1000(6),
+				full10(1),
+				full100(2),
+				full1000(3),
+				half10(4),
+				half100(5),
+				half1000(6),
 				unknown(7),
-				full-10g(8),
-				full-2point5g(9),
-				full-5g(10),
-				full-25g(11),
-				full-40g(12)
+				full10g(8),
+				full2point5g(9),
+				full5g(10),
+				full25g(11),
+				full40g(12)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -4917,17 +4917,17 @@
 			SYNTAX INTEGER
 				{
 				auto(1),
-				half-10(2),
-				full-10(3),
-				half-100(4),
-				full-100(5),
-				full-1000(6),
-				half-1000(7),
-				full-10g(8),
-				full-2point5g(9),
-				full-5g(10),
-				full-25g(11),
-				full-40g(12)
+				half10(2),
+				full10(3),
+				half100(4),
+				full100(5),
+				full1000(6),
+				half1000(7),
+				full10g(8),
+				full2point5g(9),
+				full5g(10),
+				full25g(11),
+				full40g(12)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -5088,7 +5088,7 @@
 			SYNTAX INTEGER
 				{
 				dhcp(1),
-				static_ip(2)
+				staticIp(2)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -8608,8 +8608,8 @@
 		gOnuAutoBindMatchingTypeSelect OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				exact_matching(0),
-				fuzzy_matching(1)
+				exactMatching(0),
+				fuzzyMatching(1)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -8758,7 +8758,7 @@
 				active(2),
 				commit(3),
 				mix(4),
-				quick_active(5)
+				quickActive(5)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -9051,7 +9051,7 @@
 				active(2),
 				commit(3),
 				update-and-reboot(4),
-				quick_active(6)
+				quickActive(6)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -9717,7 +9717,7 @@
 			SYNTAX INTEGER
 				{
 				silent(1),
-				cut_off(2)
+				cutOff(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -9744,7 +9744,7 @@
 --  1.3.6.1.4.1.37950.1.1.6.1.5.4.5
 		-- 1.3.6.1.4.1.37950.1.1.6.1.5.4.5
 		gxbRogueOnuAlgorithm OBJECT-TYPE
-			SYNTAX INTEGER { early_rogue_detection(0) }
+			SYNTAX INTEGER { earlyrogueDetection(0) }
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION
@@ -9872,7 +9872,7 @@
 			SYNTAX INTEGER
 				{
 				silent(1),
-				cut_off(2)
+				cutOff(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -9901,8 +9901,8 @@
 		gxbRogueOnuAlgorithmS OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				early_detection(0),
-				extend_guard(1)
+				earlyDetection(0),
+				extendGuard(1)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -10127,10 +10127,10 @@
 				internet(0),
 				multicast(1),
 				tr069(2),
-				tr069_internet(3),
-				tr069_voip(4),
-				voip_internet(5),
-				tr069_voip_internet(6),
+				tr069Internet(3),
+				tr069Voip(4),
+				voipInternet(5),
+				tr069voipInternet(6),
 				voip(7),
 				other(100)
 				}
@@ -10531,7 +10531,7 @@
 				pc(0),
 				camera(1),
 				stb(2),
-				ip_phone(3)
+				ipPhone(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -10601,8 +10601,8 @@
 			SYNTAX INTEGER
 				{
 				static(0),
-				hgw_proxy(1),
-				from_isp(2)
+				hgwProxy(1),
+				fromIsp(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -10796,8 +10796,8 @@
 				s20MHz(0),
 				s40MHz(1),
 				s80MHz(2),
-				s20_40MHz(3),
-				s20_40_80MHz(4),
+				s2040mhz(3),
+				s204080MHz(4),
 				s160MHz(5)
 				}
 			MAX-ACCESS read-write
@@ -10913,10 +10913,10 @@
 				wpa(5),
 				wpa2psk(6),
 				wpa2(7),
-				wpa_wpa2(8),
-				wpapsk_wpa2psk(9),
+				wpaWpa2(8),
+				wpapskWpa2psk(9),
 				wpa3psk(10),
-				wpa2psk_wpa3psk(11)
+				wpa2pskWpa3psk(11)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -11603,7 +11603,7 @@
 				{
 				transparent(0),
 				rfc2833(1),
-				rfc2833_redundancyl(2),
+				rfc2833Redundancyl(2),
 				outband(3)
 				}
 			MAX-ACCESS read-write
@@ -12554,10 +12554,10 @@
 				internet(0),
 				multicast(1),
 				tr069(2),
-				tr069_internet(3),
-				tr069_voip(4),
-				voip_internet(5),
-				tr069_voip_internet(6),
+				tr069Internet(3),
+				tr069Voip(4),
+				voipInternet(5),
+				tr069voipInternet(6),
 				voip(7),
 				other(100)
 				}
@@ -12612,7 +12612,7 @@
 				{
 				ipv4(0),
 				ipv6(1),
-				ipv4_ipv6(2)
+				ipv4Ipv6(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -13200,7 +13200,7 @@
 		onuPriDhcpv6PrefixMode OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				wan_delegated(0),
+				wanDelegated(0),
 				static(1),
 				auto(2)
 				}
@@ -13279,7 +13279,7 @@
 				pc(0),
 				camera(1),
 				stb(2),
-				ip_phone(3)
+				ipPhone(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -13558,8 +13558,8 @@
 		gOnuPriLCDestMacType OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				broadcast_address(0),
-				bpdu_address(1)
+				broadcastAddress(0),
+				bpduAddress(1)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -14099,9 +14099,9 @@
 		priH248SrvRegisterMode OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				ip_address(0),
-				domain_name(1),
-				device_name(2)
+				ipAddress(0),
+				domainName(1),
+				deviceName(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -14127,8 +14127,8 @@
 			SYNTAX INTEGER
 				{
 				disable(0),
-				active_enable(1),
-				passive_enable(2)
+				activeEnable(1),
+				passiveEnable(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -14143,7 +14143,7 @@
 			SYNTAX INTEGER
 				{
 				notify(1),
-				service_change(2)
+				serviceChange(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -14808,14 +14808,14 @@
 			SYNTAX INTEGER
 				{
 				auto(0),
-				speed-6M(1),
-				speed-9M(2),
-				speed-12M(3),
-				speed-18M(4),
-				speed-24M(5),
-				speed-36M(6),
-				speed-48M(7),
-				speed-54M(8),
+				speed6M(1),
+				speed9M(2),
+				speed12M(3),
+				speed18M(4),
+				speed24M(5),
+				speed36M(6),
+				speed48M(7),
+				speed54M(8),
 				speed-MCS0(9),
 				speed-MCS1(10),
 				speed-MCS2(11),
@@ -14860,12 +14860,12 @@
 				speed-NSS2-MCS7(50),
 				speed-NSS2-MCS8(51),
 				speed-NSS2-MCS9(52),
-				speed-300M(53),
-				speed-1M(54),
-				speed-2M(55),
-				speed-5_5M(56),
-				speed-11M(57),
-				speed-144M(58)
+				speed300M(53),
+				speed1M(54),
+				speed2M(55),
+				speed55M(56),
+				speed11M(57),
+				speed144M(58)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -14878,8 +14878,8 @@
 		priWifiAdvPreambleType OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				long_Preamble(0),
-				short_Preamble(1)
+				longPreamble(0),
+				shortPreamble(1)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -15032,8 +15032,8 @@
 		priWifiAdvBandSteApply OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				prefer_2_4GHz(0),
-				prefer_5GHz(1)
+				prefer24GHz(0),
+				prefer5ghz(1)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -15067,7 +15067,7 @@
 			SYNTAX INTEGER
 				{
 				submit(1),
-				submit_bandsteer(2)
+				submitBandsteer(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -15391,7 +15391,7 @@
 				pc(0),
 				camera(1),
 				stb(2),
-				ip_phone(3)
+				ipPhone(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -15454,8 +15454,8 @@
 			SYNTAX INTEGER
 				{
 				static(0),
-				hgw_proxy(1),
-				from_isp(2)
+				hgwProxy(1),
+				fromIsp(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -15628,10 +15628,10 @@
 				internet(0),
 				multicast(1),
 				tr069(2),
-				tr069_internet(3),
-				tr069_voip(4),
-				voip_internet(5),
-				tr069_voip_internet(6),
+				tr069Internet(3),
+				tr069Voip(4),
+				voipInternet(5),
+				tr069voipInternet(6),
 				voip(7),
 				other(100)
 				}
@@ -16198,8 +16198,8 @@
 				s20MHz(0),
 				s40MHz(1),
 				s80MHz(2),
-				s20_40MHz(3),
-				s20_40_80MHz(4),
+				s2040mhz(3),
+				s204080MHz(4),
 				s160MHz(5)
 				}
 			MAX-ACCESS read-write
@@ -16388,10 +16388,10 @@
 				wpa(5),
 				wpa2psk(6),
 				wpa2(7),
-				wpa_wpa2(8),
-				wpapsk_wpa2psk(9),
+				wpaWpa2(8),
+				wpapskWpa2psk(9),
 				wpa3psk(10),
-				wpa2psk_wpa3psk(11)
+				wpa2pskWpa3psk(11)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -17207,7 +17207,7 @@
 				{
 				transparent(0),
 				rfc2833(1),
-				rfc2833_redundancy(2),
+				rfc2833Redundancy(2),
 				outband(3)
 				}
 			MAX-ACCESS read-write
@@ -18463,10 +18463,10 @@
 				internet(0),
 				multicast(1),
 				tr069(2),
-				tr069_internet(3),
-				tr069_voip(4),
-				voip_internet(5),
-				tr069_voip_internet(6),
+				tr069Internet(3),
+				tr069Voip(4),
+				voipInternet(5),
+				tr069voipInternet(6),
 				voip(7),
 				other(100)
 				}
@@ -19006,10 +19006,10 @@
 				internet(0),
 				multicast(1),
 				tr069(2),
-				tr069_internet(3),
-				tr069_voip(4),
-				voip_internet(5),
-				tr069_voip_internet(6),
+				tr069Internet(3),
+				tr069Voip(4),
+				voipInternet(5),
+				tr069voipInternet(6),
 				voip(7),
 				other(100)
 				}
@@ -19064,7 +19064,7 @@
 				{
 				ipv4(0),
 				ipv6(1),
-				ipv4_ipv6(2)
+				ipv4Ipv6(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -19770,10 +19770,10 @@
 				internet(0),
 				multicast(1),
 				tr069(2),
-				tr069_internet(3),
-				tr069_voip(4),
-				voip_internet(5),
-				tr069_voip_internet(6),
+				tr069Internet(3),
+				tr069Voip(4),
+				voipInternet(5),
+				tr069voipInternet(6),
 				voip(7),
 				other(100)
 				}
@@ -19828,7 +19828,7 @@
 				{
 				ipv4(0),
 				ipv6(1),
-				ipv4_ipv6(2)
+				ipv4Ipv6(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -20439,7 +20439,7 @@
 		priDhcpv6PrefixMode OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				wan_delegated(0),
+				wanDelegated(0),
 				static(1),
 				auto(2)
 				}
@@ -20518,7 +20518,7 @@
 				pc(0),
 				camera(1),
 				stb(2),
-				ip_phone(3)
+				ipPhone(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -20833,8 +20833,8 @@
 		gOnuPriLCDestMacTypeS OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				broadcast_address(0),
-				bpdu_address(1)
+				broadcastAddress(0),
+				bpduAddress(1)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -21534,7 +21534,7 @@
 		priH248SrvActiveMGC OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				backup_mgc(0),
+				backupMgc(0),
 				mgc(1)
 				}
 			MAX-ACCESS read-write
@@ -21549,9 +21549,9 @@
 		priH248SrvRegisterModeS OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				ip_address(0),
-				domain_name(1),
-				device_name(2)
+				ipAddress(0),
+				domainName(1),
+				deviceName(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -21577,8 +21577,8 @@
 			SYNTAX INTEGER
 				{
 				disable(0),
-				active_enable(1),
-				passive_enable(2)
+				activeEnable(1),
+				passiveEnable(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -21593,7 +21593,7 @@
 			SYNTAX INTEGER
 				{
 				notify(1),
-				service_change(2)
+				serviceChange(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -22438,14 +22438,14 @@
 			SYNTAX INTEGER
 				{
 				speed-auto(0),
-				speed-6M(1),
-				speed-9M(2),
-				speed-12M(3),
-				speed-18M(4),
-				speed-24M(5),
-				speed-36M(6),
-				speed-48M(7),
-				speed-54M(8),
+				speed6M(1),
+				speed9M(2),
+				speed12M(3),
+				speed18M(4),
+				speed24M(5),
+				speed36M(6),
+				speed48M(7),
+				speed54M(8),
 				speed-MCS0(9),
 				speed-MCS1(10),
 				speed-MCS2(11),
@@ -22490,12 +22490,12 @@
 				speed-NSS2-MCS7(50),
 				speed-NSS2-MCS8(51),
 				speed-NSS2-MCS9(52),
-				speed-300M(53),
-				speed-1M(54),
-				speed-2M(55),
-				speed-5_5M(56),
-				speed-11M(57),
-				speed-144M(58)
+				speed300M(53),
+				speed1M(54),
+				speed2M(55),
+				speed55M(56),
+				speed11M(57),
+				speed144M(58)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -22508,8 +22508,8 @@
 		priWifiAdvPreambleTypeS OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				long_Preamble(0),
-				short_Preamble(1)
+				longPreamble(0),
+				shortPreamble(1)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -22658,8 +22658,8 @@
 		priWifiAdvBandSteApplyS OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				prefer_2_4GHz(0),
-				prefer_5GHz(1)
+				prefer24GHz(0),
+				prefer5ghz(1)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -24317,17 +24317,17 @@
 			SYNTAX INTEGER
 				{
 				auto(0),
-				full-10(1),
-				full-100(2),
-				full-1000(3),
-				full-10g(5),
-				full-2point5g(6),
-				full-5g(7),
-				full-25g(8),
-				full-40g(9),
-				half-10(17),
-				half-100(18),
-				half-1000(19)
+				full10(1),
+				full100(2),
+				full1000(3),
+				full10g(5),
+				full2point5g(6),
+				full5g(7),
+				full25g(8),
+				full40g(9),
+				half10(17),
+				half100(18),
+				half1000(19)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -24963,10 +24963,10 @@
 				internet(0),
 				multicast(1),
 				tr069(2),
-				tr069_internet(3),
-				tr069_voip(4),
-				voip_internet(5),
-				tr069_voip_internet(6),
+				tr069Internet(3),
+				tr069Voip(4),
+				voipInternet(5),
+				tr069voipInternet(6),
 				voip(7),
 				other(100)
 				}
@@ -25310,7 +25310,7 @@
 				pc(0),
 				camera(1),
 				stb(2),
-				ip_phone(3)
+				ipPhone(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -25384,8 +25384,8 @@
 			SYNTAX INTEGER
 				{
 				static(0),
-				hgw_proxy(1),
-				from_isp(2)
+				hgwProxy(1),
+				fromIsp(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -25538,8 +25538,8 @@
 				s20MHz(0),
 				s40MHz(1),
 				s80MHz(2),
-				s20_40MHz(3),
-				s20_40_80MHz(4),
+				s2040mhz(3),
+				s204080MHz(4),
 				s160MHz(5)
 				}
 			MAX-ACCESS read-write
@@ -25644,10 +25644,10 @@
 				wpa(5),
 				wpa2psk(6),
 				wpa2(7),
-				wpa_wpa2(8),
-				wpapsk_wpa2psk(9),
+				wpaWpa2(8),
+				wpapskWpa2psk(9),
 				wpa3psk(10),
-				wpa2psk_wpa3psk(11)
+				wpa2pskWpa3psk(11)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -26247,7 +26247,7 @@
 				{
 				transparent(0),
 				rfc2833(1),
-				rfc2833_redundancyl(2),
+				rfc2833Redundancyl(2),
 				outband(3)
 				}
 			MAX-ACCESS read-write
@@ -26929,10 +26929,10 @@
 				internet(0),
 				multicast(1),
 				tr069(2),
-				tr069_internet(3),
-				tr069_voip(4),
-				voip_internet(5),
-				tr069_voip_internet(6),
+				tr069Internet(3),
+				tr069Voip(4),
+				voipInternet(5),
+				tr069voipInternet(6),
 				voip(7),
 				other(100)
 				}
@@ -26987,7 +26987,7 @@
 				{
 				ipv4(0),
 				ipv6(1),
-				ipv4_ipv6(2)
+				ipv4Ipv6(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -27526,7 +27526,7 @@
 		dhcpv6PrefixMode OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				wan_delegated(0),
+				wanDelegated(0),
 				static(1),
 				auto(2)
 				}
@@ -27605,7 +27605,7 @@
 				pc(0),
 				camera(1),
 				stb(2),
-				ip_phone(3)
+				ipPhone(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -27873,8 +27873,8 @@
 		priPLCDestMacType OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				broadcast_address(0),
-				bpdu_address(1)
+				broadcastAddress(0),
+				bpduAddress(1)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -28362,9 +28362,9 @@
 		h248SrvRegisterMode OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				ip_address(0),
-				domain_name(1),
-				device_name(2)
+				ipAddress(0),
+				domainName(1),
+				deviceName(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -28390,8 +28390,8 @@
 			SYNTAX INTEGER
 				{
 				disable(0),
-				active_enable(1),
-				passive_enable(2)
+				activeEnable(1),
+				passiveEnable(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -28406,7 +28406,7 @@
 			SYNTAX INTEGER
 				{
 				notify(1),
-				service_change(2)
+				serviceChange(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -28883,14 +28883,14 @@
 			SYNTAX INTEGER
 				{
 				auto(0),
-				speed-6M(1),
-				speed-9M(2),
-				speed-12M(3),
-				speed-18M(4),
-				speed-24M(5),
-				speed-36M(6),
-				speed-48M(7),
-				speed-54M(8),
+				speed6M(1),
+				speed9M(2),
+				speed12M(3),
+				speed18M(4),
+				speed24M(5),
+				speed36M(6),
+				speed48M(7),
+				speed54M(8),
 				speed-MCS0(9),
 				speed-MCS1(10),
 				speed-MCS2(11),
@@ -28935,11 +28935,11 @@
 				speed-NSS2-MCS7(50),
 				speed-NSS2-MCS8(51),
 				speed-NSS2-MCS9(52),
-				speed-300M(53),
-				speed-1M(54),
-				speed-2M(55),
-				speed-5_5M(56),
-				speed-144M(58)
+				speed300M(53),
+				speed1M(54),
+				speed2M(55),
+				speed55M(56),
+				speed144M(58)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -28952,8 +28952,8 @@
 		priPWifiAdvPreambleType OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				long_Preamble(0),
-				short_Preamble(1)
+				longPreamble(0),
+				shortPreamble(1)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -29106,8 +29106,8 @@
 		priPWifiAdvBandSteApply OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				prefer_2_4GHz(0),
-				prefer_5GHz(1)
+				prefer24GHz(0),
+				prefer5ghz(1)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -29141,7 +29141,7 @@
 			SYNTAX INTEGER
 				{
 				submit(1),
-				submit_bandsteer(2)
+				submitBandsteer(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -29376,11 +29376,11 @@
 		gxbIgmpVersion OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				igmp_v1(1),
-				igmp_v2(2),
-				igmp_v3(3),
-				mld_v1(16),
-				mld_v2(17)
+				igmpV1(1),
+				igmpV2(2),
+				igmpV3(3),
+				mldV1(16),
+				mldV2(17)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -29426,9 +29426,9 @@
 			SYNTAX INTEGER
 				{
 				transparent(0),
-				add_vlan_tag(1),
-				replace_vlan_tag(2),
-				replace_vlan_id(3)
+				addvlanTag(1),
+				replacevlanTag(2),
+				replacevlanId(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -29531,13 +29531,13 @@
 			SYNTAX INTEGER
 				{
 				transparent(0),
-				strip_outer_tag(1),
-				add_outer_tag(2),
-				replace_outer_tci(3),
-				replace_outer_vid(4),
-				add_outer_tag_by_subscriber_conf_info(5),
-				replace_outer_tci_by_subscriber_conf_info(6),
-				replace_outer_vid_by_subscriber_conf_info(7)
+				stripouterTag(1),
+				addouterTag(2),
+				replaceouterTci(3),
+				replaceouterVid(4),
+				addoutertagbySubscriberconfinfo(5),
+				replaceoutertcibySubscriberconfinfo(6),
+				replaceoutervidbySubscriberconfinfo(7)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -31618,17 +31618,17 @@
 			SYNTAX INTEGER
 				{
 				auto(0),
-				full-10(1),
-				full-100(2),
-				full-1000(3),
-				full-10g(5),
-				full-2point5g(6),
-				full-5g(7),
-				full-25g(8),
-				full-40g(9),
-				half-10(17),
-				half-100(18),
-				half-1000(19)
+				full10(1),
+				full100(2),
+				full1000(3),
+				full10g(5),
+				full2point5g(6),
+				full5g(7),
+				full25g(8),
+				full40g(9),
+				half10(17),
+				half100(18),
+				half1000(19)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -32303,10 +32303,10 @@
 				internet(0),
 				multicast(1),
 				tr069(2),
-				tr069_internet(3),
-				tr069_voip(4),
-				voip_internet(5),
-				tr069_voip_internet(6),
+				tr069Internet(3),
+				tr069Voip(4),
+				voipInternet(5),
+				tr069voipInternet(6),
 				voip(7),
 				other(100)
 				}
@@ -32807,7 +32807,7 @@
 				pc(0),
 				camera(1),
 				stb(2),
-				ip_phone(3)
+				ipPhone(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -32870,8 +32870,8 @@
 			SYNTAX INTEGER
 				{
 				static(0),
-				hgw_proxy(1),
-				from_isp(2)
+				hgwProxy(1),
+				fromIsp(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -33057,8 +33057,8 @@
 				s20MHz(0),
 				s40MHz(1),
 				s80MHz(2),
-				s20_40MHz(3),
-				s20_40_80MHz(4),
+				s2040mhz(3),
+				s204080MHz(4),
 				s160MHz(5)
 				}
 			MAX-ACCESS read-write
@@ -33233,10 +33233,10 @@
 				wpa(5),
 				wpa2psk(6),
 				wpa2(7),
-				wpa_wpa2(8),
-				wpapsk_wpa2psk(9),
+				wpaWpa2(8),
+				wpapskWpa2psk(9),
 				wpa3psk(10),
-				wpa2psk_wpa3psk(11)
+				wpa2pskWpa3psk(11)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -33984,7 +33984,7 @@
 				{
 				transparent(0),
 				rfc2833(1),
-				rfc2833_redundancy(2),
+				rfc2833Redundancy(2),
 				outband(3)
 				}
 			MAX-ACCESS read-write
@@ -34819,10 +34819,10 @@
 				internet(0),
 				multicast(1),
 				tr069(2),
-				tr069_internet(3),
-				tr069_voip(4),
-				voip_internet(5),
-				tr069_voip_internet(6),
+				tr069Internet(3),
+				tr069Voip(4),
+				voipInternet(5),
+				tr069voipInternet(6),
 				voip(7),
 				other(100)
 				}
@@ -34877,7 +34877,7 @@
 				{
 				ipv4(0),
 				ipv6(1),
-				ipv4_ipv6(2)
+				ipv4Ipv6(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -35473,7 +35473,7 @@
 		priPDhcpv6PrefixMode OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				wan_delegated(0),
+				wanDelegated(0),
 				static(1),
 				auto(2)
 				}
@@ -35552,7 +35552,7 @@
 				pc(0),
 				camera(1),
 				stb(2),
-				ip_phone(3)
+				ipPhone(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -35843,8 +35843,8 @@
 		priPLCDestMacTypeS OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				broadcast_address(0),
-				bpdu_address(1)
+				broadcastAddress(0),
+				bpduAddress(1)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -36442,9 +36442,9 @@
 		h248SrvRegisterModeS OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				ip_address(0),
-				domain_name(1),
-				device_name(2)
+				ipAddress(0),
+				domainName(1),
+				deviceName(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -36470,8 +36470,8 @@
 			SYNTAX INTEGER
 				{
 				disable(0),
-				active_enable(1),
-				passive_enable(2)
+				activeEnable(1),
+				passiveEnable(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -36486,7 +36486,7 @@
 			SYNTAX INTEGER
 				{
 				notify(1),
-				service_change(2)
+				serviceChange(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -37124,14 +37124,14 @@
 			SYNTAX INTEGER
 				{
 				speed-auto(0),
-				speed-6M(1),
-				speed-9M(2),
-				speed-12M(3),
-				speed-18M(4),
-				speed-24M(5),
-				speed-36M(6),
-				speed-48M(7),
-				speed-54M(8),
+				speed6M(1),
+				speed9M(2),
+				speed12M(3),
+				speed18M(4),
+				speed24M(5),
+				speed36M(6),
+				speed48M(7),
+				speed54M(8),
 				speed-MCS0(9),
 				speed-MCS1(10),
 				speed-MCS2(11),
@@ -37176,12 +37176,12 @@
 				speed-NSS2-MCS7(50),
 				speed-NSS2-MCS8(51),
 				speed-NSS2-MCS9(52),
-				speed-300M(53),
-				speed-1M(54),
-				speed-2M(55),
-				speed-5_5M(56),
-				speed-11M(57),
-				speed-144M(58)
+				speed300M(53),
+				speed1M(54),
+				speed2M(55),
+				speed55M(56),
+				speed11M(57),
+				speed144M(58)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -37194,8 +37194,8 @@
 		priPWifiAdvPreambleTypeS OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				long_Preamble(0),
-				short_Preamble(1)
+				longPreamble(0),
+				shortPreamble(1)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -37344,8 +37344,8 @@
 		priPWifiAdvBandSteApplyS OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				prefer_2_4GHz(0),
-				prefer_5GHz(1)
+				prefer24GHz(0),
+				prefer5ghz(1)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -38011,11 +38011,11 @@
 		gxbIgmpVersionS OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				igmp_v1(1),
-				igmp_v2(2),
-				igmp_v3(3),
-				mld_v1(16),
-				mld_v2(17)
+				igmpV1(1),
+				igmpV2(2),
+				igmpV3(3),
+				mldV1(16),
+				mldV2(17)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -38061,9 +38061,9 @@
 			SYNTAX INTEGER
 				{
 				transparent(0),
-				add_vlan_tag(1),
-				replace_vlan_tag(2),
-				replace_vlan_id(3)
+				addvlanTag(1),
+				replacevlanTag(2),
+				replacevlanId(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -38166,13 +38166,13 @@
 			SYNTAX INTEGER
 				{
 				transparent(0),
-				strip_outer_tag(1),
-				add_outer_tag(2),
-				replace_outer_tci(3),
-				replace_outer_vid(4),
-				add_outer_tag_by_subscriber_conf_info(5),
-				replace_outer_tci_by_subscriber_conf_info(6),
-				replace_outer_vid_by_subscriber_conf_info(7)
+				stripouterTag(1),
+				addouterTag(2),
+				replaceouterTci(3),
+				replaceouterVid(4),
+				addoutertagbySubscriberconfinfo(5),
+				replaceoutertcibySubscriberconfinfo(6),
+				replaceoutervidbySubscriberconfinfo(7)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -39760,10 +39760,10 @@
 				{
 				any(1),
 				sn(2),
-				vendor_id(3),
-				fuzzy_equid(4),
-				exact_equid(5),
-				onu_id(6)
+				vendorId(3),
+				fuzzyEquid(4),
+				exactEquid(5),
+				onuId(6)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -39919,11 +39919,11 @@
 			SYNTAX INTEGER
 				{
 				any(1),
-				fuzzy_equit(2),
-				exact_equit(3),
-				onu_id(4),
+				fuzzyEquit(2),
+				exactEquit(3),
+				onuId(4),
 				sn(5),
-				vendor_id(6)
+				vendorId(6)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -40016,7 +40016,7 @@
 				{
 				add(0),
 				delete(1),
-				modify_state(2)
+				modifyState(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -40224,7 +40224,7 @@
 				descriptions(1),
 				model(2),
 				info(3),
-				deployment_status(4)
+				deploymentStatus(4)
 				}
 			MAX-ACCESS read-write
 			STATUS current

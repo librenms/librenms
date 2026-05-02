@@ -26,7 +26,7 @@ class VsolDataAlarmTrap implements SnmptrapHandler
     {
         $pon = $trap->getOidData($trap->findOid('V1600GSwitch::dataPon'));
         $onu = $trap->getOidData($trap->findOid('V1600GSwitch::dataOnu'));
-        $alarmLevel = (int) $trap->getOidData($trap->findOid('V1600GSwitch::dateAlarmLevel'));
+        $alarmLevel = $trap->getOidData($trap->findOid('V1600GSwitch::dateAlarmLevel'));
         $alarmTypeId = (int) $trap->getOidData($trap->findOid('V1600GSwitch::dataAlarmType'));
         $value = $trap->getOidData($trap->findOid('V1600GSwitch::dataValue'));
 
@@ -51,10 +51,11 @@ class VsolDataAlarmTrap implements SnmptrapHandler
         }
 
         $severity = match ($alarmLevel) {
-            4, 5 => Severity::Error,      // critical/major
-            3 => Severity::Warning,        // minor
-            2 => Severity::Notice,         // warning
-            1 => Severity::Ok,             // cleared
+            'criterr', 'alert', 'emerg' => Severity::Error,
+            'major' => Severity::Error,
+            'warning' => Severity::Warning,
+            'notice' => Severity::Notice,
+            'info' => Severity::Ok,
             default => Severity::Info,
         };
 

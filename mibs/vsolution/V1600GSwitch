@@ -353,7 +353,7 @@
 		upLinkPortIsolate OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				no_isolate(0),
+				noIsolate(0),
 				isolate(1)
 				}
 			MAX-ACCESS read-write
@@ -1499,7 +1499,7 @@
 		ponPortIsolate OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				no_isolate(0),
+				noIsolate(0),
 				isolate(1)
 				}
 			MAX-ACCESS read-write
@@ -3581,7 +3581,7 @@
 				{
 				Global(0),
 				Link-local(1),
-				EUI-64(2)
+				eui64(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -5760,7 +5760,7 @@
 		tagstrip OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				no_tagstrip(0),
+				noTagstrip(0),
 				tagstrip(1)
 				}
 			MAX-ACCESS read-write
@@ -8375,7 +8375,7 @@
 				{
 				permit(1),
 				deny(2),
-				traffic_classifier(3)
+				trafficClassifier(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -9404,7 +9404,7 @@
 				{
 				permit(1),
 				deny(2),
-				traffic_classifier(3)
+				trafficClassifier(3)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -10235,7 +10235,7 @@
 				{
 				permit(1),
 				deny(2),
-				traffic_classifier(3)
+				trafficClassifier(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -10774,7 +10774,7 @@
 				{
 				permit(1),
 				deny(2),
-				traffic_classifier(3)
+				trafficClassifier(3)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -12904,8 +12904,8 @@
 			SYNTAX INTEGER
 				{
 				timeout(0),
-				fix_time(1),
-				week_day(2)
+				fixTime(1),
+				weekDay(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -13160,8 +13160,8 @@
 			SYNTAX INTEGER
 				{
 				timeout(0),
-				fix_time(1),
-				week_day(2)
+				fixTime(1),
+				weekDay(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -13337,8 +13337,8 @@
 			SYNTAX INTEGER
 				{
 				timeout(0),
-				fix_time(1),
-				week_day(2)
+				fixTime(1),
+				weekDay(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -13605,8 +13605,8 @@
 			SYNTAX INTEGER
 				{
 				timeout(0),
-				fix_time(1),
-				week_day(2)
+				fixTime(1),
+				weekDay(2)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -15844,8 +15844,8 @@
 			SYNTAX INTEGER
 				{
 				timeout(0),
-				fix_time(1),
-				week_day(2)
+				fixTime(1),
+				weekDay(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -16100,8 +16100,8 @@
 			SYNTAX INTEGER
 				{
 				timeout(0),
-				fix_time(1),
-				week_day(2)
+				fixTime(1),
+				weekDay(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -17437,7 +17437,7 @@
 				{
 				onu(0),
 				olt(1),
-				olt_cfg(2)
+				oltCfg(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -17787,9 +17787,9 @@
 		dataTrapClass OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				clear_alarm(0),
-				raised_alarm(1),
-				no_clear_alarm(2)
+				clearAlarm(0),
+				raisedAlarm(1),
+				noclearAlarm(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -35679,8 +35679,8 @@
 		onuAuthInfo2DeregReason OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				wire_down(0),
-				power_off(1)
+				wireDown(0),
+				powerOff(1)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -36691,7 +36691,7 @@
 		ipv6Support OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				not_support(0),
+				notSupport(0),
 				support(1)
 				}
 			MAX-ACCESS read-only
@@ -36706,9 +36706,9 @@
 		powerControl OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				not_support(0),
-				support_onu_tx(1),
-				support_onu_tx_and_rx(2)
+				notSupport(0),
+				supportonuTx(1),
+				supportonutxandRx(2)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -37070,9 +37070,9 @@
 		snmpVer OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				SNMP_V1(1),
-				SNMP_V2(2),
-				SNMP_V3(3)
+				snmpV1(1),
+				snmpV2(2),
+				snmpV3(3)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -37244,7 +37244,7 @@
 				{
 				SP(0),
 				WRR(1),
-				SP_WRR(2)
+				spWrr(2)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -38383,9 +38383,9 @@
 		onuSlaMode OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				sp_basic(1),
+				spBasic(1),
 				wrr(2),
-				sp_wrr(3)
+				spWrr(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -39795,8 +39795,8 @@
 				wpa(5),
 				wpa2psk(6),
 				wpa2(7),
-				wpa_wpa2(8),
-				wpapsk_wpa2psk(9)
+				wpaWpa2(8),
+				wpapskWpa2psk(9)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -40167,10 +40167,10 @@
 				internet(0),
 				multicast(1),
 				tr069(2),
-				tr069_internet(3),
-				tr069_voip(4),
-				voip_internet(5),
-				tr069_voip_internet(6),
+				tr069Internet(3),
+				tr069Voip(4),
+				voipInternet(5),
+				tr069voipInternet(6),
 				other(100)
 				}
 			MAX-ACCESS read-write
@@ -40913,7 +40913,7 @@
 				pc(0),
 				camera(1),
 				stb(2),
-				ip_phone(3)
+				ipPhone(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -42235,8 +42235,8 @@
 				wpa(5),
 				wpa2psk(6),
 				wpa2(7),
-				wpa_wpa2(8),
-				wpapsk_wpa2psk(9)
+				wpaWpa2(8),
+				wpapskWpa2psk(9)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -42572,10 +42572,10 @@
 				internet(0),
 				multicast(1),
 				tr069(2),
-				tr069_internet(3),
-				tr069_voip(4),
-				voip_internet(5),
-				tr069_voip_internet(6),
+				tr069Internet(3),
+				tr069Voip(4),
+				voipInternet(5),
+				tr069voipInternet(6),
 				other(100)
 				}
 			MAX-ACCESS read-write
@@ -43259,7 +43259,7 @@
 				pc(0),
 				camera(1),
 				stb(2),
-				ip_phone(3)
+				ipPhone(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -44553,7 +44553,7 @@
 				{
 				transparent(0),
 				rfc2833(1),
-				rfc2833_redundancy(2),
+				rfc2833Redundancy(2),
 				outband(3)
 				}
 			MAX-ACCESS read-write
@@ -45142,7 +45142,7 @@
 				{
 				transparent(0),
 				rfc2833(1),
-				rfc2833_redundancy(2),
+				rfc2833Redundancy(2),
 				outband(3)
 				}
 			MAX-ACCESS read-write
@@ -49557,7 +49557,7 @@
 		mVlanTagsMode OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				no_strip(0),
+				noStrip(0),
 				strip(1),
 				vlanTrans(2)
 				}
@@ -49830,8 +49830,8 @@
 		queryMode OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				monitor_current(1),
-				monitor_history(2)
+				monitorCurrent(1),
+				monitorHistory(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -50417,7 +50417,7 @@
 		voipGIPMode OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				Static_IP(0),
+				staticIp(0),
 				DHCP(1),
 				PPPoE(2)
 				}
@@ -50506,7 +50506,7 @@
 				{
 				Transparent(0),
 				Tag(1),
-				Vlan_Stacking(2)
+				vlanStacking(2)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -50835,11 +50835,11 @@
 				Offhook(2),
 				Dialing(3),
 				Ringing(4),
-				Ring_Back(5),
+				ringBack(5),
 				Connecting(6),
 				Connected(7),
-				Release_connection(8),
-				Register_fail(9),
+				releaseConnection(8),
+				registerFail(9),
 				Inactive(10)
 				}
 			MAX-ACCESS read-only
@@ -50951,10 +50951,10 @@
 			SYNTAX INTEGER
 				{
 				Registering(0),
-				Register_success(1),
-				IAD_fault(2),
+				registerSuccess(1),
+				iadFault(2),
 				Deregister(3),
-				IAD_restarting(4)
+				iadRestarting(4)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -51114,8 +51114,8 @@
 			SYNTAX INTEGER
 				{
 				Ipaddr(0),
-				Domain_name(1),
-				Device_name(2)
+				domainName(1),
+				deviceName(2)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -51783,7 +51783,7 @@
 			SYNTAX INTEGER
 				{
 				Negotiation(0),
-				Auto_VBD(1)
+				autoVbd(1)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -51829,7 +51829,7 @@
 		voipIpMode OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				Static_IP(0),
+				staticIp(0),
 				DHCP(1),
 				PPPoE(2)
 				}
@@ -51918,7 +51918,7 @@
 				{
 				Transparent(0),
 				Tag(1),
-				Vlan_Stacking(2)
+				vlanStacking(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -52064,7 +52064,7 @@
 --  1.3.6.1.4.1.37950.1.1.5.12.6.3.1.1.3
 		-- 1.3.6.1.4.1.37950.1.1.5.12.6.3.1.1.3
 		ipRegMode OBJECT-TYPE
-			SYNTAX INTEGER { ip_addr(1) }
+			SYNTAX INTEGER { ipAddr(1) }
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION
@@ -52403,8 +52403,8 @@
 			SYNTAX INTEGER
 				{
 				IPAddr(0),
-				Domain_name(1),
-				Device_name(2)
+				domainName(1),
+				deviceName(2)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -54359,9 +54359,9 @@
 		ctcSlaMode OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				sp_basic(1),
+				spBasic(1),
 				wrr(2),
-				sp_wrr(3)
+				spWrr(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -56146,8 +56146,8 @@
 				wpa(5),
 				wpa2psk(6),
 				wpa2(7),
-				wpa_wpa2(8),
-				wpapsk_wpa2psk(9)
+				wpaWpa2(8),
+				wpapskWpa2psk(9)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -56452,10 +56452,10 @@
 				internet(0),
 				multicast(1),
 				tr069(2),
-				tr069_internet(3),
-				tr069_voip(4),
-				voip_internet(5),
-				tr069_voip_internet(6),
+				tr069Internet(3),
+				tr069Voip(4),
+				voipInternet(5),
+				tr069voipInternet(6),
 				other(100)
 				}
 			MAX-ACCESS read-write
@@ -57074,7 +57074,7 @@
 				pc(0),
 				camera(1),
 				stb(2),
-				ip_phone(3)
+				ipPhone(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -57408,7 +57408,7 @@
 				{
 				transparent(1),
 				tag(2),
-				vlan_stacking(3)
+				vlanStacking(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -57540,7 +57540,7 @@
 		ctcRegMode OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				ip_addr(0),
+				ipAddr(0),
 				realm(1),
 				device(2)
 				}
@@ -58315,7 +58315,7 @@
 				{
 				transparent(0),
 				rfc2833(1),
-				rfc2833_redundancy(2),
+				rfc2833Redundancy(2),
 				outband(3)
 				}
 			MAX-ACCESS read-write
@@ -62574,8 +62574,8 @@
 			SYNTAX INTEGER
 				{
 				none(1),
-				tx_sleep_only(2),
-				tx_and_rx_sleep(3)
+				txsleepOnly(2),
+				txandRxsleep(3)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -63223,8 +63223,8 @@
 				wpa(5),
 				wpa2psk(6),
 				wpa2(7),
-				wpa_wpa2(8),
-				wpapsk_wpa2psk(9)
+				wpaWpa2(8),
+				wpapskWpa2psk(9)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -63543,10 +63543,10 @@
 				internet(0),
 				multicast(1),
 				tr069(2),
-				tr069_internet(3),
-				tr069_voip(4),
-				voip_internet(5),
-				tr069_voip_internet(6),
+				tr069Internet(3),
+				tr069Voip(4),
+				voipInternet(5),
+				tr069voipInternet(6),
 				other(100)
 				}
 			MAX-ACCESS read-write
@@ -64289,7 +64289,7 @@
 				pc(0),
 				camera(1),
 				stb(2),
-				ip_phone(3)
+				ipPhone(3)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -64744,7 +64744,7 @@
 				{
 				transparent(1),
 				tag(2),
-				vlan_stacking(3)
+				vlanStacking(3)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -64906,9 +64906,9 @@
 		h248ProRegModeS OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				ip_addr(0),
-				realm_name(1),
-				device_name(2)
+				ipAddr(0),
+				realmName(1),
+				deviceName(2)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -65628,7 +65628,7 @@
 			SYNTAX INTEGER
 				{
 				negotiation(1),
-				auto_vbd(2)
+				autoVbd(2)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -65938,7 +65938,7 @@
 				{
 				transparent(0),
 				rfc2833(1),
-				rfc2833_redundancy(2),
+				rfc2833Redundancy(2),
 				outband(3)
 				}
 			MAX-ACCESS read-write
