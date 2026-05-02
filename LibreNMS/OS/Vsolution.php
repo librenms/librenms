@@ -25,6 +25,7 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
     /** @var array<int, int> gePortIdx => ifIndex for GE uplink ports */
     private array $geIfMap = [];
 
+    /** @return Collection<int, Transceiver> */
     public function discoverTransceivers(): Collection
     {
         $this->buildPortMaps();
@@ -136,6 +137,8 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
      * Discover per-ONU optical sensors and link them to transceivers.
      *
      * Called from includes/discovery/sensors/{class}/vsolution.inc.php
+     *
+     * @param array<string> $types
      */
     public function discoverOnuOpticalSensors(array $types = ['dbm', 'current', 'temperature', 'voltage']): void
     {
@@ -333,6 +336,7 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
         }
     }
 
+    /** @return Collection<int, Vlan> */
     public function discoverVlans(): Collection
     {
         return SnmpQuery::cache()->hideMib()

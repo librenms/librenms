@@ -59,6 +59,6 @@ class VsolDataAlarmTrap implements SnmptrapHandler
             default => Severity::Info,
         };
 
-        $trap->log($message, $severity, 'trap');
+        $trap->log($message, $severity);
     }
 }
