@@ -65,6 +65,15 @@ export default function filterBarComponent({
         remoteOptions: [],
         isLoading: false,
 
+        get formattedFilters() {
+            const formatted = {};
+            this.filters.forEach((f) => {
+                if (!formatted[f.key]) formatted[f.key] = {};
+                formatted[f.key][f.op] = this.encodeValue(f.value);
+            });
+            return formatted;
+        },
+
         // --- Initialization ---
         async init() {
             this.$watch("op", (newOp, oldOp) => {
@@ -109,9 +118,15 @@ export default function filterBarComponent({
             this.syncPageUrls();
 
             this.$dispatch("filter:loaded", {
-                filters: this.filters,
+                filters: this.formattedFilters,
                 source: hasUrlFilters ? "url" : "initial",
             });
+
+            if (this.filters.length > 0 && !this.reload) {
+                this.$dispatch("filter:apply", {
+                    filters: this.formattedFilters,
+                });
+            }
 
             window.addEventListener("popstate", () =>
                 this.restoreFromUrl(new URLSearchParams(window.location.search))
@@ -167,15 +182,6 @@ export default function filterBarComponent({
         },
 
         // --- Syncing & Persistence ---
-        getFormattedFilters() {
-            const formatted = {};
-            this.filters.forEach((f) => {
-                if (!formatted[f.key]) formatted[f.key] = {};
-                formatted[f.key][f.op] = this.encodeValue(f.value);
-            });
-            return formatted;
-        },
-
         applyFiltersToUrl(url) {
             [...url.searchParams.keys()]
                 .filter((k) => k.startsWith("filter["))
@@ -203,7 +209,7 @@ export default function filterBarComponent({
                 window.history.pushState({}, "", url);
                 this.syncPageUrls();
                 this.$dispatch("filter:apply", {
-                    filters: this.getFormattedFilters(),
+                    filters: this.formattedFilters,
                 });
             }
         },
@@ -229,7 +235,7 @@ export default function filterBarComponent({
                     },
                     body: JSON.stringify({
                         name: this.name,
-                        filters: this.getFormattedFilters(),
+                        filters: this.formattedFilters,
                     }),
                 });
                 this.showOptions = false;
