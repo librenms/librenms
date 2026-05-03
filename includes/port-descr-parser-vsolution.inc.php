@@ -16,11 +16,20 @@ use App\Models\Port;
 use App\Models\Transceiver;
 
 return function (string $ifAlias, string $ifIndex = '', string $ifName = '', int $port_id = 0): array {
+    static $deviceOsCache = [];
+    static $transceiverCache = [];
+
     // Detect ONU virtual ports by ifName pattern: GPON01ONU1, GPON01ONU2, etc.
     if ($port_id && preg_match('/GPON\d{2}ONU\d+/', $ifName)) {
-        $port = Port::with('device')->find($port_id);
-        if ($port && $port->device && $port->device->os === 'vsolution') {
-            $transceiver = Transceiver::where('port_id', $port_id)->first();
+        if (! isset($deviceOsCache[$port_id])) {
+            $port = Port::with('device')->find($port_id);
+            $deviceOsCache[$port_id] = $port && $port->device && $port->device->os === 'vsolution';
+        }
+        if ($deviceOsCache[$port_id]) {
+            if (! array_key_exists($port_id, $transceiverCache)) {
+                $transceiverCache[$port_id] = Transceiver::where('port_id', $port_id)->first();
+            }
+            $transceiver = $transceiverCache[$port_id];
 
             $descr = $transceiver->serial ?? $ifAlias;
             $model = $transceiver->model ?? '';

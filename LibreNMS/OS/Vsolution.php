@@ -25,6 +25,10 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
     /** @var array<int, int> gePortIdx => ifIndex for GE uplink ports */
     private array $geIfMap = [];
 
+    private bool $portMapsBuilt = false;
+
+    private bool $onuSensorsDiscovered = false;
+
     /** @return Collection<int, Transceiver> */
     public function discoverTransceivers(): Collection
     {
@@ -142,6 +146,12 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
      */
     public function discoverOnuOpticalSensors(array $types = ['dbm', 'current', 'temperature', 'voltage']): void
     {
+        if ($this->onuSensorsDiscovered) {
+            return;
+        }
+        $this->onuSensorsDiscovered = true;
+        $types = ['dbm', 'current', 'temperature', 'voltage'];
+
         $this->buildPortMaps();
 
         // --- OLT PON SFP sensors ---
@@ -149,6 +159,13 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
             ->walk('V1600D::ponTransceiverTable')->table(1);
         $ponDescrs = SnmpQuery::cache()->hideMib()
             ->walk('V1600D::ponPortDescr')->pluck();
+
+        $ponDescrMap = [];
+        foreach ($ponDescrs as $oid => $descr) {
+            if (preg_match('/\.(\d+)$/', (string) $oid, $m)) {
+                $ponDescrMap[(int) $m[1]] = $descr;
+            }
+        }
 
         $ponOidBase = '.1.3.6.1.4.1.37950.1.1.5.10.13.1.1';
 
@@ -158,14 +175,7 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
                 continue;
             }
 
-            // Get port description for label
-            $label = 'PON ' . $ponIdx;
-            foreach ($ponDescrs as $oid => $descr) {
-                if (str_ends_with((string) $oid, ".$ponIdx")) {
-                    $label = $descr;
-                    break;
-                }
-            }
+            $label = $ponDescrMap[$ponIdx] ?? 'PON ' . $ponIdx;
 
             $ponSensorDefs = [
                 ['class' => 'temperature', 'col' => 2, 'key' => 'tempperature', 'types' => ['temperature']],
@@ -350,9 +360,10 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
 
     private function buildPortMaps(): void
     {
-        if (! empty($this->onuIfMap)) {
+        if ($this->portMapsBuilt) {
             return;
         }
+        $this->portMapsBuilt = true;
 
         $ports = Port::where('device_id', $this->getDevice()->device_id)->get(['ifIndex', 'ifDescr']);
         foreach ($ports as $port) {

@@ -109,4 +109,108 @@ TRAP,
             [Severity::Warning],
         );
     }
+
+    public function testUnknownAlarmTypeFallback(): void
+    {
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:57602->[10.0.0.1]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 0:01:23:45.67
+SNMPv2-MIB::snmpTrapOID.0 V1600GSwitch::dataAlarmTrap
+V1600GSwitch::dataUpLinkPort.0 ""
+V1600GSwitch::dataPon.0 2
+V1600GSwitch::dataOnu.0 5
+V1600GSwitch::dataOnuPort.0 ""
+V1600GSwitch::dataTrapOID.0 ""
+V1600GSwitch::dataTrapClass.0 ""
+V1600GSwitch::dataMac.0 ""
+V1600GSwitch::dataTime.0 ""
+V1600GSwitch::dateAlarmLevel.0 notice
+V1600GSwitch::dataValue.0 ""
+V1600GSwitch::dataAlarmType.0 99
+V1600GSwitch::dataSynOID.0 ""
+TRAP,
+            'alarm-99 (PON 2 ONU 5)',
+            'Could not handle VsolDataAlarmTrap alarm-99',
+            [Severity::Notice],
+        );
+    }
+
+    public function testUnknownAlarmLevelFallsBackToInfo(): void
+    {
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:57602->[10.0.0.1]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 0:01:23:45.67
+SNMPv2-MIB::snmpTrapOID.0 V1600GSwitch::dataAlarmTrap
+V1600GSwitch::dataUpLinkPort.0 ""
+V1600GSwitch::dataPon.0 1
+V1600GSwitch::dataOnu.0 1
+V1600GSwitch::dataOnuPort.0 ""
+V1600GSwitch::dataTrapOID.0 ""
+V1600GSwitch::dataTrapClass.0 ""
+V1600GSwitch::dataMac.0 ""
+V1600GSwitch::dataTime.0 ""
+V1600GSwitch::dateAlarmLevel.0 debug
+V1600GSwitch::dataValue.0 ""
+V1600GSwitch::dataAlarmType.0 41
+V1600GSwitch::dataSynOID.0 ""
+TRAP,
+            'onu-register (PON 1 ONU 1)',
+            'Could not handle VsolDataAlarmTrap onu-register',
+            [Severity::Info],
+        );
+    }
+
+    public function testNoPonOrOnuOmitsLocation(): void
+    {
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:57602->[10.0.0.1]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 0:01:23:45.67
+SNMPv2-MIB::snmpTrapOID.0 V1600GSwitch::dataAlarmTrap
+V1600GSwitch::dataUpLinkPort.0 ""
+V1600GSwitch::dataPon.0 ""
+V1600GSwitch::dataOnu.0 ""
+V1600GSwitch::dataOnuPort.0 ""
+V1600GSwitch::dataTrapOID.0 ""
+V1600GSwitch::dataTrapClass.0 ""
+V1600GSwitch::dataMac.0 ""
+V1600GSwitch::dataTime.0 ""
+V1600GSwitch::dateAlarmLevel.0 major
+V1600GSwitch::dataValue.0 ""
+V1600GSwitch::dataAlarmType.0 1
+V1600GSwitch::dataSynOID.0 ""
+TRAP,
+            'fan',
+            'Could not handle VsolDataAlarmTrap fan',
+            [Severity::Error],
+        );
+    }
+
+    public function testZeroDataValueIncludedInMessage(): void
+    {
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:57602->[10.0.0.1]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 0:01:23:45.67
+SNMPv2-MIB::snmpTrapOID.0 V1600GSwitch::dataAlarmTrap
+V1600GSwitch::dataUpLinkPort.0 ""
+V1600GSwitch::dataPon.0 1
+V1600GSwitch::dataOnu.0 3
+V1600GSwitch::dataOnuPort.0 ""
+V1600GSwitch::dataTrapOID.0 ""
+V1600GSwitch::dataTrapClass.0 ""
+V1600GSwitch::dataMac.0 ""
+V1600GSwitch::dataTime.0 ""
+V1600GSwitch::dateAlarmLevel.0 warning
+V1600GSwitch::dataValue.0 0
+V1600GSwitch::dataAlarmType.0 48
+V1600GSwitch::dataSynOID.0 ""
+TRAP,
+            'onu-pon-rxpower-low (PON 1 ONU 3) value=0',
+            'Could not handle VsolDataAlarmTrap onu-pon-rxpower-low',
+            [Severity::Warning],
+        );
+    }
 }

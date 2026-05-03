@@ -46,7 +46,7 @@ class VsolDataAlarmTrap implements SnmptrapHandler
         if ($location) {
             $message .= " ($location)";
         }
-        if (! empty($value) && $value !== 'dataValue') {
+        if ($value !== null && $value !== '' && $value !== 'dataValue') {
             $message .= " value=$value";
         }
 
