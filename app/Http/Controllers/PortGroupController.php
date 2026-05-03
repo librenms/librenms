@@ -120,10 +120,12 @@ class PortGroupController extends Controller
     /**
      * Show graph of all ports in a group
      */
-    public function graph(Request $request, int $group) : View
+    public function graph(Request $request, PortGroup $group) : View
     {
+        $this->authorize('view', $group);
+
         return view('port-group.graph', [
-            'group' => PortGroup::hasAccess($request->user())->find($group),
+            'group' => $group,
             'ports' => Port::hasAccess($request->user())->inPortGroup($group)->with('device')->withCount('macAccounting')->get(),
         ]);
     }
