@@ -10,7 +10,7 @@
     @keydown.escape.window="close()">
 
     {{-- Main Bar --}}
-    <div class="tw:flex tw:items-stretch tw:h-[2.4em] tw:rounded-lg tw:border tw:border-neutral-300 tw:dark:border-dark-gray-300 tw:bg-white tw:dark:bg-dark-gray-500 tw:font-mono tw:shadow-xs tw:max-w-full">
+    <div class="tw:flex tw:items-stretch tw:h-[34px] tw:rounded-lg tw:border tw:border-neutral-300 tw:dark:border-dark-gray-300 tw:bg-white tw:dark:bg-dark-gray-500 tw:font-mono tw:shadow-xs tw:max-w-full">
 
         {{-- LEFT SECTION: Options Dropdown --}}
         <div class="tw:relative tw:flex tw:items-stretch">
@@ -64,7 +64,7 @@
                         </span>
                     </button>
                     <button type="button" title="{{ __('Remove filter') }}" @click.stop="remove(f.key)"
-                            class="tw:h-full tw:w-0 tw:group-hover:w-[2.4em] tw:flex tw:items-center tw:justify-center tw:bg-neutral-100 tw:dark:bg-dark-gray-400 tw:text-neutral-500! tw:dark:text-dark-white-400! tw:transition-all tw:duration-200 tw:ease-in-out tw:overflow-hidden tw:text-[1.2em] tw:hover:text-red-600! tw:dark:hover:text-red-400!">
+                            class="tw:h-full tw:w-0 tw:group-hover:w-[34px] tw:flex tw:items-center tw:justify-center tw:bg-neutral-100 tw:dark:bg-dark-gray-400 tw:text-neutral-500! tw:dark:text-dark-white-400! tw:transition-all tw:duration-200 tw:ease-in-out tw:overflow-hidden tw:text-[1.2em] tw:hover:text-red-600! tw:dark:hover:text-red-400!">
                         &times;
                     </button>
                 </div>
@@ -76,7 +76,7 @@
             <button type="button" title="{{ __('Add new filter') }}" @click.stop="toggleAdd()"
                     @keydown.arrow-down.prevent="navDropdown('next')"
                     @keydown.arrow-up.prevent="navDropdown('prev')"
-                    class="tw:w-[2.4em] tw:h-full tw:flex tw:items-center tw:justify-center tw:text-[1.4em] tw:text-neutral-400! tw:dark:text-dark-white-400! tw:hover:text-neutral-900! tw:dark:hover:text-dark-white-100! tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400 tw:transition-colors tw:rounded-r-lg">
+                    class="tw:w-[34px] tw:h-full tw:flex tw:items-center tw:justify-center tw:text-[1.4em] tw:text-neutral-400! tw:dark:text-dark-white-400! tw:hover:text-neutral-900! tw:dark:hover:text-dark-white-100! tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400 tw:transition-colors tw:rounded-r-lg">
                 +
             </button>
 
