@@ -138,7 +138,7 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
      *
      * Called from includes/discovery/sensors/{class}/vsolution.inc.php
      *
-     * @param array<string> $types
+     * @param  array<string>  $types
      */
     public function discoverOnuOpticalSensors(array $types = ['dbm', 'current', 'temperature', 'voltage']): void
     {
