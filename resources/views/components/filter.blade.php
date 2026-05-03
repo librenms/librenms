@@ -10,15 +10,15 @@
     @keydown.escape.window="close()">
 
     {{-- Main Bar --}}
-<div class="tw:group/bar tw:flex tw:flex-nowrap">
-    <div class="tw:flex tw:items-stretch tw:h-[34px] tw:rounded-lg tw:border tw:border-neutral-300 tw:dark:border-dark-gray-300 tw:bg-white tw:dark:bg-dark-gray-500 tw:font-mono tw:shadow-xs tw:max-w-full">
+<div class="tw:group/bar tw:flex tw:flex-col tw:sm:flex-row tw:flex-nowrap">
+    <div class="tw:flex tw:items-stretch tw:flex-col tw:sm:flex-row tw:h-auto tw:sm:h-[34px] tw:rounded-lg tw:border tw:border-neutral-300 tw:dark:border-dark-gray-300 tw:bg-white tw:dark:bg-dark-gray-500 tw:font-mono tw:shadow-xs tw:max-w-full">
 
         {{-- LEFT SECTION: Options Dropdown --}}
         <div class="tw:relative tw:flex tw:items-stretch">
             <button type="button"
                     :title="filters.length ? '{{ __('Filter options') }}' : '{{ __('Open filter menu') }}'"
                     @click.stop="toggleOptions()"
-                    class="tw:shrink-0 tw:flex tw:items-center tw:gap-2 tw:px-4 tw:h-full tw:transition-colors tw:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:rounded-l-lg tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400">
+                    class="tw:shrink-0 tw:flex tw:items-center tw:gap-2 tw:px-4 tw:h-full tw:max-sm:w-full tw:max-sm:left-0 tw:transition-colors tw:border-b tw:sm:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:rounded-l-lg tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400">
                 <div class="tw:relative tw:flex tw:items-center">
                     <i class="fas fa-filter tw:text-[1.12em]"></i>
                     <span x-show="filters.length"
@@ -49,9 +49,9 @@
         </div>
 
         {{-- MIDDLE SECTION: Chips --}}
-        <div class="tw:flex tw:items-stretch tw:overflow-x-auto tw:scrollbar-none tw:flex-nowrap">
+        <div class="tw:flex tw:flex-col tw:sm:flex-row tw:items-stretch tw:overflow-x-auto tw:scrollbar-none tw:flex-nowrap">
             <template x-for="f in filters" :key="f.key">
-                <div class="filter-chip tw:shrink-0 tw:relative tw:group tw:flex tw:items-stretch tw:h-full tw:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300"
+                <div class="filter-chip tw:shrink-0 tw:relative tw:group tw:flex tw:items-stretch tw:h-full tw:border-b tw:sm:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300"
                     role="listitem">
                     <button type="button" title="{{ __('Edit filter') }}"
                             @click="open(fields.find(field => field.key === f.key))"
@@ -72,11 +72,11 @@
         </div>
 
         {{-- RIGHT SECTION: Plus Button & Dropdown --}}
-        <div class="tw:shrink-0 tw:relative tw:flex tw:items-stretch">
+        <div class="tw:shrink-0 tw:max-sm:left-0 tw:flex tw:items-stretch">
             <button type="button" title="{{ __('Add new filter') }}" @click.stop="toggleAdd()"
                     @keydown.arrow-down.prevent="navDropdown('next')"
                     @keydown.arrow-up.prevent="navDropdown('prev')"
-                    class="tw:w-[34px] tw:h-full tw:flex tw:items-center tw:justify-center tw:text-[1.4em] tw:text-neutral-400! tw:dark:text-dark-white-400! tw:hover:text-neutral-900! tw:dark:hover:text-dark-white-100! tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400 tw:transition-colors tw:rounded-r-lg">
+                    class="tw:w-[34px] tw:h-full tw:relative tw:max-sm:w-full tw:flex tw:items-center tw:justify-center tw:text-[1.4em] tw:text-neutral-400! tw:dark:text-dark-white-400! tw:hover:text-neutral-900! tw:dark:hover:text-dark-white-100! tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400 tw:transition-colors tw:rounded-r-lg">
                 +
             </button>
 
@@ -100,8 +100,10 @@
             </div>
         </div>
     </div>
+
+    {{-- Spacer to reserve space for remove button --}}
     <div x-show="filters.length > 0"
-        class="tw:w-[34px] tw:transition-all tw:duration-200 tw:ease-in-out tw:overflow-hidden tw:group-has-[.filter-chip:hover]/bar:w-0">
+        class="tw:w-[34px] tw:hidden tw:sm:block tw:transition-all tw:duration-200 tw:ease-in-out tw:overflow-hidden tw:group-has-[.filter-chip:hover]/bar:w-0">
     </div>
 </div>
     {{-- Dialog Modal (Teleported) --}}
