@@ -1,8 +1,10 @@
 @section('title', $pagetitle)
 
 <div class="container-fluid">
-    <x-panel body-class="{{ $alertClass }}">
+    <x-panel>
+        <x-slot:slot class="tw:p-0!">
         <img src="{{ url($device->logo()) }}" title="{{ $device->logo() }}"
+             alt="logo"
              class="device-icon-header pull-left tw:dark:bg-gray-50 tw:dark:rounded-lg tw:dark:p-2"
              style="max-height: 100px">
         <div class="pull-left" style="margin-top: 5px;">
@@ -32,6 +34,7 @@
             @endforeach
             <br style="clear: both;"/>
         </div>
+        </x-slot:slot>
     </x-panel>
 
     <x-device.page-tabs :device="$device" :dropdown-links="$dropdownLinks"/>

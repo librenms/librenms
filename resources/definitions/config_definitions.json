@@ -2914,6 +2914,14 @@
             },
             "type": "graph"
         },
+        "graph_types.device.cambium_epmp_gps": {
+            "default": {
+                "section": "wireless",
+                "order": 5,
+                "descr": "GPS Satellites"
+            },
+            "type": "graph"
+        },
         "graph_types.device.cambium_epmp_freq": {
             "default": {
                 "section": "wireless",
@@ -2925,8 +2933,8 @@
         "graph_types.device.cambium_epmp_gpsSync": {
             "default": {
                 "section": "wireless",
-                "order": 5,
-                "descr": "GPS Sync Status"
+                "order": 8,
+                "descr": "GPS Sync State"
             },
             "type": "graph"
         },
@@ -2935,6 +2943,14 @@
                 "section": "wireless",
                 "order": 2,
                 "descr": "ePMP Modulation"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.cambium_epmp_traffic": {
+            "default": {
+                "section": "wireless",
+                "order": 1,
+                "descr": "Traffic"
             },
             "type": "graph"
         },
@@ -5757,7 +5773,6 @@
                         {"match": "ciscosb", "value": "ciscosmb"},
                         {"match": "f5", "value": "tmos"},
                         {"match": "fireware", "value": "firewareos"},
-                        {"match": "fortigate", "value": "fortios"},
                         {"match": "fortiswitch", "value": "fortios"},
                         {"match": "siklu-mhtg", "value": "siklumhtg"},
                         {"match": "vyos", "value": "vyatta"},
