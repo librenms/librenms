@@ -1,5 +1,5 @@
 <div
-    {{ $attributes->merge(['class' => 'tw:relative tw:flex tw:items-center tw:text-[13px] tw:max-w-full' . ($hide ? ' tw:hidden' : '')]) }}
+    {{ $attributes->merge(['class' => 'tw:relative tw:inline-flex tw:items-center tw:text-[13px] tw:max-w-full' . ($hide ? ' tw:hidden' : '')]) }}
     x-data="filterBarComponent({
         name: @js($name),
         fields: @js($fields),
@@ -10,6 +10,7 @@
     @keydown.escape.window="close()">
 
     {{-- Main Bar --}}
+<div class="tw:group/bar tw:flex tw:flex-nowrap">
     <div class="tw:flex tw:items-stretch tw:h-[34px] tw:rounded-lg tw:border tw:border-neutral-300 tw:dark:border-dark-gray-300 tw:bg-white tw:dark:bg-dark-gray-500 tw:font-mono tw:shadow-xs tw:max-w-full">
 
         {{-- LEFT SECTION: Options Dropdown --}}
@@ -50,8 +51,7 @@
         {{-- MIDDLE SECTION: Chips --}}
         <div class="tw:flex tw:items-stretch tw:overflow-x-auto tw:scrollbar-none tw:flex-nowrap">
             <template x-for="f in filters" :key="f.key">
-                <div
-                    class="tw:shrink-0 tw:relative tw:group tw:flex tw:items-stretch tw:h-full tw:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300"
+                <div class="filter-chip tw:shrink-0 tw:relative tw:group tw:flex tw:items-stretch tw:h-full tw:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300"
                     role="listitem">
                     <button type="button" title="{{ __('Edit filter') }}"
                             @click="open(fields.find(field => field.key === f.key))"
@@ -100,7 +100,10 @@
             </div>
         </div>
     </div>
-
+    <div x-show="filters.length > 0"
+        class="tw:w-[34px] tw:transition-all tw:duration-200 tw:ease-in-out tw:overflow-hidden tw:group-has-[.filter-chip:hover]/bar:w-0">
+    </div>
+</div>
     {{-- Dialog Modal (Teleported) --}}
     <template x-teleport="body">
         <div x-show="dialog" x-cloak

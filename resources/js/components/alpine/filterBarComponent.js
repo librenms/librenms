@@ -54,6 +54,7 @@ export default function filterBarComponent({
         dialog: false,
         current: null,
         snapshot: null,
+        hoverdKey: null,
 
         // Mapping HTML refs to these legacy property names to ensure HTML compatibility
         op: "",
