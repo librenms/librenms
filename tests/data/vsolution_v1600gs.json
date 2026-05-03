@@ -2483,77 +2483,77 @@
                 {
                     "state_name": "gOnuStaInfoPhaseSta",
                     "state_descr": "Logging",
-                    "state_draw_graph": 1,
+                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "gOnuStaInfoPhaseSta",
                     "state_descr": "LOS",
-                    "state_draw_graph": 1,
+                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "gOnuStaInfoPhaseSta",
                     "state_descr": "Sync MIB",
-                    "state_draw_graph": 1,
+                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "gOnuStaInfoPhaseSta",
                     "state_descr": "Working",
-                    "state_draw_graph": 1,
+                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "gOnuStaInfoPhaseSta",
                     "state_descr": "Dying Gasp",
-                    "state_draw_graph": 1,
+                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "gOnuStaInfoPhaseSta",
                     "state_descr": "Auth Fail",
-                    "state_draw_graph": 1,
+                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "gOnuStaInfoPhaseSta",
                     "state_descr": "Offline",
-                    "state_draw_graph": 1,
+                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "gOnuStaInfoPhaseSta",
                     "state_descr": "Deactivated",
-                    "state_draw_graph": 1,
+                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "gOnuStaInfoPhaseSta",
                     "state_descr": "Config Fail",
-                    "state_draw_graph": 1,
+                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "vsolutionPsuStatus",
                     "state_descr": "Off",
-                    "state_draw_graph": 1,
+                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "vsolutionPsuStatus",
                     "state_descr": "On",
-                    "state_draw_graph": 1,
+                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 }

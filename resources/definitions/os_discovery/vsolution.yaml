@@ -55,28 +55,28 @@ modules:
                     group: "ONU"
                     state_name: gOnuStaInfoPhaseSta
                     states:
-                        - { value: 0, generic: 1, graph: 1, descr: 'Logging' }
-                        - { value: 1, generic: 2, graph: 1, descr: 'LOS' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'Sync MIB' }
-                        - { value: 3, generic: 0, graph: 1, descr: 'Working' }
-                        - { value: 4, generic: 2, graph: 1, descr: 'Dying Gasp' }
-                        - { value: 5, generic: 2, graph: 1, descr: 'Auth Fail' }
-                        - { value: 6, generic: 2, graph: 1, descr: 'Offline' }
-                        - { value: 7, generic: 1, graph: 1, descr: 'Deactivated' }
-                        - { value: 8, generic: 2, graph: 1, descr: 'Config Fail' }
+                        - { value: 0, generic: 1, descr: 'Logging' }
+                        - { value: 1, generic: 2, descr: 'LOS' }
+                        - { value: 2, generic: 1, descr: 'Sync MIB' }
+                        - { value: 3, generic: 0, descr: 'Working' }
+                        - { value: 4, generic: 2, descr: 'Dying Gasp' }
+                        - { value: 5, generic: 2, descr: 'Auth Fail' }
+                        - { value: 6, generic: 2, descr: 'Offline' }
+                        - { value: 7, generic: 1, descr: 'Deactivated' }
+                        - { value: 8, generic: 2, descr: 'Config Fail' }
                 -
                     oid: V1600GSwitch::sysPower1Status
                     num_oid: '.1.3.6.1.4.1.37950.1.1.5.10.12.5.16.{{ $index }}'
                     descr: "PSU 1"
                     state_name: vsolutionPsuStatus
                     states:
-                        - { value: 0, generic: 2, graph: 1, descr: 'Off' }
-                        - { value: 1, generic: 0, graph: 1, descr: 'On' }
+                        - { value: 0, generic: 2, descr: 'Off' }
+                        - { value: 1, generic: 0, descr: 'On' }
                 -
                     oid: V1600GSwitch::sysPower2Status
                     num_oid: '.1.3.6.1.4.1.37950.1.1.5.10.12.5.17.{{ $index }}'
                     descr: "PSU 2"
                     state_name: vsolutionPsuStatus
                     states:
-                        - { value: 0, generic: 2, graph: 1, descr: 'Off' }
-                        - { value: 1, generic: 0, graph: 1, descr: 'On' }
+                        - { value: 0, generic: 2, descr: 'Off' }
+                        - { value: 1, generic: 0, descr: 'On' }
