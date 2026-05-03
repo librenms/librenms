@@ -30,7 +30,7 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
     {
         $this->buildPortMaps();
 
-        $transceivers = new Collection;
+        $transceivers = new Collection();
 
         // OLT PON SFP transceivers
         $ponData = SnmpQuery::cache()->hideMib()
