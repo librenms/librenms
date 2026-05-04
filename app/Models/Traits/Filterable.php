@@ -121,6 +121,7 @@ trait Filterable
 
         return $query;
     }
+
     protected function applyQueryLogic($query, $field, $op, $value, $config, $method): void
     {
         if (in_array($op, ['is_empty', 'is_not_empty'])) {
