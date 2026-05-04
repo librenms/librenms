@@ -15,7 +15,12 @@ class EnforceJsonApi
         // Reject request bodies with wrong Content-Type (JSON:API §5.3)
         if ($request->getContent() && ! $this->isJsonApi($request->header('Content-Type', ''))) {
             return response()->json([
-                'errors' => [['status' => '415', 'title' => 'Unsupported Media Type']],
+                'errors' => [[
+                    'status' => '415',
+                    'code' => 'unsupported_media_type',
+                    'title' => 'Unsupported Media Type',
+                    'detail' => 'Request body must be application/vnd.api+json or application/json.',
+                ]],
             ], 415)->withHeaders(['Content-Type' => self::CONTENT_TYPE]);
         }
 

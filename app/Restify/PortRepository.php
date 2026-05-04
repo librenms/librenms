@@ -11,6 +11,8 @@ use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\Request;
 
 class PortRepository extends Repository
 {
@@ -99,7 +101,13 @@ class PortRepository extends Repository
         return [
             field('interfaceIndex', fn ($value, $model) => $model->ifIndex)->readonly(),
             field('name', fn ($value, $model) => $model->ifName)->readonly(),
-            field('alias', fn ($value, $model) => $model->ifAlias)->readonly(),
+            field('alias', fn ($value, $model) => $model->ifAlias)
+                ->fillCallback(function ($request, $model, $attribute) {
+                    if ($request->exists($attribute)) {
+                        $model->ifAlias = $request->input($attribute);
+                    }
+                })
+                ->rules('nullable', 'string'),
             field('description', fn ($value, $model) => $model->ifDescr)->readonly(),
             field('category', fn ($value, $model) => $model->ifType)->readonly(),
             field('speed', fn ($value, $model) => $model->ifSpeed)->readonly(),
@@ -112,6 +120,46 @@ class PortRepository extends Repository
             field('outOctets', fn ($value, $model) => $model->ifOutOctets)->readonly(),
             field('inErrors', fn ($value, $model) => $model->ifInErrors)->readonly(),
             field('outErrors', fn ($value, $model) => $model->ifOutErrors)->readonly(),
+            field('isIgnored', fn ($value, $model) => (bool) $model->ignore)
+                ->fillCallback(function ($request, $model, $attribute) {
+                    if ($request->exists($attribute)) {
+                        $model->ignore = $request->boolean($attribute);
+                    }
+                })
+                ->rules('boolean'),
+            field('isPollingEnabled', fn ($value, $model) => ! $model->disabled)
+                ->fillCallback(function ($request, $model, $attribute) {
+                    if ($request->exists($attribute)) {
+                        $model->disabled = ! $request->boolean($attribute);
+                    }
+                })
+                ->rules('boolean'),
         ];
+    }
+
+    /**
+     * Ports are auto-discovered, not created via the API.
+     */
+    public static function authorizedToStore(Request $request): bool
+    {
+        return false;
+    }
+
+    public static function authorizeToStore(Request $request): void
+    {
+        throw new AuthorizationException();
+    }
+
+    /**
+     * Port deletion is handled by the discovery cleanup logic, not the API.
+     */
+    public function authorizedToDelete(Request $request): bool
+    {
+        return false;
+    }
+
+    public function authorizeToDelete(Request $request): void
+    {
+        throw new AuthorizationException();
     }
 }

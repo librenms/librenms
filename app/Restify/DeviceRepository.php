@@ -41,7 +41,8 @@ class DeviceRepository extends Repository
             'syslogs' => HasMany::make('syslogs', SyslogRepository::class),
             'alert-logs' => HasMany::make('alertLogs', AlertLogRepository::class)->label('alert-logs'),
             'location' => BelongsTo::make('location', LocationRepository::class),
-            'groups' => BelongsToMany::make('groups', DeviceGroupRepository::class),
+            'device-groups' => BelongsToMany::make('groups', DeviceGroupRepository::class)->label('device-groups'),
+            'parents' => BelongsToMany::make('parents', DeviceRepository::class),
             'alerts' => HasMany::make('alerts', AlertRepository::class),
             'outages' => HasMany::make('outages', DeviceOutageRepository::class),
             'links' => HasMany::make('links', LinkRepository::class),
@@ -148,7 +149,7 @@ class DeviceRepository extends Repository
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('hostname')->readonly(),
+            field('hostname')->rules('required', 'string', 'max:255'),
             field('systemName', fn ($value, $model) => $model->sysName)->readonly(),
             field('systemDescription', fn ($value, $model) => $model->sysDescr)->readonly(),
             field('systemObjectId', fn ($value, $model) => $model->sysObjectID)->readonly(),
@@ -159,19 +160,71 @@ class DeviceRepository extends Repository
             field('serial')->readonly(),
             field('version')->readonly(),
             field('features')->readonly(),
-            field('ip')->readonly(),
+            field('ip')->rules('nullable', 'ip'),
             field('uptime')->readonly(),
-            field('notes')->readonly(),
-            field('display')->readonly(),
-            field('overwriteIp', fn ($value, $model) => $model->overwrite_ip)->readonly(),
-            field('purpose')->readonly(),
-            field('category', fn ($value, $model) => $model->type)->readonly(),
-            field('isPollingEnabled', fn ($value, $model) => ! $model->disabled)->readonly(),
-            field('isAlertingEnabled', fn ($value, $model) => ! $model->disable_notify)->readonly(),
-            field('isIgnored', fn ($value, $model) => $model->ignore)->readonly(),
-            field('isStatusIgnored', fn ($value, $model) => $model->ignore_status)->readonly(),
-            field('isSystemLocationOverridden', fn ($value, $model) => $model->override_sysLocation)->readonly(),
+            field('notes')->rules('nullable', 'string'),
+            field('display')->rules('nullable', 'string', 'max:255'),
+            field('overwriteIp', fn ($value, $model) => $model->overwrite_ip)
+                ->fillCallback(function ($request, $model, $attribute) {
+                    if ($request->exists($attribute)) {
+                        $model->overwrite_ip = $request->input($attribute);
+                    }
+                })
+                ->rules('nullable', 'ip'),
+            field('purpose')->rules('nullable', 'string'),
+            field('category', fn ($value, $model) => $model->type)
+                ->fillCallback(function ($request, $model, $attribute) {
+                    if ($request->exists($attribute)) {
+                        $model->type = $request->input($attribute);
+                    }
+                })
+                ->rules('nullable', 'string', 'max:255'),
+            field('isPollingEnabled', fn ($value, $model) => ! $model->disabled)
+                ->fillCallback(function ($request, $model, $attribute) {
+                    if ($request->exists($attribute)) {
+                        $model->disabled = ! $request->boolean($attribute);
+                    }
+                })
+                ->rules('boolean'),
+            field('isAlertingEnabled', fn ($value, $model) => ! $model->disable_notify)
+                ->fillCallback(function ($request, $model, $attribute) {
+                    if ($request->exists($attribute)) {
+                        $model->disable_notify = ! $request->boolean($attribute);
+                    }
+                })
+                ->rules('boolean'),
+            field('isIgnored', fn ($value, $model) => (bool) $model->ignore)
+                ->fillCallback(function ($request, $model, $attribute) {
+                    if ($request->exists($attribute)) {
+                        $model->ignore = $request->boolean($attribute);
+                    }
+                })
+                ->rules('boolean'),
+            field('isStatusIgnored', fn ($value, $model) => (bool) $model->ignore_status)
+                ->fillCallback(function ($request, $model, $attribute) {
+                    if ($request->exists($attribute)) {
+                        $model->ignore_status = $request->boolean($attribute);
+                    }
+                })
+                ->rules('boolean'),
+            field('isSystemLocationOverridden', fn ($value, $model) => (bool) $model->override_sysLocation)
+                ->fillCallback(function ($request, $model, $attribute) {
+                    if ($request->exists($attribute)) {
+                        $model->override_sysLocation = $request->boolean($attribute);
+                    }
+                })
+                ->rules('boolean'),
             field('systemLocation', fn ($value, $model) => $model->location?->location)->readonly(),
+        ];
+    }
+
+    public function actions(RestifyRequest $request): array
+    {
+        $canSee = fn (\Illuminate\Http\Request $req) => $req->user()?->can('update', \App\Models\Device::class) ?? false;
+
+        return [
+            \App\Restify\Actions\DiscoverDeviceAction::make()->canSee($canSee),
+            \App\Restify\Actions\MaintenanceDeviceAction::make()->canSee($canSee),
         ];
     }
 }

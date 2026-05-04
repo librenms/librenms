@@ -16,6 +16,7 @@ return [
     "middleware" => [
         \App\Http\Middleware\EnforceJsonApi::class,
         "auth:sanctum",
+        \App\Http\Middleware\RestifyAttachRelationResolver::class,
         DispatchRestifyStartingEvent::class,
         AuthorizeRestify::class,
     ],

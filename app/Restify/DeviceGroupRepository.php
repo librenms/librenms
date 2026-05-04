@@ -8,6 +8,8 @@ use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class DeviceGroupRepository extends Repository
 {
@@ -23,8 +25,18 @@ class DeviceGroupRepository extends Repository
     public static function related(): array
     {
         return [
-            'devices' => BelongsToMany::make('devices', DeviceRepository::class),
+            'devices' => BelongsToMany::make('devices', DeviceRepository::class)
+                ->canAttach(fn ($request, $pivot) => true)
+                ->canDetach(fn ($request, $pivot) => self::groupForPivot($pivot)?->type === 'static'),
+            'users' => BelongsToMany::make('users', UserRepository::class),
         ];
+    }
+
+    private static function groupForPivot($pivot): ?DeviceGroup
+    {
+        $id = $pivot->device_group_id ?? null;
+
+        return $id ? DeviceGroup::find($id) : null;
     }
 
     public static function searchables(): array
@@ -72,7 +84,80 @@ class DeviceGroupRepository extends Repository
                     }
                 })
                 ->rules('required', 'string', 'in:dynamic,static'),
-            field('rules')->readonly(),
+            field('rules')->rules('nullable', 'array'),
         ];
+    }
+
+    public function actions(RestifyRequest $request): array
+    {
+        $canSee = fn (\Illuminate\Http\Request $req) => $req->user()?->can('update', \App\Models\DeviceGroup::class) ?? false;
+
+        return [
+            \App\Restify\Actions\MaintenanceDeviceGroupAction::make()->canSee($canSee),
+        ];
+    }
+
+    public function store(RestifyRequest $request)
+    {
+        $deviceIds = $this->validatedDeviceIds($request);
+
+        $response = parent::store($request);
+
+        $this->syncDevicesIfRequested($deviceIds);
+
+        return $response;
+    }
+
+    public function update(RestifyRequest $request, $repositoryId)
+    {
+        $deviceIds = $this->validatedDeviceIds($request);
+
+        $response = parent::update($request, $repositoryId);
+
+        $this->syncDevicesIfRequested($deviceIds);
+
+        return $response;
+    }
+
+    /**
+     * Returns null when 'devices' is not in the payload (leave membership untouched),
+     * otherwise an array of integer device_ids (possibly empty to clear).
+     *
+     * @return array<int>|null
+     */
+    private function validatedDeviceIds(RestifyRequest $request): ?array
+    {
+        if (! $request->has('devices')) {
+            return null;
+        }
+
+        $payload = ['devices' => $request->input('devices', [])];
+        Validator::make($payload, [
+            'devices' => ['array'],
+            'devices.*' => ['integer', 'exists:devices,device_id'],
+        ])->validate();
+
+        return array_values(array_map('intval', $payload['devices']));
+    }
+
+    /**
+     * @param  array<int>|null  $deviceIds
+     */
+    private function syncDevicesIfRequested(?array $deviceIds): void
+    {
+        if ($deviceIds === null) {
+            return;
+        }
+
+        /** @var DeviceGroup $group */
+        $group = $this->resource;
+
+        if ($group->type !== 'static' && $deviceIds !== []) {
+            throw ValidationException::withMessages([
+                'devices' => 'Devices cannot be manually assigned to a dynamic group.',
+            ]);
+        }
+
+        $group->devices()->sync($deviceIds);
     }
 }

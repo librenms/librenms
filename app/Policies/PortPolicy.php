@@ -4,7 +4,9 @@ namespace App\Policies;
 
 use App\Facades\Permissions;
 use App\Models\Port;
+use App\Models\PortGroup;
 use App\Models\User;
+use Illuminate\Support\Collection;
 
 class PortPolicy
 {
@@ -57,5 +59,20 @@ class PortPolicy
     public function delete(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'delete');
+    }
+
+    public function attachGroups(User $user, Port $port, PortGroup $group): bool
+    {
+        return $this->update($user);
+    }
+
+    public function syncGroups(User $user, Port $port, Collection $groups): bool
+    {
+        return $this->update($user);
+    }
+
+    public function detachGroups(User $user, Port $port, PortGroup $group): bool
+    {
+        return $this->update($user);
     }
 }

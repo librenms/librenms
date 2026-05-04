@@ -27,13 +27,24 @@
 namespace App\Exceptions;
 
 use App\Facades\LibrenmsConfig;
+use App\Http\Middleware\EnforceJsonApi;
+use Binaryk\LaravelRestify\Exceptions\RepositoryNotFoundException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use LibreNMS\Util\Git;
 use Spatie\LaravelIgnition\Facades\Flare;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class ErrorReporting
@@ -79,7 +90,7 @@ class ErrorReporting
         return true;
     }
 
-    public function render(Throwable $exception, Request $request): ?Response
+    public function render(Throwable $exception, Request $request): Response|JsonResponse|null
     {
         // try to upgrade generic exceptions to more specific ones
         if (! config('app.debug')) {
@@ -94,7 +105,134 @@ class ErrorReporting
             }
         }
 
+        if ($request->is('api/v1/*') || $request->is('api/v1')) {
+            return self::renderApiException($exception);
+        }
+
         return null; // use default rendering
+    }
+
+    /**
+     * Render any exception as a JSON:API errors-array document for v1 API requests.
+     * Public + static so it can be unit-tested without a full HTTP cycle.
+     */
+    public static function renderApiException(Throwable $e): JsonResponse
+    {
+        [$status, $code, $title] = self::classifyException($e);
+
+        if ($e instanceof ValidationException) {
+            $entries = [];
+            foreach ($e->errors() as $field => $messages) {
+                foreach ((array) $messages as $message) {
+                    $entries[] = [
+                        'status' => (string) $status,
+                        'code' => $code,
+                        'title' => $title,
+                        'detail' => $message,
+                        'source' => ['pointer' => '/' . ltrim((string) $field, '/')],
+                    ];
+                }
+            }
+            if ($entries === []) {
+                $entries[] = self::buildSingleErrorEntry($e, $status, $code, $title);
+            }
+        } else {
+            $entries = [self::buildSingleErrorEntry($e, $status, $code, $title)];
+        }
+
+        if ($status >= 500 && config('app.debug')) {
+            $entries[0]['meta'] = [
+                'exception' => $e::class,
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => self::formatTrace($e),
+            ];
+        }
+
+        return response()->json(
+            ['errors' => $entries],
+            $status,
+            ['Content-Type' => EnforceJsonApi::CONTENT_TYPE],
+        );
+    }
+
+    /**
+     * @return array{0:int,1:string,2:string} [status, code, title]
+     */
+    private static function classifyException(Throwable $e): array
+    {
+        if ($e instanceof ValidationException) {
+            return [$e->status, 'validation_failed', 'Validation Failed'];
+        }
+        if ($e instanceof AuthenticationException) {
+            return [401, 'unauthenticated', 'Unauthenticated'];
+        }
+        if ($e instanceof AuthorizationException) {
+            return [403, 'forbidden', 'Forbidden'];
+        }
+        if ($e instanceof ModelNotFoundException || $e instanceof RepositoryNotFoundException) {
+            return [404, 'not_found', 'Not Found'];
+        }
+        if ($e instanceof ThrottleRequestsException) {
+            return [429, 'too_many_requests', 'Too Many Requests'];
+        }
+        if ($e instanceof HttpExceptionInterface) {
+            return self::classifyByStatus($e->getStatusCode());
+        }
+
+        return [500, 'server_error', 'Server Error'];
+    }
+
+    /**
+     * @return array{0:int,1:string,2:string}
+     */
+    private static function classifyByStatus(int $status): array
+    {
+        return match ($status) {
+            401 => [401, 'unauthenticated', 'Unauthenticated'],
+            403 => [403, 'forbidden', 'Forbidden'],
+            404 => [404, 'not_found', 'Not Found'],
+            405 => [405, 'method_not_allowed', 'Method Not Allowed'],
+            429 => [429, 'too_many_requests', 'Too Many Requests'],
+            default => [
+                $status,
+                'http_' . $status,
+                Response::$statusTexts[$status] ?? 'Error',
+            ],
+        };
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function buildSingleErrorEntry(Throwable $e, int $status, string $code, string $title): array
+    {
+        $detail = $e->getMessage();
+        if ($detail === '' || ($status >= 500 && ! config('app.debug'))) {
+            $detail = $status >= 500 ? 'An unexpected error occurred.' : $title;
+        }
+
+        return [
+            'status' => (string) $status,
+            'code' => $code,
+            'title' => $title,
+            'detail' => $detail,
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    private static function formatTrace(Throwable $e): array
+    {
+        $frames = [];
+        foreach (array_slice($e->getTrace(), 0, 10) as $frame) {
+            $location = ($frame['file'] ?? '?') . ':' . ($frame['line'] ?? '?');
+            $call = ($frame['class'] ?? '') . ($frame['type'] ?? '') . ($frame['function'] ?? '');
+            $frames[] = trim($location . ' ' . $call);
+        }
+
+        return $frames;
     }
 
     /**

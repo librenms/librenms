@@ -43,9 +43,11 @@ class OpenApiSpecTest extends TestCase
         $this->assertSame('object', $deviceAttributes['type'] ?? null);
         $this->assertArrayHasKey('hostname', $deviceAttributes['properties']);
         $this->assertSame('string', $deviceAttributes['properties']['hostname']['type']);
-        $this->assertTrue($deviceAttributes['properties']['hostname']['readOnly']);
+        $this->assertArrayNotHasKey('readOnly', $deviceAttributes['properties']['hostname']);
         $this->assertSame('boolean', $deviceAttributes['properties']['isUp']['type']);
+        $this->assertTrue($deviceAttributes['properties']['isUp']['readOnly']);
         $this->assertSame('integer', $deviceAttributes['properties']['uptime']['type']);
+        $this->assertTrue($deviceAttributes['properties']['os']['readOnly']);
     }
 
     public function testEnumValuesPropagateFromValidationRules(): void
@@ -86,7 +88,7 @@ class OpenApiSpecTest extends TestCase
         $this->assertSame('object', $writeAttrs['type']);
         $this->assertArrayHasKey('name', $writeAttrs['properties']);
         $this->assertArrayHasKey('isDefault', $writeAttrs['properties']);
-        $this->assertArrayNotHasKey('configuration', $writeAttrs['properties']);
+        $this->assertArrayHasKey('configuration', $writeAttrs['properties']);
 
         $body = $response->json();
         $postBody = $body['paths']['/api/v1/alert-transports']['post']['requestBody']['content']['application/vnd.api+json']['schema'];
@@ -99,7 +101,7 @@ class OpenApiSpecTest extends TestCase
 
         $paths = array_keys($response->json('paths'));
 
-        foreach (['/api/v1/devices/{id}/ports', '/api/v1/devices/{id}/location', '/api/v1/devices/{id}/groups'] as $expected) {
+        foreach (['/api/v1/devices/{id}/ports', '/api/v1/devices/{id}/location', '/api/v1/devices/{id}/device-groups'] as $expected) {
             $this->assertContains($expected, $paths);
         }
     }
@@ -160,6 +162,134 @@ class OpenApiSpecTest extends TestCase
         $this->assertSame('boolean', $byName['isUp']['schema']['type']);
         $this->assertSame('integer', $byName['uptime']['schema']['type']);
         $this->assertStringContainsString('hostname', $byName['search']['description']);
+    }
+
+    public function testAttachableRelationshipsExposeAttachSyncDetachPaths(): void
+    {
+        $response = $this->getJson('/api/v1/openapi.json?fresh=1');
+
+        $paths = array_keys($response->json('paths'));
+
+        foreach (['attach', 'sync', 'detach'] as $action) {
+            $this->assertContains("/api/v1/device-groups/{id}/{$action}/devices", $paths);
+        }
+    }
+
+    public function testHasManyRelationshipsDoNotExposeAttachPaths(): void
+    {
+        $response = $this->getJson('/api/v1/openapi.json?fresh=1');
+
+        $paths = array_keys($response->json('paths'));
+
+        $this->assertContains('/api/v1/devices/{id}/ports', $paths);
+        $this->assertNotContains('/api/v1/devices/{id}/attach/ports', $paths);
+        $this->assertNotContains('/api/v1/devices/{id}/sync/ports', $paths);
+        $this->assertNotContains('/api/v1/devices/{id}/detach/ports', $paths);
+    }
+
+    public function testAttachOperationDescribesBodyShape(): void
+    {
+        $response = $this->getJson('/api/v1/openapi.json?fresh=1');
+
+        $attach = $response->json('paths./api/v1/device-groups/{id}/attach/devices.post');
+        $this->assertSame('Attach devices to a device-group', $attach['summary']);
+
+        $body = $attach['requestBody']['content']['application/vnd.api+json']['schema'];
+        $this->assertArrayHasKey('devices', $body['properties']);
+        $this->assertSame('array', $body['properties']['devices']['type']);
+        $this->assertSame('integer', $body['properties']['devices']['items']['type']);
+        $this->assertSame(['devices'], $body['required']);
+
+        $this->assertArrayHasKey('201', $attach['responses']);
+
+        $detach = $response->json('paths./api/v1/device-groups/{id}/detach/devices.post');
+        $this->assertArrayHasKey('204', $detach['responses']);
+    }
+
+    public function testAttachUrlUsesFieldAttributeNotArrayKey(): void
+    {
+        $response = $this->getJson('/api/v1/openapi.json?fresh=1');
+
+        $paths = array_keys($response->json('paths'));
+
+        // UserRepository has 'devices-owned' => BelongsToMany::make('devicesOwned', ...)
+        // Restify routes match the URL segment to the field attribute, not the array key.
+        $this->assertContains('/api/v1/users/{id}/attach/devicesOwned', $paths);
+        $this->assertNotContains('/api/v1/users/{id}/attach/devices-owned', $paths);
+    }
+
+    public function testNewlyAddedAttachableRelationsAreInSpec(): void
+    {
+        $response = $this->getJson('/api/v1/openapi.json?fresh=1');
+
+        $paths = array_keys($response->json('paths'));
+
+        foreach ([
+            '/api/v1/alert-rules/{id}/attach/templates',
+            '/api/v1/devices/{id}/attach/parents',
+            '/api/v1/device-groups/{id}/attach/users',
+            '/api/v1/users/{id}/attach/bills',
+            '/api/v1/users/{id}/attach/deviceGroups',
+            '/api/v1/alert-transport-groups/{id}/attach/transports',
+            '/api/v1/alert-transport-groups',
+        ] as $expected) {
+            $this->assertContains($expected, $paths, "Expected path {$expected}");
+        }
+    }
+
+    public function testActionPathsAreInSpec(): void
+    {
+        $response = $this->getJson('/api/v1/openapi.json?fresh=1');
+
+        $paths = array_keys($response->json('paths'));
+
+        foreach ([
+            '/api/v1/devices/{id}/actions',
+            '/api/v1/device-groups/{id}/actions',
+            '/api/v1/locations/{id}/actions',
+            '/api/v1/alerts/{id}/actions',
+        ] as $expected) {
+            $this->assertContains($expected, $paths, "Expected actions path {$expected}");
+        }
+    }
+
+    public function testActionPostOperationDocumentsActionEnumAndPayload(): void
+    {
+        $response = $this->getJson('/api/v1/openapi.json?fresh=1');
+
+        $perform = $response->json('paths./api/v1/devices/{id}/actions.post');
+        $this->assertNotNull($perform);
+
+        $byName = [];
+        foreach ($perform['parameters'] as $p) {
+            $byName[$p['name']] = $p;
+        }
+        $this->assertArrayHasKey('action', $byName);
+        $this->assertTrue($byName['action']['required']);
+        $this->assertContains('discover', $byName['action']['schema']['enum']);
+        $this->assertContains('maintenance', $byName['action']['schema']['enum']);
+
+        $body = $perform['requestBody']['content']['application/vnd.api+json']['schema'];
+        $this->assertArrayHasKey('oneOf', $body);
+    }
+
+    public function testActionListEndpointDescribesAvailableActions(): void
+    {
+        $response = $this->getJson('/api/v1/openapi.json?fresh=1');
+
+        $list = $response->json('paths./api/v1/devices/{id}/actions.get');
+        $this->assertNotNull($list);
+        $this->assertSame('List available actions on Devices', $list['summary']);
+    }
+
+    public function testRepositoriesWithoutActionsHaveNoActionsPath(): void
+    {
+        $response = $this->getJson('/api/v1/openapi.json?fresh=1');
+
+        $paths = array_keys($response->json('paths'));
+
+        $this->assertNotContains('/api/v1/ports/{id}/actions', $paths);
+        $this->assertNotContains('/api/v1/bills/{id}/actions', $paths);
     }
 
     public function testDocsEndpointRendersSwaggerUi(): void

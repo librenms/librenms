@@ -177,7 +177,8 @@ class RestifyApiTest extends DBTestCase
     {
         $this->getJson('/api/v1/devices')
             ->assertStatus(401)
-            ->assertJson(['message' => 'Unauthenticated.']);
+            ->assertJsonPath('errors.0.code', 'unauthenticated')
+            ->assertJsonPath('errors.0.status', '401');
     }
 
     public function testInvalidTokenReturns401(): void
@@ -4987,5 +4988,367 @@ class RestifyApiTest extends DBTestCase
             'isEnabled' => true,
             'alertOperationId' => 999999,
         ])->assertStatus(422);
+    }
+
+    // ── Writable-field expansions ──────────────────────────
+
+    public function testAdminCanCreateAlertScheduleWithStartAndEnd(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/alert-schedules', [
+            'title' => 'Maintenance Window',
+            'notes' => 'Router upgrade',
+            'isRecurring' => false,
+            'scheduleStartAt' => '2026-05-01 22:00:00',
+            'scheduleEndAt' => '2026-05-02 02:00:00',
+        ])->assertStatus(201)
+            ->assertJsonPath('data.attributes.title', 'Maintenance Window');
+
+        $created = AlertSchedule::where('title', 'Maintenance Window')->firstOrFail();
+        $this->assertSame('2026-05-01 22:00:00', $created->start->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-05-02 02:00:00', $created->end->format('Y-m-d H:i:s'));
+    }
+
+    public function testAlertScheduleEndMustBeAfterStart(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/alert-schedules', [
+            'title' => 'Reverse',
+            'notes' => 'invalid',
+            'scheduleStartAt' => '2026-05-02 00:00:00',
+            'scheduleEndAt' => '2026-05-01 00:00:00',
+        ])->assertStatus(422);
+    }
+
+    public function testAdminCanUpdateDeviceWritableFields(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create([
+            'disabled' => 0,
+            'ignore' => 0,
+        ]);
+        Sanctum::actingAs($user);
+
+        $this->putJsonApi("/api/v1/devices/{$device->device_id}", [
+            'hostname' => $device->hostname,
+            'notes' => 'Updated via API',
+            'display' => 'New Display',
+            'purpose' => 'lab',
+            'category' => 'network',
+            'isPollingEnabled' => false,
+            'isAlertingEnabled' => false,
+            'isIgnored' => true,
+            'isStatusIgnored' => true,
+            'isSystemLocationOverridden' => true,
+            'overwriteIp' => '10.0.0.1',
+        ])->assertStatus(200)
+            ->assertJsonPath('data.attributes.notes', 'Updated via API')
+            ->assertJsonPath('data.attributes.isPollingEnabled', false)
+            ->assertJsonPath('data.attributes.isAlertingEnabled', false)
+            ->assertJsonPath('data.attributes.isIgnored', true)
+            ->assertJsonPath('data.attributes.overwriteIp', '10.0.0.1');
+
+        $device->refresh();
+        $this->assertSame(1, (int) $device->disabled);
+        $this->assertSame(1, (int) $device->disable_notify);
+        $this->assertSame(1, (int) $device->ignore);
+        $this->assertSame(1, (int) $device->ignore_status);
+        $this->assertSame(1, (int) $device->override_sysLocation);
+        $this->assertSame('10.0.0.1', $device->overwrite_ip);
+        $this->assertSame('network', $device->type);
+        $this->assertSame('Updated via API', $device->notes);
+    }
+
+    public function testDeviceUpdateRejectsInvalidIp(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->putJsonApi("/api/v1/devices/{$device->device_id}", [
+            'hostname' => $device->hostname,
+            'ip' => 'not-an-ip',
+        ])->assertStatus(422);
+    }
+
+    public function testAdminCanUpdateLocationFixedCoordinates(): void
+    {
+        $user = User::factory()->admin()->create();
+        $location = \App\Models\Location::factory()->create(['fixed_coordinates' => 0]);
+        Sanctum::actingAs($user);
+
+        $this->putJsonApi("/api/v1/locations/{$location->id}", [
+            'name' => $location->location,
+            'hasFixedCoordinates' => true,
+        ])->assertStatus(200)
+            ->assertJsonPath('data.attributes.hasFixedCoordinates', true);
+
+        $location->refresh();
+        $this->assertTrue((bool) $location->fixed_coordinates);
+    }
+
+    public function testAdminCanUpdatePortWritableFields(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create([
+            'ifAlias' => 'Old description',
+            'ignore' => 0,
+            'disabled' => 0,
+        ]);
+        Sanctum::actingAs($user);
+
+        $this->putJsonApi("/api/v1/ports/{$port->port_id}", [
+            'alias' => 'Uplink to core',
+            'isIgnored' => true,
+            'isPollingEnabled' => false,
+        ])->assertStatus(200)
+            ->assertJsonPath('data.attributes.alias', 'Uplink to core')
+            ->assertJsonPath('data.attributes.isIgnored', true)
+            ->assertJsonPath('data.attributes.isPollingEnabled', false);
+
+        $port->refresh();
+        $this->assertSame('Uplink to core', $port->ifAlias);
+        $this->assertSame(1, (int) $port->ignore);
+        $this->assertSame(1, (int) $port->disabled);
+    }
+
+    public function testPortsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/ports', ['alias' => 'New port'])
+            ->assertStatus(403);
+    }
+
+    public function testPortsCannotBeDeletedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->deleteJsonApi("/api/v1/ports/{$port->port_id}")
+            ->assertStatus(403);
+
+        $this->assertDatabaseHas('ports', ['port_id' => $port->port_id]);
+    }
+
+    public function testAdminCanCreateAlertTransportWithConfiguration(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $config = ['url' => 'https://hooks.example.com/abc', 'channel' => '#alerts'];
+
+        $this->postJsonApi('/api/v1/alert-transports', [
+            'name' => 'Slack Webhook',
+            'category' => 'slack',
+            'isDefault' => false,
+            'configuration' => $config,
+        ])->assertStatus(201)
+            ->assertJsonPath('data.attributes.configuration', $config);
+
+        $created = AlertTransport::where('transport_name', 'Slack Webhook')->firstOrFail();
+        $this->assertSame($config, $created->transport_config);
+    }
+
+    public function testAdminCanCreateDeviceGroupWithRules(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $rules = [
+            'condition' => 'AND',
+            'rules' => [['id' => 'devices.os', 'field' => 'devices.os', 'type' => 'string', 'input' => 'text', 'operator' => 'equal', 'value' => 'iosxe']],
+            'valid' => true,
+        ];
+
+        $this->postJsonApi('/api/v1/device-groups', [
+            'name' => 'IOS-XE devices',
+            'description' => 'auto',
+            'category' => 'dynamic',
+            'rules' => $rules,
+        ])->assertStatus(201);
+
+        $created = DeviceGroup::where('name', 'IOS-XE devices')->firstOrFail();
+        $this->assertNotEmpty($created->rules);
+    }
+
+    // ── DeviceGroup attach/sync/detach devices ──────────────
+
+    public function testAdminCanAttachDeviceToStaticGroup(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $group = DeviceGroup::factory()->create(['type' => 'static']);
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi("/api/v1/device-groups/{$group->id}/attach/devices", [
+            'devices' => [$device->device_id],
+        ])->assertStatus(201);
+
+        $this->assertDatabaseHas('device_group_device', [
+            'device_group_id' => $group->id,
+            'device_id' => $device->device_id,
+        ]);
+    }
+
+    public function testDetachFromDynamicGroupIsRejected(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $group = DeviceGroup::factory()->create(['type' => 'dynamic']);
+        $group->devices()->attach($device->device_id);
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi("/api/v1/device-groups/{$group->id}/detach/devices", [
+            'devices' => [$device->device_id],
+        ])->assertStatus(403);
+
+        $this->assertDatabaseHas('device_group_device', [
+            'device_group_id' => $group->id,
+            'device_id' => $device->device_id,
+        ]);
+    }
+
+    public function testAdminCanDetachDeviceFromStaticGroup(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $group = DeviceGroup::factory()->create(['type' => 'static']);
+        $group->devices()->attach($device->device_id);
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi("/api/v1/device-groups/{$group->id}/detach/devices", [
+            'devices' => [$device->device_id],
+        ])->assertStatus(204);
+
+        $this->assertDatabaseMissing('device_group_device', [
+            'device_group_id' => $group->id,
+            'device_id' => $device->device_id,
+        ]);
+    }
+
+    public function testReadOnlyUserCannotAttachDevice(): void
+    {
+        $user = User::factory()->read()->create();
+        $device = Device::factory()->create();
+        $group = DeviceGroup::factory()->create(['type' => 'static']);
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi("/api/v1/device-groups/{$group->id}/attach/devices", [
+            'devices' => [$device->device_id],
+        ])->assertStatus(403);
+    }
+
+    public function testAdminCanCreateStaticDeviceGroupWithDevices(): void
+    {
+        $user = User::factory()->admin()->create();
+        $a = Device::factory()->create();
+        $b = Device::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/device-groups', [
+            'name' => 'one-shot-group',
+            'description' => 'created with devices',
+            'category' => 'static',
+            'devices' => [$a->device_id, $b->device_id],
+        ])->assertStatus(201);
+
+        $created = DeviceGroup::where('name', 'one-shot-group')->firstOrFail();
+        $this->assertEqualsCanonicalizing(
+            [$a->device_id, $b->device_id],
+            $created->devices->pluck('device_id')->all(),
+        );
+    }
+
+    public function testCreateDynamicDeviceGroupWithDevicesIsRejected(): void
+    {
+        $user = User::factory()->admin()->create();
+        $a = Device::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/device-groups', [
+            'name' => 'no-can-do',
+            'category' => 'dynamic',
+            'devices' => [$a->device_id],
+        ])->assertStatus(422);
+    }
+
+    public function testAdminCanReplaceDevicesViaUpdate(): void
+    {
+        $user = User::factory()->admin()->create();
+        $a = Device::factory()->create();
+        $b = Device::factory()->create();
+        $c = Device::factory()->create();
+        $group = DeviceGroup::factory()->create(['type' => 'static']);
+        $group->devices()->attach([$a->device_id, $b->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->putJsonApi("/api/v1/device-groups/{$group->id}", [
+            'name' => $group->name,
+            'category' => 'static',
+            'devices' => [$c->device_id],
+        ])->assertStatus(200);
+
+        $group->refresh();
+        $this->assertEqualsCanonicalizing(
+            [$c->device_id],
+            $group->devices->pluck('device_id')->all(),
+        );
+    }
+
+    public function testUpdateWithoutDevicesKeyLeavesMembershipAlone(): void
+    {
+        $user = User::factory()->admin()->create();
+        $a = Device::factory()->create();
+        $group = DeviceGroup::factory()->create(['type' => 'static']);
+        $group->devices()->attach($a->device_id);
+        Sanctum::actingAs($user);
+
+        $this->putJsonApi("/api/v1/device-groups/{$group->id}", [
+            'name' => 'renamed-only',
+            'category' => 'static',
+        ])->assertStatus(200);
+
+        $group->refresh();
+        $this->assertSame('renamed-only', $group->name);
+        $this->assertSame([$a->device_id], $group->devices->pluck('device_id')->all());
+    }
+
+    public function testCreateRejectsUnknownDeviceId(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/device-groups', [
+            'name' => 'bad-fk',
+            'category' => 'static',
+            'devices' => [99999999],
+        ])->assertStatus(422);
+    }
+
+    public function testAdminCanCreateServiceTemplateWithRules(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $rules = ['condition' => 'AND', 'rules' => [], 'valid' => true];
+
+        $this->postJsonApi('/api/v1/service-templates', [
+            'name' => 'HTTP Template',
+            'check' => 'http',
+            'category' => 'static',
+            'rules' => $rules,
+        ])->assertStatus(201);
+
+        $created = ServiceTemplate::where('name', 'HTTP Template')->firstOrFail();
+        $this->assertSame($rules, $created->rules);
     }
 }

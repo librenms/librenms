@@ -2,8 +2,11 @@
 
 namespace App\Policies;
 
+use App\Models\Device;
+use App\Models\DeviceGroup;
 use App\Models\ServiceTemplate;
 use App\Models\User;
+use Illuminate\Support\Collection;
 
 class ServiceTemplatePolicy
 {
@@ -63,5 +66,35 @@ class ServiceTemplatePolicy
     public function delete(User $user, ServiceTemplate $template): bool
     {
         return $this->hasGlobalPermission($user, 'delete');
+    }
+
+    public function attachDevices(User $user, ServiceTemplate $template, Device $device): bool
+    {
+        return $this->hasGlobalPermission($user, 'update');
+    }
+
+    public function syncDevices(User $user, ServiceTemplate $template, Collection $devices): bool
+    {
+        return $this->hasGlobalPermission($user, 'update');
+    }
+
+    public function detachDevices(User $user, ServiceTemplate $template, Device $device): bool
+    {
+        return $this->hasGlobalPermission($user, 'update');
+    }
+
+    public function attachDeviceGroups(User $user, ServiceTemplate $template, DeviceGroup $group): bool
+    {
+        return $this->hasGlobalPermission($user, 'update');
+    }
+
+    public function syncDeviceGroups(User $user, ServiceTemplate $template, Collection $groups): bool
+    {
+        return $this->hasGlobalPermission($user, 'update');
+    }
+
+    public function detachDeviceGroups(User $user, ServiceTemplate $template, DeviceGroup $group): bool
+    {
+        return $this->hasGlobalPermission($user, 'update');
     }
 }

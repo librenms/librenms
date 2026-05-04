@@ -6,8 +6,8 @@ API v1 uses [Laravel Restify](https://restify.binarcode.com/) repositories to ex
 
 Each API resource needs:
 
-1. A **Repository** class in `app/Restify/` — defines fields, search, and query scoping
-2. A **Policy** with an `allowRestify()` method — controls who can access the resource
+1. A **Repository** class in `app/Restify/` defines fields, search, and query scoping
+2. A **Policy** with an `allowRestify()` method controls who can access the resource
 3. **Registration** in `RestifyServiceProvider`
 
 ## Step 1: Create the Repository
@@ -64,11 +64,11 @@ class LocationRepository extends Repository
 
 ### Key concepts
 
-- **`$model`** — The Eloquent model class this repository wraps.
-- **`$id`** — Override if the model uses a non-standard primary key (e.g. `device_id`, `port_id`).
-- **`fields()`** — Defines which attributes are exposed in the API response. Use `->readonly()` for fields that should not be writable.
-- **`$search`** — Array of columns that the `?search=` parameter queries against.
-- **`indexQuery()` / `showQuery()`** — Scope queries for access control. See existing `DeviceRepository` and `PortRepository` for examples using `$query->hasAccess($user)`.
+- **`$model`** The Eloquent model class this repository wraps.
+- **`$id`** Override if the model uses a non-standard primary key (e.g. `device_id`, `port_id`).
+- **`fields()`** Defines which attributes are exposed in the API response. Use `->readonly()` for fields that should not be writable.
+- **`$search`** Array of columns that the `?search=` parameter queries against.
+- **`indexQuery()` / `showQuery()`** Scope queries for access control. See existing `DeviceRepository` and `PortRepository` for examples using `$query->hasAccess($user)`.
 
 ### Making fields writable
 
@@ -177,7 +177,7 @@ After registration, these endpoints are automatically available:
 | PUT/PATCH | `/api/v1/locations/{id}` | Update |
 | DELETE | `/api/v1/locations/{id}` | Delete |
 
-Plus search, filters, bulk operations, and nested resource support — all provided by Restify automatically.
+Plus search, filters, bulk operations, and nested resource support all provided by Restify automatically.
 
 ## Access Control Patterns
 
@@ -194,7 +194,7 @@ The `allowRestify()` policy method already gates access. No additional scoping n
 
 ### Per-device access scoping
 
-Used by `DeviceRepository` and `PortRepository` — restricts results to devices the user has access to:
+Used by `DeviceRepository` and `PortRepository` restricts results to devices the user has access to:
 
 ```php
 public static function indexQuery(RestifyRequest $request, Builder|Relation $query)
@@ -209,7 +209,7 @@ public static function indexQuery(RestifyRequest $request, Builder|Relation $que
 
 ### Admin-only listing
 
-Used by `UserRepository` — non-admins can only see themselves:
+Used by `UserRepository` non-admins can only see themselves:
 
 ```php
 public static function indexQuery(RestifyRequest $request, Builder|Relation $query)

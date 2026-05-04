@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Api\OpenApi;
 
+use Binaryk\LaravelRestify\Actions\Action;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Fields\BelongsToMany;
 use Binaryk\LaravelRestify\Fields\EagerField;
@@ -85,7 +86,7 @@ class RepositoryIntrospector
 
     /**
      * @param  class-string<RestifyRepository>  $repositoryClass
-     * @return array<string, array{cardinality: 'one'|'many', repository: class-string<RestifyRepository>}>
+     * @return array<string, array{cardinality: 'one'|'many', repository: class-string<RestifyRepository>, is_attachable: bool, attribute: string}>
      */
     public function related(string $repositoryClass): array
     {
@@ -107,6 +108,41 @@ class RepositoryIntrospector
             $out[(string) $name] = [
                 'cardinality' => $cardinality,
                 'repository' => $field->repositoryClass,
+                'is_attachable' => $field instanceof BelongsToMany,
+                'attribute' => (string) $field->attribute,
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * Pull metadata for each action declared on the repository.
+     *
+     * @param  class-string<RestifyRepository>  $repositoryClass
+     * @return array<int, array{uriKey: string, name: string, description: string, rules: array<string, mixed>, standalone: bool}>
+     */
+    public function actions(string $repositoryClass): array
+    {
+        $repository = new $repositoryClass();
+        if (! method_exists($repository, 'actions')) {
+            return [];
+        }
+
+        $request = new RestifyRequest();
+        $actions = $repository->actions($request);
+
+        $out = [];
+        foreach ($actions as $action) {
+            if (! $action instanceof Action) {
+                continue;
+            }
+            $out[] = [
+                'uriKey' => $action->uriKey(),
+                'name' => $action->name(),
+                'description' => $action->description($request),
+                'rules' => $action->rules(),
+                'standalone' => $action->isStandalone(),
             ];
         }
 

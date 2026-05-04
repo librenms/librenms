@@ -2,8 +2,11 @@
 
 namespace App\Policies;
 
+use App\Models\Device;
 use App\Models\DeviceGroup;
+use App\Models\ServiceTemplate;
 use App\Models\User;
+use Illuminate\Support\Collection;
 
 class DeviceGroupPolicy
 {
@@ -63,5 +66,44 @@ class DeviceGroupPolicy
     public function delete(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'delete');
+    }
+
+    /**
+     * Restify v10.4 attach gate: POST /api/v1/device-groups/{id}/attach/devices
+     */
+    public function attachDevices(User $user, DeviceGroup $deviceGroup, Device $device): bool
+    {
+        return $this->update($user);
+    }
+
+    /**
+     * Restify v10.4 sync gate: POST /api/v1/device-groups/{id}/sync/devices
+     */
+    public function syncDevices(User $user, DeviceGroup $deviceGroup, Collection $devices): bool
+    {
+        return $this->update($user);
+    }
+
+    /**
+     * Restify v10.4 detach gate: DELETE /api/v1/device-groups/{id}/detach/devices
+     */
+    public function detachDevices(User $user, DeviceGroup $deviceGroup, Device $device): bool
+    {
+        return $this->update($user);
+    }
+
+    public function attachUsers(User $user, DeviceGroup $deviceGroup, User $target): bool
+    {
+        return $this->update($user);
+    }
+
+    public function syncUsers(User $user, DeviceGroup $deviceGroup, Collection $users): bool
+    {
+        return $this->update($user);
+    }
+
+    public function detachUsers(User $user, DeviceGroup $deviceGroup, User $target): bool
+    {
+        return $this->update($user);
     }
 }

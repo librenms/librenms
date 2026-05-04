@@ -190,6 +190,14 @@ class AlertRule extends BaseModel
     }
 
     /**
+     * @return BelongsToMany<AlertTemplate, $this>
+     */
+    public function templates(): BelongsToMany
+    {
+        return $this->belongsToMany(AlertTemplate::class, 'alert_template_map', 'alert_rule_id', 'alert_templates_id');
+    }
+
+    /**
      * Backwards-compatible shape: one array entry per segment (same as legacy multi-row operations).
      *
      * @return array<int, array<string, mixed>>

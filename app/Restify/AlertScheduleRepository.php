@@ -62,8 +62,20 @@ class AlertScheduleRepository extends Repository
                     }
                 })
                 ->rules('boolean'),
-            field('scheduleStartAt', fn ($value, $model) => $model->start)->readonly(),
-            field('scheduleEndAt', fn ($value, $model) => $model->end)->readonly(),
+            field('scheduleStartAt', fn ($value, $model) => $model->start)
+                ->fillCallback(function ($request, $model, $attribute) {
+                    if ($request->exists($attribute)) {
+                        $model->start = $request->input($attribute);
+                    }
+                })
+                ->rules('nullable', 'date'),
+            field('scheduleEndAt', fn ($value, $model) => $model->end)
+                ->fillCallback(function ($request, $model, $attribute) {
+                    if ($request->exists($attribute)) {
+                        $model->end = $request->input($attribute);
+                    }
+                })
+                ->rules('nullable', 'date', 'after_or_equal:scheduleStartAt'),
             field('status')->readonly(),
         ];
     }

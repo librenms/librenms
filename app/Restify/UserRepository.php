@@ -27,6 +27,8 @@ class UserRepository extends Repository
         return [
             'devices-owned' => BelongsToMany::make('devicesOwned', DeviceRepository::class)->label('devices-owned'),
             'ports-owned' => BelongsToMany::make('portsOwned', PortRepository::class)->label('ports-owned'),
+            'bills' => BelongsToMany::make('bills', BillRepository::class),
+            'device-groups' => BelongsToMany::make('deviceGroups', DeviceGroupRepository::class)->label('device-groups'),
         ];
     }
 

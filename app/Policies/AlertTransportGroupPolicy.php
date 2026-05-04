@@ -2,26 +2,22 @@
 
 namespace App\Policies;
 
-use App\Facades\LibrenmsConfig;
-use App\Facades\Permissions;
-use App\Models\Bill;
-use App\Models\Port;
+use App\Models\AlertTransport;
+use App\Models\AlertTransportGroup;
 use App\Models\User;
 use Illuminate\Support\Collection;
 
-class BillPolicy
+class AlertTransportGroupPolicy
 {
     use ChecksGlobalPermissions;
 
-    /**
-     * Determine whether the user can view any bill.
-     */
+    public function __construct()
+    {
+        $this->globalPrefix = 'alert';
+    }
+
     public function viewAny(User $user): bool
     {
-        if (! LibrenmsConfig::get('enable_billing')) {
-            return false;
-        }
-
         return $this->hasGlobalPermission($user, 'view')
             || $this->hasGlobalPermission($user, 'viewAll')
             || $this->hasGlobalPermission($user, 'create')
@@ -29,62 +25,46 @@ class BillPolicy
             || $this->hasGlobalPermission($user, 'delete');
     }
 
-    /**
-     * Determine whether the user can view all models.
-     */
     public function viewAll(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'viewAll');
     }
 
-    /**
-     * Determine whether the user can view the bill.
-     */
-    public function view(User $user, Bill $bill): bool
+    public function view(User $user, AlertTransportGroup $group): bool
     {
         if ($this->hasGlobalPermission($user, 'viewAll')) {
             return true;
         }
 
-        return $this->hasGlobalPermission($user, 'view')
-            && Permissions::canAccessBill($bill, $user);
+        return $this->hasGlobalPermission($user, 'view');
     }
 
-    /**
-     * Determine whether the user can create bills.
-     */
     public function create(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'create');
     }
 
-    /**
-     * Determine whether the user can update the bill.
-     */
     public function update(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'update');
     }
 
-    /**
-     * Determine whether the user can delete the bill.
-     */
     public function delete(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'delete');
     }
 
-    public function attachPorts(User $user, Bill $bill, Port $port): bool
+    public function attachTransports(User $user, AlertTransportGroup $group, AlertTransport $transport): bool
     {
         return $this->update($user);
     }
 
-    public function syncPorts(User $user, Bill $bill, Collection $ports): bool
+    public function syncTransports(User $user, AlertTransportGroup $group, Collection $transports): bool
     {
         return $this->update($user);
     }
 
-    public function detachPorts(User $user, Bill $bill, Port $port): bool
+    public function detachTransports(User $user, AlertTransportGroup $group, AlertTransport $transport): bool
     {
         return $this->update($user);
     }

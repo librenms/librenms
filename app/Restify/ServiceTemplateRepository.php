@@ -24,7 +24,10 @@ class ServiceTemplateRepository extends Repository
     {
         return [
             'devices' => BelongsToMany::make('devices', DeviceRepository::class),
-            'groups' => BelongsToMany::make('groups', DeviceGroupRepository::class),
+            'device-groups' => tap(
+                BelongsToMany::make('device-groups', DeviceGroupRepository::class),
+                static fn ($f) => $f->relation = 'groups',
+            ),
         ];
     }
 
@@ -97,7 +100,7 @@ class ServiceTemplateRepository extends Repository
                     }
                 })
                 ->rules('boolean'),
-            field('rules')->readonly(),
+            field('rules')->rules('nullable', 'array'),
         ];
     }
 }

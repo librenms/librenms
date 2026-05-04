@@ -25,8 +25,12 @@ class AlertRuleRepository extends Repository
     {
         return [
             'devices' => BelongsToMany::make('devices', DeviceRepository::class),
-            'groups' => BelongsToMany::make('groups', DeviceGroupRepository::class),
+            'device-groups' => tap(
+                BelongsToMany::make('device-groups', DeviceGroupRepository::class),
+                static fn ($f) => $f->relation = 'groups',
+            ),
             'locations' => BelongsToMany::make('locations', LocationRepository::class),
+            'templates' => BelongsToMany::make('templates', AlertTemplateRepository::class),
             'alertOperation' => BelongsTo::make('alertOperation', AlertOperationRepository::class),
         ];
     }

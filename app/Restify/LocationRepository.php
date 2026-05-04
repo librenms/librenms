@@ -78,7 +78,22 @@ class LocationRepository extends Repository
                     }
                 })
                 ->rules('nullable', 'numeric'),
-            field('hasFixedCoordinates', fn ($value, $model) => $model->fixed_coordinates)->readonly(),
+            field('hasFixedCoordinates', fn ($value, $model) => (bool) $model->fixed_coordinates)
+                ->fillCallback(function ($request, $model, $attribute) {
+                    if ($request->exists($attribute)) {
+                        $model->fixed_coordinates = $request->boolean($attribute);
+                    }
+                })
+                ->rules('boolean'),
+        ];
+    }
+
+    public function actions(RestifyRequest $request): array
+    {
+        $canSee = fn (\Illuminate\Http\Request $req) => $req->user()?->can('update', \App\Models\Location::class) ?? false;
+
+        return [
+            \App\Restify\Actions\MaintenanceLocationAction::make()->canSee($canSee),
         ];
     }
 }

@@ -4,7 +4,9 @@ namespace App\Policies;
 
 use App\Facades\Permissions;
 use App\Models\Device;
+use App\Models\DeviceGroup;
 use App\Models\User;
+use Illuminate\Support\Collection;
 
 class DevicePolicy
 {
@@ -89,5 +91,35 @@ class DevicePolicy
     {
         return $this->hasGlobalPermission($user, 'updateNotes')
             && $this->view($user, $device);
+    }
+
+    public function attachGroups(User $user, Device $device, DeviceGroup $group): bool
+    {
+        return $this->update($user, $device);
+    }
+
+    public function syncGroups(User $user, Device $device, Collection $groups): bool
+    {
+        return $this->update($user, $device);
+    }
+
+    public function detachGroups(User $user, Device $device, DeviceGroup $group): bool
+    {
+        return $this->update($user, $device);
+    }
+
+    public function attachParents(User $user, Device $device, Device $parent): bool
+    {
+        return $this->update($user, $device);
+    }
+
+    public function syncParents(User $user, Device $device, Collection $parents): bool
+    {
+        return $this->update($user, $device);
+    }
+
+    public function detachParents(User $user, Device $device, Device $parent): bool
+    {
+        return $this->update($user, $device);
     }
 }

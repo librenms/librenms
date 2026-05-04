@@ -326,10 +326,10 @@ class RestifyRelationshipsTest extends DBTestCase
         $template->groups()->attach($groups->pluck('id'));
         Sanctum::actingAs($user);
 
-        $response = $this->getJson("/api/v1/service-templates/{$template->id}?related=groups");
+        $response = $this->getJson("/api/v1/service-templates/{$template->id}?related=device-groups");
 
         $response->assertStatus(200)
-            ->assertJsonCount(2, 'data.relationships.groups');
+            ->assertJsonCount(2, 'data.relationships.device-groups');
     }
 
     // ── User relationships ──────────────────────────────────
@@ -785,7 +785,7 @@ class RestifyRelationshipsTest extends DBTestCase
             'api.access',
             'device-group.viewAny',
             'device-group.view',
-            // No device.view — user relies on per-device permission via devices_perms
+            // No device.view user relies on per-device permission via devices_perms
         ]);
 
         $group = DeviceGroup::factory()->create(['type' => 'static']);
@@ -805,7 +805,7 @@ class RestifyRelationshipsTest extends DBTestCase
 
         $response->assertStatus(200);
 
-        // Filter out nulls — only the permitted device should remain
+        // Filter out nulls; only the permitted device should remain
         $relationships = $response->json('data.relationships.devices');
         $visibleDevices = collect($relationships)->filter()->values();
         $this->assertCount(1, $visibleDevices, 'User should only see the device they have access to');

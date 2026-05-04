@@ -13,6 +13,7 @@ use App\Restify\AlertRepository;
 use App\Restify\AlertRuleRepository;
 use App\Restify\AlertScheduleRepository;
 use App\Restify\AlertTemplateRepository;
+use App\Restify\AlertTransportGroupRepository;
 use App\Restify\AlertTransportRepository;
 use App\Restify\CefSwitchingRepository;
 use App\Restify\ComponentRepository;
@@ -85,6 +86,9 @@ use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\OpenApiController;
 use App\Http\Controllers\Api\V1\SystemController;
 use Binaryk\LaravelRestify\Bootstrap\RoutesBoot;
+use Binaryk\LaravelRestify\Http\Requests\RepositoryAttachRequest;
+use Binaryk\LaravelRestify\Http\Requests\RepositoryDetachRequest;
+use Binaryk\LaravelRestify\Http\Requests\RepositorySyncRequest;
 use Binaryk\LaravelRestify\Restify;
 use Binaryk\LaravelRestify\RestifyApplicationServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -121,6 +125,20 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
         }
     }
 
+    public function register(): void
+    {
+        parent::register();
+
+        // Replace Restify's default attach/sync/detach request classes with ones
+        // that resolve the related repository from the parent's `related()`
+        // declaration instead of via model-table-name lookup. Lets us advertise
+        // URL slugs that don't match the underlying database table name
+        // (e.g. /attach/device-groups against the `device_groups` table).
+        $this->app->bind(RepositoryAttachRequest::class, \App\Http\Requests\Restify\AttachRequest::class);
+        $this->app->bind(RepositorySyncRequest::class, \App\Http\Requests\Restify\SyncRequest::class);
+        $this->app->bind(RepositoryDetachRequest::class, \App\Http\Requests\Restify\DetachRequest::class);
+    }
+
     public function boot(): void
     {
         parent::boot();
@@ -133,6 +151,7 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
             AlertRuleRepository::class,
             AlertScheduleRepository::class,
             AlertTemplateRepository::class,
+            AlertTransportGroupRepository::class,
             AlertTransportRepository::class,
             AccessPointRepository::class,
             ApplicationRepository::class,

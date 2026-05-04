@@ -8,6 +8,7 @@ use App\Restify\Repository as LibrenmsRepository;
 use Binaryk\LaravelRestify\Restify;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\AllOf;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Components;
+use GoldSpecDigital\ObjectOrientedOAS\Objects\OneOf;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Info;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\MediaType;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Operation;
@@ -141,6 +142,7 @@ class OpenApiGenerator
                 ),
                 $this->errorResponse(401, 'Unauthorized'),
                 $this->errorResponse(403, 'Forbidden'),
+                $this->errorResponse(500, 'Server Error'),
             );
 
         $idParameter = Parameter::path()
@@ -161,6 +163,7 @@ class OpenApiGenerator
                 $this->errorResponse(401, 'Unauthorized'),
                 $this->errorResponse(403, 'Forbidden'),
                 $this->errorResponse(404, 'Not Found'),
+                $this->errorResponse(500, 'Server Error'),
             );
 
         $collectionOps = [$listOperation];
@@ -179,6 +182,7 @@ class OpenApiGenerator
                     $this->errorResponse(401, 'Unauthorized'),
                     $this->errorResponse(403, 'Forbidden'),
                     $this->errorResponse(422, 'Validation Failed'),
+                    $this->errorResponse(500, 'Server Error'),
                 );
         }
 
@@ -197,6 +201,7 @@ class OpenApiGenerator
                     $this->errorResponse(403, 'Forbidden'),
                     $this->errorResponse(404, 'Not Found'),
                     $this->errorResponse(422, 'Validation Failed'),
+                    $this->errorResponse(500, 'Server Error'),
                 );
         }
 
@@ -211,6 +216,7 @@ class OpenApiGenerator
                     $this->errorResponse(401, 'Unauthorized'),
                     $this->errorResponse(403, 'Forbidden'),
                     $this->errorResponse(404, 'Not Found'),
+                    $this->errorResponse(500, 'Server Error'),
                 );
         }
 
@@ -221,9 +227,258 @@ class OpenApiGenerator
 
         foreach ($related as $name => $info) {
             $pathItems[] = $this->relatedPathItem($uriKey, $name, $info, $tagName, $idParameter);
+
+            if ($info['is_attachable'] ?? false) {
+                $segment = (string) ($info['attribute'] ?? $name);
+                foreach ($this->attachablePathItems($uriKey, $segment, $tagName, $idParameter) as $item) {
+                    $pathItems[] = $item;
+                }
+            }
+        }
+
+        $actions = $this->introspector->actions($repositoryClass);
+        if ($actions !== []) {
+            foreach ($this->actionPathItems($uriKey, $resourceName, $tagName, $idParameter, $actions) as $item) {
+                $pathItems[] = $item;
+            }
         }
 
         return $pathItems;
+    }
+
+    /**
+     * Emit /actions paths for a repository: one GET (list available actions)
+     * and one POST (perform an action via ?action=<uriKey>) per scope.
+     *
+     * @param  array<int, array{uriKey: string, name: string, description: string, rules: array<string, mixed>, standalone: bool}>  $actions
+     * @return PathItem[]
+     */
+    private function actionPathItems(string $uriKey, string $resourceName, string $tagName, Parameter $idParameter, array $actions): array
+    {
+        $resourceActions = array_values(array_filter($actions, static fn ($a) => ! $a['standalone']));
+        $standaloneActions = array_values(array_filter($actions, static fn ($a) => $a['standalone']));
+
+        $items = [];
+
+        if ($resourceActions !== []) {
+            $items[] = PathItem::create()
+                ->route("/api/v1/{$uriKey}/{id}/actions")
+                ->operations(
+                    $this->listActionsOperation($uriKey, $resourceName, $tagName, $resourceActions, [$idParameter]),
+                    $this->performActionOperation($uriKey, $resourceName, $tagName, $resourceActions, [$idParameter], scope: 'resource'),
+                );
+        }
+
+        if ($standaloneActions !== []) {
+            $items[] = PathItem::create()
+                ->route("/api/v1/{$uriKey}/actions")
+                ->operations(
+                    $this->listActionsOperation($uriKey, $resourceName, $tagName, $standaloneActions, [], scope: 'collection'),
+                    $this->performActionOperation($uriKey, $resourceName, $tagName, $standaloneActions, [], scope: 'collection'),
+                );
+        }
+
+        return $items;
+    }
+
+    /**
+     * @param  array<int, array{uriKey: string, name: string, description: string, rules: array<string, mixed>, standalone: bool}>  $actions
+     * @param  Parameter[]  $extraParams
+     */
+    private function listActionsOperation(string $uriKey, string $resourceName, string $tagName, array $actions, array $extraParams, string $scope = 'resource'): Operation
+    {
+        $listSchema = Schema::object()->properties(
+            Schema::array('data')->items(
+                Schema::object()->properties(
+                    Schema::string('uriKey'),
+                    Schema::string('name'),
+                    Schema::string('description')->nullable(),
+                    Schema::boolean('destructive'),
+                    Schema::object('payload')->nullable(),
+                )->required('uriKey', 'name'),
+            ),
+        );
+
+        $opIdSuffix = $scope === 'collection' ? 'collection' : 'item';
+
+        return Operation::get()
+            ->operationId("{$uriKey}.actions.list.{$opIdSuffix}")
+            ->summary("List available actions on {$tagName}")
+            ->description('Returns metadata for each action this caller is allowed to invoke.')
+            ->tags($tagName)
+            ->parameters(...$extraParams)
+            ->responses(
+                Response::ok()->content(
+                    MediaType::create()->mediaType(self::JSON_API_MEDIA_TYPE)->schema($listSchema)
+                ),
+                $this->errorResponse(401, 'Unauthorized'),
+                $this->errorResponse(403, 'Forbidden'),
+                $this->errorResponse(404, 'Not Found'),
+                $this->errorResponse(500, 'Server Error'),
+            );
+    }
+
+    /**
+     * @param  array<int, array{uriKey: string, name: string, description: string, rules: array<string, mixed>, standalone: bool}>  $actions
+     * @param  Parameter[]  $extraParams
+     */
+    private function performActionOperation(string $uriKey, string $resourceName, string $tagName, array $actions, array $extraParams, string $scope = 'resource'): Operation
+    {
+        $uriKeys = array_map(static fn ($a) => $a['uriKey'], $actions);
+
+        $actionParam = Parameter::query()
+            ->name('action')
+            ->required()
+            ->description('The uriKey of the action to perform. Use `GET …/actions` to list available actions for the current caller.')
+            ->schema(Schema::string()->enum(...$uriKeys));
+
+        $bodySchemas = [];
+        foreach ($actions as $action) {
+            $bodySchemas[] = $this->actionPayloadSchema($action);
+        }
+
+        $bodySchema = count($bodySchemas) === 1
+            ? $bodySchemas[0]
+            : OneOf::create()->schemas(...$bodySchemas);
+
+        $opIdSuffix = $scope === 'collection' ? 'collection' : 'item';
+
+        $description = "Performs one of the registered actions. Pass `?action=<uriKey>` to choose. Available: " .
+            implode(', ', array_map(
+                static fn ($a) => sprintf('`%s` (%s)', $a['uriKey'], $a['name']),
+                $actions,
+            )) . '.';
+
+        return Operation::post()
+            ->operationId("{$uriKey}.actions.perform.{$opIdSuffix}")
+            ->summary("Perform an action on a {$resourceName}")
+            ->description($description)
+            ->tags($tagName)
+            ->parameters(...array_merge($extraParams, [$actionParam]))
+            ->requestBody(
+                RequestBody::create()->content(
+                    MediaType::create()->mediaType(self::JSON_API_MEDIA_TYPE)->schema($bodySchema)
+                )
+            )
+            ->responses(
+                Response::ok()->description('Action executed'),
+                Response::create()->statusCode(201)->description('Resource created by action'),
+                $this->errorResponse(401, 'Unauthorized'),
+                $this->errorResponse(403, 'Forbidden'),
+                $this->errorResponse(404, 'Not Found'),
+                $this->errorResponse(422, 'Validation Failed'),
+                $this->errorResponse(500, 'Server Error'),
+            );
+    }
+
+    /**
+     * Build a request-body schema for one action from its `rules()` array.
+     *
+     * @param  array{uriKey: string, name: string, description: string, rules: array<string, mixed>, standalone: bool}  $action
+     */
+    private function actionPayloadSchema(array $action): Schema
+    {
+        $properties = [];
+        $required = [];
+
+        foreach ($action['rules'] as $field => $rules) {
+            if (! is_string($field) || $field === '') {
+                continue;
+            }
+            $rules = is_array($rules) ? $rules : explode('|', (string) $rules);
+            $type = $this->typeMapper->oasType($field, [], []);
+            $property = $this->propertyFromType($field, $type);
+
+            $enum = $this->typeMapper->extractEnumValues($rules);
+            if ($enum !== null) {
+                $property = $property->enum(...$enum);
+            }
+
+            if (in_array('required', $rules, true)) {
+                $required[] = $field;
+            }
+
+            $properties[] = $property;
+        }
+
+        $schema = Schema::object("Action_{$action['uriKey']}_Payload")->title("{$action['name']} payload");
+        if ($properties !== []) {
+            $schema = $schema->properties(...$properties);
+        }
+        if ($required !== []) {
+            $schema = $schema->required(...$required);
+        }
+
+        return $schema;
+    }
+
+    /**
+     * Emit attach/sync/detach paths for BelongsToMany relations.
+     *
+     * @return PathItem[]
+     */
+    private function attachablePathItems(string $parentUriKey, string $relationName, string $tagName, Parameter $idParameter): array
+    {
+        $bodySchema = Schema::object()->properties(
+            Schema::array($relationName)->items(Schema::integer()),
+        )->required($relationName);
+
+        $body = RequestBody::create()->required()->content(
+            MediaType::create()->mediaType(self::JSON_API_MEDIA_TYPE)->schema($bodySchema)
+        );
+
+        $singular = Str::singular($parentUriKey);
+
+        $attachOp = Operation::post()
+            ->operationId("{$parentUriKey}.attach.{$relationName}")
+            ->summary("Attach {$relationName} to a {$singular}")
+            ->tags($tagName)
+            ->parameters($idParameter)
+            ->requestBody($body)
+            ->responses(
+                Response::create()->statusCode(201)->description('Attached'),
+                $this->errorResponse(401, 'Unauthorized'),
+                $this->errorResponse(403, 'Forbidden'),
+                $this->errorResponse(404, 'Not Found'),
+                $this->errorResponse(422, 'Validation Failed'),
+                $this->errorResponse(500, 'Server Error'),
+            );
+
+        $syncOp = Operation::post()
+            ->operationId("{$parentUriKey}.sync.{$relationName}")
+            ->summary("Replace {$relationName} on a {$singular}")
+            ->tags($tagName)
+            ->parameters($idParameter)
+            ->requestBody($body)
+            ->responses(
+                Response::ok()->description('Synced'),
+                $this->errorResponse(401, 'Unauthorized'),
+                $this->errorResponse(403, 'Forbidden'),
+                $this->errorResponse(404, 'Not Found'),
+                $this->errorResponse(422, 'Validation Failed'),
+                $this->errorResponse(500, 'Server Error'),
+            );
+
+        $detachOp = Operation::post()
+            ->operationId("{$parentUriKey}.detach.{$relationName}")
+            ->summary("Detach {$relationName} from a {$singular}")
+            ->tags($tagName)
+            ->parameters($idParameter)
+            ->requestBody($body)
+            ->responses(
+                Response::create()->statusCode(204)->description('Detached'),
+                $this->errorResponse(401, 'Unauthorized'),
+                $this->errorResponse(403, 'Forbidden'),
+                $this->errorResponse(404, 'Not Found'),
+                $this->errorResponse(422, 'Validation Failed'),
+                $this->errorResponse(500, 'Server Error'),
+            );
+
+        return [
+            PathItem::create()->route("/api/v1/{$parentUriKey}/{id}/attach/{$relationName}")->operations($attachOp),
+            PathItem::create()->route("/api/v1/{$parentUriKey}/{id}/sync/{$relationName}")->operations($syncOp),
+            PathItem::create()->route("/api/v1/{$parentUriKey}/{id}/detach/{$relationName}")->operations($detachOp),
+        ];
     }
 
     /**
@@ -258,6 +513,7 @@ class OpenApiGenerator
                 $this->errorResponse(401, 'Unauthorized'),
                 $this->errorResponse(403, 'Forbidden'),
                 $this->errorResponse(404, 'Not Found'),
+                $this->errorResponse(500, 'Server Error'),
             );
 
         return PathItem::create()->route("/api/v1/{$parentUriKey}/{id}/{$relationName}")->operations($operation);
@@ -564,12 +820,23 @@ class OpenApiGenerator
             Schema::array('included')->items(Schema::ref('#/components/schemas/JsonApiResource'))->nullable(),
         )->required('data');
 
-        $error = Schema::object('JsonApiError')->properties(
-            Schema::string('message'),
-            Schema::object('errors')->nullable(),
-        );
+        $errorObject = Schema::object('JsonApiErrorObject')->properties(
+            Schema::string('status'),
+            Schema::string('code'),
+            Schema::string('title'),
+            Schema::string('detail')->nullable(),
+            Schema::object('source')->properties(
+                Schema::string('pointer')->nullable(),
+                Schema::string('parameter')->nullable(),
+            )->nullable(),
+            Schema::object('meta')->nullable(),
+        )->required('status', 'code', 'title');
 
-        return [$pagination, $links, $resource, $list, $single, $error];
+        $error = Schema::object('JsonApiError')->properties(
+            Schema::array('errors')->items(Schema::ref('#/components/schemas/JsonApiErrorObject')),
+        )->required('errors');
+
+        return [$pagination, $links, $resource, $list, $single, $errorObject, $error];
     }
 
     private function errorResponse(int $status, string $description): Response

@@ -70,7 +70,13 @@ class AlertTransportRepository extends Repository
                     }
                 })
                 ->rules('boolean'),
-            field('configuration', fn ($value, $model) => $model->transport_config)->readonly(),
+            field('configuration', fn ($value, $model) => $model->transport_config)
+                ->fillCallback(function ($request, $model, $attribute) {
+                    if ($request->exists($attribute)) {
+                        $model->transport_config = $request->input($attribute);
+                    }
+                })
+                ->rules('nullable', 'array'),
         ];
     }
 
