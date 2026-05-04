@@ -196,6 +196,7 @@
             column: 20,
             float: false,
             draggable: {handle: 'header, span'},
+            alwaysShowResizeHandle: false,
             resizable: {handles: 'se,sw,ne,nw'},
             disableOneColumnMode: true,
         }, '.grid-stack');
