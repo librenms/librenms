@@ -119,12 +119,14 @@ export default function filterBarComponent({
             this.syncPageUrls();
 
             this.$dispatch("filter:loaded", {
+                name: this.name,
                 filters: this.formattedFilters,
-                source: hasUrlFilters ? "url" : "initial",
+                from: hasUrlFilters ? "url" : (sessionData !== null ? "session" : "initial"),
             });
 
             if (this.filters.length > 0 && !this.reload) {
                 this.$dispatch("filter:apply", {
+                    name: this.name,
                     filters: this.formattedFilters,
                 });
             }
@@ -210,6 +212,7 @@ export default function filterBarComponent({
                 window.history.pushState({}, "", url);
                 this.syncPageUrls();
                 this.$dispatch("filter:apply", {
+                    name: this.name,
                     filters: this.formattedFilters,
                 });
             }
