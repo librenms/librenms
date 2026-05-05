@@ -18,20 +18,11 @@ if (empty($bgpLocalAs)) {
 
 if (! empty($bgpLocalAs) && $bgpLocalAs == '23456') { // 4Byte ASN
     if ($device['os_group'] === 'arista') {
-        $entries = \SnmpQuery::walk('ARISTA-BGP4V2-MIB::aristaBgp4V2PeerLocalAs')->values();
-        if (! empty($entries)) {
-            $bgpLocalAs = reset($entries);
-        }
+        $bgpLocalAs = \SnmpQuery::next('ARISTA-BGP4V2-MIB::aristaBgp4V2PeerLocalAs')->value();
     } elseif ($device['os'] == 'junos') {
-        $entries = \SnmpQuery::walk('BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAs')->values();
-        if (! empty($entries)) {
-            $bgpLocalAs = reset($entries);
-        }
+        $bgpLocalAs = \SnmpQuery::next('BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAs')->value();
     } elseif ($device['os_group'] === 'cisco') {
-        $entries = \SnmpQuery::walk('CISCO-BGP4-MIB::cbgpPeer2LocalAs')->values();
-        if (! empty($entries)) {
-            $bgpLocalAs = reset($entries);
-        }
+        $bgpLocalAs = \SnmpQuery::next('CISCO-BGP4-MIB::cbgpPeer2LocalAs')->value();
     } elseif ($device['os'] === 'cumulus') {
         $bgpLocalAs = \SnmpQuery::get('CUMULUS-BGPUN-MIB::bgpLocalAs.0')->value();
     }
