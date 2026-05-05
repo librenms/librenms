@@ -87,9 +87,9 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
                 'index' => "ge.$geIdx",
                 'entity_physical_index' => $ifIndex,
                 'type' => 'sfp',
-                'vendor' => ($data['upLinkOpticalVendor'] ?? 'N/A') !== 'N/A' ? $data['upLinkOpticalVendor'] : null,
-                'serial' => ($data['upLinkOpticalSerialNo'] ?? 'N/A') !== 'N/A' ? $data['upLinkOpticalSerialNo'] : null,
-                'wavelength' => ($data['upLinkOpticalWavelen'] ?? 'N/A') !== 'N/A' ? (int) $data['upLinkOpticalWavelen'] : null,
+                'vendor' => self::naToNull($data['upLinkOpticalVendor'] ?? null),
+                'serial' => self::naToNull($data['upLinkOpticalSerialNo'] ?? null),
+                'wavelength' => ($w = self::naToNull($data['upLinkOpticalWavelen'] ?? null)) !== null ? (int) $w : null,
                 'ddm' => true,
                 'channels' => 1,
             ]));
@@ -382,5 +382,10 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
                 $this->ponIfMap[$ponIdx] = $port->ifIndex;
             }
         }
+    }
+
+    private static function naToNull(?string $value): ?string
+    {
+        return ($value === null || $value === 'N/A') ? null : $value;
     }
 }
