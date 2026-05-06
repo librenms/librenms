@@ -18,7 +18,7 @@ return new class extends Migration
         Schema::table('devices', function (Blueprint $table) {
             $table->string('display', 128)->default('')->change();
 
-            if (!Schema::hasColumn('devices', 'display_template')) {
+            if (! Schema::hasColumn('devices', 'display_template')) {
                 $table->string('display_template', 128)->nullable()->after('display');
             }
         });
@@ -31,7 +31,7 @@ return new class extends Migration
     public function down(): void
     {
         DB::table('devices')->update([
-            'display' => DB::raw('display_template')
+            'display' => DB::raw('display_template'),
         ]);
 
         Schema::table('devices', function (Blueprint $table) {
