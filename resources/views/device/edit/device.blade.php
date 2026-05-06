@@ -49,7 +49,7 @@
             <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="{{ __('device.edit.display_title', ['sysName' => $device->sysName]) }}" >
                 <label for="edit-display-input" class="col-sm-2 control-label" >{{ __('device.edit.display_name') }}</label>
                 <div class="col-sm-6">
-                    <input type="text" id="edit-display-input" name="display" class="form-control" placeholder="{{ __('device.edit.system_default') }}" value="{{ old('display', $device->display) }}">
+                    <input type="text" id="edit-display-input" name="display_template" class="form-control" placeholder="{{ __('device.edit.system_default') }}" value="{{ old('display_template', $device->display_template) }}">
                 </div>
             </div>
 
