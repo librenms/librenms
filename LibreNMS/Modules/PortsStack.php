@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Modules;
 
+use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\PortStack;
@@ -112,9 +113,28 @@ class PortsStack implements Module
                     'ifStackStatus' => 'active',
                 ]);
             });
+
+            if (LibrenmsConfig::get('discovery.ports_stack.preserve_lagmib_stale_members', false)) {
+                $seen = $portStacks->filter()->pluck('low_ifIndex')->map(fn ($i) => (int) $i)->all();
+                foreach ($device->portsStack()->get() as $existing) {
+                    if (! in_array((int) $existing->low_ifIndex, $seen, true)) {
+                        $portStacks->push(new PortStack([
+                            'high_ifIndex' => $existing->high_ifIndex,
+                            'high_port_id' => PortCache::getIdFromIfIndex($existing->high_ifIndex, $device),
+                            'low_ifIndex' => $existing->low_ifIndex,
+                            'low_port_id' => PortCache::getIdFromIfIndex($existing->low_ifIndex, $device),
+                            'ifStackStatus' => 'notInService',
+                        ]));
+                    }
+                }
+            }
         }
 
         ModuleModelObserver::observe(PortStack::class);
+        // syncModels reads $device->portsStack to find existing rows; if the relation was
+        // hydrated earlier in the request (e.g., by the preservation loop above), it's
+        // stale by the time syncModels sees it, so refresh it.
+        $device->unsetRelation('portsStack');
         $this->syncModels($device, 'portsStack', $portStacks->filter());
     }
 
