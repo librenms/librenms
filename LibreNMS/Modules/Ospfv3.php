@@ -343,7 +343,7 @@ class Ospfv3 implements Module
 
     public function fetchAndFillArea(Ospfv3Area $area): void
     {
-        $area->fill(SnmpQuery::context($area->context_name)
+        $ospf_area = SnmpQuery::context($area->context_name)
             ->hideMib()->enumStrings()->get([
                 'OSPFV3-MIB::ospfv3AreaImportAsExtern.' . $area->ospfv3AreaId,
                 'OSPFV3-MIB::ospfv3AreaSpfRuns.' . $area->ospfv3AreaId,
@@ -359,7 +359,11 @@ class Ospfv3 implements Module
                 'OSPFV3-MIB::ospfv3AreaNssaTranslatorStabInterval.' . $area->ospfv3AreaId,
                 'OSPFV3-MIB::ospfv3AreaNssaTranslatorEvents.' . $area->ospfv3AreaId,
                 'OSPFV3-MIB::ospfv3AreaTEEnabled.' . $area->ospfv3AreaId,
-            ])->valuesByIndex()[$area->ospfv3AreaId] ?? []);
+            ])->valuesByIndex()["$area->ospfv3AreaId"] ?? [];
+
+        $ospf_area['ospfv3AreaScopeLsaCksumSum'] ??= 0;
+
+        $area->fill($ospf_area);
     }
 
     public function fetchAndFillPort(Ospfv3Port $port): void

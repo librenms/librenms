@@ -141,7 +141,11 @@ Route::middleware(['auth'])->group(function (): void {
         Route::post('/device/{device}/rediscover', [DeviceController::class, 'rediscover'])->name('device.rediscover');
     });
 
+    Route::get('/device/delete', [DeviceController::class, 'deleteIndex'])->name('device.delete');
     Route::prefix('device/{device}')->name('device.')->group(function (): void {
+        Route::get('delete', [DeviceController::class, 'deleteConfirm'])->name('delete.confirm');
+        Route::delete('', [DeviceController::class, 'destroy'])->name('destroy');
+
         Route::redirect('logs', 'logs/eventlog')->name('logs');
         Route::get('logs/eventlog', Device\Tabs\EventlogController::class)->name('eventlog');
         Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');
@@ -374,6 +378,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('generic-image', Widgets\ImageController::class);
             Route::post('globe', Widgets\GlobeController::class);
             Route::post('graylog', Widgets\GraylogController::class);
+            Route::post('health-sensors', Widgets\HealthSensorsController::class);
             Route::post('placeholder', Widgets\PlaceholderController::class);
             Route::post('notes', Widgets\NotesController::class);
             Route::post('server-stats', Widgets\ServerStatsController::class);

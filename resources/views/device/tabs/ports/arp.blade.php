@@ -1,4 +1,5 @@
-<x-panel body-class="tw:p-0!">
+<x-panel>
+    <x-slot:slot class="tw:p-0!">
     <table id="ports-arp" class="table table-condensed table-hover table-striped tw:mt-1 tw:mb-0!">
         <thead>
         <tr>
@@ -13,6 +14,7 @@
         </tr>
         </thead>
     </table>
+    </x-slot:slot>
 </x-panel>
 
 <script>
