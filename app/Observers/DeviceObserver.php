@@ -67,7 +67,6 @@ class DeviceObserver
     {
         if ($device->isDirty(['display_template', 'hostname', 'sysName', 'ip', 'overwrite_ip'])) {
             $device->regenerateDisplayName();
-            \Debugbar::log('display name regenerated');
         }
 
         // handle device renames
