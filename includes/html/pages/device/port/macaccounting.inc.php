@@ -5,13 +5,15 @@ use App\Models\Ipv4Mac;
 use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\Number;
+use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
 // FIXME - REWRITE!
 $hostname = $device['hostname'];
 $ifname = $port['ifDescr'];
 $ifIndex = $port['ifIndex'];
-$speed = LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 0, 'bps');
+$speed = Number::formatSi($port['ifSpeed'], 2, 0, 'bps');
 
 $ifalias = $port['name'];
 
@@ -33,7 +35,7 @@ if ($port['ifAdminStatus'] == IfOperStatus::Up && $port['ifOperStatus'] == IfOpe
 }
 
 $i = 1;
-$inf = LibreNMS\Util\Rewrite::normalizeIfName($ifname);
+$inf = Rewrite::normalizeIfName($ifname);
 
 echo "<div style='clear: both;'>";
 
@@ -183,8 +185,8 @@ if ($vars['subview'] == 'top10') {
           <td class=list-large width=200>' . Mac::parse($acc['mac'])->readable() . '</td>
           <td class=list-large width=200>' . $ipv4 . '</td>
           <td class=list-large width=500>' . $name . ' ' . $arp_name . '</td>
-          <td class=list-large width=100>' . LibreNMS\Util\Number::formatSi($acc['bps_in'], 2, 3, 'bps') . '</td>
-          <td class=list-large width=100>' . LibreNMS\Util\Number::formatSi($acc['bps_out'], 2, 3, 'bps') . '</td>
+          <td class=list-large width=100>' . Number::formatSi($acc['bps_in'], 2, 3, 'bps') . '</td>
+          <td class=list-large width=100>' . Number::formatSi($acc['bps_out'], 2, 3, 'bps') . '</td>
         </tr>
       </table>
       </div>
