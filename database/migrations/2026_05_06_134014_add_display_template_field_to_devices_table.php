@@ -24,7 +24,6 @@ return new class extends Migration
         });
 
         DB::table('devices')
-            ->whereNotNull('display')
             ->where('display', '!=', '')
             ->update(['display_template' => DB::raw('display')]);
     }
