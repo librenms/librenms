@@ -39,11 +39,11 @@
                     <td>{{ $version_webserver }}</td>
                 </tr>
                 <tr>
-                    <td><b>{{ __('PHP') }}</b></td>
+                    <td><a target="_blank" href="https://www.php.net/"><b>{{ __('PHP') }}</b></a></td>
                     <td>{{ $version_php }}</td>
                 </tr>
                 <tr>
-                    <td><b>{{ __('Python') }}</b></td>
+                    <td><a target="_blank" href="https://www.python.org/"><b>{{ __('Python') }}</b></a></td>
                     <td>{{ $version_python }}</td>
                 </tr>
                 <tr>
@@ -57,6 +57,10 @@
                 <tr>
                     <td><a target="_blank" href="https://oss.oetiker.ch/rrdtool/"><b>{{ __('RRDtool') }}</b></a></td>
                     <td>{{ $version_rrdtool }}</td>
+                </tr>
+                <tr>
+                    <td><a target="_blank" href="https://www.net-snmp.org/"><b>{{ __('Net-SNMP') }}</b></a></td>
+                    <td>{{ $version_netsnmp }}</td>
                 </tr>
             </table>
 
