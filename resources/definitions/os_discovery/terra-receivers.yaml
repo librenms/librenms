@@ -184,50 +184,6 @@ modules:
                     states:
                         - { value: 1, generic: 0, descr: OK }
                         - { value: 0, generic: 3, descr: Error }
-                -
-                    oid: TERRA-sdi480-MIB::sdi480alarms
-                    value: TERRA-sdi480-MIB::alarmUnlock1
-                    num_oid: '.1.3.6.1.4.1.30631.1.17.2.8'
-                    descr: 'LNB #01'
-                    index: '2.8'
-                    group: Tuner Lock
-                    state_name: TERRA-sdi480-MIB::alarmUnlock1
-                    states:
-                        - { value: 0, generic: 0, descr: OK }
-                        - { value: 1, generic: 3, descr: Error }
-                -
-                    oid: TERRA-sdi480-MIB::sdi480alarms
-                    value: TERRA-sdi480-MIB::alarmUnlock2
-                    num_oid: '.1.3.6.1.4.1.30631.1.17.2.9'
-                    descr: 'LNB #02'
-                    index: '2.9'
-                    group: Tuner Lock
-                    state_name: TERRA-sdi480-MIB::alarmUnlock2
-                    states:
-                        - { value: 0, generic: 0, descr: OK }
-                        - { value: 1, generic: 3, descr: Error }
-                -
-                    oid: TERRA-sdi480-MIB::sdi480alarms
-                    value: TERRA-sdi480-MIB::alarmUnlock3
-                    num_oid: '.1.3.6.1.4.1.30631.1.17.2.10'
-                    descr: 'LNB #03'
-                    index: '2.10'
-                    group: Tuner Lock
-                    state_name: TERRA-sdi480-MIB::alarmUnlock3
-                    states:
-                        - { value: 0, generic: 0, descr: OK }
-                        - { value: 1, generic: 3, descr: Error }
-                -
-                    oid: TERRA-sdi480-MIB::sdi480alarms
-                    value: TERRA-sdi480-MIB::alarmUnlock4
-                    num_oid: '.1.3.6.1.4.1.30631.1.17.2.11'
-                    descr: 'LNB #04'
-                    index: '2.11'
-                    group: Tuner Lock
-                    state_name: TERRA-sdi480-MIB::alarmUnlock4
-                    states:
-                        - { value: 0, generic: 0, descr: OK }
-                        - { value: 1, generic: 3, descr: Error }
         snr:
             data:
                 -
@@ -284,7 +240,7 @@ modules:
                     oid: TERRA-sdi480-MIB::sdi480status
                     value: TERRA-sdi480-MIB::insnr1
                     num_oid: '.1.3.6.1.4.1.30631.1.17.1.1.3.{{ $index }}'
-                    descr: 'Input #01'
+                    descr: 'Input 1'
                     index: '1.3.{{ $index }}'
                     divisor: 10
                     low_limit: 13
@@ -294,7 +250,7 @@ modules:
                     oid: TERRA-sdi480-MIB::sdi480status
                     value: TERRA-sdi480-MIB::insnr2
                     num_oid: '.1.3.6.1.4.1.30631.1.17.1.2.3.{{ $index }}'
-                    descr: 'Input #02'
+                    descr: 'Input 2'
                     index: '2.3.{{ $index }}'
                     divisor: 10
                     low_limit: 13
@@ -304,7 +260,7 @@ modules:
                     oid: TERRA-sdi480-MIB::sdi480status
                     value: TERRA-sdi480-MIB::insnr3
                     num_oid: '.1.3.6.1.4.1.30631.1.17.1.3.3.{{ $index }}'
-                    descr: 'Input #03'
+                    descr: 'Input 3'
                     index: '3.3.{{ $index }}'
                     divisor: 10
                     low_limit: 13
@@ -314,7 +270,7 @@ modules:
                     oid: TERRA-sdi480-MIB::sdi480status
                     value: TERRA-sdi480-MIB::insnr4
                     num_oid: '.1.3.6.1.4.1.30631.1.17.1.4.3.{{ $index }}'
-                    descr: 'Input #04'
+                    descr: 'Input 4'
                     index: '4.3.{{ $index }}'
                     divisor: 10
                     low_limit: 13
@@ -324,7 +280,7 @@ modules:
                     oid: TERRA-sdi480-MIB::sdi480status
                     value: TERRA-sdi480-MIB::insnr5
                     num_oid: '.1.3.6.1.4.1.30631.1.17.1.5.3.{{ $index }}'
-                    descr: 'Input #05'
+                    descr: 'Input 5'
                     index: '5.3.{{ $index }}'
                     divisor: 10
                     low_limit: 13
@@ -334,7 +290,7 @@ modules:
                     oid: TERRA-sdi480-MIB::sdi480status
                     value: TERRA-sdi480-MIB::insnr6
                     num_oid: '.1.3.6.1.4.1.30631.1.17.1.6.3.{{ $index }}'
-                    descr: 'Input #06'
+                    descr: 'Input 6'
                     index: '6.3.{{ $index }}'
                     divisor: 10
                     low_limit: 13
@@ -344,7 +300,7 @@ modules:
                     oid: TERRA-sdi480-MIB::sdi480status
                     value: TERRA-sdi480-MIB::insnr7
                     num_oid: '.1.3.6.1.4.1.30631.1.17.1.7.3.{{ $index }}'
-                    descr: 'Input #07'
+                    descr: 'Input 7'
                     index: '7.3.{{ $index }}'
                     divisor: 10
                     low_limit: 13
@@ -354,7 +310,7 @@ modules:
                     oid: TERRA-sdi480-MIB::sdi480status
                     value: TERRA-sdi480-MIB::insnr8
                     num_oid: '.1.3.6.1.4.1.30631.1.17.1.8.3.{{ $index }}'
-                    descr: 'Input #08'
+                    descr: 'Input 8'
                     index: '8.3.{{ $index }}'
                     divisor: 10
                     low_limit: 13
@@ -438,7 +394,7 @@ modules:
                 -
                     oid: TERRA-sdi410C-MIB::inputStatus
                     value: TERRA-sdi410C-MIB::level
-                    num_oid: ' .1.3.6.1.4.1.30631.1.8.1.27.3.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.30631.1.8.1.27.3.{{ $index }}'
                     descr: 'Input 1 / {{ TERRA-sdi410C-MIB::std }} / {{ TERRA-sdi410C-MIB::mod }}'
                     index: '27.3.{{ $index }}'
                 -
@@ -469,27 +425,27 @@ modules:
                     oid: TERRA-sdi480-MIB::sdi480status
                     value: TERRA-sdi480-MIB::inlevel1
                     num_oid: '.1.3.6.1.4.1.30631.1.17.1.1.2.{{ $index }}'
-                    descr: 'LNB #01'
+                    descr: 'LNB 1'
                     index: '1.2.{{ $index }}'
                     divisor: 10
                 -
                     oid: TERRA-sdi480-MIB::sdi480status
                     value: TERRA-sdi480-MIB::inlevel2
                     num_oid: '.1.3.6.1.4.1.30631.1.17.1.2.2.{{ $index }}'
-                    descr: 'LNB #02'
+                    descr: 'LNB 2'
                     index: '2.2.{{ $index }}'
                     divisor: 10
                 -
                     oid: TERRA-sdi480-MIB::sdi480status
                     value: TERRA-sdi480-MIB::inlevel3
                     num_oid: '.1.3.6.1.4.1.30631.1.17.1.3.2.{{ $index }}'
-                    descr: 'LNB #03'
+                    descr: 'LNB 3'
                     index: '3.2.{{ $index }}'
                     divisor: 10
                 -
                     oid: TERRA-sdi480-MIB::sdi480status
                     value: TERRA-sdi480-MIB::inlevel4
                     num_oid: '.1.3.6.1.4.1.30631.1.17.1.4.2.{{ $index }}'
-                    descr: 'LNB #04'
+                    descr: 'LNB 4'
                     index: '4.2.{{ $index }}'
                     divisor: 10
