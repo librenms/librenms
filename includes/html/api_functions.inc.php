@@ -304,7 +304,7 @@ function get_device(Illuminate\Http\Request $request)
     $device = DeviceCache::get($request->route('hostname'));
 
     if (! $device->exists) {
-        return api_error(404, "Device " . $request->route('hostname') . " does not exist");
+        return api_error(404, 'Device ' . $request->route('hostname') . ' does not exist');
     }
 
     return check_device_permission($device->device_id, function () use ($device) {
