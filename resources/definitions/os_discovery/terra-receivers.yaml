@@ -132,14 +132,14 @@ modules:
                 -
                     oid: TERRA-sdi410C-MIB::sdi410calarms
                     value: TERRA-sdi410C-MIB::alarmInpsig
-                    num_oid: '.1.3.6.1.4.1.30631.1.8.1.27.1.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.30631.1.8.2.3.{{ $index }}'
                     descr: 'Input 1 / {{ TERRA-sdi410C-MIB::std }} / {{ TERRA-sdi410C-MIB::mod }}'
                     index: 0
                     group: Tuner Lock
                     state_name: TERRA-sdi410C-MIB::alarmInpsig
                     states:
                         - { value: 0, generic: 0, descr: OK }
-                        - { value: 1, generic: 3, descr: Error }
+                        - { value: 1, generic: 2, descr: Error }
                 -
                     oid: TERRA-sti440-MIB::sti440status
                     value: TERRA-sti440-MIB::inLock1
@@ -150,7 +150,7 @@ modules:
                     state_name: TERRA-sti440-MIB::inLock1
                     states:
                         - { value: 1, generic: 0, descr: OK }
-                        - { value: 0, generic: 3, descr: Error }
+                        - { value: 0, generic: 2, descr: Error }
                 -
                     oid: TERRA-sti440-MIB::sti440status
                     value: TERRA-sti440-MIB::inLock2
@@ -161,7 +161,7 @@ modules:
                     state_name: TERRA-sti440-MIB::inLock2
                     states:
                         - { value: 1, generic: 0, descr: OK }
-                        - { value: 0, generic: 3, descr: Error }
+                        - { value: 0, generic: 2, descr: Error }
                 -
                     oid: TERRA-sti440-MIB::sti440status
                     value: TERRA-sti440-MIB::inLock3
@@ -172,7 +172,7 @@ modules:
                     state_name: TERRA-sti440-MIB::inLock3
                     states:
                         - { value: 1, generic: 0, descr: OK }
-                        - { value: 0, generic: 3, descr: Error }
+                        - { value: 0, generic: 2, descr: Error }
                 -
                     oid: TERRA-sti440-MIB::sti440status
                     value: TERRA-sti440-MIB::inLock4
@@ -183,7 +183,7 @@ modules:
                     state_name: TERRA-sti440-MIB::inLock4
                     states:
                         - { value: 1, generic: 0, descr: OK }
-                        - { value: 0, generic: 3, descr: Error }
+                        - { value: 0, generic: 2, descr: Error }
         snr:
             data:
                 -
