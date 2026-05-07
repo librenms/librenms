@@ -122,7 +122,7 @@ class PortGroupController extends Controller
      */
     public function graph(Request $request, PortGroup $group): View
     {
-        $this->authorize('view', $group);
+        $this->authorize('viewAny', Port::class);
 
         return view('port-group.graph', [
             'group' => $group,

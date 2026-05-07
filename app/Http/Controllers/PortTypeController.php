@@ -34,6 +34,8 @@ class PortTypeController extends Controller
 {
     public function graph(Request $request, string $types): View
     {
+        $this->authorize('viewAny', Port::class);
+
         $types = explode(',', (string) $types);
         $ports = Port::hasAccess($request->user())->whereIn('port_descr_type', $types)->with('device')->withCount('macAccounting')->get();
 
