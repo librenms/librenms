@@ -2,7 +2,7 @@
     'start' => '',
     'end' => '',
     'presets' => true,
-    'placeholder' => 'Select date range...',
+    'placeholder' => __('Select date range...'),
     'class' => 'tw:w-full tw:px-3 tw:py-2 tw:border tw:border-gray-300 tw:rounded-md'
 ])
 

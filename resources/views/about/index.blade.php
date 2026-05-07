@@ -14,7 +14,7 @@
                 <pre>{!! $git_log !!}</pre>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">@Lang('Close')</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('Close') }}</button>
             </div>
         </div>
     </div>
