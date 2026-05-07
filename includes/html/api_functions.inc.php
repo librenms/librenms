@@ -308,17 +308,16 @@ function get_device(Illuminate\Http\Request $request)
     }
 
     return check_device_permission($device->device_id, function () use ($device) {
-        $ret = $device->toArray();
-        $ret['location'] = $device->location->location ?? null;
-        $ret['lat'] = $device->location->lat ?? null;
-        $ret['lng'] = $device->location->lng ?? null;
+        $device['location'] = $device->location?->location;
+        $device['lat'] = $device->location?->lat;
+        $device['lng'] = $device->location?->lng;
 
-        $host_id = get_vm_parent_id($ret);
+        $host_id = get_vm_parent_id($device);
         if (is_numeric($host_id)) {
-            $ret = array_merge($ret, ['parent_id' => $host_id]);
+            $device = array_merge($device, ['parent_id' => $host_id]);
         }
 
-        return api_success([$ret], 'devices');
+        return api_success([$device], 'devices');
     });
 }
 
