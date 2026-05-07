@@ -30,7 +30,7 @@
                 <div
                    x-text="tab.name"
                    class="tw:inline-block tw:p-3 tw:border-b-2 tw:rounded-t-lg tw:cursor-pointer"
-                   :class="tab.value === activeTab ? 'tw:text-blue-600 tw:border-blue-600 active tw:dark:text-blue-500 tw:dark:border-blue-500' : 'tw:border-transparent tw:hover:text-gray-600 tw:hover:border-gray-300 tw:dark:hover:text-gray-300'"
+                   :class="tab.value === activeTab ? 'tw:text-blue-600 tw:border-blue-600 active tw:dark:text-blue-500 tw:dark:border-blue-500 tw:bg-gray-100 tw:dark:bg-gray-700' : 'tw:border-transparent tw:hover:text-gray-600 tw:hover:border-gray-300 tw:dark:hover:text-gray-300'"
                 ></div>
             </li>
         </template>

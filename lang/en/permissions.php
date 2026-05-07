@@ -238,6 +238,7 @@ return [
         'create' => ['label' => 'Create Users', 'description' => 'Create new user accounts'],
         'update' => ['label' => 'Edit Users', 'description' => 'Modify user accounts, roles, and permissions'],
         'delete' => ['label' => 'Delete Users', 'description' => 'Delete user accounts'],
+        'manage' => ['label' => 'Manage Permissions', 'description' => 'Manage user permissions'],
         'updatePassword' => ['label' => 'Update Password', 'description' => 'Update user password'],
     ],
 
@@ -296,5 +297,12 @@ return [
         'updated' => 'Role :name updated successfully',
         'deleted' => 'Role :name deleted successfully',
         'role_name_regex' => 'Role names can only contain lowercase letters and hyphens (-).',
+    ],
+    'permissions' => [
+        'user_permissons' => ':name Permissions',
+        'bill_access' => 'Bill Access (:count)',
+        'device_access' => 'Device Access (:count)',
+        'device_group_access' => 'Device Group Access (:count)',
+        'port_access' => 'Port Access (:count)',
     ],
 ];
