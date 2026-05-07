@@ -301,25 +301,24 @@ function list_locations()
 
 function get_device(Illuminate\Http\Request $request)
 {
-    // return details of a single device
-    $hostname = $request->route('hostname');
+    $device = DeviceCache::get($request->route('hostname'));
 
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-
-    // find device matching the id
-    $device = device_by_id_cache($device_id);
-    if (! $device || ! isset($device['device_id'])) {
-        return api_error(404, "Device $hostname does not exist");
+    if (! $device->exists) {
+        return api_error(404, "Device " . $request->route('hostname') . " does not exist");
     }
 
-    return check_device_permission($device_id, function () use ($device) {
-        $host_id = get_vm_parent_id($device);
+    return check_device_permission($device->device_id, function () use ($device) {
+        $ret = $device->toArray();
+        $ret['location'] = $device->location->location ?? null;
+        $ret['lat'] = $device->location->lat ?? null;
+        $ret['lng'] = $device->location->lng ?? null;
+
+        $host_id = get_vm_parent_id($ret);
         if (is_numeric($host_id)) {
-            $device = array_merge($device, ['parent_id' => $host_id]);
+            $ret = array_merge($ret, ['parent_id' => $host_id]);
         }
 
-        return api_success([$device], 'devices');
+        return api_success([$ret], 'devices');
     });
 }
 
