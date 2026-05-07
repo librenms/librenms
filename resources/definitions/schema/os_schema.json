@@ -115,6 +115,9 @@
                 "customoid": {
                     "type": "boolean"
                 },
+                "device-stack": {
+                    "type": "boolean"
+                },
                 "entity-physical": {
                     "type": "boolean"
                 },
@@ -296,6 +299,9 @@
                     "type": "boolean"
                 },
                 "diskio": {
+                    "type": "boolean"
+                },
+                "device-stack": {
                     "type": "boolean"
                 },
                 "entity-physical": {
