@@ -15,6 +15,10 @@
         </div>
     @endif
 
+    @isset($table)
+        {{ $table }}
+    @endisset
+
     @isset($footer)
         <div {{ $footer->attributes->class(['panel-footer']) }}>
             {{ $footer }}
