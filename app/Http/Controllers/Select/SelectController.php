@@ -37,6 +37,7 @@ use Illuminate\Support\Collection;
 
 /**
  * @template TModel of Model
+ *
  * @extends PaginatedAjaxController<TModel>
  */
 abstract class SelectController extends PaginatedAjaxController

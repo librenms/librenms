@@ -77,8 +77,8 @@ abstract class AggregateSelectController extends SelectController
     }
 
     /**
-     * @param Collection<int, array{text: string, controller: SelectController, prefix: string, items: LengthAwarePaginator}> $paginator
-     * @param bool $hasMore
+     * @param  Collection<int, array{text: string, controller: SelectController, prefix: string, items: LengthAwarePaginator}>  $paginator
+     * @param  bool  $hasMore
      * @return JsonResponse
      */
     protected function formatResponse($paginator, bool $hasMore = false): JsonResponse
@@ -92,7 +92,7 @@ abstract class AggregateSelectController extends SelectController
     }
 
     /**
-     * @param array{text: string, controller: SelectController, prefix: string, items: LengthAwarePaginator} $group
+     * @param  array{text: string, controller: SelectController, prefix: string, items: LengthAwarePaginator}  $group
      * @return array{text: string|null, children: array<int, array{id: int|string, text: string, icon?: string}>}|array<never, never>
      */
     public function formatGroup(array $group): array

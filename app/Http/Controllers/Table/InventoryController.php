@@ -117,6 +117,7 @@ class InventoryController extends TableController
 
     /**
      * Format a row for CSV export
+     *
      * @param  EntPhysical  $entPhysical
      */
     protected function formatExportRow(Model $entPhysical): array

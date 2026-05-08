@@ -39,6 +39,7 @@ use LibreNMS\Util\Url;
 
 /**
  * @template TModel of PortRelatedModel
+ *
  * @extends TableController<TModel>
  */
 abstract class AddressSearchController extends TableController

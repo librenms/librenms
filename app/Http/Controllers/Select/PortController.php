@@ -87,6 +87,7 @@ class PortController extends SelectController
 
     /**
      * @param  Port  $model
+     *
      * @returns array{id: int|string, text: string, icon?: string}
      */
     public function formatItem(Model $model): array

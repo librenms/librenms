@@ -37,9 +37,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-
 /**
  * @template TModel of Model
+ *
  * @extends PaginatedAjaxController<TModel>
  */
 abstract class TableController extends PaginatedAjaxController

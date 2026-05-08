@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SensorModel.php
  *
@@ -30,6 +31,7 @@ use LibreNMS\Enum\WirelessSensorType;
 
 /**
  * @template T
+ *
  * @property int $sensor_id
  * @property int $sensor_deleted
  * @property string|WirelessSensorType $sensor_class
@@ -56,11 +58,17 @@ abstract class SensorModel extends DeviceRelatedModel
 {
     use HasThresholds;
 
-    abstract public function formatValue($field = 'sensor_current'): string;
+    abstract public function formatValue(string $field = 'sensor_current'): string;
+
     abstract public function getGraphType(): string;
+
     abstract public function unit(): string;
+
     abstract public function unitLong(): string;
+
     abstract public function icon(): string;
+
     abstract public function classDescr(): string;
+
     abstract public function classDescrLong(): string;
 }
