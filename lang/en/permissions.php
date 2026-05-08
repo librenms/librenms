@@ -304,5 +304,10 @@ return [
         'device_access' => 'Device Access (:count)',
         'device_group_access' => 'Device Group Access (:count)',
         'port_access' => 'Port Access (:count)',
+        'bill_all' => 'All Bills',
+        'device_all' => 'All Devices',
+        'device_group_all' => 'All Device Groups',
+        'port_all' => 'All Ports',
+        'none_configured' => 'None Configured',
     ],
 ];

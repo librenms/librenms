@@ -11,8 +11,8 @@
                     <i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i>
                     {{ __('permissions.permissions.user_permissons', ['name' => $user->realname ?: $user->username]) }}
                 </div>
-                <a href="{{ route('users.index') }}" class="tw:text-gray-500 tw:hover:text-red-700! tw:dark:hover:text-red-800! tw:transition-colors">
-                    <span class="tw:sr-only">Close and return home</span>
+                <a href="{{ route('users.index') }}" class="tw:focus:outline-none tw:text-gray-500 tw:hover:text-red-700! tw:dark:hover:text-red-800! tw:transition-colors">
+                    <span class="tw:sr-only">Close and return to user management page</span>
                     <i class="fas fa-x"></i>
                 </a>
             </div>
@@ -21,7 +21,7 @@
         <x-tabs active="{{ $tab }}">
             <x-tab name="{{ __('permissions.permissions.device_access', ['count' => $deviceCount]) }}" value="device">
                     @if($deviceCount == 'all')
-                        <h4>{{ __('All Devices') }}</h4>
+                        <h4 class="tw:m-3">{{ __('permissions.permissions.device_all') }}</h4>
                     @else
                     <div class="tw:p-5">
                     <h4>{{ __('Grant access to new device') }}</h4>
@@ -58,7 +58,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="2">{{ __('None Configured') }}</td>
+                                <td colspan="2">{{ __('permissions.permissions.none_configured') }}</td>
                             </tr>
                         @endforelse
                     </table>
@@ -67,7 +67,7 @@
 
             <x-tab name="{{ __('permissions.permissions.device_group_access', ['count' => $deviceGroupCount]) }}" value="device-group">
                     @if($deviceGroupCount == 'all')
-                        <h4>{{ __('All Device Groups') }}</h4>
+                        <h4 class="tw:m-3">{{ __('permissions.permissions.device_group_all') }}</h4>
                     @else
                     <div class="tw:p-5">
                         <h4>{{ __('Grant access to new Device Group') }}</h4>
@@ -104,7 +104,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="2">{{ __('None Configured') }}</td>
+                                <td colspan="2">{{ __('permissions.permissions.none_configured') }}</td>
                             </tr>
                         @endforelse
                     </table>
@@ -113,7 +113,7 @@
 
             <x-tab name="{{ __('permissions.permissions.port_access', ['count' => $portCount]) }}" value="port">
                     @if($portCount == 'all')
-                        <h4>{{ __('All Ports') }}</h4>
+                        <h4 class="tw:m-3">{{ __('permissions.permissions.port_all') }}</h4>
                     @else
                     <div class="tw:p-5">
                         <h4>{{ __('Grant access to new interface') }}</h4>
@@ -128,7 +128,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="port_id" class="col-sm-2 control-label">{{ __('Interface:') }}</label>
+                                <label for="port_id" class="col-sm-2 control-label">{{ __('Port:') }}</label>
                                 <div class="col-sm-10">
                                     <select class="form-control" id="port_id" name="port_id"></select>
                                 </div>
@@ -143,7 +143,7 @@
                     </div>
                     <table class="table table-hover table-condensed table-striped tw:mb-0">
                         <tr>
-                            <th>{{ __('Interface name') }}</th>
+                            <th>{{ __('Port name') }}</th>
                             <th>{{ __('Action') }}</th>
                         </tr>
                         @forelse($portPermissions as $portPermission)
@@ -168,7 +168,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="2">{{ __('None Configured') }}</td>
+                                <td colspan="2">{{ __('permissions.permissions.none_configured') }}</td>
                             </tr>
                         @endforelse
                     </table>
@@ -177,7 +177,7 @@
 
             <x-tab name="{{ __('permissions.permissions.bill_access', ['count' => $billCount]) }}" value="bill">
                     @if($billCount == 'all')
-                        <h4>{{ __('All Bills') }}</h4>
+                        <h4 class="tw:m-3">{{ __('permissions.permissions.bill_all') }}</h4>
                     @else
                         <div class="tw:p-5">
                             <h4>{{ __('Grant access to new bill') }}</h4>
@@ -215,7 +215,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="2">{{ __('None Configured') }}</td>
+                                    <td colspan="2">{{ __('permissions.permissions.none_configured') }}</td>
                                 </tr>
                             @endforelse
                         </table>
