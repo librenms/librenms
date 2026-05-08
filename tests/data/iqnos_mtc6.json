@@ -47650,6 +47650,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2017-8-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -47669,6 +47670,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2017-8-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -47688,6 +47690,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2022-9-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -47707,6 +47710,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -47726,6 +47730,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -47745,6 +47750,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -47764,6 +47770,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -47783,6 +47790,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2019-12-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -47802,6 +47810,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2017-8-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -47821,6 +47830,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2017-8-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -47840,6 +47850,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2020-3-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -47859,6 +47870,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2020-7-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -47878,6 +47890,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2020-7-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -47897,6 +47910,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2020-7-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -47916,6 +47930,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2020-3-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -47935,6 +47950,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -47954,6 +47970,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -47973,6 +47990,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -47992,6 +48010,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2017-8-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -48011,6 +48030,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2017-8-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -48030,6 +48050,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2020-3-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -48049,6 +48070,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2020-6-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -48068,6 +48090,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2020-7-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -48087,6 +48110,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -48106,6 +48130,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -48125,6 +48150,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2020-8-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -48144,6 +48170,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2022-9-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -48163,6 +48190,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2016-10-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -48182,6 +48210,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2022-9-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -48201,6 +48230,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2022-11-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -48220,6 +48250,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": "2022-10-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -48239,6 +48270,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -48258,6 +48290,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "INFINERA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

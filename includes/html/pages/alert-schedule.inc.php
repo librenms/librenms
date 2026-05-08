@@ -12,9 +12,11 @@
  * the source code distribution for details.
  */
 
+use App\Models\AlertSchedule;
+
 $pagetitle[] = 'Alert Schedule';
 $no_refresh = true;
-if (Auth::user()->hasGlobalAdmin()) {
+if (Gate::allows('viewAny', AlertSchedule::class)) {
     include_once 'includes/html/modal/alert_schedule.inc.php';
     include_once 'includes/html/modal/remove_alert_schedule.inc.php'; ?>
 

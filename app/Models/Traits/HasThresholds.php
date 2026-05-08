@@ -73,8 +73,11 @@ trait HasThresholds
 
     public function guessLimits(bool $high, bool $low): void
     {
+        // Get the string value for matching (supports both enum casts and raw strings)
+        $class = $this->sensor_class instanceof \BackedEnum ? $this->sensor_class->value : $this->sensor_class;
+
         if ($high) {
-            $this->sensor_limit = match ($this->sensor_class) {
+            $this->sensor_limit = match ($class) {
                 'temperature' => $this->sensor_current + 20,
                 'voltage' => $this->sensor_current * 1.15,
                 'humidity' => 70,
@@ -88,7 +91,7 @@ trait HasThresholds
         }
 
         if ($low) {
-            $this->sensor_limit_low = match ($this->sensor_class) {
+            $this->sensor_limit_low = match ($class) {
                 'temperature' => $this->sensor_current - 10,
                 'voltage' => $this->sensor_current * 0.85,
                 'humidity' => 30,

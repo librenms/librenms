@@ -37,6 +37,13 @@ use LibreNMS\Util\Url;
 
 class MempoolsController extends TableController
 {
+    protected function rules(): array
+    {
+        return [
+            'status' => 'nullable|string',
+        ];
+    }
+
     protected function searchFields($request)
     {
         return ['hostname', 'display', 'mempool_descr'];
@@ -53,17 +60,23 @@ class MempoolsController extends TableController
     protected function baseQuery($request)
     {
         if ($request->input('view') == 'graphs') {
-            return Device::hasAccess($request->user())->has('mempools')->with('mempools');
+            $query = Device::hasAccess($request->user())->has('mempools')->with('mempools');
+        } else {
+            $query = Mempool::hasAccess($request->user())
+                ->with(['device', 'device.location']);
+
+            // join devices table to sort by hostname or search
+            if (array_key_exists('hostname', $request->input('sort', $this->default_sort)) || $request->input('searchPhrase')) {
+                $query->join('devices', 'mempools.device_id', 'devices.device_id')
+                    ->select('mempools.*');
+            }
         }
 
-        $query = Mempool::hasAccess($request->user())
-            ->with(['device', 'device.location']);
-
-        // join devices table to sort by hostname or search
-        if (array_key_exists('hostname', $request->input('sort', $this->default_sort)) || $request->input('searchPhrase')) {
-            $query->join('devices', 'mempools.device_id', 'devices.device_id')
-                ->select('mempools.*');
-        }
+        $query->when($request->input('status') == 'warning', function ($q): void {
+            // show only entries in warning state
+            $q->where('mempool_perc_warn', '>', 0)
+                ->whereColumn('mempool_perc', '>=', 'mempool_perc_warn');
+        });
 
         return $query;
     }

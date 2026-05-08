@@ -34,8 +34,13 @@ if (! empty($oids)) {
     foreach ($oids as $vlan => $oidData) {
         foreach ($oidData as $mac => $macData) {
             $port = $macData['dot1qTpFdbPort'];
-            //try both variation with & without space
-            $port_id = find_port_id('gigabitEthernet 1/0/' . $port, 'gigabitEthernet1/0/' . $port, $device['device_id']) ?? 0;
+            // TP-Link JetStream: ifIndex = bridge port + 49152
+            $ifIndex = $port + 49152;
+            $port_id = \App\Facades\PortCache::getIdFromIfIndex($ifIndex, $device['device_id']);
+            // fallback: try name match (with and without space)
+            if (! $port_id) {
+                $port_id = find_port_id('gigabitEthernet 1/0/' . $port, 'gigabitEthernet1/0/' . $port, $device['device_id']) ?? 0;
+            }
             $mac_address = Mac::parse($mac)->hex();
             if (strlen($mac_address) != 12) {
                 Log::debug("MAC address padding failed for $mac\n");

@@ -30,6 +30,7 @@ use App\Models\WirelessSensor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use LibreNMS\Enum\WirelessSensorType;
 
 class WirelessSensorController extends SensorsController
 {
@@ -37,7 +38,7 @@ class WirelessSensorController extends SensorsController
     {
         return [
             'view' => Rule::in(['detail', 'graphs']),
-            'class' => Rule::in(array_keys(\LibreNMS\Device\WirelessSensor::getTypes())),
+            'class' => Rule::in(WirelessSensorType::values()),
         ];
     }
 

@@ -1,4 +1,3 @@
-mib:  ALPHA-RECTIFIER-SYS-MIB:ALPHA-RESOURCE-MIB
 modules:
     os:
         serial: ALPHA-RESOURCE-MIB::componentListSerialNumber.1.1

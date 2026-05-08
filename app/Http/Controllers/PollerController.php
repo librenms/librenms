@@ -32,7 +32,7 @@ class PollerController extends Controller
 
     public function groupsTab()
     {
-        $this->authorize('manage', PollerCluster::class);
+        $this->authorize('viewAny', PollerGroup::class);
 
         return view('poller.groups', [
             'current_tab' => 'groups',
@@ -47,7 +47,6 @@ class PollerController extends Controller
         $this->authorize('viewAny', PollerCluster::class);
 
         return view('poller.poller', [
-            'timezone' => session('preferences.timezone'),
             'current_tab' => 'poller',
             'pollers' => $this->poller(),
             'poller_cluster' => $this->pollerCluster(),
@@ -56,7 +55,7 @@ class PollerController extends Controller
 
     public function settingsTab()
     {
-        $this->authorize('manage', PollerCluster::class);
+        $this->authorize('update', PollerCluster::class);
         $pollerClusters = PollerCluster::all()->keyBy('id');
 
         return view('poller.settings', [
@@ -78,7 +77,7 @@ class PollerController extends Controller
         $since_last_poll = (int) Carbon::parse($last)->diffInSeconds(null, true);
 
         $poller->row_class = $this->checkTimeSinceLastPoll($since_last_poll);
-        $poller->long_not_polled = (\Auth::user()->hasGlobalAdmin() && ($since_last_poll > ($this->rrdstep * 2)));
+        $poller->long_not_polled = $since_last_poll > ($this->rrdstep * 2);
 
         return $poller;
     }
@@ -104,6 +103,9 @@ class PollerController extends Controller
         return 'success';
     }
 
+    /**
+     * @return Collection<int, array<string, mixed>>
+     */
     private function pollerSettings($pollers): Collection
     {
         $groups = PollerGroup::list();

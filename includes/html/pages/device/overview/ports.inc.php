@@ -34,10 +34,10 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
 
     $ports = ObjectCache::portCounts(['total', 'up', 'down', 'disabled'], $device['device_id']);
     echo '<div class="panel-body">
-    <a class="btn btn-default" role="button" href="' . \LibreNMS\Util\Url::deviceUrl($device['device_id'], ['tab' => 'ports']) . '">Total: <span class="badge">' . $ports['total'] . '</span></a>
-    <a class="btn btn-success" role="button" href="' . \LibreNMS\Util\Url::deviceUrl($device['device_id'], ['tab' => 'ports', 'status' => 'up']) . '">Up: <span class="badge">' . $ports['up'] . '</span></a>
-    <a class="btn btn-danger" role="button" href="' . \LibreNMS\Util\Url::deviceUrl($device['device_id'], ['tab' => 'ports', 'status' => 'down']) . '">Down: <span class="badge">' . $ports['down'] . '</span></a>
-    <a class="btn btn-primary" role="button" href="' . \LibreNMS\Util\Url::deviceUrl($device['device_id'], ['tab' => 'ports', 'disabled' => 1]) . '">Disabled: <span class="badge">' . $ports['disabled'] . '</span></a>
+    <a class="btn btn-default" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports']) . '">Total: <span class="badge">' . $ports['total'] . '</span></a>
+    <a class="btn btn-success" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports', 'status' => 'up', 'admin' => 'up']) . '">Up: <span class="badge">' . $ports['up'] . '</span></a>
+    <a class="btn btn-danger" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports', 'status' => 'down', 'admin' => 'up']) . '">Down: <span class="badge">' . $ports['down'] . '</span></a>
+    <a class="btn btn-primary" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports', 'disabled' => 1]) . '">Disabled: <span class="badge">' . $ports['disabled'] . '</span></a>
     </div>';
 
     echo '<div class="panel-footer">';

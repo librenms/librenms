@@ -11582,6 +11582,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11601,6 +11602,7 @@
                     "entPhysicalContainedIn": 671220736,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11620,6 +11622,7 @@
                     "entPhysicalContainedIn": 671221760,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11639,6 +11642,7 @@
                     "entPhysicalContainedIn": 671222784,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11658,6 +11662,7 @@
                     "entPhysicalContainedIn": 671223808,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11677,6 +11682,7 @@
                     "entPhysicalContainedIn": 671223809,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11696,6 +11702,7 @@
                     "entPhysicalContainedIn": 671223810,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11715,6 +11722,7 @@
                     "entPhysicalContainedIn": 671223811,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11734,6 +11742,7 @@
                     "entPhysicalContainedIn": 671223813,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11753,6 +11762,7 @@
                     "entPhysicalContainedIn": 671223814,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11772,6 +11782,7 @@
                     "entPhysicalContainedIn": 671223815,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11791,6 +11802,7 @@
                     "entPhysicalContainedIn": 671224832,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11810,6 +11822,7 @@
                     "entPhysicalContainedIn": 671225856,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11829,6 +11842,7 @@
                     "entPhysicalContainedIn": 671225857,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11848,6 +11862,7 @@
                     "entPhysicalContainedIn": 671225858,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11867,6 +11882,7 @@
                     "entPhysicalContainedIn": 671225861,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11886,6 +11902,7 @@
                     "entPhysicalContainedIn": 671225862,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11905,6 +11922,7 @@
                     "entPhysicalContainedIn": 671226880,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11924,6 +11942,7 @@
                     "entPhysicalContainedIn": 671235072,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11943,6 +11962,7 @@
                     "entPhysicalContainedIn": 671235073,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11962,6 +11982,7 @@
                     "entPhysicalContainedIn": 671238144,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11981,6 +12002,7 @@
                     "entPhysicalContainedIn": 671240192,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12000,6 +12022,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12019,6 +12042,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12038,6 +12062,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12057,6 +12082,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12076,6 +12102,7 @@
                     "entPhysicalContainedIn": 537006080,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12095,6 +12122,7 @@
                     "entPhysicalContainedIn": 537006080,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12114,6 +12142,7 @@
                     "entPhysicalContainedIn": 537006080,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12133,6 +12162,7 @@
                     "entPhysicalContainedIn": 537006080,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12152,6 +12182,7 @@
                     "entPhysicalContainedIn": 537006080,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12171,6 +12202,7 @@
                     "entPhysicalContainedIn": 537006080,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12190,6 +12222,7 @@
                     "entPhysicalContainedIn": 537006080,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12209,6 +12242,7 @@
                     "entPhysicalContainedIn": 537006080,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12228,6 +12262,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12247,6 +12282,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12266,6 +12302,7 @@
                     "entPhysicalContainedIn": 537008128,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12285,6 +12322,7 @@
                     "entPhysicalContainedIn": 537008128,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12304,6 +12342,7 @@
                     "entPhysicalContainedIn": 537008128,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12323,6 +12362,7 @@
                     "entPhysicalContainedIn": 537008128,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12342,6 +12382,7 @@
                     "entPhysicalContainedIn": 537008128,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12361,6 +12402,7 @@
                     "entPhysicalContainedIn": 537008128,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12380,6 +12422,7 @@
                     "entPhysicalContainedIn": 537008128,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12399,6 +12442,7 @@
                     "entPhysicalContainedIn": 537008128,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12418,6 +12462,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12437,6 +12482,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12456,6 +12502,7 @@
                     "entPhysicalContainedIn": 537017344,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12475,6 +12522,7 @@
                     "entPhysicalContainedIn": 537017344,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12494,6 +12542,7 @@
                     "entPhysicalContainedIn": 537020416,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12513,6 +12562,7 @@
                     "entPhysicalContainedIn": 537022464,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12532,6 +12582,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 83,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12551,6 +12602,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 84,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12570,6 +12622,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 85,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12589,6 +12642,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 86,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12608,6 +12662,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 87,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12627,6 +12682,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 88,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12646,6 +12702,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 89,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12665,6 +12722,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 90,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12684,6 +12742,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 91,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12703,6 +12762,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 92,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12722,6 +12782,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 93,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12741,6 +12802,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 94,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12760,6 +12822,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 95,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12779,6 +12842,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 96,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12798,6 +12862,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 97,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12817,6 +12882,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 98,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12836,6 +12902,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 99,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

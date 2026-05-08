@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\CustomMap;
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,11 @@ class CustomMapSettingsRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->isAdmin();  // TODO permissions
+        if ($this->map) {
+            return $this->user()->can('update', $this->map);
+        }
+
+        return $this->user()->can('create', CustomMap::class);
     }
 
     /**

@@ -1,5 +1,5 @@
 <?php
 
-$class = 'power_consumed';
+$class = \LibreNMS\Enum\Sensor::PowerConsumed;
 
 require 'sensors.inc.php';

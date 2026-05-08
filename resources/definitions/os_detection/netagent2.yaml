@@ -2,6 +2,7 @@ os: netagent2
 text: 'MegaTec NetAgent II'
 group: ups
 type: power
+mib_dir: megatec
 over:
     - { graph: device_load, text: Load }
 discovery:

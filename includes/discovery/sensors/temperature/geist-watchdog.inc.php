@@ -23,14 +23,14 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-$value = snmp_get($device, 'climateTempC', '-Oqv', 'GEIST-MIB-V3');
+$value = SnmpQuery::get('GEIST-MIB-V3::climateTempC')->value();
 if ($value) {
     $current_oid = '.1.3.6.1.4.1.21239.2.2.1.5.1';
     $descr = 'Temperature';
     discover_sensor(null, 'temperature', $device, $current_oid, 'climateTempC', 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value);
 }
 
-$value = snmp_get($device, 'climateTempF', '-Oqv', 'GEIST-MIB-V3');
+$value = SnmpQuery::get('GEIST-MIB-V3::climateTempF')->value();
 if ($value) {
     $current_oid = '.1.3.6.1.4.1.21239.2.2.1.6.1';
     $descr = 'Temperature';

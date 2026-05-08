@@ -16,6 +16,9 @@
 
 /* FIXME: is there a central place we can put this? */
 
+use App\Models\Alert;
+use Illuminate\Support\Facades\Gate;
+
 $alert_states = [
     // divined from librenms/alerts.php
     'recovered' => 0,
@@ -35,7 +38,8 @@ $alert_severities = [
     'warning only' => 5,
     'critical only' => 6,
 ];
-if (Auth::user()->hasGlobalAdmin()) {
+$admin_verbose_details = '';
+if (Gate::allows('detail', Alert::class)) {
     $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
 }
 

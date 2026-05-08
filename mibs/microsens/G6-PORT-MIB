@@ -1,0 +1,568 @@
+G6-PORT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Counter32, enterprises,NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+	DisplayString, MacAddress
+		FROM SNMPv2-TC
+	g6	FROM MICROSENS-G6-MIB
+	;
+
+device MODULE-IDENTITY --Category
+	LAST-UPDATED "202302141127Z"
+	ORGANIZATION "MICROSENS GmbH & Co. KG"
+	CONTACT-INFO
+		"Kueferstrasse 16
+		D-59067 Hamm
+		Germany
+		support@microsens.de
+		http://www.microsens.de"
+	DESCRIPTION
+		"Microsens private MIB for Generation 6 Ethernet Switches"
+
+	REVISION "202302141127Z"
+	DESCRIPTION
+		"File creation"
+	::= { g6 1 }
+
+port  OBJECT IDENTIFIER ::= { device 81 }
+
+
+
+-- *************************** CONFIGURATION SECTION ********************************
+
+
+-- ******************* Begin of configTable *************************
+
+configTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF ConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This section defines the basic configuration parameter for each port."
+	::= { port 1 }
+
+configEntry	OBJECT-TYPE
+	SYNTAX ConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { configPortIndex }
+	::= { configTable 1 }
+
+
+	ConfigEntry ::= SEQUENCE {
+	configPortIndex INTEGER,
+	configAlias DisplayString,
+	configPortOperation INTEGER ,
+	configRole INTEGER ,
+	configSpeed INTEGER ,
+	configMtu INTEGER ,
+	configLoopProtection INTEGER ,
+	configAutoNegotiation INTEGER ,
+	configFullDuplex INTEGER ,
+	configFlowcontrol INTEGER ,
+	configMdiMode INTEGER ,
+	configEnergyEfficiency INTEGER ,
+	configDualMediaMode INTEGER ,
+	configAllowedOutgoingPorts OCTET STRING 
+	}
+
+configPortIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0..24)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { configEntry 1 }
+
+configAlias OBJECT-TYPE   -- alias
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Alternative descriptive port name, user definable."
+	::= { configEntry 2 }
+
+configPortOperation OBJECT-TYPE   -- port_operation
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Enables the port for operation. When disabled, port is shut down."
+	::= { configEntry 3 }
+
+configRole OBJECT-TYPE   -- role
+	SYNTAX INTEGER 
+		{
+		default (0),
+		local (1),
+		uplink (2),
+		downlink (3)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Defines is a port is a regular local user port or a link to the network. This setting is references in various sanity checks throughout the system. When in doubt leave at default setting."
+	::= { configEntry 4 }
+
+configSpeed OBJECT-TYPE   -- speed
+	SYNTAX INTEGER 
+		{
+		ms10Mbit (0),
+		ms100Mbit (1),
+		ms1000Mbit (2),
+		sfpAuto (3)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When Auto-Negotiation is disabled sets the ports data rate to the selected speed. When Auto-Negotiation is enabled it determines the highest data rate advertised on port."
+	::= { configEntry 5 }
+
+configMtu OBJECT-TYPE   -- mtu
+	SYNTAX INTEGER 
+		{
+		ms1522Byte (0),
+		ms2048Byte (1),
+		ms10240Byte (2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"MTU used only to have a place holder for SNMP ifTable"
+	::= { configEntry 6 }
+
+configLoopProtection OBJECT-TYPE   -- loop_protection
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Loop protection detects Ethernet loops that can occur when cables are plugged in a way that the data send out of a port come back to the switch on another port. This will result in a data loop of endless packets. Such a loop condition seriously affects network performance and must be avoided."
+	::= { configEntry 7 }
+
+configAutoNegotiation OBJECT-TYPE   -- auto_negotiation
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Enables Auto-Negotiation mode. When Auto-Negotiation mode is enabled, the parameters speed, full_duplex and flow_control determine the advertised port abilities. When Auto-Negotiation is disabled, the parameters speed, full_duplex and flow_control determine the fixed port configuration. Auto-Negotiation is not available for fiber ports in 100 Mbps mode and must be switched off."
+	::= { configEntry 8 }
+
+configFullDuplex OBJECT-TYPE   -- full_duplex
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When Auto-Negotiation is disabled sets port to full duplex operation (when disabled, port is in half duplex mode). When Auto-Negotiation is enabled, it determines the advertisement of full duplex capability."
+	::= { configEntry 9 }
+
+configFlowcontrol OBJECT-TYPE   -- flowcontrol
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When Auto-Negotiation is disabled sets port into flow control mode. When Auto-Negotiation is enabled, it determines the advertisement of flow control capability. Flow control is only supported when port is in full duplex mode."
+	::= { configEntry 10 }
+
+configMdiMode OBJECT-TYPE   -- mdi_mode
+	SYNTAX INTEGER 
+		{
+		auto (0),
+		forceMdiStd (1),
+		forceMdix (2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Enables Auto MDI/MDI-X mode to automatically adapt port pinout to cable type used. When set to forced, port pinout is fixed."
+	::= { configEntry 11 }
+
+configEnergyEfficiency OBJECT-TYPE   -- energy_efficiency
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Enable Energy Efficient Ethernet mode is only available for copper ports in 1000Base-T mode."
+	::= { configEntry 12 }
+
+configDualMediaMode OBJECT-TYPE   -- dual_media_mode
+	SYNTAX INTEGER 
+		{
+		fiberPriority (0),
+		copperPriority (1),
+		forceFiber (2),
+		forceCopper (3)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Define media selection for dual media ports. This function is only available on ports with dual media Phy."
+	::= { configEntry 13 }
+
+configAllowedOutgoingPorts OBJECT-TYPE   -- allowed_outgoing_ports
+	SYNTAX OCTET STRING (SIZE (0..4))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"This bitmask may be used to limit the outgoing traffic to certain ports. This feature is also known as port based vlan. Syntax: slot/port, slot/port or use hex value for quick setup = 0x3f (ports 1-6)"
+	::= { configEntry 14 }
+
+
+-- ********************* End of configTable ***********************
+
+
+-- ******************* Begin of monitorTable *************************
+
+monitorTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF MonitorEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Port monitoring is a test tool which permits reading data from on port on another port for trouble shooting purposes."
+	::= { port 2 }
+
+monitorEntry	OBJECT-TYPE
+	SYNTAX MonitorEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { monitorIndex }
+	::= { monitorTable 1 }
+
+
+	MonitorEntry ::= SEQUENCE {
+	monitorIndex INTEGER,
+	monitorMode INTEGER ,
+	monitorSource OCTET STRING ,
+	monitorDestination Integer32 
+	}
+
+monitorIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { monitorEntry 1 }
+
+monitorMode OBJECT-TYPE   -- mode
+	SYNTAX INTEGER 
+		{
+		disabled (0),
+		txOnly (1),
+		rxOnly (2),
+		rxAndTx (3)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Defines in which mode of port monitoring operation is used. Default is DISABLED for normal operation."
+	::= { monitorEntry 2 }
+
+monitorSource OBJECT-TYPE   -- source
+	SYNTAX OCTET STRING (SIZE (0..4))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Source port(2) of which the traffic is to be monitored. CLI Syntax: 1/1 for first port. 1/1,1/3 for first and third port"
+	::= { monitorEntry 3 }
+
+monitorDestination OBJECT-TYPE   -- destination
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Port on which the traffic monitored on the source port shall be copied to. Normally a network sniffer is connected to this port. Please observe that possibly the VLAN setting of the destination port must match the that of the monitored ports. CLI Syntax: 1/1 for first port."
+	::= { monitorEntry 4 }
+
+
+-- ********************* End of monitorTable ***********************
+
+
+portRestartPort OBJECT-TYPE   -- restart_port
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"This function may be used to briefly disabled and enable the port. This may be used to restart port authentication for example. Please supply port number as parameter. The shorthand port format like 1 for 1/1 may be used. Syntax examples: restart_port = 1/2,1/5.   "
+	::= { port 3 }
+
+
+
+-- ****************************** STATUS SECTION ********************************
+
+
+portUplinkPorts OBJECT-TYPE   -- uplink_ports
+	SYNTAX OCTET STRING (SIZE (0..4))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates which port(s) are connected to the network. The setting is derived from default setting and may be overridden by port.role setting."
+	::= { port 100 }
+
+
+portDownlinkPorts OBJECT-TYPE   -- downlink_ports
+	SYNTAX OCTET STRING (SIZE (0..4))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates to which port(s) a downstream switch is connected. The setting is derived from default setting and may be overridden by port.role setting."
+	::= { port 101 }
+
+
+-- ******************* Begin of statusTable *************************
+
+statusTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF StatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This status table indicates current port status and (negotiated) settings. It also displays if a port is logically blocked due to a certain protocol condition."
+	::= { port 102 }
+
+statusEntry	OBJECT-TYPE
+	SYNTAX StatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { statusPortIndex }
+	::= { statusTable 1 }
+
+
+	StatusEntry ::= SEQUENCE {
+	statusPortIndex INTEGER,
+	statusLinkUp INTEGER ,
+	statusLastLinkChange DisplayString,
+	statusLinkState INTEGER ,
+	statusRxActivity INTEGER ,
+	statusTxActivity INTEGER ,
+	statusMediaUsed INTEGER ,
+	statusSpeedUsed INTEGER ,
+	statusLoopedPort OCTET STRING ,
+	statusFullDuplexUsed INTEGER ,
+	statusFlowcontrolUsed INTEGER ,
+	statusMdiUsed INTEGER ,
+	statusEeeActive INTEGER ,
+	statusBlockingAlgorithm BITS ,
+	statusLearningAlgorithm BITS ,
+	statusForwardingAlgorithm BITS ,
+	statusUnauthorizedAlgorithm BITS 
+	}
+
+statusPortIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0..31)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { statusEntry 1 }
+
+statusLinkUp OBJECT-TYPE   -- link_up
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"False: Link is down, True: Link is up. For dual media ports this indicates the status of the active media."
+	::= { statusEntry 2 }
+
+statusLastLinkChange OBJECT-TYPE   -- last_link_change
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Time when the link_up status changed the last time. Value may appear illogical if the system time is not properly set."
+	::= { statusEntry 3 }
+
+statusLinkState OBJECT-TYPE   -- link_state
+	SYNTAX INTEGER 
+		{
+		linkDown (0),
+		blocking (1),
+		learning (2),
+		forwarding (3),
+		unauthVlan (4)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Logical port status."
+	::= { statusEntry 4 }
+
+statusRxActivity OBJECT-TYPE   -- rx_activity
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates true when data activity on the receiver is detected."
+	::= { statusEntry 5 }
+
+statusTxActivity OBJECT-TYPE   -- tx_activity
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates true when data activity on the transmitter is detected."
+	::= { statusEntry 6 }
+
+statusMediaUsed OBJECT-TYPE   -- media_used
+	SYNTAX INTEGER 
+		{
+		none (0),
+		copper (1),
+		fiber (2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"indicates which media is used for dual media ports"
+	::= { statusEntry 7 }
+
+statusSpeedUsed OBJECT-TYPE   -- speed_used
+	SYNTAX INTEGER 
+		{
+		down (0),
+		ms10Mbit (1),
+		ms100Mbit (2),
+		ms1000Mbit (3),
+		ms2500Mbit (4),
+		ms5Gbit (5),
+		ms10Gbit (6)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Actual (negotiated) port data rate."
+	::= { statusEntry 8 }
+
+statusLoopedPort OBJECT-TYPE   -- looped_port
+	SYNTAX OCTET STRING (SIZE (0..4))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Usually empty. When a port loop is detected through loop protection function then the looped port is indicated here."
+	::= { statusEntry 9 }
+
+statusFullDuplexUsed OBJECT-TYPE   -- full_duplex_used
+	SYNTAX INTEGER 
+		{
+		none (0),
+		full (1),
+		half (2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"False: Half duplex, True: Full duplex."
+	::= { statusEntry 10 }
+
+statusFlowcontrolUsed OBJECT-TYPE   -- flowcontrol_used
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"False: No flow control, True: Use flow control."
+	::= { statusEntry 11 }
+
+statusMdiUsed OBJECT-TYPE   -- mdi_used
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"False: MDI pinout, True: MDI-X pinout."
+	::= { statusEntry 12 }
+
+statusEeeActive OBJECT-TYPE   -- eee_active
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"When true Energy Efficient Ethernet is supported by both ends of the link and is active."
+	::= { statusEntry 13 }
+
+statusBlockingAlgorithm OBJECT-TYPE   -- blocking_algorithm
+	SYNTAX BITS 
+		{
+		portIsEnabled (0),
+		ms8021xApplies (1),
+		rstpApplies (2),
+		ringApplies (3),
+		couplingApplies (4),
+		loopPreventionApplies (5),
+		macAuthApplies (6),
+		bpduGuardApplies (7),
+		dhcpFilterApplies (8)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Flags indicate blocking request by which algorithm per port."
+	::= { statusEntry 14 }
+
+statusLearningAlgorithm OBJECT-TYPE   -- learning_algorithm
+	SYNTAX BITS 
+		{
+		portIsEnabled (0),
+		ms8021xApplies (1),
+		rstpApplies (2),
+		ringApplies (3),
+		couplingApplies (4),
+		loopPreventionApplies (5),
+		macAuthApplies (6),
+		bpduGuardApplies (7),
+		dhcpFilterApplies (8)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Flags indicate learning request by which algorithm per port."
+	::= { statusEntry 15 }
+
+statusForwardingAlgorithm OBJECT-TYPE   -- forwarding_algorithm
+	SYNTAX BITS 
+		{
+		portIsEnabled (0),
+		ms8021xApplies (1),
+		rstpApplies (2),
+		ringApplies (3),
+		couplingApplies (4),
+		loopPreventionApplies (5),
+		macAuthApplies (6),
+		bpduGuardApplies (7),
+		dhcpFilterApplies (8)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Flags indicate forwarding request by which algorithm per port."
+	::= { statusEntry 16 }
+
+statusUnauthorizedAlgorithm OBJECT-TYPE   -- unauthorized_algorithm
+	SYNTAX BITS 
+		{
+		portIsEnabled (0),
+		ms8021xApplies (1),
+		rstpApplies (2),
+		ringApplies (3),
+		couplingApplies (4),
+		loopPreventionApplies (5),
+		macAuthApplies (6),
+		bpduGuardApplies (7),
+		dhcpFilterApplies (8)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Flags indicate use of unauthorized vlan request by which algorithm per port."
+	::= { statusEntry 17 }
+
+
+-- ********************* End of statusTable ***********************
+
+
+
+END
+

@@ -17,6 +17,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Port;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Device\YamlDiscovery;
@@ -388,9 +389,24 @@ function discovery_process($os, $sensor_class, $pre_cache)
                             $user_function = 'fahrenheit_to_celsius';
                         }
                     }
-                    preg_match('/-?\d*\.?\d+/', (string) $snmp_value, $temp_response);
-                    if (! empty($temp_response[0])) {
-                        $snmp_value = $temp_response[0];
+                    if ($sensor_class === 'state' && isset($data['states'])) {
+                        // For state sensors, try to look up the string value in the states table first
+                        // before falling back to numeric extraction (avoids matching leading digits
+                        // in strings like "5G-NSA" as the integer value 5)
+                        $state_map = array_column($data['states'], 'value', 'descr');
+                        if (array_key_exists($snmp_value, $state_map)) {
+                            $snmp_value = $state_map[$snmp_value];
+                        } else {
+                            preg_match('/-?\d*\.?\d+/', (string) $snmp_value, $temp_response);
+                            if (! empty($temp_response[0])) {
+                                $snmp_value = $temp_response[0];
+                            }
+                        }
+                    } else {
+                        preg_match('/-?\d*\.?\d+/', (string) $snmp_value, $temp_response);
+                        if (! empty($temp_response[0])) {
+                            $snmp_value = $temp_response[0];
+                        }
                     }
                 }
 
@@ -826,7 +842,7 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
         }
 
         $sql = 'SELECT `device_id` FROM `devices` WHERE ' . implode(' OR ', $where) . ' LIMIT 2';
-        $ids = dbFetchColumn($sql, $params);
+        $ids = array_column(DB::select($sql, $params), 'device_id');
         if (count($ids) == 1) {
             return (int) $ids[0];
         } elseif (count($ids) > 1) {

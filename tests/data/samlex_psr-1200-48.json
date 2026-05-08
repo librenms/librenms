@@ -703,189 +703,162 @@
                 {
                     "state_name": "fanStatus",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "fanStatus",
                     "state_descr": "on",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "gridACStatus",
                     "state_descr": "non-existent",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "gridACStatus",
                     "state_descr": "detect",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "gridACStatus",
                     "state_descr": "present",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "gridACStatus",
                     "state_descr": "sync",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "gridACStatus",
                     "state_descr": "wont-sync",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "inverterMode",
                     "state_descr": "offline",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "inverterMode",
                     "state_descr": "online",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "transferTypes",
                     "state_descr": "grid",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "transferTypes",
                     "state_descr": "inverter",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "warningFanFaultStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "warningFanFaultStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "warningOverloadStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "warningOverloadStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "warningOverTemperatureStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "warningOverTemperatureStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "warningOverVoltageAlarmStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "warningOverVoltageAlarmStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "warningOverVoltageProtectionStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "warningOverVoltageProtectionStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "warningShortCircuitStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "warningShortCircuitStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "warningUnderVoltageAlarmStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "warningUnderVoltageAlarmStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "warningUnderVoltageProtectionStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "warningUnderVoltageProtectionStatus",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 }

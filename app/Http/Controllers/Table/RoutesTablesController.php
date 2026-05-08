@@ -82,8 +82,8 @@ class RoutesTablesController extends TableController
         $join = function ($query): void {
             $query->on('ports.port_id', 'route.port_id');
         };
-        $showAllRoutes = trim(\Request::get('showAllRoutes'));
-        $showProtocols = trim(\Request::get('showProtocols'));
+        $showAllRoutes = trim(\Request::input('showAllRoutes'));
+        $showProtocols = trim(\Request::input('showProtocols'));
         if ($showProtocols == 'all') {
             $protocols = ['ipv4', 'ipv6'];
         } else {
@@ -122,7 +122,7 @@ class RoutesTablesController extends TableController
      */
     protected function search($search, $query, $fields = [])
     {
-        if ($search = trim(\Request::get('searchPhrase'))) {
+        if ($search = trim(\Request::input('searchPhrase'))) {
             $searchLike = '%' . $search . '%';
 
             return $query->where(fn ($query) => $query->where('route.inetCidrRouteNextHop', 'like', $searchLike)

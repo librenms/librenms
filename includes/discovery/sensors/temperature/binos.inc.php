@@ -23,7 +23,7 @@ if (str_contains((string) $device['sysObjectID'], '.1.3.6.1.4.1.738.1.5.100')) {
 
     $descr = 'CPU Temperature';
     $valueoid = '.1.3.6.1.4.1.738.1.5.100.3.2.3.0'; // PRVT-SWITCH-MIB::reportsHardwareTemperature.0
-    $value = snmp_get($device, $valueoid, '-Oqv');
+    $value = SnmpQuery::get($valueoid)->value();
     $value = str_replace('"', '', $value);
 
     if (is_numeric($value)) {

@@ -1,30 +1,29 @@
-mib: CERENT-ENVMON-MIB:ENTITY-MIB
 modules:
     sensors:
         additional_oids:
             data:
                 -
                     oid:
-                        - entPhysicalDescr
+                        - ENTITY-MIB::entPhysicalDescr
         voltage:
             data:
                 -
-                    oid: cerentEnvMonVoltageStatsTable
+                    oid: CERENT-ENVMON-MIB::cerentEnvMonVoltageStatsTable
                     num_oid: '.1.3.6.1.4.1.3607.2.80.10.1.30.{{ $index }}'
-                    value: cerentEnvMonVoltageStatsCurrentValue
+                    value: CERENT-ENVMON-MIB::cerentEnvMonVoltageStatsCurrentValue
                     index: 'cerentEnvMonVoltageStats.{{ $index }}'
-                    descr: '{{ $entPhysicalDescr }} - {{ $cerentEnvMonVoltageStatsDescr }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalDescr }} - {{ CERENT-ENVMON-MIB::cerentEnvMonVoltageStatsDescr }}'
                     divisor: 1000
-                    warn_limit: cerentEnvMonVoltageStatsThresholdHigh
-                    high_limit: cerentEnvMonVoltageStatsThresholdVeryHigh
-                    low_warn_limit: cerentEnvMonVoltageStatsThresholdLow
-                    low_limit: cerentEnvMonVoltageStatsThresholdVeryLow
+                    warn_limit: CERENT-ENVMON-MIB::cerentEnvMonVoltageStatsThresholdHigh
+                    high_limit: CERENT-ENVMON-MIB::cerentEnvMonVoltageStatsThresholdVeryHigh
+                    low_warn_limit: CERENT-ENVMON-MIB::cerentEnvMonVoltageStatsThresholdLow
+                    low_limit: CERENT-ENVMON-MIB::cerentEnvMonVoltageStatsThresholdVeryLow
         temperature:
             data:
                 -
-                    oid: cerentEnvMonTemperatureStatsTable
+                    oid: CERENT-ENVMON-MIB::cerentEnvMonTemperatureStatsTable
                     num_oid: '.1.3.6.1.4.1.3607.2.80.20.1.30.{{ $index }}'
-                    value: cerentEnvMonTemperatureStatsCurrentValue
+                    value: CERENT-ENVMON-MIB::cerentEnvMonTemperatureStatsCurrentValue
                     index: 'cerentEnvMonTemperatureStats.{{ $index }}'
-                    descr: '{{ $entPhysicalDescr }} - {{ $cerentEnvMonTemperatureStatsDescr }}'
-                    high_limit: cerentEnvMonTemperatureStatsThresholdHigh
+                    descr: '{{ ENTITY-MIB::entPhysicalDescr }} - {{ CERENT-ENVMON-MIB::cerentEnvMonTemperatureStatsDescr }}'
+                    high_limit: CERENT-ENVMON-MIB::cerentEnvMonTemperatureStatsThresholdHigh

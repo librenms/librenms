@@ -25,6 +25,7 @@
  */
 
 use App\Facades\LibrenmsConfig;
+use App\Models\BgpPeerCbgp;
 use LibreNMS\Util\IP;
 
 $bgpPeersCache = snmpwalk_cache_oid($device, 'hwBgpPeerRemoteAs', [], 'HUAWEI-BGP-VPN-MIB');
@@ -165,11 +166,12 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
                 ! isset($bgpPeersCache[$vrfName][$entry['bgpPeerIdentifier']]) ||
                 $bgpPeersCache[$vrfName][$entry['bgpPeerIdentifier']][$entry['afi']] != $afi ||
                 $bgpPeersCache[$vrfName][$entry['bgpPeerIdentifier']][$entry['safi']] != $safi) {
-            dbDelete(
-                'bgpPeers_cbgp',
-                '`device_id`=? AND `bgpPeerIdentifier`=? AND context_name=? AND afi=? AND safi=?',
-                [$device['device_id'], $address, $vrfName, $afi, $safi]
-            );
+            BgpPeerCbgp::where('device_id', $device['device_id'])
+                ->where('bgpPeerIdentifier', $address)
+                ->where('context_name', $vrfName)
+                ->where('afi', $afi)
+                ->where('safi', $safi)
+                ->delete();
         }
     }
 

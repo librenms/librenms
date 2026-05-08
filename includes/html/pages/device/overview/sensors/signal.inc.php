@@ -1,8 +1,5 @@
 <?php
 
-$graph_type = 'sensor_signal';
-$sensor_class = 'signal';
-$sensor_unit = 'dBm';
-$sensor_type = 'Wireless';
+$sensor_class = \LibreNMS\Enum\Sensor::Signal;
 
 require 'includes/html/pages/device/overview/generic/sensor.inc.php';

@@ -26,8 +26,10 @@
 
 use App\Models\Device;
 use App\Models\Eventlog;
+use App\Models\Port;
+use Illuminate\Support\Facades\Gate;
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('update', Port::class)) {
     $response = [
         'status' => 'error',
         'message' => 'Need to be admin',

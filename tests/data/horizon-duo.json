@@ -378,98 +378,84 @@
                 {
                     "state_name": "hzIduEnetPort1EthernetLinkDown",
                     "state_descr": "Up",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hzIduEnetPort1EthernetLinkDown",
                     "state_descr": "Down",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "hzIduEnetPort2EthernetLinkDown",
                     "state_descr": "Up",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hzIduEnetPort2EthernetLinkDown",
                     "state_descr": "Down",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "hzIduModemModulationType",
                     "state_descr": "qpsk",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "hzIduModemModulationType",
                     "state_descr": "qam",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "hzIduModemModulationType",
                     "state_descr": "qam16",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "hzIduModemModulationType",
                     "state_descr": "qam32",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "hzIduModemModulationType",
                     "state_descr": "qam64",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "hzIduModemModulationType",
                     "state_descr": "qam128",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "hzIduModemModulationType",
                     "state_descr": "qam256",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hzIduModemModulationType",
                     "state_descr": "x8psk",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hzIduModemRxLossOfSignal",
                     "state_descr": "No",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hzIduModemRxLossOfSignal",
                     "state_descr": "Yes",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 }

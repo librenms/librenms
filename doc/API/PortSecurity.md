@@ -82,7 +82,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/port_security/123
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/port_security/port/123
 ```
 
 Output:
@@ -138,9 +138,9 @@ Output:
 
 ### `get_port_security_by_hostname`
 
-Get all port security info by inputting port_id
+Get all port security info by inputting hostname or device_id
 
-Route: `/api/v0/port_security/:hostname`
+Route: `/api/v0/port_security/device/:hostname`
 
 - hostname can be str hostname or int device_id
 

@@ -12,8 +12,11 @@
  * the source code distribution for details.
  */
 
-if (! Auth::user()->hasGlobalAdmin()) {
-    $status = ['status' => 1, 'message' => 'You need to be admin'];
+use App\Models\Device;
+use Illuminate\Support\Facades\Gate;
+
+if (Gate::denies('update', Device::class)) {
+    $status = ['status' => 1, 'message' => 'You need permission'];
 } else {
     if ($_POST['device_id']) {
         if (! is_numeric($_POST['device_id'])) {

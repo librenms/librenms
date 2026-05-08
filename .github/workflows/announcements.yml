@@ -12,16 +12,19 @@ jobs:
 
     steps:
       - name: Send Notification to Discord
-        if: contains(github.event.issue.labels.*.name, 'Breaking-Change')
+        if: contains(github.event.pull_request.labels.*.name, 'Breaking-Change')
         env:
-          DISCORD_WEBHOOK_URL: "${{ secrets.DISCORD_WEBHOOK_URL_ANNOUNCEMENT }}"
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_ANNOUNCEMENT }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_MESSAGE: ${{ github.event.pull_request.body }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          PR_MESSAGE="${{ github.event.pull_request.body }}"
-          PR_URL="${{ github.event.pull_request.html_url }}"
-
+          PAYLOAD=$(jq -n \
+            --arg title "$PR_TITLE" \
+            --arg url "$PR_URL" \
+            --arg body "$PR_MESSAGE" \
+            '{content: ":rotating_light: A breaking change pull request has been merged! :rotating_light:\n\n**Title**: \($title)\n[View PR](\($url))\n\n\($body)"}')
+      
           curl -X POST -H "Content-Type: application/json" \
-          -d "{
-            \"content\": \":rotating_light: A breaking change pull request has been merged! :rotating_light: \n\n**Title**: $PR_TITLE\n[View PR]($PR_URL)\n\n$PR_MESSAGE\"
-          }" \
-          $DISCORD_WEBHOOK_URL
+            -d "$PAYLOAD" \
+            "$DISCORD_WEBHOOK_URL"

@@ -5,7 +5,7 @@ use LibreNMS\Util\Number;
 
 echo 'RFC1628 ';
 
-$battery_volts = snmp_get($device, 'upsBatteryVoltage.0', '-OqvU', 'UPS-MIB');
+$battery_volts = SnmpQuery::get('UPS-MIB::upsBatteryVoltage.0')->value();
 if (is_numeric($battery_volts)) {
     $volt_oid = '.1.3.6.1.2.1.33.1.2.5.0';
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, 'voltage', $volt_oid);

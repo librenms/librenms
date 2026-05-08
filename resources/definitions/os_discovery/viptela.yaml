@@ -1,4 +1,3 @@
-mib: VIPTELA-OPER-SYSTEM:VIPTELA-HARDWARE
 modules:
     os:
         serial: VIPTELA-HARDWARE::hardwareInventorySerialNumber.chassis.0

@@ -126,6 +126,9 @@
             @can('create', \App\Models\User::class)
                 $('.actionBar').append('<div class="pull-left"><a href="{{ route('users.create') }}" type="button" class="btn btn-primary">{{ __('Add User') }}</a></div>');
             @endcan
+            @can('viewAny', \Spatie\Permission\Models\Role::class)
+                $('.actionBar').append('<div class="pull-left tw:ml-2"><a href="{{ route('roles.index') }}" type="button" class="btn btn-default">{{ __('permissions.rbac.manage_roles') }}</a></div>');
+            @endcan
 
             user_grid.css('display', 'table'); // done loading, show
         });

@@ -1407,273 +1407,234 @@
                 {
                     "state_name": "lgpEnvStateAudibleAlarm",
                     "state_descr": "on",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "lgpEnvStateAudibleAlarm",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateCooling",
                     "state_descr": "on",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateCooling",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "lgpEnvStateDehumidifying",
                     "state_descr": "on",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateDehumidifying",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "lgpEnvStateElectricHeater",
                     "state_descr": "on",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateElectricHeater",
                     "state_descr": "off",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateFan",
                     "state_descr": "on",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateFan",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "lgpEnvStateGeneralAlarmOutput",
                     "state_descr": "on",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "lgpEnvStateGeneralAlarmOutput",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateHotWater",
                     "state_descr": "on",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateHotWater",
                     "state_descr": "off",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateHumidifying",
                     "state_descr": "on",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateHumidifying",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "lgpEnvStateOperatingMode",
                     "state_descr": "auto",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateOperatingMode",
                     "state_descr": "manual",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateOperatingReason",
                     "state_descr": "none",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateOperatingReason",
                     "state_descr": "localUser",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateOperatingReason",
                     "state_descr": "alarm",
-                    "state_draw_graph": 2,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateOperatingReason",
                     "state_descr": "schedule",
-                    "state_draw_graph": 3,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateOperatingReason",
                     "state_descr": "remoteUser",
-                    "state_draw_graph": 4,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateOperatingReason",
                     "state_descr": "externalDevice",
-                    "state_draw_graph": 5,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateOperatingReason",
                     "state_descr": "localDisplay",
-                    "state_draw_graph": 6,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateSystem",
                     "state_descr": "on",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpEnvStateSystem",
                     "state_descr": "off",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "lgpEnvStateSystem",
                     "state_descr": "standby",
-                    "state_draw_graph": 2,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBatteryStatusState",
                     "state_descr": "Unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "upsBatteryStatusState",
                     "state_descr": "Normal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBatteryStatusState",
                     "state_descr": "Low",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "upsBatteryStatusState",
                     "state_descr": "Depleted",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "upsOutputSourceState",
                     "state_descr": "Other",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "upsOutputSourceState",
                     "state_descr": "None",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "upsOutputSourceState",
                     "state_descr": "Normal",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsOutputSourceState",
                     "state_descr": "Bypass",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsOutputSourceState",
                     "state_descr": "Battery",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "upsOutputSourceState",
                     "state_descr": "Booster",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "upsOutputSourceState",
                     "state_descr": "Reducer",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
                 }

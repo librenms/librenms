@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Interfaces\ToastInterface;
 use App\Models\Device;
 use App\Models\DeviceGroup;
-use App\Models\Service;
 use App\Models\ServiceTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -26,7 +25,7 @@ class ServiceTemplateController extends Controller
      */
     public function index()
     {
-        //$this->authorize('manage', ServiceTemplate::class);
+        $this->authorize('viewAny', ServiceTemplate::class);
 
         return view(
             'service-template.index', [
@@ -81,7 +80,7 @@ class ServiceTemplateController extends Controller
             ]
         );
 
-        $template = ServiceTemplate::make(
+        $template = new ServiceTemplate(
             $request->only(
                 [
                     'name',
@@ -232,9 +231,8 @@ class ServiceTemplateController extends Controller
      * Apply specified Service Template to Device Groups.
      *
      * @param  ServiceTemplate  $template
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function applyDeviceGroups(ServiceTemplate $template)
+    private function applyDeviceGroups(ServiceTemplate $template): void
     {
         foreach (DeviceGroup::inServiceTemplate($template->id)->get() as $device_group) {
             foreach (Device::inDeviceGroup($device_group->id)->get() as $device) {
@@ -255,18 +253,14 @@ class ServiceTemplateController extends Controller
                 );
             }
         }
-        $msg = __('Services for Template :name have been updated', ['name' => $template->name]);
-
-        return response($msg, 200);
     }
 
     /**
      * Apply specified Service Template to Devices.
      *
      * @param  ServiceTemplate  $template
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function applyDevices(ServiceTemplate $template)
+    private function applyDevices(ServiceTemplate $template): void
     {
         foreach (Device::inServiceTemplate($template->id)->get() as $device) {
             $device->services()->updateOrCreate(
@@ -285,9 +279,6 @@ class ServiceTemplateController extends Controller
                 ]
             );
         }
-        $msg = __('Services for Template :name have been updated', ['name' => $template->name]);
-
-        return response($msg, 200);
     }
 
     /**
@@ -297,6 +288,8 @@ class ServiceTemplateController extends Controller
      */
     public function applyAll()
     {
+        $this->authorize('update', ServiceTemplate::class);
+
         foreach (ServiceTemplate::all() as $template) {
             $this->apply($template);
         }
@@ -307,17 +300,15 @@ class ServiceTemplateController extends Controller
 
     /**
      * Apply all Service Templates for a device
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function applyDeviceAll(int $device_id)
+    public function applyDeviceAll(int $device_id): void
     {
         foreach (ServiceTemplate::all() as $template) {
+            if ($template->type == 'dynamic') {
+                $template->updateDevices();
+            }
             $this->applyDevice($template, $device_id);
         }
-        $msg = __('All Service Templates have been applied to device ' . $device_id);
-
-        return response($msg, 200);
     }
 
     /**
@@ -328,15 +319,17 @@ class ServiceTemplateController extends Controller
      */
     public function apply(ServiceTemplate $template)
     {
+        $this->authorize('update', ServiceTemplate::class);
+
         if ($template->type == 'dynamic') {
             $template->updateDevices();
         }
-        ServiceTemplateController::applyDevices($template);
-        ServiceTemplateController::applyDeviceGroups($template);
+        $this->applyDevices($template);
+        $this->applyDeviceGroups($template);
 
         // remove any remaining services no longer in the correct device group
         foreach (Device::notInServiceTemplate($template->id)->notInDeviceGroup($template->groups->pluck('id'))->pluck('device_id') as $device_id) {
-            Service::where('device_id', $device_id)->where('service_template_id', $template->id)->delete();
+            $template->services()->where('device_id', $device_id)->delete();
         }
         $msg = __('All Service Templates have been applied');
 
@@ -348,9 +341,8 @@ class ServiceTemplateController extends Controller
      *
      * @param  ServiceTemplate  $template
      * @param  int  $device_id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function applyDevice(ServiceTemplate $template, int $device_id)
+    private function applyDevice(ServiceTemplate $template, int $device_id): void
     {
         // Check if the device needs to be added
         foreach (Device::inServiceTemplate($template->id)->where('device_id', $device_id)->get() as $device) {
@@ -370,7 +362,7 @@ class ServiceTemplateController extends Controller
                 ]
             );
 
-            return response('Service template ' . $template->id . ' applied to device ID ' . $device_id, 200);
+            return; // found
         }
 
         foreach (DeviceGroup::inServiceTemplate($template->id)->get() as $device_group) {
@@ -391,16 +383,14 @@ class ServiceTemplateController extends Controller
                     ]
                 );
 
-                return response('Service template ' . $template->id . ' applied to device ID ' . $device_id, 200);
+                return; // found
             }
         }
 
         // remove if this template no longer applies
         foreach (Device::notInServiceTemplate($template->id)->notInDeviceGroup($template->groups->pluck('id'))->where('device_id', $device_id)->pluck('device_id') as $device_id) {
-            Service::where('device_id', $device_id)->where('service_template_id', $template->id)->delete();
+            $template->services()->where('device_id', $device_id)->delete();
         }
-
-        return response('Service template ' . $template->id . ' applied to device ID ' . $device_id, 200);
     }
 
     /**
@@ -411,7 +401,9 @@ class ServiceTemplateController extends Controller
      */
     public function remove(ServiceTemplate $template)
     {
-        Service::where('service_template_id', $template->id)->delete();
+        $this->authorize('update', ServiceTemplate::class);
+
+        $template->services()->delete();
 
         $msg = __('All Service Templates have been applied');
 
@@ -426,7 +418,7 @@ class ServiceTemplateController extends Controller
      */
     public function destroy(ServiceTemplate $template)
     {
-        Service::where('service_template_id', $template->id)->delete();
+        $template->services()->delete();
         $template->delete();
 
         $msg = __('Service Template :name deleted, Services removed', ['name' => htmlentities($template->name)]);

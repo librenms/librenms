@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\AlertTransport;
+use Illuminate\Support\Facades\Gate as Gate;
+
 $no_refresh = true;
 
 ?>
@@ -13,7 +16,7 @@ $no_refresh = true;
 require_once 'includes/html/modal/edit_alert_transport.inc.php';
 require_once 'includes/html/modal/edit_transport_group.inc.php';
 
-if (Auth::user()->hasGlobalAdmin()) {
+if (Gate::allows('create', AlertTransport::class)) {
     echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#edit-alert-transport'>Create alert transport</button>";
 }
 ?>
@@ -41,10 +44,14 @@ foreach (\App\Models\AlertTransport::orderBy('transport_name', 'asc')->get() as 
 
     echo '<td>';
     // Add action buttons for admin users only
-    if (Auth::user()->hasGlobalAdmin()) {
+    if (Gate::any(['update', 'delete'], AlertTransport::class)) {
         echo "<div class='btn-group btn-group-sm' role='group'>";
-        echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-popover='popover' data-target='#edit-alert-transport' data-transport_id='" . $transport->transport_id . "' name='edit-alert-rule' data-content='Edit transport'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
-        echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#delete-alert-transport' data-transport_id='" . $transport->transport_id . "' name='delete-alert-transport' data-popover='popover' data-content='Delete transport'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+        if (Gate::allows('update', AlertTransport::class)) {
+            echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-popover='popover' data-target='#edit-alert-transport' data-transport_id='" . $transport->transport_id . "' name='edit-alert-rule' data-content='Edit transport'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
+        }
+        if (Gate::allows('delete', AlertTransport::class)) {
+            echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#delete-alert-transport' data-transport_id='" . $transport->transport_id . "' name='delete-alert-transport' data-popover='popover' data-content='Delete transport'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+        }
         echo "<button type='button' class='btn btn-warning btn-sm' data-transport_id='" . $transport->transport_id . "' data-transport='{$transport->transport_type}' name='test-transport' id='test-transport' data-popover='popover' data-content='Test transport'><i class='fa fa-lg fa-check' aria-hidden='true'></i></button> ";
         echo '</div>';
     }
@@ -56,7 +63,7 @@ foreach (\App\Models\AlertTransport::orderBy('transport_name', 'asc')->get() as 
 </div>
 <br>
 <?php
-if (Auth::user()->hasGlobalAdmin()) {
+if (Gate::allows('create', AlertTransport::class)) {
     echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#edit-transport-group'>Create transport group</button>";
 }
 ?>
@@ -87,10 +94,14 @@ foreach (dbFetchRows($query) as $group) {
     }
     echo '</td>';
     echo '<td>';
-    if (Auth::user()->hasGlobalAdmin()) {
+    if (Gate::any(['update', 'delete'], AlertTransport::class)) {
         echo "<div class='btn-group btn-group-sm' role='group'>";
-        echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-popover='popover' data-target='#edit-transport-group' data-group_id='" . $group['id'] . "' data-content='Edit transport group'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
-        echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-popover='popover' data-target='#delete-transport-group' data-group_id='" . $group['id'] . "' data-content='Delete transport group'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+        if (Gate::allows('update', AlertTransport::class)) {
+            echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-popover='popover' data-target='#edit-transport-group' data-group_id='" . $group['id'] . "' data-content='Edit transport group'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
+        }
+        if (Gate::allows('delete', AlertTransport::class)) {
+            echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-popover='popover' data-target='#delete-transport-group' data-group_id='" . $group['id'] . "' data-content='Delete transport group'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+        }
         echo '</div>';
     }
     echo '</td>';

@@ -1,4 +1,3 @@
-mib: PACKETLOGIC-MIB
 modules:
     os:
         hardware: PACKETLOGIC-OVERVIEW-MIB::model.1.0

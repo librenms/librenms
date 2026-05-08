@@ -318,7 +318,25 @@ Then setup mappings from the returned claim arrays to the User levels you want
     lnms config:set auth.socialite.claims.RETURN_FROM_CLAIM.roles '["admin"]'
     lnms config:set auth.socialite.claims.OTHER_RETURN_FROM_CLAIM.roles '["global-read","cleaner"]'
     ```
+## Claim Field (advanced)
 
+Some providers deliver role or group membership under a token claim field that
+is **not** a valid OAuth scope name.  Microsoft is a common example: app-role
+assignments arrive in the `roles` claim, but adding `roles` to
+`auth.socialite.scopes` causes Microsoft to return:
+
+```
+AADSTS650053: The application asked for scope 'roles' that doesn't exist
+```
+
+The `claim_field` option solves this by separating *what is requested from the
+IdP* (scopes) from *what key is read in the returned token* (claim_field).  It
+is configured per provider under `auth.socialite.configs.<provider>.claim_field`
+and accepts an array of strings.
+
+```bash
+lnms config:set auth.socialite.configs.microsoft.claim_field roles
+```
 
 ## SAML2 Example
 

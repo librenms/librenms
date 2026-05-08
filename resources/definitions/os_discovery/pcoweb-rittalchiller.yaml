@@ -1,11 +1,10 @@
-mib: KELVIN-pCOWeb-Chiller-MIB
 modules:
     sensors:
         waterflow:
             data:
                 -
-                    oid: flow-value.0
-                    value: flow-value
+                    oid: KELVIN-pCOWeb-Chiller-MIB::flow-value.0
+                    value: KELVIN-pCOWeb-Chiller-MIB::flow-value
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.9839.2.1.2.73.{{ $index }}'
                     descr: Water Flow Rate
@@ -13,16 +12,16 @@ modules:
         eer:
             data:
                 -
-                    oid: analogObjects.120
-                    value: analogObjects
+                    oid: KELVIN-pCOWeb-Chiller-MIB::analogObjects.120
+                    value: KELVIN-pCOWeb-Chiller-MIB::analogObjects
                     num_oid: '.1.3.6.1.4.1.9839.2.1.3.{{ $index }}'
                     descr: Energy Efficiency Ratio
                     index: 'analogObjects.{{ $index }}'
         power:
             data:
                 -
-                    oid: analogObjects.103
-                    value: analogObjects
+                    oid: KELVIN-pCOWeb-Chiller-MIB::analogObjects.103
+                    value: KELVIN-pCOWeb-Chiller-MIB::analogObjects
                     multiplier: 100
                     num_oid: '.1.3.6.1.4.1.9839.2.1.2.{{ $index }}'
                     descr: Power Consumption
@@ -30,8 +29,8 @@ modules:
         current:
             data:
                 -
-                    oid: amp-value.0
-                    value: amp-value
+                    oid: KELVIN-pCOWeb-Chiller-MIB::amp-value.0
+                    value: KELVIN-pCOWeb-Chiller-MIB::amp-value
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.9839.2.1.2.74.{{ $index }}'
                     descr: Current Consumption
@@ -39,22 +38,22 @@ modules:
         temperature:
             data:
                 -
-                    oid: analogObjects.140
-                    value: analogObjects
+                    oid: KELVIN-pCOWeb-Chiller-MIB::analogObjects.140
+                    value: KELVIN-pCOWeb-Chiller-MIB::analogObjects
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.9839.2.1.2.{{ $index }}'
                     descr: Temperature Ambient
                     index: 'analogObjects.{{ $index }}'
                 -
-                    oid: analogObjects.137
-                    value: analogObjects
+                    oid: KELVIN-pCOWeb-Chiller-MIB::analogObjects.137
+                    value: KELVIN-pCOWeb-Chiller-MIB::analogObjects
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.9839.2.1.2.{{ $index }}'
                     descr: Temperature Out
                     index: 'analogObjects.{{ $index }}'
                 -
-                    oid: analogObjects.136
-                    value: analogObjects
+                    oid: KELVIN-pCOWeb-Chiller-MIB::analogObjects.136
+                    value: KELVIN-pCOWeb-Chiller-MIB::analogObjects
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.9839.2.1.2.{{ $index }}'
                     descr: Temperature In
@@ -62,22 +61,22 @@ modules:
         cooling:
             data:
                 -
-                    oid: cooling-capacity.0
-                    value: cooling-capacity
+                    oid: KELVIN-pCOWeb-Chiller-MIB::cooling-capacity.0
+                    value: KELVIN-pCOWeb-Chiller-MIB::cooling-capacity
                     multiplier: 100
                     num_oid: '.1.3.6.1.4.1.9839.2.1.2.100.{{ $index }}'
                     descr: Free Cooling Capacity
                     index: 'cooling-capacity.{{ $index }}'
                 -
-                    oid: freecooling-capacity.0
-                    value: freecooling-capacity
+                    oid: KELVIN-pCOWeb-Chiller-MIB::freecooling-capacity.0
+                    value: KELVIN-pCOWeb-Chiller-MIB::freecooling-capacity
                     multiplier: 100
                     num_oid: '.1.3.6.1.4.1.9839.2.1.2.101.{{ $index }}'
                     descr: Compressor Cooling Capacity
                     index: 'freecooling-capacity.{{ $index }}'
                 -
-                    oid: total-capacity.0
-                    value: total-capacity
+                    oid: KELVIN-pCOWeb-Chiller-MIB::total-capacity.0
+                    value: KELVIN-pCOWeb-Chiller-MIB::total-capacity
                     multiplier: 100
                     num_oid: '.1.3.6.1.4.1.9839.2.1.2.102.{{ $index }}'
                     descr: Total cooling Capacity
@@ -85,15 +84,15 @@ modules:
         humidity:
             data:
                 -
-                    oid: pp1.0
-                    value: pp1
+                    oid: KELVIN-pCOWeb-Chiller-MIB::pp1.0
+                    value: KELVIN-pCOWeb-Chiller-MIB::pp1
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.9839.2.1.2.90.{{ $index }}'
                     descr: Hydraulic Pump 1 Speed
                     index: 'pp1.{{ $index }}'
                 -
-                    oid: pp2.0
-                    value: pp2
+                    oid: KELVIN-pCOWeb-Chiller-MIB::pp2.0
+                    value: KELVIN-pCOWeb-Chiller-MIB::pp2
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.9839.2.1.2.91.{{ $index }}'
                     descr: Hydraulic Pump 2 Speed
@@ -101,29 +100,29 @@ modules:
         pressure:
             data:
                 -
-                    oid: analogObjects.138
-                    value: analogObjects
+                    oid: KELVIN-pCOWeb-Chiller-MIB::analogObjects.138
+                    value: KELVIN-pCOWeb-Chiller-MIB::analogObjects
                     multiplier: 10
                     num_oid: '.1.3.6.1.4.1.9839.2.1.2.{{ $index }}'
                     descr: Hydraulic Pressure (Suction)
                     index: 'analogObjects.{{ $index }}'
                 -
-                    oid: analogObjects.133
-                    value: analogObjects
+                    oid: KELVIN-pCOWeb-Chiller-MIB::analogObjects.133
+                    value: KELVIN-pCOWeb-Chiller-MIB::analogObjects
                     multiplier: 10
                     num_oid: '.1.3.6.1.4.1.9839.2.1.2.{{ $index }}'
                     descr: Hydraulic Pressure (Discharge)
                     index: 'analogObjects.{{ $index }}'
                 -
-                    oid: pressione1.0
-                    value: pressione1
+                    oid: KELVIN-pCOWeb-Chiller-MIB::pressione1.0
+                    value: KELVIN-pCOWeb-Chiller-MIB::pressione1
                     multiplier: 10
                     num_oid: '.1.3.6.1.4.1.9839.2.1.2.77.{{ $index }}'
                     descr: Condensation Pressure 1
                     index: 'pressione1.{{ $index }}'
                 -
-                    oid: pressione2.0
-                    value: pressione2
+                    oid: KELVIN-pCOWeb-Chiller-MIB::pressione2.0
+                    value: KELVIN-pCOWeb-Chiller-MIB::pressione2
                     multiplier: 10
                     num_oid: '.1.3.6.1.4.1.9839.2.1.2.78.{{ $index }}'
                     descr: Condensation Pressure 2

@@ -3,7 +3,7 @@
 $multiplier = 1;
 $divisor = 1;
 foreach ($pre_cache['nokiaIsamSfpPort'] as $slotId => $slot) {
-    $slotName = $pre_cache['nokiaIsamSlot'][$slotId]['numBasedSlot'];
+    $slotName = $pre_cache['nokiaIsamSlot'][$slotId];
     foreach ($slot as $portId => $port) {
         $portName = $slotName . $port['numBasedPort'];
         if (isset($port['sfpDiagRxPower']) && is_numeric($port['sfpDiagRxPower'])) {

@@ -67,7 +67,7 @@ class LocationController extends TableController
 
     /**
      * @param  Location  $location
-     * @return array|\Illuminate\Database\Eloquent\Model|\Illuminate\Support\Collection
+     * @return array|\Illuminate\Database\Eloquent\Model|\Illuminate\Support\Collection<string, mixed>
      */
     public function formatItem($location)
     {

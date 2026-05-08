@@ -1,4 +1,3 @@
-mib: MPIOS-MIB
 modules:
     mempools:
         data:
@@ -12,6 +11,6 @@ modules:
     processors:
         data:
             -
-                oid: cpuUtilCurrentUtil
+                oid: MPIOS-MIB::cpuUtilCurrentUtil
                 num_oid: '.1.3.6.1.4.1.5651.3.20.1.1.3.5.1.10.{{ $index }}'
                 index: 1

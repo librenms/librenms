@@ -20,7 +20,7 @@ $divisor = '10';
 $multiplier = '1';
 
 d_echo($pre_cache['sentry4_temp']);
-$sentry_temp_scale = snmp_get($device, 'st4TempSensorScale.0', '-Ovq', 'Sentry4-MIB');
+$sentry_temp_scale = SnmpQuery::get('Sentry4-MIB::st4TempSensorScale.0')->value();
 foreach ($pre_cache['sentry4_temp'] as $index => $data) {
     $descr = $data['st4TempSensorName'];
     $oid = ".1.3.6.1.4.1.1718.4.1.9.3.1.1.$index";

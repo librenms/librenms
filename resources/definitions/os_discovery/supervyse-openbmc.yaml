@@ -14,6 +14,6 @@ modules:
                     index: 'hostPwrStatus.{{ $index }}'
                     state_name: hostPwrStatus
                     states:
-                        - { descr: "OFF", graph: 1, value: 0, generic: 2 }
-                        - { descr: "ON", graph: 1, value: 1, generic: 0 }
-                        - { descr: "RESET", graph: 1, value: 2, generic: 1 }
+                        - { descr: "OFF", value: 0, generic: 2 }
+                        - { descr: "ON", value: 1, generic: 0 }
+                        - { descr: "RESET", value: 2, generic: 1 }

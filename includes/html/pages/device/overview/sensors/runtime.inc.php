@@ -1,7 +1,4 @@
 <?php
 
-$graph_type = 'sensor_runtime';
-$sensor_class = 'runtime';
-$sensor_unit = 'Min';
-$sensor_type = 'Runtime';
+$sensor_class = \LibreNMS\Enum\Sensor::Runtime;
 require 'includes/html/pages/device/overview/generic/sensor.inc.php';

@@ -3,6 +3,9 @@ text: 'Dell DRAC'
 icon: dell
 type: management
 mib_dir: dell
+over:
+    - { graph: device_temperature, text: 'Temperature' }
+    - { graph: device_power, text: 'Power' }
 discovery:
     -
         sysObjectID:

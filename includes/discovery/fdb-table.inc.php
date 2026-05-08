@@ -1,7 +1,6 @@
 <?php
 
 // Build a dictionary of vlans in database
-
 $vlans_dict = [];
 foreach (dbFetchRows('SELECT `vlan_id`, `vlan_vlan` from `vlans` WHERE `device_id` = ?', [$device['device_id']]) as $vlan_entry) {
     $vlans_dict[$vlan_entry['vlan_vlan']] = $vlan_entry['vlan_id'];
@@ -61,8 +60,7 @@ if (! empty($insert)) {
                     // fix SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'port_id' cannot be null
                     // If $entry['port_id'] truly is null then  Illuminate throws a fatal errory and all subsequent processing stops.
                     // Cisco ISO (and others) may have null ids. We still want them inserted as new
-                    // strings work with DB::table->insert().
-                    $entry['port_id'] = '';
+                    $entry['port_id'] = 0;
                 }
 
                 DB::table('ports_fdb')->insert([

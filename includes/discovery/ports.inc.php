@@ -108,7 +108,7 @@ if ($device['port_association_mode']) {
 
 // Build array of ports in the database and an ifIndex/ifName -> port_id map
 $ports_mapped = get_ports_mapped($device['device_id']);
-$ports_db = $ports_mapped['ports'];
+$ports_db = $ports_mapped['ports'] ?? [];
 
 // Fill ifAlias for fibrechannel ports
 if ($device['os'] == 'fabos') {
@@ -126,6 +126,8 @@ $default_port_group = LibrenmsConfig::get('default_port_group');
 foreach ($port_stats as $ifIndex => $snmp_data) {
     $snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry
     $snmp_data['ifAlias'] = StringHelpers::inferEncoding($snmp_data['ifAlias'] ?? null);
+    $snmp_data['ifName'] = StringHelpers::inferEncoding($snmp_data['ifName'] ?? null);
+    $snmp_data['ifDescr'] = StringHelpers::inferEncoding($snmp_data['ifDescr'] ?? null);
 
     // Get port_id according to port_association_mode used for this device
     $port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);
@@ -138,7 +140,7 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
         }
 
         // Port newly discovered?
-        if (! isset($ports_db[$port_id]) || ! is_array($ports_db[$port_id])) {
+        if ($port_id === null || ! isset($ports_db[$port_id]) || ! is_array($ports_db[$port_id])) {
             $snmp_data['device_id'] = $device['device_id'];
             $port_id = dbInsert($snmp_data, 'ports');
 

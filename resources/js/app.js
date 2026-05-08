@@ -7,6 +7,11 @@
 import "../css/app.css";
 import "./bootstrap";
 
+// Gridstack (bundled by Vite)
+import 'gridstack/dist/gridstack.min.css';
+import { GridStack } from 'gridstack';
+window.GridStack = GridStack;
+
 import Vue from "vue";
 import {i18n} from "./plugins/i18n.js"; // translation
 import ToggleButton from "vue-js-toggle-button";
@@ -20,6 +25,10 @@ import Alpine from "alpinejs";
 // import popup from './components/alpine/popup.js'
 import popup from "./components/alpine/oldpopup.js";
 import deviceLink from "./components/alpine/deviceLink.js";
+import LibreNMSDate from './datetime.js';
+
+window.LibreNMS = window.LibreNMS || {};
+window.LibreNMS.Date = LibreNMSDate;
 
 /**
  * The following block of code may be used to automatically register your

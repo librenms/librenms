@@ -419,7 +419,7 @@ Output:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health/device_wireless_ccq/1
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless/device_wireless_ccq/1
 ```
 
 Output:
@@ -588,7 +588,7 @@ Input:
   Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services/localhost/35/graphs/loss
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/services/35/graphs/loss
 ```
 
 Output:
@@ -1123,6 +1123,7 @@ Input:
 - ifDescr: If this is set to true then we will use ifDescr to lookup
   the port instead of ifName. Pass the ifDescr value you want to
   search as you would ifName.
+- graph_type: This can be png or svg to force the output as required.
 
 Example:
 

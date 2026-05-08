@@ -23,9 +23,6 @@
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-$graph_type = 'sensor_airflow';
-$sensor_class = 'airflow';
-$sensor_unit = 'cfm';
-$sensor_type = 'Airflow';
+$sensor_class = \LibreNMS\Enum\Sensor::Airflow;
 
 require 'includes/html/pages/device/overview/generic/sensor.inc.php';

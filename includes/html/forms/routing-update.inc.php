@@ -12,9 +12,11 @@
  * the source code distribution for details.
  */
 
+use App\Models\BgpPeer;
+
 header('Content-type: application/json');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('update', BgpPeer::class)) {
     $response = [
         'status' => 'error',
         'message' => 'Need to be admin',
@@ -35,7 +37,7 @@ if (! is_numeric($device_id)) {
 } elseif (! is_numeric($routing_id)) {
     $message = 'Missing routing id';
 } else {
-    if (dbUpdate(['bgpPeerDescr' => $data], 'bgpPeers', '`bgpPeer_id`=? AND `device_id`=?', [$routing_id, $device_id]) >= 0) {
+    if (BgpPeer::where('bgpPeer_id', $routing_id)->where('device_id', $device_id)->update(['bgpPeerDescr' => $data]) >= 0) {
         $message = 'Routing information updated';
         $status = 'ok';
     } else {

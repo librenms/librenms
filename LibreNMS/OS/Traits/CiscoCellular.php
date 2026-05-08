@@ -27,6 +27,7 @@
 namespace LibreNMS\OS\Traits;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 
 trait CiscoCellular
 {
@@ -56,7 +57,7 @@ trait CiscoCellular
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'c3gCurrentGsmRssi', [], 'CISCO-WAN-3G-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'rssi',
+                WirelessSensorType::Rssi,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.9.9.661.1.3.4.1.1.1.' . $index,
                 'ios',
@@ -82,7 +83,7 @@ trait CiscoCellular
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'cwceLteCurrSnr', [], 'CISCO-WAN-CELL-EXT-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'snr',
+                WirelessSensorType::Snr,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.9.9.817.1.1.1.1.1.3.' . $index,
                 'ios',
@@ -110,7 +111,7 @@ trait CiscoCellular
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'cwceLteCurrRsrq', [], 'CISCO-WAN-CELL-EXT-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'rsrq',
+                WirelessSensorType::Rsrq,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.9.9.817.1.1.1.1.1.2.' . $index,
                 'ios',
@@ -138,7 +139,7 @@ trait CiscoCellular
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'cwceLteCurrRsrp', [], 'CISCO-WAN-CELL-EXT-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'rsrp',
+                WirelessSensorType::Rsrp,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.9.9.817.1.1.1.1.1.1.' . $index,
                 'ios',
@@ -164,7 +165,7 @@ trait CiscoCellular
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'c3gGsmChannelNumber', [], 'CISCO-WAN-3G-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'channel',
+                WirelessSensorType::Channel,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.9.9.661.1.3.4.1.1.4.' . $index,
                 'ios',
@@ -190,7 +191,7 @@ trait CiscoCellular
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'c3gGsmCurrentCellId', [], 'CISCO-WAN-3G-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'cell',
+                WirelessSensorType::Cell,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.9.9.661.1.3.2.1.13.' . $index,
                 'ios',

@@ -76,7 +76,6 @@ $tunnel = dbFetchRows('SELECT * FROM `ipsec_tunnels` WHERE `device_id` = ? ORDER
 ]);
 
 if (is_null($vars['graph'])) {
-    $tunnel_label = 'warning';
     echo '<table class="table table-condensed table-hover">
     <thead>
       <tr>
@@ -91,10 +90,8 @@ if (is_null($vars['graph'])) {
     foreach ($tunnel as $entry) {
         $local_addr = preg_replace('/\b0+(?=\d)/', '', htmlentities((string) $entry['local_addr']));
         $remote_addr = preg_replace('/\b0+(?=\d)/', '', htmlentities((string) $entry['peer_addr']));
+        $tunnel_label = $entry['tunnel_status'] == 'active' ? 'success' : 'warning';
 
-        if ($tunnel['tunnel_status'] = 'active') {
-            $tunnel_label = 'success';
-        }
         echo '<tr>
             <td>' . $local_addr . '</td>
             <td>' . $remote_addr . '</td>

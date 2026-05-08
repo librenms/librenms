@@ -25,10 +25,6 @@
 
 use LibreNMS\Alerting\QueryBuilderParser;
 
-if (! Auth::user()->hasGlobalAdmin()) {
-    exit('ERROR: You need to be admin');
-}
-
 ?>
 
 <div class="modal fade" id="search_alert_rule_modal" tabindex="-1" role="dialog" aria-labelledby="search_alert_rule_list" aria-hidden="true">
@@ -59,8 +55,8 @@ if (! Auth::user()->hasGlobalAdmin()) {
                             }
                             echo "
                                 <tr>
-                                    <td>" . e(strip_tags((string)$rule['name'])) . "</td>
-                                    <td><i>" . e($rule_display) . "</i></td>
+                                    <td>" . e(strip_tags((string) $rule['name'])) . "</td>
+                                    <td><i>" . e(strip_tags((string) $rule_display)) . "</i></td>
                                     <td>{$rule['severity']}</td>
                                     <td>{$rule['id']}</td>
                                 </tr>

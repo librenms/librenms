@@ -9,6 +9,11 @@ use LibreNMS\Util\Html;
 
 class LocationController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Location::class);
+    }
+
     public function index()
     {
         $data = [
@@ -48,8 +53,6 @@ class LocationController extends Controller
      */
     public function update(Request $request, Location $location)
     {
-        $this->authorize('admin', $request->user());
-
         $this->validate($request, [
             'lat' => 'required|numeric|max:90|min:-90',
             'lng' => 'required|numeric|max:180|min:-180',
@@ -72,8 +75,6 @@ class LocationController extends Controller
      */
     public function destroy(Request $request, Location $location)
     {
-        $this->authorize('admin', $request->user());
-
         $location->delete();
 
         return response()->json(['status' => 'success']);

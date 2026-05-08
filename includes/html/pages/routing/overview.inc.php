@@ -1,6 +1,6 @@
 <?php
 
-foreach ($datas as $type) {
+foreach ($sensor_classes as $type) {
     $type = basename((string) $type);
     if ($type != 'overview') {
         if (is_file("includes/html/pages/routing/overview/$type.inc.php")) {

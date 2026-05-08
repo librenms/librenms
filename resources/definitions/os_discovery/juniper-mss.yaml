@@ -1,4 +1,3 @@
-mib: TRAPEZE-NETWORKS-SYSTEM-MIB
 modules:
     mempools:
         data:
@@ -11,5 +10,5 @@ modules:
     processors:
         data:
             -
-                oid: trpzSysCpuInstantLoad
+                oid: TRAPEZE-NETWORKS-SYSTEM-MIB::trpzSysCpuInstantLoad
                 num_oid: '.1.3.6.1.4.1.14525.4.8.1.1.11.1.{{ $index }}'

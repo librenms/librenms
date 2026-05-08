@@ -57,10 +57,10 @@ modules:
           index: 'systemstatus.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::systemstatus
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: normal,  graph: 1, value: 1,  generic: 0 }
-            - { descr: minor,   graph: 1, value: 2,  generic: 1 }
-            - { descr: major,   graph: 1, value: 3,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: normal,  value: 1,  generic: 0 }
+            - { descr: minor,   value: 2,  generic: 1 }
+            - { descr: major,   value: 3,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::batterymode
           num_oid: '.1.3.6.1.4.1.40865.1.13.{{ $index }}'
@@ -68,9 +68,9 @@ modules:
           index: 'batterymode.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::batterymode
           states:
-            - { descr: floatcharge,     graph: 1, value: 0,  generic: 0 }
-            - { descr: floatcharge,     graph: 1, value: 1,  generic: 0 }
-            - { descr: equalizecharge,  graph: 1, value: 2,  generic: 0 }
+            - { descr: floatcharge,     value: 0,  generic: 0 }
+            - { descr: floatcharge,     value: 1,  generic: 0 }
+            - { descr: equalizecharge,  value: 2,  generic: 0 }
 
         - oid: ARHANGELSK-GLOBAL-REG::rectopenstate
           num_oid: '.1.3.6.1.4.1.40865.1.5.{{ $index }}'
@@ -78,8 +78,8 @@ modules:
           index: 'rectopenstate.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::rectopenstate
           states:
-            - { descr: power-on,  graph: 1, value: 1,  generic: 0 }
-            - { descr: shutdown,  graph: 1, value: 0,  generic: 2 }
+            - { descr: power-on,  value: 1,  generic: 0 }
+            - { descr: shutdown,  value: 0,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::rectpluginnotok
           num_oid: '.1.3.6.1.4.1.40865.1.21.{{ $index }}'
@@ -87,8 +87,8 @@ modules:
           index: 'rectpluginnotok.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::rectpluginnotok
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: alarm,   value: 1,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::hvsdflag
           num_oid: '.1.3.6.1.4.1.40865.1.22.{{ $index }}'
@@ -96,8 +96,8 @@ modules:
           index: 'hvsdflag.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::hvsdflag
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: alarm,   value: 1,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::outputundervol
           num_oid: '.1.3.6.1.4.1.40865.1.23.{{ $index }}'
@@ -105,8 +105,8 @@ modules:
           state_name: ARHANGELSK-GLOBAL-REG::outputundervol
           index: 'outputundervol.{{ $index }}'
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: alarm,   value: 1,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::inputundervol
           num_oid: '.1.3.6.1.4.1.40865.1.24.{{ $index }}'
@@ -114,8 +114,8 @@ modules:
           index: 'inputundervol.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::inputundervol
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: alarm,   value: 1,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::fanisnotrotate
           num_oid: '.1.3.6.1.4.1.40865.1.26.{{ $index }}'
@@ -123,8 +123,8 @@ modules:
           index: 'fanisnotrotate.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::fanisnotrotate
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: alarm,   value: 1,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::ambientovertemp
           num_oid: '.1.3.6.1.4.1.40865.1.27.{{ $index }}'
@@ -132,8 +132,8 @@ modules:
           index: 'ambientovertemp.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::ambientovertemp
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: alarm,   value: 1,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::ambientundertemp
           num_oid: '.1.3.6.1.4.1.40865.1.28.{{ $index }}'
@@ -141,8 +141,8 @@ modules:
           index: 'ambientundertemp.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::ambientundertemp
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: alarm,   value: 1,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::pfcovertemp
           num_oid: '.1.3.6.1.4.1.40865.1.29.{{ $index }}'
@@ -150,8 +150,8 @@ modules:
           index: 'pfcovertemp.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::pfcovertemp
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: alarm,   value: 1,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::pfceepromfault
           num_oid: '.1.3.6.1.4.1.40865.1.36.{{ $index }}'
@@ -159,8 +159,8 @@ modules:
           index: 'pfceepromfault.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::pfceepromfault
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: alarm,   value: 1,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::dcdcovertemp
           num_oid: '.1.3.6.1.4.1.40865.1.30.{{ $index }}'
@@ -168,8 +168,8 @@ modules:
           index: 'dcdcovertemp.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::dcdcovertemp
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: alarm,   value: 1,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::dcdceepromfault
           num_oid: '.1.3.6.1.4.1.40865.1.32.{{ $index }}'
@@ -177,8 +177,8 @@ modules:
           index: 'dcdceepromfault.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::dcdceepromfault
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: alarm,   value: 1,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::powderatedbyacvol
           num_oid: '.1.3.6.1.4.1.40865.1.33.{{ $index }}'
@@ -186,8 +186,8 @@ modules:
           index: 'powderatedbyacvol.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::powderatedbyacvol
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: alarm,   value: 1,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::powderatedbytemp
           num_oid: '.1.3.6.1.4.1.40865.1.34.{{ $index }}'
@@ -195,8 +195,8 @@ modules:
           index: 'powderatedbytemp.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::powderatedbytemp
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: alarm,   value: 1,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::currentsharenotok
           num_oid: '.1.3.6.1.4.1.40865.1.35.{{ $index }}'
@@ -204,8 +204,8 @@ modules:
           index: 'currentsharenotok.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::currentsharenotok
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: alarm,   value: 1,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::acstopflag
           num_oid: '.1.3.6.1.4.1.40865.1.38.{{ $index }}'
@@ -213,8 +213,8 @@ modules:
           index: 'acstopflag.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::acstopflag
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: alarm,   graph: 1, value: 2,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: alarm,   value: 2,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::dcvoltagealarm
           num_oid: '.1.3.6.1.4.1.40865.1.39.{{ $index }}'
@@ -222,8 +222,8 @@ modules:
           index: 'dcvoltagealarm.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::dcvoltagealarm
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: alarm,   value: 1,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::battfusebreak
           num_oid: '.1.3.6.1.4.1.40865.1.42.{{ $index }}'
@@ -231,8 +231,8 @@ modules:
           index: 'battfusebreak.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::battfusebreak
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: alarm,   value: 1,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::loadfusebreak
           num_oid: '.1.3.6.1.4.1.40865.1.44.{{ $index }}'
@@ -240,8 +240,8 @@ modules:
           index: 'loadfusebreak.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::loadfusebreak
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: alarm,   value: 1,  generic: 2 }
 
         - oid: ARHANGELSK-GLOBAL-REG::batteryprotectflag
           num_oid: '.1.3.6.1.4.1.40865.1.45.{{ $index }}'
@@ -249,5 +249,5 @@ modules:
           index: 'batteryprotectflag.{{ $index }}'
           state_name: ARHANGELSK-GLOBAL-REG::batteryprotectflag
           states:
-            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
-            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+            - { descr: normal,  value: 0,  generic: 0 }
+            - { descr: alarm,   value: 1,  generic: 2 }

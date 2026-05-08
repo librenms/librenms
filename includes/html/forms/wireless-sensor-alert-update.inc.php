@@ -13,14 +13,16 @@
  * the source code distribution for details.
  */
 
+use App\Models\WirelessSensor;
+
 header('Content-type: application/json');
 
 // FUA
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('update', WirelessSensor::class)) {
     exit(json_encode([
         'status' => 'error',
-        'message' => 'You need to be admin',
+        'message' => 'You need permission',
     ]));
 }
 

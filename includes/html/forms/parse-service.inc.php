@@ -12,24 +12,21 @@
  * the source code distribution for details.
  */
 
-if (! Auth::user()->hasGlobalAdmin()) {
-    exit('ERROR: You need to be admin');
-}
+use App\Models\Service;
 
-$service_id = $vars['service_id'];
+$service = Service::find(Request::input('service_id'));
 
-if (is_numeric($service_id) && $service_id > 0) {
-    $service = service_get(null, $service_id);
-
+if ($service) {
+    Gate::authorize('view', $service);
     $output = [
-        'stype' => $service[0]['service_type'],
-        'ip' => $service[0]['service_ip'],
-        'desc' => $service[0]['service_desc'],
-        'param' => $service[0]['service_param'],
-        'ignore' => $service[0]['service_ignore'],
-        'disabled' => $service[0]['service_disabled'],
-        'template_id' => $service[0]['service_template_id'],
-        'name' => $service[0]['service_name'],
+        'stype' => $service->service_type,
+        'ip' => $service->service_ip,
+        'desc' => $service->service_desc,
+        'param' => $service->service_param,
+        'ignore' => $service->service_ignore,
+        'disabled' => $service->service_disabled,
+        'template_id' => $service->service_template_id,
+        'name' => $service->service_name,
     ];
 
     header('Content-Type: application/json');

@@ -12,7 +12,7 @@
         <div class="btn-group btn-lg">
             <button class="btn btn-default disabled" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.title') }}</span></button>
             <div class="btn-group">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false" style="min-width:160px;">
                     <span class="pull-left">{{ $dashboard->user_id != Auth::id() ? ($dashboard->user->username ?? trans('dashboard.deleted_user')) . ':' : null}} {{ $dashboard->dashboard_name }}</span>
                 <span class="pull-right">
                 <span class="caret"></span>
@@ -95,7 +95,8 @@
                             </div>
                         </form>
                     </div>
-                    @if (count($user_list) and auth()->user()->isAdmin())
+                    @can('copy', \App\Models\Dashboard::class)
+                    @if (count($user_list))
                     <div class="btn-group btn-lg" style="margin-top:5px;position:absolute;right:0px;">
                         <div class="btn-group">
                         <select class="form-control" id="dashboard_copy_target" name="dashboard_copy_target" onchange="dashboard_copy_user_select()">
@@ -108,6 +109,7 @@
                         <button disabled id="do_copy_dashboard" class="btn btn-primary" onclick="dashboard_copy(this)" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.copy') }}"><i class="fa fa-copy fa-fw"></i></button>
                     </div>
                     @endif
+                    @endcan
                 </div>
             </div>
             <!-- End Dashboard-Settings -->
@@ -118,7 +120,7 @@
                         <div class="btn-group" role="group">
                             <a class="btn btn-default disabled" role="button" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.widgets.add') }}</span></a>
                             <div class="btn-group">
-                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.widgets.select') }}</span>
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.widgets.select') }}</span>
                                 <span class="pull-right">
                                     <span class="caret"></span>
                                     <span class="sr-only">{{ trans('dashboard.toggle_dropdown') }}</span>
@@ -160,14 +162,11 @@
 </div>
 @endif
 <span class="message" id="message"></span>
-<div class="gridster grid">
-    <ul></ul>
-</div>
+<div class="grid-stack"></div>
 </div>
 @endsection
 
 @section('javascript')
-<script src="{{ asset('js/jquery.gridster.min.js?ver=05072021') }}"></script>
 <script src="{{ asset('js/raphael.min.js?ver=05072021') }}"></script>
 <script src="{{ asset('js/justgage.min.js?ver=05072021') }}"></script>
 @endsection
@@ -175,13 +174,9 @@
 @push('scripts')
 @include('map.custom-js')
 <script type="text/javascript">
-    var gridster;
-
     var serialization = @json($dash_config);
-
-    serialization = Gridster.sort_by_row_and_col_asc(serialization);
-    var gridster_state = 0;
-
+    var gridstack_state = 0;
+    var grid;
 
     @if ($dashboard->dashboard_id > 0)
         var dashboard_id = {{ $dashboard->dashboard_id }};
@@ -189,58 +184,59 @@
         var dashboard_id = 0;
     @endif
 
-    $('[data-toggle="tooltip"]').tooltip();
-    dashboard_collapse();
-    gridster = $(".gridster ul").gridster({
-        widget_base_dimensions: ['auto', 100],
-        autogenerate_stylesheet: true,
-        widget_margins: [5, 5],
-        avoid_overlapped_widgets: true,
-        min_cols: 1,
-        max_cols: 20,
-        max_rows: 200,
-        draggable: {
-            handle: 'header, span',
-            stop: function(e, ui, $widget) {
-                updatePos(gridster);
-            },
-        },
-        resize: {
-            enabled: true,
-            stop: function(e, ui, widget) {
-                updatePos(gridster);
-                widget_reload(widget.attr('id'), widget.data('type'));
-            }
-        },
-        serialize_params: function(w, wgd) {
-            return {
-                id: $(w).attr('id'),
-                col: wgd.col,
-                row: wgd.row,
-                size_x: wgd.size_x,
-                size_y: wgd.size_y
-            };
-        }
-    }).data('gridster');
-    $('.gridster  ul').css({'width': $(window).width()});
+    // Vite loads GridStack as a deferred module; ensure it's available before running dashboard code.
+    window.addEventListener('DOMContentLoaded', function () {
+        $('[data-toggle="tooltip"]').tooltip();
+        dashboard_collapse();
+        grid = GridStack.init({
+            cellHeight: 100,
+            margin: 10,
+            minRow: 1,
+            maxRow: 200,
+            column: 20,
+            float: false,
+            draggable: {handle: 'header, span'},
+            alwaysShowResizeHandle: false,
+            resizable: {handles: 'se,sw,ne,nw'},
+            disableOneColumnMode: true,
+        }, '.grid-stack');
 
-    gridster.remove_all_widgets();
-    gridster.disable();
-    gridster.disable_resize();
-    $.each(serialization, function() {
-        widget_dom(this);
+        // load existing widgets (sorted by row/col like Gridster used to)
+        serialization.sort((a, b) => (a.row - b.row) || (a.col - b.col)).forEach(widget_dom);
+
+        // default to "view mode"
+        grid.enableMove(false);
+        grid.enableResize(false);
+
+        grid.on('change', function () {
+            updatePos(grid);
+        });
+
+        grid.on('resizestop', function (event, element) {
+            var $el = $(element);
+            updatePos(grid);
+            widget_reload($el.attr('id'), $el.data('type'));
+        });
+
+        @if (empty($dashboard->dashboard_id) && $default_dash == 0)
+        $('#dashboard_name').val('Default');
+        dashboard_add($('#add_form'));
+        @endif
     });
+
+    $('#new-widget').popover();
+
     $(document).on('click','.edit-dash-btn', function() {
-        if (gridster_state == 0) {
-            gridster.enable();
-            gridster.enable_resize();
-            gridster_state = 1;
+        if (gridstack_state == 0) {
+            grid.enableMove(true);
+            grid.enableResize(true);
+            gridstack_state = 1;
             $('.fade-edit').fadeIn();
         }
         else {
-            gridster.disable();
-            gridster.disable_resize();
-            gridster_state = 0;
+            grid.enableMove(false);
+            grid.enableResize(false);
+            gridstack_state = 0;
             $('.fade-edit').fadeOut();
         }
     });
@@ -253,7 +249,7 @@
                 dataType: "json",
                 success: function (data) {
                     if (data.status == 'ok') {
-                        gridster.remove_all_widgets();
+                        grid.removeAll();
                         toastr.success(data.message);
                     }
                     else {
@@ -281,7 +277,7 @@
                 success: function (data) {
                     if (data.status === 'ok') {
                         widget_dom(data.extra);
-                        updatePos(gridster);
+                        updatePos(grid);
                         toastr.success(data.message);
                     }
                     else {
@@ -303,8 +299,11 @@
             dataType: "json",
             success: function (data) {
                 if (data.status == 'ok') {
-                    gridster.remove_widget($('#'+widget_id));
-                    updatePos(gridster);
+                    var el = document.getElementById(widget_id);
+                    if (el) {
+                        grid.removeWidget(el);
+                    }
+                    updatePos(grid);
                     toastr.success(data.message);
                 }
                 else {
@@ -318,19 +317,19 @@
     });
 
     $(document).on("click",".edit-widget",function() {
-        obj = $(this).parent().parent().parent();
-        if( obj.data('settings') == 1 ) {
-            obj.data('settings','0');
+        const $widget = $(this).closest('.grid-stack-item');
+        if ($widget.data('settings') == 1) {
+            $widget.data('settings', '0');
         } else {
-            obj.data('settings','1');
+            $widget.data('settings', '1');
         }
-        widget_reload(obj.attr('id'), obj.data('type'), true);
+        widget_reload($widget.attr('id'), $widget.data('type'), true);
     });
 
 
 
 
-    function updatePos(gridster) {
+    function updatePos(grid) {
         @if ($dashboard->dashboard_id > 0)
             var dashboard_id = {{ $dashboard->dashboard_id }};
         @else
@@ -338,16 +337,23 @@
         @endif
 
         if (dashboard_id > 0) {
+            var serialized = grid.save(false).map(function(item) {
+                var id = item.id || (item.el ? item.el.getAttribute('id') : undefined);
+                return {
+                    id: id,
+                    col: (item.x ?? 0) + 1,
+                    row: (item.y ?? 0) + 1,
+                    size_x: item.w ?? 1,
+                    size_y: item.h ?? 1,
+                };
+            });
             $.ajax({
                 type: 'PUT',
                 url: '{{ route('dashboard.widget.update', '?') }}'.replace('?', dashboard_id),
-                data: {data: JSON.stringify(gridster.serialize())},
+                data: {data: JSON.stringify(serialized)},
                 dataType: "json",
                 success: function (data) {
-                    if (data.status == 'ok') {
-                        toastr.success(data.message);
-                    }
-                    else {
+                    if (data.status !== 'ok') {
                         toastr.error(data.message);
                     }
                 },
@@ -365,9 +371,9 @@
             });
             $(target).fadeToggle(300);
             if (target != "#edit_dash") {
-                gridster.disable();
-                gridster.disable_resize();
-                gridster_state = 0;
+                grid.enableMove(false);
+                grid.enableResize(false);
+                gridstack_state = 0;
                 $('.fade-edit').fadeOut();
             }
         } else {
@@ -463,7 +469,6 @@
         });
     }
 
-@if (auth()->user()->isAdmin())
     function dashboard_copy_user_select() {
         var button_disabled = true;
         if (document.getElementById("dashboard_copy_target").value > 0) {
@@ -504,10 +509,10 @@
             dashboard_copy_user_select();
         }
     }
-@endif
 
     function widget_dom(data) {
-        dom = '<li id="'+data.user_widget_id+'" data-type="'+data.widget+'" data-settings="0">'+
+        dom = '<div id="'+data.user_widget_id+'" class="grid-stack-item" data-type="'+data.widget+'" data-settings="0" gs-id="'+data.user_widget_id+'">'+
+              '<div class="grid-stack-item-content">'+
               '<header class="widget_header"><span id="widget_title_'+data.user_widget_id+'">'+data.title+
               '</span><span id="widget_title_counter_'+data.user_widget_id+'"></span>'+
               '<span class="fade-edit pull-right">'+
@@ -522,15 +527,29 @@
               '</span>'+
               '</header>'+
               '<div class="widget_body" id="widget_body_'+data.user_widget_id+'">'+data.widget+'</div>'+
-              '\<script\>var timeout'+data.user_widget_id+' = grab_data('+data.user_widget_id+',\''+data.widget+'\');\<\/script\>'+
-              '</li>';
+              '</div></div>';
+
+        // GridStack v11+ doesn't accept HTML strings in addWidget(), so build an element.
+        // (Also, relying on injected <script> tags is brittle; we start widget refresh explicitly below.)
+        var wrap = document.createElement('div');
+        wrap.innerHTML = dom;
+        var el = wrap.firstElementChild;
 
         if (data.hasOwnProperty('col') && data.hasOwnProperty('row')) {
-            gridster.add_widget(dom, parseInt(data.size_x), parseInt(data.size_y), parseInt(data.col), parseInt(data.row));
+            el.setAttribute('gs-w', '' + parseInt(data.size_x));
+            el.setAttribute('gs-h', '' + parseInt(data.size_y));
+            el.setAttribute('gs-x', '' + (parseInt(data.col) - 1));
+            el.setAttribute('gs-y', '' + (parseInt(data.row) - 1));
         } else {
-            gridster.add_widget(dom, parseInt(data.size_x), parseInt(data.size_y));
+            el.setAttribute('gs-w', '' + parseInt(data.size_x));
+            el.setAttribute('gs-h', '' + parseInt(data.size_y));
         }
-        if (gridster_state == 0) {
+
+        // GridStack v11: prefer makeWidget() over addWidget(el)
+        grid.el.appendChild(el);
+        grid.makeWidget(el);
+        grab_data(data.user_widget_id, data.widget);
+        if (gridstack_state == 0) {
             $('.fade-edit').fadeOut(0);
         }
         $('[data-toggle="tooltip"]').tooltip();
@@ -554,11 +573,12 @@
             }
         }
 
-        $('.gridster').find('div[id^=widget_body_]').each(function() {
+        $('.grid-stack').find('div[id^=widget_body_]').each(function() {
             if(this.contains(data)) {
-                widget_id = $(this).parent().attr('id');
-                widget_type = $(this).parent().data('type');
-                $(this).parent().data('settings', '0');
+                const $widget = $(this).closest('.grid-stack-item');
+                widget_id = $widget.attr('id');
+                widget_type = $widget.data('type');
+                $widget.data('settings', '0');
             }
         });
         if(widget_id > 0 && widget_settings != {}) {
@@ -600,7 +620,7 @@
             data: {
                 id: id,
                 dimensions: {x: $widget_body.width(), y: $widget_body.height()},
-                settings: $widget_body.parent().data('settings') == 1 ? 1 : 0
+                settings: $widget_body.closest('.grid-stack-item').data('settings') == 1 ? 1 : 0
             },
             dataType: 'json',
             success: function (data) {
@@ -610,7 +630,7 @@
 
                     $('#widget_title_' + id).html(data.title);
                     $widget_body.html(data.html);
-                    $widget_body.parent().data('settings', data.show_settings).data('refresh', data.settings.refresh);
+                    $widget_body.closest('.grid-stack-item').data('settings', data.show_settings).data('refresh', data.settings.refresh);
                 } else {
                     $widget_body.html('<div class="alert alert-info">' + data.message + '</div>');
                 }
@@ -622,7 +642,7 @@
     }
 
     function grab_data(id, data_type) {
-        const refresh = $('#widget_body_' + id).parent().data('refresh');
+        const refresh = $('#widget_body_' + id).closest('.grid-stack-item').data('refresh');
         widget_reload(id, data_type);
 
         setTimeout(function () {
@@ -630,7 +650,7 @@
         }, (refresh > 0 ? refresh : 60) * 1000);
     }
 
-    // make sure gridster stays disabled when the window is resized
+    // make sure edit mode stays disabled when the window is resized
     var resizeTrigger = null;
     addEvent(window, "resize", function(event) {
         // emit resize event, but only once every 100ms
@@ -642,18 +662,11 @@
         }
 
         setTimeout(function(){
-            if(!gridster_state) {
-                gridster.disable();
-                gridster.disable_resize();
+            if(!gridstack_state) {
+                grid.enableMove(false);
+                grid.enableResize(false);
             }
         }, 100);
     });
-
-    $('#new-widget').popover();
-
-    @if (empty($dashboard->dashboard_id) && $default_dash == 0)
-        $('#dashboard_name').val('Default');
-        dashboard_add($('#add_form'));
-    @endif
 </script>
 @endpush

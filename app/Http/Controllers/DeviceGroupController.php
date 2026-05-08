@@ -22,8 +22,6 @@ class DeviceGroupController extends Controller
      */
     public function index()
     {
-        $this->authorize('manage', DeviceGroup::class);
-
         return view('device-group.index', [
             'device_groups' => DeviceGroup::orderBy('name')->withCount('devices')->get(),
         ]);
@@ -58,7 +56,7 @@ class DeviceGroupController extends Controller
             'rules' => 'json|required_if:type,dynamic',
         ]);
 
-        $deviceGroup = DeviceGroup::make($request->only(['name', 'desc', 'type']));
+        $deviceGroup = new DeviceGroup($request->only(['name', 'desc', 'type']));
         $deviceGroup->rules = json_decode($request->rules);
         $deviceGroup->save();
 

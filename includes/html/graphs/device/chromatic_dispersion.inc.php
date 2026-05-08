@@ -1,7 +1,5 @@
 <?php
 
-$class = 'chromatic_dispersion';
-$unit = 'ps/nm';
-$unit_long = 'ps/nm';
+$class = \LibreNMS\Enum\Sensor::ChromaticDispersion;
 
 require 'includes/html/graphs/device/sensor.inc.php';

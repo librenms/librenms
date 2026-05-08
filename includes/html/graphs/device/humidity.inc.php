@@ -1,7 +1,5 @@
 <?php
 
-$class = 'humidity';
-$unit = '%%';
-$unit_long = 'Percent';
+$class = \LibreNMS\Enum\Sensor::Humidity;
 
 require 'includes/html/graphs/device/sensor.inc.php';

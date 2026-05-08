@@ -37,34 +37,34 @@ modules:
                     num_oid: '.1.3.6.1.4.1.30140.3.5.{{ $index }}'
                     descr: RTC battery status
                     states:
-                        - { descr: Unknown, graph: 0, value: 0, generic: 3 }
-                        - { descr: OK, graph: 2, value: 1, generic: 0 }
-                        - { descr: Empty, graph: 1, value: 2, generic: 1 }
+                        - { descr: Unknown, value: 0, generic: 3 }
+                        - { descr: OK, value: 1, generic: 0 }
+                        - { descr: Empty, value: 2, generic: 1 }
                 -
                     oid: CONEL-IO-MIB::ioBin0
                     num_oid: '.1.3.6.1.4.1.30140.2.3.1.{{ $index }}'
                     descr: IO BIN0 status
                     states:
-                        - { descr: Low, graph: 0, value: 0, generic: 0 }
-                        - { descr: High, graph: 1, value: 1, generic: 1 }
+                        - { descr: Low, value: 0, generic: 0 }
+                        - { descr: High, value: 1, generic: 1 }
                 -
                     oid: CONEL-IO-MIB::ioBin1
                     num_oid: '.1.3.6.1.4.1.30140.2.3.3.{{ $index }}'
                     descr: IO BIN1 status
                     states:
-                        - { descr: Low, graph: 0, value: 0, generic: 0 }
-                        - { descr: High, graph: 1, value: 1, generic: 1 }
+                        - { descr: Low, value: 0, generic: 0 }
+                        - { descr: High, value: 1, generic: 1 }
                 -
                     oid: CONEL-IO-MIB::ioOut0
                     num_oid: '.1.3.6.1.4.1.30140.2.3.2.{{ $index }}'
                     descr: IO OUT0 status
                     states:
-                        - { descr: Low, graph: 0, value: 0, generic: 0 }
-                        - { descr: High, graph: 1, value: 1, generic: 1 }
+                        - { descr: Low, value: 0, generic: 0 }
+                        - { descr: High, value: 1, generic: 1 }
                 -
                     oid: CONEL-IO-MIB::ioOut1
                     num_oid: '.1.3.6.1.4.1.30140.2.3.4.{{ $index }}'
                     descr: IO OUT1 status
                     states:
-                        - { descr: Low, graph: 0, value: 0, generic: 0 }
-                        - { descr: High, graph: 1, value: 1, generic: 1 }
+                        - { descr: Low, value: 0, generic: 0 }
+                        - { descr: High, value: 1, generic: 1 }

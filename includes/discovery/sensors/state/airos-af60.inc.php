@@ -9,15 +9,15 @@ foreach ($oids as $index => $entry) {
     $rxmcs_state_name = 'af60StaRxMCS';
 
     $rate_states = [
-        ['value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => '1X'],
-        ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => '2X'],
-        ['value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => '3X'],
-        ['value' => 4, 'generic' => 1, 'graph' => 1, 'descr' => '4X'],
-        ['value' => 5, 'generic' => 0, 'graph' => 1, 'descr' => '5X'],
-        ['value' => 6, 'generic' => 0, 'graph' => 1, 'descr' => '6X'],
-        ['value' => 7, 'generic' => 0, 'graph' => 1, 'descr' => '7X'],
-        ['value' => 8, 'generic' => 0, 'graph' => 1, 'descr' => '8X'],
-        ['value' => 9, 'generic' => 0, 'graph' => 1, 'descr' => '9X'],
+        ['value' => 1, 'generic' => 2, 'descr' => '1X'],
+        ['value' => 2, 'generic' => 2, 'descr' => '2X'],
+        ['value' => 3, 'generic' => 1, 'descr' => '3X'],
+        ['value' => 4, 'generic' => 1, 'descr' => '4X'],
+        ['value' => 5, 'generic' => 0, 'descr' => '5X'],
+        ['value' => 6, 'generic' => 0, 'descr' => '6X'],
+        ['value' => 7, 'generic' => 0, 'descr' => '7X'],
+        ['value' => 8, 'generic' => 0, 'descr' => '8X'],
+        ['value' => 9, 'generic' => 0, 'descr' => '9X'],
     ];
 
     create_state_index($txmcs_state_name, $rate_states);
@@ -48,8 +48,8 @@ foreach ($oids as $index => $entry) {
     $activeLink_state_name = 'af60StaActiveLink';
 
     $rate_states = [
-        ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'Main'],
-        ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'Backup'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'Main'],
+        ['value' => 2, 'generic' => 1, 'descr' => 'Backup'],
     ];
 
     create_state_index($activeLink_state_name, $rate_states);

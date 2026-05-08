@@ -9,7 +9,7 @@ if (preg_match('/(Linux).+(ntc)/', (string) $device['sysDescr'])) {
     $limit = null;
     $descr = 'Battery charge';
     $index = '116.8';
-    $value = snmp_get($device, $oid . $index, '-Oqv');
+    $value = SnmpQuery::get($oid . $index)->value();
     if (is_numeric($value)) {
         discover_sensor(null, 'charge', $device, $oid . $index, $index, $sensor_type, $descr, 1, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
     }

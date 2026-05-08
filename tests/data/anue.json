@@ -47250,6 +47250,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "2014-7-1,17:1:0.0,+0:0",
                     "ifIndex": null
                 },
                 {
@@ -47269,6 +47270,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47288,6 +47290,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47307,6 +47310,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47326,6 +47330,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47345,6 +47350,7 @@
                     "entPhysicalContainedIn": 5,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47364,6 +47370,7 @@
                     "entPhysicalContainedIn": 5,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47383,6 +47390,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47402,6 +47410,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47421,6 +47430,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47440,6 +47450,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47447,7 +47458,7 @@
                     "entPhysicalDescr": "eth0",
                     "entPhysicalClass": "port",
                     "entPhysicalName": "eth0",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47459,6 +47470,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47466,7 +47478,7 @@
                     "entPhysicalDescr": "eth1",
                     "entPhysicalClass": "port",
                     "entPhysicalName": "eth1",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47478,6 +47490,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47485,7 +47498,7 @@
                     "entPhysicalDescr": "Internal Power supply (DC)",
                     "entPhysicalClass": "powerSupply",
                     "entPhysicalName": "Internal Power supply A",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47497,6 +47510,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47504,7 +47518,7 @@
                     "entPhysicalDescr": "Internal Power supply (DC)",
                     "entPhysicalClass": "powerSupply",
                     "entPhysicalName": "Internal Power supply B",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47516,6 +47530,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47523,7 +47538,7 @@
                     "entPhysicalDescr": "External Power supply (DC)",
                     "entPhysicalClass": "powerSupply",
                     "entPhysicalName": "External Power supply 1",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47535,6 +47550,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47542,7 +47558,7 @@
                     "entPhysicalDescr": "Fan Module 1",
                     "entPhysicalClass": "fan",
                     "entPhysicalName": "Fan",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47554,6 +47570,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47561,7 +47578,7 @@
                     "entPhysicalDescr": "Fan Module 2",
                     "entPhysicalClass": "fan",
                     "entPhysicalName": "Fan",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47573,6 +47590,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47580,7 +47598,7 @@
                     "entPhysicalDescr": "Fan Module 3",
                     "entPhysicalClass": "fan",
                     "entPhysicalName": "Fan",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47592,6 +47610,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47599,7 +47618,7 @@
                     "entPhysicalDescr": "Fan Module 4",
                     "entPhysicalClass": "fan",
                     "entPhysicalName": "Fan",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47611,6 +47630,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47618,7 +47638,7 @@
                     "entPhysicalDescr": "Fan Module 5",
                     "entPhysicalClass": "fan",
                     "entPhysicalName": "Fan",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47630,6 +47650,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47637,7 +47658,7 @@
                     "entPhysicalDescr": "Fan Module 6",
                     "entPhysicalClass": "fan",
                     "entPhysicalName": "Fan",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47649,6 +47670,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47656,7 +47678,7 @@
                     "entPhysicalDescr": "7300 Temperature Sensor",
                     "entPhysicalClass": "sensor",
                     "entPhysicalName": "Temperature Sensor",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47668,6 +47690,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47675,7 +47698,7 @@
                     "entPhysicalDescr": "7300 Temperature Sensor",
                     "entPhysicalClass": "sensor",
                     "entPhysicalName": "Temperature Sensor",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47687,6 +47710,7 @@
                     "entPhysicalContainedIn": 8,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47694,7 +47718,7 @@
                     "entPhysicalDescr": "7300 Temperature Sensor",
                     "entPhysicalClass": "sensor",
                     "entPhysicalName": "Temperature Sensor",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47706,6 +47730,7 @@
                     "entPhysicalContainedIn": 9,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47713,7 +47738,7 @@
                     "entPhysicalDescr": "7300 Temperature Sensor",
                     "entPhysicalClass": "sensor",
                     "entPhysicalName": "Temperature Sensor",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47725,6 +47750,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47732,7 +47758,7 @@
                     "entPhysicalDescr": "7300 Temperature Sensor",
                     "entPhysicalClass": "sensor",
                     "entPhysicalName": "Temperature Sensor",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47744,6 +47770,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47751,7 +47778,7 @@
                     "entPhysicalDescr": "7300 Temperature Sensor",
                     "entPhysicalClass": "sensor",
                     "entPhysicalName": "Temperature Sensor",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47763,6 +47790,7 @@
                     "entPhysicalContainedIn": 12,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47770,7 +47798,7 @@
                     "entPhysicalDescr": "7300 Temperature Sensor",
                     "entPhysicalClass": "sensor",
                     "entPhysicalName": "Temperature Sensor",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47782,6 +47810,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47789,7 +47818,7 @@
                     "entPhysicalDescr": "7300 Temperature Sensor",
                     "entPhysicalClass": "sensor",
                     "entPhysicalName": "Temperature Sensor",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47801,6 +47830,7 @@
                     "entPhysicalContainedIn": 5,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47820,6 +47850,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -47827,7 +47858,7 @@
                     "entPhysicalDescr": "7300 Temperature Sensor",
                     "entPhysicalClass": "sensor",
                     "entPhysicalName": "Temperature Sensor",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
@@ -47839,6 +47870,7 @@
                     "entPhysicalContainedIn": 33,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "Ixia",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 }
             ]

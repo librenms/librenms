@@ -3,6 +3,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCapacityDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -31,7 +32,7 @@ class Mni extends OS implements
 
         return [
             new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 $transmit_oid,
                 'mni-tx',
@@ -42,7 +43,7 @@ class Mni extends OS implements
                 1
             ),
             new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 $receive_oid,
                 'mni-rx',
@@ -69,7 +70,7 @@ class Mni extends OS implements
 
         return [
             new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 $receive_oid,
                 'mni-rx-rate',
@@ -86,7 +87,7 @@ class Mni extends OS implements
     {
         return \SnmpQuery::walk('MNI-PROTEUS-AMT-MIB::mnPrPerfBaseLinkCapMbps')
             ->mapTable(fn ($data, $mnInterfaceIndex) => new WirelessSensor(
-                'capacity',
+                WirelessSensorType::Capacity,
                 $this->getDeviceId(),
                 ".1.3.6.1.4.1.3323.13.1.4.1.1.17.$mnInterfaceIndex",
                 'mni-capacity',
@@ -101,7 +102,7 @@ class Mni extends OS implements
     {
         return \SnmpQuery::walk('MNI-PROTEUS-AMT-MIB::mnPrRadStatODUFreqBand')
             ->mapTable(fn ($data, $mnRadioIndex) => new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 ".1.3.6.1.4.1.3323.13.1.1.2.1.17.$mnRadioIndex",
                 'mni-frequency',
