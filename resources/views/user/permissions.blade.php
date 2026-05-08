@@ -143,7 +143,7 @@
                     </div>
                     <table class="table table-hover table-condensed table-striped tw:mb-0">
                         <tr>
-                            <th>{{ __('Port name') }}</th>
+                            <th>{{ __('Port') }}</th>
                             <th>{{ __('Action') }}</th>
                         </tr>
                         @forelse($portPermissions as $portPermission)
@@ -194,7 +194,7 @@
                         </div>
                         <table class="table table-hover table-condensed table-striped tw:mb-0">
                             <tr>
-                                <th>{{ __('Bill name') }}</th>
+                                <th>{{ __('Bill') }}</th>
                                 <th>{{ __('Action') }}</th>
                             </tr>
                             @forelse($billPermissions as $billPermission)
