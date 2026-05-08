@@ -10,14 +10,12 @@
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
-use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\StateTranslation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Util\Time;
 
 function renamehost($id, $new, $source = 'console')
 {
@@ -223,11 +221,6 @@ function port_fill_missing_and_trim(&$port, $device)
         $port['ifName'] = $port['ifDescr'];
         Log::debug(' Using ifDescr as ifName');
     }
-}
-
-function convert_delay($delay)
-{
-    return Time::durationToSeconds($delay);
 }
 
 /**

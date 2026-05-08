@@ -53,6 +53,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v6
         with:
+          fetch-depth: 2
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /*
@@ -77,6 +78,21 @@ jobs:
 
       - name: Composer dump
         run: composer dump --strict-psr --strict-ambiguous --no-interaction --no-scripts
+
+      - name: Find new PHP files
+        if: github.event_name == 'pull_request'
+        id: new-php-files
+        run: |
+          # HEAD is the PR merge commit, HEAD~1 is its first parent (base branch tip)
+          NEW_PHP_FILES=$(git diff -z --diff-filter=A --name-only HEAD~1 HEAD -- 'app/**.php' 'bootstrap/**.php' 'config/**.php' 'database/**.php' 'LibreNMS/**.php' 'resources/**.php' 'routes/**.php' 'tests/**.php' | xargs -0)
+          echo "Discovered new PHP files: $NEW_PHP_FILES"
+          echo "files=$NEW_PHP_FILES" >> "$GITHUB_OUTPUT"
+
+      - name: Run PHPStan (New files, level 6)
+        if: github.event_name == 'pull_request' && steps.new-php-files.outputs.files != ''
+        env:
+          NEW_PHP_FILES: ${{ steps.new-php-files.outputs.files }}
+        run: ./vendor/bin/phpstan analyze --no-interaction --memory-limit=4G --level=6 -- $NEW_PHP_FILES
 
       - name: Run PHPStan
         run: ./vendor/bin/phpstan analyze --no-interaction --memory-limit=4G

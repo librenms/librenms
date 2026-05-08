@@ -161,6 +161,7 @@ class GraphParameters implements \Stringable
         }
 
         // set up fonts
+        array_push($options, '--font', 'TITLE:' . $this->font_size . ':' . $this->font);
         array_push($options, '--font', 'LEGEND:' . $this->font_size . ':' . $this->font);
         array_push($options, '--font', 'AXIS:' . ($this->font_size - 1) . ':' . $this->font);
         array_push($options, '--font-render-mode', 'normal');
@@ -214,8 +215,7 @@ class GraphParameters implements \Stringable
         }
 
         if ($this->visible('title')) {
-            // remove single quotes, because we can't drop out of the string if this is sent to rrdtool stdin
-            $options[] = '--title=' . str_replace("'", '', $this->getTitle());
+            $options[] = '--title=' . $this->formatTitle();
         }
 
         if ($this->right_axis !== null) {
@@ -297,5 +297,28 @@ class GraphParameters implements \Stringable
         $title .= Str::title(str_replace('_', ' ', $this->subtype));
 
         return $title;
+    }
+
+    private function formatTitle(): string
+    {
+        $title = str_replace("'", '', $this->getTitle());
+
+        // linear approximation
+        $slope = 0.1332;
+        $intercept = 15.55;
+        $sizeAdjustment = 8 / $this->font_size; // Adjust the slope if the font size deviates from 8
+        $adjustedSlope = $slope * $sizeAdjustment;
+
+        $maxChars = (int) floor($this->width * $adjustedSlope + $intercept);
+
+        if ($maxChars <= 0) {
+            return '';
+        }
+
+        if (strlen($title) <= $maxChars) {
+            return $title;
+        }
+
+        return substr($title, 0, max(0, $maxChars - 3)) . '...';
     }
 }
