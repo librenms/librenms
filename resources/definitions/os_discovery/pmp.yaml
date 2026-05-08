@@ -20,3 +20,87 @@ modules:
                         - { value: 1, generic: 0, descr: gpsSynchronized }
                         - { value: 2, generic: 2, descr: gpsLostSync }
                         - { value: 3, generic: 0, descr: generatingSync }
+        count:
+            data:
+                # AP — registered SMs
+                -
+                    oid: WHISP-APS-MIB::regCount
+                    num_oid: '.1.3.6.1.4.1.161.19.3.1.7.1.0'
+                    index: 0
+                    descr: 'Registered SMs'
+                # AP — registration failures since boot
+                -
+                    oid: WHISP-APS-MIB::regFailureCount
+                    num_oid: '.1.3.6.1.4.1.161.19.3.1.7.32.0'
+                    index: 1
+                    descr: 'Registration Failures'
+                # AP — virtual circuit count
+                -
+                    oid: WHISP-APS-MIB::vcCount
+                    num_oid: '.1.3.6.1.4.1.161.19.3.1.7.39.0'
+                    index: 2
+                    descr: 'VC Count'
+                # AP — invalid packet discards
+                -
+                    oid: WHISP-APS-MIB::invalidPacketDiscards
+                    num_oid: '.1.3.6.1.4.1.161.19.3.1.7.54.0'
+                    index: 3
+                    descr: 'Invalid Packet Discards'
+                # SM — TX power adjustment count
+                -
+                    oid: WHISP-SM-MIB::rfStatPowerAdjustmentCount
+                    num_oid: '.1.3.6.1.4.1.161.19.3.2.2.161.0'
+                    index: 4
+                    descr: 'TX Power Adjustments'
+                # SM — scan cycles
+                -
+                    oid: WHISP-SM-MIB::scanCycleCount
+                    num_oid: '.1.3.6.1.4.1.161.19.3.2.2.147.0'
+                    index: 5
+                    descr: 'Scan Cycles'
+        percent:
+            data:
+                # SM — beacons received
+                -
+                    oid: WHISP-SM-MIB::beaconsPercentReceived
+                    num_oid: '.1.3.6.1.4.1.161.19.3.2.2.139.0'
+                    index: 0
+                    descr: 'Beacons Received %'
+                # SM — MAPs received
+                -
+                    oid: WHISP-SM-MIB::mapsPercentReceived
+                    num_oid: '.1.3.6.1.4.1.161.19.3.2.2.140.0'
+                    index: 1
+                    descr: 'MAPs Received %'
+                # AP — failed-SM percent
+                -
+                    oid: WHISP-APS-MIB::failedSmPercent
+                    num_oid: '.1.3.6.1.4.1.161.19.3.1.7.51.0'
+                    index: 2
+                    descr: 'Failed SM %'
+        delay:
+            data:
+                # SM — air delay (round-trip ns; divide by 6.6713 for metres)
+                -
+                    oid: WHISP-SM-MIB::airDelayns
+                    num_oid: '.1.3.6.1.4.1.161.19.3.2.2.64.0'
+                    index: 0
+                    descr: 'Air Delay (round-trip ns)'
+        signal:
+            data:
+                # SM — running-average RSSI (radioDbmInt is already covered by
+                # Pmp.php discoverWirelessRssi(); add the average flavour here)
+                -
+                    oid: WHISP-SM-MIB::radioDbmAvg
+                    num_oid: '.1.3.6.1.4.1.161.19.3.2.2.61.0'
+                    index: 0
+                    descr: 'Cambium RSSI Avg'
+        frequency:
+            data:
+                # SM — current channel frequency (kHz → MHz)
+                -
+                    oid: WHISP-SM-MIB::currentChanFreq
+                    num_oid: '.1.3.6.1.4.1.161.19.3.2.2.67.0'
+                    index: 0
+                    descr: 'SM Channel Frequency'
+                    divisor: 1000
