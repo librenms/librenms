@@ -6,6 +6,8 @@ over:
 icon: digital-loggers
 discovery:
     -
+        sysObjectID_regex:
+            - '/^$/'
         snmpget:
             oid: .1.3.6.1.2.1.229.0.1.0
             op: '='
