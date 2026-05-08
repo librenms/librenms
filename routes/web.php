@@ -125,14 +125,14 @@ Route::middleware(['auth'])->group(function (): void {
     Route::resource('users', UserController::class);
     Route::prefix('users/{user}/permissions')->name('users.permissions.')->group(function (): void {
         Route::get('', [UserPermissionsController::class, 'edit'])->name('edit');
-        Route::post('device', [UserPermissionsController::class, 'storeDevice'])->name('device.store');
-        Route::delete('device/{device}', [UserPermissionsController::class, 'destroyDevice'])->name('device.destroy')->whereNumber('device');
-        Route::post('device-group', [UserPermissionsController::class, 'storeDeviceGroup'])->name('device-group.store');
-        Route::delete('device-group/{deviceGroup}', [UserPermissionsController::class, 'destroyDeviceGroup'])->name('device-group.destroy')->whereNumber('deviceGroup');
-        Route::post('port', [UserPermissionsController::class, 'storePort'])->name('port.store');
-        Route::delete('port/{port}', [UserPermissionsController::class, 'destroyPort'])->name('port.destroy')->whereNumber('port');
-        Route::post('bill', [UserPermissionsController::class, 'storeBill'])->name('bill.store');
-        Route::delete('bill/{bill}', [UserPermissionsController::class, 'destroyBill'])->name('bill.destroy')->whereNumber('bill');
+        Route::post('device', [UserPermissionsController::class, 'attachDevice'])->name('device.attach');
+        Route::delete('device/{device}', [UserPermissionsController::class, 'detachDevice'])->name('device.detach')->whereNumber('device');
+        Route::post('device-group', [UserPermissionsController::class, 'attachDeviceGroup'])->name('device-group.attach');
+        Route::delete('device-group/{deviceGroup}', [UserPermissionsController::class, 'detachDeviceGroup'])->name('device-group.detach')->whereNumber('deviceGroup');
+        Route::post('port', [UserPermissionsController::class, 'attachPort'])->name('port.attach');
+        Route::delete('port/{port}', [UserPermissionsController::class, 'detachPort'])->name('port.detach')->whereNumber('port');
+        Route::post('bill', [UserPermissionsController::class, 'attachBill'])->name('bill.attach');
+        Route::delete('bill/{bill}', [UserPermissionsController::class, 'detachBill'])->name('bill.detach')->whereNumber('bill');
     });
     Route::get('about', [AboutController::class, 'index'])->name('about');
     Route::delete('reporting', [AboutController::class, 'clearReportingData'])->name('reporting.clear');

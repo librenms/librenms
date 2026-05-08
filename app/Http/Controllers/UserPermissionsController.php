@@ -52,7 +52,7 @@ class UserPermissionsController extends Controller
         ]);
     }
 
-    public function storeDevice(Request $request, User $user): RedirectResponse
+    public function attachDevice(Request $request, User $user): RedirectResponse
     {
         $this->authorize('manage', $user);
 
@@ -72,7 +72,7 @@ class UserPermissionsController extends Controller
         return redirect()->route('users.permissions.edit', [$user, 'tab' => 'device']);
     }
 
-    public function destroyDevice(User $user, int $device): RedirectResponse
+    public function detachDevice(User $user, int $device): RedirectResponse
     {
         $this->authorize('manage', $user);
 
@@ -82,7 +82,7 @@ class UserPermissionsController extends Controller
         return redirect()->route('users.permissions.edit', [$user, 'tab' => 'device']);
     }
 
-    public function storeDeviceGroup(Request $request, User $user): RedirectResponse
+    public function attachDeviceGroup(Request $request, User $user): RedirectResponse
     {
         $this->authorize('manage', $user);
 
@@ -96,7 +96,7 @@ class UserPermissionsController extends Controller
         return redirect()->route('users.permissions.edit', [$user, 'tab' => 'device-group']);
     }
 
-    public function destroyDeviceGroup(User $user, int $deviceGroup): RedirectResponse
+    public function detachDeviceGroup(User $user, int $deviceGroup): RedirectResponse
     {
         $this->authorize('manage', $user);
 
@@ -106,7 +106,7 @@ class UserPermissionsController extends Controller
         return redirect()->route('users.permissions.edit', [$user, 'tab' => 'device-group']);
     }
 
-    public function storePort(Request $request, User $user): RedirectResponse
+    public function attachPort(Request $request, User $user): RedirectResponse
     {
         $this->authorize('manage', $user);
 
@@ -126,7 +126,7 @@ class UserPermissionsController extends Controller
         return redirect()->route('users.permissions.edit', [$user, 'tab' => 'port']);
     }
 
-    public function destroyPort(User $user, int $port): RedirectResponse
+    public function detachPort(User $user, int $port): RedirectResponse
     {
         $this->authorize('manage', $user);
 
@@ -136,7 +136,7 @@ class UserPermissionsController extends Controller
         return redirect()->route('users.permissions.edit', [$user, 'tab' => 'port']);
     }
 
-    public function storeBill(Request $request, User $user): RedirectResponse
+    public function attachBill(Request $request, User $user): RedirectResponse
     {
         $this->authorize('manage', $user);
 
@@ -156,7 +156,7 @@ class UserPermissionsController extends Controller
         return redirect()->route('users.permissions.edit', [$user, 'tab' => 'bill']);
     }
 
-    public function destroyBill(User $user, int $bill): RedirectResponse
+    public function detachBill(User $user, int $bill): RedirectResponse
     {
         $this->authorize('manage', $user);
 

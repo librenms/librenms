@@ -246,7 +246,7 @@ class UserControllerTest extends TestCase
 
         $admin->givePermissionTo('user.manage');
 
-        $addResponse = $this->actingAs($admin)->post(route('users.permissions.device.store', $targetUser), [
+        $addResponse = $this->actingAs($admin)->post(route('users.permissions.device.attach', $targetUser), [
             'device_id' => $device->device_id,
         ]);
 
@@ -258,7 +258,7 @@ class UserControllerTest extends TestCase
 
         $perm = DevicePerm::query()->where('user_id', $targetUser->user_id)->where('device_id', $device->device_id)->firstOrFail();
 
-        $removeResponse = $this->actingAs($admin)->delete(route('users.permissions.device.destroy', [$targetUser, $perm->device_id]));
+        $removeResponse = $this->actingAs($admin)->delete(route('users.permissions.device.detach', [$targetUser, $perm->device_id]));
 
         $removeResponse->assertRedirect(route('users.permissions.edit', $targetUser));
         $this->assertDatabaseMissing('devices_perms', [

@@ -26,7 +26,7 @@
                     <div class="tw:p-5">
                     <h4>{{ __('Grant access to new device') }}</h4>
                     <form class="form-inline" role="form" method="post"
-                          action="{{ route('users.permissions.device.store', $user) }}">
+                          action="{{ route('users.permissions.device.attach', $user) }}">
                         @csrf
                         <div class="form-group">
                             <label class="sr-only" for="device_id">{{ __('Device') }}</label>
@@ -45,7 +45,7 @@
                                 <td><strong>{{ $devicePermission->displayName() }}</strong></td>
                                 <td>
                                     <form
-                                        action="{{ route('users.permissions.device.destroy', [$user, $devicePermission->device_id]) }}"
+                                        action="{{ route('users.permissions.device.detach', [$user, $devicePermission->device_id]) }}"
                                         method="POST" class="tw:inline">
                                         @csrf
                                         @method('DELETE')
@@ -72,7 +72,7 @@
                     <div class="tw:p-5">
                         <h4>{{ __('Grant access to new Device Group') }}</h4>
                         <form class="form-inline" role="form" method="post"
-                              action="{{ route('users.permissions.device-group.store', $user) }}">
+                              action="{{ route('users.permissions.device-group.attach', $user) }}">
                             @csrf
                             <div class="form-group">
                                 <label class="sr-only" for="device_group_id">{{ __('Device Group') }}</label>
@@ -91,7 +91,7 @@
                                 <td><strong>{{ $deviceGroupPermission->name }}</strong></td>
                                 <td>
                                     <form
-                                        action="{{ route('users.permissions.device-group.destroy', [$user, $deviceGroupPermission->id]) }}"
+                                        action="{{ route('users.permissions.device-group.detach', [$user, $deviceGroupPermission->id]) }}"
                                         method="POST" class="tw:inline">
                                         @csrf
                                         @method('DELETE')
@@ -117,7 +117,7 @@
                     @else
                     <div class="tw:p-5">
                         <h4>{{ __('Grant access to new interface') }}</h4>
-                        <form action="{{ route('users.permissions.port.store', $user) }}" method="post" class="form-horizontal"
+                        <form action="{{ route('users.permissions.port.attach', $user) }}" method="post" class="form-horizontal"
                               role="form">
                             @csrf
                             <div class="form-group">
@@ -155,7 +155,7 @@
                                 </td>
                                 <td>
                                     <form
-                                        action="{{ route('users.permissions.port.destroy', [$user, $portPermission->port_id]) }}"
+                                        action="{{ route('users.permissions.port.detach', [$user, $portPermission->port_id]) }}"
                                         method="POST" class="tw:inline">
                                         @csrf
                                         @method('DELETE')
@@ -181,7 +181,7 @@
                     @else
                         <div class="tw:p-5">
                             <h4>{{ __('Grant access to new bill') }}</h4>
-                            <form method="post" action="{{ route('users.permissions.bill.store', $user) }}"
+                            <form method="post" action="{{ route('users.permissions.bill.attach', $user) }}"
                                   class="form-inline" role="form">
                                 @csrf
                                 <div class="form-group">
@@ -202,7 +202,7 @@
                                     <td><strong>{{ $billPermission->bill_name }}</strong></td>
                                     <td>
                                         <form
-                                            action="{{ route('users.permissions.bill.destroy', [$user, $billPermission->bill_id]) }}"
+                                            action="{{ route('users.permissions.bill.detach', [$user, $billPermission->bill_id]) }}"
                                             method="POST" class="tw:inline">
                                             @csrf
                                             @method('DELETE')
