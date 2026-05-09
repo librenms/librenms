@@ -58,6 +58,8 @@ class DiscoveryNextHops implements Module
 
     /**
      * @inheritDoc
+     *
+     * @return array<string>
      */
     public function dependencies(): array
     {
@@ -136,6 +138,7 @@ class DiscoveryNextHops implements Module
     /**
      * Filter the device's routes table down to interesting next-hops.
      *
+     * @param  array<string>  $extra_supernets  CIDR strings to also consider beyond the default route
      * @return array<string, array{route: \App\Models\Route, is_default: bool}>
      */
     private function collectCandidates(Device $device, bool $only_default, array $extra_supernets): array
@@ -179,6 +182,8 @@ class DiscoveryNextHops implements Module
 
     /**
      * Create a new pingonly device for this next-hop and link it to its parent.
+     *
+     * @param  array{route: \App\Models\Route, is_default: bool}  $meta
      */
     private function createPingonlyHop(string $hop_ip, array $meta, Device $parent): bool
     {
@@ -278,6 +283,8 @@ class DiscoveryNextHops implements Module
 
     /**
      * @inheritDoc
+     *
+     * @return array<string, mixed>|null
      */
     public function dump(Device $device, string $type): ?array
     {
