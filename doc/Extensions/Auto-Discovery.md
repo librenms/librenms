@@ -113,6 +113,55 @@ within the Modules section.
     lnms config:set discovery_modules.discovery-arp true
     ```
 
+### Next Hops
+
+Disabled by default.
+
+Adds the *next-hop gateway* of each "interesting" route in a device's
+routing table as a pingonly child device. Default behaviour: only the
+default route's next-hop is discovered (i.e. the upstream / WAN
+gateway). Optionally you can also flag specific supernets so internal
+next-hop routers get the same treatment.
+
+The motivation: when a monitored router is up but its upstream is
+unreachable, no entity in LibreNMS reflects that today. By making each
+next-hop a first-class monitored device — pingonly, parented to its
+discovering router — outage detection, latency graphs, and
+dependency-aware alerting all light up automatically.
+
+This module depends on the `route` module being enabled (it consumes
+the routes already populated in the `routes` table — no extra SNMP
+walking).
+
+To enable, set `discovery_modules.discovery-next-hops` either globally
+or per device.
+
+!!! setting "discovery/discovery_modules"
+    ```bash
+    lnms config:set discovery_modules.discovery-next-hops true
+    ```
+
+By default only the default route's next-hop is captured. To also
+include specific internal supernets:
+
+!!! setting "discovery/autodiscovery"
+    ```bash
+    lnms config:set autodiscovery.discovery-next-hops.supernets.+ '10.0.0.0/8'
+    lnms config:set autodiscovery.discovery-next-hops.supernets.+ '172.16.0.0/12'
+    ```
+
+To capture all remote next-hops (default + every other non-default route):
+
+!!! setting "discovery/autodiscovery"
+    ```bash
+    lnms config:set autodiscovery.discovery-next-hops.only-default-route false
+    ```
+
+Discovered next-hops are added with `snmp_disable=1` and `os=ping`, and
+the discovering device is set as their parent in `device_relationships`,
+so existing dependency-aware alerting suppresses cascade alarms when a
+parent goes down.
+
 ### XDP
 
 Enabled by default. Can be disabled with:
