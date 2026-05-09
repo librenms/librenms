@@ -145,6 +145,11 @@ class Xdsl implements Module
         $adslPorts = new Collection;
 
         foreach ($adsl as $ifIndex => $data) {
+            if (!is_array($data)) {
+                Log::warning("XDSL: Invalid data received for ifIndex $ifIndex. Expected array, got " . gettype($data));
+                continue;
+            }
+
             // Values are 1/10
             foreach ($this->adslTenthValues as $oid) {
                 if (isset($data[$oid])) {
@@ -195,6 +200,10 @@ class Xdsl implements Module
         $vdslPorts = new Collection;
 
         foreach ($vdsl as $ifIndex => $data) {
+            if (!is_array($data)) {
+                Log::warning("XDSL: Invalid data received for ifIndex $ifIndex. Expected array, got " . gettype($data));
+                continue;
+            }
             $portVdsl = new PortVdsl([
                 'port_id' => PortCache::getIdFromIfIndex($ifIndex, $os->getDevice()),
                 'xdsl2ChStatusActDataRateXtur' => $data['xdsl2ChStatusActDataRate']['xtur'] ?? 0,
