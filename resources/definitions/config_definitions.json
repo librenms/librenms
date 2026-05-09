@@ -7527,6 +7527,27 @@
             "section": "smokeping",
             "order": 3,
             "type": "text"
+        },
+        "discovery_modules.discovery-next-hops": {
+            "order": 275,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": false,
+            "type": "boolean"
+        },
+        "autodiscovery.discovery-next-hops.only-default-route": {
+            "order": 25,
+            "group": "discovery",
+            "section": "autodiscovery",
+            "default": true,
+            "type": "boolean"
+        },
+        "autodiscovery.discovery-next-hops.supernets": {
+            "order": 26,
+            "group": "discovery",
+            "section": "autodiscovery",
+            "default": [],
+            "type": "array"
         }
     }
 }
