@@ -145,7 +145,7 @@ class Xdsl implements Module
         $adslPorts = new Collection;
 
         foreach ($adsl as $ifIndex => $data) {
-            if (!is_array($data)) {
+            if (! is_array($data)) {
                 Log::warning("XDSL: Invalid data received for ifIndex $ifIndex. Expected array, got " . gettype($data));
                 continue;
             }
@@ -200,7 +200,7 @@ class Xdsl implements Module
         $vdslPorts = new Collection;
 
         foreach ($vdsl as $ifIndex => $data) {
-            if (!is_array($data)) {
+            if (! is_array($data)) {
                 Log::warning("XDSL: Invalid data received for ifIndex $ifIndex. Expected array, got " . gettype($data));
                 continue;
             }
