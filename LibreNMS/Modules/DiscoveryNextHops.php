@@ -228,7 +228,7 @@ class DiscoveryNextHops implements Module
 
         Eventlog::log(
             sprintf(
-                "Next-hop discovery: added %s as pingonly child of %s (%s)",
+                'Next-hop discovery: added %s as pingonly child of %s (%s)',
                 $hop_ip, $parent->hostname, $sysName
             ),
             $parent->device_id,
