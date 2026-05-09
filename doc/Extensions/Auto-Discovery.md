@@ -157,10 +157,25 @@ To capture all remote next-hops (default + every other non-default route):
     lnms config:set autodiscovery.discovery-next-hops.only-default-route false
     ```
 
-Discovered next-hops are added with `snmp_disable=1` and `os=ping`, and
-the discovering device is set as their parent in `device_relationships`,
-so existing dependency-aware alerting suppresses cascade alarms when a
-parent goes down.
+If the next-hop IP already belongs to a monitored device — by hostname,
+primary IP, or any of its discovered interface IPs — no duplicate is
+created; the discovering device is just attached as its parent.
+
+For genuinely new next-hops, two creation modes apply:
+
+- **Default route** (the WAN gateway, typically a public IP): added as
+  a pingonly device (`snmp_disable=1`, `os=ping`). SNMP and `nets`
+  checks are skipped, since upstream gateways are rarely SNMP-reachable
+  and not expected to be inside `nets`.
+- **Internal supernet next-hop**: SNMP credential discovery is attempted
+  first (so a manageable internal router gets fully discovered with
+  full interface, CPU, memory, etc. metrics). If SNMP fails, the device
+  falls back to pingonly. The `nets` allowlist applies — make sure your
+  internal supernets are listed in `nets` for this path to fire.
+
+In both cases the discovering device is set as the parent in
+`device_relationships`, so existing dependency-aware alerting suppresses
+cascade alarms when a parent goes down.
 
 ### XDP
 

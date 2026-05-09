@@ -37,6 +37,8 @@ use App\Models\Eventlog;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Exceptions\HostExistsException;
+use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
@@ -110,10 +112,12 @@ class DiscoveryNextHops implements Module
                 continue;
             }
 
-            // If the hop is already a monitored device, just ensure parent linkage
-            $existing = Device::where('hostname', $hop_ip)
-                ->orWhere('overwrite_ip', $hop_ip)
-                ->first();
+            // If the hop matches any already-monitored device — by hostname,
+            // by primary IP, or by any of its interface IPs — just ensure
+            // parent linkage. Device::findByIp() walks ipv4_addresses /
+            // ipv6_addresses, so this catches the "next-hop is core-router's
+            // eth0" case that hostname-only matching misses.
+            $existing = Device::findByIp($hop_ip);
 
             if ($existing) {
                 if ($this->ensureParentRelationship($existing, $device)) {
@@ -123,8 +127,7 @@ class DiscoveryNextHops implements Module
                 continue;
             }
 
-            // Create new pingonly device
-            if ($this->createPingonlyHop($hop_ip, $meta, $device)) {
+            if ($this->createDiscoveredHop($hop_ip, $meta, $device)) {
                 $created++;
             }
         }
@@ -181,11 +184,20 @@ class DiscoveryNextHops implements Module
     }
 
     /**
-     * Create a new pingonly device for this next-hop and link it to its parent.
+     * Create a new device for this next-hop and link it to its parent.
+     *
+     * Two modes:
+     *   - Default route (WAN gateway): pingonly with force=true. Public IPs
+     *     aren't in `nets` and rarely speak SNMP, so we skip those checks
+     *     and create the device directly.
+     *   - Internal supernet next-hop: SNMP-first with ping_fallback=true.
+     *     Respects `nets`, attempts SNMP credential discovery, falls back
+     *     to pingonly if SNMP fails. Lets manageable internal routers get
+     *     fully discovered instead of stub pingonly entries.
      *
      * @param  array{route: \App\Models\Route, is_default: bool}  $meta
      */
-    private function createPingonlyHop(string $hop_ip, array $meta, Device $parent): bool
+    private function createDiscoveredHop(string $hop_ip, array $meta, Device $parent): bool
     {
         $route = $meta['route'];
         $is_default = $meta['is_default'];
@@ -199,21 +211,37 @@ class DiscoveryNextHops implements Module
                 $parent->hostname
             );
 
-        $newDevice = new Device([
-            'hostname' => $hop_ip,
-            'snmp_disable' => 1,
-            'os' => 'ping',
-            'sysName' => $sysName,
-            'type' => 'firewall',
-        ]);
+        if ($is_default) {
+            $newDevice = new Device([
+                'hostname' => $hop_ip,
+                'snmp_disable' => 1,
+                'os' => 'ping',
+                'sysName' => $sysName,
+                'type' => 'firewall',
+            ]);
+            $force = true;
+            $ping_fallback = false;
+        } else {
+            // Internal next-hop — try SNMP first, let LibreNMS auto-detect OS
+            $newDevice = new Device([
+                'hostname' => $hop_ip,
+                'sysName' => $sysName,
+            ]);
+            $force = false;
+            $ping_fallback = true;
+        }
 
         try {
-            $action = new ValidateDeviceAndCreate($newDevice, force: true);
+            $action = new ValidateDeviceAndCreate($newDevice, force: $force, ping_fallback: $ping_fallback);
             if (! $action->execute()) {
                 Log::debug("next-hop $hop_ip: creation no-op (already exists)");
 
                 return false;
             }
+        } catch (HostExistsException|HostUnreachableException $e) {
+            Log::info("next-hop $hop_ip: skipped — " . $e->getMessage());
+
+            return false;
         } catch (\Throwable $e) {
             Log::warning("next-hop $hop_ip: creation failed: " . $e->getMessage());
 
@@ -226,10 +254,14 @@ class DiscoveryNextHops implements Module
             $this->ensureParentRelationship($persisted, $parent);
         }
 
+        $kind = ($persisted && ! $persisted->snmp_disable)
+            ? sprintf('SNMP-managed (%s)', $persisted->os)
+            : 'pingonly';
+
         Eventlog::log(
             sprintf(
-                'Next-hop discovery: added %s as pingonly child of %s (%s)',
-                $hop_ip, $parent->hostname, $sysName
+                'Next-hop discovery: added %s as %s child of %s (%s)',
+                $hop_ip, $kind, $parent->hostname, $sysName
             ),
             $parent->device_id,
             'discovery',
