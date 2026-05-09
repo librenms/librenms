@@ -5,14 +5,14 @@ IMPORTS
         FROM AXIS-ROOT-MIB
     MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
         FROM SNMPv2-CONF            -- RFC 2580
-    Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE,
-    Unsigned32
+    Gauge32, Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE,
+    TimeTicks, Unsigned32
         FROM SNMPv2-SMI             -- RFC 2578
    SnmpAdminString
         FROM SNMP-FRAMEWORK-MIB;    -- RFC 3411
 
 video MODULE-IDENTITY
-    LAST-UPDATED "201609231218Z"
+    LAST-UPDATED "202604210000Z"
     ORGANIZATION
         "Axis Communications AB"
     CONTACT-INFO
@@ -28,6 +28,12 @@ video MODULE-IDENTITY
         "Axis Video MIB. Includes HW resources, such as power
          supplies, and traps for notifying management stations when
          something fails."
+    REVISION    "202604210000Z"
+    DESCRIPTION
+        "Added deviceInfo subtree (videoObjects 100) exposing device
+        identification, CPU/memory/flash utilization, system load
+        and device uptime. Introduced in AXIS OS 12.10."
+
     REVISION    "201609231218Z"
     DESCRIPTION
         "Updates in the compliance statement. Video products do not support all
@@ -400,6 +406,140 @@ storageDisruptionDetected OBJECT-TYPE
 
 --- { videoObjects 9 }, reserved for tampering
 
+--- Device Information (added in AXIS OS 12.10)
+
+deviceInfo OBJECT IDENTIFIER
+    ::= { videoObjects 100 }
+
+deviceCpuGroup OBJECT IDENTIFIER
+    ::= { deviceInfo 1 }
+
+deviceFlashGroup OBJECT IDENTIFIER
+    ::= { deviceInfo 2 }
+
+deviceLoadGroup OBJECT IDENTIFIER
+    ::= { deviceInfo 3 }
+
+deviceCpuUtilization OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current CPU utilization as a percentage (0-100)."
+    ::= { deviceCpuGroup 1 }
+
+deviceMemoryTotal OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kilobytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total physical memory available on the device, in kilobytes."
+    ::= { deviceCpuGroup 2 }
+
+deviceMemoryUsed OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kilobytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Currently used physical memory on the device, in kilobytes."
+    ::= { deviceCpuGroup 3 }
+
+deviceFlashUsed OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kilobytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Used flash storage on the device, in kilobytes."
+    ::= { deviceFlashGroup 1 }
+
+deviceFlashTotal OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kilobytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total flash storage on the device, in kilobytes."
+    ::= { deviceFlashGroup 2 }
+
+deviceFlashUtilization OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kilobytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Used flash storage on the device, in kilobytes."
+    ::= { deviceFlashGroup 3 }
+
+deviceMemoryUtilization OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current memory utilization as a percentage (0-100)."
+    ::= { deviceLoadGroup 1 }
+
+deviceSystemLoad OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "System load averages as a space-separated string representing
+        the 1, 5 and 15 minute load averages.
+        Example: '0.57 0.69 0.71'"
+    ::= { deviceLoadGroup 2 }
+
+deviceUptime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time since the device was last restarted, expressed in
+        hundredths of a second. This reflects device uptime independently
+        of the SNMP agent uptime (sysUpTime)."
+    ::= { deviceInfo 4 }
+
+deviceSoftware OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The software version currently running on the device.
+        Example: '12.10.68'"
+    ::= { deviceInfo 5 }
+
+deviceSerialNumber OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The serial number of the device. For Axis devices this is the
+        MAC address without separators.
+        Example: 'B8A44F5135F9'"
+    ::= { deviceInfo 6 }
+
+deviceManufacturer OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The manufacturer name of the device.
+        Example: 'Axis Communications'"
+    ::= { deviceInfo 7 }
+
+deviceModel OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The model name of the device.
+        Example: 'Q6074'"
+    ::= { deviceInfo 8 }
+
 -- Objects used in Private Enterprise Traps
 videoNotifications OBJECT IDENTIFIER
     ::= { video 2 }
@@ -573,4 +713,29 @@ videoCompliance MODULE-COMPLIANCE
 
     ::= { videoCompliances 1 }
 
+
+deviceInfoGroup OBJECT-GROUP
+    OBJECTS { deviceCpuUtilization, deviceMemoryTotal, deviceMemoryUsed,
+              deviceFlashUsed, deviceFlashTotal, deviceFlashUtilization,
+              deviceMemoryUtilization, deviceSystemLoad, deviceUptime,
+              deviceSoftware, deviceSerialNumber, deviceManufacturer,
+              deviceModel }
+    STATUS  current
+    DESCRIPTION
+        "Objects related to Axis device identification and resource
+        utilization. Introduced in AXIS OS 12.10."
+    ::= { videoGroups 6 }
+
+videoComplianceRev3 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for Axis video entities including device
+        information scalars introduced in AXIS OS 12.10."
+    MODULE  -- this module
+        MANDATORY-GROUPS { videoNotificationGroup }
+        GROUP   deviceInfoGroup
+        DESCRIPTION
+              "This group is mandatory for all AXIS video products running
+              AXIS OS 12.10 or later."
+    ::= { videoCompliances 3 }
 END -- end of module AXIS-VIDEO-MIB.
