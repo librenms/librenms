@@ -1,8 +1,10 @@
 <?php
 
+use App\Facades\PortCache;
 use App\Models\OspfArea;
 use App\Models\OspfNbr;
 use App\Models\OspfPort;
+use LibreNMS\Util\Url;
 
 $i = 0;
 
@@ -109,17 +111,17 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', [$d
                       </thead>
                   </div>';
     foreach (dbFetchRows("SELECT * FROM `ospf_ports` AS O, `ports` AS P WHERE O.`ospfIfAdminStat` = 'enabled' AND O.`device_id` = ? AND P.port_id = O.port_id ORDER BY O.`ospfIfAreaId`", [$device['device_id']]) as $ospfport) {
-        $ospfport = cleanPort($ospfport);
         $port_status_color = 'default';
 
         if ($ospfport['ospfIfAdminStat'] == 'enabled') {
             $port_status_color = 'success';
         }
 
+        //TODO: Rewrite to Eloquent with port
         echo '
                   <tbody>
                     <tr>
-                      <td>' . generate_port_link($ospfport) . '</td>
+                      <td>' . Url::portLink(PortCache::get($ospfport['port_id'])) . '</td>
                       <td>' . $ospfport['ospfIfType'] . '</td>
                       <td>' . $ospfport['ospfIfState'] . '</td>
                       <td>' . $ospfport['ospfIfMetricValue'] . '</td>

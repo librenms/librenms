@@ -12,20 +12,25 @@
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Facades\Permissions;
 use App\Facades\PortCache;
 use App\Models\Bill;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\Sensor;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\ImageFormat;
+use LibreNMS\Util\Clean;
+use LibreNMS\Util\Color;
+use LibreNMS\Util\Graph;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
 function toner2colour($descr, $percent)
 {
-    $colour = \LibreNMS\Util\Color::percentage(100 - $percent, null);
+    $colour = Color::percentage(100 - $percent, null);
 
     if (str_ends_with((string) $descr, 'C') || stripos((string) $descr, 'cyan') !== false) {
         $colour['left'] = '55D6D3';
@@ -91,7 +96,7 @@ function bill_permitted($bill_id)
         return true;
     }
 
-    return \Permissions::canAccessBill($bill_id, Auth::id());
+    return Permissions::canAccessBill($bill_id, Auth::id());
 }
 
 function port_permitted($port_id, $device_id = null)
@@ -108,7 +113,7 @@ function port_permitted($port_id, $device_id = null)
         return true;
     }
 
-    return \Permissions::canAccessPort($port_id, Auth::id());
+    return Permissions::canAccessPort($port_id, Auth::id());
 }
 
 function device_permitted($device_id)
@@ -117,7 +122,7 @@ function device_permitted($device_id)
         return true;
     }
 
-    return \Permissions::canAccessDevice($device_id, Auth::id());
+    return Permissions::canAccessDevice($device_id, Auth::id());
 }
 
 function alert_layout($severity)
@@ -226,69 +231,6 @@ STATE;
     return $state;
 }//end generate_graph_js_state()
 
-function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
-{
-    if (is_null($port)) {
-        return (string) $text;
-    }
-    $graph_array = [];
-
-    if (! $text) {
-        $text = Rewrite::normalizeIfName($port['label'] ?? $port['ifName']);
-    }
-
-    if ($type) {
-        $port['graph_type'] = $type;
-    }
-
-    if (! isset($port['graph_type'])) {
-        $port['graph_type'] = 'port_bits';
-    }
-
-    $class = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
-
-    if (! isset($port['hostname'])) {
-        $port = array_merge($port, device_by_id_cache($port['device_id']));
-    }
-
-    if (! isset($port['label'])) {
-        $port = cleanPort($port);
-    }
-
-    $content = '<div class="overlib-text">' . ($port['hostname'] ?? '') . ' - ' . Rewrite::normalizeIfName(addslashes(\LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
-    $content .= addslashes(\LibreNMS\Util\Clean::html($port['ifAlias'], [])) . '<br />';
-
-    $content .= "<div style=\'width: 850px\'>";
-    $graph_array['type'] = $port['graph_type'];
-    $graph_array['legend'] = 'yes';
-    $graph_array['height'] = '100';
-    $graph_array['width'] = '340';
-    $graph_array['to'] = LibrenmsConfig::get('time.now');
-    $graph_array['from'] = LibrenmsConfig::get('time.day');
-    $graph_array['id'] = $port['port_id'];
-    $content .= Url::graphTag($graph_array);
-    if ($single_graph == 0) {
-        $graph_array['from'] = LibrenmsConfig::get('time.week');
-        $content .= Url::graphTag($graph_array);
-        $graph_array['from'] = LibrenmsConfig::get('time.month');
-        $content .= Url::graphTag($graph_array);
-        $graph_array['from'] = LibrenmsConfig::get('time.year');
-        $content .= Url::graphTag($graph_array);
-    }
-
-    $content .= '</div>';
-
-    $url = generate_port_url($port);
-
-    if ($overlib == 0) {
-        return $content;
-    } elseif (port_permitted($port['port_id'], $port['device_id'])) {
-        return Url::overlibLink($url, $text, $content, $class);
-    } else {
-        return Rewrite::normalizeIfName($text);
-    }
-}//end generate_port_link()
-
 function generate_port_url($port, $vars = [])
 {
     return Url::generate(['page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']], $vars);
@@ -322,12 +264,12 @@ function generate_port_image($args)
 function graph_error($text, $short = null, $color = [128, 0, 0])
 {
     header('Content-Type: ' . ImageFormat::forGraph()->contentType());
-    echo \LibreNMS\Util\Graph::error($text, $short, 300, null, $color);
+    echo Graph::error($text, $short, 300, null, $color);
 }
 
 function print_port_thumbnail($args)
 {
-    echo generate_port_link($args, generate_port_image($args));
+    echo Url::portLink(PortCache::get($args['port_id']), generate_port_image($args));
 }//end print_port_thumbnail()
 
 function print_optionbar_start($height = 0, $width = 0, $marginbottom = 5)
@@ -367,7 +309,7 @@ function generate_ap_link($args, $text = null, $type = null)
 
     $content = '<div class=list-large>' . $args['text'] . ' - ' . Rewrite::normalizeIfName($args['label']) . '</div>';
     if ($args['ifAlias']) {
-        $content .= \LibreNMS\Util\Clean::html($args['ifAlias'], []) . '<br />';
+        $content .= Clean::html($args['ifAlias'], []) . '<br />';
     }
 
     $content .= "<div style=\'width: 850px\'>";
@@ -513,18 +455,15 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     }
 
     if (isset($tmp_alerts['port_id'])) {
+        $port = PortCache::get($tmp_alerts['port_id']);
         if (! empty($tmp_alerts['isisISAdjState'])) {
             $fault_detail .= 'Adjacent ' . $tmp_alerts['isisISAdjIPAddrAddress'];
-            $port = Port::find($tmp_alerts['port_id']);
             $fault_detail .= ', Interface ' . Url::portLink($port);
         } else {
-            $tmp_alerts = cleanPort($tmp_alerts);
-            $fault_detail .= generate_port_link($tmp_alerts) . ';&nbsp;';
+            $fault_detail .= Url::portLink($port) . ';&nbsp;';
         }
-        if ((isset($tmp_alerts['ifDescr'])) && (isset($tmp_alerts['ifAlias'])) && ($tmp_alerts['ifDescr'] != $tmp_alerts['ifAlias'])) {
-            // IfAlias has been set, so display it on alarms
-            $fault_detail .= $tmp_alerts['ifAlias'] . '; ';
-            unset($tmp_alerts['label']);
+        if ($port->ifDescr != $port->ifAlias) {
+            $fault_detail .= $port->ifAlias . '; ';
         }
         $fallback = false;
     }

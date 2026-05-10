@@ -1,6 +1,8 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Port;
+use LibreNMS\Util\Url;
 
 $link_array = [
     'page' => 'device',
@@ -107,14 +109,9 @@ if (isset($vars['vmif']) and isset($vars['vm'])) {
         '<b>MAC:</b> ' . $mac;
     if (isset($port) && isset($mac) && $mac != '') {
         echo ' (' .
-               generate_device_link(['device_id' => $port->device_id]) .
+               Url::deviceLink($port->device) .
                ', ' .
-               generate_port_link([
-                   'label' => $port->label,
-                   'port_id' => $port->port_id,
-                   'ifName' => $port->ifName,
-                   'device_id' => $port->device_id,
-               ]) .
+               Url::portLink($port) .
             ')';
     }
     echo "<br>\n";
@@ -132,12 +129,7 @@ if (isset($vars['vmif']) and isset($vars['vm'])) {
         echo '<b>HV if:</b> ' . htmlspecialchars((string) $app->data['VMifs'][$vars['vm']][$vars['vmif']]['if']) . "\n";
     } else {
         echo '<b>HV if:</b> ' .
-            generate_port_link([
-                'label' => $port->label,
-                'port_id' => $port->port_id,
-                'ifName' => $port->ifName,
-                'device_id' => $port->device_id,
-            ]);
+            Url::portLink($port);
     }
 
     // Not likely to be known on Libvirt systems thanks to Libvirt sucking at reporting some info... and IF stuff in general
@@ -146,13 +138,7 @@ if (isset($vars['vmif']) and isset($vars['vm'])) {
         if (! isset($port)) {
             echo '<br><b>HV parent if:</b> ' . $app->data['VMifs'][$vars['vm']][$vars['vmif']]['parent'];
         } else {
-            echo '<br><b>HV parent if:</b> ' .
-                generate_port_link([
-                    'label' => $port->label,
-                    'port_id' => $port->port_id,
-                    'ifName' => $port->ifName,
-                    'device_id' => $port->device_id,
-                ]);
+            echo '<br><b>HV parent if:</b> ' . Url::portLink($port);
         }
     }
 }
@@ -246,7 +232,7 @@ foreach ($graphs as $key => $text) {
     $graph_type = $key;
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
-    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
+    $graph_array['to'] = LibrenmsConfig::get('time.now');
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 

@@ -1,9 +1,11 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Ipv4Address;
 use App\Models\Ipv6Address;
 use App\Models\Port;
 use App\Models\Storage;
+use LibreNMS\Util\Url;
 
 require base_path('includes/nfs-shared.inc.php');
 
@@ -212,13 +214,8 @@ if ($vars['app_page'] == 'general') {
                     if (isset($port)) {
                         $new_host['raw'] = true;
                         $new_host['data'] = $data['host'] . ' (' .
-                            generate_device_link(['device_id' => $port->device_id]) . ', ' .
-                            generate_port_link([
-                                'label' => $port->label,
-                                'port_id' => $port->port_id,
-                                'ifName' => $port->ifName,
-                                'device_id' => $port->device_id,
-                            ]) . ')';
+                            Url::deviceLink($port->device) . ', ' .
+                            Url::portLink($port) . ')';
                     } else {
                         $new_host['data'] = $data['host'];
                     }
@@ -253,28 +250,28 @@ if ($vars['app_page'] == 'general') {
                     $path_graph_array = [];
                     $path_graph_array['height'] = '100';
                     $path_graph_array['width'] = '210';
-                    $path_graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
+                    $path_graph_array['to'] = LibrenmsConfig::get('time.now');
                     $path_graph_array['id'] = $storage_info['storage_id'];
                     $path_graph_array['type'] = 'storage_usage';
-                    $path_graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
+                    $path_graph_array['from'] = LibrenmsConfig::get('time.day');
                     $path_graph_array['legend'] = 'no';
 
                     $path_link_array = $path_graph_array;
                     $path_link_array['page'] = 'graphs';
                     unset($rpath_link_array['height'], $path_link_array['width'], $path_link_array['legend']);
 
-                    $path_link = \LibreNMS\Util\Url::generate($path_link_array);
+                    $path_link = Url::generate($path_link_array);
 
                     $path_overlib_content = generate_overlib_content($path_graph_array, $device['hostname'] . ' - ' . $storage_info['storage_descr']);
 
                     $path_graph_array['width'] = 80;
                     $path_graph_array['height'] = 20;
                     $path_graph_array['bg'] = 'ffffff00';
-                    $path_minigraph = \LibreNMS\Util\Url::lazyGraphTag($path_graph_array);
+                    $path_minigraph = Url::lazyGraphTag($path_graph_array);
 
-                    $new_path['data'] = \LibreNMS\Util\Url::overlibLink($path_link, $data['path'], $path_overlib_content) .
+                    $new_path['data'] = Url::overlibLink($path_link, $data['path'], $path_overlib_content) .
                         ' (' . round($storage_info['storage_perc']) . '%)' .
-                        \LibreNMS\Util\Url::overlibLink($path_link, $path_minigraph, $path_overlib_content);
+                        Url::overlibLink($path_link, $path_minigraph, $path_overlib_content);
                     $new_path['raw'] = true;
 
                     $path_cache[$data['host']][$data['path']] = $new_path;
@@ -324,13 +321,8 @@ if ($vars['app_page'] == 'general') {
                     if (isset($port)) {
                         $new_host['raw'] = true;
                         $new_host['data'] = $data['host'] . ' (' .
-                            generate_device_link(['device_id' => $port->device_id]) . ', ' .
-                            generate_port_link([
-                                'label' => $port->label,
-                                'port_id' => $port->port_id,
-                                'ifName' => $port->ifName,
-                                'device_id' => $port->device_id,
-                            ]) . ')';
+                            Url::deviceLink($port->device) . ', ' .
+                            Url::portLink($port) . ')';
                     } else {
                         $new_host['data'] = $data['host'];
                     }
@@ -356,28 +348,28 @@ if ($vars['app_page'] == 'general') {
                     $rpath_graph_array = [];
                     $rpath_graph_array['height'] = '100';
                     $rpath_graph_array['width'] = '210';
-                    $rpath_graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
+                    $rpath_graph_array['to'] = LibrenmsConfig::get('time.now');
                     $rpath_graph_array['id'] = $storage_info['storage_id'];
                     $rpath_graph_array['type'] = 'storage_usage';
-                    $rpath_graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
+                    $rpath_graph_array['from'] = LibrenmsConfig::get('time.day');
                     $rpath_graph_array['legend'] = 'no';
 
                     $rpath_link_array = $rpath_graph_array;
                     $rpath_link_array['page'] = 'graphs';
                     unset($rpath_link_array['height'], $rpath_link_array['width'], $rpath_link_array['legend']);
 
-                    $rpath_link = \LibreNMS\Util\Url::generate($rpath_link_array);
+                    $rpath_link = Url::generate($rpath_link_array);
 
                     $rpath_overlib_content = generate_overlib_content($rpath_graph_array, $device['hostname'] . ' - ' . $storage_info['storage_descr']);
 
                     $rpath_graph_array['width'] = 80;
                     $rpath_graph_array['height'] = 20;
                     $rpath_graph_array['bg'] = 'ffffff00';
-                    $rpath_minigraph = \LibreNMS\Util\Url::lazyGraphTag($rpath_graph_array);
+                    $rpath_minigraph = Url::lazyGraphTag($rpath_graph_array);
 
-                    $new_rpath['data'] = \LibreNMS\Util\Url::overlibLink($rpath_link, $storage_info['storage_descr'], $rpath_overlib_content) .
+                    $new_rpath['data'] = Url::overlibLink($rpath_link, $storage_info['storage_descr'], $rpath_overlib_content) .
                         ' (' . round($storage_info['storage_perc']) . '%)' .
-                        \LibreNMS\Util\Url::overlibLink($rpath_link, $rpath_minigraph, $rpath_overlib_content);
+                        Url::overlibLink($rpath_link, $rpath_minigraph, $rpath_overlib_content);
                     $new_rpath['raw'] = true;
 
                     $rpath_cache[$data['host']][$data['rpath']] = $new_path;
@@ -451,7 +443,7 @@ foreach ($graphs as $key => $text) {
     $graph_type = $key;
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
-    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
+    $graph_array['to'] = LibrenmsConfig::get('time.now');
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 

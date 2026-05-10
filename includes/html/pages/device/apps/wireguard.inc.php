@@ -4,6 +4,7 @@ use App\Models\Device;
 use App\Models\Ipv4Address;
 use App\Models\Ipv6Address;
 use App\Models\Port;
+use LibreNMS\Util\Url;
 
 $link_array = [
     'page' => 'device',
@@ -115,7 +116,7 @@ if (isset($vars['interface']) &&
     if (isset($peer['hostname'])) {
         $peer_dev = Device::firstWhere(['hostname' => $peer['hostname']]);
         if (isset($peer_dev)) {
-            echo generate_device_link(['device_id' => $peer_dev->device_id], $name) . "<br>\n";
+            echo Url::deviceLink($peer_dev, $name) . "<br>\n";
         } else {
             echo htmlspecialchars($peer['hostname']) . "<br>\n";
         }
@@ -131,12 +132,7 @@ if (isset($vars['interface']) &&
     echo 'Interface: ';
     $port = Port::with('device')->firstWhere(['ifName' => $vars['interface'], 'device_id' => $device['device_id']]);
     if (isset($port)) {
-        echo generate_port_link([
-            'label' => $port->label,
-            'port_id' => $port->port_id,
-            'ifName' => $port->ifName,
-            'device_id' => $port->device_id,
-        ]) . "<br>\n";
+        echo Url::portLink($port) . "<br>\n";
     } else {
         echo htmlspecialchars((string) $vars['interface']) . "<br>\n";
     }
@@ -148,13 +144,8 @@ if (isset($vars['interface']) &&
     }
     if (isset($ip_info)) {
         $port = Port::with('device')->firstWhere(['port_id' => $ip_info->port_id]);
-        echo $peer['endpoint_host'] . '(' . generate_device_link(['device_id' => $port->device_id]) . ', ' .
-            generate_port_link([
-                'label' => $port->label,
-                'port_id' => $port->port_id,
-                'ifName' => $port->ifName,
-                'device_id' => $port->device_id,
-            ]) . ")<br>\n";
+        echo $peer['endpoint_host'] . '(' . Url::deviceLink($port->device) . ', ' .
+            Url::portLink($port) . ")<br>\n";
     } else {
         echo htmlspecialchars((string) $peer['endpoint_host']) . "<br>\n";
     }
@@ -178,13 +169,8 @@ if (isset($vars['interface']) &&
             }
             if ($ip_found) {
                 $port = Port::with('device')->firstWhere(['port_id' => $ip_info->port_id]);
-                $ip_info_string = generate_device_link(['device_id' => $port->device_id], $allowed_ip) . '(' .
-                    generate_port_link([
-                        'label' => $port->label,
-                        'port_id' => $port->port_id,
-                        'ifName' => $port->ifName,
-                        'device_id' => $port->device_id,
-                    ]) . ')';
+                $ip_info_string = Url::deviceLink($port->device, $allowed_ip) . '(' .
+                    Url::portLink($port) . ')';
                 if ($allowed_ips == '') {
                     $allowed_ips = $ip_info_string;
                 } else {
@@ -225,12 +211,7 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
         $port = Port::with('device')->firstWhere(['ifName' => $returned_data_key, 'device_id' => $device['device_id']]);
         if (isset($port)) {
             $interface_info_raw = true;
-            $interface_info = generate_port_link([
-                'label' => $port->label,
-                'port_id' => $port->port_id,
-                'ifName' => $port->ifName,
-                'device_id' => $port->device_id,
-            ]);
+            $interface_info = Url::portLink($port);
         } else {
             $interface_info_raw = false;
         }
@@ -242,7 +223,7 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
                 $peer_dev = Device::firstWhere(['hostname' => $peer['hostname']]);
                 if (isset($peer_dev)) {
                     $name_raw = true;
-                    $name = generate_device_link(['device_id' => $peer_dev->device_id], $name);
+                    $name = Url::deviceLink($peer_dev, $name);
                 }
             }
             // if this is null, it means the extend did not return it as that options is set to 0
@@ -262,13 +243,8 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
                 if (isset($ip_info)) {
                     $endpoint_raw = true;
                     $port = Port::with('device')->firstWhere(['port_id' => $ip_info->port_id]);
-                    $peer['endpoint_host'] = $peer['endpoint_host'] . '(' . generate_device_link(['device_id' => $port->device_id]) . ', ' .
-                        generate_port_link([
-                            'label' => $port->label,
-                            'port_id' => $port->port_id,
-                            'ifName' => $port->ifName,
-                            'device_id' => $port->device_id,
-                        ]) . ')';
+                    $peer['endpoint_host'] = $peer['endpoint_host'] . '(' . Url::deviceLink($port->device) . ', ' .
+                        Url::portLink($port) . ')';
                 }
             }
             // ensure we have something set for the endpoint port
@@ -293,13 +269,8 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
                     }
                     if ($ip_found) {
                         $port = Port::with('device')->firstWhere(['port_id' => $ip_info->port_id]);
-                        $ip_info_string = generate_device_link(['device_id' => $port->device_id], $allowed_ip) . '(' .
-                            generate_port_link([
-                                'label' => $port->label,
-                                'port_id' => $port->port_id,
-                                'ifName' => $port->ifName,
-                                'device_id' => $port->device_id,
-                            ]) . ')';
+                        $ip_info_string = Url::deviceLink($port->device, $allowed_ip) . '(' .
+                            Url::portLink($port) . ')';
                         if ($allowed_ips == '') {
                             $allowed_ips = $ip_info_string;
                         } else {

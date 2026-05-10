@@ -1,6 +1,8 @@
 <?php
 
+use App\Facades\PortCache;
 use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Url;
 
 $vlans = dbFetchRows("SELECT * FROM `ports_vlans` AS PV, vlans AS V WHERE PV.`port_id` = '" . $port['port_id'] . "' and PV.`device_id` = '" . $device['device_id'] . "' AND V.`vlan_vlan` = PV.vlan AND V.device_id = PV.device_id");
 
@@ -49,8 +51,7 @@ foreach ($vlans as $vlan) {
     echo '<td>';
     $vsep = '';
     foreach ($vlan_ports as $otherport) {
-        $otherport = cleanPort($otherport);
-        echo $vsep . generate_port_link($otherport, Rewrite::shortenIfName($otherport['ifDescr']));
+        echo $vsep . Url::portLink(PortCache::get($otherport['port_id']), Rewrite::shortenIfName($otherport['ifDescr']));
         if ($otherport['untagged']) {
             echo '(U)';
         }

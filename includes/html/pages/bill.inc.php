@@ -1,10 +1,14 @@
 <?php
 
+use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
+use App\Facades\PortCache;
 use App\Models\Bill;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Billing;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\Url;
 
 $bill_id = (int) ($vars['bill_id'] ?? 0);
 $bill = Bill::find($bill_id);
@@ -57,8 +61,8 @@ if (Gate::allows('view', $bill)) {
         $bill_color = '#0000cc';
     }
 
-    $fromtext = dbFetchCell("SELECT DATE_FORMAT($datefrom, '" . \App\Facades\LibrenmsConfig::get('dateformat.mysql.date') . "')");
-    $totext = dbFetchCell("SELECT DATE_FORMAT($dateto, '" . \App\Facades\LibrenmsConfig::get('dateformat.mysql.date') . "')");
+    $fromtext = dbFetchCell("SELECT DATE_FORMAT($datefrom, '" . LibrenmsConfig::get('dateformat.mysql.date') . "')");
+    $totext = dbFetchCell("SELECT DATE_FORMAT($dateto, '" . LibrenmsConfig::get('dateformat.mysql.date') . "')");
     $unixfrom = dbFetchCell("SELECT UNIX_TIMESTAMP('$datefrom')");
     $unixto = dbFetchCell("SELECT UNIX_TIMESTAMP('$dateto')");
 
@@ -74,6 +78,9 @@ if (Gate::allows('view', $bill)) {
 
     $vars['view'] ??= 'quick';
 
+    /**
+     * TODO: Convert the calls to Port Eloquent Models instead of the legacy port array
+     */
     function print_port_list($ports)
     {
         echo '<div class="panel panel-default">
@@ -84,11 +91,12 @@ if (Gate::allows('view', $bill)) {
 
         // Collected Earlier
         foreach ($ports as $port) {
-            $port = cleanPort($port);
-            $portalias = (empty($port['ifAlias']) ? '' : ' - ' . $port['ifAlias'] . '');
+            // TODO: Rewrite to Eloquent with device
+            $port = PortCache::get($port['port_id']);
+            $portalias = (empty($port->ifAlias) ? '' : ' - ' . $port->ifAlias . '');
 
             echo '<div class="list-group-item">';
-            echo generate_port_link($port, $port['ifName'] . $portalias) . ' on ' . generate_device_link($port);
+            echo Url::portLink($port, $port->ifName . $portalias) . ' on ' . Url::deviceLink(DeviceCache::get($port->device_id));
             echo '</div>';
         }
 
@@ -130,7 +138,7 @@ if (Gate::allows('view', $bill)) {
         $sep = ' | ';
     }
 
-    echo '<div style="font-weight: bold; float: right;"><a href="' . \LibreNMS\Util\Url::generate(['page' => 'bills']) . '/"><i class="fa fa-arrow-left fa-lg icon-theme" aria-hidden="true"></i> Back to Bills</a></div>';
+    echo '<div style="font-weight: bold; float: right;"><a href="' . Url::generate(['page' => 'bills']) . '/"><i class="fa fa-arrow-left fa-lg icon-theme" aria-hidden="true"></i> Back to Bills</a></div>';
 
     print_optionbar_end();
 
@@ -235,7 +243,7 @@ if (Gate::allows('view', $bill)) {
             $li .= "$type'>";
 
             $di = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . htmlspecialchars($bill_code);
-            $di .= '&amp;from=' . \App\Facades\LibrenmsConfig::get('time.day') . '&amp;to=' . \App\Facades\LibrenmsConfig::get('time.now');
+            $di .= '&amp;from=' . LibrenmsConfig::get('time.day') . '&amp;to=' . LibrenmsConfig::get('time.now');
             $di .= '&amp;x=1190&amp;y=250';
             $di .= "$type'>";
 
@@ -253,7 +261,7 @@ if (Gate::allows('view', $bill)) {
             $li .= '&amp;width=1000&amp;height=200&amp;total=1&amp;dir=' . $dir_95th . "'>";
 
             $di = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
-            $di .= '&amp;from=' . \App\Facades\LibrenmsConfig::get('time.day') . '&amp;to=' . \App\Facades\LibrenmsConfig::get('time.now');
+            $di .= '&amp;from=' . LibrenmsConfig::get('time.day') . '&amp;to=' . LibrenmsConfig::get('time.now');
             $di .= '&amp;width=1000&amp;height=200&amp;total=1&amp;dir=' . $dir_95th . "'>";
 
             $mi = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;

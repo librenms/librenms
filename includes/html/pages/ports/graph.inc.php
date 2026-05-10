@@ -1,5 +1,9 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
+use App\Facades\PortCache;
+use LibreNMS\Util\Url;
+
 echo '<div class="panel panel-default panel-condensed">';
 echo '<div class="panel-heading">';
 echo $displayLists;
@@ -13,7 +17,7 @@ $param = [];
 $where = '';
 $ignore_filter = 0;
 $disabled_filter = 0;
-$device = DeviceCache::get((int) ($vars['device_id'] ?? 0));
+$device = DeviceCache::get((int) $vars['device_id']);
 
 $device_selected = json_encode($device->exists ? ['id' => $device->device_id, 'text' => $device->displayName()] : '');
 echo '<script>init_select2("#device_id", "device", {field: "device_id"}, ' . $device_selected . ' , "All Devices")</script>';
@@ -123,14 +127,15 @@ $ports = match ($vars['sort'] ?? '') {
 };
 
 foreach ($ports as $port) {
-    $speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 0, 'bps');
-    $type = \LibreNMS\Util\Rewrite::normalizeIfType($port['ifType']);
+    $speed = LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 0, 'bps');
+    $type = LibreNMS\Util\Rewrite::normalizeIfType($port['ifType']);
 
-    $port['in_rate'] = \LibreNMS\Util\Number::formatSi($port['ifInOctets_rate'] * 8, 2, 0, 'bps');
-    $port['out_rate'] = \LibreNMS\Util\Number::formatSi($port['ifOutOctets_rate'] * 8, 2, 0, 'bps');
+    $port['in_rate'] = LibreNMS\Util\Number::formatSi($port['ifInOctets_rate'] * 8, 2, 0, 'bps');
+    $port['out_rate'] = LibreNMS\Util\Number::formatSi($port['ifOutOctets_rate'] * 8, 2, 0, 'bps');
 
     if ($port['ifInErrors_delta'] > 0 || $port['ifOutErrors_delta'] > 0) {
-        $error_img = generate_port_link($port, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'errors');
+        //TODO: Rewrite to Eloquent with device
+        $error_img = Url::portLink(PortCache::get($port['port_id']), "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'errors');
     } else {
         $error_img = '';
     }
@@ -155,24 +160,24 @@ foreach ($ports as $port) {
         $graph_array = [];
         $graph_array['height'] = 100;
         $graph_array['width'] = 210;
-        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
+        $graph_array['to'] = LibrenmsConfig::get('time.now');
         $graph_array['id'] = $port['port_id'];
         $graph_array['type'] = $graph_type;
-        $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
+        $graph_array['from'] = LibrenmsConfig::get('time.day');
         $graph_array['legend'] = 'no';
 
         $link_array = $graph_array;
         $link_array['page'] = 'graphs';
         unset($link_array['height'], $link_array['width'], $link_array['legend']);
-        $link = \LibreNMS\Util\Url::generate($link_array);
+        $link = Url::generate($link_array);
         $overlib_content = generate_overlib_content($graph_array, $port['hostname'] . ' - ' . $port['label']);
         $graph_array['title'] = 'yes';
         $graph_array['width'] = $width;
         $graph_array['height'] = 119;
-        $graph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
+        $graph = Url::lazyGraphTag($graph_array);
 
         echo "<div class='graph-all-common' style='min-width: " . $width_div . 'px;max-width:' . $width_div . "px;'>";
-        echo \LibreNMS\Util\Url::overlibLink($link, $graph, $overlib_content);
+        echo Url::overlibLink($link, $graph, $overlib_content);
         echo '</div>';
     }
 }

@@ -1,6 +1,11 @@
 <?php
 
+use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
+use App\Models\Port;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\Time;
+use LibreNMS\Util\Url;
 
 print_optionbar_start();
 
@@ -105,9 +110,9 @@ if ($vars['view'] == 'lsp') {
         $device = device_by_id_cache($lsp['device_id']);
 
         if (! is_int($i / 2)) {
-            $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
+            $bg_colour = LibrenmsConfig::get('list_colour.even');
         } else {
-            $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
+            $bg_colour = LibrenmsConfig::get('list_colour.odd');
         }
 
         $adminstate_status_color = $operstate_status_color = $path_status_color = 'default';
@@ -143,9 +148,9 @@ if ($vars['view'] == 'lsp') {
             <td>' . $lsp['vrf_name'] . '</td>
             <td><span class="label label-' . $adminstate_status_color . '">' . $lsp['mplsLspAdminState'] . '</td>
             <td><span class="label label-' . $operstate_status_color . '">' . $lsp['mplsLspOperState'] . '</td>
-            <td>' . \LibreNMS\Util\Time::formatInterval($lsp['mplsLspLastChange']) . '</td>
+            <td>' . Time::formatInterval($lsp['mplsLspLastChange']) . '</td>
             <td>' . $lsp['mplsLspTransitions'] . '</td>
-            <td>' . \LibreNMS\Util\Time::formatInterval($lsp['mplsLspLastTransition']) . '</td>
+            <td>' . Time::formatInterval($lsp['mplsLspLastTransition']) . '</td>
             <td><span class="label label-' . $path_status_color . '">' . $lsp['mplsLspConfiguredPaths'] . '      /     ' . $lsp['mplsLspStandbyPaths'] . ' / ' . $lsp['mplsLspOperationalPaths'] . '</td>
             <td>' . $lsp['mplsLspType'] . '</td>
             <td>' . $lsp['mplsLspFastReroute'] . '</td>
@@ -180,9 +185,9 @@ if ($vars['view'] == 'paths') {
     foreach (dbFetchRows('SELECT *, `mplsLspName` FROM `mpls_lsp_paths` AS `p`, `mpls_lsps` AS `l` WHERE `p`.`lsp_id` = `l`.`lsp_id` ORDER BY `p`.`device_id`, `l`.`mplsLspName`') as $path) {
         $device = device_by_id_cache($path['device_id']);
         if (! is_int($i / 2)) {
-            $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
+            $bg_colour = LibrenmsConfig::get('list_colour.even');
         } else {
-            $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
+            $bg_colour = LibrenmsConfig::get('list_colour.odd');
         }
 
         $adminstate_status_color = $operstate_status_color = 'default';
@@ -212,7 +217,7 @@ if ($vars['view'] == 'paths') {
             <td>' . $path['mplsLspPathType'] . '</td>
             <td><span class="label label-' . $adminstate_status_color . '">' . $path['mplsLspPathAdminState'] . '</td>
             <td><span class="label label-' . $operstate_status_color . '">' . $path['mplsLspPathOperState'] . '</td>
-            <td>' . \LibreNMS\Util\Time::formatInterval($path['mplsLspPathLastChange']) . '</td>
+            <td>' . Time::formatInterval($path['mplsLspPathLastChange']) . '</td>
             <td>' . $path['mplsLspPathTransitionCount'] . '</td>
             <td>' . $path['mplsLspPathBandwidth'] . '</td>
             <td>' . $path['mplsLspPathOperBandwidth'] . '</td>
@@ -248,9 +253,9 @@ if ($vars['view'] == 'sdps') {
     foreach (dbFetchRows('SELECT * FROM `mpls_sdps` ORDER BY `sdp_oid`') as $sdp) {
         $device = device_by_id_cache($sdp['device_id']);
         if (! is_int($i / 2)) {
-            $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
+            $bg_colour = LibrenmsConfig::get('list_colour.even');
         } else {
-            $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
+            $bg_colour = LibrenmsConfig::get('list_colour.odd');
         }
 
         $adminstate_status_color = $operstate_status_color = 'default';
@@ -281,8 +286,8 @@ if ($vars['view'] == 'sdps') {
             <td><span class="label label-' . $operstate_status_color . '">' . $sdp['sdpOperStatus'] . '</td>
             <td>' . $sdp['sdpAdminPathMtu'] . '</td>
             <td>' . $sdp['sdpOperPathMtu'] . '</td>
-            <td>' . \LibreNMS\Util\Time::formatInterval($sdp['sdpLastMgmtChange']) . '</td>
-            <td>' . \LibreNMS\Util\Time::formatInterval($sdp['sdpLastStatusChange']) . '</td>';
+            <td>' . Time::formatInterval($sdp['sdpLastMgmtChange']) . '</td>
+            <td>' . Time::formatInterval($sdp['sdpLastStatusChange']) . '</td>';
         echo '</tr>';
 
         $i++;
@@ -321,9 +326,9 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
     foreach (dbFetchRows('SELECT b.*, s.svc_oid AS svcId FROM `mpls_sdp_binds` AS b LEFT JOIN `mpls_services` AS s ON `b`.`svc_id` = `s`.`svc_id` ORDER BY `sdp_oid`, `svc_oid`') as $sdpbind) {
         $device = device_by_id_cache($sdpbind['device_id']);
         if (! is_int($i / 2)) {
-            $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
+            $bg_colour = LibrenmsConfig::get('list_colour.even');
         } else {
-            $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
+            $bg_colour = LibrenmsConfig::get('list_colour.odd');
         }
 
         $adminstate_status_color = $operstate_status_color = 'default';
@@ -346,8 +351,8 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
             <td>' . $sdpbind['sdpBindVcType'] . '</td>
             <td><span class="label label-' . $adminstate_status_color . '">' . $sdpbind['sdpBindAdminStatus'] . '</td>
             <td><span class="label label-' . $operstate_status_color . '">' . $sdpbind['sdpBindOperStatus'] . '</td>
-            <td>' . \LibreNMS\Util\Time::formatInterval($sdpbind['sdpBindLastMgmtChange']) . '</td>
-            <td>' . \LibreNMS\Util\Time::formatInterval($sdpbind['sdpBindLastStatusChange']) . '</td>
+            <td>' . Time::formatInterval($sdpbind['sdpBindLastMgmtChange']) . '</td>
+            <td>' . Time::formatInterval($sdpbind['sdpBindLastStatusChange']) . '</td>
             <td>' . $sdpbind['sdpBindBaseStatsIngFwdPackets'] . '</td>
             <td>' . $sdpbind['sdpBindBaseStatsIngFwdOctets'] . '</td>
             <td>' . $sdpbind['sdpBindBaseStatsEgrFwdPackets'] . '</td>
@@ -389,9 +394,9 @@ vprn services are up when the service is administratively up however routing fun
     foreach (dbFetchRows('SELECT s.*, v.vrf_name FROM `mpls_services` AS s LEFT JOIN  `vrfs` AS v ON `s`.`svcVRouterId` = `v`.`vrf_oid` AND `s`.`device_id` = `v`.`device_id` ORDER BY `svc_oid`') as $svc) {
         $device = device_by_id_cache($svc['device_id']);
         if (! is_int($i / 2)) {
-            $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
+            $bg_colour = LibrenmsConfig::get('list_colour.even');
         } else {
-            $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
+            $bg_colour = LibrenmsConfig::get('list_colour.odd');
         }
 
         $adminstate_status_color = $operstate_status_color = 'default';
@@ -425,8 +430,8 @@ vprn services are up when the service is administratively up however routing fun
             <td>' . $svc['svcDescription'] . '</td>
             <td>' . $svc['svcMtu'] . '</td>
             <td>' . $svc['svcNumSaps'] . '</td>
-            <td>' . \LibreNMS\Util\Time::formatInterval($svc['svcLastMgmtChange']) . '</td>
-            <td>' . \LibreNMS\Util\Time::formatInterval($svc['svcLastStatusChange']) . '</td>
+            <td>' . Time::formatInterval($svc['svcLastMgmtChange']) . '</td>
+            <td>' . Time::formatInterval($svc['svcLastStatusChange']) . '</td>
             <td>' . $svc['vrf_name'] . '</td>
             <td>' . $svc['svcTlsMacLearning'] . '</td>
             <td>' . $svc['svcTlsFdbTableSize'] . '</td>
@@ -456,14 +461,14 @@ if ($vars['view'] == 'saps') {
     $i = 0;
 
     foreach (dbFetchRows('SELECT * FROM `mpls_saps` ORDER BY `device_id`, `svc_oid`, `sapPortId`, `sapEncapValue`') as $sap) {
-        $port = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifName` = ?', [$sap['device_id'], $sap['ifName']]);
-        $port = cleanPort($port);
+        //TODO: Rewrite foreach to Eloquent with device and port.
+        $device = DeviceCache::get($sap['device_id']);
+        $port = Port::whereBelongsTo($device)->where($sap['ifName'])->first();
 
-        $device = device_by_id_cache($sap['device_id']);
         if (! is_int($i / 2)) {
-            $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
+            $bg_colour = LibrenmsConfig::get('list_colour.even');
         } else {
-            $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
+            $bg_colour = LibrenmsConfig::get('list_colour.odd');
         }
 
         $adminstate_status_color = $operstate_status_color = 'default';
@@ -479,16 +484,16 @@ if ($vars['view'] == 'saps') {
         }
 
         echo "<tr bgcolor=$bg_colour>
-            <td>" . generate_device_link($device, 0, ['tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps']) . '</td>
+            <td>" . Url::deviceLink($device, 0, ['tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps']) . '</td>
             <td>' . generate_sap_url($sap, $sap['svc_oid']) . '</td>
-            <td>' . generate_port_link($port) . '</td>
+            <td>' . Url::portLink($port) . '</td>
             <td>' . $sap['sapEncapValue'] . '</td>
             <td>' . $sap['sapType'] . '</td>
             <td>' . $sap['sapDescription'] . '</td>
             <td><span class="label label-' . $adminstate_status_color . '">' . $sap['sapAdminStatus'] . '</td>
             <td><span class="label label-' . $operstate_status_color . '">' . $sap['sapOperStatus'] . '</td>
-            <td>' . \LibreNMS\Util\Time::formatInterval($sap['sapLastMgmtChange']) . '</td>
-            <td>' . \LibreNMS\Util\Time::formatInterval($sap['sapLastStatusChange']) . '</td>';
+            <td>' . Time::formatInterval($sap['sapLastMgmtChange']) . '</td>
+            <td>' . Time::formatInterval($sap['sapLastStatusChange']) . '</td>';
         echo '</tr>';
 
         $i++;

@@ -2,9 +2,11 @@
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Facades\PortCache;
 use App\Models\Vrf;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Url;
 
 if (Gate::denies('viewAny', Vrf::class)) {
     include 'includes/html/error-no-perm.inc.php';
@@ -111,7 +113,7 @@ if (Gate::denies('viewAny', Vrf::class)) {
         foreach (dbFetchRows('SELECT `vrf_name`, `mplsVpnVrfRouteDistinguisher`, `mplsVpnVrfDescription` FROM `vrfs` GROUP BY `mplsVpnVrfRouteDistinguisher`, `mplsVpnVrfDescription`,`vrf_name`') as $vrf) {
             echo '<tr><td></td>';
             echo '<td width=240>';
-            echo '<a class=list-large href=' . \LibreNMS\Util\Url::generate($vars, ['view' => 'detail', 'vrf' => $vrf['vrf_name']]) . '>';
+            echo '<a class=list-large href=' . Url::generate($vars, ['view' => 'detail', 'vrf' => $vrf['vrf_name']]) . '>';
             echo $vrf['vrf_name'] . '</a><br />';
             echo '<span class=box-desc>' . $vrf['mplsVpnVrfDescription'] . '</span></td>';
             echo '<td width=100 class=box-desc>' . $vrf['mplsVpnVrfRouteDistinguisher'] . '</td>';
@@ -119,7 +121,7 @@ if (Gate::denies('viewAny', Vrf::class)) {
             $x = 1;
             foreach ($vrf_devices[$vrf['vrf_name']][$vrf['mplsVpnVrfRouteDistinguisher']] as $device) {
                 echo "<tr><td width=200><a href='";
-                echo \LibreNMS\Util\Url::generate(['page' => 'device'], ['device' => $device['device_id'], 'tab' => 'routing', 'view' => 'basic', 'proto' => 'vrf']);
+                echo Url::generate(['page' => 'device'], ['device' => $device['device_id'], 'tab' => 'routing', 'view' => 'basic', 'proto' => 'vrf']);
                 echo "'>" . DeviceCache::get($device['device_id'])->displayName() . '</a> ';
 
                 if ($device['vrf_name'] != $vrf['vrf_name']) {
@@ -152,7 +154,8 @@ if (Gate::denies('viewAny', Vrf::class)) {
                             break;
 
                         default:
-                            echo $seperator . generate_port_link($port, Rewrite::shortenIfName($port['ifDescr']));
+                            //TODO: Rewrite to Eloquent
+                            echo $seperator . Url::portLink(PortCache::get($port['port_id']), Rewrite::shortenIfName($port['ifDescr']));
                             $seperator = ', ';
                             break;
                     }//end switch

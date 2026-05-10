@@ -1,11 +1,18 @@
 <?php
 
 // Don't refresh this page to stop adding multiple ports
-$no_refresh = true;
 
-  // This needs more verification. Is it already added? Does it exist?
-  // Calculation to extract MB/GB/TB of Kbps/Mbps/Gbps
-$base = \App\Facades\LibrenmsConfig::get('billing.base');
+use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
+use App\Facades\PortCache;
+use LibreNMS\Util\Url;
+
+$no_refresh = true;
+$device = DeviceCache::getPrimary();
+
+// This needs more verification. Is it already added? Does it exist?
+// Calculation to extract MB/GB/TB of Kbps/Mbps/Gbps
+$base = LibrenmsConfig::get('billing.base');
 
 if ($bill_data['bill_type'] == 'quota') {
     $data = $bill_data['bill_quota'];
@@ -101,11 +108,10 @@ if ($bill_data['bill_type'] == 'cdr') {
                 [$bill_data['bill_id']]
             );
 
-            if (is_array($ports)) {
-                ?>
+if (is_array($ports)) {
+    ?>
             <div class="list-group">
                 <?php   foreach ($ports as $port) {
-                    $port = cleanPort($port);
                     $emptyCheck = true;
                     $portalias = (empty($port['ifAlias']) ? '' : ' - ' . $port['ifAlias'] . ''); ?>
                 <div class="list-group-item">
@@ -119,22 +125,22 @@ if ($bill_data['bill_type'] == 'cdr') {
                         <i class="fa fa-minus"></i>
                         Remove Interface
                     </button>
-                    <?php echo generate_device_link($port); ?>
+                    <?php echo Url::deviceLink(DeviceCache::get($port['device_id'])); //TODO: Rewrite to Eloquent with device?>
                     <i class="fa fa-random"></i>
-                    <?php echo generate_port_link($port, $port['ifName'] . '' . $portalias); ?>
+                    <?php echo Url::portLink(PortCache::get($port['port_id']), $port['ifName'] . '' . $portalias); //TODO: Rewrite to Eloquent Port with device?>
                 </div>
                 <?php
                 }
-                if (empty($emptyCheck)) { ?>
+    if (empty($emptyCheck)) { ?>
                 <div class="alert alert-info">There are no ports assigned to this bill</alert>
                 <?php                   } ?>
 
             </div>
 
                 <?php
-            }
-            $port_device_id = -1;
-            ?>
+}
+$port_device_id = -1;
+?>
         </div>
 
         <h4>Add Port</h4>

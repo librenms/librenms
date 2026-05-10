@@ -3,6 +3,7 @@
 use App\Facades\LibrenmsConfig;
 use App\Models\Port;
 use App\Models\Storage;
+use LibreNMS\Util\Url;
 
 $name = 'oslv_monitor';
 
@@ -351,28 +352,28 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                 $path_graph_array = [];
                 $path_graph_array['height'] = '100';
                 $path_graph_array['width'] = '210';
-                $path_graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
+                $path_graph_array['to'] = LibrenmsConfig::get('time.now');
                 $path_graph_array['id'] = $storage_info['storage_id'];
                 $path_graph_array['type'] = 'storage_usage';
-                $path_graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
+                $path_graph_array['from'] = LibrenmsConfig::get('time.day');
                 $path_graph_array['legend'] = 'no';
 
                 $path_link_array = $path_graph_array;
                 $path_link_array['page'] = 'graphs';
                 unset($rpath_link_array['height'], $path_link_array['width'], $path_link_array['legend']);
 
-                $path_link = LibreNMS\Util\Url::generate($path_link_array);
+                $path_link = Url::generate($path_link_array);
 
                 $path_overlib_content = generate_overlib_content($path_graph_array, $device['hostname'] . ' - ' . $storage_info['storage_descr']);
 
                 $path_graph_array['width'] = 80;
                 $path_graph_array['height'] = 20;
                 $path_graph_array['bg'] = 'ffffff00';
-                $path_minigraph = LibreNMS\Util\Url::lazyGraphTag($path_graph_array);
+                $path_minigraph = Url::lazyGraphTag($path_graph_array);
 
-                $mount_path = LibreNMS\Util\Url::overlibLink($path_link, $mount_path, $path_overlib_content);
+                $mount_path = Url::overlibLink($path_link, $mount_path, $path_overlib_content);
                 $mount_path_usage = round($storage_info['storage_perc']) . '% ';
-                $mount_path_usage_graph = LibreNMS\Util\Url::overlibLink($path_link, $path_minigraph, $path_overlib_content);
+                $mount_path_usage_graph = Url::overlibLink($path_link, $path_minigraph, $path_overlib_content);
             }
         }
         $table_info['rows'][] = [
@@ -442,12 +443,7 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                         $port = Port::with('device')->firstWhere(['device_id' => $app->device_id, 'ifName' => $interface]);
                         if (isset($port)) {
                             $interface_raw = true;
-                            $interface = generate_port_link([
-                                'label' => $port->label,
-                                'port_id' => $port->port_id,
-                                'ifName' => $port->ifName,
-                                'device_id' => $port->device_id,
-                            ]);
+                            $interface = Url::portLink($port);
                         }
                         $if_speed = $port->ifSpeed;
                         $ifInUcastPkts_rate = $port->ifInUcastPkts_rate;
@@ -463,12 +459,7 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                         $port = Port::with('device')->firstWhere(['device_id' => $app->device_id, 'ifName' => $gw_interface]);
                         if (isset($port)) {
                             $gw_interface_raw = true;
-                            $gw_interface = generate_port_link([
-                                'label' => $port->label,
-                                'port_id' => $port->port_id,
-                                'ifName' => $port->ifName,
-                                'device_id' => $port->device_id,
-                            ]);
+                            $gw_interface = Url::portLink($port);
                         }
                     }
                 } else {

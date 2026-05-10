@@ -1,5 +1,10 @@
 <?php
 
+use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
+use App\Facades\PortCache;
+use LibreNMS\Util\Url;
+
 $pagetitle[] = 'Pseudowires';
 
 if (! isset($vars['view'])) {
@@ -70,9 +75,9 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I, devices AS D W
         $bg = 'ffffff';
     }
 
-    echo "<tr style=\"background-color: #$bg;\"><td rowspan=2 style='font-size:18px; padding:4px;'>" . $pw_a['cpwVcID'] . '</td><td>' . generate_device_link($pw_a) . '</td><td>' . generate_port_link($pw_a) . "</td>
+    echo "<tr style=\"background-color: #$bg;\"><td rowspan=2 style='font-size:18px; padding:4px;'>" . $pw_a['cpwVcID'] . '</td><td>' . Url::deviceLink(DeviceCache::get($pw_a['deice_id'])) . '</td><td>' . Url::portLink(PortCache::get($pw_a['port_id'])) . "</td>
                                                                                           <td rowspan=2> <i class='fa fa-arrows-alt fa-lg icon-theme' aria-hidden='true'></i> </td>
-                                                                                          <td>" . generate_device_link($pw_b) . '</td><td>' . generate_port_link($pw_b) . '</td></tr>';
+                                                                                          <td>" . Url::deviceLink(DeviceCache::get($pw_b['device_id'])) . '</td><td>' . Url::portLink(PortCache::get($pw_b['port_id'])) . '</td></tr>';
     echo "<tr style=\"background-color: #$bg;\"><td colspan=2>" . $pw_a['ifAlias'] . '</td><td colspan=2>' . $pw_b['ifAlias'] . '</td></tr>';
 
     if ($vars['view'] == 'minigraphs') {
@@ -81,8 +86,8 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I, devices AS D W
         if ($pw_a) {
             $pw_a['width'] = '150';
             $pw_a['height'] = '30';
-            $pw_a['from'] = \App\Facades\LibrenmsConfig::get('time.day');
-            $pw_a['to'] = \App\Facades\LibrenmsConfig::get('time.now');
+            $pw_a['from'] = LibrenmsConfig::get('time.day');
+            $pw_a['to'] = LibrenmsConfig::get('time.now');
             $pw_a['bg'] = $bg;
             $types = ['bits', 'upkts', 'errors'];
             foreach ($types as $graph_type) {
@@ -96,8 +101,8 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I, devices AS D W
         if ($pw_b) {
             $pw_b['width'] = '150';
             $pw_b['height'] = '30';
-            $pw_b['from'] = \App\Facades\LibrenmsConfig::get('time.day');
-            $pw_b['to'] = \App\Facades\LibrenmsConfig::get('time.now');
+            $pw_b['from'] = LibrenmsConfig::get('time.day');
+            $pw_b['to'] = LibrenmsConfig::get('time.now');
             $pw_b['bg'] = $bg;
             $types = ['bits', 'upkts', 'errors'];
             foreach ($types as $graph_type) {

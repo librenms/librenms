@@ -1,5 +1,11 @@
 <?php
 
+use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
+use App\Facades\PortCache;
+use LibreNMS\Util\Url;
+
+$device = DeviceCache::getPrimary();
 $pagetitle[] = 'Pseudowires';
 
 if (! isset($vars['view'])) {
@@ -40,7 +46,7 @@ echo '<tr><th>PW ID</th><th>Local PW Name</th><th>Local Port</th><td></th><th>Re
 $linkdone = [];
 $bg = '';
 
-foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I WHERE P.port_id = I.port_id AND I.device_id = ? ORDER BY I.ifDescr', [$device['device_id']]) as $pw_a) {
+foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I WHERE P.port_id = I.port_id AND I.device_id = ? ORDER BY I.ifDescr', [$device->device_id]) as $pw_a) {
     $pw_a = cleanPort($pw_a);
     if (in_array($pw_a['device_id'] . $pw_a['port_id'], $linkdone)) {
         continue;
@@ -70,10 +76,11 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I WHERE P.port_id
         $bg = '255,255,255';
     }
 
+    //TODO: Rewrite to Eloquent
     echo '<tr style="background-color: rgb(' . $bg . ')">
             <td style="font-size:18px; padding:4px;vertical-align: middle;">' . $pw_a['cpwVcID'] . '</td>
             <td>' . $pw_a['pw_descr'] . '<br/><span class="box-desc">' . $pw_a['pw_type'] . ' ' . $pw_a['pw_psntype'] . '</span></td>
-            <td>' . generate_port_link($pw_a) . ' <i class="fa fa-arrow-' . $pw_a['ifOperStatus'] . ' report-' . $pw_a['ifOperStatus'] . '" aria-hidden="true"></i><br/><span class="interface-desc">' . $pw_a['ifAlias'] . '</span>';
+            <td>' . Url::portLink(PortCache::get($pw_a['port_id'])) . ' <i class="fa fa-arrow-' . $pw_a['ifOperStatus'] . ' report-' . $pw_a['ifOperStatus'] . '" aria-hidden="true"></i><br/><span class="interface-desc">' . $pw_a['ifAlias'] . '</span>';
     if ($pw_a['pw_local_mtu'] != 0) {
         echo '<br/><span class="box-desc">MTU ' . $pw_a['ifMtu'] . '</span>';
         echo '<br/><span class="box-desc">PW MTU ' . $pw_a['pw_local_mtu'] . '</span>';
@@ -85,8 +92,9 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I WHERE P.port_id
 
     //Only if b-endpoint was found
     if ($pw_b) {
-        echo '<td>' . generate_device_link($pw_b) . '<br/><span class="box-desc"> ' . $pw_b['pw_descr'] . '</span></td>
-                <td>' . generate_port_link($pw_b) . ' <i class="fa fa-arrow-' . $pw_b['ifOperStatus'] . ' report-' . $pw_b['ifOperStatus'] . '" aria-hidden="true"></i><br/><span class="interface-desc">' . $pw_b['ifAlias'] . '</span>';
+        //TODO: Rewrite to Eloquent with device
+        echo '<td>' . Url::deviceLink(DeviceCache::get($pw_b['device_id'])) . '<br/><span class="box-desc"> ' . $pw_b['pw_descr'] . '</span></td>
+                <td>' . Url::portLink(PortCache::get($pw_b['port_id'])) . ' <i class="fa fa-arrow-' . $pw_b['ifOperStatus'] . ' report-' . $pw_b['ifOperStatus'] . '" aria-hidden="true"></i><br/><span class="interface-desc">' . $pw_b['ifAlias'] . '</span>';
 
         if ($pw_b['pw_local_mtu'] != 0) {
             echo '<br/><span class="box-desc">MTU ' . $pw_b['ifMtu'] . '</span>';
@@ -106,8 +114,8 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I WHERE P.port_id
         if ($pw_a) {
             $pw_a['width'] = '150';
             $pw_a['height'] = '30';
-            $pw_a['from'] = \App\Facades\LibrenmsConfig::get('time.day');
-            $pw_a['to'] = \App\Facades\LibrenmsConfig::get('time.now');
+            $pw_a['from'] = LibrenmsConfig::get('time.day');
+            $pw_a['to'] = LibrenmsConfig::get('time.now');
             $pw_a['bg'] = $bg;
             $types = [
                 'bits',
@@ -125,8 +133,8 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I WHERE P.port_id
         if ($pw_b) {
             $pw_b['width'] = '150';
             $pw_b['height'] = '30';
-            $pw_b['from'] = \App\Facades\LibrenmsConfig::get('time.day');
-            $pw_b['to'] = \App\Facades\LibrenmsConfig::get('time.now');
+            $pw_b['from'] = LibrenmsConfig::get('time.day');
+            $pw_b['to'] = LibrenmsConfig::get('time.now');
             $pw_b['bg'] = $bg;
             $types = ['bits', 'upkts', 'errors'];
             foreach ($types as $graph_type) {
