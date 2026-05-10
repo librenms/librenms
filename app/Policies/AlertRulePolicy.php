@@ -57,7 +57,7 @@ class AlertRulePolicy
         }
 
         foreach ($alertRule->locations as $location) {
-            foreach($location->devices as $device) {
+            foreach ($location->devices as $device) {
                 if (Permissions::canAccessDevice($device, $user)) {
                     return true;
                 }

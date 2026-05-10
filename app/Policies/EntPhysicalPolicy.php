@@ -10,7 +10,8 @@ class EntPhysicalPolicy
 {
     use ChecksGlobalPermissions;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->globalPrefix = 'inventory';
     }
 

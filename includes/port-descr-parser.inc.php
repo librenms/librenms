@@ -10,6 +10,7 @@ return function (string $ifAlias): array {
     $pull = function (string $pattern, string &$str): string {
         if (preg_match($pattern, $str, $m)) {
             $str = str_replace($m[0], '', $str);
+
             return trim($m[1]);
         }
 

@@ -36,7 +36,7 @@ class EventlogController extends Controller
 {
     public function __invoke(Device $device, Request $request): View
     {
-        $this->authorize('view',$device);
+        $this->authorize('view', $device);
         $this->authorize('viewAny', Eventlog::class);
 
         $request->validate([

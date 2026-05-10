@@ -10,7 +10,8 @@ class PortsNacPolicy
 {
     use ChecksGlobalPermissions;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->globalPrefix = 'port';
     }
 

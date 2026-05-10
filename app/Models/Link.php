@@ -28,7 +28,7 @@ class Link extends Model
 
         return $query->where(function ($query) use ($user) {
             return $query->whereIntegerInRaw('links.local_port_id', Permissions::portsForUser($user))
-                ->orWhereIntegerInRaw("links.local_device_id", Permissions::devicesForUser($user));
+                ->orWhereIntegerInRaw('links.local_device_id', Permissions::devicesForUser($user));
         })->where(function (Builder $query) use ($user) {
             return $query->where('links.remote_device_id', 0)
                 ->orWhereIntegerInRaw('links.remote_port_id', Permissions::portsForUser($user))

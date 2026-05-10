@@ -10,7 +10,6 @@ class AuthLogController
 {
     use AuthorizesRequests;
 
-
     public function index(): View
     {
         $this->authorize('auth-log.view');
