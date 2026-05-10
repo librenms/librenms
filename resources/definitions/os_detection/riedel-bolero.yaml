@@ -1,0 +1,6 @@
+os: riedel-bolero
+text: 'Riedel Bolero'
+type: wireless
+icon: riedel
+over:
+    - { graph: device_ping_perf, text: 'ICMP Response' }
