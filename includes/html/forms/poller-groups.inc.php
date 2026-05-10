@@ -28,7 +28,7 @@ $group_name = $_POST['group_name'];
 $descr = $_POST['descr'];
 if (! empty($group_name)) {
     if (is_numeric($group_id)) {
-        Gate::authorize('update', PollerGroup::class);
+        Gate::authorize('poller.update');
         if (PollerGroup::where('id', $group_id)->update(['group_name' => $group_name, 'descr' => $descr]) >= 0) {
             $ok = 'Updated poller group';
         } else {

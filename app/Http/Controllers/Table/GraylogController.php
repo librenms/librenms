@@ -29,6 +29,7 @@ namespace App\Http\Controllers\Table;
 use App\ApiClients\GraylogApi;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\Syslog;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
@@ -49,6 +50,8 @@ class GraylogController extends SimpleTableController
 
     public function __invoke(Request $request, GraylogApi $api): JsonResponse
     {
+        $this->authorize('viewAny', Syslog::class); // Graylog replaces syslog
+
         if (! $api->isConfigured()) {
             return response()->json([
                 'error' => 'Graylog is not configured',

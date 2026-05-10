@@ -40,6 +40,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
@@ -55,7 +56,7 @@ class PortsController implements DeviceTab
 
     public function visible(Device $device): bool
     {
-        return $device->ports()->exists();
+        return Gate::allows('viewAny', Port::class) && $device->ports()->exists();
     }
 
     public function slug(): string

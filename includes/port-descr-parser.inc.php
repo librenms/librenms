@@ -3,19 +3,28 @@
 // Parser should return an array with type, descr, circuit, speed and notes
 
 return function (string $ifAlias): array {
-    $split = preg_split('/[:\[\]{}()]/', $ifAlias);
-    $type = trim($split[0] ?? '');
-    $descr = trim($split[1] ?? '');
-
-    if ($type && $descr) {
-        return [
-            'type' => strtolower($type),
-            'descr' => $descr,
-            'circuit' => trim(preg_split('/[{}]/', $ifAlias)[1] ?? ''),
-            'speed' => trim(preg_split('/[\[\]]/', $ifAlias)[1] ?? ''),
-            'notes' => trim(preg_split('/[()]/', $ifAlias)[1] ?? ''),
-        ];
+    if (! str_contains($ifAlias, ':')) {
+        return [];
     }
 
-    return [];
+    $pull = function (string $pattern, string &$str): string {
+        if (preg_match($pattern, $str, $m)) {
+            $str = str_replace($m[0], '', $str);
+            return trim($m[1]);
+        }
+
+        return '';
+    };
+
+    [$type, $rest] = explode(':', $ifAlias, 2);
+
+    $result = [
+        'type' => strtolower(trim($type)),
+        'circuit' => $pull('/\{([^}]*)\}/', $rest),
+        'speed' => $pull('/\[([^\]]*)\]/', $rest),
+        'notes' => $pull('/\(([^)]*)\)/', $rest),
+        'descr' => trim($rest),
+    ];
+
+    return $result['type'] && $result['descr'] ? $result : [];
 };

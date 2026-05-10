@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Facades\LibrenmsConfig;
 use App\Facades\Permissions;
 use App\Models\PortGroup;
 use App\Models\User;
@@ -16,12 +15,16 @@ class PortGroupPolicy
      */
     public function viewAny(User $user): bool
     {
-        if (! LibrenmsConfig::get('distributed_poller')) {
-            return false;
-        }
-
-        return $this->hasGlobalPermission($user, 'viewAll')
+        return $this->hasGlobalPermission($user, 'view', true)
+            || $this->hasGlobalPermission($user, 'viewAll')
             || $this->hasGlobalPermission($user, 'create')
+            || $this->hasGlobalPermission($user, 'update')
+            || $this->hasGlobalPermission($user, 'delete');
+    }
+
+    public function manage(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'create')
             || $this->hasGlobalPermission($user, 'update')
             || $this->hasGlobalPermission($user, 'delete');
     }
@@ -35,23 +38,30 @@ class PortGroupPolicy
             return true;
         }
 
-        return $this->hasGlobalPermission($user, 'view')
+        return $this->hasGlobalPermission($user, 'view', true)
             && Permissions::canAccessPortGroup($portGroup, $user);
+    }
+
+    public function create(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'create');
     }
 
     /**
      * Determine whether the user can update the port group.
      */
-    public function update(User $user): bool
+    public function update(User $user, PortGroup $portGroup): bool
     {
-        return $this->hasGlobalPermission($user, 'update');
+        return $this->hasGlobalPermission($user, 'update')
+            && Permissions::canAccessPortGroup($portGroup, $user);
     }
 
     /**
      * Determine whether the user can delete the port group.
      */
-    public function delete(User $user): bool
+    public function delete(User $user, PortGroup $portGroup): bool
     {
-        return $this->hasGlobalPermission($user, 'delete');
+        return $this->hasGlobalPermission($user, 'delete')
+            && Permissions::canAccessPortGroup($portGroup, $user);
     }
 }

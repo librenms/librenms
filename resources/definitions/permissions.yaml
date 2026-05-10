@@ -6,6 +6,10 @@ groups:
         - alert.update
         - alert.delete
 
+    alert-log:
+        - alert-log.viewAll
+        - alert-log.view
+
     alert-rule:
         - alert-rule.viewAll
         - alert-rule.view
@@ -31,15 +35,12 @@ groups:
         - alert-transport.update
         - alert-transport.delete
 
-    alert-operation:
-        - alert-operation.view
-        - alert-operation.create
-        - alert-operation.update
-        - alert-operation.delete
     api:
         - api.access
 
     application:
+        - application.viewAll
+        - application.view
         - application.update
 
     auth-log:
@@ -63,6 +64,8 @@ groups:
         - custom-map.delete
 
     dashboard:
+        - dashboard.update
+        - dashboard.delete
         - dashboard.copy
 
     device:
@@ -82,8 +85,21 @@ groups:
         - device-group.update
         - device-group.delete
 
+    diskio:
+        - diskio.view
+
+    eventlog:
+        - eventlog.viewAll
+        - eventlog.view
+
+    inventory:
+        - inventory.viewAll
+        - inventory.view
+        - inventory.purge
+
     link:
         - link.viewAll
+        - link.view
 
     location:
         - location.viewAll
@@ -93,11 +109,16 @@ groups:
         - location.delete
 
     mempool:
+        - mempool.view
         - mempool.update
 
     notification:
         - notification.update
         - notification.create
+
+    outage:
+        - outage.viewAll
+        - outage.view
 
     oxidized:
         - oxidized.refresh
@@ -141,7 +162,10 @@ groups:
         - reporting.update
 
     role:
+        - role.view
+        - role.create
         - role.update
+        - role.delete
 
     routing:
         - routing.viewAll
@@ -168,10 +192,22 @@ groups:
     ssl-certificate:
         - ssl-certificate.view
         - ssl-certificate.create
+        - ssl-certificate.update
         - ssl-certificate.delete
 
+    storage:
+        - storage.viewAll
+        - storage.view
+        - storage.update
+
     syslog:
+        - syslog.viewAll
+        - syslog.view
         - syslog.delete
+
+    tools:
+        - tools.oui
+        - tools.ripe
 
     user:
         - user.view

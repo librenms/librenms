@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\AlertOperation;
+use App\Models\AlertRule;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -25,6 +26,8 @@ class AlertOperationController extends SelectController
      */
     public function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', AlertRule::class);
+
         return AlertOperation::query()
             ->select(['id', 'name'])
             ->orderBy('name');

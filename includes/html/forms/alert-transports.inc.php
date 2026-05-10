@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
 
-if (Gate::none(['create', 'update'], AlertTransport::class)) {
+if (Gate::none(['alert-transport.create', 'alert-transport.update'])) {
     exit(json_encode([
         'status' => 'error',
         'message' => 'You need permisisson',
@@ -57,9 +57,12 @@ if (empty($name)) {
     ];
 
     if (is_numeric($transport_id) && $transport_id > 0) {
-        Gate::authorize('update', AlertTransport::class);
+        $transport = AlertTransport::findOrFail($transport_id);
+        Gate::authorize('update', $transport);
+        $transport->transport_name = $name;
+        $transport->is_default = $is_default;
+        $transport->save();
         // Update the fields -- json config field will be updated later
-        dbUpdate($details, 'alert_transports', 'transport_id=?', [$transport_id]);
     } else {
         Gate::authorize('create', AlertTransport::class);
         // Insert the new alert transport

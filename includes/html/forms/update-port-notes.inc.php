@@ -14,7 +14,7 @@
 use App\Facades\DeviceCache;
 use App\Models\Port;
 
-Gate::authorize('update', Port::class);
+Gate::authorize('port.update');
 
 header('Content-type: application/json');
 

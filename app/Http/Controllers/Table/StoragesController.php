@@ -48,6 +48,8 @@ class StoragesController extends TableController
 
     protected function baseQuery(Request $request): Builder|\Illuminate\Database\Query\Builder
     {
+        $this->authorize('viewAny', Storage::class);
+
         return Storage::query()
             ->hasAccess($request->user())
             ->when($request->input('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'storage.device_id'))

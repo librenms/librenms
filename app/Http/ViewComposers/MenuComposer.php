@@ -79,7 +79,7 @@ class MenuComposer
         $vars['project_name'] = LibrenmsConfig::get('project_name', 'LibreNMS');
 
         //Dashboards
-        $vars['dashboards'] = Dashboard::select('dashboard_id', 'dashboard_name')->allAvailable($user)->orderBy('dashboard_name')->get();
+        $vars['dashboards'] = Dashboard::select('dashboard_id', 'dashboard_name')->hasAccess($user)->orderBy('dashboard_name')->get();
 
         // Device menu
         $vars['device_groups'] = DeviceGroup::hasAccess($user)->orderBy('name')->get(['device_groups.id', 'name', 'desc']);
@@ -102,7 +102,7 @@ class MenuComposer
         $vars['show_vmwinfo'] = $user->can('viewAny', \App\Models\Vminfo::class) && Vminfo::hasAccess($user)->exists();
         $vars['show_device_extra_divider'] = $vars['show_vmwinfo']
             || $user->can('viewAny', \App\Models\DeviceGroup::class)
-            || $user->can('update', \App\Models\Device::class);
+            || $user->can('device.update');
 
         //Maps
         $vars['links'] = Link::exists();

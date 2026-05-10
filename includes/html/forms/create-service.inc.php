@@ -51,7 +51,7 @@ foreach (['stype', 'device_id', 'service_id'] as $varname) {
 }
 
 if (is_numeric($service_id) && $service_id > 0) {
-    Gate::authorize('update', Service::class);
+    Gate::authorize('service.update');
     // Need to edit.
     if (is_numeric(edit_service($update, $service_id))) {
         $status = ['status' => 0, 'message' => 'Modified Service: <i>' . $service_id . ': ' . $stype . '</i>'];

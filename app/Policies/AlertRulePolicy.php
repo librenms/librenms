@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Facades\Permissions;
 use App\Models\AlertRule;
 use App\Models\User;
 
@@ -14,7 +15,7 @@ class AlertRulePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
+        return $this->hasGlobalPermission($user, 'view', true)
             || $this->hasGlobalPermission($user, 'viewAll')
             || $this->hasGlobalPermission($user, 'create')
             || $this->hasGlobalPermission($user, 'update')
@@ -38,7 +39,32 @@ class AlertRulePolicy
             return true;
         }
 
-        return $this->hasGlobalPermission($user, 'view'); // TODO check if user has access to any device covered by the alert rule
+        if (! $this->hasGlobalPermission($user, 'view', true)) {
+            return false;
+        }
+
+        // FIXME probably a less brain-dead way to do this
+        foreach ($alertRule->devices as $device) {
+            if (Permissions::canAccessDevice($device, $user)) {
+                return true;
+            }
+        }
+
+        foreach ($alertRule->groups as $group) {
+            if (Permissions::canAccessDeviceGroup($group, $user)) {
+                return true;
+            }
+        }
+
+        foreach ($alertRule->locations as $location) {
+            foreach($location->devices as $device) {
+                if (Permissions::canAccessDevice($device, $user)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -45,6 +45,8 @@ class LocationController extends SelectController
      */
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Location::class);
+
         return Location::hasAccess($request->user())
             ->orderBy('location')
             ->select(['id', 'location']);

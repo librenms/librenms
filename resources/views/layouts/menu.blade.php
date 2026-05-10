@@ -61,18 +61,22 @@
                             <a><i class="fa fa-wrench fa-fw fa-lg"
                                                                aria-hidden="true"></i> {{ __('Tools') }}</a>
                             <ul class="dropdown-menu">
+                                @can('tools.ripe')
                                 <li><a href="{{ url('ripenccapi') }}"><i class="fa fa-star fa-fw fa-lg"
                                                                          aria-hidden="true"></i> {{ __('RIPE NCC API') }}
                                     </a></li>
+                                @endcan
                                 @config('smokeping.integration')
                                 <li><a href="{{ \App\Facades\LibrenmsConfig::get('smokeping.url') }}"><i class="fa fa-line-chart fa-fw fa-lg"
                                                                        aria-hidden="true"></i> {{ __('Smokeping') }}</a>
                                 </li>
                                 @endconfig
                                 @config('mac_oui.enabled')
-                                <li><a href="{{ route('tool.oui-lookup') }}"><i class="fa fa-magnifying-glass fa-fw fa-lg"
-                                                                                              aria-hidden="true"></i> {{ __('tools.oui.title') }}</a>
-                                </li>
+                                    @can('tools.oui')
+                                    <li><a href="{{ route('tool.oui-lookup') }}"><i class="fa fa-magnifying-glass fa-fw fa-lg"
+                                                                                                  aria-hidden="true"></i> {{ __('tools.oui.title') }}</a>
+                                    </li>
+                                    @endcan
                                 @endconfig
                                 @config('oxidized.enabled')
                                 <li><a href="{{ url('oxidized') }}"><i class="fa fa-stack-overflow fa-fw fa-lg"
@@ -180,21 +184,21 @@
                                                                         aria-hidden="true"></i> {{ __('Manage Groups') }}
                                 </a></li>
                         @endcan
-                        @can('update', \App\Models\Device::class)
+                        @can('device.update')
                         <li><a href="{{ url('device-dependencies') }}"><i class="fa fa-group fa-fw fa-lg"></i> {{ __('Device Dependencies') }}</a></li>
                         @endcan
                         @if($show_vmwinfo)
                             <li><a href="{{ url('vminfo') }}"><i
                                         class="fa fa-cog fa-fw fa-lg"></i> {{ __('Virtual Machines') }}</a></li>
                         @endif
-                        @canany(['create', 'delete'], \App\Models\Device::class)
+                        @canany(['device.create', 'device.delete'])
                         <li role="presentation" class="divider"></li>
                         @endcanany
-                        @can('create', \App\Models\Device::class)
+                        @can('device.create')
                         <li><a href="{{ url('addhost') }}"><i class="fa fa-plus fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Add Device') }}</a></li>
                         @endcan
-                        @can('delete', \App\Models\Device::class)
+                        @can('device.delete')
                         <li><a href="{{ route('device.delete') }}"><i class="fa fa-trash fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Delete Device') }}</a></li>
                         @endcan
@@ -317,8 +321,10 @@
                                 </a></li>
                         @endif
 
+                        @can('viewAny', \App\Models\Vlan::class)
                         <li><a href="{{ route('vlans.index') }}"><i class="fa fa-tasks fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('VLANs') }}</a></li>
+                        @endcan
 
                         @can('viewAny', \App\Models\Bill::class)
                         <li><a href="{{ url('bills') }}"><i class="fa fa-money fa-fw fa-lg"
@@ -379,9 +385,9 @@
                             @endif
 
                             <li role="presentation" class="divider"></li>
-                            @if(Gate::any(['create', 'update', 'delete'], \App\Models\PortGroup::class))
+                            @can('manage', \App\Models\PortGroup::class))
                             <li><a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Manage Groups') }} </a></li>
-                            @endif
+                            @endcan
                             @if($port_groups->isNotEmpty())
                                 <li class="dropdown-submenu">
                                 <a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Port Groups') }}</a>
@@ -409,7 +415,7 @@
                                         aria-hidden="true"></i> {{ __('Disabled :port_count', ['port_count' => $port_counts['shutdown']]) }}
                                 </a></li>
 
-                            @can('delete', \App\Models\Port::class)
+                            @can('port.delete')
                             @if($port_counts['deleted'])
                                 <li><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['deleted' => ['eq' => '1']]]) }}"><i class="fa fa-minus-circle fa-fw fa-lg"
                                                                                 aria-hidden="true"></i> {{ __('Deleted :port_count', ['port_count' => $port_counts['deleted']]) }}
@@ -667,7 +673,7 @@
                         </li>
                         @endcan
                         @can('auth-log.view')
-                        <li><a href="{{ url('authlog') }}"><i class="fa fa-shield fa-fw fa-lg"
+                        <li><a href="{{ route('auth-log') }}"><i class="fa fa-shield fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Auth History') }}</a></li>
                         @endcan
                         @if(Gate::allows('viewAny', \App\Models\PollerCluster::class) || Gate::allows('viewAny', \App\Models\PollerGroup::class))
@@ -679,7 +685,7 @@
                                 @can('viewAny', \App\Models\PollerGroup::class)
                                 <li><a href="{{ route('poller.groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Groups') }}</a></li>
                                 @endcan
-                                @can('update', \App\Models\PollerCluster::class)
+                                @can('poller.update')
                                 <li><a href="{{ route('poller.settings') }}"><i class="fa fa-gears fa-fw fa-lg" aria-hidden="true"></i> {{ __('Settings') }}</a></li>
                                 @endcan
                                 @can('viewAny', \App\Models\PollerCluster::class)
