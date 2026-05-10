@@ -1,0 +1,919 @@
+
+HM2-NETCONFIG-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann Network Configuration MIB
+-- *************************************************************
+--
+
+IMPORTS
+	NOTIFICATION-TYPE,
+    MODULE-IDENTITY, 
+    OBJECT-TYPE,
+    Unsigned32,
+    Integer32					FROM SNMPv2-SMI  
+    TEXTUAL-CONVENTION,
+    DisplayString,
+    RowStatus,
+    MacAddress                	FROM SNMPv2-TC
+	TimeFilter					FROM RMON2-MIB
+    InetAddressType,
+    InetAddress, 
+    InetAddressPrefixLength
+    			                FROM INET-ADDRESS-MIB
+    ifIndex,
+   	InterfaceIndex              FROM IF-MIB
+	IpAddressOriginTC           FROM IP-MIB
+    hm2ConfigurationMibs,
+    HmEnabledStatus             FROM HM2-TC-MIB;
+
+
+hm2NetConfigMib MODULE-IDENTITY
+	LAST-UPDATED "201103160000Z" -- March 16, 2011
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann Network Configuration MIB.
+         Copyright (C) 2012. All Rights Reserved."
+    REVISION     "201103160000Z" -- March 16, 2011
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 20 }
+
+--
+-- *************************************************************
+-- hm2NetConfigMib
+-- *************************************************************
+--
+hm2NetConfigMibNotifications	OBJECT IDENTIFIER ::= { hm2NetConfigMib 0 }
+hm2NetConfigMibObjects			OBJECT IDENTIFIER ::= { hm2NetConfigMib 1 }
+-- hm2NetConfigMibConformance			OBJECT IDENTIFIER ::= { hm2NetConfigMib 2 }
+
+--
+-- *************************************************************
+-- hm2NetConfigMib groups
+-- *************************************************************
+--
+hm2NetStaticGroup		OBJECT IDENTIFIER ::= { hm2NetConfigMibObjects 1 }
+hm2NetACDGroup			OBJECT IDENTIFIER ::= { hm2NetConfigMibObjects 2 }
+hm2NetMacGroup			OBJECT IDENTIFIER ::= { hm2NetConfigMibObjects 3 }
+hm2NetHiDiscoveryGroup	OBJECT IDENTIFIER ::= { hm2NetConfigMibObjects 4 }
+hm2NetMacACDGroup		OBJECT IDENTIFIER ::= { hm2NetConfigMibObjects 5 }
+hm2NetOobMgmtGroup		OBJECT IDENTIFIER ::= { hm2NetConfigMibObjects 6 }
+hm2NetOobUsbMgmtGroup	OBJECT IDENTIFIER ::= { hm2NetConfigMibObjects 7 }
+
+
+--
+-- *************************************************************
+-- hm2NetStaticGroup
+-- *************************************************************
+--
+
+hm2NetConfigProtocol	OBJECT-TYPE
+			SYNTAX		INTEGER {
+								none(1),
+								bootp(2),
+								dhcp(3)
+						}
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"The switch's network configuration protocol.
+					 The default value is dependent of the device type."
+			DEFVAL { dhcp }
+			::= { hm2NetStaticGroup 1 }
+
+
+hm2NetLocalIPAddrType	OBJECT-TYPE
+			SYNTAX		InetAddressType
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Local IP address type."
+			DEFVAL { ipv4 }
+			::= { hm2NetStaticGroup 2 }
+
+
+hm2NetLocalIPAddr		OBJECT-TYPE
+			SYNTAX		InetAddress
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"IP address of the management agent board.
+					Changing this value will take effect after activating
+					with hm2NetAction."
+			DEFVAL { '00000000'H }
+			::= { hm2NetStaticGroup 3 }
+
+hm2NetPrefixLength		OBJECT-TYPE
+			SYNTAX		InetAddressPrefixLength
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"The length of the IP netmask."
+            DEFVAL { 0 }
+			::= { hm2NetStaticGroup 4 }
+
+hm2NetGatewayIPAddrType	OBJECT-TYPE
+			SYNTAX		InetAddressType
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Default gateway IP address type."
+			DEFVAL { ipv4 }
+			::= { hm2NetStaticGroup 5 }
+
+
+hm2NetGatewayIPAddr		OBJECT-TYPE
+			SYNTAX		InetAddress
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"IP address of the default gateway.
+					 Changing this value will take effect after activating
+					 with hm2NetAction."
+			DEFVAL { '00000000'H }
+			::= { hm2NetStaticGroup 6 }
+
+hm2NetVlanID			OBJECT-TYPE
+			SYNTAX		Integer32 (1..4042)
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"VLAN-ID of the IP protocol stack. The VLAN-ID value means
+					 that only traffic of the appropriate VLAN is accepted and
+					 outgoing traffic uses this VLAN-ID."
+			DEFVAL { 1 }
+			::= { hm2NetStaticGroup 7 }
+
+hm2NetVlanPriority		OBJECT-TYPE
+			SYNTAX		Integer32 (0..7)
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"VLAN Priority which is used in management replies."
+			DEFVAL { 0 }
+			::= { hm2NetStaticGroup 8 }
+
+hm2NetIpDscpPriority	OBJECT-TYPE
+			SYNTAX		Integer32 (0..63)
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"IP DSCP value which is used in management replies."
+			DEFVAL { 0 }			
+			::= { hm2NetStaticGroup 9 }
+
+hm2NetMgmtPort OBJECT-TYPE
+			SYNTAX      Integer32
+			MAX-ACCESS  read-write
+			STATUS      current
+			DESCRIPTION
+					"The port number of the Ethernet port, which gets the access to
+					 the switch management.
+					 If the value is set to 0, the access to the switch management is 
+					 permitted from all ports of the switch.
+					 This object is only applicable for embedded switches which are 
+					 integrated into customer devices."
+		    DEFVAL { 0 }
+			::= { hm2NetStaticGroup 10 }
+
+hm2NetDHCPClientId OBJECT-TYPE 
+		    SYNTAX       DisplayString (SIZE (0..255))
+    		MAX-ACCESS   read-only
+    		STATUS       current 
+    		DESCRIPTION 
+      			"The identifier string that is currently used by the client in the 
+      			 request packets to the server for obtaining lease information." 
+			::= { hm2NetStaticGroup 11 }
+
+hm2NetDHCPClientConfigLoad OBJECT-TYPE
+			SYNTAX  HmEnabledStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+					"Enables/disables the DHCP options 4/42 (time servers) and 66/67 
+					(Load config over TFTP on boot) on DHCP/BOOTP client."
+			DEFVAL { enable }
+			::= { hm2NetStaticGroup 20 }
+
+hm2NetDHCPClientLeaseTime OBJECT-TYPE
+			SYNTAX  Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+					"Displays the remaining lease of the management IP time in seconds."
+			::= { hm2NetStaticGroup 21 }
+
+hm2NetIPv6AdminStatus OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enable/Disable IPv6 feature. A (1) enables, a (2) disables."
+			DEFVAL { enable }
+			::= { hm2NetStaticGroup 30 }
+
+hm2NetIPv6ConfigProtocol	OBJECT-TYPE
+			SYNTAX		INTEGER {
+								none(1),
+								auto(2),
+								dhcpv6(3),
+								all(4)
+						}
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"The switch's network IPv6 configuration protocol."
+			DEFVAL { auto }
+			::= { hm2NetStaticGroup 31 }
+
+hm2NetIPv6GatewayAddrType	OBJECT-TYPE
+			SYNTAX		InetAddressType
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Default gateway IPv6 address type."
+			DEFVAL { ipv6 }
+			::= { hm2NetStaticGroup 32 }
+
+
+hm2NetIPv6GatewayAddr	OBJECT-TYPE
+			SYNTAX		InetAddress
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"IPv6 address of the default gateway."
+			DEFVAL { '00000000000000000000000000000000'H }
+			::= { hm2NetStaticGroup 33 }
+
+hm2NetIPv6DupAddrDetectTrans		OBJECT-TYPE
+			SYNTAX		Integer32 (0..5)
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Number of Neighbor Solicitations for DAD mechanism."
+			DEFVAL { 1 }
+			::= { hm2NetStaticGroup 34 }
+
+hm2NetIPv6DHCPClientId   OBJECT-TYPE
+		    SYNTAX       DisplayString (SIZE (0..255))
+    		MAX-ACCESS   read-only
+    		STATUS       current
+    		DESCRIPTION
+					"The identifier string that is currently used by the client in the
+      				IPv6 implementation to request packets to the server to obtain
+					lease information."
+			::= { hm2NetStaticGroup 35 }
+
+hm2NetIPv6LocalAddrTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF Hm2NetIPv6LocalAddrEntry
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+					"The list of IPv6 addresses and their prefixes
+					for the network port."
+			::=  { hm2NetStaticGroup 36 }
+
+hm2NetIPv6LocalAddrEntry OBJECT-TYPE
+			SYNTAX  Hm2NetIPv6LocalAddrEntry
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+				"An interface entry containing objects of
+				a particular IPv6 address prefix"
+			INDEX   {
+					hm2NetIPv6LocalAddrPrefixType,
+					hm2NetIPv6LocalAddrPrefix,
+					hm2NetIPv6LocalAddrPrefixLength
+					}
+			::= { hm2NetIPv6LocalAddrTable 1 }
+			Hm2NetIPv6LocalAddrEntry ::= SEQUENCE {
+				hm2NetIPv6LocalAddrPrefixType      InetAddressType,
+				hm2NetIPv6LocalAddrPrefix          InetAddress,
+				hm2NetIPv6LocalAddrPrefixLength    INTEGER,
+				hm2NetIPv6LocalAddrType            InetAddressType,
+				hm2NetIPv6LocalAddr                InetAddress,
+				hm2NetIPv6LocalAddrEuiFlag         INTEGER,
+				hm2NetIPv6LocalAddrOrigin          IpAddressOriginTC,
+				hm2NetIPv6LocalAddrStatus          RowStatus
+			}
+
+			hm2NetIPv6LocalAddrPrefixType OBJECT-TYPE
+				SYNTAX      InetAddressType
+				MAX-ACCESS  not-accessible
+				STATUS      current
+				DESCRIPTION
+					"The management IPv6 prefix type"
+			    ::=  { hm2NetIPv6LocalAddrEntry 1 }
+
+			hm2NetIPv6LocalAddrPrefix OBJECT-TYPE
+				SYNTAX      InetAddress
+				MAX-ACCESS  not-accessible
+				STATUS      current
+				DESCRIPTION
+					"IPv6 prefix of the management agent board."
+				::=  { hm2NetIPv6LocalAddrEntry 2 }
+
+			hm2NetIPv6LocalAddrPrefixLength OBJECT-TYPE
+				SYNTAX      INTEGER (0..128)
+				MAX-ACCESS  not-accessible
+				STATUS      current
+				DESCRIPTION
+					"The management IPv6 address prefix length."
+				::=  { hm2NetIPv6LocalAddrEntry 3 }
+				
+			hm2NetIPv6LocalAddrType OBJECT-TYPE
+				SYNTAX      InetAddressType
+				MAX-ACCESS  read-write
+				STATUS      current
+				DESCRIPTION
+					"The management IPv6 address type"
+				DEFVAL      { ipv6 }
+			    ::=  { hm2NetIPv6LocalAddrEntry 4 }
+
+			hm2NetIPv6LocalAddr OBJECT-TYPE
+				SYNTAX      InetAddress
+				MAX-ACCESS  read-write
+				STATUS      current
+				DESCRIPTION
+					"IPv6 address of the management agent board."
+				DEFVAL { '00000000000000000000000000000000'H }
+				::=  { hm2NetIPv6LocalAddrEntry 5 }
+
+			hm2NetIPv6LocalAddrEuiFlag OBJECT-TYPE
+				SYNTAX      HmEnabledStatus
+				MAX-ACCESS  read-write
+				STATUS      current
+				DESCRIPTION
+					"The management IPv6 EUI flag."
+				DEFVAL { disable }
+				::=  { hm2NetIPv6LocalAddrEntry 6 }
+
+			hm2NetIPv6LocalAddrOrigin OBJECT-TYPE
+				SYNTAX      IpAddressOriginTC
+				MAX-ACCESS  read-write
+				STATUS      current
+				DESCRIPTION
+					"Origin of IPv6 address."
+				DEFVAL { manual }
+				::=  { hm2NetIPv6LocalAddrEntry 7 }
+
+			hm2NetIPv6LocalAddrStatus OBJECT-TYPE
+				SYNTAX      RowStatus
+				MAX-ACCESS  read-create
+				STATUS      current
+				DESCRIPTION
+					""
+			    ::= { hm2NetIPv6LocalAddrEntry 8 }
+
+hm2NetAction			OBJECT-TYPE
+			SYNTAX		INTEGER {
+								other (1),
+								activate (2)
+						}
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"This object, when read, always returns a value of other(1).
+					Setting the object to activate(2) causes a reconfiguration
+					of the IP protocol stack with the current values of 
+					hm2NetLocalIPAddr, hm2NetGatewayIPAddr and hm2NetMask."
+			DEFVAL { other }
+			::= { hm2NetStaticGroup 50 }
+
+
+
+--
+-- *************************************************************
+-- hm2NetACDGroup
+-- *************************************************************
+--
+hm2NetACDStatus OBJECT-TYPE
+			SYNTAX  HmEnabledStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+         	"Sets the status of the ip address conflict detection mechanism on this device.
+         	 With activating the ACD status an internal check of duplicated IP-addresses is
+         	 enabled."
+			DEFVAL     { enable }				
+			::= { hm2NetACDGroup 1 }
+			
+hm2NetACDDetectionMode OBJECT-TYPE
+			SYNTAX INTEGER {
+				activeAndPassive(1),
+				activeDetectionOnly(2),
+				passiveDetectionOnly(3)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+         	"Sets the mode of the ip address conflict detection mechanism on this device.
+         	activeAndPassive (1): Both active and passive detection are active.
+         	activeDetectionOnly (2): During configuration of a local ip address 
+         	the device actively probes the network for this ip address.
+         	passiveDetectionOnly (3): The device listens passively on the network 
+         	if another device with an already locally configured ip address appears. 
+         	In this case the own ip address is actively defended by transmitting gratituous ARP's."
+			DEFVAL { activeAndPassive }
+			::= { hm2NetACDGroup 2 }
+
+hm2NetACDOngoingProbeStatus OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS read-write
+  			STATUS current
+  			DESCRIPTION
+         	"If enabled, the device sends periodic ARP or NDP probes every 90-120 seconds."
+  		    DEFVAL	{ enable }			
+  			::= { hm2NetACDGroup 3 }
+
+hm2NetACDDelay OBJECT-TYPE
+  			SYNTAX Integer32 (20..500)
+  			MAX-ACCESS read-write
+  			STATUS current
+  			DESCRIPTION
+         	"Time gap between ARP or NDP probes being sent." 
+  		    DEFVAL	{ 200 }						
+  			::= { hm2NetACDGroup 5 }
+
+hm2NetACDReleaseDelay OBJECT-TYPE
+  			SYNTAX Integer32 (3..3600)
+  			MAX-ACCESS read-write
+  			STATUS current
+  			DESCRIPTION
+         	"Delay in seconds to the next ARP or NDP probe cycle after an ip address conflict was detected."
+  		    DEFVAL	{ 15 }			
+  			::= { hm2NetACDGroup 7 }
+
+hm2NetACDMaxProtection OBJECT-TYPE
+  			SYNTAX Integer32 (0..100)
+  			MAX-ACCESS read-write
+  			STATUS current
+  			DESCRIPTION
+  			"The number of ARP announcement packets (gratuitous ARP packets) in passive(ongoing) mode to be received
+  			 within hm2NetACDProtectInterval until the agent detects this as a conflict."
+  		    DEFVAL { 1 }			
+  			::= { hm2NetACDGroup 9 }
+
+hm2NetACDProtectInterval OBJECT-TYPE
+  			SYNTAX Integer32 (20..10000)
+  			MAX-ACCESS read-write
+  			STATUS current
+  			DESCRIPTION
+  			"Delay in milliseconds between two protections. See also hm2NetACDMaxProtection."
+  		    DEFVAL	{ 10000 }			
+  			::= { hm2NetACDGroup 11 }
+  			
+hm2NetACDFaultState OBJECT-TYPE
+			SYNTAX INTEGER {
+				true(1),
+				false(2)
+			}
+  			MAX-ACCESS read-only
+  			STATUS current
+  			DESCRIPTION
+  			"true(1) if an active address conflict is detected.
+  			false(2) if no present address conflict."
+  			::= { hm2NetACDGroup 13 }
+  			
+hm2NetACDTrapEnable		OBJECT-TYPE
+			SYNTAX      HmEnabledStatus
+			MAX-ACCESS  read-write
+			STATUS      current
+			DESCRIPTION
+				"If enabled this trap reports an address conflict."
+ 			DEFVAL { enable }      
+			::= { hm2NetACDGroup 15 }
+
+-- ACD address conflict table 	
+hm2NetACDAddrTable OBJECT-TYPE
+		    SYNTAX      SEQUENCE OF Hm2NetACDAddrEntry
+		    MAX-ACCESS  not-accessible
+		    STATUS      current
+		    DESCRIPTION
+		            "This table contains address conflict detection information
+		             on the local system known to this agent."
+		    ::= { hm2NetACDGroup 20 }
+
+hm2NetACDAddrEntry OBJECT-TYPE
+		    SYNTAX      Hm2NetACDAddrEntry
+		    MAX-ACCESS	not-accessible
+		    STATUS      current
+		    DESCRIPTION
+		            "IP Address conflict detection information about a particular 
+		            address on the local system known to this agent.
+		            There may be multiple addresses configured on the system.
+		            Entries may be created and deleted in this table by the
+		            agent."
+		    INDEX   { hm2NetACDTimeMark }
+		    ::= { hm2NetACDAddrTable 1 }
+
+Hm2NetACDAddrEntry ::= SEQUENCE {
+			hm2NetACDTimeMark	TimeFilter,
+			hm2NetACDAddrType	InetAddressType,
+			hm2NetACDIPAddr		InetAddress,
+			hm2NetACDMAC		MacAddress,
+			hm2NetACDifIndex	InterfaceIndex
+}
+
+hm2NetACDTimeMark  OBJECT-TYPE
+			SYNTAX      TimeFilter
+			MAX-ACCESS	read-only
+		    STATUS      current
+		    DESCRIPTION
+		            "A TimeFilter for this entry.  See the TimeFilter textual
+		            convention in IETF RFC 2021 and 
+		            http://www.ietf.org/IESG/Implementations/RFC2021-Implementation.txt
+		            to see how TimeFilter works."
+		    REFERENCE 
+		            "IETF RFC 2021 section 6"
+		    ::= { hm2NetACDAddrEntry 1 }
+    
+hm2NetACDAddrType  OBJECT-TYPE
+		    SYNTAX      InetAddressType
+		    MAX-ACCESS 	read-only
+		    STATUS      current
+		    DESCRIPTION
+            	"Local IP Address Type"
+		    ::= { hm2NetACDAddrEntry 3 }
+
+hm2NetACDIPAddr  OBJECT-TYPE
+		    SYNTAX      InetAddress
+		    MAX-ACCESS 	read-only
+		    STATUS      current
+		    DESCRIPTION
+		            "IP address used to identify the management address
+					component associated with the local system."
+		    ::= { hm2NetACDAddrEntry 5 }
+
+hm2NetACDMAC  OBJECT-TYPE
+		    SYNTAX      MacAddress
+		    MAX-ACCESS 	read-only
+		    STATUS      current
+		    DESCRIPTION
+            	"The physical address of the device that was detected 
+            	causing the ip address conflict."
+
+		    ::= { hm2NetACDAddrEntry 7 }
+
+hm2NetACDifIndex  OBJECT-TYPE
+		    SYNTAX      InterfaceIndex
+		    MAX-ACCESS 	read-only
+		    STATUS      current
+		    DESCRIPTION
+            	"The interface index on the local system 
+            	where the ip address conflict was detected."
+
+		    ::= { hm2NetACDAddrEntry 9 }		    
+
+--
+-- *************************************************************
+-- hm2NetMacGroup
+-- *************************************************************
+--
+
+hm2NetLocalBurnedInMacAddr	OBJECT-TYPE
+			SYNTAX		MacAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"Physical base address (MAC address) of the agent.
+					 This is the burned in MAC address from the production"
+			::= { hm2NetMacGroup 1 }
+
+hm2NetLocalAdminMacAddress	OBJECT-TYPE
+			SYNTAX		MacAddress
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"The switch's network locally administered MAC address.
+					 This is the locally MAC address from the administrator. If
+					 the hm2NetLocalAdminMacAddress is nonzero, the device starts 
+					 with this MAC address at the next boot.
+					 If the variable is changed, they must be stored by the 
+					 configuration manager. 
+					 A MAC address with a set multicast bit will not be accepted"
+			DEFVAL { '000000000000'h }
+			::= { hm2NetMacGroup 2 }
+
+hm2NetMacAddressType	OBJECT-TYPE
+			SYNTAX		INTEGER {
+								burned-in(1),
+								local(2)
+						}
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"Shows the currently used MAC address at boot time.
+					The device starts with the burned in MAC address when 
+					hm2NetLocalAdminMacAddress is zero, otherwise with the 
+					Local-Admin-MAC-Address." 
+			::= { hm2NetMacGroup 3 }
+
+
+--
+-- *************************************************************
+-- hm2NetHiDiscoveryGroup
+-- *************************************************************
+--
+
+hm2NetHiDiscoveryOperation 	OBJECT-TYPE
+			SYNTAX			HmEnabledStatus
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+				"Enables/disables the HiDiscovery protocol
+				on this device.
+				This protocol allows a remote host to detect
+				devices without an IP configuration.
+				It also allows the host to set IP parameters,
+				like the ip address, the netmask and 
+				the gateway address."
+			DEFVAL  		{ enable }
+			::= { hm2NetHiDiscoveryGroup 1 }
+
+hm2NetHiDiscoveryMode 		OBJECT-TYPE
+			SYNTAX			INTEGER {
+								readWrite(1),
+								readOnly(2)
+							}
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+				"In the read only mode only detecting and 
+				reading the IP parameters is permitted.
+				The read write mode gives full access to
+				the device."
+			DEFVAL  		{ readWrite }
+			::= { hm2NetHiDiscoveryGroup 2 }
+
+hm2NetHiDiscoveryBlinking	OBJECT-TYPE
+			SYNTAX			HmEnabledStatus
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+				"Enables/disables the HiDiscovery blinking sequence
+				on this device. This object will not be saved."
+			DEFVAL  		{ disable }
+			::= { hm2NetHiDiscoveryGroup 3 }
+
+hm2NetHiDiscoveryProtocol	OBJECT-TYPE
+			SYNTAX			BITS { none(0), v1(1), v2(2) }
+			MAX-ACCESS		read-only
+			STATUS			current
+			DESCRIPTION
+				"Shows the HiDiscovery protocols supported by the device."
+			::= { hm2NetHiDiscoveryGroup 4 }
+			
+hm2NetHiDiscoveryRelay	    OBJECT-TYPE
+			SYNTAX			HmEnabledStatus
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+				"Relay/bridge HiDiscovery frames."
+			DEFVAL  		{ enable }
+			::= { hm2NetHiDiscoveryGroup 5 }
+
+--
+-- *************************************************************
+-- hm2NetMacACDGroup
+-- *************************************************************
+--
+hm2NetMacACDStatus OBJECT-TYPE
+			SYNTAX  HmEnabledStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+         	"Sets the status of the MAC address conflict detection mechanism on this device."
+			DEFVAL { disable }				
+			::= { hm2NetMacACDGroup 1 }
+
+hm2NetMacACDConflictAddress	OBJECT-TYPE
+			SYNTAX		MacAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"MAC address in case of a conflict."					 
+			::= { hm2NetMacACDGroup 2 }
+
+-- 
+-- ***********************************************************
+-- hm2NetConfigMibNotifications
+-- ***********************************************************
+hm2NetACDNotification NOTIFICATION-TYPE
+		OBJECTS	{ hm2NetACDTimeMark, hm2NetACDAddrType, hm2NetACDIPAddr, hm2NetACDMAC, hm2NetACDifIndex }
+		STATUS  current
+		DESCRIPTION	
+		"This trap reports an address conflict."
+		::= { hm2NetConfigMibNotifications 1 }
+
+hm2NetMacACDNotification NOTIFICATION-TYPE
+		OBJECTS	{ ifIndex, hm2NetMacACDConflictAddress }
+		STATUS  current
+		DESCRIPTION	
+		"This trap reports a MAC address conflict with it's own MAC address."
+		::= { hm2NetConfigMibNotifications 2 }
+
+--
+-- *************************************************************
+-- hm2NetOobMgmtGroup
+-- *************************************************************
+--
+hm2NetOobMgmtAdminState		OBJECT-TYPE
+			SYNTAX  		HmEnabledStatus
+			MAX-ACCESS 		read-write
+			STATUS 			current
+			DESCRIPTION
+         			"The status of the Out-of-band management on this device."
+			DEFVAL { enable }				
+			::= { hm2NetOobMgmtGroup 1 }
+
+hm2NetOobMgmtProtocol	OBJECT-TYPE
+			SYNTAX		INTEGER {
+								none(1),
+								bootp(2),
+								dhcp(3)
+						}
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"The switch's out-of-band network configuration protocol.
+					 The default value is dependent of the device type."
+			DEFVAL { none }
+			::= { hm2NetOobMgmtGroup 2 }
+
+hm2NetOobMgmtIPAddrType	OBJECT-TYPE
+			SYNTAX		InetAddressType
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Out-of-band IP address type."
+			DEFVAL { ipv4 }
+			::= { hm2NetOobMgmtGroup 3 }
+
+hm2NetOobMgmtIPAddr		OBJECT-TYPE
+			SYNTAX		InetAddress
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Out-of-band IP address of the management agent board.
+					Changing this value will take effect after activating
+					with hm2NetOobMgmtAction."
+			DEFVAL { '00000000'H }
+			::= { hm2NetOobMgmtGroup 4 }
+
+hm2NetOobMgmtPrefixLength		OBJECT-TYPE
+			SYNTAX		InetAddressPrefixLength
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"The length of the IP netmask."
+			DEFVAL { 0 }
+			::= { hm2NetOobMgmtGroup 5 }
+
+hm2NetOobMgmtGatewayIPAddrType	OBJECT-TYPE
+			SYNTAX		InetAddressType
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Out-of-band default gateway IP address type."
+			DEFVAL { ipv4 }
+			::= { hm2NetOobMgmtGroup 6 }
+
+hm2NetOobMgmtGatewayIPAddr		OBJECT-TYPE
+			SYNTAX		InetAddress
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Out-of-band IP address of the default gateway.
+					 Changing this value will take effect after activating
+					 with hm2NetOobMgmtAction."
+			DEFVAL { '00000000'H }
+			::= { hm2NetOobMgmtGroup 7 }
+
+hm2NetOobMgmtMacAddress		OBJECT-TYPE
+			SYNTAX		MacAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"Out-of-band MAC address of the interface."
+			::= { hm2NetOobMgmtGroup 8 }
+
+hm2NetOobMgmtOperState		OBJECT-TYPE
+			SYNTAX		INTEGER {
+								up (1),
+								down (2)
+						}
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"Out-of-band interface current operational state."
+			::= { hm2NetOobMgmtGroup 9 }
+			
+hm2NetOobMgmtDHCPClientLeaseTime OBJECT-TYPE
+			SYNTAX  Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+					"Displays the remaining lease of the management(OOB) IP time in seconds."
+			::= { hm2NetOobMgmtGroup 10 }
+
+hm2NetOobMgmtAction		OBJECT-TYPE
+			SYNTAX		INTEGER {
+								other (1),
+								activate (2)
+						}
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"This object, when read, always returns a value of other(1).
+					Setting the object to activate(2) causes a reconfiguration
+					of the out-of-band IP protocol stack with the current values of 
+					hm2NetOobMgmtLocalIPAddr, hm2NetOobMgmtPrefixLength and hm2NetOobMgmtGatewayIPAddr."
+			DEFVAL { other }
+			::= { hm2NetOobMgmtGroup 50 }
+
+
+--
+-- *************************************************************
+-- hm2NetOobUsbMgmtGroup
+-- *************************************************************
+--
+hm2NetOobUsbMgmtAdminState		OBJECT-TYPE
+			SYNTAX  		HmEnabledStatus
+			MAX-ACCESS 		read-write
+			STATUS 			current
+			DESCRIPTION
+         			"The status of the USB Out-of-band management on this device."
+			DEFVAL { enable }				
+			::= { hm2NetOobUsbMgmtGroup 1 }
+
+hm2NetOobUsbMgmtIPAddrType	OBJECT-TYPE
+			SYNTAX		InetAddressType
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"USB Out-of-band Device IP address type."
+			DEFVAL { ipv4 }
+			::= { hm2NetOobUsbMgmtGroup 3 }
+
+hm2NetOobUsbMgmtIPAddr		OBJECT-TYPE
+			SYNTAX		InetAddress
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"USB Out-of-band device IP address.
+					Changing this value will take effect after activating
+					with hm2NetOobUsbMgmtAction."
+			DEFVAL { '00000000'H }
+			::= { hm2NetOobUsbMgmtGroup 4 }
+
+hm2NetOobUsbMgmtPrefixLength		OBJECT-TYPE
+			SYNTAX		InetAddressPrefixLength
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"The length of the IP netmask."
+			DEFVAL { 0 }
+			::= { hm2NetOobUsbMgmtGroup 5 }
+
+hm2NetOobUsbMgmtHostMacAddress		OBJECT-TYPE
+			SYNTAX		MacAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"USB Out-of-band MAC address of the host interface."
+			::= { hm2NetOobUsbMgmtGroup 7 }
+
+hm2NetOobUsbMgmtDeviceMacAddress		OBJECT-TYPE
+			SYNTAX		MacAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"USB Out-of-band MAC address of the device interface."
+			::= { hm2NetOobUsbMgmtGroup 8 }
+
+hm2NetOobUsbMgmtAction		OBJECT-TYPE
+			SYNTAX		INTEGER {
+								other (1),
+								activate (2)
+						}
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"This object, when read, always returns a value of other(1).
+					Setting the object to activate(2) causes a reconfiguration
+					of the USB out-of-band IP protocol stack with the current values of 
+					hm2NetOobUsbMgmtLocalIPAddr and hm2NetOobUsbMgmtPrefixLength."
+			DEFVAL { other }
+			::= { hm2NetOobUsbMgmtGroup 50 }
+
+END
+

@@ -1,0 +1,4798 @@
+HM2-PLATFORM-ROUTING-MIB DEFINITIONS ::= BEGIN
+
+-- 
+-- ***********************************************************
+-- Hirschmann Platform Routing MIB
+-- ***********************************************************
+--
+
+	IMPORTS
+		hm2PlatformMibs, HmEnabledStatus
+			FROM HM2-TC-MIB
+		ifIndex, InterfaceIndex, InterfaceIndexOrZero
+			FROM IF-MIB
+		InetAddress, InetAddressType, InetAddressIPv4
+			FROM INET-ADDRESS-MIB
+		ospfIfEntry, ospfNbrEntry, ospfVirtIfEntry, ospfAreaEntry, ospfIfMetricEntry, RouterID
+    		FROM OSPF-MIB
+    	VlanId
+			FROM Q-BRIDGE-MIB
+		vrrpOperVrId
+		    FROM VRRP-MIB			
+		PhysAddress
+			FROM RFC1213-MIB
+		rip2IfConfEntry
+			FROM RIPv2-MIB
+		TimeTicks, Integer32, Gauge32, 
+		IpAddress, Counter32, Unsigned32, MODULE-IDENTITY,
+		OBJECT-IDENTITY, OBJECT-TYPE
+			FROM SNMPv2-SMI
+		DisplayString, RowStatus, TruthValue
+			FROM SNMPv2-TC
+		SnmpAdminString     	
+			FROM SNMP-FRAMEWORK-MIB;
+
+--
+-- Node definitions
+--
+	 
+	hm2PlatformRouting MODULE-IDENTITY
+		LAST-UPDATED "201109080000Z"		-- September 8, 2011 at 00:00 GMT (201109080000Z)
+		ORGANIZATION
+			"Hirschmann Automation and Control GmbH"
+		CONTACT-INFO
+			"Postal:     Stuttgarter Str. 45-51
+			72654 Neckartenzlingen
+			Germany
+			Phone:      +49 7127 140
+			E-mail:     hac.support@belden.com"
+		DESCRIPTION
+			"The Hirschmann Platform2 MIB for Layer3 Switching.
+			Copyright (C) 2011. All Rights Reserved."
+		REVISION "201109080000Z"		-- September 8, 2011 at 00:00 GMT (201109080000Z)
+		DESCRIPTION
+			"Initial version."
+	::= { hm2PlatformMibs 2 }
+
+--
+-- hm2AgentSwitchArpGroup
+--	 
+	hm2AgentSwitchArpGroup OBJECT IDENTIFIER ::= { hm2PlatformRouting 1 }
+	 
+	hm2AgentSwitchArpAgeoutTime OBJECT-TYPE
+		SYNTAX Integer32 (15..21600)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"HiOS: Configures the exact ARP entry age-out time in seconds.
+			 HiSecOS: Configures the average ARP entry age-out time in seconds, with each
+			   entry aging out after a random time between 0.5*hm2AgentSwitchArpAgeoutTime
+			   and 1.5*hm2AgentSwitchArpAgeoutTime."
+		DEFVAL { 1200 } 
+	::= { hm2AgentSwitchArpGroup 1 }
+
+	 
+	hm2AgentSwitchArpResponseTime OBJECT-TYPE
+		SYNTAX Integer32 (1..10)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Configures the ARP request response timeout in seconds.
+			Allowable range: 1-10"
+		DEFVAL	{ 1 }
+	::= { hm2AgentSwitchArpGroup 2 }
+
+	 
+	hm2AgentSwitchArpMaxRetries OBJECT-TYPE
+		SYNTAX Integer32 (0..10)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Configures the ARP count of maximum request for retries.
+			Allowable range: 0-10"
+		DEFVAL	{ 4 }
+	::= { hm2AgentSwitchArpGroup 3 }
+
+	 
+	hm2AgentSwitchArpCacheSize OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Configures the ARP maximum number of entries in the cache.
+			Allowable range is platform specific."
+	::= { hm2AgentSwitchArpGroup 4 }
+
+	 
+	hm2AgentSwitchArpDynamicRenew OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This indicates the current setting of ARP dynamic renew mode."
+		DEFVAL { disable }
+	::= { hm2AgentSwitchArpGroup 5 }
+
+	 
+	hm2AgentSwitchArpTotalEntryCountCurrent OBJECT-TYPE
+		SYNTAX Gauge32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Current number of entries in the ARP cache."
+	::= { hm2AgentSwitchArpGroup 6 }
+
+	 
+	hm2AgentSwitchArpTotalEntryCountPeak OBJECT-TYPE
+		SYNTAX Gauge32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Peak number of entries recorded in the ARP cache over
+			time.  This value is restarted whenever the ARP cache
+			size is changed."
+	::= { hm2AgentSwitchArpGroup 7 }
+
+	 
+	hm2AgentSwitchArpStaticEntryCountCurrent OBJECT-TYPE
+		SYNTAX Gauge32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Current number of configured static ARP entries."
+	::= { hm2AgentSwitchArpGroup 8 }
+
+	 
+	hm2AgentSwitchArpStaticEntryCountMax OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Maximum number of configurable static ARP entries."
+	::= { hm2AgentSwitchArpGroup 9 }
+
+	 
+	hm2AgentSwitchLocalProxyArpTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentSwitchLocalProxyArpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table contains the per-interface configuration
+			parameters for local proxy ARP."
+	::= { hm2AgentSwitchArpGroup 11 }
+
+	 
+	hm2AgentSwitchLocalProxyArpEntry OBJECT-TYPE
+		SYNTAX Hm2AgentSwitchLocalProxyArpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Represents a logical row in the
+			hm2AgentSwitchLocalProxyArpTable."
+		INDEX { ifIndex } 
+	::= { hm2AgentSwitchLocalProxyArpTable 1 }
+
+
+	Hm2AgentSwitchLocalProxyArpEntry ::= SEQUENCE
+		{
+		hm2AgentSwitchLocalProxyArpMode INTEGER
+		}
+
+	 
+	hm2AgentSwitchLocalProxyArpMode OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The local proxy ARP mode for the interface."
+		DEFVAL	{ disable }
+	::= { hm2AgentSwitchLocalProxyArpEntry 1 }
+
+	 
+	hm2AgentSwitchIntfArpTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentSwitchIntfArpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table augments the MIB-II ipNetToMediaTable by providing
+			per-interface ARP entry information."
+	::= { hm2AgentSwitchArpGroup 12 }
+
+	 
+	hm2AgentSwitchIntfArpEntry OBJECT-TYPE
+		SYNTAX Hm2AgentSwitchIntfArpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table augments the MIB-II ipNetToMediaTable by providing
+			per-interface ARP entry information."
+		INDEX { hm2AgentSwitchIntfArpIpAddress, hm2AgentSwitchIntfArpIfIndex } 
+	::= { hm2AgentSwitchIntfArpTable 1 }
+
+
+	Hm2AgentSwitchIntfArpEntry ::= SEQUENCE
+		{
+		hm2AgentSwitchIntfArpIpAddress 		IpAddress,
+		hm2AgentSwitchIntfArpIfIndex 		InterfaceIndex,
+		hm2AgentSwitchIntfArpAge 			TimeTicks,
+		hm2AgentSwitchIntfArpMacAddress 	PhysAddress,
+		hm2AgentSwitchIntfArpType 			INTEGER,
+		hm2AgentSwitchIntfArpStatus 		RowStatus
+		}
+
+	 
+	hm2AgentSwitchIntfArpIpAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The Type of Address assigned to this interface."
+	::= { hm2AgentSwitchIntfArpEntry 1 }
+
+	 
+	hm2AgentSwitchIntfArpIfIndex OBJECT-TYPE
+		SYNTAX InterfaceIndex
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The Associated IfIndex which identified the ARP Entry.
+			This value must be specified for static ARP entries on an
+			unnumbered interface"
+	::= { hm2AgentSwitchIntfArpEntry 2 }
+
+	 
+	hm2AgentSwitchIntfArpAge OBJECT-TYPE
+		SYNTAX TimeTicks
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This defines the time (in seconds) since the ARP entry 
+			was last refreshed.  This value is 0 for ARP entries of
+			type local(1) or static(3), since these entries are 
+			not subject to aging."
+	::= { hm2AgentSwitchIntfArpEntry 3 }
+
+	 
+	hm2AgentSwitchIntfArpMacAddress OBJECT-TYPE
+		SYNTAX PhysAddress
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The hardware MAX Address that each interface maps to."
+	::= { hm2AgentSwitchIntfArpEntry 4 }
+
+	 
+	hm2AgentSwitchIntfArpType OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			local(1),
+			gateway(2),
+			static(3),
+			dynamic(4)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The type of ARP entry."
+	::= { hm2AgentSwitchIntfArpEntry 5 }
+
+	 
+	hm2AgentSwitchIntfArpStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The status of this ARP entry.  Setting this object destroy will remove the entry."
+	::= { hm2AgentSwitchIntfArpEntry 6 }
+
+	 
+	hm2AgentSwitchArpSparseLearn OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This indicates the current setting of ARP sparse learn mode. "
+		DEFVAL { enable }
+	::= { hm2AgentSwitchArpGroup 100 }
+
+	 
+	hm2AgentSwitchArpCacheClear OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			other(1),
+			flushARP(2),
+			flushARPWithGateway(3)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Setting the object to 'flushARP' will flush the ARP cache.
+			Setting the object to 'flushARPWithGateway' will also flush
+			the ARP cache but includes the ARP entries that are used by
+			gateways of routes.
+			Reading the object always returns 'other'."
+	::= { hm2AgentSwitchArpGroup 101 }
+
+	hm2AgentSwitchProxyArpMaxResponseDelay OBJECT-TYPE
+		SYNTAX Integer32 (0|1..1000)
+		UNITS       "milli-seconds"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Configures the maximum time in ms to wait before a proxy
+			response is sent. Setting this to 0 determines a response
+			to be sent immediately."
+		DEFVAL { 800 }
+	::= { hm2AgentSwitchArpGroup 248 }
+
+--
+-- hm2AgentSwitchIpGroup
+--	 
+	hm2AgentSwitchIpGroup OBJECT IDENTIFIER ::= { hm2PlatformRouting 2 }
+
+	 
+	hm2AgentSwitchIpRoutingMode OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Administratively enables/disables routing on the switch."
+		DEFVAL { disable }
+	::= { hm2AgentSwitchIpGroup 1 }
+
+		 
+	hm2AgentSwitchIpDefaultGateway OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Specifies the default gateway manually configured."
+	::= { hm2AgentSwitchIpGroup 2 }
+
+	 
+	hm2AgentSwitchIpInterfaceTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentSwitchIpInterfaceEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"IP interface table."
+	::= { hm2AgentSwitchIpGroup 3 }
+
+	 
+	hm2AgentSwitchIpInterfaceEntry OBJECT-TYPE
+		SYNTAX Hm2AgentSwitchIpInterfaceEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"IP interface entry."
+		INDEX { hm2AgentSwitchIpInterfaceIfIndex } 
+	::= { hm2AgentSwitchIpInterfaceTable 1 }
+
+
+	Hm2AgentSwitchIpInterfaceEntry ::= SEQUENCE
+		{
+		hm2AgentSwitchIpInterfaceIfIndex 			InterfaceIndex,
+		hm2AgentSwitchIPAddressConfigMethod 		INTEGER,
+		hm2AgentSwitchIpInterfaceIpAddress 			IpAddress,
+		hm2AgentSwitchIpInterfaceNetMask 			IpAddress,
+		hm2AgentSwitchIpInterfaceClearIp 			HmEnabledStatus,
+		hm2AgentSwitchIpInterfaceRoutingMode 		HmEnabledStatus,
+		hm2AgentSwitchIpInterfaceProxyARPMode 		HmEnabledStatus,
+		hm2AgentSwitchIpInterfaceMtuValue 			Unsigned32,
+		hm2AgentSwitchIpInterfaceBandwidth 			Unsigned32,
+		hm2AgentSwitchIpInterfaceUnnumberedIfIndex 	InterfaceIndexOrZero,
+		hm2AgentSwitchIpInterfaceIcmpUnreachables 	HmEnabledStatus,
+		hm2AgentSwitchIpInterfaceIcmpRedirects 		HmEnabledStatus,
+		hm2AgentSwitchDhcpOperation 				INTEGER,
+		hm2AgentSwitchIpInterfaceSuppressed 		INTEGER,
+		hm2AgentSwitchIpInterfaceNumberOfFlaps		Unsigned32,
+		hm2AgentSwitchIpInterfaceCurrentPenalty 	Unsigned32,
+		hm2AgentSwitchIpInterfaceReUseTime 			Unsigned32,
+		hm2AgentSwitchIpInterfaceNetdirectedBCMode 	HmEnabledStatus
+		}
+
+	 
+	hm2AgentSwitchIpInterfaceIfIndex OBJECT-TYPE
+		SYNTAX InterfaceIndex
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The IfIndex associated with this instance."
+	::= { hm2AgentSwitchIpInterfaceEntry 1 }
+
+	 
+	hm2AgentSwitchIPAddressConfigMethod OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			none(0),
+			manual(1),
+			dhcp(2)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The source of the IP address. User can set the object to none(0) or dhcp(2).
+			Option dhcp(2) enables DHCP client on the interface.
+			Option none(0) disables DHCP client on the interface.
+			Get on this object returns manual(1) only when the interface has a manually configured address."
+	::= { hm2AgentSwitchIpInterfaceEntry 2 }
+
+	 
+	hm2AgentSwitchIpInterfaceIpAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The IP address assigned to this interface. When setting this value,
+			the value of hm2AgentSwitchIpInterfaceNetMask must be set at the same time."
+	::= { hm2AgentSwitchIpInterfaceEntry 3 }
+
+	 
+	hm2AgentSwitchIpInterfaceNetMask OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The netmask assigned to this interface. When setting this value, the 
+			value of hm2AgentSwitchIpInterfaceIpAddress must be set at the same time."
+	::= { hm2AgentSwitchIpInterfaceEntry 4 }
+
+	 
+	hm2AgentSwitchIpInterfaceClearIp OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"When setting this object to 'enable(1)' the interfaces IP address and netmask will
+			be set back to 0.0.0.0. Reading this object always returns 'disable(2)."
+	::= { hm2AgentSwitchIpInterfaceEntry 5 }
+
+	 
+	hm2AgentSwitchIpInterfaceRoutingMode OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Enables or disables routing for this interface."
+		DEFVAL	{ disable }
+	::= { hm2AgentSwitchIpInterfaceEntry 6 }
+
+	 
+	hm2AgentSwitchIpInterfaceProxyARPMode OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Enables or disables proxy ARP for this interface."
+		DEFVAL	{ disable }
+	::= { hm2AgentSwitchIpInterfaceEntry 7 }
+
+	 
+	hm2AgentSwitchIpInterfaceMtuValue OBJECT-TYPE
+		SYNTAX Unsigned32 (0 | 68..12266)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Configures the MTU value for this interface. The applicable range is 
+			68 to the <interface MTU value - 18>, in bytes. Get of this object 
+			returns the effective MTU value on the interface. Set of this object 
+			with a value of 0 resets the MTU to the default IP MTU value on the 
+			interface. If a packet is received where the size exceeds the mtu
+			value, an icmp destination unreachable message is sent back to the
+			sender with the current mtu."
+	::= { hm2AgentSwitchIpInterfaceEntry 8 }
+
+	 
+	hm2AgentSwitchIpInterfaceBandwidth OBJECT-TYPE
+		SYNTAX Unsigned32 (0..10000000)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Configures the bandwidth value for this interface. If the returned value is 0,
+			bandwidth for this interface is not configured."
+	::= { hm2AgentSwitchIpInterfaceEntry 9 }
+
+	 
+	hm2AgentSwitchIpInterfaceUnnumberedIfIndex OBJECT-TYPE
+		SYNTAX InterfaceIndexOrZero
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"If this object is non-zero, it indicates that the interface is unnumbered
+			and specifies which interface the address is borrowed from."
+	::= { hm2AgentSwitchIpInterfaceEntry 10 }
+
+	 
+	hm2AgentSwitchIpInterfaceIcmpUnreachables OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"If this object is enabled, it indicates that ICMP unreachables can be sent on this
+			interface."
+		DEFVAL	{ enable }
+	::= { hm2AgentSwitchIpInterfaceEntry 11 }
+
+	 
+	hm2AgentSwitchIpInterfaceIcmpRedirects OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"If this object is enabled and hm2AgentSwitchIpIcmpRedirectsMode is also enabled, ICMP redirects
+			can be sent on this interface."
+		DEFVAL	{ enable }
+	::= { hm2AgentSwitchIpInterfaceEntry 12 }
+
+	 
+	hm2AgentSwitchDhcpOperation OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			renew(1),
+			release(2),
+			none(3)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Renew or release the IP address learned through DHCP.
+			Get on this object always gives none. None means no operation is performed on DHCP."
+	::= { hm2AgentSwitchIpInterfaceEntry 13 }
+
+	 
+	hm2AgentSwitchIpInterfaceSuppressed OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			unsuppressed(0),
+			suppressed(1)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" This mib variable contains the following values, which has the meaning as:
+			'unsuppressed'     - The interface is not suppressed
+			'suppressed'         - The interface is suppressed
+			"
+	::= { hm2AgentSwitchIpInterfaceEntry 14 }
+
+	 
+	hm2AgentSwitchIpInterfaceNumberOfFlaps OBJECT-TYPE
+		SYNTAX Unsigned32 (0..4294967295)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This mib variable displays the number of flaps occurred on the interface"
+	::= { hm2AgentSwitchIpInterfaceEntry 15 }
+
+	 
+	hm2AgentSwitchIpInterfaceCurrentPenalty OBJECT-TYPE
+		SYNTAX Unsigned32 (0..20000)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This mib variable displays the current penalty of an interface"
+	::= { hm2AgentSwitchIpInterfaceEntry 16 }
+
+	 
+	hm2AgentSwitchIpInterfaceReUseTime OBJECT-TYPE
+		SYNTAX Unsigned32 (0..255)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This mib variable displays the number of seconds until the interface is  
+			allowed to come up "
+	::= { hm2AgentSwitchIpInterfaceEntry 17 }
+
+	 
+	hm2AgentSwitchIpInterfaceNetdirectedBCMode OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Enables or disables netdirected broadcasts for this interface."
+		DEFVAL { disable }
+	::= { hm2AgentSwitchIpInterfaceEntry 248 }
+
+	 
+	hm2AgentSwitchIpRouterDiscoveryTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentSwitchIpRouterDiscoveryEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"There is no global administrative flag for router discovery.  The global
+			routing flag (hm2AgentSwitchIpRoutingMode) will be used for this purpose.  If routing
+			is disabled, router discovery is disabled as well."
+	::= { hm2AgentSwitchIpGroup 4 }
+
+	 
+	hm2AgentSwitchIpRouterDiscoveryEntry OBJECT-TYPE
+		SYNTAX Hm2AgentSwitchIpRouterDiscoveryEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		INDEX { hm2AgentSwitchIpRouterDiscoveryIfIndex } 
+	::= { hm2AgentSwitchIpRouterDiscoveryTable 1 }
+
+
+	Hm2AgentSwitchIpRouterDiscoveryEntry ::= SEQUENCE
+		{
+		hm2AgentSwitchIpRouterDiscoveryIfIndex 					Integer32,
+		hm2AgentSwitchIpRouterDiscoveryAdvertiseMode 			INTEGER,
+		hm2AgentSwitchIpRouterDiscoveryMaxAdvertisementInterval Integer32,
+		hm2AgentSwitchIpRouterDiscoveryMinAdvertisementInterval Integer32,
+		hm2AgentSwitchIpRouterDiscoveryAdvertisementLifetime 	Integer32,
+		hm2AgentSwitchIpRouterDiscoveryPreferenceLevel 			Integer32,
+		hm2AgentSwitchIpRouterDiscoveryAdvertisementAddress 	IpAddress
+		}
+
+	 
+	hm2AgentSwitchIpRouterDiscoveryIfIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..2147483647)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Interface Number to configure Router Discovery on."
+	::= { hm2AgentSwitchIpRouterDiscoveryEntry 1 }
+
+	 
+	hm2AgentSwitchIpRouterDiscoveryAdvertiseMode OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Enable or disable router discovery on the interface."
+		DEFVAL { disable }
+	::= { hm2AgentSwitchIpRouterDiscoveryEntry 2 }
+
+	 
+	hm2AgentSwitchIpRouterDiscoveryMaxAdvertisementInterval OBJECT-TYPE
+		SYNTAX Integer32 (4..1800)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Maximum time allowed between sending router advertisements 
+			from the interface."
+		DEFVAL { 600 } 
+	::= { hm2AgentSwitchIpRouterDiscoveryEntry 3 }
+
+	 
+	hm2AgentSwitchIpRouterDiscoveryMinAdvertisementInterval OBJECT-TYPE
+		SYNTAX Integer32 (3..1800)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Minimum time allowed between sending router advertisements from the interface.
+			
+			This value must be less than or equal to 
+			hm2AgentSwitchIpRouterDiscoveryMaxAdvertisementInterval."
+		DEFVAL { 450 } 
+	::= { hm2AgentSwitchIpRouterDiscoveryEntry 4 }
+
+	 
+	hm2AgentSwitchIpRouterDiscoveryAdvertisementLifetime OBJECT-TYPE
+		SYNTAX Integer32 (4..9000)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Value of lifetime field of router advertsisement sent from 
+			the interface.
+			
+			This value must be greater than or equal to 
+			hm2AgentSwitchIpRouterDiscoveryMaxAdvertisementInterval."
+		DEFVAL { 1800 } 
+	::= { hm2AgentSwitchIpRouterDiscoveryEntry 5 }
+
+	 
+	hm2AgentSwitchIpRouterDiscoveryPreferenceLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Preferability of the address as a default router address,
+			related to other addresses on the same subnet.  This is defined
+			as the larger the number, the higher the preference."
+		DEFVAL { 0 } 
+	::= { hm2AgentSwitchIpRouterDiscoveryEntry 6 }
+
+	 
+	hm2AgentSwitchIpRouterDiscoveryAdvertisementAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Address used when sending router advertisements from the interface."
+		DEFVAL { 'E0000001'h } 
+	::= { hm2AgentSwitchIpRouterDiscoveryEntry 7 }
+
+	 
+	hm2AgentSwitchIpVlanTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentSwitchIpVlanEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A static VLAN for which routing can be enabled/disabled."
+	::= { hm2AgentSwitchIpGroup 5 }
+
+	 
+	hm2AgentSwitchIpVlanEntry OBJECT-TYPE
+		SYNTAX Hm2AgentSwitchIpVlanEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A static VLAN for which routing can be enabled/disabled."
+		INDEX { hm2AgentSwitchIpVlanId } 
+	::= { hm2AgentSwitchIpVlanTable 1 }
+
+
+	Hm2AgentSwitchIpVlanEntry ::= SEQUENCE
+		{
+		hm2AgentSwitchIpVlanId VlanId,
+		hm2AgentSwitchIpVlanIfIndex InterfaceIndex,
+		hm2AgentSwitchIpVlanRoutingStatus RowStatus
+		}
+
+	 
+	hm2AgentSwitchIpVlanId OBJECT-TYPE
+		SYNTAX VlanId
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The VLAN's ID."
+	::= { hm2AgentSwitchIpVlanEntry 1 }
+
+	 
+	hm2AgentSwitchIpVlanIfIndex OBJECT-TYPE
+		SYNTAX InterfaceIndex
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The IfIndex associated with this VLAN."
+	::= { hm2AgentSwitchIpVlanEntry 2 }
+
+	 
+	hm2AgentSwitchIpVlanRoutingStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Status of Routing mode per VLAN.
+			active(1)       - VLAN is enabled for routing
+			createAndGo(4)  - Adds VLAN entry for routing
+			createAndWait(5)  - Adds VLAN entry for routing
+			destroy(6)      - Removes VLAN from routing"
+	::= { hm2AgentSwitchIpVlanEntry 3 }
+
+	 
+	hm2AgentSwitchSecondaryAddressTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentSwitchSecondaryAddressEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Contains a list of secondary IP addresses associated with an interface."
+	::= { hm2AgentSwitchIpGroup 6 }
+
+	 
+	hm2AgentSwitchSecondaryAddressEntry OBJECT-TYPE
+		SYNTAX Hm2AgentSwitchSecondaryAddressEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A secondary IP address for a given interface. This IP address must not 
+			conflict with the IP address configured in the hm2AgentSwitchIpInterfaceTable."
+		INDEX { hm2AgentSwitchIpInterfaceIfIndex, hm2AgentSwitchSecondaryIpAddress } 
+	::= { hm2AgentSwitchSecondaryAddressTable 1 }
+
+
+	Hm2AgentSwitchSecondaryAddressEntry ::= SEQUENCE
+		{
+		hm2AgentSwitchSecondaryIpAddress 	IpAddress,
+		hm2AgentSwitchSecondaryNetMask 		IpAddress,
+		hm2AgentSwitchSecondaryStatus 		RowStatus
+		}
+
+	 
+	hm2AgentSwitchSecondaryIpAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The secondary IP address assigned to this interface."
+	::= { hm2AgentSwitchSecondaryAddressEntry 1 }
+
+	 
+	hm2AgentSwitchSecondaryNetMask OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The secondary netmask assigned to this interface. This value must be
+			set during creation and can not be changed."
+	::= { hm2AgentSwitchSecondaryAddressEntry 2 }
+
+	 
+	hm2AgentSwitchSecondaryStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Creates a new entry in the secondary address table.
+			Allowed values are:
+			createAndGo(4)  - Creates an entry in this table, associating the address
+					  with a given interface.  The hm2AgentSwitchSecondaryNetMask
+					  object must be set during creation.
+			
+			destroy(6)      - Removes the associated address from the interface."
+	::= { hm2AgentSwitchSecondaryAddressEntry 3 }
+
+--
+-- hm2AgentSwitchIpIcmpControlGroup
+--	 
+	hm2AgentSwitchIpIcmpControlGroup OBJECT IDENTIFIER ::= { hm2AgentSwitchIpGroup 8 }
+    hm2AgentSwitchIpIcmpEchoReplyMode OBJECT-TYPE
+				 SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Sets the administrative Echo Reply Mode."
+         DEFVAL 	{ enable }
+         ::= { hm2AgentSwitchIpIcmpControlGroup 1 }
+
+    hm2AgentSwitchIpIcmpRedirectsMode OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION 
+                     "Sets the administrative Mode for sending Redirects. "
+         DEFVAL 	{ enable }
+         ::= { hm2AgentSwitchIpIcmpControlGroup 2 }
+
+    hm2AgentSwitchIpIcmpRateLimitInterval OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         UNITS       "milli-seconds"
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "HiOS: Specifies the burst-interval parameter to calculate the average rate 
+					  (determined as interval/burst-size) which is the minimum time between subsequent
+					  ICMP packets for each destination. A granularity of less than 10ms is not
+					  guaranteed. The minimum possible configurable rate is 10. To disable the rate limit,
+					  set the interval to 0.
+                     HiSecOS: Specifies the average minimum time between subsequent ICMP packets for
+                      each destination, using a token bucket algorithm. In times without ICMP packets,
+                      the tokens accumulate to allow for bursts of up to hm2AgentSwitchIpIcmpRateLimitBurstSize
+					  packets. A granularity of less than 10ms is not guaranteed. the minimum possible configurable
+					  average time is 10. To disable the rate limit, set the interval to 0."
+         DEFVAL 	{ 1000 }
+         ::= { hm2AgentSwitchIpIcmpControlGroup 3 }
+
+    hm2AgentSwitchIpIcmpRateLimitBurstSize OBJECT-TYPE
+         SYNTAX      Integer32 (1..200)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "HiOS: Specifies the burst-size parameter to calculate the average rate 
+					 (interval/burst-size). A granularity of less than 10ms is not guaranteed.
+                     HiSecOS: The size of the token bucket, fixed at 6 tokens."
+         DEFVAL 	{ 100 }
+         ::= { hm2AgentSwitchIpIcmpControlGroup 4 }
+
+
+	hm2AgentSwitchIntfIpHelperAddressTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentSwitchIntfIpHelperAddressEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Contains a list of IP helper addresses associated with an interface."
+	::= { hm2AgentSwitchIpGroup 10 }
+
+	 
+	hm2AgentSwitchIpFirstActiveAddressType OBJECT-TYPE
+		SYNTAX InetAddressType 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The type of hm2AgentSwitchIpFirstActiveAddress."
+	::= { hm2AgentSwitchIpGroup 248 }
+	 
+    hm2AgentSwitchIpFirstActiveAddress OBJECT-TYPE
+       	SYNTAX InetAddress (SIZE(4|16))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The lowest ip address of any active routing interface."
+	::= { hm2AgentSwitchIpGroup 249 }
+	 
+	hm2AgentSwitchIpStaticDefaultPref OBJECT-TYPE
+       	SYNTAX Integer32 (1..255)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The default preference for static routes."
+		DEFVAL 	{ 1 }
+	::= { hm2AgentSwitchIpGroup 250 }
+
+		hm2AgentSwitchIpRouteCount OBJECT-TYPE
+        	SYNTAX      Unsigned32
+        	MAX-ACCESS  read-only
+        	STATUS      current
+        	DESCRIPTION
+                     "Number of routes configured on the switch."
+        ::= { hm2AgentSwitchIpGroup 251 }
+
+    	hm2AgentSwitchIpBestRouteCount OBJECT-TYPE
+        	SYNTAX      Unsigned32
+        	MAX-ACCESS  read-only
+        	STATUS      current
+        	DESCRIPTION
+                     "Number of best routes active on the switch."
+        ::= { hm2AgentSwitchIpGroup 252 }
+        
+        hm2AgentSwitchIpSourceRoutingMode OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Administratively enables/disables source routing on the switch."
+			DEFVAL { disable }
+		::= { hm2AgentSwitchIpGroup 253 }
+
+	 
+	hm2AgentSwitchIntfIpHelperAddressEntry OBJECT-TYPE
+		SYNTAX Hm2AgentSwitchIntfIpHelperAddressEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An IP helper address for a given interface."
+		INDEX { hm2AgentSwitchIpInterfaceIfIndex, hm2AgentSwitchIntfIpHelperUdpPort, 
+		hm2AgentSwitchIntfIpHelperIpAddress } 
+	::= { hm2AgentSwitchIntfIpHelperAddressTable 1 }
+
+
+	Hm2AgentSwitchIntfIpHelperAddressEntry ::= SEQUENCE
+		{
+		hm2AgentSwitchIntfIpHelperUdpPort 		Unsigned32,
+		hm2AgentSwitchIntfIpHelperIpAddress 	IpAddress,
+		hm2AgentSwitchIntfIpHelperHitCount 		Unsigned32,
+		hm2AgentSwitchIntfIpHelperStatus 		RowStatus
+		}
+
+	 
+	hm2AgentSwitchIntfIpHelperUdpPort OBJECT-TYPE
+		SYNTAX Unsigned32 (0..65535)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"UDP port number. Received packets with this destination UDP port
+			number are forwarded to the helper address in this entry.
+			A relay entry with port 0 allows dhcp, time, winnameserver, tacacs,
+			dns, tftp, netbios-ns and netbios-dgm relay."
+	::= { hm2AgentSwitchIntfIpHelperAddressEntry 1 }
+
+	 
+	hm2AgentSwitchIntfIpHelperIpAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An IP helper address for packets received on this interface. 
+			An address of 0.0.0.0 identifies the entry as a discard entry.
+			Packets that match a discard entry are dropped."
+	::= { hm2AgentSwitchIntfIpHelperAddressEntry 2 }
+
+	 
+	hm2AgentSwitchIntfIpHelperHitCount OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of times a packet has been forwarded or discarded according to this entry."
+	::= { hm2AgentSwitchIntfIpHelperAddressEntry 4 }
+
+	 
+	hm2AgentSwitchIntfIpHelperStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Creates a new entry in the Helper Address table.
+			Allowed values are:
+			
+			createAndGo(4)  - Creates an IP helper entry in this table.
+			
+			destroy(6)      - Removes the IP helper entry."
+	::= { hm2AgentSwitchIntfIpHelperAddressEntry 5 }
+
+    hm2AgentSwitchClearIpDefaultGateway OBJECT-TYPE
+         SYNTAX      INTEGER {
+                        enable(1),
+                        disable(2)
+                       }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                   "Resets the Global Default Gateway address."
+       ::= { hm2AgentSwitchIpGroup 11 }
+
+
+--
+-- hm2AgentRouterRipConfigGroup
+--	 
+	hm2AgentRouterRipConfigGroup OBJECT IDENTIFIER ::= { hm2PlatformRouting 3 }
+
+    hm2AgentRouterRipAdminState OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Sets the administrative mode of RIP in the router."
+         DEFVAL { disable }
+         ::= { hm2AgentRouterRipConfigGroup 1 }
+         
+    hm2AgentRouterRipSplitHorizonMode OBJECT-TYPE
+         SYNTAX      INTEGER 
+         			 {
+                     	none(1),
+                     	simple(2),
+                     	poisonReverse(3)
+                  	 }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Sets the RIP split horizon operating mode in the router.
+                      A value of none(1) means split horizon processing is
+                      disabled.  When set to simple(2), the simple split 
+                      horizon technique is used.  When set to poisonReverse(3),
+                      the split horizon with poison reverse technique is used.
+                      The default split horizon mode is simple(2)."
+         DEFVAL { simple }
+         ::= { hm2AgentRouterRipConfigGroup 2 }
+         
+    hm2AgentRouterRipAutoSummaryMode OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Sets the RIP auto summarization mode in the router.
+                      A value of enable(1) means that routes advertized by
+                      this RIP router are combined, or summarized, whenever
+                      possible into aggregates. When set to disable(2),
+                      routes are not aggregated in RIP updates generated
+                      by this router.  The default auto summary mode is 
+                      enable(1)."
+         DEFVAL { enable }
+         ::= { hm2AgentRouterRipConfigGroup 3 }
+         
+    hm2AgentRouterRipHostRoutesAcceptMode OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Sets the RIP host route acceptance mode in the router.
+                      A value of enable(1) means that host routes advertized
+                      to this RIP router will be accepted (learned) into its
+                      routing table.  When set to disable(2), host routes 
+                      advertized in RIP updates from neighboring routers
+                      are ignored.  The default host routes accept mode is
+                      enable(1)."
+         DEFVAL { enable }
+         ::= { hm2AgentRouterRipConfigGroup 4 }
+         
+    --************************************************************************************  
+    hm2AgentRouterRipDefaultMetric  OBJECT-TYPE
+    	 SYNTAX      Integer32 (0|1..15)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+               		 "Default metric of redistributed routes, when RIP redistributes 
+                	  from other protocols. {0} indicates that the parameter is not configured,
+                	  this value should not be set. Valid range for set is (1..15)."
+         DEFVAL { 0 }
+         ::= { hm2AgentRouterRipConfigGroup 5 }
+
+    hm2AgentRouterRipDefaultMetricConfigured OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+               		 "Flag to determine whether RIP default-metric is configured or not.
+                	  Set to 'false' to unconfigure the default route metric. Set to 'true' is
+                	  not allowed."
+         DEFVAL { false }
+         ::= { hm2AgentRouterRipConfigGroup 6 } 
+            
+    hm2AgentRouterRipDefaultInfoOriginate  OBJECT-TYPE
+       	 SYNTAX      TruthValue
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+               		 "Flag to determine, whether RIP can advertise a default-route learned
+                	  from another protocol." 
+       	 DEFVAL { false }
+         ::= { hm2AgentRouterRipConfigGroup 7 }   
+                                
+    -- Agent RIP Route-redistribution table.  This table contains, one entry per
+    -- source(bgp, ospf, static, connected) from which BGP redistributes routes. 
+        
+    hm2AgentRipRouteRedistTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentRipRouteRedistEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "This table contains the MIB objects required to configure 
+                      route-redistribution for RIP. Here, RIP is the Destination
+                      protocol and the source protocols can be any of : BGP, OSPF,
+                      Static, Connected."
+         ::= { hm2AgentRouterRipConfigGroup 8 }
+
+    hm2AgentRipRouteRedistEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentRipRouteRedistEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "The entries of the table."
+         INDEX       { hm2AgentRipRouteRedistSource }
+         ::= { hm2AgentRipRouteRedistTable 1 }
+         
+    Hm2AgentRipRouteRedistEntry ::= SEQUENCE {         
+          hm2AgentRipRouteRedistSource
+              INTEGER,
+          hm2AgentRipRouteRedistMode
+              INTEGER,
+          hm2AgentRipRouteRedistMetric
+              Integer32,
+          hm2AgentRipRouteRedistMetricConfigured
+              TruthValue,
+          hm2AgentRipRouteRedistMatchInternal
+              INTEGER,
+          hm2AgentRipRouteRedistMatchExternal1
+              INTEGER, 
+          hm2AgentRipRouteRedistMatchExternal2
+              INTEGER,
+          hm2AgentRipRouteRedistMatchNSSAExternal1
+              INTEGER, 
+          hm2AgentRipRouteRedistMatchNSSAExternal2
+              INTEGER,
+          hm2AgentRipRouteRedistDistList
+              Unsigned32,
+          hm2AgentRipRouteRedistDistListConfigured
+              TruthValue
+          } 
+         
+    hm2AgentRipRouteRedistSource OBJECT-TYPE
+         SYNTAX      INTEGER
+         			 {
+                     	connected(1),
+                     	static(2),                     
+                     	ospf(3),
+                     	bgp(4)                                        
+                     }         
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Source route, from which RIP can redistribute routes.
+                      This object also acts as the identifier for  the 
+                      RIP redistribution Table entry."
+         ::= { hm2AgentRipRouteRedistEntry 1 }
+                                                   
+    hm2AgentRipRouteRedistMode OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "User enabels/disables route-redistribution for a particular source
+                      protocol."
+         DEFVAL { disable }
+         ::= { hm2AgentRipRouteRedistEntry 2 }
+     
+    hm2AgentRipRouteRedistMetric OBJECT-TYPE
+         SYNTAX      Integer32 (0|1..15)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Metric used for redistributing a particular source protocol route
+                      into RIP. {0} indicates that the parameter is not configured, this value
+                      should not be set. Valid range for set is (1..15)."
+         DEFVAL { 0 }
+         ::= { hm2AgentRipRouteRedistEntry 3 } 
+         
+    hm2AgentRipRouteRedistMetricConfigured OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Flag to determine whether RIP redistribute-metric is configured
+                      or not. Set to 'false' to unconfigure redistribute metric. Set to 'true'
+                      is not allowed."
+         DEFVAL { false }
+         ::= { hm2AgentRipRouteRedistEntry 4 } 
+
+    hm2AgentRipRouteRedistMatchInternal OBJECT-TYPE
+         SYNTAX      INTEGER 
+         			 {
+                      	true(1),
+                      	false(2),
+                      	not-applicable(3)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "If this flag is true, RIP redistributes OSPF internal routes.
+                      It will be non-applicable, when source protocol is other than ospf."
+         ::= { hm2AgentRipRouteRedistEntry 5 }
+         
+    hm2AgentRipRouteRedistMatchExternal1 OBJECT-TYPE
+         SYNTAX      INTEGER 
+         			 {
+                      	true(1),
+                      	false(2),
+                      	not-applicable(3)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "If this flag is true, RIP redistributes OSPF External1 routes.
+                      It will be non-applicable, when source protocol is other than ospf."
+         ::= { hm2AgentRipRouteRedistEntry 6 }
+         
+    hm2AgentRipRouteRedistMatchExternal2 OBJECT-TYPE
+         SYNTAX      INTEGER 
+         			 {
+                      	true(1),
+                      	false(2),
+                      	not-applicable(3)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "If this flag is true, RIP redistributes OSPF External2 routes.
+                      It will be non-applicable, when source protocol is other than ospf."
+         ::= { hm2AgentRipRouteRedistEntry 7 } 
+         
+    hm2AgentRipRouteRedistMatchNSSAExternal1 OBJECT-TYPE
+         SYNTAX      INTEGER 
+         			 {
+                      	true(1),
+                      	false(2),
+                      	not-applicable(3)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "If this flag is true, RIP redistributes OSPF NSSA-External1 routes.
+                      It will be non-applicable, when source protocol is other than ospf."
+         ::= { hm2AgentRipRouteRedistEntry 8 }
+         
+    hm2AgentRipRouteRedistMatchNSSAExternal2 OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      true(1),
+                      false(2),
+                      not-applicable(3)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "If this flag is true, RIP redistributes OSPF NSSA-External2 routes.
+                      It will be non-applicable, when source protocol is other than ospf."
+         ::= { hm2AgentRipRouteRedistEntry 9 } 
+         
+    hm2AgentRipRouteRedistDistList OBJECT-TYPE
+         SYNTAX      Unsigned32 (0|1000..1099)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Access-list number of the access-list, which filters routes received
+                      from a source-protocol."
+         ::= { hm2AgentRipRouteRedistEntry 10 } 
+         
+     hm2AgentRipRouteRedistDistListConfigured OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Flag to determine whether Access-list is configured or not."
+         ::= { hm2AgentRipRouteRedistEntry 11 }
+      
+    -- The RIP Interface Configuration Table (augmented information).
+
+    hm2AgentRip2IfConfTable OBJECT-TYPE
+         SYNTAX   	 SEQUENCE OF Hm2AgentRip2IfConfEntry
+         MAX-ACCESS  not-accessible
+         STATUS   	 current
+         DESCRIPTION
+           			 "A list of subnets which require separate
+           			  configuration in RIP.  Augments rip2IfConfTable
+           			  in the RIPv2-MIB."
+       ::= { hm2AgentRouterRipConfigGroup 9 }
+
+    hm2AgentRip2IfConfEntry OBJECT-TYPE
+         SYNTAX   	 Hm2AgentRip2IfConfEntry
+         MAX-ACCESS  not-accessible
+         STATUS   	 current
+         DESCRIPTION
+           			 "A Single Routing Domain in a single Subnet.
+           			  Augments rip2IfConfEntry in RIPv2-MIB."
+         AUGMENTS { rip2IfConfEntry }
+         ::= { hm2AgentRip2IfConfTable 1 }
+
+    Hm2AgentRip2IfConfEntry ::=
+         SEQUENCE 
+         {
+             hm2AgentRip2IfConfAuthKeyId
+             	 Integer32
+         }
+
+    hm2AgentRip2IfConfAuthKeyId OBJECT-TYPE
+         SYNTAX      Integer32 (0..255)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+           			 "The identifier for the authentication key used
+            		  on this interface.  This field is only meaningful 
+           			  when the RIPv2-MIB rip2IfConfAuthType is md5(3); 
+           			  otherwise, the value is not used."
+      	 ::= { hm2AgentRip2IfConfEntry 1 }  
+
+     hm2AgentRouterRipRoutePref OBJECT-TYPE
+         SYNTAX   	 Integer32 (1..255)
+         MAX-ACCESS  read-write
+         STATUS   	 current
+         DESCRIPTION
+           			 "The route preference, sometimes called administrative distance, for RIP routes.
+           			  A route with a preference of 255 is considered unreachable."
+         DEFVAL { 120 }
+      	 ::= { hm2AgentRouterRipConfigGroup 10 }
+
+     hm2AgentRouterRipUpdateTimerInterval OBJECT-TYPE
+         SYNTAX      Integer32 (1..1000)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Sets the RIP update timer interval in the router.
+		 		      This is the time in seconds between two full routing table
+		      		  update packets."
+         DEFVAL { 30 }
+         ::= { hm2AgentRouterRipConfigGroup 248 }
+         
+--
+-- hm2AgentRouterOspfConfigGroup
+--	 
+	hm2AgentRouterOspfConfigGroup OBJECT IDENTIFIER ::= { hm2PlatformRouting 4 }
+
+	 
+	hm2AgentOspfDefaultMetric OBJECT-TYPE
+		SYNTAX Integer32 (0 | 1..16777214)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Default metric of redistributed routes, when OSPF redistributes 
+			from other protocols. {0} indicates that the parameter is not configured,
+			this value should not be set. Valid range for set is (1..16777214)."
+		DEFVAL { 0 } 
+	::= { hm2AgentRouterOspfConfigGroup 1 }
+
+	 
+	hm2AgentOspfDefaultMetricConfigured OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Flag to determine whether OSPF default-metric is configured or not.
+			Set to 'false' to unconfigure the OSPF default-metric. Set to 'true' is
+			not allowed."
+		DEFVAL { false }
+	::= { hm2AgentRouterOspfConfigGroup 2 }
+
+	 
+	hm2AgentOspfDefaultInfoOriginate OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Flag to determine, whether OSPF can advertise a default-route learned
+			from another protocol."
+		DEFVAL { false }
+	::= { hm2AgentRouterOspfConfigGroup 3 }
+
+	 
+	hm2AgentOspfDefaultInfoOriginateAlways OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"When this flag is true, the router advertises 0.0.0.0/0.0.0.0 always.
+			Without this option, OSPF will only advertise 0.0.0.0/0.0.0.0 if the
+			router's forwarding table contains a default route."
+		DEFVAL { false }
+	::= { hm2AgentRouterOspfConfigGroup 4 }
+
+	 
+	hm2AgentOspfDefaultInfoOriginateMetric OBJECT-TYPE
+		SYNTAX Integer32 (0 | 1..16777214)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Metric of the default route, which OSPF advertises when learned from
+			other protocol.
+			(0) indicates that the parameter is not configured, this value should not be set.
+			Valid range for set is (1..16777214)."
+		DEFVAL { 0 } 
+	::= { hm2AgentRouterOspfConfigGroup 5 }
+
+	 
+	hm2AgentOspfDefaultInfoOriginateMetricConfigured OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Flag to determine whether OSPF default-info originate metric 
+			is configured or not. Setting to false unconfigures the 
+			default route metric. Setting to true is not allowed."
+	::= { hm2AgentRouterOspfConfigGroup 6 }
+
+	 
+	hm2AgentOspfDefaultInfoOriginateMetricType OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			externalType1(1),
+			externalType2(2)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Metric Type of the default route,which OSPF advertises when learned from
+			other protocol. It can be 1(external type 1) or 2(external type 2)."
+		DEFVAL { 2 } 
+	::= { hm2AgentRouterOspfConfigGroup 7 }
+
+	 
+	hm2AgentOspfRouteRedistTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentOspfRouteRedistEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table contains the MIB objects required to configure 
+			route-redistribution for OSPF. Here, OSPF is the Destination
+			protocol and the source protocols can be any of : BGP, RIP,
+			Static, Connected."
+	::= { hm2AgentRouterOspfConfigGroup 8 }
+
+	 
+	hm2AgentOspfRouteRedistEntry OBJECT-TYPE
+		SYNTAX Hm2AgentOspfRouteRedistEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The entries of the table."
+		INDEX { hm2AgentOspfRouteRedistSource } 
+	::= { hm2AgentOspfRouteRedistTable 1 }
+
+
+	Hm2AgentOspfRouteRedistEntry ::= SEQUENCE
+		{
+		hm2AgentOspfRouteRedistSource 				INTEGER,
+		hm2AgentOspfRouteRedistMode 				INTEGER,
+		hm2AgentOspfRouteRedistMetric 				Integer32,
+		hm2AgentOspfRouteRedistMetricConfigured 	TruthValue,
+		hm2AgentOspfRouteRedistMetricType 			INTEGER,
+		hm2AgentOspfRouteRedistTag 					Unsigned32,
+		hm2AgentOspfRouteRedistSubnets 				TruthValue,
+		hm2AgentOspfRouteRedistDistList 			Unsigned32,
+		hm2AgentOspfRouteRedistDistListConfigured 	TruthValue
+		}
+
+	 
+	hm2AgentOspfRouteRedistSource OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			connected(1),
+			static(2),
+			rip(3),
+			bgp(4)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Source protocol, from which OSPF can redistribute routes.
+			This object also acts as the identifier for  the 
+			OSPF redistribution Table entry."
+	::= { hm2AgentOspfRouteRedistEntry 1 }
+
+	 
+	hm2AgentOspfRouteRedistMode OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"User enables/disables route-redistribution for a particular source
+			protocol."
+		DEFVAL { disable }
+	::= { hm2AgentOspfRouteRedistEntry 2 }
+
+	 
+	hm2AgentOspfRouteRedistMetric OBJECT-TYPE
+		SYNTAX Integer32 (0..16777214)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Metric used for redistributing a particular source protocol route
+			into OSPF."
+	::= { hm2AgentOspfRouteRedistEntry 3 }
+
+	 
+	hm2AgentOspfRouteRedistMetricConfigured OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Flag to determine whether OSPF redistribute-metric is configured or not."
+	::= { hm2AgentOspfRouteRedistEntry 4 }
+
+	 
+	hm2AgentOspfRouteRedistMetricType OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			externalType1(1),
+			externalType2(2)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Metric Type of routes,which OSPF redistributes from other source protocols.
+			It can be 1(external type 1) or 2(external type 2)."
+		DEFVAL { externalType2 }
+	::= { hm2AgentOspfRouteRedistEntry 5 }
+
+	hm2AgentOspfRouteRedistTag OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"It specifies the tag field in routes redistributed by OSPF."
+	::= { hm2AgentOspfRouteRedistEntry 6 }
+
+	 
+	hm2AgentOspfRouteRedistSubnets OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"If this value is false, then OSPF will not redistribute subnetted routes."
+		DEFVAL { true }
+	::= { hm2AgentOspfRouteRedistEntry 7 }
+
+	 
+	hm2AgentOspfRouteRedistDistList OBJECT-TYPE
+		SYNTAX Unsigned32 (0|1..10000)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Access-list number of the access-list, which filters routes received
+			from a source-protocol.
+			  HiOS: Valid access list numbers are between 1000 and 1099.
+			  HiSecOS: Valid access list numbers are between 1 and 10000."
+	::= { hm2AgentOspfRouteRedistEntry 8 }
+
+	 
+	hm2AgentOspfRouteRedistDistListConfigured OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Flag to determine whether Access-list is configured or not."
+	::= { hm2AgentOspfRouteRedistEntry 9 }
+
+	 
+	hm2AgentOspfIfTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentOspfIfEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The OSPF Interface Table describes the  inter-
+			faces from the viewpoint of OSPF.  Augments 
+			ospfIfTable from the OSPF-MIB."
+	::= { hm2AgentRouterOspfConfigGroup 9 }
+
+	 
+	hm2AgentOspfIfEntry OBJECT-TYPE
+		SYNTAX Hm2AgentOspfIfEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The OSPF Interface Entry describes one  inter-
+			face from the viewpoint of OSPF.  Augments
+			ospfIfEntry in OSPF-MIB."
+		AUGMENTS { ospfIfEntry } 
+	::= { hm2AgentOspfIfTable 1 }
+
+
+	Hm2AgentOspfIfEntry ::= SEQUENCE
+		{
+		hm2AgentOspfIfAuthKeyId 			Integer32,
+		hm2AgentOspfIfIpMtuIgnoreFlag 		INTEGER,
+		hm2AgentOspfIfPassiveMode 			TruthValue,
+		hm2AgentOspfIfAdvertiseSecondaries 	INTEGER,
+		hm2AgentOspfIfFastHelloMode			INTEGER
+		}
+
+	 
+	hm2AgentOspfIfAuthKeyId OBJECT-TYPE
+		SYNTAX Integer32 (0..255)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The identifier for the authentication key used
+			on this interface.  This field is only meaningful 
+			when the OSPF-MIB ospfIfAuthType is md5(2); 
+			otherwise, the value is not used."
+	::= { hm2AgentOspfIfEntry 1 }
+
+	 
+	hm2AgentOspfIfIpMtuIgnoreFlag OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Configures the IP MTU Ignore Flag value for this OSPF interface."
+	::= { hm2AgentOspfIfEntry 2 }
+
+	 
+	hm2AgentOspfIfPassiveMode OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Flag to determine whether the interface is passive.
+			A passive interface will not participate in the OSPF
+			adjacency formation."
+		DEFVAL { false }
+	::= { hm2AgentOspfIfEntry 3 }
+
+	 
+	hm2AgentOspfIfAdvertiseSecondaries OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Configures the advertisability of the secondary addresses
+			configured on this interface."
+	::= { hm2AgentOspfIfEntry 4 }
+	
+
+	hm2AgentOspfIfFastHelloMode OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Configures the fast hello mode on this interface.
+			 If enabled, hello packets are sent every 250ms,
+			 ospfIfHelloInterval is ignored. The dead interval and spf delay
+			 need to be re-configured accordingly for faster convergence."
+		DEFVAL { disable }
+	::= { hm2AgentOspfIfEntry 248 }
+	 
+
+
+	hm2AgentOspfVirtIfTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentOspfVirtIfEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Information about this router's virtual inter-
+			faces.  Augments ospfVirtIfTable from the OSPF-MIB."
+	::= { hm2AgentRouterOspfConfigGroup 10 }
+
+	 
+	hm2AgentOspfVirtIfEntry OBJECT-TYPE
+		SYNTAX Hm2AgentOspfVirtIfEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Information about a single Virtual Interface.
+			Augments ospfVirtIfEntry in OSPF-MIB."
+		AUGMENTS { ospfVirtIfEntry } 
+	::= { hm2AgentOspfVirtIfTable 1 }
+
+
+	Hm2AgentOspfVirtIfEntry ::= SEQUENCE
+		{
+		hm2AgentOspfVirtIfAuthKeyId Integer32
+		}
+
+	 
+	hm2AgentOspfVirtIfAuthKeyId OBJECT-TYPE
+		SYNTAX Integer32 (0..255)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The identifier for the authentication key used
+			on this virtual interface.  This field is only meaningful 
+			when the OSPF-MIB ospfVirtIfAuthType is md5(2); 
+			otherwise, the value is not used."
+	::= { hm2AgentOspfVirtIfEntry 1 }
+
+	 
+	hm2AgentRouterOspfRFC1583CompatibilityMode OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"From RFC2328: 
+			Controls the preference rules used in Section 16.4 when
+			choosing among multiple AS-external-LSAs advertising the
+			same destination. When set to 'enabled', the preference
+			rules remain those specified by RFC 1583 ([Ref9]). When set
+			to 'disabled', the preference rules are those stated in
+			
+			Section 16.4.1, which prevent routing loops when AS-
+			external-LSAs for the same destination have been originated
+			from different areas. Set to 'enabled' by default.
+			
+			In order to minimize the chance of routing loops, all OSPF
+			routers in an OSPF routing domain should have
+			RFC1583Compatibility set identically. When there are routers
+			present that have not been updated with the functionality
+			specified in Section 16.4.1 of this memo, all routers should
+			have RFC1583Compatibility set to 'enabled'. Otherwise, all
+			routers should have RFC1583Compatibility set to 'disabled',
+			preventing all routing loops."
+		DEFVAL { enable }
+	::= { hm2AgentRouterOspfConfigGroup 11 }
+
+	 
+	hm2AgentOspfSpfDelayTime OBJECT-TYPE
+		SYNTAX Integer32 (0..65535)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Delay time (in seconds) between when OSPF
+			receives a topology change and when it
+			starts an SPF calculation. It can be an
+			integer from 0 to 65535. The default
+			time is 5 seconds. A value of 0 means
+			that there is no delay; that is, the
+			SPF calculation is started immediately."
+		DEFVAL { 5 } 
+	::= { hm2AgentRouterOspfConfigGroup 12 }
+
+	 
+	hm2AgentOspfSpfHoldTime OBJECT-TYPE
+		SYNTAX Integer32 (0..65535)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Minimum time (in seconds) between two
+			consecutive SPF calculations. It can
+			be an integer from 0 to 65535. The
+			default time is 10 seconds. A value
+			of 0 means that there is no delay;
+			that is, two SPF calculations can
+			be done, one immediately after the
+			other."
+		DEFVAL { 10 } 
+	::= { hm2AgentRouterOspfConfigGroup 13 }
+
+	 
+	hm2AgentOspfAutoCostRefBw OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Auto cost reference bandwidth of the 
+			router interfaces for ospf metric calculations.
+			It can be an integer from 1 to 4294967. The
+			default reference bandwidth is 100 Mbps."
+		DEFVAL { 100 } 
+	::= { hm2AgentRouterOspfConfigGroup 14 }
+
+	 
+	hm2AgentOspfOpaqueLsaSupport OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The router's support for Opaque LSA types. 
+			This object is persistent and when written 
+			the entity SHOULD save the change to non-volatile
+			storage."
+		REFERENCE 
+			"The OSPF Opaque LSA Option"
+	::= { hm2AgentRouterOspfConfigGroup 15 }
+
+	 
+	hm2AgentOspfAreaOpaqueLsdbTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentOspfAreaOpaqueLsdbEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The OSPF Process's Area Link State Database (LSDB). 
+			The LSDB contains type-10 Link State Advertisements 
+			from throughout the areas that the device is attached to."
+		REFERENCE 
+			"OSPF Version 2, Section 12 Link State Advertisements"
+	::= { hm2AgentRouterOspfConfigGroup 16 }
+
+	 
+	hm2AgentOspfAreaOpaqueLsdbEntry OBJECT-TYPE
+		SYNTAX Hm2AgentOspfAreaOpaqueLsdbEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A single AreaOpaque Link State Advertisement."
+		INDEX { hm2AgentOspfAreaOpaqueLsdbAreaId, hm2AgentOspfAreaOpaqueLsdbType, 
+		hm2AgentOspfAreaOpaqueLsdbLsid, hm2AgentOspfAreaOpaqueLsdbRouterId } 
+	::= { hm2AgentOspfAreaOpaqueLsdbTable 1 }
+
+
+	Hm2AgentOspfAreaOpaqueLsdbEntry ::= SEQUENCE
+		{
+		hm2AgentOspfAreaOpaqueLsdbAreaId 			IpAddress,
+		hm2AgentOspfAreaOpaqueLsdbType 				INTEGER,
+		hm2AgentOspfAreaOpaqueLsdbLsid 				IpAddress,
+		hm2AgentOspfAreaOpaqueLsdbRouterId 			RouterID,
+		hm2AgentOspfAreaOpaqueLsdbSequence 			Integer32,
+		hm2AgentOspfAreaOpaqueLsdbAge 				Integer32,
+		hm2AgentOspfAreaOpaqueLsdbChecksum 			Integer32,
+		hm2AgentOspfAreaOpaqueLsdbAdvertisement 	OCTET STRING
+		}
+
+	 
+	hm2AgentOspfAreaOpaqueLsdbAreaId OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The 32 bit identifier of the Area from which 
+			the LSA was received."
+		REFERENCE 
+			"OSPF Version 2, Appendix C.2 Area parameters"
+	::= { hm2AgentOspfAreaOpaqueLsdbEntry 1 }
+
+	 
+	hm2AgentOspfAreaOpaqueLsdbType OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			areaOpaqueLink(10)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The type of the link state advertisement. 
+			Each link state type has a separate advertisement 
+			format."
+		REFERENCE 
+			"OSPF Version 2, Appendix A.4.1 The  Link  State 
+			Advertisement header"
+	::= { hm2AgentOspfAreaOpaqueLsdbEntry 2 }
+
+	 
+	hm2AgentOspfAreaOpaqueLsdbLsid OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The Link State ID is an LS Type Specific field 
+			containing either a Router ID or an IP Address; 
+			it identifies the piece of the routing domain 
+			that is being described by the advertisement."
+		REFERENCE 
+			"OSPF Version 2, Section 12.1.4 Link State ID"
+	::= { hm2AgentOspfAreaOpaqueLsdbEntry 3 }
+
+	 
+	hm2AgentOspfAreaOpaqueLsdbRouterId OBJECT-TYPE
+		SYNTAX RouterID
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The 32 bit number that uniquely identifies the 
+			originating router in the Autonomous System."
+		REFERENCE 
+			"OSPF Version 2, Appendix C.1 Global parameters"
+	::= { hm2AgentOspfAreaOpaqueLsdbEntry 4 }
+
+	 
+	hm2AgentOspfAreaOpaqueLsdbSequence OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The sequence number field is a signed 32-bit 
+			integer. It starts with the value '80000001'h, 
+			or -'7FFFFFFF'h, and increments until '7FFFFFFF'h. 
+			Thus, a typical sequence number will be very negative. 
+			It is used to detect old and duplicate link state 
+			advertisements. The space of sequence numbers is linearly 
+			ordered. The larger the sequence number the more recent 
+			the advertisement."
+		REFERENCE 
+			"OSPF Version 2, Section 12.1.6 LS sequence 
+			number"
+	::= { hm2AgentOspfAreaOpaqueLsdbEntry 5 }
+
+	 
+	hm2AgentOspfAreaOpaqueLsdbAge OBJECT-TYPE
+		SYNTAX Integer32
+		UNITS
+			"seconds"
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This field is the age of the link state advertisement 
+			in seconds."
+		REFERENCE 
+			"OSPF Version 2, Section 12.1.1 LS age"
+	::= { hm2AgentOspfAreaOpaqueLsdbEntry 6 }
+
+	 
+	hm2AgentOspfAreaOpaqueLsdbChecksum OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This field is the checksum of the complete contents of
+			the advertisement, excepting the age field. The age field
+			is excepted so that an advertisement's age can be 
+			incremented without updating the checksum. The checksum
+			used is the same that is used for ISO connectionless
+			datagrams; it is commonly referred to as the Fletcher 
+			checksum."
+		REFERENCE 
+			"OSPF Version 2, Section 12.1.7 LS checksum"
+	::= { hm2AgentOspfAreaOpaqueLsdbEntry 7 }
+
+	 
+	hm2AgentOspfAreaOpaqueLsdbAdvertisement OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE (1..65535))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The entire Link State Advertisement, including 
+			its header. 
+			Note that for variable length LSAs, SNMP agents 
+			may not be able to return the largest string size"
+		REFERENCE 
+			"OSPF Version 2, Section 12 Link State Advertisements"
+	::= { hm2AgentOspfAreaOpaqueLsdbEntry 8 }
+
+	 
+	hm2AgentOspfLocalLsdbTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentOspfLocalLsdbEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The OSPF Process's Link-Local Link State Database 
+			for non-virtual links. 
+			This table is identical to the OSPF LSDB Table 
+			in format, but contains only Link-Local Link State 
+			Advertisements for non-virtual links. The purpose is 
+			to allow Link-Local LSAs to be displayed for each 
+			non-virtual interface. This table is implemented to 
+			support type-9 LSAs which are defined 
+			in 'The OSPF Opaque LSA Option'."
+		REFERENCE 
+			"OSPF Version 2, Section 12 Link State 
+			Advertisements and The OSPF Opaque LSA Option"
+	::= { hm2AgentRouterOspfConfigGroup 17 }
+
+	 
+	hm2AgentOspfLocalLsdbEntry OBJECT-TYPE
+		SYNTAX Hm2AgentOspfLocalLsdbEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A single Link State Advertisement."
+		INDEX { hm2AgentOspfLocalLsdbIpAddress, hm2AgentOspfLocalLsdbAddressLessIf, 
+		hm2AgentOspfLocalLsdbType, hm2AgentOspfLocalLsdbLsid, 
+		hm2AgentOspfLocalLsdbRouterId } 
+	::= { hm2AgentOspfLocalLsdbTable 1 }
+
+
+	Hm2AgentOspfLocalLsdbEntry ::= SEQUENCE
+		{
+		hm2AgentOspfLocalLsdbIpAddress 		IpAddress,
+		hm2AgentOspfLocalLsdbAddressLessIf 	InterfaceIndexOrZero,
+		hm2AgentOspfLocalLsdbType 			INTEGER,
+		hm2AgentOspfLocalLsdbLsid 			IpAddress,
+		hm2AgentOspfLocalLsdbRouterId 		RouterID,
+		hm2AgentOspfLocalLsdbSequence	 	Integer32,
+		hm2AgentOspfLocalLsdbAge 			Integer32,
+		hm2AgentOspfLocalLsdbChecksum 		Integer32,
+		hm2AgentOspfLocalLsdbAdvertisement 	OCTET STRING
+		}
+
+	 
+	hm2AgentOspfLocalLsdbIpAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The IP Address of the interface from 
+			which the LSA was received if the interface is 
+			numbered."
+		REFERENCE 
+			"OSPF Version 2, Appendix C.3 Interface parameters"
+	::= { hm2AgentOspfLocalLsdbEntry 1 }
+
+	 
+	hm2AgentOspfLocalLsdbAddressLessIf OBJECT-TYPE
+		SYNTAX InterfaceIndexOrZero
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The Interface Index of the interface from 
+			which the LSA was received if the interface is 
+			unnumbered."
+		REFERENCE 
+			"OSPF Version 2, Appendix C.3 Interface parameters"
+	::= { hm2AgentOspfLocalLsdbEntry 2 }
+
+	 
+	hm2AgentOspfLocalLsdbType OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			localOpaqueLink(9)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The type of the link state advertisement. 
+			Each link state type has a separate advertise- 
+			ment format."
+		REFERENCE 
+			"OSPF Version 2, Appendix A.4.1 The  Link  State 
+			Advertisement header and "
+	::= { hm2AgentOspfLocalLsdbEntry 3 }
+
+	 
+	hm2AgentOspfLocalLsdbLsid OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The Link State ID is an LS Type Specific field 
+			containing a 32 bit identifier in IP address format; 
+			it identifies the piece of the routing domain 
+			that is being described by the advertisement."
+		REFERENCE 
+			"OSPF Version 2, Section 12.1.4 Link State ID"
+	::= { hm2AgentOspfLocalLsdbEntry 4 }
+
+	 
+	hm2AgentOspfLocalLsdbRouterId OBJECT-TYPE
+		SYNTAX RouterID
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The 32 bit number that uniquely identifies the 
+			originating router in the Autonomous System."
+		REFERENCE 
+			"OSPF Version 2, Appendix C.1 Global parameters"
+	::= { hm2AgentOspfLocalLsdbEntry 5 }
+
+	 
+	hm2AgentOspfLocalLsdbSequence OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The sequence number field is a signed 32-bit 
+			integer. It starts with the value '80000001'h, 
+			or -'7FFFFFFF'h, and increments until '7FFFFFFF'h. 
+			Thus, a typical sequence number will be very negative. 
+			It is used to detect old and duplicate link state 
+			advertisements. The space of sequence numbers is linearly 
+			ordered. The larger the sequence number the more recent 
+			the advertisement."
+		REFERENCE 
+			"OSPF Version 2, Section 12.1.6 LS sequence 
+			number"
+	::= { hm2AgentOspfLocalLsdbEntry 6 }
+
+	 
+	hm2AgentOspfLocalLsdbAge OBJECT-TYPE
+		SYNTAX Integer32
+		UNITS
+			"seconds"
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This field is the age of the link state adver- 
+			tisement in seconds."
+		REFERENCE 
+			"OSPF Version 2, Section 12.1.1 LS age"
+	::= { hm2AgentOspfLocalLsdbEntry 7 }
+
+	 
+	hm2AgentOspfLocalLsdbChecksum OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This field is the checksum of the complete 
+			contents of the advertisement, excepting the 
+			age field. The age field is excepted so that 
+			an advertisement's age can be incremented 
+			without updating the checksum. The checksum 
+			used is the same that is used for ISO connec- 
+			tionless datagrams; it is commonly referred  to 
+			as the Fletcher checksum."
+		REFERENCE 
+			"OSPF Version 2, Section 12.1.7 LS checksum"
+	::= { hm2AgentOspfLocalLsdbEntry 8 }
+
+	 
+	hm2AgentOspfLocalLsdbAdvertisement OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE (1..65535))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The entire Link State Advertisement, including 
+			its header. 
+			
+			Note that for variable length LSAs, SNMP agents 
+			may not be able to return the largest string size."
+		REFERENCE 
+			"OSPF Version 2, Section 12 Link State Adver- 
+			tisements"
+	::= { hm2AgentOspfLocalLsdbEntry 9 }
+
+	 
+	hm2AgentOspfAsLsdbTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentOspfAsLsdbEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The OSPF Process's AS-scope LSA Link State Database. 
+			The Database contains the AS-scope Link State 
+			Advertisements from throughout the areas that 
+			the device is attached to. 
+			
+			This table is identical to the OSPF LSDB Table 
+			in format, but contains only AS-scope Link State 
+			Advertisements.  The purpose is to allow AS-scope 
+			LSAs to be displayed once for the router rather 
+			than once in each non-stub area."
+		REFERENCE 
+			"OSPF Version 2, Section 12 Link State Adver- 
+			tisements"
+	::= { hm2AgentRouterOspfConfigGroup 18 }
+
+	 
+	hm2AgentOspfAsLsdbEntry OBJECT-TYPE
+		SYNTAX Hm2AgentOspfAsLsdbEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A single Link State Advertisement."
+		INDEX { hm2AgentOspfAsLsdbType, hm2AgentOspfAsLsdbLsid, 
+		hm2AgentOspfAsLsdbRouterId } 
+	::= { hm2AgentOspfAsLsdbTable 1 }
+
+
+	Hm2AgentOspfAsLsdbEntry ::= SEQUENCE
+		{
+		hm2AgentOspfAsLsdbType 			INTEGER,
+		hm2AgentOspfAsLsdbLsid 			IpAddress,
+		hm2AgentOspfAsLsdbRouterId 		RouterID,
+		hm2AgentOspfAsLsdbSequence 		Integer32,
+		hm2AgentOspfAsLsdbAge 			Integer32,
+		hm2AgentOspfAsLsdbChecksum 		Integer32,
+		hm2AgentOspfAsLsdbAdvertisement OCTET STRING
+		}
+
+	 
+	hm2AgentOspfAsLsdbType OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			asOpaqueLink(11)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The type of the link state advertisement. 
+			Each link state type has a separate advertise- 
+			ment format."
+		REFERENCE 
+			"OSPF Version 2, Appendix A.4.1 The  Link  State 
+			Advertisement header"
+	::= { hm2AgentOspfAsLsdbEntry 1 }
+
+	 
+	hm2AgentOspfAsLsdbLsid OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The Link State ID is an LS Type Specific field 
+			containing either a Router ID or an IP Address; 
+			it identifies the piece of the routing domain 
+			that is being described by the advertisement."
+		REFERENCE 
+			"OSPF Version 2, Section 12.1.4 Link State ID"
+	::= { hm2AgentOspfAsLsdbEntry 2 }
+
+	 
+	hm2AgentOspfAsLsdbRouterId OBJECT-TYPE
+		SYNTAX RouterID
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The 32 bit number that uniquely identifies the 
+			originating router in the Autonomous System."
+		REFERENCE 
+			"OSPF Version 2, Appendix C.1 Global parameters"
+	::= { hm2AgentOspfAsLsdbEntry 3 }
+
+	 
+	hm2AgentOspfAsLsdbSequence OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The sequence number field is a signed 32-bit 
+			integer. It starts with the value '80000001'h, 
+			or -'7FFFFFFF'h, and increments until '7FFFFFFF'h. 
+			Thus, a typical sequence number will be very negative. 
+			It is used to detect old and duplicate link state 
+			advertisements. The space of sequence numbers is linearly 
+			ordered. The larger the sequence number the more recent 
+			the advertisement."
+		REFERENCE 
+			"OSPF Version  2,  Section  12.1.6  LS  sequence 
+			number"
+	::= { hm2AgentOspfAsLsdbEntry 4 }
+
+	 
+	hm2AgentOspfAsLsdbAge OBJECT-TYPE
+		SYNTAX Integer32
+		UNITS
+			"seconds"
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This field is the age of the link state adver- 
+			tisement in seconds."
+		REFERENCE 
+			"OSPF Version 2, Section 12.1.1 LS age"
+	::= { hm2AgentOspfAsLsdbEntry 5 }
+
+	 
+	hm2AgentOspfAsLsdbChecksum OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This field is the checksum of the complete 
+			contents of the advertisement, excepting the 
+			age field. The age field is excepted so that 
+			an advertisement's age can be incremented 
+			without updating the checksum. The checksum 
+			used is the same that is used for ISO connec- 
+			tionless datagrams; it is commonly referred  to 
+			as the Fletcher checksum."
+		REFERENCE 
+			"OSPF Version 2, Section 12.1.7 LS checksum"
+	::= { hm2AgentOspfAsLsdbEntry 6 }
+
+	 
+	hm2AgentOspfAsLsdbAdvertisement OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE (1..65535))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The entire Link State Advertisement, including 
+			its header."
+		REFERENCE 
+			"OSPF Version 2, Section 12  Link  State  Adver- 
+			tisements. 
+			Note that for variable length LSAs, SNMP agents 
+			may not be able to return the largest string size."
+	::= { hm2AgentOspfAsLsdbEntry 7 }
+
+	 
+	hm2AgentOspfDefaultPassiveMode OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Flag to determine, whether all the interfaces are passive interfaces
+			by default. A passive interface will not participate in the OSPF
+			adjacency formation."
+		DEFVAL { false }
+	::= { hm2AgentRouterOspfConfigGroup 19 }
+
+	 
+	hm2AgentOspfRoutePrefIntraArea OBJECT-TYPE
+		SYNTAX Integer32 (1..255)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The route preference, sometimes called administrative distance, for intra-area OSPFv2 routes.
+			A route with a preference of 255 is considered unreachable."
+		DEFVAL { 110 } 
+	::= { hm2AgentRouterOspfConfigGroup 20 }
+
+	 
+	hm2AgentOspfRoutePrefInterArea OBJECT-TYPE
+		SYNTAX Integer32 (1..255)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The route preference, sometimes called administrative distance, for inter-area OSPFv2 routes.
+			A route with a preference of 255 is considered unreachable."
+		DEFVAL { 110 } 
+	::= { hm2AgentRouterOspfConfigGroup 21 }
+
+	 
+	hm2AgentOspfRoutePrefExternal OBJECT-TYPE
+		SYNTAX Integer32 (1..255)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The route preference, sometimes called administrative distance, for external OSPFv2 routes.
+			A route with a preference of 255 is considered unreachable."
+		DEFVAL { 110 } 
+	::= { hm2AgentRouterOspfConfigGroup 22 }
+
+--
+-- hm2AgentOspfAreaNSSAEntry
+--	 
+	hm2AgentOspfAreaNSSATable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentOspfAreaNSSAEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Information about all the configured Not-So-Stubby-Area(NSSAs) in OSPF.  
+			Augments ospfAreaTable from the OSPF-MIB."
+	::= { hm2AgentRouterOspfConfigGroup 248 }
+	 
+	hm2AgentOspfAreaNSSAEntry OBJECT-TYPE
+		SYNTAX Hm2AgentOspfAreaNSSAEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Information about a single Not-So-Stubby-Area(NSSA).
+			Augments ospfAreaEntry in OSPF-MIB."
+		AUGMENTS { ospfAreaEntry } 
+	::= { hm2AgentOspfAreaNSSATable 1 }
+
+	Hm2AgentOspfAreaNSSAEntry ::= SEQUENCE
+		{
+			hm2AgentOspfAreaNSSAImportSummaries				HmEnabledStatus,
+			hm2AgentOspfAreaNSSARedistribute 				HmEnabledStatus,
+			hm2AgentOspfAreaNSSADefaultInfoOriginate		TruthValue,
+			hm2AgentOspfAreaNSSADefaultMetric				Integer32,
+			hm2AgentOspfAreaNSSADefaultMetricType			INTEGER
+		}
+
+	hm2AgentOspfAreaNSSAImportSummaries OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"When set to enabled, OSPF's summary routes are imported into 
+			 the NSSA as Type-3 summary-LSAs.  
+			 When set to disabled, summary routes are not imported 
+			 into the NSSA.  
+			 The default setting is enabled."
+		DEFVAL { enable }
+	::= { hm2AgentOspfAreaNSSAEntry 1 }
+
+	hm2AgentOspfAreaNSSARedistribute OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"When set to enabled NSSA ASBRs will not redistribute external
+             routes into the NSSA and they will cease to originate Type-7
+             external LSAs for external routes."
+		DEFVAL { enable }
+	::= { hm2AgentOspfAreaNSSAEntry 2 }
+	 
+	hm2AgentOspfAreaNSSADefaultInfoOriginate OBJECT-TYPE                                         
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+        DESCRIPTION                                                         
+            "Determines if the router will originate a Type-7 default LSA    
+             into the NSSA.  This command will cause a default LSA to be     
+             originated only if the router is an NSSA ABR or ASBR."          
+		DEFVAL { false }
+	::= { hm2AgentOspfAreaNSSAEntry 3 }
+
+	hm2AgentOspfAreaNSSADefaultMetric OBJECT-TYPE                                         
+		SYNTAX Integer32 (1..16777214)
+		MAX-ACCESS read-write
+		STATUS current
+        DESCRIPTION                                                         
+            "Defines the metric value advertised in the Type-7 default LSA 
+             originated by this router"          
+		DEFVAL { 10 }
+	::= { hm2AgentOspfAreaNSSAEntry 4 }
+
+	hm2AgentOspfAreaNSSADefaultMetricType OBJECT-TYPE                                         
+		SYNTAX INTEGER
+				{
+				    ospfMetric (1),
+                    comparable (2),
+                    nonComparable (3)
+				}
+		MAX-ACCESS read-write
+		STATUS current
+        DESCRIPTION                                                         
+            "Defines the metric type advertised in the Type-7 default LSA 
+             originated by this router"          
+		DEFVAL { nonComparable }
+	::= { hm2AgentOspfAreaNSSAEntry 5 }
+
+
+--
+-- hm2AgentOspfIfMetricTable
+--	 
+	hm2AgentOspfIfMetricTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentOspfIfMetricEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Information about interface metrics."
+	::= { hm2AgentRouterOspfConfigGroup 249 }
+	 
+	hm2AgentOspfIfMetricEntry OBJECT-TYPE
+		SYNTAX Hm2AgentOspfIfMetricEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Information about interface metrics."
+		AUGMENTS { ospfIfMetricEntry } 
+	::= { hm2AgentOspfIfMetricTable 1 }
+
+	Hm2AgentOspfIfMetricEntry ::= SEQUENCE
+		{
+			hm2AgentOspfIfMetricCalculatedCost			Integer32
+		}
+
+	hm2AgentOspfIfMetricCalculatedCost OBJECT-TYPE                                         
+		SYNTAX Integer32 (1..'FFFF'h)
+		MAX-ACCESS read-only
+		STATUS current
+        DESCRIPTION                                                         
+            "Returns the actual cost value used by OSPF for
+             this interface."
+	::= { hm2AgentOspfIfMetricEntry 1 }
+
+
+--
+-- hm2AgentSnmpTrapFlagsConfigGroupLayer3
+--	 
+	hm2AgentSnmpTrapFlagsConfigGroupLayer3 OBJECT IDENTIFIER ::= { hm2PlatformRouting 5 }
+
+	hm2AgentSnmpVRRPNewMasterTrapFlag OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This flag enables the sending of VRRP new master notification
+			traps."
+		DEFVAL		{ disable }
+	::= { hm2AgentSnmpTrapFlagsConfigGroupLayer3 1 }
+
+	 
+	hm2AgentSnmpVRRPAuthFailureTrapFlag OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This flag enables the sending of VRRP authentication failure
+			notification traps."
+		DEFVAL		{ disable }
+	::= { hm2AgentSnmpTrapFlagsConfigGroupLayer3 2 }
+
+--
+-- hm2AgentBootpDhcpRelayGroup
+--	 
+	hm2AgentBootpDhcpRelayGroup OBJECT IDENTIFIER ::= { hm2PlatformRouting 6 }
+
+	 
+	hm2AgentBootpDhcpRelayMaxHopCount OBJECT-TYPE
+		SYNTAX Integer32 (1..16)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The BOOTP/DHCP Max Hop Count.
+			The relay agent silently discards BOOTREQUEST messages whose hops field exceeds the value 16 
+			assuming that the request is looped through the intermediate agents. The default value is 4."
+		DEFVAL { 4 } 
+	::= { hm2AgentBootpDhcpRelayGroup 1 }
+
+	 
+	hm2AgentBootpDhcpRelayMinWaitTime OBJECT-TYPE
+		SYNTAX Integer32 (0..100)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The BOOTP/DHCP Minimum Wait Time. 
+			When the BOOTP relay agent receives a BOOTREQUEST message, it MAY use the value of the 'secs' 
+			(seconds since client began booting) field of the request as a factor in deciding whether to 
+			relay the request or not."
+	::= { hm2AgentBootpDhcpRelayGroup 4 }
+
+	 
+	hm2AgentBootpDhcpRelayCircuitIdOptionMode OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The BOOTP/DHCP Circuit ID Option Mode. 
+			This flag is set to enable/disable the network element to add/remove the DHCP Relay agent
+			Circuit ID sub-options."
+	::= { hm2AgentBootpDhcpRelayGroup 5 }
+
+--
+-- hm2AgentECMPGroup
+--	 
+	hm2AgentECMPGroup OBJECT IDENTIFIER ::= { hm2PlatformRouting 7 }
+
+	 
+	hm2AgentECMPOspfMaxPaths OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"It sets the number of paths that OSPF can report for a given destination 
+			where maxpaths is platform-dependent."
+	::= { hm2AgentECMPGroup 1 }
+
+--
+-- hm2AgentRouterVrrpConfigGroup
+--	 
+	hm2AgentRouterVrrpConfigGroup OBJECT IDENTIFIER ::= { hm2PlatformRouting 8 }
+	 
+	hm2AgentRouterVrrpAdminState OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Sets the administrative mode of VRRP in the router."
+	::= { hm2AgentRouterVrrpConfigGroup 1 }
+
+
+--
+-- hm2AgentRouterVrrpOperTable
+--
+	hm2AgentVrrpOperations    OBJECT IDENTIFIER ::= { hm2PlatformRouting 9 }
+
+	hm2AgentRouterVrrpOperTable OBJECT-TYPE
+	   SYNTAX      SEQUENCE OF Hm2AgentRouterVrrpOperEntry
+	   MAX-ACCESS   not-accessible
+	   STATUS       obsolete
+	   DESCRIPTION
+		   "Operations table for a VRRP router which consists of a
+			sequence (i.e., one or more conceptual rows) of
+			`hm2AgentRouterVrrpOperEntry' items."
+	   ::= { hm2AgentVrrpOperations 1 }
+   
+	hm2AgentRouterVrrpOperEntry OBJECT-TYPE
+	   SYNTAX Hm2AgentRouterVrrpOperEntry
+	   MAX-ACCESS   not-accessible 
+	   STATUS       obsolete
+	   DESCRIPTION 
+		   "An entry in the table contains operational priority that is 
+			associated with a virtual router."
+	   INDEX    { ifIndex, vrrpOperVrId }
+	   ::= { hm2AgentRouterVrrpOperTable 1 }
+
+	Hm2AgentRouterVrrpOperEntry ::=
+	  SEQUENCE {
+		   hm2AgentRouterVrrpOperPriority 
+			  Integer32
+		  }
+		
+	hm2AgentRouterVrrpOperPriority  OBJECT-TYPE 
+	 	 SYNTAX       Integer32 (0..255)
+	 	 MAX-ACCESS   read-only
+	 	 STATUS       obsolete
+	 	 DESCRIPTION 
+		 	 "This object specifies the operational priority of the VRRP router.
+		 	 This value will be afftected by both the tracking process and the
+		 	 configured priority set by the vrrpOperPriority object."
+		 ::= {  hm2AgentRouterVrrpOperEntry 1 }
+
+
+	hm2AgentRouterVrrpNumberOfFastInst  OBJECT-TYPE 
+		SYNTAX       Integer32 (0..16)
+	 	 MAX-ACCESS   read-only
+	 	 STATUS       current
+	 	 DESCRIPTION 
+		 	 "Number of VRRP instances with advertisement interval less
+		 	 than one second."
+		 ::= { hm2AgentVrrpOperations 248 }
+	
+--
+-- hm2AgentIpHelperGroup
+--	 
+	hm2AgentIpHelperGroup OBJECT IDENTIFIER ::= { hm2PlatformRouting 11 }
+
+	 
+	hm2AgentIpHelperAdminMode OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Administratively enable or disable IP helper."
+	::= { hm2AgentIpHelperGroup 1 }
+
+	 
+	hm2AgentDhcpClientMsgsReceived OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The Number of DHCP Requests Received. 
+			Total number of DHCP requests received from all clients."
+	::= { hm2AgentIpHelperGroup 2 }
+
+	 
+	hm2AgentDhcpClientMsgsRelayed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The Number of DHCP Requests Forwarded. 
+			Total number of DHCP requests relayed to a server."
+	::= { hm2AgentIpHelperGroup 3 }
+
+	 
+	hm2AgentDhcpServerMsgsReceived OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of DHCP messages received from a server."
+	::= { hm2AgentIpHelperGroup 4 }
+
+	 
+	hm2AgentDhcpServerMsgsRelayed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of DHCP messages relayed to a server."
+	::= { hm2AgentIpHelperGroup 5 }
+
+	 
+	hm2AgentUdpClientMsgsReceived OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of UDP messages received from all clients."
+	::= { hm2AgentIpHelperGroup 6 }
+
+	 
+	hm2AgentUdpClientMsgsRelayed OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of UDP messages relayed to a server."
+	::= { hm2AgentIpHelperGroup 7 }
+
+	 
+	hm2AgentSwitchIpHelperAddressTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentSwitchIpHelperAddressEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Contains a list of IP helper addresses configured globally."
+	::= { hm2AgentIpHelperGroup 8 }
+
+	 
+	hm2AgentSwitchIpHelperAddressEntry OBJECT-TYPE
+		SYNTAX Hm2AgentSwitchIpHelperAddressEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An IP Helper address that applies to packets received on any interface."
+		INDEX { hm2AgentSwitchIpHelperUdpPort, hm2AgentSwitchIpHelperAddress } 
+	::= { hm2AgentSwitchIpHelperAddressTable 1 }
+
+
+	Hm2AgentSwitchIpHelperAddressEntry ::= SEQUENCE
+		{
+		hm2AgentSwitchIpHelperUdpPort 	Unsigned32,
+		hm2AgentSwitchIpHelperAddress 	IpAddress,
+		hm2AgentSwitchIpHelperHitCount 	Unsigned32,
+		hm2AgentSwitchIpHelperStatus 	RowStatus
+		}
+
+	 
+	hm2AgentSwitchIpHelperUdpPort OBJECT-TYPE
+		SYNTAX Unsigned32 (0..65535)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"UDP port number. A relay entry with port 0 allows dhcp, time,
+			 winnameserver, tacacs, dns, tftp, netbios-ns and netbios-dgm relay."
+	::= { hm2AgentSwitchIpHelperAddressEntry 1 }
+
+	 
+	hm2AgentSwitchIpHelperAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The IP Helper address assigned to this interface."
+	::= { hm2AgentSwitchIpHelperAddressEntry 2 }
+
+	 
+	hm2AgentSwitchIpHelperHitCount OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of times a packet has been forwarded or discarded according to this entry."
+	::= { hm2AgentSwitchIpHelperAddressEntry 3 }
+
+	 
+	hm2AgentSwitchIpHelperStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Creates a new entry in the global IP Helper address table.
+			Allowed values are:
+			
+			 createAndGo(4)  - Creates an IP helper entry in this table.
+			 destroy(6)      - Removes the IP helper entry."
+	::= { hm2AgentSwitchIpHelperAddressEntry 4 }
+
+	 
+	hm2AgentUdpClientMsgsTtlExpired OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of UDP messages received with an expired TTL."
+	::= { hm2AgentIpHelperGroup 9 }
+
+	 
+	hm2AgentUdpClientMsgsDiscarded OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of UDP messages that matched a discard entry."
+	::= { hm2AgentIpHelperGroup 10 }
+
+--
+-- hm2AgentInternalVlanGroup
+--
+	hm2AgentInternalVlanGroup OBJECT IDENTIFIER ::= { hm2PlatformRouting 12 }
+
+	hm2AgentInternalVlanBase OBJECT-TYPE
+		SYNTAX VlanId
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The VLAN ID internally assigned to the first port-based routing interface."
+		DEFVAL { 4093 } 
+	::= { hm2AgentInternalVlanGroup 1 }
+
+	 
+	hm2AgentInternalVlanPolicy OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			ascending(0),
+			descending(1)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Whether to search up or down from the base VLAN ID for a free VLAN ID to
+			assign to a port-based routing interface."
+		DEFVAL { descending }
+	::= { hm2AgentInternalVlanGroup 2 }
+
+	 
+	hm2AgentSwitchInternalVlanTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentSwitchInternalVlanEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Contains a list of VLAN IDs used internally for port-based routing interfaces."
+	::= { hm2AgentInternalVlanGroup 3 }
+
+	 
+	hm2AgentSwitchInternalVlanEntry OBJECT-TYPE
+		SYNTAX Hm2AgentSwitchInternalVlanEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A VLAN ID internally assigned to a port-based routing interface."
+		INDEX { hm2AgentSwitchInternalVlanId } 
+	::= { hm2AgentSwitchInternalVlanTable 1 }
+
+
+	Hm2AgentSwitchInternalVlanEntry ::= SEQUENCE
+		{
+		hm2AgentSwitchInternalVlanId VlanId,
+		hm2AgentSwitchInternalVlanIfIndex InterfaceIndex
+		}
+
+	 
+	hm2AgentSwitchInternalVlanId OBJECT-TYPE
+		SYNTAX VlanId
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A VLAN ID internally assigned to a port-based routing interface."
+	::= { hm2AgentSwitchInternalVlanEntry 1 }
+
+	 
+	hm2AgentSwitchInternalVlanIfIndex OBJECT-TYPE
+		SYNTAX InterfaceIndex
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Interface index of port-based routing interface using this VLAN ID."
+	::= { hm2AgentSwitchInternalVlanEntry 2 }
+
+--
+-- hm2AgentOspfQueueGroup
+--
+	hm2AgentOspfQueueGroup OBJECT IDENTIFIER ::= { hm2PlatformRouting 13 }
+	 
+	hm2AgentOspfQueueTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentOspfQueueEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Table lists information about OSPFv2 message queue utilization."
+	::= { hm2AgentOspfQueueGroup 1 }
+
+	 
+	hm2AgentOspfQueueEntry OBJECT-TYPE
+		SYNTAX Hm2AgentOspfQueueEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Information on a specific OSPFv2 message queue."
+		INDEX { hm2AgentOspfQueueIndex } 
+	::= { hm2AgentOspfQueueTable 1 }
+
+
+	Hm2AgentOspfQueueEntry ::= SEQUENCE
+		{
+		hm2AgentOspfQueueIndex 	Unsigned32,
+		hm2AgentOspfQueueName 	DisplayString,
+		hm2AgentOspfQueueLength Gauge32,
+		hm2AgentOspfQueueHigh 	Gauge32,
+		hm2AgentOspfQueueDrops 	Counter32,
+		hm2AgentOspfQueueLimit 	Unsigned32
+		}
+
+	 
+	hm2AgentOspfQueueIndex OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Index value for this message queue."
+	::= { hm2AgentOspfQueueEntry 1 }
+
+	 
+	hm2AgentOspfQueueName OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Name of an OSPFv2 message queue."
+	::= { hm2AgentOspfQueueEntry 2 }
+
+	 
+	hm2AgentOspfQueueLength OBJECT-TYPE
+		SYNTAX Gauge32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of messages currently in the message queue."
+	::= { hm2AgentOspfQueueEntry 3 }
+
+	 
+	hm2AgentOspfQueueHigh OBJECT-TYPE
+		SYNTAX Gauge32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The high water mark of the number of messages in the message queue."
+	::= { hm2AgentOspfQueueEntry 4 }
+
+	 
+	hm2AgentOspfQueueDrops OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of items dropped because the message queue was full."
+	::= { hm2AgentOspfQueueEntry 5 }
+
+	 
+	hm2AgentOspfQueueLimit OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The maximum number of messages this queue can hold."
+	::= { hm2AgentOspfQueueEntry 6 }
+
+--
+-- hm2AgentOspfPacketStatsGroup
+--	 
+	hm2AgentOspfPacketStatsGroup OBJECT IDENTIFIER ::= { hm2PlatformRouting 14 }
+
+	hm2AgentOspfCountersCleared OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The time since OSPFv2 counters were last cleared, in seconds."
+	::= { hm2AgentOspfPacketStatsGroup 1 }
+
+	 
+	hm2AgentOspfLsaRetxCount OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The total number of LSAs retransmitted since OSPF counters were last cleared. 
+			If the same LSA is retransmitted to multiple neighbors, the count is incremented 
+			for each neighbor."
+	::= { hm2AgentOspfPacketStatsGroup 2 }
+
+	 
+	hm2AgentOspfHellosRx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The total number of OSPFv2 Hello packets received since OSPF counters were last cleared."
+	::= { hm2AgentOspfPacketStatsGroup 3 }
+
+	 
+	hm2AgentOspfHellosTx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The total number of OSPFv2 Hello packets transmitted since OSPF counters were last cleared."
+	::= { hm2AgentOspfPacketStatsGroup 4 }
+
+	 
+	hm2AgentOspfDdRx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The total number of OSPFv2 Database Description packets received since OSPF counters were last cleared."
+	::= { hm2AgentOspfPacketStatsGroup 5 }
+
+	 
+	hm2AgentOspfDdTx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The total number of OSPFv2 Database Description packets transmitted since OSPF counters were last cleared."
+	::= { hm2AgentOspfPacketStatsGroup 6 }
+
+	 
+	hm2AgentOspfLsReqRx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The total number of OSPFv2 LS Request packets received since OSPF counters were last cleared."
+	::= { hm2AgentOspfPacketStatsGroup 7 }
+
+	 
+	hm2AgentOspfLsReqTx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The total number of OSPFv2 LS Request packets transmitted since OSPF counters were last cleared."
+	::= { hm2AgentOspfPacketStatsGroup 8 }
+
+	 
+	hm2AgentOspfLsUpdatesRx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The total number of OSPFv2 LS Update packets received since OSPF counters 
+			were last cleared."
+	::= { hm2AgentOspfPacketStatsGroup 9 }
+
+	 
+	hm2AgentOspfLsUpdatesTx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The total number of OSPFv2 LS Update packets transmitted since OSPF counters 
+			were last cleared."
+	::= { hm2AgentOspfPacketStatsGroup 10 }
+
+	 
+	hm2AgentOspfLsAckRx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The total number of OSPFv2 LS Acknowledgement packets received since OSPF counters were last cleared."
+	::= { hm2AgentOspfPacketStatsGroup 11 }
+
+	 
+	hm2AgentOspfLsAckTx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The total number of OSPFv2 LS Acknowledgement packets transmitted since OSPF counters were last cleared."
+	::= { hm2AgentOspfPacketStatsGroup 12 }
+
+	 
+	hm2AgentOspfLsUpdatesRxMax OBJECT-TYPE
+		SYNTAX Gauge32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The maximum rate of OSPFv2 LS Update packets received over any 5-second 
+			interval since OSPF counters were last cleared. The rate is given in packets 
+			per second (that is, the number of packets received during the 5-second 
+			interval, divided by 5)."
+	::= { hm2AgentOspfPacketStatsGroup 13 }
+
+	 
+	hm2AgentOspfLsUpdatesTxMax OBJECT-TYPE
+		SYNTAX Gauge32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The maximum rate of OSPFv2 LS Update packets transmitted over any 5-second 
+			interval since OSPF counters were last cleared. The rate is given in packets 
+			per second (that is, the number of packets transmitted during the 5-second 
+			interval, divided by 5)."
+	::= { hm2AgentOspfPacketStatsGroup 14 }
+
+	 
+	hm2AgentOspfType1LsasRx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of type 1 (router) LSAs received since OSPF counters 
+			were last cleared."
+	::= { hm2AgentOspfPacketStatsGroup 15 }
+
+	 
+	hm2AgentOspfType2LsasRx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of type 2 (network) LSAs received since OSPF counters 
+			were last cleared."
+	::= { hm2AgentOspfPacketStatsGroup 16 }
+
+	 
+	hm2AgentOspfType3LsasRx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of type 3 (network summary) LSAs received since OSPF counters 
+			were last cleared."
+	::= { hm2AgentOspfPacketStatsGroup 17 }
+
+	 
+	hm2AgentOspfType4LsasRx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of type 4 (ASBR summary) LSAs received since OSPF counters 
+			were last cleared."
+	::= { hm2AgentOspfPacketStatsGroup 18 }
+
+	 
+	hm2AgentOspfType5LsasRx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of type 5 (external) LSAs received since OSPF counters 
+			were last cleared."
+	::= { hm2AgentOspfPacketStatsGroup 19 }
+
+	 
+	hm2AgentOspfType7LsasRx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of type 7 (NSSA external) LSAs received since OSPF counters 
+			were last cleared."
+	::= { hm2AgentOspfPacketStatsGroup 20 }
+
+	 
+	hm2AgentOspfType9LsasRx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of type 9 (Link Opaque) LSAs received since OSPF counters 
+			were last cleared."
+	::= { hm2AgentOspfPacketStatsGroup 21 }
+
+	 
+	hm2AgentOspfType10LsasRx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of type 10 (Area Opaque) LSAs received since OSPF counters 
+			were last cleared."
+	::= { hm2AgentOspfPacketStatsGroup 22 }
+
+	 
+	hm2AgentOspfType11LsasRx OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of type 11 (AS Opaque) LSAs received since OSPF counters 
+			were last cleared."
+	::= { hm2AgentOspfPacketStatsGroup 23 }
+
+--
+-- hm2AgentOspfSpfStatsTable
+--
+	hm2AgentOspfSpfStatsTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentOspfSpfStatsEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Contains statistics for the twenty most recent SPF runs. 
+			Statistics are reported from the oldest SPF first to the most recent."
+	::= { hm2PlatformRouting 15 }
+
+	hm2AgentOspfSpfStatsEntry OBJECT-TYPE
+		SYNTAX Hm2AgentOspfSpfStatsEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Statistics for a single SPF run."
+		INDEX { hm2AgentOspfSpfIndex } 
+	::= { hm2AgentOspfSpfStatsTable 1 }
+
+
+	Hm2AgentOspfSpfStatsEntry ::= SEQUENCE
+		{
+		hm2AgentOspfSpfIndex 			Unsigned32,
+		hm2AgentOspfSpfStatsDeltaT 		Unsigned32,
+		hm2AgentOspfSpfStatsIntra 		Unsigned32,
+		hm2AgentOspfSpfStatsSumm 		Unsigned32,
+		hm2AgentOspfSpfStatsExt 		Unsigned32,
+		hm2AgentOspfSpfStatsSpfTotal 	Unsigned32,
+		hm2AgentOspfSpfStatsRibUpdate 	Unsigned32,
+		hm2AgentOspfSpfStatsReason 		DisplayString
+		}
+
+	 
+	hm2AgentOspfSpfIndex OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Integer that uniquely identifies an SPF run. This value is 
+			incremented each time OSPF runs a full routing table calculation."
+	::= { hm2AgentOspfSpfStatsEntry 1 }
+
+	 
+	hm2AgentOspfSpfStatsDeltaT OBJECT-TYPE
+		SYNTAX Unsigned32
+		UNITS
+			"seconds"
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"How long since this routing table calculation ran. The time is 
+			given in seconds."
+	::= { hm2AgentOspfSpfStatsEntry 2 }
+
+	 
+	hm2AgentOspfSpfStatsIntra OBJECT-TYPE
+		SYNTAX Unsigned32
+		UNITS
+			"milli-seconds"
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of milliseconds to compute intra-area routes."
+	::= { hm2AgentOspfSpfStatsEntry 3 }
+
+	 
+	hm2AgentOspfSpfStatsSumm OBJECT-TYPE
+		SYNTAX Unsigned32
+		UNITS
+			"milli-seconds"
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of milliseconds to compute inter-area routes."
+	::= { hm2AgentOspfSpfStatsEntry 4 }
+
+	 
+	hm2AgentOspfSpfStatsExt OBJECT-TYPE
+		SYNTAX Unsigned32
+		UNITS
+			"milli-seconds"
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of milliseconds to compute external routes."
+	::= { hm2AgentOspfSpfStatsEntry 5 }
+
+	 
+	hm2AgentOspfSpfStatsSpfTotal OBJECT-TYPE
+		SYNTAX Unsigned32
+		UNITS
+			"milli-seconds"
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of milliseconds for entire routing table calculation."
+	::= { hm2AgentOspfSpfStatsEntry 6 }
+
+	 
+	hm2AgentOspfSpfStatsRibUpdate OBJECT-TYPE
+		SYNTAX Unsigned32
+		UNITS
+			"milli-seconds"
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of milliseconds to update the common routing table."
+	::= { hm2AgentOspfSpfStatsEntry 7 }
+
+	 
+	hm2AgentOspfSpfStatsReason OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Reasons why a routing table calculation was required. 
+			R - new router LSA, 
+			         N - new Network LSA, 
+			         SN - new network summary LSA, 
+			         SA - new ASBR summary LSA, 
+			         X - new external LSA."
+	::= { hm2AgentOspfSpfStatsEntry 8 }
+
+    --****************************************************************
+    -- hm2AgentRoutingHeapGroup
+    --
+    --****************************************************************
+ 
+    hm2AgentRoutingHeapGroup    OBJECT IDENTIFIER ::= { hm2PlatformRouting 16 }
+
+    hm2AgentRoutingHeapSize OBJECT-TYPE
+      SYNTAX     Unsigned32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The size of the routing heap, in bytes.  Unicast routing protocols
+        and ARP allocate memory from the routing heap."
+    ::= { hm2AgentRoutingHeapGroup 1 }
+
+    hm2AgentRoutingHeapInUse OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of bytes currently allocated from the routing heap."
+    ::= { hm2AgentRoutingHeapGroup 2 }
+
+    hm2AgentRoutingHeapHigh OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "High water mark for the number of bytes allocated from the routing heap."
+    ::= { hm2AgentRoutingHeapGroup 3 }
+
+    --****************************************************************
+    -- hm2AgentRoutingTableSummaryGroup
+    --
+    --****************************************************************
+
+    hm2AgentRoutingTableSummaryGroup    OBJECT IDENTIFIER ::= { hm2PlatformRouting 17 }
+
+    hm2AgentConnectedRoutes OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of connected routes in the IPv4 routing table."
+    ::= { hm2AgentRoutingTableSummaryGroup 1 }
+
+    hm2AgentStaticRoutes OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of static routes in the IPv4 routing table."
+    ::= { hm2AgentRoutingTableSummaryGroup 2 }
+
+    hm2AgentRipRoutes OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of RIP routes in the IPv4 routing table."
+    ::= { hm2AgentRoutingTableSummaryGroup 3 }
+
+    hm2AgentOspfRoutes OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of OSPFv2 routes in the IPv4 routing table."
+    ::= { hm2AgentRoutingTableSummaryGroup 4 }
+
+    hm2AgentOspfIntraRoutes OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of OSPFv2 intra-area routes in the IPv4 routing table."
+    ::= { hm2AgentRoutingTableSummaryGroup 5 }
+
+    hm2AgentOspfInterRoutes OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of OSPFv2 inter-area routes in the IPv4 routing table."
+    ::= { hm2AgentRoutingTableSummaryGroup 6 }
+
+    hm2AgentOspfExt1Routes OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of OSPFv2 external type 1 routes in the IPv4 routing table."
+    ::= { hm2AgentRoutingTableSummaryGroup 7 }
+
+    hm2AgentOspfExt2Routes OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of OSPFv2 external type 2 routes in the IPv4 routing table."
+    ::= { hm2AgentRoutingTableSummaryGroup 8 }
+
+    hm2AgentBgpRoutes OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of BGP routes in the IPv4 routing table."
+    ::= { hm2AgentRoutingTableSummaryGroup 9 }
+
+    hm2AgentEbgpRoutes OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of external BGP routes in the IPv4 routing table."
+    ::= { hm2AgentRoutingTableSummaryGroup 10 }
+
+    hm2AgentIbgpRoutes OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of internal BGP routes in the IPv4 routing table."
+    ::= { hm2AgentRoutingTableSummaryGroup 11 }
+
+    hm2AgentLocalBgpRoutes OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of local BGP routes in the IPv4 routing table."
+    ::= { hm2AgentRoutingTableSummaryGroup 12 }
+
+    hm2AgentRejectRoutes OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of reject routes in the IPv4 routing table."
+    ::= { hm2AgentRoutingTableSummaryGroup 13 }
+
+    hm2AgentTotalRoutes OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of routes in the IPv4 routing table."
+    ::= { hm2AgentRoutingTableSummaryGroup 14 }
+
+    hm2AgentBestRoutes OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of IPv4 routes in the forwarding table."
+    ::= { hm2AgentRoutingTableSummaryGroup 15 }
+
+    hm2AgentBestRoutesHigh OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The highest number of IPv4 routes in the forwarding table."
+    ::= { hm2AgentRoutingTableSummaryGroup 16 }
+
+    hm2AgentAlternateRoutes OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of alternate routes in the IPv4 routing table.
+         An alternate route is less preferred than the best route and is not used for forwarding."
+    ::= { hm2AgentRoutingTableSummaryGroup 17 }
+
+    hm2AgentRouteAdds OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of routes added to the IPv4 routing table."
+    ::= { hm2AgentRoutingTableSummaryGroup 18 }
+
+    hm2AgentRouteModifies OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of routes changed in the IPv4 routing table."
+    ::= { hm2AgentRoutingTableSummaryGroup 19 }
+
+    hm2AgentRouteDeletes OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of routes removed from the IPv4 routing table."
+    ::= { hm2AgentRoutingTableSummaryGroup 20 }
+
+    hm2AgentUnresolvedRouteAdds OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of IPv4 route adds that failed because none of the route's next hops were on a local subnet."
+    ::= { hm2AgentRoutingTableSummaryGroup 21 }
+
+    hm2AgentInvalidRouteAdds OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of IPv4 routes adds that failed because the route was invalid."
+    ::= { hm2AgentRoutingTableSummaryGroup 22 }
+
+    hm2AgentFailedRouteAdds OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of IPv4 routes adds that failed because of a resource limitation in the routing table"
+    ::= { hm2AgentRoutingTableSummaryGroup 23 }
+
+    hm2AgentReservedLocals OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of IPv4 routing table entries reserved for a local subnet on a routing interface that is down. "
+    ::= { hm2AgentRoutingTableSummaryGroup 24 }
+
+    hm2AgentUniqueNextHops OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of distinct next hops used among all IPv4 routes currently in the routing table.
+         These include local interfaces for local routes and neighbors for indirect routes."
+    ::= { hm2AgentRoutingTableSummaryGroup 25 }
+
+    hm2AgentUniqueNextHopsHigh OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The highest count of unique next hops since counters were last cleared."
+    ::= { hm2AgentRoutingTableSummaryGroup 26 }
+
+    hm2AgentNextHopGroups OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The current number of next hop groups in use by one or more routes.
+         Each next hop group includes one or more next hops."
+    ::= { hm2AgentRoutingTableSummaryGroup 27 }
+
+    hm2AgentNextHopGroupsHigh OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The highest count of next hop groups since counters were last cleared."
+    ::= { hm2AgentRoutingTableSummaryGroup 28 }
+
+    hm2AgentEcmpGroups OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of next hop groups with multiple next hops."
+    ::= { hm2AgentRoutingTableSummaryGroup 29 }
+
+    hm2AgentEcmpGroupsHigh OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The high water mark of the number of ECMP groups."
+    ::= { hm2AgentRoutingTableSummaryGroup 30 }
+
+    hm2AgentEcmpRoutes OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The current number of IPv4 routes with multiple next hops."
+    ::= { hm2AgentRoutingTableSummaryGroup 31 }
+
+    hm2AgentTruncEcmpRoutes OBJECT-TYPE
+      SYNTAX     Gauge32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of ECMP routes that are currently installed in the forwarding table
+         with just one next hop. The forwarding table may limit the number of ECMP
+         routes or the number of ECMP groups. When an ECMP route cannot be installed
+         because such a limit is reached, the route is installed with a single next hop."
+    ::= { hm2AgentRoutingTableSummaryGroup 32 }
+
+    hm2AgentEcmpRetries OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The number of ECMP routes that have been installed in the forwarding table
+         after initially being installed with a single next hop."
+    ::= { hm2AgentRoutingTableSummaryGroup 33 }
+
+    --****************************************************************
+    -- hm2AgentEcmpCountTable
+    --
+    --************************************************************
+
+    hm2AgentEcmpCountTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentEcmpCountEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A count of the number of routes with each number of ECMP next hops."
+         ::= { hm2PlatformRouting 18}
+
+    hm2AgentEcmpCountEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentEcmpCountEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Number of IPv4 routes with a given number of next hops."
+         INDEX       { hm2AgentEcmpNextHopCount }
+         ::= { hm2AgentEcmpCountTable 1 }
+
+    Hm2AgentEcmpCountEntry ::= SEQUENCE {
+         hm2AgentEcmpNextHopCount
+            Unsigned32,
+         hm2AgentEcmpRouteCount
+            Gauge32
+       }
+
+    hm2AgentEcmpNextHopCount OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..128)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The number of next hops in a route. From 0 to the maximum number of
+                      next hops in an ECMP route. The maximum varies by platform."
+         ::= { hm2AgentEcmpCountEntry 1 }
+
+    hm2AgentEcmpRouteCount OBJECT-TYPE
+         SYNTAX      Gauge32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The number of IPv4 routes with agentEcmpNextHopCount next hops."
+         ::= { hm2AgentEcmpCountEntry 2 }
+
+ 
+    --****************************************************************
+    -- hm2AgentOspfStubRouterGroup
+    --
+    --****************************************************************
+    hm2AgentOspfStubRouterGroup    OBJECT IDENTIFIER ::= { hm2PlatformRouting 19 }
+
+   hm2AgentOspfStubRouterAdvertisement OBJECT-TYPE
+       SYNTAX       INTEGER {
+                    doNotAdvertise(1),
+                    advertise(2)
+                    }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "Specifies how the router LSAs are advertised by the router.
+           The value doNotAdvertise indicates the advertisement of a
+           standard router LSA and is the default value.  The value
+           advertise indicates the advertisement of a stub router LSA."
+       ::= { hm2AgentOspfStubRouterGroup 1 }
+
+   hm2AgentOspfStubRouterReason OBJECT-TYPE
+      SYNTAX     INTEGER {
+                 configured(0),
+                 startup(1),
+                 resource-limitation(2)
+                 }
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "This indicates the reason because of which the router is in Stub mode.
+        This is valid only if the agentOspfStubRouterMode is 'active'."
+    ::= { hm2AgentOspfStubRouterGroup 2 }
+
+   hm2AgentOspfStubRouterStartupTimeRemaining OBJECT-TYPE
+      SYNTAX     Unsigned32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "The time remaining (in seconds) for the router to come out of the
+        stub mode. This is valid only if the agentOspfStubRouterReason is
+        'startup'."
+    ::= { hm2AgentOspfStubRouterGroup 3 }
+
+   hm2AgentOspfStubRouterDuration OBJECT-TYPE
+      SYNTAX     Unsigned32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+        "Time elapsed (in seconds) since the router last entered the stub
+        router mode.  This is valid only if the agentOspfStubRouterMode is
+        'active' and agentOspfStubRouterReason is 'resource-limitation'."
+    ::= { hm2AgentOspfStubRouterGroup 4 }
+
+-- 
+-- hm2AgentOspfNbrTable
+-- 
+
+	hm2AgentOspfNbrTable OBJECT-TYPE
+		SYNTAX   	SEQUENCE OF Hm2AgentOspfNbrEntry
+		MAX-ACCESS  not-accessible
+		STATUS   	current
+		DESCRIPTION
+		           "Information about this router's neighbors.
+			    	Augments ospfNbrTable from the OSPF-MIB."
+		::= { hm2PlatformRouting 249 }
+
+	hm2AgentOspfNbrEntry OBJECT-TYPE
+		SYNTAX   	Hm2AgentOspfNbrEntry
+		MAX-ACCESS  not-accessible
+		STATUS   	current
+		DESCRIPTION
+		           "Information about a single neighbor.
+		            Augments ospfNbrEntry in OSPF-MIB."
+		AUGMENTS { ospfNbrEntry }
+		::= { hm2AgentOspfNbrTable 1 }
+
+	Hm2AgentOspfNbrEntry ::= SEQUENCE {
+		hm2AgentOspfNbrDeadTime       TimeTicks
+	}
+
+	hm2AgentOspfNbrDeadTime OBJECT-TYPE
+		SYNTAX   	TimeTicks
+		MAX-ACCESS  read-only
+		STATUS   	current
+		DESCRIPTION
+		           "The neighbor's Dead Time is the amount of remaining time 
+		           since the last OSPF hello packet received, before 
+		           declaring the neighbor status as down."
+		::= { hm2AgentOspfNbrEntry 1 }
+
+
+-- 
+--  hm2AgentOspfRouteTable
+-- 
+
+	hm2AgentOspfRouteTable OBJECT-TYPE
+		SYNTAX   	SEQUENCE OF Hm2AgentOspfRouteEntry
+		MAX-ACCESS  not-accessible
+		STATUS   	current
+		DESCRIPTION
+		           "Information about this router's OSPF routes."
+		::= { hm2PlatformRouting 250 }
+
+	hm2AgentOspfRouteEntry OBJECT-TYPE
+		SYNTAX   	Hm2AgentOspfRouteEntry
+		MAX-ACCESS  not-accessible
+		STATUS   	current
+		DESCRIPTION
+		           "Information about a single route."
+		INDEX { hm2AgentOspfRouteNet, hm2AgentOspfRouteMask }  
+		::= { hm2AgentOspfRouteTable 1 }
+
+	Hm2AgentOspfRouteEntry ::= SEQUENCE {
+		hm2AgentOspfRouteNet			InetAddressIPv4,
+		hm2AgentOspfRouteMask			InetAddressIPv4,
+		hm2AgentOspfRouteCost			Integer32,
+		hm2AgentOspfRouteProtoType		INTEGER
+	}
+
+	hm2AgentOspfRouteNet OBJECT-TYPE
+		SYNTAX      InetAddressIPv4
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			 "The IP Address of the Net or Subnet  indicated
+			  by the route."
+	   ::= { hm2AgentOspfRouteEntry 1 }
+	
+	hm2AgentOspfRouteMask OBJECT-TYPE
+		SYNTAX      InetAddressIPv4
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+				"The Subnet Mask that pertains to  the  Net  or
+			  Subnet."
+	 ::= { hm2AgentOspfRouteEntry 2 }		
+		
+	hm2AgentOspfRouteCost OBJECT-TYPE
+		SYNTAX   	Integer32
+		MAX-ACCESS  read-only
+		STATUS   	current
+		DESCRIPTION
+		           "The route cost calculated in the SPF algorithm to reach the network."
+		::= { hm2AgentOspfRouteEntry 3 }
+
+	hm2AgentOspfRouteProtoType OBJECT-TYPE
+		SYNTAX   	INTEGER { 
+		                intra (1),
+						inter (2),
+						ext-type1 (3),
+						ext-type2 (4),
+						nssa-type1 (5),
+						nssa-type2 (6)
+						} 
+		MAX-ACCESS  read-only
+		STATUS   	current
+		DESCRIPTION
+		           "The type of route that was learned from OSPF."
+		::= { hm2AgentOspfRouteEntry 4 }	
+	
+--
+-- hm2AgentVrrpExtGroup
+--	 
+	hm2AgentVrrpExtGroup OBJECT IDENTIFIER ::= { hm2PlatformRouting 260 }
+
+
+--
+-- hm2AgentVrrpTrackingTable
+--	 
+
+	hm2AgentVrrpTrackingTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentVrrpTrackingEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table contains variables to define
+			an entry in the VRRP Tracking database."
+	::= { hm2AgentVrrpExtGroup 1 }
+
+	 
+	hm2AgentVrrpTrackingEntry OBJECT-TYPE
+		SYNTAX Hm2AgentVrrpTrackingEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The entries of the table."
+		INDEX { hm2AgentVrrpTrackIfIndex, hm2AgentVrrpTrackVrid, IMPLIED hm2AgentVrrpTrackId } 
+	::= { hm2AgentVrrpTrackingTable 1 }
+
+
+	Hm2AgentVrrpTrackingEntry ::= SEQUENCE
+		{
+		hm2AgentVrrpTrackIfIndex 	Integer32,
+		hm2AgentVrrpTrackVrid 		Integer32,
+		hm2AgentVrrpTrackId 		SnmpAdminString,
+		hm2AgentVrrpTrackDecrement 	Integer32,
+		hm2AgentVrrpTrackOperStatus INTEGER,
+		hm2AgentVrrpTrackRowStatus 	RowStatus
+		}
+
+	 
+	hm2AgentVrrpTrackIfIndex OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"DURABLE: { 1:all }
+			The interface number of the virtual router"
+	::= { hm2AgentVrrpTrackingEntry 1 }
+
+	 
+	hm2AgentVrrpTrackVrid OBJECT-TYPE
+		SYNTAX Integer32 (1..255)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"DURABLE: { 1:all }
+			The virtual router id for this virtual router"
+	::= { hm2AgentVrrpTrackingEntry 2 }
+
+	 
+	hm2AgentVrrpTrackId OBJECT-TYPE
+		SYNTAX SnmpAdminString
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"DURABLE: { 1:all }
+			The id of the object being tracked"
+	::= { hm2AgentVrrpTrackingEntry 3 }
+
+	 
+	hm2AgentVrrpTrackDecrement OBJECT-TYPE
+		SYNTAX Integer32 (1..253)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"DURABLE: { 1:all }
+			The value by wich the current priority of the virtual router
+			is decremented when the tracked object goes DOWN."
+	::= { hm2AgentVrrpTrackingEntry 4 }
+
+	 
+	hm2AgentVrrpTrackOperStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			up(1),
+			down(2),
+			notReady(3)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Shows if the tracked object is currently UP or DOWN or NOT-READY"
+	::= { hm2AgentVrrpTrackingEntry 5 }
+
+	 
+	hm2AgentVrrpTrackRowStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"DURABLE: { 1:all }
+			Defines the status of a vrrp tracking database entry.
+			Set to createAndGo(4) to create a new row.
+			Set to destroy(6) to delete an entry.
+			Reads as active(1) if the tracked object exists and is trackable,
+			notReady(3) otherwise."
+	::= { hm2AgentVrrpTrackingEntry 6 }
+
+--
+-- hm2AgentVrrpExtTable
+--	 
+
+	hm2AgentVrrpExtTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentVrrpExtEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table contains variables to define
+			an entry in the VRRP enhancements database."
+	::= { hm2AgentVrrpExtGroup 2 }
+
+	 
+	hm2AgentVrrpExtEntry OBJECT-TYPE
+		SYNTAX Hm2AgentVrrpExtEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The entry of the hm2AgentVrrpExtTable."
+		INDEX { hm2AgentVrrpExtIfIndex, hm2AgentVrrpExtVrid } 
+	::= { hm2AgentVrrpExtTable 1 }
+
+
+	Hm2AgentVrrpExtEntry ::= SEQUENCE
+		{
+		hm2AgentVrrpExtIfIndex 			Integer32,
+		hm2AgentVrrpExtVrid 			Integer32,
+		hm2AgentVrrpExtDomainId 		Integer32,
+		hm2AgentVrrpExtDomainRole 		INTEGER,
+		hm2AgentVrrpExtDomainStatus 	INTEGER,
+		hm2AgentVrrpExtAdvertAddress 	IpAddress,
+		hm2AgentVrrpExtAdvertTimer 		Integer32,
+		hm2AgentVrrpExtCfgPriority	 	Integer32,
+		hm2AgentVrrpExtNotifyAddress 	IpAddress,
+		hm2AgentVrrpExtNotifyLinkdown 	INTEGER,
+		hm2AgentVrrpExtPreemptionDelay 	Integer32,
+		hm2AgentVrrpPrimaryVirtualAddress 	IpAddress,
+		hm2AgentVrrpExtMethod			INTEGER,
+		hm2AgentVrrpExtProxyarp			TruthValue
+		}
+
+	 
+	hm2AgentVrrpExtIfIndex OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The interface number of the virtual router"
+	::= { hm2AgentVrrpExtEntry 1 }
+
+	 
+	hm2AgentVrrpExtVrid OBJECT-TYPE
+		SYNTAX Integer32 (1..255)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The virtual router id for this virtual router"
+	::= { hm2AgentVrrpExtEntry 2 }
+
+	 
+	hm2AgentVrrpExtDomainId OBJECT-TYPE
+		SYNTAX Integer32 (0..8)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The domain this virtual router is a member of. If set to
+			0, the virtual router is not a member of any domain."
+		DEFVAL { 0 }
+	::= { hm2AgentVrrpExtEntry 3 }
+
+	 
+	hm2AgentVrrpExtDomainRole OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			none(1),
+			member(2),
+			supervisor(3)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The role of this virtual router in its domain. This is none(1) if 
+			the virtual router is not member of a domain, supervisor(3) if it
+			is the supervisor of its domain, member(2) otherwise."
+		DEFVAL { none }
+	::= { hm2AgentVrrpExtEntry 4 }
+
+	 
+	hm2AgentVrrpExtDomainStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			noError(1),
+			noSupervisor(2),
+			supervisorDown(3)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Shows if the domain configuration is correct for this virtual router"
+	::= { hm2AgentVrrpExtEntry 5 }
+
+	 
+	hm2AgentVrrpExtAdvertAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The IP address advertisements of the virtual router are sent to"
+		DEFVAL { 'E0000012'h } 
+	::= { hm2AgentVrrpExtEntry 6 }
+
+	 
+	hm2AgentVrrpExtAdvertTimer OBJECT-TYPE
+		SYNTAX Integer32 (100..255000)
+		UNITS
+			"milli-seconds"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This is used to set the interval between advertisements in
+			milliseconds. This accesses the same value as
+			vrrpOperAdvertisementInterval."
+		DEFVAL { 1000 } 
+	::= { hm2AgentVrrpExtEntry 7 }
+
+	 
+	hm2AgentVrrpExtCfgPriority OBJECT-TYPE
+		SYNTAX Integer32 (1..254)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The configured priority of the virtual router. This can be
+			different from the operating priority if tracked objects are down
+			or the virtual router is the ip address owner"
+		DEFVAL { 100 }
+	::= { hm2AgentVrrpExtEntry 8 }
+
+	 
+	hm2AgentVrrpExtNotifyAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The IP address notifications of the virtual router are sent to"
+		DEFVAL  { '00000000'H } -- 0.0.0.0
+	::= { hm2AgentVrrpExtEntry 9 }
+
+	 
+	hm2AgentVrrpExtNotifyLinkdown OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Enables or disables sending of notification messages if the
+			virtual router's interface goes down."
+		DEFVAL { disable }
+	::= { hm2AgentVrrpExtEntry 10 }
+
+	 
+	hm2AgentVrrpExtPreemptionDelay OBJECT-TYPE
+		SYNTAX Integer32 (0..65535)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Time (in seconds) after startup of the virtual router by which the
+			preemption of a Master with a lower priority is delayed."
+		DEFVAL { 0 } 
+	::= { hm2AgentVrrpExtEntry 11 }
+
+	hm2AgentVrrpPrimaryVirtualAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The virtual IP address in the subnet of the primary ip address on
+			the interface. If no match is found, an unspecified virtual address
+			is returned. If no virtual address is configured, 0.0.0.0 is returned."
+	::= { hm2AgentVrrpExtEntry 12 }
+	
+	hm2AgentVrrpExtMethod  OBJECT-TYPE
+   		SYNTAX      INTEGER
+   		{
+                    none (1),
+                    config (2),
+                    ttdp (3)
+   		}
+   		MAX-ACCESS  read-write
+   		STATUS      current
+   		DESCRIPTION
+          		"The source of the VRRP instance. User can set the object to none(1), config(2), ttdp(3)."
+		DEFVAL { none }
+   	::= { hm2AgentVrrpExtEntry 13 }
+
+	hm2AgentVrrpExtProxyarp  OBJECT-TYPE 
+		SYNTAX       TruthValue
+		MAX-ACCESS   read-write
+		STATUS       current
+		DESCRIPTION 
+			"This object specifies if proxy arp functionality must be 
+			 associated with a vrrp instance.
+			 Possible values:
+			 - true: enable proxy arp on change of vrrpOperState to master
+			 - false: No impact
+			 NOTE: Set the value to true when using 1:1 NAT along with VRRP.
+			       Proxy arp on the physical interface must be disabled.
+			 "
+		DEFVAL { false }
+		::= { hm2AgentVrrpExtEntry 14 }
+
+--
+-- hm2AgentVrrpDomainTable
+--	 
+	 
+	hm2AgentVrrpDomainTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentVrrpDomainEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table contains variables to define
+			an entry in the VRRP domain database."
+	::= { hm2AgentVrrpExtGroup 3 }
+
+	 
+	hm2AgentVrrpDomainEntry OBJECT-TYPE
+		SYNTAX Hm2AgentVrrpDomainEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The entries of the table."
+		INDEX { hm2AgentVrrpDomainId } 
+	::= { hm2AgentVrrpDomainTable 1 }
+
+
+	Hm2AgentVrrpDomainEntry ::= SEQUENCE
+		{
+		hm2AgentVrrpDomainId 					Integer32,
+		hm2AgentVrrpDomainMemberSendAdv 		INTEGER,
+		hm2AgentVrrpDomainStatus 				INTEGER,
+		hm2AgentVrrpDomainSupervisorIfIndex 	Integer32,
+		hm2AgentVrrpDomainSupervisorVrid 		Integer32,
+		hm2AgentVrrpDomainOperPriority 			Integer32,
+		hm2AgentVrrpDomainSupervisorOperState 	INTEGER
+		}
+
+	 
+	hm2AgentVrrpDomainId OBJECT-TYPE
+		SYNTAX Integer32 (0..8)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The domain ID."
+	::= { hm2AgentVrrpDomainEntry 1 }
+
+	 
+	hm2AgentVrrpDomainMemberSendAdv OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"DURABLE: { 1:all }
+			Determines if the members of this domain send advertisement packets.
+			If set to disabled(2), only the supervisor of the domain sends packets."
+		DEFVAL { disable }
+	::= { hm2AgentVrrpDomainEntry 2 }
+
+	 
+	hm2AgentVrrpDomainStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			noError(1),
+			noSupervisor(2),
+			supervisorDown(3)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Shows if the configuration of the domain is complete."
+	::= { hm2AgentVrrpDomainEntry 3 }
+
+	 
+	hm2AgentVrrpDomainSupervisorIfIndex OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The interface number of the supervisor of the domain"
+	::= { hm2AgentVrrpDomainEntry 4 }
+
+	 
+	hm2AgentVrrpDomainSupervisorVrid OBJECT-TYPE
+		SYNTAX Integer32 (0..255)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The virtual router id of the supervisor of the domain. 0 if unconfigured"
+	::= { hm2AgentVrrpDomainEntry 5 }
+
+	 
+	hm2AgentVrrpDomainOperPriority OBJECT-TYPE
+		SYNTAX Integer32 (0..255)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The current operating priority of the domain. This can be
+			different from the configured priority if tracked objects are down.
+			For domain members this is the priority of the supervisor of that
+			Domain if the supervisor is configured and up."
+	::= { hm2AgentVrrpDomainEntry 6 }
+
+	 
+	hm2AgentVrrpDomainSupervisorOperState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			initialize(1),
+			backup(2),
+			master(3),
+			unknown(4)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Shows the current operational state of the domain supervisor."
+	::= { hm2AgentVrrpDomainEntry 7 }
+
+--
+-- hm2AgentNeighbourGroup
+--
+	hm2AgentNeighbourGroup OBJECT IDENTIFIER ::= { hm2PlatformRouting 270 }
+
+--
+-- hm2AgentStaticNeighbourTable
+--		
+	hm2AgentStaticNeighbourTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentStaticNeighbourEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+	::= { hm2AgentNeighbourGroup 10 }
+
+	 
+	hm2AgentStaticNeighbourEntry OBJECT-TYPE
+		SYNTAX Hm2AgentStaticNeighbourEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		INDEX { hm2AgentStaticNeighbourAddressType, hm2AgentStaticNeighbourAddress } 
+	::= { hm2AgentStaticNeighbourTable 1 }
+
+
+	Hm2AgentStaticNeighbourEntry ::= SEQUENCE
+		{
+		hm2AgentStaticNeighbourAddressType 	InetAddressType,
+		hm2AgentStaticNeighbourAddress 		InetAddress,
+		hm2AgentStaticNeighbourPhysAddress 	PhysAddress,
+		hm2AgentStaticNeighbourIfIndex		InterfaceIndexOrZero,
+		hm2AgentStaticNeighbourRowStatus 	RowStatus
+		}
+
+	 
+	hm2AgentStaticNeighbourAddressType OBJECT-TYPE
+		SYNTAX InetAddressType 
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+	::= { hm2AgentStaticNeighbourEntry 1 }
+
+	 
+	hm2AgentStaticNeighbourAddress OBJECT-TYPE
+		SYNTAX InetAddress (SIZE(4|16))
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+	::= { hm2AgentStaticNeighbourEntry 2 }
+
+	 
+	hm2AgentStaticNeighbourPhysAddress OBJECT-TYPE
+		SYNTAX PhysAddress (SIZE(0..65535))
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"."
+	::= { hm2AgentStaticNeighbourEntry 3 }
+
+	hm2AgentStaticNeighbourIfIndex OBJECT-TYPE
+		SYNTAX InterfaceIndexOrZero
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"."
+	::= { hm2AgentStaticNeighbourEntry 4 }
+	 
+	hm2AgentStaticNeighbourRowStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The status of this entry. Setting this object destroy will remove the entry."
+	::= { hm2AgentStaticNeighbourEntry 5 }
+
+--
+-- hm2AgentDynamicNeighbourTable
+--		
+	hm2AgentDynamicNeighbourTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2AgentDynamicNeighbourEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+	::= { hm2AgentNeighbourGroup 11 }
+
+	 
+	hm2AgentDynamicNeighbourEntry OBJECT-TYPE
+		SYNTAX Hm2AgentDynamicNeighbourEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+		INDEX { hm2AgentDynamicNeighbourAddressType, hm2AgentDynamicNeighbourAddress } 
+	::= { hm2AgentDynamicNeighbourTable 1 }
+
+	Hm2AgentDynamicNeighbourEntry ::= SEQUENCE
+		{
+		hm2AgentDynamicNeighbourAddressType 	InetAddressType,
+		hm2AgentDynamicNeighbourAddress 		InetAddress,
+		hm2AgentDynamicNeighbourPhysAddress 	PhysAddress,
+		hm2AgentDynamicNeighbourIfIndex			InterfaceIndexOrZero,
+		hm2AgentDynamicNeighbourAction	 		INTEGER
+		}
+
+	 
+	hm2AgentDynamicNeighbourAddressType OBJECT-TYPE
+		SYNTAX InetAddressType 
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+	::= { hm2AgentDynamicNeighbourEntry 1 }
+
+	 
+	hm2AgentDynamicNeighbourAddress OBJECT-TYPE
+		SYNTAX InetAddress (SIZE(4|16))
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"."
+	::= { hm2AgentDynamicNeighbourEntry 2 }
+
+	 
+	hm2AgentDynamicNeighbourPhysAddress OBJECT-TYPE
+		SYNTAX PhysAddress (SIZE(0..65535))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"."
+	::= { hm2AgentDynamicNeighbourEntry 3 }
+
+	hm2AgentDynamicNeighbourIfIndex OBJECT-TYPE
+		SYNTAX InterfaceIndexOrZero
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"."
+	::= { hm2AgentDynamicNeighbourEntry 4 }
+	 
+	hm2AgentDynamicNeighbourAction OBJECT-TYPE
+		SYNTAX INTEGER {
+						 other(1),
+						 delete(2),
+						 static(3)
+					   }
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"."
+	::= { hm2AgentDynamicNeighbourEntry 5 }                                          
+                                          
+--
+-- hm2AgentRoutingSNMPExtensionGroup
+--	 
+	hm2AgentRoutingSNMPExtensionGroup OBJECT IDENTIFIER ::= { hm2PlatformRouting 280 }
+
+	hm2AgentIpHelperTableFullErrorReturn OBJECT-IDENTITY
+		STATUS current
+		DESCRIPTION
+			"The maximum number of IP helper entries has been reached"
+	::= { hm2AgentRoutingSNMPExtensionGroup 1 }
+
+    hm2AgentIpHelperInvalidServerAddrErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Invalid IP server address."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 2 }
+    
+    hm2AgentRouterOspfDependenciesNotMet OBJECT-IDENTITY
+    	STATUS      current
+    	DESCRIPTION "Cannot modify OSPF admin state on this interface. Set primary IP address."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 3 }
+    
+    hm2AgentRouterOspfRangeTableFullErrorReturn OBJECT-IDENTITY
+    	STATUS      current
+    	DESCRIPTION "The maximum number of area-range entries has been reached."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 4 }
+    
+    hm2AgentRouterOspfVirtNbrTableFullErrorReturn OBJECT-IDENTITY
+    	STATUS      current
+    	DESCRIPTION "The maximum number of virtual neighbor entries has been reached."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 5 }
+    
+    hm2AgentRouterRIPDependenciesNotMet OBJECT-IDENTITY
+    	STATUS      current
+    	DESCRIPTION "Cannot modify RIP admin state on this interface. Set primary IP address."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 8 }
+    
+    hm2AgentIpHelperInvalidUdpPortErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Invalid UDP port."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 9 }
+
+     hm2AgentStaticNeighbourTableFullErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Static Neighbour Table is full."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 10 }
+
+    hm2AgentSecondaryAddrNoPrimaryErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Cannot add the secondary IP address because the interface has no primary IP address."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 11 }
+
+    hm2AgentSecondaryAddrDifferentPrimaryErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "The secondary IP address must be different from the primary IP address."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 12 }
+
+    hm2AgentSecondaryAddrWrongIpClassErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "The network number of the secondary IP address is not valid to be used on a routing interface."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 13 }
+
+    hm2AgentSecondaryAddrWrongSubnetErrorReturn OBJECT-IDENTITY
+           STATUS      obsolete
+           DESCRIPTION "All IP addresses on the interface must be from different subnets."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 14 }
+
+    hm2AgentSecondaryAddrMaxIntfEntriesErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "The maximum number of secondary IP addresses on the interface has been reached."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 15 }
+
+    hm2AgentSecondaryAddrMaxSystemEntriesErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "The maximum number of IP addresses on the system has been reached."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 16 }
+
+    hm2AgentSecondaryAddrStaticRouteErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "The secondary IP address is same as the next hop address of a static route."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 17 }
+
+    hm2AgentSecondaryAddrStaticARPErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "The secondary IP address is same as a static ARP entry."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 18 }
+
+    hm2AgentSecondaryAddrAbsentEntryErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "The secondary IP address is not configured on the interface."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 19 }
+
+    hm2AgentPrimaryAddrWrongIpClassErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "The primary IP address is out of the allowed IP class."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 20 }
+
+    hm2AgentPrimaryAddrConflictErrorReturn OBJECT-IDENTITY
+           STATUS      obsolete
+           DESCRIPTION "The primary IP address conflicts with another IP address on a routing interface."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 21 }
+
+   hm2AgentPrimaryAddrStaticRouteErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "The primary IP address is same as the next hop address of a static route."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 22 }
+
+   hm2AgentPrimaryAddrStaticARPErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "The primary IP address is same as a static ARP entry."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 23 }
+
+   hm2AgentPrimaryAddrExistingSecondaryErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "The primary IP address cannot be changed because the interface has secondary IP addresses configured."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 24 }
+
+   hm2AgentPrimaryAddrNetworkConflictErrorReturn OBJECT-IDENTITY
+           STATUS      obsolete
+           DESCRIPTION "The primary IP address conflicts with the management IP address."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 25 }
+
+   hm2AgentPrimaryAddrRoutingTableFullErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "The primary IP address cannot be added because there are no free entries in the routing table."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 26 }
+
+   hm2AgentDstAddrHostBitSetErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "The route cannot be added. Host bits must not be set in the destination. Network address is {0}."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 27 }
+    
+   hm2AgentSamePrefRouteErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Route cannot be added because reject route and next hop route cannot share the same preference."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 28 }
+    
+	hm2AgentVrrpAssoIpAddrRowStatusInconsistentAddress OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "The virtual address does not matching the current interface address configuration."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 29 }
+
+	hm2AgentVrrpAssoIpAddrRowStatusInvalidAddress OBJECT-IDENTITY
+	       STATUS      current
+           DESCRIPTION "The virtual address is not valid with the current interface address configuration."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 30 }
+	
+	hm2AgentVrrpAssoIpAddrRowStatusUnknownVRID OBJECT-IDENTITY
+	       STATUS      current
+           DESCRIPTION "Unknown virtual router id."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 31 }
+    
+	hm2AgentSwitchIpRouterDiscMinMaxAdvtIntErrorRtrn OBJECT-IDENTITY
+	       STATUS      current
+           DESCRIPTION "Min advertisement interval is  bigger then max advertisement interval."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 32 }
+    
+	hm2AgentSwitchIpRouterDiscLifeTimeMaxAdvIntErrorRtrn OBJECT-IDENTITY
+	       STATUS      current
+           DESCRIPTION "Max advertisement interval is bigger then advertisement life time."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 33 }    
+
+    hm2AgentSwitchIpIcmpRateLimitExceedingRatioErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Rate limit ratio exceeds 100 packets per second."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 34 }
+
+    hm2AgentRouterOspfMaxAreaErrorReturn OBJECT-IDENTITY
+    	STATUS      current
+    	DESCRIPTION "The maximum number of OSPF areas has been reached."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 35 }
+    
+    hm2AgentospfRouterIdChange OBJECT-IDENTITY
+    	STATUS      current
+    	DESCRIPTION "OSPF must be disabled to change the router ID."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 36 }
+    
+    hm2AgentOspfRedistDistList OBJECT-IDENTITY
+    	STATUS      current
+    	DESCRIPTION "Please add a redistribute list."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 37 }
+    
+    hm2AgentOspfDefaultAreaDeleteErrorReturn OBJECT-IDENTITY
+    	STATUS      current
+    	DESCRIPTION "The default area cannot be deleted."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 38 }
+    
+    hm2AgentLocalArpDeleteErrorReturn OBJECT-IDENTITY
+    	STATUS      current
+    	DESCRIPTION "Local ARP entries cannot be deleted."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 39 }
+
+    hm2AgentDynamicVlanRoutingErrorReturn OBJECT-IDENTITY
+    	STATUS      current
+    	DESCRIPTION "Dynamic VLANs cannot be used for routing interfaces."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 40 }
+
+	hm2AgentVlanUnawareRoutingErrorReturn OBJECT-IDENTITY
+    	STATUS      current
+    	DESCRIPTION "Routing cannot be used together with the vlan unaware mode."
+    ::= { hm2AgentRoutingSNMPExtensionGroup 41 }
+
+    hm2AgentRoutingInvalidNetworkAddress OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the routing table entry contains an invalid value for 
+                       network address that cannot be processed."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 42 }
+
+    hm2AgentRoutingTypeInvalidValue OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the type is invalid."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 43 }
+
+    hm2AgentRoutingLocalRoutePreference OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the local type and local protocol should have the preference
+                       value zero."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 44 }
+
+    hm2AgentRoutingMetricInvalid OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the routing table entry contains an invalid value for
+                        metric that cannot be processed."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 45 }
+
+    hm2AgentRoutingMetricNotSupported OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the route metric except 1 is not supported and cannot be set."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 46 }
+
+    hm2AgentRoutingNexthopAtLocalInterface OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the entry has Nexthop address that is set on a local interface."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 47 }
+
+    hm2AgentRoutingNexthopInvalid OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the routing table entry contains an invalid value for
+                        next hop IP address that cannot be processed."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 48 }
+
+    hm2AgentRoutingMaxEntryCountReached OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the route entry cannot be added as maximum count has reached."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 49 }
+
+    hm2AgentRoutingNoPreferenceUpdate OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the preference value cannot be updated."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 50 }
+
+    hm2AgentRoutingPortInvalid OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the routing table entry contains an invalid value for
+                        port that cannot be processed."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 51 }
+
+    hm2AgentRoutingStaticRoutePreference OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the remote type and netmgmt protocol should have the preference
+                       value in range 1..255."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 52 }
+
+    hm2AgentRoutingSameNetworkAddrErrorReturn OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the entry with same network address already exists."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 53 }
+
+    hm2AgentRoutingTypeInvalid OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the routing table entry contains an invalid value for
+                        route type that cannot be processed."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 54 }
+
+    hm2AgentRoutingMacAddressInvalid OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the entry contains an invalid value for MAC address that
+                        cannot be processed."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 55 }
+
+    hm2AgentRoutingIPAddressExist OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that IP address already exists."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 56 }
+
+    hm2AgentRoutingPingPortInvalid OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the ping port contains an invalid value
+                       that cannot be processed."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 57 }
+
+    hm2AgentRoutingIntervalTimeInvalid OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the tracking configuration entry contains invalid
+                       characters or is out of range for ping interval time that cannot
+                       be processed. The allowed range is 100..20000."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 58 }
+
+    hm2AgentRoutingPingLoseTimeInvalid OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the tracking configuration entry contains invalid
+                       characters or is out of range for ping replies to lose time
+                       that cannot be processed. The allowed range is 1..10."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 59 }
+
+    hm2AgentRoutingPingReceiveTimeInvalid OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the tracking configuration entry contains invalid
+                       characters or is out of range for ping replies to receive time
+                       that cannot be processed. The allowed range is 1..10."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 60 }
+
+    hm2AgentRoutingPingTimeoutInvalid OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the tracking configuration entry contains invalid
+                       characters or is out of range for ping timeout that cannot be
+                       processed. The allowed range is 10..10000."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 61 }
+
+    hm2AgentRoutingPingTTLInvalid OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the tracking configuration entry contains invalid
+                       characters or is out of range for ping TTL that cannot be
+                       processed. The allowed range is 1..125."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 62 }
+
+    hm2AgentRoutingLogicalOperandInvalid OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the tracking configuration entry contains an
+                       invalid value for logical operand A|B that cannot be processed."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 63 }
+
+    hm2AgentRoutingOperatorInvalid OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the tracking configuration entry contains an invalid
+                       value for operator that cannot be processed. Possible values
+                       'and' and 'or'."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 64 }
+
+    hm2AgentRoutingLinkDelayInvalid OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the tracking configuration entry contains an invalid
+                       value for link up/down delay which is out of range and cannot be
+                       processed. The allowed range is 0..255."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 65 }
+
+    hm2AgentRoutingL3RelayFunctionInvalid OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the L3 relay function contains an invalid value
+                       that cannot be processed."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 66 }
+
+    hm2AgentRoutingBootpDhcpHopsInvalid OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that L3 configuration entry contains invalid characters
+                       or is out of range for bootp/dhcp hops (max.) that cannot be
+                       processed. The allowed range is 1..16."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 67 }
+
+    hm2AgentRoutingBootpDhcpWaitTimeInvalid OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that L3 configuration entry contains invalid characters
+                       or is out of range for bootp/dhcp wait time (min.) that cannot be
+                       processed. The allowed range is 0..100."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 68 }
+
+    hm2AgentRoutingCircuitIDInvalid OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the tracking configuration entry contains
+                       an invalid value for circuit ID that cannot be processed."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 69 }
+
+    hm2AgentRoutingTrackTypeEnableError OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the process of enabling tracking instance {0} has
+                       failed because track type is invalid."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 70 }
+
+    hm2AgentRoutingTrackingEnableErrorReturn OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the process of enabling tracking instance {0}
+                       admin state has failed."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 71 }
+
+    hm2AgentRoutingTrackingDisableErrorReturn OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the process of disabling tracking instance {0}
+                       admin state has failed."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 72 }
+
+    hm2AgentRoutingTrackTypeDisableError OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the process of disabling tracking instance {0} has
+                       failed because track type is invalid."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 73 }
+
+    hm2AgentRoutingTrackIDCreateError OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the creation of tracking instance {0} has failed
+                       because track ID is invalid."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 74 }
+
+    hm2AgentRoutingTrackTypeCreateError OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the creation of tracking instance {0} has failed
+                       because track type is invalid."
+          ::= { hm2AgentRoutingSNMPExtensionGroup 75 }
+
+END

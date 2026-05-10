@@ -1,0 +1,33 @@
+
+HM2-PLATFORM-QOS-MIB DEFINITIONS ::= BEGIN
+
+-- 
+-- ***********************************************************
+-- Hirschmann Platform QOS MIB
+-- ***********************************************************
+--
+
+IMPORTS
+    hm2PlatformMibs
+        FROM HM2-TC-MIB
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI;
+
+hm2PlatformQoS MODULE-IDENTITY
+    LAST-UPDATED "201110280000Z" -- 28 Oct 2011 12:00:00 GMT
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION 
+        "The Hirschmann Private Platform2 MIB for QoS.
+         Copyright (C) 2011. All Rights Reserved."
+    REVISION    "201110280000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { hm2PlatformMibs 3 }
+                
+END

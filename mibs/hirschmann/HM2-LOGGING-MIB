@@ -1,0 +1,1140 @@
+
+HM2-LOGGING-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann Logging MIB
+-- *************************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, 
+    NOTIFICATION-TYPE, 
+    Integer32, Counter32, Unsigned32
+    								FROM SNMPv2-SMI -- RFC 2578
+    TEXTUAL-CONVENTION,
+    DisplayString,
+    RowStatus						FROM SNMPv2-TC
+    SnmpAdminString     			FROM SNMP-FRAMEWORK-MIB
+	InetPortNumber, InetAddress,
+	InetAddressType					FROM INET-ADDRESS-MIB
+    hm2ConfigurationMibs, 
+    HmEnabledStatus,
+    HmTimeSeconds1970				FROM HM2-TC-MIB
+    Hm2TlsVersions,
+    Hm2TlsCipherSuites				FROM HM2-MGMTACCESS-MIB;
+
+hm2LoggingMib MODULE-IDENTITY
+	LAST-UPDATED "201208080000Z" -- August 8, 2012
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann Logging MIB.
+         Copyright (C) 2012. All Rights Reserved."
+    REVISION     "201208080000Z" -- August 8, 2012
+    DESCRIPTION
+         "Modify hm2LogSyslogServerIPAddrType description because DNS was added."
+    REVISION     "201103160000Z" -- March 16, 2011
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 23 }
+
+--
+-- *************************************************************
+-- Textual Conventions
+-- *************************************************************
+--         
+HmAgentLogSeverity ::= TEXTUAL-CONVENTION
+		STATUS       current
+		DESCRIPTION
+		"Severity code used in determining the SysLog priority value."
+		REFERENCE
+		"RFC3164 - 4.1.1: Table 2"
+		SYNTAX  INTEGER {
+        	 	 	 	 emergency(0),     -- System is unusable. System failure has occurred.
+        	 	 	 	 alert(1),         -- Action must be taken immediately. Unrecoverable
+        	 	 	 	 	 	 	 	   --  failure of a component. System failure likely.
+        	 	 	 	 critical(2),      -- Critical conditions. Recoverable failure of a
+        	 	 	 	 	 	 	 	   --  component that may lead to system failure.
+        	 	 	     error(3),         -- Error conditions. Recoverable failure of a component.
+        	 	 	     warning(4),       -- Warning conditions. Minor failure, e.g.
+        	 	 	     	 	 	 	   --  misconfiguration of a component.
+        	 	 	     notice(5),        -- Normal but significant conditions.
+        	 	 	     informational(6), -- Informational messages.
+        	 	 	     debug(7)          -- Debug-level messages.
+         	 	 	 	 }         
+         
+--
+-- *************************************************************
+-- hm2LoggingMib
+-- *************************************************************
+--
+hm2LoggingMibNotifications		OBJECT IDENTIFIER ::= { hm2LoggingMib 0 }
+hm2LoggingMibObjects			OBJECT IDENTIFIER ::= { hm2LoggingMib 1 }
+-- hm2LoggingMibConformance			OBJECT IDENTIFIER ::= { hm2LoggingMib 2 }
+hm2LogSNMPExtensionGroup		OBJECT IDENTIFIER ::= { hm2LoggingMib 3 }
+--
+-- *************************************************************
+-- hm2LoggingMib groups
+-- *************************************************************
+--
+hm2LogSnmpLoggingGroup			OBJECT IDENTIFIER ::= { hm2LoggingMibObjects 1 }
+hm2LogCliCommandsLoggingGroup	OBJECT IDENTIFIER ::= { hm2LoggingMibObjects 2 }
+hm2LogConsoleLoggingGroup		OBJECT IDENTIFIER ::= { hm2LoggingMibObjects 3 }
+hm2LogBufferedLoggingGroup		OBJECT IDENTIFIER ::= { hm2LoggingMibObjects 4 }
+hm2LogSyslogGroup				OBJECT IDENTIFIER ::= { hm2LoggingMibObjects 5 }
+hm2LogPersistentGroup			OBJECT IDENTIFIER ::= { hm2LoggingMibObjects 6 }
+hm2LogCounterGroup				OBJECT IDENTIFIER ::= { hm2LoggingMibObjects 7 }
+hm2LogTemperatureGroup			OBJECT IDENTIFIER ::= { hm2LoggingMibObjects 8 }
+hm2LogAuditGroup				OBJECT IDENTIFIER ::= { hm2LoggingMibObjects 9 }
+hm2LogEmailAlertGroup			OBJECT IDENTIFIER ::= { hm2LoggingMibObjects 10 }
+hm2LogHumidityGroup				OBJECT IDENTIFIER ::= { hm2LoggingMibObjects 11 }
+
+--
+-- *************************************************************
+-- hm2LogSnmpLoggingGroup
+-- *************************************************************
+--
+
+hm2LogSnmpLogGetRequest	OBJECT-TYPE
+			SYNTAX		HmEnabledStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Enable logging of SNMP GET requests."
+			DEFVAL { disable }
+			::= { hm2LogSnmpLoggingGroup 1 }
+
+
+hm2LogSnmpLogSetRequest	OBJECT-TYPE
+			SYNTAX		HmEnabledStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Enable logging of SNMP SET requests."
+			DEFVAL { disable }
+			::= { hm2LogSnmpLoggingGroup 2 }
+
+
+hm2LogSnmpLogGetSeverity	OBJECT-TYPE
+			SYNTAX		HmAgentLogSeverity
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Define the log severity for SNMP GET requests."
+			DEFVAL { notice }
+			::= { hm2LogSnmpLoggingGroup 3 }
+
+
+hm2LogSnmpLogSetSeverity	OBJECT-TYPE
+			SYNTAX		HmAgentLogSeverity
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Define the log severity for SNMP SET requests."
+			DEFVAL { notice }
+			::= { hm2LogSnmpLoggingGroup 4 }
+
+
+--
+-- *************************************************************
+-- hm2LogCliCommandsLoggingGroup
+-- *************************************************************
+--
+
+hm2LogCliCommandsAdminStatus	OBJECT-TYPE
+			SYNTAX		HmEnabledStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Administratively enable/disable the logging of the CLI commands."
+			DEFVAL { disable }
+			::= { hm2LogCliCommandsLoggingGroup 1 }
+
+
+--
+-- *************************************************************
+-- hm2LogConsoleLoggingGroup
+-- *************************************************************
+--
+
+hm2LogConsoleAdminStatus	OBJECT-TYPE
+			SYNTAX		HmEnabledStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Admin mode for console logs"
+			DEFVAL { disable }
+			::= { hm2LogConsoleLoggingGroup 1 }
+
+
+hm2LogConsoleSeverityFilter	OBJECT-TYPE
+			SYNTAX		HmAgentLogSeverity
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Severity filter for console logs"
+			DEFVAL { warning }
+			::= { hm2LogConsoleLoggingGroup 2 }
+
+
+--
+-- *************************************************************
+-- hm2LogBufferedLoggingGroup
+-- *************************************************************
+--
+
+hm2LogBufferdLogLevelThreshold	OBJECT-TYPE
+			SYNTAX		HmAgentLogSeverity
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Severities at or below this threshold are logged in the buffered log 
+					and will not be overwritten by lower priority log messages."
+			DEFVAL { warning }
+			::= { hm2LogBufferedLoggingGroup 1 }
+
+
+--
+-- *************************************************************
+-- hm2LogSyslogGroup
+-- *************************************************************
+--
+
+hm2LogSyslogAdminStatus	OBJECT-TYPE
+			SYNTAX		HmEnabledStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Enable or disable syslog logging globally."
+			DEFVAL { disable }
+			::= { hm2LogSyslogGroup 1 }
+
+hm2LogSyslogClientTlsVersions OBJECT-TYPE
+			SYNTAX			Hm2TlsVersions
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION		"The TLS versions supported by the syslog client."
+			DEFVAL {{ tlsv1-2 }}
+			::= { hm2LogSyslogGroup  2 }
+
+hm2LogSyslogClientTlsCipherSuites OBJECT-TYPE
+			SYNTAX			Hm2TlsCipherSuites
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION		"The cipher suite supported by the syslog client."
+			DEFVAL {{
+					tls-rsa-with-aes-128-cbc-sha,
+					tls-dhe-rsa-with-aes-128-cbc-sha,
+					tls-ecdhe-rsa-with-aes-128-cbc-sha,
+					tls-ecdhe-rsa-with-aes-128-gcm-sha256
+					}}
+			::= { hm2LogSyslogGroup  3 }
+
+hm2LogSyslogServerTable	OBJECT-TYPE
+			SYNTAX SEQUENCE OF Hm2LogSyslogServerEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+					"A list of syslog servers"
+			::= { hm2LogSyslogGroup 10 }
+
+
+hm2LogSyslogServerEntry	OBJECT-TYPE
+			SYNTAX		Hm2LogSyslogServerEntry
+			MAX-ACCESS	not-accessible
+			STATUS current
+			DESCRIPTION "An entry of syslog servers"
+			INDEX { hm2LogSyslogServerIndex }
+			::= { hm2LogSyslogServerTable 1 }
+
+
+Hm2LogSyslogServerEntry ::= SEQUENCE {
+		hm2LogSyslogServerIndex			Integer32,			-- index in the table
+		hm2LogSyslogServerIPAddrType	InetAddressType,	-- address type of InetAddress
+		hm2LogSyslogServerIPAddr		InetAddress,		-- IP address or domain name of syslog server
+		hm2LogSyslogServerUdpPort		InetPortNumber,		-- port number of syslog server
+		hm2LogSyslogServerLevelUpto		HmAgentLogSeverity,	-- minimal severity to be logged
+		hm2LogSyslogServerLogType		INTEGER,			-- syslog or audit trail
+		hm2LogSyslogServerRowStatus		RowStatus,			-- table row status
+		hm2LogSyslogServerTransportType  INTEGER  -- type of transport used to deliver log messages
+}
+
+hm2LogSyslogServerIndex	OBJECT-TYPE
+			SYNTAX		Integer32 (1..8)
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"An index that uniquely identifies the entry
+					in the table and so the syslog server."
+			::= { hm2LogSyslogServerEntry 1 }
+
+
+hm2LogSyslogServerIPAddrType	OBJECT-TYPE
+			SYNTAX		InetAddressType
+			MAX-ACCESS	read-create
+			STATUS		current
+			DESCRIPTION
+					"Address type for server IP address.
+					Currently, only ipv4(1), ipv6(2) and dns(16) are supported."
+			DEFVAL { ipv4 }
+		::= { hm2LogSyslogServerEntry 2 }
+
+
+hm2LogSyslogServerIPAddr	OBJECT-TYPE
+			SYNTAX		InetAddress
+			MAX-ACCESS	read-create
+			STATUS		current
+			DESCRIPTION
+					"IP address of syslog server for logging."
+			DEFVAL  { '00000000'H } -- 0.0.0.0
+			::= { hm2LogSyslogServerEntry 3 }
+
+
+hm2LogSyslogServerUdpPort	OBJECT-TYPE
+			SYNTAX		InetPortNumber
+			MAX-ACCESS	read-create
+			STATUS		current
+			DESCRIPTION
+					"TCP or UDP port used for syslog server transmission. If this value is
+					zero then the default port 514 is used."
+			DEFVAL  { 514 }
+			::= { hm2LogSyslogServerEntry 4 }
+
+
+hm2LogSyslogServerLevelUpto	OBJECT-TYPE
+			SYNTAX		HmAgentLogSeverity
+			MAX-ACCESS	read-create
+			STATUS		current
+			DESCRIPTION
+					"Up to log level to be sent to this syslog server."
+			DEFVAL  { warning }
+			::= { hm2LogSyslogServerEntry 5 }
+
+
+hm2LogSyslogServerLogType   OBJECT-TYPE
+			SYNTAX		INTEGER	{
+						systemlog(1),
+						audittrail(2)
+						}
+			MAX-ACCESS	read-create
+			STATUS		current
+			DESCRIPTION
+					"Defines the type of log messages to be sent to the syslog server.
+					systemlog  (1): Define the system event log entries as stored also in
+					the system event log.
+					audittrail (2): Define the audit trail log entries."
+			DEFVAL  { systemlog }
+			::= { hm2LogSyslogServerEntry 6 }
+
+
+hm2LogSyslogServerRowStatus	OBJECT-TYPE
+			SYNTAX		RowStatus
+			MAX-ACCESS	read-create
+			STATUS		current
+			DESCRIPTION
+					"Syslog server entry status.
+					active(1)		- This syslog server is active.
+					notInService(2)	- Row has been suspended.
+					notReady(3)		- Row has incomplete values.
+					createAndGo(4)	- Accept row values and activate.
+					createAndWait(5)- Accept row values and wait.
+					destroy(6) 		- Set to this value to remove this syslog server entry."
+			::= { hm2LogSyslogServerEntry 7 }
+
+hm2LogSyslogServerTransportType	OBJECT-TYPE
+			SYNTAX		INTEGER	{
+								udp(1),
+								tls(2)
+						}
+			MAX-ACCESS	read-create
+			STATUS		current
+			DESCRIPTION  
+			        "The transport type used to deliver the log messages to the syslog server. 
+			        When set to udp(1) the syslog messages are sent over UDP on the configured port.
+                    When set to tls(2) the syslog messages are sent over TLS 
+                    on configured TCP port (hm2LogSyslogServerUdpPort)."
+			DEFVAL  { udp }
+			::= { hm2LogSyslogServerEntry 8 }
+
+--
+-- *************************************************************
+-- hm2LogPersistentGroup
+-- *************************************************************
+--
+
+hm2LogPersistAdminStatus	OBJECT-TYPE
+			SYNTAX		HmEnabledStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Enable or disable persistent logging globally."
+			DEFVAL { enable }
+			::= { hm2LogPersistentGroup 1 }
+
+
+hm2LogPersistMaxFileSize	OBJECT-TYPE
+			SYNTAX			Integer32 (0..4096)
+			MAX-ACCESS		read-write
+			STATUS 		current
+			DESCRIPTION
+					"Maximum persistent logfile size on non-volatile medium in Kbytes
+					(0..4096). If this value is zero logging is disabled."
+			DEFVAL { 1024 }
+			::= { hm2LogPersistentGroup 2 }
+
+
+hm2LogPersistFilesMax	OBJECT-TYPE
+			SYNTAX			Integer32 (0..25)
+			MAX-ACCESS		read-write
+			STATUS 		current
+			DESCRIPTION
+					"Maximum number of persistent logfiles on non-volatile medium (0..25).
+					If this value is zero logging and archiving is disabled."
+			DEFVAL { 4 }
+			::= { hm2LogPersistentGroup 3 }
+
+
+hm2LogPersistLevelUpto	OBJECT-TYPE
+			SYNTAX		HmAgentLogSeverity
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Up to log level to be sent to the persistent log"
+			DEFVAL { warning }
+			::= { hm2LogPersistentGroup 4 }
+
+hm2LogPersistentFileTable	OBJECT-TYPE
+			SYNTAX SEQUENCE OF Hm2LogPersistentFileEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+					"A list of persistent log files"
+			::= { hm2LogPersistentGroup 5 }
+
+
+hm2LogPersistentFileEntry	OBJECT-TYPE
+			SYNTAX		Hm2LogPersistentFileEntry
+			MAX-ACCESS	not-accessible
+			STATUS	current
+			DESCRIPTION "An entry of persistent log files"
+			INDEX { hm2LogPersistentFileIndex }
+			::= { hm2LogPersistentFileTable 1 }
+
+
+Hm2LogPersistentFileEntry ::= SEQUENCE {
+		hm2LogPersistentFileIndex		Integer32,		-- index in the table
+		hm2LogPersistentFileName		DisplayString,	-- The name of the file
+		hm2LogPersistentFileSize		Integer32			-- The size of the file in bytes
+}
+
+
+hm2LogPersistentFileIndex	OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS		not-accessible
+			STATUS 		current
+			DESCRIPTION
+					"The index of the table."
+			::= { hm2LogPersistentFileEntry 1 }
+
+
+hm2LogPersistentFileName	OBJECT-TYPE
+			SYNTAX		DisplayString
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"The name of the log file."
+			::= { hm2LogPersistentFileEntry 2 }
+
+
+hm2LogPersistentFileSize	OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"The size of the file in bytes."
+			::= { hm2LogPersistentFileEntry 3 }
+
+
+
+--
+-- *************************************************************
+-- hm2LogCounterGroup
+-- *************************************************************
+--
+
+hm2LogCounterOperatingHours	OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"Cumulated uptime of the device in seconds."
+			::= { hm2LogCounterGroup 1 }
+
+
+hm2LogCounterFlashTable	OBJECT-TYPE
+			SYNTAX SEQUENCE OF Hm2LogCounterFlashEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+					"A list of log counter entries"
+			::= { hm2LogCounterGroup 10 }
+
+
+hm2LogCounterFlashEntry	OBJECT-TYPE
+			SYNTAX		Hm2LogCounterFlashEntry
+			MAX-ACCESS	not-accessible
+			STATUS	current
+			DESCRIPTION "An entry of log counter entries"
+			INDEX { hm2LogCounterFlashBlock }
+			::= { hm2LogCounterFlashTable 1 }
+
+
+Hm2LogCounterFlashEntry ::= SEQUENCE {
+		hm2LogCounterFlashBlock			INTEGER,		-- Which blocks are counted
+		hm2LogCounterFlashDescription	DisplayString,	-- Textual description of block
+		hm2LogCounterFlashCount			Integer32,		-- How many blocks are counted
+		hm2LogCounterFlashValue			Integer32		-- How often the blocks were erased
+}
+
+
+hm2LogCounterFlashBlock	OBJECT-TYPE
+			SYNTAX		INTEGER {
+							bootBlock(1),
+							fileSystem(2),
+							imageStorage(3),
+							parameters(4),
+							formatFs(5),
+							userFormatFs(6),
+							dhcpBindings(7),
+							persistentLog(8)
+						}
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION
+					"The name of the flash region."
+			::= { hm2LogCounterFlashEntry 1 }
+
+
+hm2LogCounterFlashDescription	OBJECT-TYPE
+			SYNTAX		DisplayString
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"The textual description of the group."
+			::= { hm2LogCounterFlashEntry 2 }
+
+
+hm2LogCounterFlashCount	OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"The number of flash sectors in this group."
+			::= { hm2LogCounterFlashEntry 3 }
+
+
+hm2LogCounterFlashValue	OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"The number of sector erase operations performed for this group."
+			::= { hm2LogCounterFlashEntry 4 }
+
+
+--
+-- *************************************************************
+-- hm2LogTemperatureGroup
+-- *************************************************************
+--
+
+hm2LogTempMinimum	OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"Minimal temperature on the device in 10th of centigrade (Celsius)."
+			::= { hm2LogTemperatureGroup 1 }
+			
+hm2LogTempMaximum	OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"Maximal temperature on the device in 10th of centigrade (Celsius)."
+			::= { hm2LogTemperatureGroup 2 }
+			
+hm2LogTempVariationCount	OBJECT-TYPE
+			  SYNTAX		Integer32
+			  MAX-ACCESS	read-only
+			  STATUS		current
+			  DESCRIPTION
+					"Number of variations (up or down) by minimum 20 centigrade (Celsius) in maximum one hour period."
+			::= { hm2LogTemperatureGroup 3 }			
+
+
+hm2LogTempHistTable	OBJECT-TYPE
+			SYNTAX SEQUENCE OF Hm2LogTempHistEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+					"A list of temperature ranges and how many hours the
+					device has been in these ranges (histogram)."
+			::= { hm2LogTemperatureGroup 10 }
+
+
+hm2LogTempHistEntry	OBJECT-TYPE
+			SYNTAX		Hm2LogTempHistEntry
+			MAX-ACCESS	not-accessible
+			STATUS	current
+			DESCRIPTION "An entry of temperature ranges and how many hours the
+					     device has been in these ranges (histogram)."
+			INDEX { hm2LogTempHistIndex }
+			::= { hm2LogTempHistTable 1 }
+
+
+Hm2LogTempHistEntry ::= SEQUENCE {
+		hm2LogTempHistIndex				Integer32,		-- Index
+		hm2LogTempHistRangeMin			Integer32,		-- Lower bound of the range
+		hm2LogTempHistRangeMax			Integer32,		-- Upper bound of the range
+		hm2LogTempHistTime				Integer32		-- How many minutes were spent in this range
+}
+
+hm2LogTempHistIndex	OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION
+					"Index"
+			::= { hm2LogTempHistEntry 1 }
+
+hm2LogTempHistRangeMin	OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"The lower bound of the range in 10th of centigrade (Celsius)."
+			::= { hm2LogTempHistEntry 2 }
+
+hm2LogTempHistRangeMax	OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"The upper bound of the range in 10th of centigrade (Celsius)."
+			::= { hm2LogTempHistEntry 3 }
+
+hm2LogTempHistTime	OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"The time spent in this range in minutes."
+			::= { hm2LogTempHistEntry 4 }
+
+--
+-- *************************************************************
+-- hm2LogHumidityGroup
+-- *************************************************************
+--
+
+hm2LogHumMinimum	OBJECT-TYPE
+			SYNTAX		Unsigned32 (0..100)
+			UNITS 		"percent"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"Minimal humidity on the device as a percentage."
+			::= { hm2LogHumidityGroup 1 }
+
+hm2LogHumMaximum	OBJECT-TYPE
+			SYNTAX		Unsigned32 (0..100)
+			UNITS 		"percent"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"Maximal humidity on the device as a percentage."
+			::= { hm2LogHumidityGroup 2 }
+
+
+hm2LogHumHistTable	OBJECT-TYPE
+			SYNTAX SEQUENCE OF Hm2LogHumHistEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+					"A list of humidity ranges and how many hours the
+					device has been in these ranges (histogram)."
+			::= { hm2LogHumidityGroup 10 }
+
+
+hm2LogHumHistEntry	OBJECT-TYPE
+			SYNTAX		Hm2LogHumHistEntry
+			MAX-ACCESS	not-accessible
+			STATUS	current
+			DESCRIPTION "An entry of humidity ranges and how many hours the
+					     device has been in these ranges (histogram)."
+			INDEX { hm2LogHumHistIndex }
+			::= { hm2LogHumHistTable 1 }
+
+
+Hm2LogHumHistEntry ::= SEQUENCE {
+		hm2LogHumHistIndex				Unsigned32,		-- Index
+		hm2LogHumHistRangeMin			Unsigned32,		-- Lower bound of the range
+		hm2LogHumHistRangeMax			Unsigned32,		-- Upper bound of the range
+		hm2LogHumHistTime				Unsigned32		-- How many minutes were spent in this range
+}
+
+hm2LogHumHistIndex	OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION
+					"Index"
+			::= { hm2LogHumHistEntry 1 }
+
+hm2LogHumHistRangeMin	OBJECT-TYPE
+			SYNTAX		Unsigned32 (0..100)
+			UNITS 		"percent"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"The lower bound of the range as a percentage."
+			::= { hm2LogHumHistEntry 2 }
+
+hm2LogHumHistRangeMax	OBJECT-TYPE
+			SYNTAX		Unsigned32 (0..100)
+			UNITS 		"percent"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"The upper bound of the range as a percentage."
+			::= { hm2LogHumHistEntry 3 }
+
+hm2LogHumHistTime	OBJECT-TYPE
+			SYNTAX		Unsigned32
+			UNITS 		"minutes"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"The time spent in this range in minutes."
+			::= { hm2LogHumHistEntry 4 }
+
+--
+-- *************************************************************
+-- hm2LogAuditGroup
+-- *************************************************************
+--
+
+hm2LogAuditTrailComment	OBJECT-TYPE
+			SYNTAX		DisplayString (SIZE (0|1..80))
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+					"Enter a Comment to begin or end a group of entries in the
+					 audit trail. Returns an empty string when read."
+			DEFVAL			{ "" }
+			::= { hm2LogAuditGroup 1 }
+			
+--
+-- *************************************************************
+-- hm2LogEmailAlertGroup
+-- *************************************************************
+--
+
+hm2LogEmailAdminStatus		OBJECT-TYPE
+			SYNTAX			HmEnabledStatus
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION		"Admin mode for logging email-alert."
+			DEFVAL			{ disable }
+			::= { hm2LogEmailAlertGroup 1 }
+
+hm2LogEmailFromAddress		OBJECT-TYPE
+			SYNTAX			SnmpAdminString (SIZE (0..255))
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION		"Mail address from which the mail has be sent."
+			DEFVAL			{ "" }
+			::= { hm2LogEmailAlertGroup 2 }
+			
+hm2LogEmailLogDuration		OBJECT-TYPE
+			SYNTAX			Integer32(30..1440)
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION		"Periodic timer (in minutes) to send an email-alert."
+			DEFVAL			{ 30 }
+			::= { hm2LogEmailAlertGroup 3 }
+
+hm2LogEmailUrgentSeverity	OBJECT-TYPE
+			SYNTAX			HmAgentLogSeverity
+			MAX-ACCESS		read-write
+			STATUS 			current
+			DESCRIPTION 	"Log Severity at/below which the email-alert to be sent immediately."
+			DEFVAL			{ alert }
+			::= { hm2LogEmailAlertGroup 4 }
+
+hm2LogEmailNonUrgentSeverity	OBJECT-TYPE
+			SYNTAX				HmAgentLogSeverity
+			MAX-ACCESS			read-write
+			STATUS 				current
+			DESCRIPTION 		"Log Severity at/below which the log should	be saved
+								in a buffer and sent as an email-alert later(In case
+								of log duration timeout / log buffer overflow )."
+			DEFVAL				{ warning }
+			::= { hm2LogEmailAlertGroup 5 }
+
+hm2LogEmailNumEmailsSent	OBJECT-TYPE
+			SYNTAX			Counter32 
+			MAX-ACCESS		read-only
+			STATUS 			current
+			DESCRIPTION 	"Number of email alerts that have been sent successfully."
+			::= { hm2LogEmailAlertGroup 6 }
+
+hm2LogEmailNumEmailFailures	OBJECT-TYPE
+			SYNTAX			Counter32 
+			MAX-ACCESS		read-only
+			STATUS 			current
+			DESCRIPTION 	"Number of email alerts that could not be sent."
+			::= { hm2LogEmailAlertGroup 7 }
+
+hm2LogEmailTimeOfLastMailSent  	OBJECT-TYPE
+			SYNTAX			HmTimeSeconds1970  
+			MAX-ACCESS		read-only
+			STATUS 			current
+			DESCRIPTION 	"Local system time (hm2SystemLocalTime) when the last mail was sent."
+			::= { hm2LogEmailAlertGroup 8 }  
+
+hm2LogEmailAction		   	OBJECT-TYPE
+			SYNTAX			INTEGER { 
+									  other(1),
+									  test(2), 
+									  non-urgent(3)
+									}
+			MAX-ACCESS		read-write
+			STATUS 			current
+			DESCRIPTION 	"After configuring all email alert settings, set this object 
+							to 'test' to sendt a test message to the configured address(es). 
+							Setting the object to 'non-urgent' will force the device to 
+							immediately sent all buffered logs to the configured email 
+							server(s)/address(es). 
+							When read the object is read it always returns 'other'. 
+							The object can't be set as 'other'."
+			::= { hm2LogEmailAlertGroup 9 }
+			
+hm2LogEmailTestMessageType  OBJECT-TYPE
+			SYNTAX			INTEGER { 
+									  urgent(1), 
+									  non-urgent(2)
+									}
+			MAX-ACCESS		read-write
+			STATUS 			current
+			DESCRIPTION 	"Message type for testing email alert functionality."
+			DEFVAL			{ urgent }
+			::= { hm2LogEmailAlertGroup 10 }
+			
+hm2LogEmailTestMessageBody  OBJECT-TYPE
+			SYNTAX			SnmpAdminString (SIZE (0..255))
+			MAX-ACCESS		read-write
+			STATUS 			current
+			DESCRIPTION 	"Message body for testing email alert functionality."
+			DEFVAL			{ "" }
+			::= { hm2LogEmailAlertGroup 11 }
+			
+--
+-- *************************************************************			
+-- hm2LogEmailToAddressTable
+-- *************************************************************
+--
+hm2LogEmailToAddressTable 		OBJECT-TYPE
+			SYNTAX SEQUENCE OF	Hm2LogEmailToAddressEntry
+			MAX-ACCESS 			not-accessible
+			STATUS 				current
+			DESCRIPTION			"The table listing the destination email address and the message type."
+			::= { hm2LogEmailAlertGroup 15 }
+
+hm2LogEmailToAddressEntry		OBJECT-TYPE
+			SYNTAX			Hm2LogEmailToAddressEntry
+			MAX-ACCESS		not-accessible
+			STATUS 			current
+			DESCRIPTION 	"The table entry listing the destination email address and the message type."
+			INDEX { hm2LogEmailToAddrMessageIndex }
+			::= { hm2LogEmailToAddressTable 1 }
+
+Hm2LogEmailToAddressEntry::= SEQUENCE {
+	hm2LogEmailToAddrMessageIndex		Integer32,			-- index			
+	hm2LogEmailToAddrMessageType		INTEGER,			-- log message type
+	hm2LogEmailToAddrAddress			SnmpAdminString,	-- email sender address
+	hm2LogEmailToAddrEntryStatus		RowStatus			-- to create, change or delete the entry
+}
+
+hm2LogEmailToAddrMessageIndex		OBJECT-TYPE
+			SYNTAX			Integer32 (1..10)
+			MAX-ACCESS		not-accessible
+			STATUS 			current
+			DESCRIPTION 	"An integer used only for indexing purposes.
+	           	   	   	     Generally monotonically increasing from 1 as new
+	           	   	   	     addresses are configured. Re-use of values for this 
+	           	   	   	     index should be avoided."
+			::= { hm2LogEmailToAddressEntry 1 }
+			
+hm2LogEmailToAddrMessageType		OBJECT-TYPE
+			SYNTAX			INTEGER {
+									urgent(1), 
+									non-urgent(2) }
+			MAX-ACCESS		read-create
+			STATUS 			current
+			DESCRIPTION 	"Log message type."
+			DEFVAL		{ urgent }			
+			::= { hm2LogEmailToAddressEntry 2 }
+
+hm2LogEmailToAddrAddress			OBJECT-TYPE
+			SYNTAX			SnmpAdminString (SIZE (0..255))
+			MAX-ACCESS		read-create
+			STATUS 			current
+			DESCRIPTION 	"Email address to which the email-alert to be sent."
+			DEFVAL		{ "" }			
+			::= { hm2LogEmailToAddressEntry 3 }
+
+hm2LogEmailToAddrEntryStatus			OBJECT-TYPE
+			SYNTAX			RowStatus
+			MAX-ACCESS		read-create
+			STATUS 			current
+			DESCRIPTION 	"Create, change or delete the entry."
+			::= { hm2LogEmailToAddressEntry 4 }
+		
+--
+-- *************************************************************			
+-- hm2LogEmailSubjectTable
+-- *************************************************************
+--
+hm2LogEmailSubjectTable OBJECT-TYPE
+			SYNTAX 	SEQUENCE OF Hm2LogEmailSubjectEntry
+			MAX-ACCESS 		not-accessible
+			STATUS 			current
+			DESCRIPTION		"List of subject of the email for particular message type."
+			::= { hm2LogEmailAlertGroup 16 }
+				
+hm2LogEmailSubjectEntry OBJECT-TYPE
+			SYNTAX 			Hm2LogEmailSubjectEntry
+			MAX-ACCESS 		not-accessible
+			STATUS 			current
+			DESCRIPTION		"This entry shows what kind of subject to be used for the given message 	
+
+					type."
+			INDEX 			{ hm2LogEmailSubjectMessageType}
+			::= { hm2LogEmailSubjectTable 1 }
+
+Hm2LogEmailSubjectEntry ::= SEQUENCE {
+			hm2LogEmailSubjectMessageType 	INTEGER,
+			hm2LogEmailSubject 				SnmpAdminString,
+			hm2LogEmailSubjectEntryStatus 	RowStatus
+			}
+
+hm2LogEmailSubjectMessageType OBJECT-TYPE
+			SYNTAX 			INTEGER { 
+							urgent(1), 
+							non-urgent(2)
+							}
+			MAX-ACCESS 		not-accessible
+			STATUS 			current
+			DESCRIPTION		"Log message Type"
+			::= { hm2LogEmailSubjectEntry 1 }
+
+hm2LogEmailSubject OBJECT-TYPE
+			SYNTAX 			SnmpAdminString (SIZE (0..255))
+			MAX-ACCESS 		read-create
+			STATUS 			current
+			DESCRIPTION		"Email subject for given message type."
+			DEFVAL 			{ "" }			
+			::= { hm2LogEmailSubjectEntry 2}
+
+hm2LogEmailSubjectEntryStatus OBJECT-TYPE
+			SYNTAX 			RowStatus
+			MAX-ACCESS 		read-create
+			STATUS 			current
+			DESCRIPTION		"Create, change or delete the entry."
+			::= { hm2LogEmailSubjectEntry 3 }			
+
+--
+-- *************************************************************			
+-- hm2LogEmailMailServerTable
+-- *************************************************************
+--		
+hm2LogEmailMailServerTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF 	Hm2LogEmailMailServerEntry
+			MAX-ACCESS 		not-accessible
+			STATUS 			current
+			DESCRIPTION		"The (conceptual) table listing the mail servers."
+			::= { hm2LogEmailAlertGroup 17 }
+
+hm2LogEmailMailServerEntry OBJECT-TYPE
+			SYNTAX 			Hm2LogEmailMailServerEntry
+			MAX-ACCESS 		not-accessible
+			STATUS 			current
+			DESCRIPTION		"This entry shows the conmfiguration for the mail server(s)."
+			INDEX 			{ hm2LogEmailSmtpAddrIndex }
+			::= { hm2LogEmailMailServerTable 1 }
+
+Hm2LogEmailMailServerEntry ::= SEQUENCE {
+			hm2LogEmailSmtpAddrIndex	Integer32,
+			hm2LogEmailSmtpAddrDescr	SnmpAdminString,
+			hm2LogEmailSmtpAddrType 	InetAddressType,
+			hm2LogEmailSmtpAddr 		InetAddress,
+			hm2LogEmailSmtpPort 		InetPortNumber,
+			hm2LogEmailSmtpSecurity 	INTEGER,
+			hm2LogEmailSmtpLoginID 		SnmpAdminString,
+			hm2LogEmailSmtpPassword 	SnmpAdminString,
+			hm2LogEmailSmtpEntryStatus 	RowStatus,
+			hm2LogEmailSmtpTimeout 		Unsigned32
+			}
+
+hm2LogEmailSmtpAddrIndex OBJECT-TYPE
+			SYNTAX 			Integer32 (1..5)
+			MAX-ACCESS 		not-accessible
+			STATUS 			current
+			DESCRIPTION		"An integer used only for indexing purposes.
+							 Re-use of values for this index is allowed."
+			::= { hm2LogEmailMailServerEntry 1 }
+
+hm2LogEmailSmtpAddrDescr OBJECT-TYPE
+			SYNTAX 			SnmpAdminString (SIZE (0..255))
+			MAX-ACCESS 		read-create
+			STATUS 			current
+			DESCRIPTION		"The description of the server configured."
+			DEFVAL  		{ "" }
+			::= { hm2LogEmailMailServerEntry 2 }
+			
+hm2LogEmailSmtpAddrType OBJECT-TYPE
+			SYNTAX 			InetAddressType
+			MAX-ACCESS 		read-create
+			STATUS 			current
+			DESCRIPTION		"Email SMTP address type."
+			DEFVAL  		{ ipv4 }
+			::= { hm2LogEmailMailServerEntry 3 }
+
+hm2LogEmailSmtpAddr OBJECT-TYPE
+			SYNTAX 			InetAddress
+			MAX-ACCESS 		read-create
+			STATUS 			current
+			DESCRIPTION		"SMTP server address."
+			DEFVAL  		{ '00000000'H } -- 0.0.0.0
+			::= { hm2LogEmailMailServerEntry 4 }
+
+hm2LogEmailSmtpPort OBJECT-TYPE
+			SYNTAX 			InetPortNumber
+			MAX-ACCESS 		read-create
+			STATUS 			current
+			DESCRIPTION		"SMTP port number. When this object is set to 0, it resets to factory default port number 25."
+			DEFVAL  		{ 25 }
+			::= { hm2LogEmailMailServerEntry 5 }
+
+hm2LogEmailSmtpSecurity OBJECT-TYPE
+			SYNTAX 			INTEGER {
+							none(1), 
+							tlsv1(2) 
+							}
+			MAX-ACCESS 		read-create
+			STATUS 			current
+			DESCRIPTION		"This is the authentication mechanism that should be used."
+			DEFVAL  		{ none }
+			::= { hm2LogEmailMailServerEntry 6 }
+
+hm2LogEmailSmtpLoginID OBJECT-TYPE
+			SYNTAX 			SnmpAdminString (SIZE (0..255)) 
+			MAX-ACCESS 		read-create
+			STATUS 			current
+			DESCRIPTION		"This user id is used while the switch/router is being authenticated by the SMTP server,
+					         if the hm2LogEmailSmtpSecurity is configured to 'tlsv1'."
+			DEFVAL  		{ "" }
+			::= { hm2LogEmailMailServerEntry 7 }
+
+hm2LogEmailSmtpPassword OBJECT-TYPE
+			SYNTAX 			SnmpAdminString (SIZE (0..255))
+			MAX-ACCESS 		read-create
+			STATUS 			current
+			DESCRIPTION		"This password is used while the switch/router is being authenticated by the SMTP server,
+							 if the hm2LogEmailSmtpSecurity is configured to 'tlsv1'."
+			DEFVAL  		{ "" }
+			::= { hm2LogEmailMailServerEntry 8 }
+
+hm2LogEmailSmtpEntryStatus OBJECT-TYPE
+			SYNTAX 			RowStatus
+			MAX-ACCESS 		read-create
+			STATUS 			current
+			DESCRIPTION		"Create, change or delete the entry."
+			::= { hm2LogEmailMailServerEntry 9 }
+
+hm2LogEmailSmtpTimeout OBJECT-TYPE
+			SYNTAX 			Unsigned32 (1..15)
+			MAX-ACCESS 		read-create
+			STATUS 			current
+			DESCRIPTION 	"Time out duration (in seconds) before packets are retransmitted."
+			DEFVAL   		{ 3 }
+			::= { hm2LogEmailMailServerEntry 10 }
+
+hm2LogEmailClientTlsVersions OBJECT-TYPE
+			SYNTAX			Hm2TlsVersions
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION		"The TLS version supported by the email-alert logging client."
+			DEFVAL			{{ tlsv1-0, tlsv1-2 }}
+			::= { hm2LogEmailAlertGroup  18 }
+
+hm2LogEmailClientTlsCipherSuites OBJECT-TYPE
+			SYNTAX			Hm2TlsCipherSuites
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION		"The cipher suite supported by the email-alert logging client."
+			DEFVAL			{{
+								tls-dhe-rsa-with-aes-128-cbc-sha,
+								tls-ecdhe-rsa-with-aes-128-cbc-sha,
+								tls-ecdhe-rsa-with-aes-128-gcm-sha256
+							}}
+			::= { hm2LogEmailAlertGroup  19 }
+
+-- 
+-- ***********************************************************
+-- hm2LoggingMibNotifications
+-- ***********************************************************
+--
+
+hm2LogAuditStartNextSector NOTIFICATION-TYPE
+    STATUS       current
+    DESCRIPTION
+                 "A notification shall be sent when the audit trail has filled one
+                 sector and starts a new one."
+   ::= { hm2LoggingMibNotifications 1 }
+
+hm2LogEmailSendFailed NOTIFICATION-TYPE
+	OBJECTS { hm2LogEmailNumEmailFailures }
+	STATUS current
+	DESCRIPTION
+	"Whenever a mail sending to the SMTP server is failed, this trap is sent with a count of how many times the
+	 connection to the SMTP server is failed so far."
+	::= { hm2LoggingMibNotifications 2 }
+			
+--
+-- *************************************************************
+-- hm2LogSNMPExtensionGroup
+-- *************************************************************
+--
+
+hm2LogSNMPSyslogConfigFailed	OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the configuration of syslog server IP address and
+                        port has failed."
+           ::= { hm2LogSNMPExtensionGroup 1 }
+
+hm2LogSNMPMinSeverityInvalid	OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the syslog contains an invalid value for min. severity
+                        that cannot be processed."
+           ::= { hm2LogSNMPExtensionGroup 2 }
+
+END

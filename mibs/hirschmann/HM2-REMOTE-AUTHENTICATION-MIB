@@ -1,0 +1,416 @@
+
+HM2-REMOTE-AUTHENTICATION-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann Remote Authentication Management MIB
+-- *************************************************************
+--
+
+IMPORTS
+	OBJECT-IDENTITY,
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE,
+    Integer32           	FROM SNMPv2-SMI -- RFC 2578
+    RowStatus               FROM SNMPv2-TC
+    InetAddressType, 
+    InetAddress,
+	InetPortNumber          FROM INET-ADDRESS-MIB -- RFC4001
+    SnmpAdminString     	FROM SNMP-FRAMEWORK-MIB
+    Hm2UserAccessRoles		FROM HM2-USERMGMT-MIB
+    Hm2TlsVersions,
+    Hm2TlsCipherSuites		FROM HM2-MGMTACCESS-MIB
+	HmEnabledStatus,
+	hm2ConfigurationMibs   	FROM HM2-TC-MIB;
+
+hm2RemoteAuthMib MODULE-IDENTITY
+	LAST-UPDATED "201403060000Z" -- March 6, 2014
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann MIB for remote authentication protocols.
+         Copyright (C) 2014. All Rights Reserved."
+    REVISION     "201403060000Z" -- March 6, 2014
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 26 }
+
+--
+-- *************************************************************
+-- hm2RemoteAuthMib
+-- *************************************************************
+--
+hm2RemoteAuthMibNotifications		OBJECT IDENTIFIER ::= { hm2RemoteAuthMib 0 }
+hm2RemoteAuthMibObjects				OBJECT IDENTIFIER ::= { hm2RemoteAuthMib 1 }
+-- hm2RemoteAuthMibConformance		OBJECT IDENTIFIER ::= { hm2RemoteAuthMib 2 }
+hm2RemoteAuthMibSNMPExtensionGroup 	OBJECT IDENTIFIER ::= { hm2RemoteAuthMib 3 }
+ 
+--
+-- *************************************************************
+-- hm2RemoteAuthMib groups
+-- *************************************************************
+--
+hm2LdapGroup 	OBJECT IDENTIFIER ::= { hm2RemoteAuthMibObjects 1 }
+ 
+--
+-- *************************************************************
+-- hm2LdapGroup groups
+-- *************************************************************
+--
+hm2LdapConfigGroup 					OBJECT IDENTIFIER ::= { hm2LdapGroup 10 }
+hm2LdapMappingGroup					OBJECT IDENTIFIER ::= { hm2LdapGroup 20 }
+
+--
+-- *************************************************************
+-- hm2LdapConfigGroup
+-- *************************************************************
+--
+hm2LdapClientAdminState OBJECT-TYPE
+   SYNTAX 		HmEnabledStatus
+   MAX-ACCESS 	read-write
+   STATUS     	current
+   DESCRIPTION
+		"Enables/disables the LDAP client admin mode."
+   DEFVAL { disable }       
+   ::= { hm2LdapConfigGroup 1 }
+
+hm2LdapClientCacheTimeout OBJECT-TYPE
+   SYNTAX 		Integer32 (1..1440)
+   MAX-ACCESS 	read-write
+   STATUS     	current
+   DESCRIPTION
+		"Configures the LDAP user cache entry timeout in minutes.
+		 Default timeout value is 10 minutes."
+   DEFVAL { 10 }       
+   ::= { hm2LdapConfigGroup 2 }
+
+hm2LdapClientServerBaseDN  OBJECT-TYPE
+   SYNTAX 		SnmpAdminString (SIZE(0..255)) 
+   MAX-ACCESS 	read-write
+   STATUS 		current
+   DESCRIPTION
+	   "Base distinguished name for LDAP query to remote authentication server."
+   DEFVAL { "" } 
+   ::= { hm2LdapConfigGroup 3 }
+
+hm2LdapClientServerSearchAttribute  OBJECT-TYPE
+   SYNTAX 		SnmpAdminString (SIZE(0..64))
+   MAX-ACCESS 	read-write
+   STATUS 		current
+   DESCRIPTION
+	    "Search attribute for LDAP query to remote authentication server, 
+	 	e.g. 'userPrincipalName'."
+   DEFVAL { "userPrincipalName" } 
+   ::= { hm2LdapConfigGroup 4 }
+   
+hm2LdapClientServerBindUser  OBJECT-TYPE
+   SYNTAX 		SnmpAdminString (SIZE(0..255))
+   MAX-ACCESS 	read-write
+   STATUS 		current
+   DESCRIPTION
+	   "User name of user that has permission to do user requests on a 
+ 	remote authentication server."
+   DEFVAL { "" } 
+   ::= { hm2LdapConfigGroup 5 }
+  
+hm2LdapClientServerBindUserPasswd  OBJECT-TYPE
+   SYNTAX 		SnmpAdminString (SIZE(0..64))
+   MAX-ACCESS 	read-write
+   STATUS 		current
+   DESCRIPTION
+	    "Password of user that has permission to do user requests on a remote authentication server."
+   DEFVAL { "" } 
+   ::= { hm2LdapConfigGroup 6 }
+   
+hm2LdapClientServerDefaultDomain  OBJECT-TYPE
+  SYNTAX 		SnmpAdminString (SIZE(0..64))
+  MAX-ACCESS 	read-write
+  STATUS 		current
+  DESCRIPTION
+	"Default domain used for users without a domain name."
+  DEFVAL { "" } 
+  ::= { hm2LdapConfigGroup 7 }
+   
+hm2LdapClientTlsVersions OBJECT-TYPE
+   SYNTAX		Hm2TlsVersions
+   MAX-ACCESS	read-write
+   STATUS	    current
+   DESCRIPTION
+                "The TLS version supported by the LDAP client."
+   DEFVAL       {{ tlsv1-0, tlsv1-2 }}
+   ::= { hm2LdapConfigGroup  8 }
+
+hm2LdapClientTlsCipherSuites OBJECT-TYPE
+   SYNTAX		Hm2TlsCipherSuites
+   MAX-ACCESS	read-write
+   STATUS		current
+   DESCRIPTION
+                "The cipher suite supported by the LDAP client."
+   DEFVAL       {{
+                 tls-dhe-rsa-with-aes-128-cbc-sha,
+                 tls-ecdhe-rsa-with-aes-128-cbc-sha,
+                 tls-ecdhe-rsa-with-aes-128-gcm-sha256
+                }}
+   ::= { hm2LdapConfigGroup  9 }
+--
+-- *************************************************************
+-- hm2LdapClientServerAddrTable
+-- *************************************************************
+--
+hm2LdapClientServerAddrTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2LdapClientServerAddrEntry
+	MAX-ACCESS 		not-accessible
+	STATUS 			current
+	DESCRIPTION
+		"This table contains objects to configure
+		 client connections to remote authentication server(s)."
+	::= { hm2LdapConfigGroup 20 }
+
+hm2LdapClientServerAddrEntry OBJECT-TYPE
+   SYNTAX 		Hm2LdapClientServerAddrEntry
+   MAX-ACCESS 	not-accessible
+   STATUS 		current
+   DESCRIPTION 
+		"The Ldap client connection objects."
+   INDEX { hm2LdapClientServerIndex }
+   ::= { hm2LdapClientServerAddrTable 1 }
+
+Hm2LdapClientServerAddrEntry ::= SEQUENCE {
+   hm2LdapClientServerIndex 				Integer32,
+   hm2LdapClientServerDescr	 				SnmpAdminString,
+   hm2LdapClientServerAddrType 				InetAddressType,
+   hm2LdapClientServerAddr 					InetAddress,
+   hm2LdapClientServerPort	 				InetPortNumber,
+   hm2LdapClientServerSecurity				INTEGER,
+   hm2LdapClientServerStatus 				INTEGER,
+   hm2LdapClientServerRowStatus				RowStatus
+   }		 
+
+hm2LdapClientServerIndex OBJECT-TYPE
+    SYNTAX		Integer32 (1..4)
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+				"Index for remote authentication server table."
+     ::= { hm2LdapClientServerAddrEntry 1 }
+
+hm2LdapClientServerDescr  OBJECT-TYPE
+   SYNTAX 		SnmpAdminString (SIZE(0..255))
+   MAX-ACCESS 	read-create
+   STATUS 		current
+   DESCRIPTION
+   	   "The description of the server configured."
+   ::= { hm2LdapClientServerAddrEntry 2 }
+
+hm2LdapClientServerAddrType OBJECT-TYPE
+    SYNTAX		InetAddressType
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+				"Address type."
+	DEFVAL		{ ipv4 }                   
+     ::= { hm2LdapClientServerAddrEntry 3 }
+         
+hm2LdapClientServerAddr OBJECT-TYPE
+    SYNTAX		InetAddress
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+				"IP address of remote authentication server."
+	DEFVAL		{ '00000000'H }                   
+     ::= { hm2LdapClientServerAddrEntry 4 }
+
+hm2LdapClientServerPort OBJECT-TYPE
+    SYNTAX		InetPortNumber
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+				"The port number of the remote authentication server."
+	DEFVAL		{ 389 }                   
+     ::= { hm2LdapClientServerAddrEntry 5 }
+
+hm2LdapClientServerSecurity OBJECT-TYPE
+   SYNTAX      INTEGER {
+				 none(1),
+				 ssl(2),
+				 startTLS(3)
+				 }
+   MAX-ACCESS 	read-create
+   STATUS     	current
+   DESCRIPTION
+		"Configures connection security options.
+		 		  - none		-> connection to AD server is unprotected.
+		 						   (Attention: passwords are transmitted as plain text)
+				  - ssl			-> SSL connection is established between device and AD server
+								   and AD server certificate is proved valid with loaded
+				  				   certificate authority (CA certificate).
+				  - startTLS 	-> TLS connection is established between device and AD server
+				  				   and AD server certificate is proved valid with loaded
+				  				   certificate authority (CA certificate)."
+   DEFVAL { startTLS }       
+   ::= { hm2LdapClientServerAddrEntry 6 }
+
+hm2LdapClientServerStatus OBJECT-TYPE
+   SYNTAX      INTEGER {
+				 ok(1),
+				 unreachable(2),
+				 other(3)
+				 }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+               "Status of authentication against remote authentication server:
+                - ok			-> Server reachable, authentication succeeded
+                - unreachable -> Server (primary and backup) not reachable
+                - other       -> any other error state"
+   DEFVAL  { other }					    
+   ::= { hm2LdapClientServerAddrEntry 7 }
+		 
+hm2LdapClientServerRowStatus OBJECT-TYPE
+	SYNTAX      RowStatus
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+		"Indicates the status of an entry in this table,
+		and is used to create/delete entries. Objects
+		within this table can by changed while the status
+		is 'active'."
+	::= { hm2LdapClientServerAddrEntry 8 }
+
+
+--
+-- *************************************************************
+-- hm2LdapMappingGroup
+-- *************************************************************
+--
+hm2LdapRoleMatchingPolicy OBJECT-TYPE
+   SYNTAX 		INTEGER {
+   					highest(1),
+   					first(2)
+   				}
+   MAX-ACCESS 	read-write
+   STATUS     	current
+   DESCRIPTION
+		"Configures the way role mapping table entries are
+		 applied. If set to first (2) the first matching entry
+		 determines the user's role. If set to highest (1) the
+		 the matching entry with the highest role is used."
+   DEFVAL { 1 }       
+   ::= { hm2LdapMappingGroup 1 } 
+
+--
+-- *************************************************************
+-- hm2LdapRoleMappingTable
+-- *************************************************************
+--
+hm2LdapRoleMappingTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2LdapRoleMappingEntry
+	MAX-ACCESS 		not-accessible
+	STATUS 			current
+	DESCRIPTION
+		"This table contains string objects to configure
+		 the mapping to an available user role."
+	::= { hm2LdapMappingGroup 10 }
+
+hm2LdapRoleMappingEntry OBJECT-TYPE
+   SYNTAX 		Hm2LdapRoleMappingEntry
+   MAX-ACCESS 	not-accessible
+   STATUS 		current
+   DESCRIPTION 
+		"The role mapping string objects."
+   INDEX { hm2LdapRoleMappingIndex }
+   ::= { hm2LdapRoleMappingTable 1 }
+
+Hm2LdapRoleMappingEntry ::= SEQUENCE {
+   hm2LdapRoleMappingIndex 				Integer32,
+   hm2LdapRoleMappingAccessRole			Hm2UserAccessRoles,
+   hm2LdapRoleMappingType				INTEGER,
+   hm2LdapRoleMappingParameter			SnmpAdminString,
+   hm2LdapRoleMappingRowStatus			RowStatus
+   }		 
+
+hm2LdapRoleMappingIndex OBJECT-TYPE
+    SYNTAX		Integer32 (1..64)
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"Index for remote authentication role mapping table."
+     ::= { hm2LdapRoleMappingEntry 1 }
+
+hm2LdapRoleMappingAccessRole  OBJECT-TYPE
+   SYNTAX 		Hm2UserAccessRoles 
+   MAX-ACCESS 	read-create
+   STATUS 		current
+   DESCRIPTION
+   	   "The access role to be mapped."
+   ::= { hm2LdapRoleMappingEntry 2 }
+  
+hm2LdapRoleMappingType OBJECT-TYPE
+    SYNTAX		INTEGER
+    	{
+    		attribute(1),
+    		group(2)
+    	}
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+				"Type of this entry"                 
+     ::= { hm2LdapRoleMappingEntry 3 }
+      
+hm2LdapRoleMappingParameter  OBJECT-TYPE
+   SYNTAX 		SnmpAdminString (SIZE(0..255))
+   MAX-ACCESS 	read-create
+   STATUS 		current
+   DESCRIPTION
+   	   "The search string for the entry. For hm2LdapRoleMappingType attribute(1) this
+   	   is in the form attribute=value. For hm2LdapRoleMappingType group(2) this is the group."
+   ::= { hm2LdapRoleMappingEntry 4 }
+
+hm2LdapRoleMappingRowStatus OBJECT-TYPE
+	SYNTAX      RowStatus
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+		"Indicates the status of an entry in this table,
+		and is used to create/delete entries. Objects
+		within this table can by changed while the status
+		is 'active'."
+	::= { hm2LdapRoleMappingEntry 5 }
+
+-- ***********************************************************
+-- hm2RemoteAuthMibSNMPExtensionGroup
+-- ***********************************************************
+hm2LdapSESGroup 	OBJECT IDENTIFIER ::= { hm2RemoteAuthMibSNMPExtensionGroup 1 }
+
+-- ***********************************************************
+-- hm2LdapSESGroup
+-- ***********************************************************
+hm2LdapSESDuplicateIPorHost OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION 
+           		"Indicates that there exists a remote authentication client server
+           		 entry with the same IP address or host name."
+           ::= { hm2LdapSESGroup 1 }
+
+
+-- 
+-- ***********************************************************
+-- hm2LdapMgmtMibNotifications
+-- ***********************************************************
+--
+hm2LdapConfigStatusTrap  NOTIFICATION-TYPE
+	OBJECTS		{ hm2LdapClientServerIndex, hm2LdapClientServerStatus }
+	STATUS		current
+	DESCRIPTION 
+				"This notification is send when authentication via Ldap to a
+				 remote authentication server is done."
+	::= { hm2RemoteAuthMibNotifications 1 }
+	
+END
+

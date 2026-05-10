@@ -1,0 +1,1126 @@
+
+HM2-USERMGMT-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann User Management MIB
+-- *************************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE,
+    OBJECT-IDENTITY,
+    Integer32               FROM SNMPv2-SMI -- RFC 2578
+    TEXTUAL-CONVENTION,
+    DisplayString,
+    RowStatus,               
+    TruthValue				FROM SNMPv2-TC
+    SnmpAdminString     	FROM SNMP-FRAMEWORK-MIB
+	HmEnabledStatus,
+	hm2ConfigurationMibs   	FROM HM2-TC-MIB;
+
+hm2UserMgmtMib MODULE-IDENTITY
+	LAST-UPDATED "201103160000Z" -- March 16, 2011
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann User and Password Management MIB.
+         Copyright (C) 2011. All Rights Reserved."
+    REVISION     "201103160000Z" -- March 16, 2011
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 24 }
+
+--
+-- Textual conventions
+--
+Hm2UserAccessRoles ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+		"Agent user roles."
+ 	SYNTAX INTEGER {
+ 			  			unauthorized (0),
+        	   			guest (1),
+             			auditor (2),
+             			custom1 (5),
+						custom2 (6),
+						custom3 (7),
+            			operator (13),
+            			administrator (15)
+          	  	   }
+
+Hm2UserAuthList ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+		"Agent auth list."
+	SYNTAX INTEGER {
+						local(3),
+						radius(5),
+						ias(7),
+						cam(9),
+						ldap(10),
+						reject(248),
+						none(300)
+				   }
+         
+Hm2UserCustomAccessRoles ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+		"Agent custom-based user roles."
+ 	SYNTAX INTEGER {
+             			custom1 (5),
+						custom2 (6),
+						custom3 (7)
+          	  	   }
+
+Hm2UserCliExecModes  ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+		"Agent CLI modes."
+	SYNTAX INTEGER {
+             			user-exec-mode (1),
+             			priv-exec-mode (2),
+             			global-config-exec-mode (3),
+             			vlan-database-exec-mode (4),
+             			interface-exec-mode (5),
+						all-modes (10)
+          	  	   } 
+
+--
+-- *************************************************************
+-- hm2UserMgmtMib
+-- *************************************************************
+--
+hm2UserMgmtMibNotifications			OBJECT IDENTIFIER ::= { hm2UserMgmtMib 0 }
+hm2UserMgmtMibObjects				OBJECT IDENTIFIER ::= { hm2UserMgmtMib 1 }
+-- hm2UserMgmtMibConformance			OBJECT IDENTIFIER ::= { hm2UserMgmtMib 2 }
+
+--
+-- *************************************************************
+-- hm2UserMgmtMib groups
+-- *************************************************************
+--
+hm2UserConfigGroup 					OBJECT IDENTIFIER ::= { hm2UserMgmtMibObjects 1 }
+hm2PwdMgmtGroup 					OBJECT IDENTIFIER ::= { hm2UserMgmtMibObjects 2 }
+hm2UserApplicationListGroup         OBJECT IDENTIFIER ::= { hm2UserMgmtMibObjects 3 }
+hm2UserAuthListGroup                OBJECT IDENTIFIER ::= { hm2UserMgmtMibObjects 4 }
+hm2UserIasGroup                     OBJECT IDENTIFIER ::= { hm2UserMgmtMibObjects 5 }
+
+--
+-- *************************************************************
+-- hm2UserConfigGroup
+-- *************************************************************
+--
+hm2UserConfigTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2UserConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "User configuration table. 
+					  This table provides the functionality the system uses
+					  for any interaction started by the user - authentication,
+                      encryption - changing authentication, password and access role
+					  for login purposes through Web, CLI, SSH, SNMPv3.
+					  For SNMPv3 the standard SNMPv3 authentication/encryption methods are used.
+					  To create a new user set hm2UserStatus to 'createAndWait,
+					  and set the corresponding objects to their values. Setting
+					  hm2UserStatus to 'active' activates the user. To delete a
+					  user, set hm2UserStatus to 'destroy'. Creating a new user
+					  in the hm2UserConfigTable always creates a new user in the
+					  SNMPv3 tables. The newly created SNMPv3 user will get the
+					  corresponding view in the SNMPv3 tables which matches to one
+					  of the given roles the user can have.
+					  All objects in this table can be set while a row is 'active'."
+         ::= { hm2UserConfigGroup 1 }
+    
+hm2UserConfigEntry OBJECT-TYPE
+         SYNTAX      Hm2UserConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "User configuration entry."
+         INDEX { IMPLIED hm2UserName }
+         ::= { hm2UserConfigTable 1 }
+
+Hm2UserConfigEntry ::= SEQUENCE {
+                 hm2UserName             			SnmpAdminString,
+                 hm2UserPassword         			DisplayString,
+                 hm2UserAccessRole       			Hm2UserAccessRoles,
+                 hm2UserLockoutStatus				TruthValue,
+                 hm2UserPwdChangePerm				TruthValue,
+                 hm2UserPwdPolicyChk				HmEnabledStatus,
+                 hm2UserSnmpAuthType                INTEGER,
+                 hm2UserSnmpEncType                 INTEGER,
+                 hm2UserStatus                      RowStatus,
+                 hm2UserSnmpAuthPassword			DisplayString,
+                 hm2UserSnmpEncPassword				DisplayString                
+             }
+    
+    hm2UserName OBJECT-TYPE
+         SYNTAX      SnmpAdminString (SIZE(1..32))
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+                     "Agent user name."
+         ::= { hm2UserConfigEntry 1 }
+        
+    hm2UserPassword OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0..64))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Agent user password
+                      This object will always return '********' when read.
+                      The minimum size of the password is defined with the
+                      hm2PwdMgmtMinLength object. The user password can be
+                      set while the row is active."
+		 DEFVAL  { "" }
+         ::= { hm2UserConfigEntry 2 }
+        
+    hm2UserAccessRole OBJECT-TYPE
+         SYNTAX      Hm2UserAccessRoles
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Agent user's role.
+					 The user's role can be set while the row is active."
+         DEFVAL  { guest }
+         ::= { hm2UserConfigEntry 3 }
+         
+    
+    hm2UserLockoutStatus OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Displays whether the user account is locked due to excessive failed login attempts.
+                      If the user is locked out, the hm2UserLockoutStatus status is 'true'.
+                      Only a user with the administrator role can set this status back to 'false'."
+         DEFVAL  { false }
+         ::= { hm2UserConfigEntry 4 }
+    
+        
+	hm2UserPwdChangePerm OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Displays whether the user is allowed to change his own password.
+                      Only a user with the administrator role can set this value."
+         DEFVAL  { true }
+         ::= { hm2UserConfigEntry 5 }
+          
+
+	hm2UserPwdPolicyChk OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Displays whether the password policy check is enabled or not.
+                      The password policy check objects are defined in the hm2PwdMgmtGroup.
+                      Even if this object if set to 'disable' the size of a new password has
+                      to be at least the size of the hm2PwdMgmtMinLength object set.
+                      Only a user with the administrator role can set this value."
+         DEFVAL  { disable }
+         ::= { hm2UserConfigEntry 6 } 
+         
+                
+    hm2UserSnmpAuthType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     hmacmd5(1),
+                     hmacsha(2)
+                  }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "SNMPv3 user authentication. The user password must be set
+                     to a string greater than or equal to 8 characters for this to be
+                     set to anything but none(0).
+                     
+                     - hmacmd5(1)   -> Use HMAC-MD5 authentication
+                     - hmacsha(2)   -> Use HMAC-SHA authentication
+
+					 The user authentication type can be set while the row is active ."
+ 		 DEFVAL  { hmacmd5 }
+         ::= { hm2UserConfigEntry 7 }      
+         
+
+    hm2UserSnmpEncType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     none(0),
+                     des(1),
+				     aesCfb128(2)
+                  }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "SNMPv3 user encryption
+                     Can not be set to des(2) or aesCfb128(3) if
+					 hm2UserSnmpAuthenticationType is set to none(0).
+                     - none(0) 			-> no encryption used
+                     - des(1)  			-> DES encryption used
+				     - aesCfb128(2)  	-> AES-128 encryption used
+					 The user encryption type can be set while the row is active."
+		 DEFVAL  { des }
+         ::= { hm2UserConfigEntry 8 }   
+         
+    
+    hm2UserStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Agent user status.
+                     active(1)  		- This user account is active.
+					 notInService(2) 	- Row has been suspended.
+					 notReady(3)		- Row has incomplete values.
+					 createAndGo(4)		- Accept row values and activate.
+					 createAndWait(5)	- Accept row values and wait.
+                     destroy(6) 		- Set to this value to remove this user account."
+         ::= { hm2UserConfigEntry 9 }
+         
+    hm2UserSnmpAuthPassword OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0..64))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "SNMPv3 user authentication password
+                      This object will always return '********' when read.
+                      The minimum size of the password is defined with the
+                      hm2PwdMgmtMinLength object. The SNMPv3 user authentication 
+                      password can be set while the row is active."
+		 DEFVAL  { "" }
+         ::= { hm2UserConfigEntry 10 }
+         
+    hm2UserSnmpEncPassword OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0..64))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "SNMPv3 user encryption password
+                      This object will always return '********' when read.
+                      The minimum size of the password is defined with the
+                      hm2PwdMgmtMinLength object. The SNMPv3 user encryption 
+                      password can be set while the row is active."
+		 DEFVAL  { "" }
+         ::= { hm2UserConfigEntry 11 }
+      
+--
+-- ******************************************************************
+-- hm2UserStatusGroup
+-- ******************************************************************
+--
+hm2UserStatusGroup	OBJECT IDENTIFIER ::= { hm2UserConfigGroup 10 }
+         
+hm2UserLastUserCreated OBJECT-TYPE
+	SYNTAX      SnmpAdminString (SIZE(0|1..32))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+			 	 "Name of the last user created in hm2UserConfigTable."
+	::= { hm2UserStatusGroup 1 }
+
+hm2UserLastUserDeleted OBJECT-TYPE
+	SYNTAX      SnmpAdminString (SIZE(0|1..32))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+				"Name of the last user deleted in hm2UserConfigTable."
+	::= { hm2UserStatusGroup 2 }         
+
+hm2UserForcePasswordStatus OBJECT-TYPE
+	SYNTAX      HmEnabledStatus
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+			"If enabled, then the password must be changed on first management access to the device.
+			This value is only set from internal component."
+	DEFVAL  { enable }
+	::= { hm2UserStatusGroup 3 }
+
+--
+--**************************************************************************************
+-- hm2UserCustomGroup
+--**************************************************************************************
+--
+hm2UserCustomGroup		OBJECT IDENTIFIER ::= { hm2UserConfigGroup 20 }
+
+--
+-- hm2UserCustomAccessRole2NameTable
+--
+    hm2UserCustomAccessRole2NameTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2UserCustomAccessRole2NameEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Custom based role to name mapping."
+         ::= { hm2UserCustomGroup 1 }
+
+    hm2UserCustomAccessRole2NameEntry OBJECT-TYPE
+         SYNTAX      Hm2UserCustomAccessRole2NameEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The hm2UserCustomAccessRole2NameEntry."
+         INDEX       { hm2UserCustomAccessRole }
+         ::= { hm2UserCustomAccessRole2NameTable 1 }
+
+    Hm2UserCustomAccessRole2NameEntry ::=
+         SEQUENCE { 
+         			hm2UserCustomAccessRole			Hm2UserCustomAccessRoles,
+         			hm2UserCustomAccessRoleName		SnmpAdminString,
+         			hm2UserCustomAccessRoleStatus	RowStatus
+                  }        
+
+    hm2UserCustomAccessRole OBJECT-TYPE
+         SYNTAX      Hm2UserCustomAccessRoles
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Custom based roles."
+         ::= { hm2UserCustomAccessRole2NameEntry 1 }
+                 
+    hm2UserCustomAccessRoleName OBJECT-TYPE
+         SYNTAX      SnmpAdminString (SIZE(1..32))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Custom based role name."
+         ::= { hm2UserCustomAccessRole2NameEntry 2 } 
+         
+    hm2UserCustomAccessRoleStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Custom-based role to name command row status.
+                     active(1)  		- This user account is active.
+					 notInService(2) 	- Row has been suspended.
+					 notReady(3)		- Row has incomplete values.
+					 createAndGo(4)		- Accept row values and activate.
+					 createAndWait(5)	- Accept row values and wait.
+                     destroy(6) 		- Set to this value to remove this role to name entry."
+         ::= { hm2UserCustomAccessRole2NameEntry 3 }
+
+--
+-- hm2UserCustomCliCmdInheritTable
+--
+    hm2UserCustomCliCmdInheritTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2UserCustomCliCmdInheritEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Base access role from which the custom-based CLI commands are inherited from."
+         ::= { hm2UserCustomGroup 2 }
+
+    hm2UserCustomCliCmdInheritEntry OBJECT-TYPE
+         SYNTAX      Hm2UserCustomCliCmdInheritEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The hm2UserCustomCliCmdInheritEntry."
+         INDEX       { hm2UserCustomAccessRole }
+         ::= { hm2UserCustomCliCmdInheritTable 1 }
+
+    Hm2UserCustomCliCmdInheritEntry ::=
+         SEQUENCE {
+         			hm2UserCustomCliBaseAccessRole			Hm2UserAccessRoles,
+         			hm2UserCustomCliBaseAccessRoleStatus    RowStatus
+                  }        
+                 
+    hm2UserCustomCliBaseAccessRole OBJECT-TYPE
+         SYNTAX      Hm2UserAccessRoles
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The base access role the new CLI command is inherited from."
+         DEFVAL  { guest }
+         ::= { hm2UserCustomCliCmdInheritEntry 1 }
+
+    hm2UserCustomCliBaseAccessRoleStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Custom-based CLI base access role command row status.
+                     active(1)  		- This user account is active.
+					 notInService(2) 	- Row has been suspended.
+					 notReady(3)		- Row has incomplete values.
+					 createAndGo(4)		- Accept row values and activate.
+					 createAndWait(5)	- Accept row values and wait.
+                     destroy(6) 		- Set to this value to remove this role to name entry."
+         ::= { hm2UserCustomCliCmdInheritEntry 2 }
+
+
+--
+-- hm2UserCustomCliCmdTable
+--
+    hm2UserCustomCliCmdTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2UserCustomCliCmdEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Table containing the custom-based CLI commands."
+         ::= { hm2UserCustomGroup 3 }
+
+    hm2UserCustomCliCmdEntry OBJECT-TYPE
+         SYNTAX      Hm2UserCustomCliCmdEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The entries of the table."
+         INDEX       { hm2UserCustomAccessRole, hm2UserCustomCliExecMode, hm2UserCustomCliIndex }
+         ::= { hm2UserCustomCliCmdTable 1 }
+
+    Hm2UserCustomCliCmdEntry ::=
+         SEQUENCE {
+         			hm2UserCustomCliExecMode		Hm2UserCliExecModes,
+         			hm2UserCustomCliIndex	  		Integer32,
+         			hm2UserCustomCliCommand	 	 	SnmpAdminString,
+         			hm2UserCustomCliType			INTEGER,
+       	 			hm2UserCustomCliStatus   		RowStatus		 
+                  }        
+
+	hm2UserCustomCliExecMode OBJECT-TYPE
+         SYNTAX      Hm2UserCliExecModes
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "CLI exec mode."
+         ::= { hm2UserCustomCliCmdEntry 1 }
+                 
+	hm2UserCustomCliIndex OBJECT-TYPE
+         SYNTAX      Integer32 (1..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Index of the custom based CLI commands."
+         ::= { hm2UserCustomCliCmdEntry 2 }
+
+	hm2UserCustomCliCommand OBJECT-TYPE
+         SYNTAX      SnmpAdminString
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The custom based CLI command to be assigned."
+         ::= { hm2UserCustomCliCmdEntry 3 }
+
+	hm2UserCustomCliType OBJECT-TYPE
+         SYNTAX      INTEGER 
+         					{ 
+         						included (1),
+         						excluded (2)
+         					}
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The custom based CLI command to be included or excluded in respect to the base role."
+         ::= { hm2UserCustomCliCmdEntry 4 }
+
+    hm2UserCustomCliStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Custom-based CLI command row status.
+                     active(1)  		- This user account is active.
+					 notInService(2) 	- Row has been suspended.
+					 notReady(3)		- Row has incomplete values.
+					 createAndGo(4)		- Accept row values and activate.
+					 createAndWait(5)	- Accept row values and wait.
+                     destroy(6) 		- Set to this value to remove this CLI command entry."
+         ::= { hm2UserCustomCliCmdEntry 5 }
+
+--
+-- *************************************************************
+-- hm2PwdMgmtGroup
+-- *************************************************************
+--
+
+	hm2PwdMgmtMinLength OBJECT-TYPE
+         SYNTAX      Integer32 (1..64)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Minimum length for user passwords
+                      All new local user passwords must be at least this many characters in length.
+                     "
+		 DEFVAL  { 6 }                     
+         ::= { hm2PwdMgmtGroup 1 }
+
+    hm2PwdMgmtLoginAttempts OBJECT-TYPE
+         SYNTAX      Integer32 (0..5)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The number of allowable failed local authentication attempts before the user's
+                      account is locked.  A value of '0' indicates that user accounts will never be locked."
+         DEFVAL  { 0 }
+         ::= { hm2PwdMgmtGroup 2 }
+
+    hm2PwdMgmtMinUpperCase OBJECT-TYPE
+         SYNTAX      Integer32 (0..16)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION "The number of minimum allowable uppercase letters in a 
+                      password. Minimum of '0' means no restriction on that set 
+                      of characters."
+		 DEFVAL  { 1 }                      
+         ::= { hm2PwdMgmtGroup 3 }
+
+    hm2PwdMgmtMinLowerCase OBJECT-TYPE
+         SYNTAX      Integer32 (0..16)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The number of minimum allowable lowercase letters in a 
+                      password. Minimum of '0' means no restriction on that set 
+                      of characters."
+         DEFVAL  { 1 }                      
+         ::= { hm2PwdMgmtGroup 4 }
+
+    hm2PwdMgmtMinNumericNumbers OBJECT-TYPE
+         SYNTAX      Integer32 (0..16)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The number of minimum allowable numeric numbers in a 
+                      password. Minimum of '0' means no restriction on that set 
+                      of characters."
+         DEFVAL  { 1 }                       
+         ::= { hm2PwdMgmtGroup 5 }
+
+    hm2PwdMgmtMinSpecialCharacters OBJECT-TYPE
+         SYNTAX      Integer32 (0..16)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The number of minimum allowable special characters in a 
+                      password. Minimum of '0' means no restriction on that set 
+                      of characters.
+                      The following special characters are allowed:
+                      !#$%&'()*+,-./:;<=>?@[\\]^_`{}~"
+         DEFVAL  { 1 }                      
+         ::= { hm2PwdMgmtGroup 6 }
+
+    hm2PwdMgmtLoginAttemptsTimePeriod OBJECT-TYPE
+         SYNTAX      Integer32 (0..60)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The period of time after the number of allowable failed
+                     local authentication attempts is reset. A value of '0'
+                     indicates that the number of attempts is never reset."
+         DEFVAL  { 0 }
+         ::= { hm2PwdMgmtGroup 7 }
+
+--
+-- *************************************************************
+-- hm2PwdMgmtDefaultPwdStatusGroup
+-- *************************************************************
+-- 
+hm2PwdMgmtDefaultPwdStatusGroup OBJECT IDENTIFIER ::= { hm2PwdMgmtGroup 100 }
+
+hm2PwdMgmtDefaultPwdActive OBJECT-TYPE
+		SYNTAX 		TruthValue
+		MAX-ACCESS 	read-only
+		STATUS 		current
+		DESCRIPTION
+					"Shows if one or more default passwords are active for
+					users configured in the hm2UserConfigTable.
+					The hm2PwdMgmtDefaultPwdStatusTable shows for which
+					users the default password is currently actice."
+		::= { hm2PwdMgmtDefaultPwdStatusGroup 1 }
+--
+-- *************************************************************
+-- hm2PwdMgmtDefaultPwdStatusTable
+-- *************************************************************
+-- 
+hm2PwdMgmtDefaultPwdStatusTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2PwdMgmtDefaultPwdStatusEntry
+		MAX-ACCESS 	not-accessible
+		STATUS 		current
+		DESCRIPTION 
+					"Table showing for which users defined in hm2UserConfigTable the
+					 default password has not been changed."
+		::= { hm2PwdMgmtDefaultPwdStatusGroup 100 }
+
+hm2PwdMgmtDefaultPwdStatusEntry OBJECT-TYPE
+		SYNTAX Hm2PwdMgmtDefaultPwdStatusEntry
+		MAX-ACCESS 	not-accessible
+		STATUS 		current
+		DESCRIPTION 
+					"Entry."
+		INDEX { hm2PwdMgmtDefaultPwdStatusIndex }
+		::= { hm2PwdMgmtDefaultPwdStatusTable 1 }
+
+		Hm2PwdMgmtDefaultPwdStatusEntry ::= SEQUENCE {
+		hm2PwdMgmtDefaultPwdStatusIndex Integer32,
+		hm2PwdMgmtDefaultPwdStatusUserName SnmpAdminString
+		}
+
+hm2PwdMgmtDefaultPwdStatusIndex OBJECT-TYPE
+		SYNTAX 		Integer32
+		MAX-ACCESS 	not-accessible
+		STATUS 		current
+		DESCRIPTION
+					"Index for the table."
+		::= { hm2PwdMgmtDefaultPwdStatusEntry 1 }
+
+hm2PwdMgmtDefaultPwdStatusUserName OBJECT-TYPE
+		SYNTAX 		SnmpAdminString
+		MAX-ACCESS 	read-only
+		STATUS 		current
+		DESCRIPTION
+					"The name of the default user for which the default password has not
+					 been changed."
+		::= { hm2PwdMgmtDefaultPwdStatusEntry 2 }
+
+
+--**************************************************************************************
+--    hm2UserApplicationListGroup
+--**************************************************************************************
+
+	hm2UserApplicationListTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2UserApplicationListEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "This table provides the functionality the system uses to assign an
+                      authentication list to an application.
+					  All objects in this table can be set while a row is 'active'."
+         ::= { hm2UserApplicationListGroup 1 }
+    
+    hm2UserApplicationListEntry OBJECT-TYPE
+         SYNTAX      Hm2UserApplicationListEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Application list entry."
+         INDEX { IMPLIED hm2UserApplicationListName }
+         ::= { hm2UserApplicationListTable 1 }
+
+ 	Hm2UserApplicationListEntry ::= SEQUENCE {
+                 hm2UserApplicationListName
+                     SnmpAdminString,
+    			 hm2UserApplicationListAuthListName
+					 SnmpAdminString,
+                 hm2UserApplicationListStatus
+                     RowStatus                 
+             }
+     hm2UserApplicationListName OBJECT-TYPE
+         SYNTAX      SnmpAdminString (SIZE(1..32))
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Application list name."
+         ::= { hm2UserApplicationListEntry 1 }
+        
+    hm2UserApplicationListAuthListName OBJECT-TYPE
+         SYNTAX      SnmpAdminString (SIZE(0..32))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The authentication list used for this application to authenticate
+					  to the system. 
+ 					  The application authentication list can be set while the row is active."
+         ::= { hm2UserApplicationListEntry 6 }
+    
+    hm2UserApplicationListStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Application row status.
+                     active(1)  		- This user account is active.
+					 notInService(2) 	- Row has been suspended.
+					 notReady(3)		- Row has incomplete values.
+					 createAndGo(4)		- Accept row values and activate.
+					 createAndWait(5)	- Accept row values and wait.
+                     destroy(6) 		- Set to this value to remove this application list entry."
+         ::= { hm2UserApplicationListEntry 7 }
+
+ 
+--**************************************************************************************
+--    hm2UserAuthListGroup
+--**************************************************************************************
+
+    hm2UserAuthListTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2UserAuthListEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The hm2UserAuthListTable contains the policies a user authenticates to the system.
+                      Each entry in the table can contain up to 5 policies."
+         ::= { hm2UserAuthListGroup 1 }
+
+    hm2UserAuthListEntry OBJECT-TYPE
+         SYNTAX      Hm2UserAuthListEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The hm2UserAuthListEntry."
+         INDEX       { IMPLIED hm2UserAuthListName }
+         ::= { hm2UserAuthListTable 1 }
+
+    Hm2UserAuthListEntry ::=
+         SEQUENCE {
+         hm2UserAuthListName
+                 SnmpAdminString,
+         hm2UserAuthListPolicy1
+         	 	 Hm2UserAuthList,
+         hm2UserAuthListPolicy2
+         	 	 Hm2UserAuthList,
+         hm2UserAuthListPolicy3
+         	 	 Hm2UserAuthList,
+		 hm2UserAuthListPolicy4
+		 	 	 Hm2UserAuthList,     
+		 hm2UserAuthListPolicy5
+		 	 	 Hm2UserAuthList,                                  
+         hm2UserAuthListStatus
+                 RowStatus
+         }
+
+    hm2UserAuthListName OBJECT-TYPE
+         SYNTAX      SnmpAdminString (SIZE(1..32))
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Authentication list index.
+                     Unique name used for indexing into this table."
+         ::= { hm2UserAuthListEntry 1 }
+
+    hm2UserAuthListPolicy1 OBJECT-TYPE
+         SYNTAX      Hm2UserAuthList
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Authentication list policy 1.
+                      Configures the first authentication policy to use when this list is
+                      specified.
+                      - local		-> authentication is done through local user database
+					  - radius		-> authentication is done through a RADIUS server
+					  - ias			-> authentication is done through a (i)ntegrated (a)uthentication (s)erver
+					  - cam         -> authentication is done through a CAM server (via LDAP)
+					  - ldap        -> authentication is done through a AD server (via LDAP)
+					  - reject      -> authentication is rejected/not allowed. 
+					    Note: If a policy is set to 'reject' further policies are ignored."
+		DEFVAL  { local }
+         ::= { hm2UserAuthListEntry 2 }
+
+    hm2UserAuthListPolicy2 OBJECT-TYPE
+         SYNTAX      Hm2UserAuthList
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Authentication list policy 2.
+                      Configures the first authentication policy to use when this list is
+                      specified.
+                      - local		-> authentication is done through local user database
+					  - radius		-> authentication is done through a RADIUS server
+					  - ias			-> authentication is done through a (i)ntegrated (a)uthentication (s)erver
+					  - cam         -> authentication is done through a CAM server (via LDAP)
+					  - ldap        -> authentication is done through a AD server (via LDAP)
+					  - reject      -> authentication is rejected/not allowed
+					    Note: If a policy is set to 'reject' further policies are ignored."
+		 DEFVAL  { reject }					    
+         ::= { hm2UserAuthListEntry 3 }
+
+    hm2UserAuthListPolicy3 OBJECT-TYPE
+         SYNTAX      Hm2UserAuthList
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Authentication list policy 3.
+                      Configures the first authentication policy to use when this list is
+                      specified.
+                      - local		-> authentication is done through local user database
+					  - radius		-> authentication is done through a RADIUS server
+					  - ias			-> authentication is done through a (i)ntegrated (a)uthentication (s)erver
+					  - cam         -> authentication is done through a CAM server (via LDAP)
+					  - ldap        -> authentication is done through a AD server (via LDAP)
+					  - reject      -> authentication is rejected/not allowed
+					    Note: If a policy is set to 'reject' further policies are ignored."
+		 DEFVAL  { reject }					    
+         ::= { hm2UserAuthListEntry 4 }
+
+	hm2UserAuthListPolicy4 OBJECT-TYPE
+         SYNTAX      Hm2UserAuthList
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Authentication list policy 4.
+                      Configures the first authentication policy to use when this list is
+                      specified.
+                      - local		-> authentication is done through local user database
+					  - radius		-> authentication is done through a RADIUS server
+					  - ias			-> authentication is done through a (i)ntegrated (a)uthentication (s)erver
+					  - cam         -> authentication is done through a CAM server (via LDAP)
+					  - ldap        -> authentication is done through a AD server (via LDAP)
+					  - reject      -> authentication is rejected/not allowed
+					    Note: If a policy is set to 'reject' further policies are ignored."
+		 DEFVAL  { reject }					    
+         ::= { hm2UserAuthListEntry 5 }
+         
+	hm2UserAuthListPolicy5 OBJECT-TYPE
+         SYNTAX      Hm2UserAuthList
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Authentication list policy 5.
+                      Configures the first authentication policy to use when this list is
+                      specified.
+                      - local		-> authentication is done through local user database
+					  - radius		-> authentication is done through a RADIUS server
+					  - ias			-> authentication is done through a (i)ntegrated (a)uthentication (s)erver
+					  - cam         -> authentication is done through a CAM server (via LDAP)
+					  - ldap        -> authentication is done through a AD server (via LDAP)
+					  - reject      -> authentication is rejected/not allowed
+					    Note: If a policy is set to 'reject' further policies are ignored."
+		 DEFVAL  { reject }					    
+         ::= { hm2UserAuthListEntry 6 }
+                  
+    hm2UserAuthListStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The status of the authentication list.
+                     active(1)  		- This entry is active.
+					 notInService(2) 	- Row has been suspended.
+					 notReady(3)		- Row has incomplete values.
+					 createAndGo(4)		- Accept row values and activate.
+					 createAndWait(5)	- Accept row values and wait.
+                     destroy(6) 		- Set to this value to remove this authentication list."
+         ::= { hm2UserAuthListEntry 7 }
+
+--**************************************************************************************
+--    hm2UserIasGroup
+--**************************************************************************************
+
+    hm2UserIasTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2UserIasEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "(I)ntegrated (A)uthentication (S)erver."
+         ::= { hm2UserIasGroup 1 }
+
+    hm2UserIasEntry OBJECT-TYPE
+         SYNTAX      Hm2UserIasEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The hm2UserIasEntry."
+         INDEX       { IMPLIED hm2UserIasUserName }
+         ::= { hm2UserIasTable 1 }
+
+    Hm2UserIasEntry ::=
+         SEQUENCE {
+         hm2UserIasUserName
+                 SnmpAdminString,
+         hm2UserIasUserPassword
+       			 DisplayString,
+       	 hm2UserIasUserStatus
+       	 		 RowStatus		 
+                 }        
+                 
+    hm2UserIasUserName OBJECT-TYPE
+         SYNTAX      SnmpAdminString (SIZE(1..32))
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The (I)ntegrated (A)uthentication (S)erver user name."
+         ::= { hm2UserIasEntry 1 }
+        
+    hm2UserIasUserPassword OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0..64))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The (I)ntegrated (A)uthentication (S)erver user password.
+                      This object will always return '********' when read.
+					  The user password can be set while the row is active.
+                     "
+		 DEFVAL  { "" }
+         ::= { hm2UserIasEntry 2 }
+
+	hm2UserIasUserStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The status of the IAS users.
+                     active(1)  		- This entry is active.
+					 notInService(2) 	- Row has been suspended.
+					 notReady(3)		- Row has incomplete values.
+					 createAndGo(4)		- Accept row values and activate.
+					 createAndWait(5)	- Accept row values and wait.
+                     destroy(6) 		- Set to this value to remove this IAS entry."
+         ::= { hm2UserIasEntry 3 }
+
+-- 
+-- ***********************************************************
+-- hm2UserMgmtMibNotifications
+-- ***********************************************************
+--
+hm2UserCreatedTrap  NOTIFICATION-TYPE
+	OBJECTS		{ hm2UserLastUserCreated }
+	STATUS		current
+	DESCRIPTION 
+				"This notification is send when a new user is added to the hm2UserConfigTable."
+	::= { hm2UserMgmtMibNotifications 1 }
+
+hm2UserDeletedTrap  NOTIFICATION-TYPE
+	OBJECTS		{ hm2UserLastUserDeleted }
+	STATUS		current
+	DESCRIPTION 
+				"This notification is send when a user is deleted from the hm2UserConfigTable."
+	::= { hm2UserMgmtMibNotifications 2 }
+
+hm2UserLockedTrap  NOTIFICATION-TYPE
+	OBJECTS		{ hm2UserName, hm2UserLockoutStatus }
+	STATUS		current
+	DESCRIPTION 
+				"This notification is send when a user is locked due to excessive failed login attempts."
+	::= { hm2UserMgmtMibNotifications 3 }
+
+hm2UserPwdChangedTrap  NOTIFICATION-TYPE
+	OBJECTS		{ hm2UserName }
+	STATUS		current
+	DESCRIPTION 
+				"This notification is send when a password for a user is changed."
+	::= { hm2UserMgmtMibNotifications 4 }
+	
+hm2UserPwdPolicyChkChangedTrap  NOTIFICATION-TYPE
+	OBJECTS		{ hm2UserName, hm2UserPwdPolicyChk }
+	STATUS		current
+	DESCRIPTION 
+				"This notification is send when the password policy for a user is changed."
+	::= { hm2UserMgmtMibNotifications 5 }	
+	
+hm2UserPwdChangedSnmpv3AuthTrap  NOTIFICATION-TYPE
+	OBJECTS		{ hm2UserName }
+	STATUS		current
+	DESCRIPTION 
+				"This notification is send when a SNMPv3 authentication password for an user is changed."
+	::= { hm2UserMgmtMibNotifications 6 }
+	
+hm2UserPwdChangedSnmpv3EncTrap  NOTIFICATION-TYPE
+	OBJECTS		{ hm2UserName }
+	STATUS		current
+	DESCRIPTION 
+				"This notification is send when a SNMPv3 encryption password for an user is changed."
+	::= { hm2UserMgmtMibNotifications 7 }
+
+hm2UserMgmtMibSNMPExtensionGroup 		OBJECT IDENTIFIER ::= { hm2UserMgmtMib 3 }
+
+-- ***********************************************************
+-- hm2UserMgmtMibSNMPExtensionGroup
+-- ***********************************************************
+hm2UserMgmtGlobalSESGroup 			OBJECT IDENTIFIER ::= { hm2UserMgmtMibSNMPExtensionGroup 1 }
+hm2UserMgmtUserSESGroup 			OBJECT IDENTIFIER ::= { hm2UserMgmtMibSNMPExtensionGroup 2 }
+hm2UserMgmtApplSESGroup 			OBJECT IDENTIFIER ::= { hm2UserMgmtMibSNMPExtensionGroup 3 }
+hm2UserMgmtAuthSESGroup		 		OBJECT IDENTIFIER ::= { hm2UserMgmtMibSNMPExtensionGroup 4 }
+
+-- ***********************************************************
+-- hm2UserMgmtGlobalSESGroup
+-- ***********************************************************
+
+hm2UserMgmtGlobalSESLenCharset OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION 
+           		"Indicates that the chosen entry name uses not allowed character(s).
+				 Allowed are alphanumerical characters and name size from 1 to 32."
+           ::= { hm2UserMgmtGlobalSESGroup 1 }
+		   
+hm2UserMgmtGlobalSESPwdLenCharset OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION 
+           		"Indicates that the chosen password is incorrect.
+				 Check character set, length, policy matching (if
+				 password policy checker is enabled)."
+           ::= { hm2UserMgmtGlobalSESGroup 2 }
+
+-- ***********************************************************
+-- hm2UserMgmtUserSESGroup
+-- ***********************************************************
+
+hm2UserMgmtUserSESActivate OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION 
+           		"Indicates that the chosen user entry can not be activated.
+				 Be sure that a user password has been successfully set before."
+           ::= { hm2UserMgmtUserSESGroup 1 }
+		   
+hm2UserMgmtUserSESDeactivate OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION 
+           		"Indicates that the chosen user entry can not be deactivated.
+				 Be sure that this user is not the last active admin on the device."
+           ::= { hm2UserMgmtUserSESGroup 2 }
+
+hm2UserMgmtUserSESActivateExisting OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION
+           		"Indicates that the chosen user entry can not be activated.
+				 Be sure that a user password has been successfully set before.
+                     Also check SNMP notification user table for entries with the same name."
+           ::= { hm2UserMgmtUserSESGroup 3 }
+
+-- ***********************************************************
+-- hm2UserMgmtApplSESGroup
+-- ***********************************************************
+
+hm2UserMgmtApplSESAddDel OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION 
+           		"Indicates that the chosen entry can not be added or deleted.
+				 Notice that application lists can neither be added nor deleted."
+           ::= { hm2UserMgmtApplSESGroup 1 }
+		   
+hm2UserMgmtApplSESDeactivate OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION 
+           		"Indicates that the chosen entry can not be deactivated.
+				 Be sure that this list is not referenced to an authentication list
+				 (hm2UserApplicationListAuthListName has to be set to a zero length string)."
+           ::= { hm2UserMgmtApplSESGroup 2 }
+
+hm2UserMgmtApplSESAuthDeactivated OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION 
+           		"Indicates that the chosen entry can not be allocated to authentication list.
+                     Authentication list is deactivated. Application list can not be allocated to
+                     deactivated authentication list."
+           ::= { hm2UserMgmtApplSESGroup 3 }
+
+-- ***********************************************************
+-- hm2UserMgmtAuthSESGroup
+-- ***********************************************************
+
+hm2UserMgmtAuthSESDuplPolicy OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION 
+           		"Indicates that the chosen policy of this entry can not be set twice.
+				 Be sure that a policy is set only once per authentication list
+				 (exception: the policy 'reject' can be set several times)."
+           ::= { hm2UserMgmtAuthSESGroup 1 }
+		   
+hm2UserMgmtAuthSESDeactivate OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION 
+           		"Indicates that the chosen entry can not be deactivated.
+				 Be sure that this list is not referenced by an apllication list
+				 (hm2UserApplicationListAuthListName is not set to this authentication
+				 list name)."
+           ::= { hm2UserMgmtAuthSESGroup 2 }		   
+END
+

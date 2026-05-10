@@ -1,0 +1,125 @@
+HM2-PLATFORM-LOOPBACK-MIB DEFINITIONS ::= BEGIN
+
+-- 
+-- ***********************************************************
+-- Hirschmann Platform Loopback MIB
+-- ***********************************************************
+--
+
+IMPORTS
+	 hm2PlatformMibs
+        FROM HM2-TC-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, 
+    Integer32          
+    	FROM SNMPv2-SMI
+    RowStatus
+        FROM SNMPv2-TC
+    InterfaceIndex
+    	FROM IF-MIB    
+    InetAddressIPv4			                  
+   		FROM INET-ADDRESS-MIB;
+    
+hm2PlatformLoopback MODULE-IDENTITY
+    LAST-UPDATED "201109080000Z"
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION 
+        "The Hirschmann Platform2 MIB for Loopback Interfaces.
+         Copyright (C) 2011. All Rights Reserved."
+    REVISION    "201109080000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { hm2PlatformMibs 22 }
+
+
+--**************************************************************************************
+-- hm2AgentLoopbackGroup
+--
+--**************************************************************************************
+
+hm2AgentLoopbackGroup       OBJECT IDENTIFIER ::= { hm2PlatformLoopback 1 }
+
+hm2AgentLoopbackTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF Hm2AgentLoopbackEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "A summary table of the Loopback instances"
+     ::= { hm2AgentLoopbackGroup 1 }
+
+hm2AgentLoopbackEntry OBJECT-TYPE
+     SYNTAX      Hm2AgentLoopbackEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "."
+     INDEX       { hm2AgentLoopbackID }
+     ::= { hm2AgentLoopbackTable 1 }
+
+Hm2AgentLoopbackEntry ::= SEQUENCE {
+            hm2AgentLoopbackID
+               Integer32,
+            hm2AgentLoopbackIfIndex
+               InterfaceIndex,
+            hm2AgentLoopbackIPAddress
+            InetAddressIPv4,
+            hm2AgentLoopbackIPSubnet
+            InetAddressIPv4,
+            hm2AgentLoopbackStatus
+               RowStatus
+}
+
+hm2AgentLoopbackID      OBJECT-TYPE
+     SYNTAX          Integer32 (0..2147483647)
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+                     "The  Loopback ID is associated with Internal Interface number
+                     which will be generated when we create a loopback."
+     ::= { hm2AgentLoopbackEntry 1 }
+
+hm2AgentLoopbackIfIndex OBJECT-TYPE
+     SYNTAX          InterfaceIndex
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+                     "The  Loopback ID is associated with an Internal Interface number
+                     which will be generated when we create a loopback."
+     ::= { hm2AgentLoopbackEntry 2 }
+
+hm2AgentLoopbackIPAddress OBJECT-TYPE
+     SYNTAX            InetAddressIPv4
+     MAX-ACCESS        read-write
+     STATUS            current
+     DESCRIPTION
+                       "The IP Address configured for the respective loopback"
+     ::= { hm2AgentLoopbackEntry 3 }
+
+hm2AgentLoopbackIPSubnet  OBJECT-TYPE
+     SYNTAX            InetAddressIPv4
+     MAX-ACCESS        read-write
+     STATUS            current
+     DESCRIPTION
+                       "The Subnet mask configured for the respective loopback"
+     ::= { hm2AgentLoopbackEntry 4 }
+
+hm2AgentLoopbackStatus OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+                    "Status of this instance.  The rows can be added/deleted in the table by setting createAndGo/createAndWait/destroy respectively
+
+                 active(1)        - this loopback instance is active
+                 createAndGo(4)   - set to this value to create an instance
+                 createAndWait(5) - set to this value to create an instance
+                 destroy(6)       - set to this value to delete an instance"
+     ::= { hm2AgentLoopbackEntry 5 }
+
+END
+

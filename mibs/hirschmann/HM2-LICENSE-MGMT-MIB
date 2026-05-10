@@ -1,0 +1,417 @@
+HM2-LICENSE-MGMT-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann License Management MIB
+-- *************************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE, 
+    Integer32, Unsigned32	FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION		FROM SNMPv2-TC
+    SnmpAdminString         FROM SNMP-FRAMEWORK-MIB
+    hm2ConfigurationMibs	FROM HM2-TC-MIB;
+
+	hm2LicenseMgmtMib MODULE-IDENTITY
+	LAST-UPDATED "201208030000Z" -- Aug 3, 2012
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "This MIB defines the objects of the Hirschmann License Management. 
+         Copyright (C) 2012. All Rights Reserved."
+    REVISION     	"201208030000Z" -- Aug 3, 2012
+    DESCRIPTION		"Initial version."
+    ::= { hm2ConfigurationMibs 3 }
+
+--
+-- *************************************************************
+-- Textual Conventions
+-- *************************************************************
+--
+HmLmSwLvlCap ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "."
+    SYNTAX       BITS 
+			 	  	 	 	 {
+			 	  	 	 	   sw-lvl-default (0),
+				  	  	  	   sw-lvl-2e   (1),
+				  	  	  	   sw-lvl-2s   (2),
+				  	  	  	   sw-lvl-2a   (3),
+				  	  	  	   sw-lvl-3s   (4),
+				  	  	  	   sw-lvl-3a   (5)
+			 	 	 	 	 }
+
+HmLmLicenseLvlCap ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "."
+    SYNTAX       BITS 
+			 	  	 	 	 {
+			 	  	 	 	   none 				(0),
+				  	  	  	   unicast-routing 		(1),
+				  	  	  	   multicast-routing 	(2)
+				  	  	  	 }
+--
+-- *************************************************************
+-- hm2LicenseMgmtMib
+-- *************************************************************
+--
+hm2LicenseMgmtMibNotifications	OBJECT IDENTIFIER ::= { hm2LicenseMgmtMib 0 }
+hm2LicenseMgmtMibObjects		OBJECT IDENTIFIER ::= { hm2LicenseMgmtMib 1 }
+-- hm2LicenseMgmtMibConformance	OBJECT IDENTIFIER ::= { hm2LicenseMgmtMib 2 }
+
+--
+-- *************************************************************
+-- hm2LicenseMgmtMib groups
+-- *************************************************************
+--
+hm2LMLicenseKeyGroup	OBJECT IDENTIFIER ::= { hm2LicenseMgmtMibObjects 1 }
+hm2LMLicenseGroup 		OBJECT IDENTIFIER ::= { hm2LicenseMgmtMibObjects 2 }
+hm2LMFeatureGroup 		OBJECT IDENTIFIER ::= { hm2LicenseMgmtMibObjects 3 }
+hm2LMSwLvlGroup			OBJECT IDENTIFIER ::= { hm2LicenseMgmtMibObjects 4 }			
+
+--
+-- *************************************************************
+-- hm2LMLicenseKey group
+-- *************************************************************
+--
+hm2LMLicenseKeyUdi 		OBJECT-TYPE
+   SYNTAX 			SnmpAdminString (SIZE(0..255))
+   MAX-ACCESS 			read-only
+   STATUS     			current
+   DESCRIPTION			"Unique device identifier for license 
+   			 	generation."     
+
+   ::= { hm2LMLicenseKeyGroup 1 }
+
+hm2LMLicenseKeyInstall 		OBJECT-TYPE
+   SYNTAX 			SnmpAdminString (SIZE(0..255))
+   MAX-ACCESS 			read-write
+   STATUS     			current
+   DESCRIPTION			"Installation of a new license key."  
+   
+   ::= { hm2LMLicenseKeyGroup 2 }
+   
+hm2LMLicenseKeyDelete 		OBJECT-TYPE
+   SYNTAX 			SnmpAdminString (SIZE(0..255))
+   MAX-ACCESS 			read-write
+   STATUS     			current
+   DESCRIPTION			"Delete a license key."
+     
+   ::= { hm2LMLicenseKeyGroup 3 }
+    			    
+      
+--
+-- *************************************************************
+-- hm2LMLicense group
+-- *************************************************************
+--
+hm2LMLicenseTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF 		Hm2LMLicenseEntry
+   MAX-ACCESS 			not-accessible
+   STATUS 			current
+   DESCRIPTION			"This table contains objects, to get 
+		 		information on all licenses that are 
+		 		available on this device."
+
+   ::= { hm2LMLicenseGroup 1 }
+
+hm2LMLicenseEntry OBJECT-TYPE
+   SYNTAX 			Hm2LMLicenseEntry
+   MAX-ACCESS 			not-accessible
+   STATUS 			current
+   DESCRIPTION 			"The license information objects."
+   INDEX 			{ hm2LMLicenseId }
+
+   ::= { hm2LMLicenseTable 1 }
+
+Hm2LMLicenseEntry ::= SEQUENCE {
+   hm2LMLicenseId 			Integer32,
+   hm2LMLicenseDescription 	SnmpAdminString,
+   hm2LMLicenseVersion		SnmpAdminString,
+   hm2LMLicenseKey			SnmpAdminString,
+   hm2LMLicenseModel		INTEGER,
+   hm2LMLicenseExpiryPeriod	Integer32,
+   hm2LMLicenseOperStatus   INTEGER,
+   hm2LMLicenseAdminStatus  INTEGER,
+   hm2LMLicenseSwLvlCap 	HmLmSwLvlCap
+   }
+
+-- *************************************************************
+-- hm2LMLicense entry
+-- *************************************************************
+hm2LMLicenseId  OBJECT-TYPE
+   SYNTAX 			Integer32 
+   MAX-ACCESS 			accessible-for-notify
+   STATUS 			current
+   DESCRIPTION			"The unique identification number of this license."    
+
+   ::= { hm2LMLicenseEntry 1 }
+   
+hm2LMLicenseDescription  	OBJECT-TYPE
+   SYNTAX 			SnmpAdminString (SIZE(0..80))
+   MAX-ACCESS 			read-only
+   STATUS 			current
+   DESCRIPTION			"Description of this license."
+
+   ::= { hm2LMLicenseEntry 2 }
+
+hm2LMLicenseVersion 		OBJECT-TYPE
+   SYNTAX 			SnmpAdminString (SIZE(0..16))
+   MAX-ACCESS 			read-only
+   STATUS 			current
+   DESCRIPTION			"Version of this license."   
+  
+   ::= { hm2LMLicenseEntry 3 }
+
+hm2LMLicenseKey   		OBJECT-TYPE
+   SYNTAX 			SnmpAdminString (SIZE(0..255))
+   MAX-ACCESS 			read-only
+   STATUS     			current
+   DESCRIPTION			"The granted license key for this license."   
+  
+   ::= { hm2LMLicenseEntry 4 }
+
+hm2LMLicenseModel 		OBJECT-TYPE
+   SYNTAX 			INTEGER {
+				  		demo 		(1),
+						permanent 	(2)
+					}
+   MAX-ACCESS 			read-only
+   STATUS 			current
+   DESCRIPTION			"The current licensing model of this license."
+   ::= { hm2LMLicenseEntry 5 }
+
+hm2LMLicenseExpiryPeriod 	OBJECT-TYPE       
+   SYNTAX       		Integer32 
+   MAX-ACCESS 			read-only
+   STATUS 			current
+   DESCRIPTION			"The time period in hours for which the license
+                 		is still valid. The value of this object is only 
+				relevant, when the licensing model is demo."    
+   ::= { hm2LMLicenseEntry 6 }
+
+
+hm2LMLicenseOperStatus OBJECT-TYPE
+   SYNTAX 			INTEGER {
+						active 		(1),
+						inactive 	(2),
+						expired 	(3),
+						error 		(4),
+						no-license  (5)
+					}
+   MAX-ACCESS 			read-only
+   STATUS 			current
+   DESCRIPTION			"The current operating status of this license."
+   ::= { hm2LMLicenseEntry 9 }
+   
+
+hm2LMLicenseAdminStatus OBJECT-TYPE
+      SYNTAX 			INTEGER {
+   						active 		(1),
+   						inactive 	(2)
+   					}
+      MAX-ACCESS 			read-write
+      STATUS 			current
+      DESCRIPTION			"The administrative status of this license."
+      ::= { hm2LMLicenseEntry 10 }
+
+hm2LMLicenseSwLvlCap OBJECT-TYPE
+      SYNTAX 	    HmLmSwLvlCap
+      MAX-ACCESS	read-only
+      STATUS 		current
+      DESCRIPTION	
+      		"."
+      ::= { hm2LMLicenseEntry 11 }
+
+--
+-- *************************************************************
+-- hm2LMFeature group
+-- *************************************************************
+--
+hm2LMFeatureTable OBJECT-TYPE
+   SYNTAX 			SEQUENCE OF Hm2LMFeatureEntry
+   MAX-ACCESS 			not-accessible
+   STATUS 			current
+   DESCRIPTION			"This table contains objects, to get information 
+				about feature licensing."
+
+   ::= { hm2LMFeatureGroup 1 }
+
+hm2LMFeatureEntry OBJECT-TYPE
+   SYNTAX 			Hm2LMFeatureEntry
+   MAX-ACCESS 			not-accessible
+   STATUS 			current
+   DESCRIPTION 			"The feature objects."
+   INDEX 			{ IMPLIED hm2LMFeatureId }
+
+   ::= { hm2LMFeatureTable 1 }
+
+Hm2LMFeatureEntry ::= SEQUENCE {
+   hm2LMFeatureId				OBJECT IDENTIFIER,
+   hm2LMFeatureDescription		SnmpAdminString,
+   hm2LMFeatureBinaryID  		Unsigned32,
+   hm2LMFeatureCount   			Unsigned32,
+   hm2LMFeatureLicenseId		Integer32,
+   hm2LMFeatureStatus			INTEGER,
+   hm2LMFeatureSwLvlCap			HmLmSwLvlCap,
+   hm2LMFeatureSwLicCap 		HmLmLicenseLvlCap
+   }
+
+-- *************************************************************
+-- hm2LMFeature entry
+-- *************************************************************
+hm2LMFeatureId 		OBJECT-TYPE
+   SYNTAX 			OBJECT IDENTIFIER 
+   MAX-ACCESS 		accessible-for-notify
+   STATUS 			current
+   DESCRIPTION		
+   		"The unique identification number of this feature."  
+   ::= { hm2LMFeatureEntry 1 }
+
+hm2LMFeatureDescription  	OBJECT-TYPE
+   SYNTAX 			SnmpAdminString 
+   MAX-ACCESS		read-only
+   STATUS 			current
+   DESCRIPTION
+   		"Description of this feature."
+   ::= { hm2LMFeatureEntry 2 }
+
+hm2LMFeatureBinaryID 		OBJECT-TYPE
+   SYNTAX 			Unsigned32 
+   MAX-ACCESS 		read-only
+   STATUS 			current
+   DESCRIPTION	
+   		"The integer representation of the license ID."   
+   ::= { hm2LMFeatureEntry 3 }
+
+hm2LMFeatureCount 			OBJECT-TYPE
+   SYNTAX 			Unsigned32
+   MAX-ACCESS 		read-only
+   STATUS     		current
+   DESCRIPTION			
+   		"The number of licensed instances for this feature."
+   ::= { hm2LMFeatureEntry 4 }
+
+hm2LMFeatureLicenseId  		OBJECT-TYPE
+   SYNTAX 			Integer32 
+   MAX-ACCESS 		read-only
+   STATUS 			current
+   DESCRIPTION		
+   		"The unique identification number of 
+         the license which belongs to this feature."   
+   ::= { hm2LMFeatureEntry 5 }
+
+hm2LMFeatureStatus  		OBJECT-TYPE
+   SYNTAX 			INTEGER {
+						active 		(1),
+						inactive 	(2),
+						expired 	(3),
+						error 		(4)
+					}
+   MAX-ACCESS 			read-only
+   STATUS 			current
+   DESCRIPTION
+   		"The current license status of this feature."
+   ::= { hm2LMFeatureEntry 9 }
+   
+hm2LMFeatureSwLvlCap  		OBJECT-TYPE
+   SYNTAX 			HmLmSwLvlCap 
+   MAX-ACCESS 		read-only
+   STATUS 			current
+   DESCRIPTION	
+   		"The software level capabilities for the feature."   
+   ::= { hm2LMFeatureEntry 10 }
+
+hm2LMFeatureSwLicCap  		OBJECT-TYPE
+   SYNTAX 			HmLmLicenseLvlCap 
+   MAX-ACCESS 		read-only
+   STATUS 			current
+   DESCRIPTION	
+   		"The license level Cap for the feature."   
+   ::= { hm2LMFeatureEntry 11 }
+--
+-- *************************************************************
+-- hm2LMSwLvlGroup
+-- *************************************************************
+--
+hm2LMSwLvlDescription  	OBJECT-TYPE
+   SYNTAX 					SnmpAdminString
+   MAX-ACCESS 				read-only
+   STATUS 					current
+   DESCRIPTION				
+   		"A textual description of the license currently applied and running on the device."
+   ::= { hm2LMSwLvlGroup 1 }
+
+hm2LMSwLvlCap  	OBJECT-TYPE
+   SYNTAX 				    HmLmSwLvlCap
+   MAX-ACCESS 				read-only
+   STATUS 					current
+   DESCRIPTION
+   		"The available software level selectable on this device."
+   ::= { hm2LMSwLvlGroup 2 } 
+
+hm2LMSwLvlAdminStatus  	OBJECT-TYPE
+   SYNTAX 				    HmLmSwLvlCap
+   MAX-ACCESS 				read-write
+   STATUS 					current
+   DESCRIPTION
+   		"The configured software level. Setting a new software Lvl requires to save the configuration
+   		 and reboot the device."
+   DEFVAL			 { {sw-lvl-default} }
+   ::= { hm2LMSwLvlGroup 3 } 
+
+hm2LMSwLvlOperStatus  	OBJECT-TYPE
+   SYNTAX 				    HmLmSwLvlCap
+   MAX-ACCESS 				read-only
+   STATUS 					current
+   DESCRIPTION
+   		"The current software level applied and running on this device."
+   ::= { hm2LMSwLvlGroup 4 }
+
+-- 
+-- ***********************************************************
+-- hm2LicenseMgmtMibNotifications
+-- ***********************************************************
+--
+
+hm2LMLicenseChangeTrap NOTIFICATION-TYPE
+OBJECTS 	{ 
+			hm2LMLicenseId,
+   			hm2LMLicenseDescription,
+   			hm2LMLicenseVersion,
+   			hm2LMLicenseKey,
+			hm2LMLicenseModel,
+			hm2LMLicenseExpiryPeriod,
+   			hm2LMLicenseOperStatus,	
+   			hm2LMLicenseAdminStatus	
+	  	}
+STATUS  	current
+DESCRIPTION 	"This trap is sent if one of the license 
+		information objects is changed."
+
+::= { hm2LicenseMgmtMibNotifications 1 }
+
+hm2LMFeatureChangeTrap NOTIFICATION-TYPE
+OBJECTS 	{ 
+			hm2LMFeatureId,
+			hm2LMFeatureDescription,
+			hm2LMFeatureBinaryID,
+			hm2LMFeatureCount,
+			hm2LMFeatureLicenseId,
+			hm2LMFeatureStatus
+	        }
+STATUS  	current
+DESCRIPTION 	"This trap is sent if one of the feature
+		information objects is changed."
+
+::= { hm2LicenseMgmtMibNotifications 2 }
+
+END
