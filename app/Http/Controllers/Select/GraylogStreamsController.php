@@ -28,6 +28,7 @@ namespace App\Http\Controllers\Select;
 
 use App\ApiClients\GraylogApi;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Log;
@@ -36,11 +37,8 @@ class GraylogStreamsController extends Controller
 {
     /**
      * The default method called by the route handler
-     *
-     * @param  Request  $request
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function __invoke(Request $request, GraylogApi $api)
+    public function __invoke(Request $request, GraylogApi $api): JsonResponse
     {
         $this->validate($request, [
             'limit' => 'int',

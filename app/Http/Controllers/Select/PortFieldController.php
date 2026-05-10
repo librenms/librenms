@@ -27,15 +27,18 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\Port;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
+/**
+ * @extends SelectController<Port>
+ */
 class PortFieldController extends SelectController
 {
     /**
      * Defines validation rules (will override base validation rules for select2 responses too)
-     *
-     * @return array
      */
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'field' => 'required|in:ifType',
@@ -45,11 +48,8 @@ class PortFieldController extends SelectController
 
     /**
      * Defines fields that can be used as filters
-     *
-     * @param  $request
-     * @return string[]
      */
-    protected function filterFields($request)
+    protected function filterFields(Request $request): array
     {
         return [
             'device_id' => 'device',
@@ -58,22 +58,16 @@ class PortFieldController extends SelectController
 
     /**
      * Defines search fields will be searched in order
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
-    protected function searchFields($request)
+    protected function searchFields(Request $request): array
     {
         return [$request->input('field')];
     }
 
     /**
      * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
         return Port::hasAccess($request->user())
             ->select($request->input('field'))->distinct();
