@@ -10,9 +10,9 @@ trait ChecksGlobalPermissions
 {
     protected ?string $globalPrefix = null;
 
-    protected function hasGlobalPermission(User $user, string $action, bool $itemizedPermissions = false): bool
+    protected function hasGlobalPermission(User $user, string $action, bool $allowUserViewItemizedPermissions = false): bool
     {
-        if ($itemizedPermissions && $action === 'view' && $user->hasRole('user')) {
+        if ($allowUserViewItemizedPermissions && $action === 'view' && $user->hasRole('user')) {
             return true; // user role has all view permissions
         }
 
