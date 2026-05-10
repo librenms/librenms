@@ -17,10 +17,8 @@ class Dashboard extends Model
 
     protected function scopeHasAccess(Builder $query, User $user): Builder
     {
-        return $query->where(function (Builder $query) use ($user) {
-            return $query->where('user_id', $user->user_id)
-                ->orWhere('access', '>', 0);
-        });
+        return $query->where(fn (Builder $query) => $query->where('user_id', $user->user_id)
+            ->orWhere('access', '>', 0));
     }
 
     // ---- Define Relationships ----
