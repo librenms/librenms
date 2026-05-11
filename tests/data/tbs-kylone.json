@@ -9,6 +9,7 @@
                     "sysContact": "<private>",
                     "version": "v3.0.0 - 2021080800",
                     "hardware": "Kylone Advanced Gateway/Transcoder EE",
+                    "features": null,
                     "location": "<private>",
                     "os": "tbs-kylone",
                     "type": "network",
