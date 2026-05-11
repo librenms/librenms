@@ -232,7 +232,7 @@ class PortsController extends Controller
      * @param  string  $view
      * @param  int  $perPage
      * @param  string  $sort
-     * @return LengthAwarePaginator<Port>|null
+     * @return LengthAwarePaginator<int, Port>|null
      */
     private function getPorts(string $view, int $perPage, string $sort): ?LengthAwarePaginator
     {
