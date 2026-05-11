@@ -10,22 +10,22 @@
     @keydown.escape.window="close()">
 
     {{-- Main Bar --}}
-<div class="tw:group/bar tw:flex tw:flex-col tw:sm:flex-row tw:flex-nowrap">
-    <div class="tw:flex tw:items-stretch tw:flex-col tw:sm:flex-row tw:h-auto tw:sm:h-[34px] tw:rounded-lg tw:border tw:border-neutral-300 tw:dark:border-dark-gray-300 tw:bg-white tw:dark:bg-dark-gray-500 tw:font-mono tw:shadow-xs tw:max-w-full">
+<div class="tw:group/bar tw:flex tw:flex-col tw:sm:flex-row tw:flex-nowrap" style="font-size: 16px">
+    <div class="tw:flex tw:items-stretch tw:flex-col tw:sm:flex-row tw:h-auto tw:sm:h-[2.125em] tw:rounded-lg tw:border tw:border-neutral-300 tw:dark:border-dark-gray-300 tw:bg-white tw:dark:bg-dark-gray-500 tw:font-mono tw:shadow-xs tw:max-w-full">
 
         {{-- LEFT SECTION: Options Dropdown --}}
         <div class="tw:relative tw:flex tw:items-stretch">
             <button type="button"
                     :title="filters.length ? '{{ __('Filter options') }}' : '{{ __('Open filter menu') }}'"
                     @click.stop="toggleOptions()"
-                    class="tw:shrink-0 tw:flex tw:items-center tw:gap-2 tw:px-4 tw:h-full tw:max-sm:w-full tw:max-sm:left-0 tw:transition-colors tw:border-b tw:sm:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:rounded-l-lg tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400">
+                    class="tw:shrink-0 tw:flex tw:items-center tw:gap-2 tw:px-4 tw:h-full tw:max-sm:w-full tw:max-sm:left-0 tw:transition-colors tw:border-b tw:sm:border-b-0 tw:sm:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:rounded-l-lg tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400">
                 <div class="tw:relative tw:flex tw:items-center">
                     <i class="fas fa-filter tw:text-[1.12em]"></i>
                     <span x-show="filters.length"
                           class="tw:absolute tw:top-[-0.2em] tw:right-[-0.3em] tw:w-[0.5em] tw:h-[0.5em] tw:bg-neutral-600 tw:dark:bg-dark-white-300 tw:rounded-full tw:ring-1 tw:ring-white tw:dark:ring-dark-gray-500"></span>
                 </div>
                 <span class="tw:font-bold" x-show="!filters.length">{{ __('Filter') }}</span>
-                <span class="tw:text-[0.85em]" x-show="filters.length" x-text="filters.length"></span>
+                <span class="tw:text-[0.95em]" x-show="filters.length" x-text="filters.length"></span>
             </button>
 
             {{-- Options Menu --}}
@@ -51,7 +51,7 @@
         {{-- MIDDLE SECTION: Chips --}}
         <div class="tw:flex tw:flex-col tw:sm:flex-row tw:items-stretch tw:overflow-x-auto tw:scrollbar-none tw:flex-nowrap">
             <template x-for="f in filters" :key="f.key">
-                <div class="filter-chip tw:shrink-0 tw:relative tw:group tw:flex tw:items-stretch tw:h-full tw:border-b tw:sm:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300"
+                <div class="filter-chip tw:shrink-0 tw:relative tw:group tw:flex tw:items-stretch tw:h-full tw:border-b tw:sm:border-b-0 tw:sm:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300"
                     role="listitem">
                     <button type="button" title="{{ __('Edit filter') }}"
                             @click="open(fields.find(field => field.key === f.key))"
@@ -64,7 +64,7 @@
                         </span>
                     </button>
                     <button type="button" title="{{ __('Remove filter') }}" @click.stop="remove(f.key)"
-                            class="tw:h-full tw:w-0 tw:group-hover:w-[34px] tw:flex tw:items-center tw:justify-center tw:bg-neutral-100 tw:dark:bg-dark-gray-400 tw:text-neutral-500! tw:dark:text-dark-white-400! tw:transition-all tw:duration-200 tw:ease-in-out tw:overflow-hidden tw:text-[1.2em] tw:hover:text-red-600! tw:dark:hover:text-red-400!">
+                            class="tw:h-full tw:w-0 tw:group-hover:w-[2.125em] tw:flex tw:items-center tw:justify-center tw:bg-neutral-100 tw:dark:bg-dark-gray-400 tw:text-neutral-500! tw:dark:text-dark-white-400! tw:transition-all tw:duration-200 tw:ease-in-out tw:overflow-hidden tw:text-[1.2em] tw:hover:text-red-600! tw:dark:hover:text-red-400!">
                         &times;
                     </button>
                 </div>
@@ -76,7 +76,7 @@
             <button type="button" title="{{ __('Add new filter') }}" @click.stop="toggleAdd()"
                     @keydown.arrow-down.prevent="navDropdown('next')"
                     @keydown.arrow-up.prevent="navDropdown('prev')"
-                    class="tw:w-[34px] tw:h-full tw:relative tw:max-sm:w-full tw:flex tw:items-center tw:justify-center tw:text-[1.4em] tw:text-neutral-400! tw:dark:text-dark-white-400! tw:hover:text-neutral-900! tw:dark:hover:text-dark-white-100! tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400 tw:transition-colors tw:rounded-r-lg">
+                    class="tw:w-[2.125em] tw:h-full tw:relative tw:max-sm:w-full tw:flex tw:items-center tw:justify-center tw:text-[1.4em] tw:text-neutral-400! tw:dark:text-dark-white-400! tw:hover:text-neutral-900! tw:dark:hover:text-dark-white-100! tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400 tw:transition-colors tw:rounded-r-lg">
                 +
             </button>
 
@@ -103,13 +103,14 @@
 
     {{-- Spacer to reserve space for remove button --}}
     <div x-show="filters.length > 0"
-        class="tw:w-[34px] tw:hidden tw:sm:block tw:transition-all tw:duration-200 tw:ease-in-out tw:overflow-hidden tw:group-has-[.filter-chip:hover]/bar:w-0">
+        class="tw:w-[2.125em] tw:hidden tw:sm:block tw:transition-all tw:duration-200 tw:ease-in-out tw:overflow-hidden tw:group-has-[.filter-chip:hover]/bar:w-0">
     </div>
 </div>
     {{-- Dialog Modal (Teleported) --}}
     <template x-teleport="body">
         <div x-show="dialog" x-cloak
              class="tw:fixed tw:inset-0 tw:z-100 tw:flex tw:items-center tw:justify-center tw:p-6 tw:bg-neutral-950/60 tw:backdrop-blur-xs tw:text-[14px]"
+             style="font-size: 16px"
              @click="close()">
             <div x-show="dialog" x-transition @click.stop
                  class="tw:w-full tw:max-w-[25em] tw:bg-white tw:dark:bg-dark-gray-500 tw:border tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:rounded-2xl tw:shadow-2xl tw:font-mono"
@@ -132,11 +133,11 @@
                 <div class="tw:p-6 tw:space-y-7">
                     <div>
                         <span
-                            class="tw:block tw:text-[0.75em] tw:font-black tw:text-neutral-400 tw:dark:text-dark-white-400 tw:uppercase tw:tracking-widest tw:mb-4">{{ __('Condition') }}</span>
+                            class="tw:block tw:text-[0.8em] tw:font-black tw:text-neutral-400 tw:dark:text-dark-white-400 tw:uppercase tw:tracking-widest tw:mb-4">{{ __('Condition') }}</span>
                         <div class="tw:grid tw:grid-cols-2 tw:gap-2">
                             <template x-for="o in ops()" :key="o.v">
                                 <button type="button" @click="op = o.v"
-                                        class="tw:flex tw:items-center tw:gap-4 tw:px-4 tw:py-3 tw:rounded-lg tw:text-[0.85em] tw:font-bold tw:transition-all tw:border"
+                                        class="tw:flex tw:items-center tw:gap-4 tw:px-4 tw:py-3 tw:rounded-lg tw:text-[0.95em] tw:font-bold tw:transition-all tw:border"
                                         :class="op === o.v
                                             ? 'tw:bg-blue-600 tw:dark:bg-blue-600 tw:text-white! tw:dark:text-white! tw:border-blue-600 tw:shadow-md'
                                             : 'tw:bg-neutral-50 tw:dark:bg-dark-gray-400 tw:text-neutral-600! tw:dark:text-dark-white-200! tw:border-neutral-100 tw:dark:border-dark-gray-300 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300'">
@@ -149,7 +150,7 @@
 
                     <div x-show="!isNullary()">
                         <span
-                            class="tw:block tw:text-[0.75em] tw:font-black tw:text-neutral-400 tw:dark:text-dark-white-400 tw:uppercase tw:tracking-widest tw:mb-4">{{ __('Value') }}</span>
+                            class="tw:block tw:text-[0.8em] tw:font-black tw:text-neutral-400 tw:dark:text-dark-white-400 tw:uppercase tw:tracking-widest tw:mb-4">{{ __('Value') }}</span>
 
                         {{-- Text/Number/Date --}}
                         <template x-if="current && ['text','email','number','date'].includes(current?.type) && !current?.endpoint">
@@ -172,7 +173,7 @@
                                 <template x-for="opt in getNormalizedOptions()" :key="opt.value">
                                     <button type="button"
                                             @click="selectOption(opt.value, opt.label)"
-                                            class="tw:flex tw:items-center tw:justify-between tw:w-full tw:px-[1.2em] tw:py-[0.8em] tw:rounded-lg tw:text-[0.85em] tw:font-bold tw:transition-all tw:border tw:text-left"
+                                            class="tw:flex tw:items-center tw:justify-between tw:w-full tw:px-[1.2em] tw:py-[0.8em] tw:rounded-lg tw:text-[0.95em] tw:font-bold tw:transition-all tw:border tw:text-left"
                                             :class="(isMulti() ? value.includes(opt.value) : value === opt.value)
                                               ? 'tw:bg-blue-600 tw:text-white! tw:border-blue-600 tw:shadow-md'
                                               : 'tw:bg-neutral-50 tw:dark:bg-dark-gray-400 tw:text-neutral-600! tw:dark:text-dark-white-200! tw:border-neutral-100 tw:dark:border-dark-gray-300 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300'">
@@ -215,18 +216,18 @@
                 {{-- Footer --}}
                 <div class="tw:flex tw:items-center tw:justify-between tw:px-6 tw:py-[1.2em] tw:bg-neutral-50/50 tw:dark:bg-dark-gray-400 tw:rounded-b-2xl tw:border-t tw:border-neutral-100 tw:dark:border-dark-gray-300">
                     <button type="button" x-show="isActive(current?.key)" @click="remove(current.key)"
-                            class="tw:h-[2.6em] tw:px-5 tw:bg-white tw:dark:bg-dark-gray-500 tw:text-neutral-600! tw:dark:text-red-400! tw:border tw:border-neutral-200 tw:dark:border-dark-gray-200 tw:rounded-lg tw:text-[0.8em] tw:font-bold tw:transition-colors tw:hover:bg-red-50 tw:dark:hover:bg-red-900/20">
+                            class="tw:h-[2.6em] tw:px-5 tw:bg-white tw:dark:bg-dark-gray-500 tw:text-neutral-600! tw:dark:text-red-400! tw:border tw:border-neutral-200 tw:dark:border-dark-gray-200 tw:rounded-lg tw:text-[0.9em] tw:font-bold tw:transition-colors tw:hover:bg-red-50 tw:dark:hover:bg-red-900/20">
                         {{ __('Remove') }}
                     </button>
                     <div x-show="!isActive(current?.key)"></div>
                     <div class="tw:flex tw:gap-4">
                         <button type="button" @click="close()"
-                                class="tw:h-[2.6em] tw:px-5 tw:bg-white tw:dark:bg-dark-gray-500 tw:border tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:text-[0.8em] tw:font-bold tw:text-neutral-600! tw:dark:text-dark-white-300! tw:rounded-lg tw:transition-colors tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400">
+                                class="tw:h-[2.6em] tw:px-5 tw:bg-white tw:dark:bg-dark-gray-500 tw:border tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:text-[0.9em] tw:font-bold tw:text-neutral-600! tw:dark:text-dark-white-300! tw:rounded-lg tw:transition-colors tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400">
                             {{ __('Cancel') }}
                         </button>
                         <button type="button" @click="apply()"
                                 :disabled="!isNullary() && (isMulti() ? !value.length : value === '' || value === null)"
-                                class="tw:h-[2.6em] tw:px-[1.8em] tw:text-[0.8em] tw:font-bold tw:bg-blue-600 tw:text-white! tw:rounded-lg tw:transition-all tw:hover:bg-blue-700 tw:dark:hover:bg-blue-500 tw:disabled:opacity-20">
+                                class="tw:h-[2.6em] tw:px-[1.8em] tw:text-[0.9em] tw:font-bold tw:bg-blue-600 tw:text-white! tw:rounded-lg tw:transition-all tw:hover:bg-blue-700 tw:dark:hover:bg-blue-500 tw:disabled:opacity-20">
                             {{ __('Apply') }}
                         </button>
                     </div>
