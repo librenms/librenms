@@ -317,6 +317,11 @@ export default function filterBarComponent({
                 return;
             }
 
+            if (field.type === "boolean") {
+                filter.display = filter.value ? "Yes" : "No";
+                return;
+            }
+
             if (field.options) {
                 const isMap = !Array.isArray(field.options);
                 const lookup = (v) => (isMap ? field.options[v] || v : v);
