@@ -27,12 +27,18 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\Device;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
+/**
+ * @extends SelectController<Device>
+ */
 class DeviceController extends SelectController
 {
-    private $id = 'device_id';
+    private string $id = 'device_id';
 
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'access' => 'nullable|in:normal,inverted',
@@ -42,12 +48,12 @@ class DeviceController extends SelectController
         ];
     }
 
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return ['hostname', 'sysName'];
     }
 
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
         $this->id = $request->input('id', 'device_id');
         $user_id = $request->input('user');
@@ -70,13 +76,17 @@ class DeviceController extends SelectController
             ->orderBy('hostname');
     }
 
-    public function formatItem($device)
+    /**
+     * @param  Device  $model
+     * @return array{id: int|string, text: string, icon?: string}
+     */
+    public function formatItem(Model $model): array
     {
-        /** @var Device $device */
+        /** @var Device $model */
         return [
-            'id' => $device->{$this->id},
-            'text' => $device->displayName(),
-            'icon' => $device->icon,
+            'id' => $model->{$this->id},
+            'text' => $model->displayName(),
+            'icon' => $model->icon,
         ];
     }
 }

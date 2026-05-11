@@ -46,6 +46,9 @@ return [
     'graylog' => [
         'title' => 'Graylog',
     ],
+    'health-sensors' => [
+        'title' => 'Health Sensors',
+    ],
     'notes' => [
         'title' => 'Notes',
     ],

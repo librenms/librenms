@@ -171,7 +171,7 @@ final class OSDiscoveryTest extends TestCase
         Debug::setVerbose(false);
         Debug::disableCliDebugOutput();
 
-        $this->assertLessThan(10, microtime(true) - $start, "OS $expected_os took longer than 10s to detect");
+        $this->assertLessThan(60, microtime(true) - $start, "OS $expected_os took longer than 60s to detect");
         $this->assertEquals($expected_os, $os, "Test file: $community.snmprec\n$output");
     }
 

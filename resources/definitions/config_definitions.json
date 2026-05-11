@@ -1160,7 +1160,7 @@
             "type": "array",
             "group": "webui",
             "section": "port-descr",
-            "order": 2
+            "order": 41
         },
         "cpu_details_overview": {
             "default": false,
@@ -1171,7 +1171,7 @@
             "type": "array",
             "group": "webui",
             "section": "port-descr",
-            "order": 4
+            "order": 51
         },
         "custom_map.background_type": {
             "default": "none",
@@ -1396,7 +1396,7 @@
             "type": "array",
             "group": "webui",
             "section": "port-descr",
-            "order": 3
+            "order": 11
         },
         "dateformat.byminute": {
             "default": "Y-m-d H:i",
@@ -2914,6 +2914,14 @@
             },
             "type": "graph"
         },
+        "graph_types.device.cambium_epmp_gps": {
+            "default": {
+                "section": "wireless",
+                "order": 5,
+                "descr": "GPS Satellites"
+            },
+            "type": "graph"
+        },
         "graph_types.device.cambium_epmp_freq": {
             "default": {
                 "section": "wireless",
@@ -2925,8 +2933,8 @@
         "graph_types.device.cambium_epmp_gpsSync": {
             "default": {
                 "section": "wireless",
-                "order": 5,
-                "descr": "GPS Sync Status"
+                "order": 8,
+                "descr": "GPS Sync State"
             },
             "type": "graph"
         },
@@ -2935,6 +2943,14 @@
                 "section": "wireless",
                 "order": 2,
                 "descr": "ePMP Modulation"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.cambium_epmp_traffic": {
+            "default": {
+                "section": "wireless",
+                "order": 1,
+                "descr": "Traffic"
             },
             "type": "graph"
         },
@@ -5069,16 +5085,16 @@
         "int_core": {
             "default": true,
             "group": "webui",
-            "section": "menu",
+            "section": "port-descr",
             "type": "boolean",
-            "order": 3
+            "order": 40
         },
         "int_customers": {
             "default": true,
             "group": "webui",
-            "section": "menu",
+            "section": "port-descr",
             "type": "boolean",
-            "order": 4
+            "order": 10
         },
         "int_l2tp": {
             "default": false,
@@ -5090,16 +5106,16 @@
         "int_peering": {
             "default": true,
             "group": "webui",
-            "section": "menu",
+            "section": "port-descr",
             "type": "boolean",
-            "order": 6
+            "order": 30
         },
         "int_transit": {
             "default": true,
             "group": "webui",
-            "section": "menu",
+            "section": "port-descr",
             "type": "boolean",
-            "order": 7
+            "order": 20
         },
         "ipmi.type": {
             "default": [
@@ -5757,7 +5773,6 @@
                         {"match": "ciscosb", "value": "ciscosmb"},
                         {"match": "f5", "value": "tmos"},
                         {"match": "fireware", "value": "firewareos"},
-                        {"match": "fortigate", "value": "fortios"},
                         {"match": "fortiswitch", "value": "fortios"},
                         {"match": "siklu-mhtg", "value": "siklumhtg"},
                         {"match": "vyos", "value": "vyatta"},
@@ -5884,7 +5899,7 @@
             "type": "array",
             "group": "webui",
             "section": "port-descr",
-            "order": 0
+            "order": 31
         },
         "peeringdb.enabled": {
             "default": false,
@@ -6896,7 +6911,7 @@
             "group": "poller",
             "section": "snmp",
             "order": 2,
-            "type": "array",
+            "type": "password-array",
             "default": [
                 "public"
             ]
@@ -7233,7 +7248,7 @@
             "type": "array",
             "group": "webui",
             "section": "port-descr",
-            "order": 1
+            "order": 21
         },
         "twofactor": {
             "default": false,

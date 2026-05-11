@@ -15,7 +15,7 @@ $status = 'error';
 $message = '';
 
 $device_id = $_POST['device_id'];
-$id = $_POST['ccustomoid_id'];
+$id = $_POST['customoid_id'];
 $action = $_POST['action'];
 $name = strip_tags((string) $_POST['name']);
 $oid = strip_tags((string) $_POST['oid']);
