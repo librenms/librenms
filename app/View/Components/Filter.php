@@ -10,6 +10,7 @@ class Filter extends Component
 {
     /**
      * Create a new component instance.
+     *
      * @param  string  $name
      * @param  array<array{key: string, label: string, type: string, endpoint?: string, options?: string[], params?: array<string, string>}>  $fields
      * @param  bool  $reload
