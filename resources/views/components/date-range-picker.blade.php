@@ -37,7 +37,7 @@
             <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(40px,max-content))] tw:gap-2 tw:justify-center tw:mb-3 tw:dark:text-white">
                 <template x-for="(preset, idx) in presets">
                     <button type="button"
-                            class="preset-btn tw:px-3 tw:py-2 tw:text-sm tw:hover:bg-gray-200 tw:dark:hover:bg-gray-600 tw:rounded-md tw:transition-colors tw:min-w-[40px] tw:dark:text-gray-400"
+                            class="preset-btn tw:px-3 tw:py-2 tw:text-sm tw:hover:bg-gray-200 tw:dark:hover:bg-gray-600 tw:rounded-md tw:transition-colors tw:min-w-10 tw:dark:text-gray-400"
                             :class="isPresetSelected(preset) ? 'tw:bg-blue-500 tw:text-white tw:dark:text-white' : 'tw:bg-gray-100 tw:dark:bg-gray-700'"
                             x-on:click="setRange(preset, 'now')"
                             x-text="preset"
@@ -123,7 +123,7 @@
 
             get outStartString() {
                 if (this.relativeStartSeconds !== null) {
-                    return this.toShortOffset(this.relativeStartSeconds);
+                    return LibreNMS.Date.toShortOffset(this.relativeStartSeconds);
                 }
 
                 return LibreNMS.Date.toUrl(this.start);
@@ -131,7 +131,7 @@
 
             get outEndString() {
                 if (this.relativeEndSeconds !== null) {
-                    return this.toShortOffset(this.relativeEndSeconds);
+                    return LibreNMS.Date.toShortOffset(this.relativeEndSeconds);
                 }
 
                 if (this.relativeStartSeconds !== null) {
@@ -307,25 +307,6 @@
                 const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' });
                 // rtf: negative = past, positive = future
                 return rtf.format(seconds > 0 ? -value : value, u.unit);
-            },
-
-            // Convert signed seconds to a short offset label like -1d or +3h
-            toShortOffset(seconds) {
-                if (seconds === 0) return '0s';
-                const units = [
-                    { label: 'y', sec: 31536000 },
-                    { label: 'mo', sec: 2592000 },
-                    { label: 'w', sec: 604800 },
-                    { label: 'd', sec: 86400 },
-                    { label: 'h', sec: 3600 },
-                    { label: 'm', sec: 60 },
-                    { label: 's', sec: 1 },
-                ];
-                const abs = Math.abs(seconds);
-                const u = units.find(u => abs % u.sec === 0) || units[units.length - 1];
-                const value = Math.round(abs / u.sec) || 0;
-                const sign = seconds > 0 ? '-' : '+'; // positive seconds => past => '-'
-                return `${sign}${value}${u.label}`;
             },
 
             // Check if a preset is selected based on seconds value

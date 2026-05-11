@@ -28,7 +28,10 @@ namespace App\Http\Controllers\Select;
 
 use App\Models\Port;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use LibreNMS\Util\Number;
+use LibreNMS\Util\Rewrite;
 
 /**
  * @extends SelectController<Port>
@@ -41,7 +44,7 @@ class PortFieldController extends SelectController
     protected function rules(): array
     {
         return [
-            'field' => 'required|in:ifType',
+            'field' => 'required|in:ifType,ifSpeed,port_descr_type',
             'device' => 'nullable|int',
         ];
     }
@@ -61,7 +64,7 @@ class PortFieldController extends SelectController
      */
     protected function searchFields(Request $request): array
     {
-        return [$request->input('field')];
+        return [$request->string('field')];
     }
 
     /**
@@ -69,7 +72,32 @@ class PortFieldController extends SelectController
      */
     protected function baseQuery(Request $request): Builder
     {
+        $this->idField = $request->string('field');
+
         return Port::hasAccess($request->user())
-            ->select($request->input('field'))->distinct();
+            ->whereNotNull($this->idField)
+            ->select($this->idField)
+            ->distinct()
+            ->orderBy($this->idField);
+    }
+
+    /**
+     * @param  Port  $model
+     * @return array{id: int|string, text: string, icon?: string}
+     */
+    public function formatItem(Model $model): array
+    {
+        $field = array_key_first($model->getAttributes());
+        $value = array_first($model->getAttributes());
+        \Debugbar::log("field: $field, value: $value");
+
+        return [
+            'id' => $value,
+            'text' => match ($field) {
+                'ifSpeed' => Number::formatSi($value, suffix: 'bps'),
+                'ifType' => Rewrite::normalizeIfType($value),
+                default => $value,
+            },
+        ];
     }
 }
