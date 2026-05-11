@@ -28,6 +28,8 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\Port;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
@@ -36,9 +38,12 @@ use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
+/**
+ * @extends TableController<Port>
+ */
 class PortsController extends TableController
 {
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'device_id' => 'nullable|integer',
@@ -56,7 +61,7 @@ class PortsController extends TableController
         ];
     }
 
-    protected function filterFields($request)
+    protected function filterFields(Request $request): array
     {
         return [
             'ports.device_id' => 'device_id',
@@ -71,7 +76,7 @@ class PortsController extends TableController
         ];
     }
 
-    protected function sortFields($request)
+    protected function sortFields(Request $request): array
     {
         return [
             'hostname',
@@ -95,7 +100,7 @@ class PortsController extends TableController
         ];
     }
 
-    protected function baseQuery($request)
+    protected function baseQuery($request): Builder
     {
         $query = Port::hasAccess($request->user())
             ->with(['device', 'device.location'])
@@ -130,44 +135,42 @@ class PortsController extends TableController
     }
 
     /**
-     * @param  Port  $port
-     * @return array
+     * @param  Port  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($port)
+    public function formatItem(Model $model): array
     {
-        $status = $port->ifOperStatus == IfOperStatus::Down
-            ? ($port->ifAdminStatus == IfOperStatus::Up ? 'label-danger' : 'label-warning')
+        $status = $model->ifOperStatus == IfOperStatus::Down
+            ? ($model->ifAdminStatus == IfOperStatus::Up ? 'label-danger' : 'label-warning')
             : 'label-success';
 
         return [
             'status' => $status,
-            'device' => Url::modernDeviceLink($port->device),
-            'port' => Blade::render('<x-port-link :port="$port"/>', ['port' => $port]),
-            'secondsIfLastChange' => ceil($port->device?->uptime - ($port->ifLastChange / 100)),
-            'ifConnectorPresent' => ($port->ifConnectorPresent == 'true') ? 'yes' : 'no',
-            'ifSpeed' => $port->ifSpeed,
-            'ifDuplex' => $port->ifDuplex,
-            'ifMtu' => $port->ifMtu,
-            'ifInOctets_rate' => $port->ifInOctets_rate * 8,
-            'ifOutOctets_rate' => $port->ifOutOctets_rate * 8,
-            'ifInUcastPkts_rate' => $port->ifInUcastPkts_rate,
-            'ifOutUcastPkts_rate' => $port->ifOutUcastPkts_rate,
-            'ifInErrors' => $port->ifInErrors,
-            'ifOutErrors' => $port->ifOutErrors,
-            'ifInErrors_delta' => $port->poll_period ? Number::formatSi($port->ifInErrors_delta / $port->poll_period, 2, 0, 'EPS') : '',
-            'ifOutErrors_delta' => $port->poll_period ? Number::formatSi($port->ifOutErrors_delta / $port->poll_period, 2, 0, 'EPS') : '',
-            'ifType' => Rewrite::normalizeIfType($port->ifType),
-            'ifAlias' => htmlentities((string) $port->ifAlias),
-            'actions' => (string) view('port.actions', ['port' => $port]),
+            'device' => Url::modernDeviceLink($model->device),
+            'port' => Blade::render('<x-port-link :port="$port"/>', ['port' => $model]),
+            'secondsIfLastChange' => ceil($model->device?->uptime - ($model->ifLastChange / 100)),
+            'ifConnectorPresent' => ($model->ifConnectorPresent == 'true') ? 'yes' : 'no',
+            'ifSpeed' => $model->ifSpeed,
+            'ifDuplex' => $model->ifDuplex,
+            'ifMtu' => $model->ifMtu,
+            'ifInOctets_rate' => $model->ifInOctets_rate * 8,
+            'ifOutOctets_rate' => $model->ifOutOctets_rate * 8,
+            'ifInUcastPkts_rate' => $model->ifInUcastPkts_rate,
+            'ifOutUcastPkts_rate' => $model->ifOutUcastPkts_rate,
+            'ifInErrors' => $model->ifInErrors,
+            'ifOutErrors' => $model->ifOutErrors,
+            'ifInErrors_delta' => $model->poll_period ? Number::formatSi($model->ifInErrors_delta / $model->poll_period, 2, 0, 'EPS') : '',
+            'ifOutErrors_delta' => $model->poll_period ? Number::formatSi($model->ifOutErrors_delta / $model->poll_period, 2, 0, 'EPS') : '',
+            'ifType' => Rewrite::normalizeIfType($model->ifType),
+            'ifAlias' => htmlentities((string) $model->ifAlias),
+            'actions' => (string) view('port.actions', ['port' => $model]),
         ];
     }
 
     /**
      * Get headers for CSV export
-     *
-     * @return array
      */
-    protected function getExportHeaders()
+    protected function getExportHeaders(): array
     {
         return [
             'Device ID',
@@ -196,9 +199,9 @@ class PortsController extends TableController
      * Format a row for CSV export
      *
      * @param  Port  $port
-     * @return array
+     * @return array<scalar>
      */
-    protected function formatExportRow($port)
+    protected function formatExportRow(Model $port): array
     {
         $status = $port->ifOperStatus?->value;
         $adminStatus = $port->ifAdminStatus?->value;

@@ -26,14 +26,19 @@
 
 namespace App\Http\Controllers\Select;
 
+use App\Models\Syslog;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+
+/**
+ * @extends SelectController<Syslog>
+ */
 class SyslogController extends SelectController
 {
     /**
      * Defines validation rules (will override base validation rules for select2 responses too)
-     *
-     * @return array
      */
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'field' => 'required|in:program,priority',
@@ -43,25 +48,18 @@ class SyslogController extends SelectController
 
     /**
      * Defines search fields will be searched in order
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
-    protected function searchFields($request)
+    protected function searchFields(Request $request): array
     {
         return [$request->input('field')];
     }
 
     /**
      * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
-        /** @var \Illuminate\Database\Eloquent\Builder $query */
-        $query = \App\Models\Syslog::hasAccess($request->user())
+        $query = Syslog::hasAccess($request->user())
             ->select($request->input('field'))->distinct();
 
         if ($device_id = $request->input('device')) {

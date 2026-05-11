@@ -27,15 +27,19 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\Sensor;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
+/**
+ * @extends SelectController<Sensor>
+ */
 class SensorController extends SelectController
 {
     /**
      * Defines validation rules (will override base validation rules for select2 responses too)
-     *
-     * @return array
      */
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'device' => 'nullable|int',
@@ -45,24 +49,17 @@ class SensorController extends SelectController
 
     /**
      * Defines search fields will be searched in order
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
-    protected function searchFields($request)
+    protected function searchFields(Request $request): array
     {
         return ['sensor_descr', 'devices.hostname', 'devices.sysName'];
     }
 
     /**
      * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
-        /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = Sensor::hasAccess($request->user())
             ->has('device')
             ->with(['device' => function ($query): void {
@@ -93,19 +90,18 @@ class SensorController extends SelectController
     /**
      * Format a sensor item for Select2 display
      *
-     * @param  Sensor  $sensor
-     * @return array
+     * @param  Sensor  $model
+     * @return array{id: int|string, text: string, icon?: string, device_id?: int, sensor_class?: string}
      */
-    public function formatItem($sensor)
+    public function formatItem(Model $model): array
     {
-        /** @var Sensor $sensor */
-        $classDescr = ucfirst((string) $sensor->sensor_class);
+        $classDescr = ucfirst((string) $model->sensor_class);
 
         return [
-            'id' => $sensor->sensor_id,
-            'text' => $sensor->device->shortDisplayName() . ' - ' . $sensor->sensor_descr . ' (' . $classDescr . ')',
-            'device_id' => $sensor->device_id,
-            'sensor_class' => $sensor->sensor_class,
+            'id' => $model->sensor_id,
+            'text' => $model->device->shortDisplayName() . ' - ' . $model->sensor_descr . ' (' . $classDescr . ')',
+            'device_id' => $model->device_id,
+            'sensor_class' => $model->sensor_class,
         ];
     }
 }

@@ -285,6 +285,7 @@ if (! empty($peers)) {
                     }
 
                     $peer_data = [];
+                    $peer_data['bgpPeerDescr'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgDescription'] ?? '';
                     $peer_data['bgpPeerState'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgConnState'];
                     if ($peerData['TIMETRA-BGP-MIB::tBgpPeerNgShutdown'] == '1') {
                         $peer_data['bgpPeerAdminStatus'] = 'adminShutdown';

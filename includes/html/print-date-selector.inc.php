@@ -6,7 +6,7 @@ use LibreNMS\Util\Time;
 ?>
 <div style="text-align: center;">
     <form class="form-inline" id="customrange">
-        <input type="hidden" id="selfaction" value="<?php Request::url(); ?>">
+        <input type="hidden" id="selfaction" value="<?php echo Request::url(); ?>">
         <div class="form-group">
         <label for="dtpickerfrom"><?= __('From') ?></label>
             <input type="text"
