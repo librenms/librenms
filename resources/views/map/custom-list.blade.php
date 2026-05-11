@@ -4,15 +4,15 @@
 
 @section('content')
 <div class="tw:px-3 tw:sm:px-6 tw:mx-auto">
-    <x-panel id="manage-custom-maps" body-class="tw:pb-0!" class="tw:mx-auto tw:max-w-(--breakpoint-lg)">
-        <x-slot name="title">
+    <x-panel id="manage-custom-maps" class="tw:mx-auto tw:max-w-(--breakpoint-lg)">
+        <x-slot:title>
             <div class="tw:flex tw:justify-between tw:items-center">
                 <div>
                     {{ __('Custom Maps') }}
                 </div>
             </div>
-        </x-slot>
-
+        </x-slot:title>
+        <x-slot:slot class="tw:pb-0!">
         <x-accordion accordionId="CustomMapGroups">
             @foreach($maps as $group_name => $group)
                 <x-accordion.item title="{{$group_name ?: 'Ungrouped'}}" id="{{uniqid()}}" open="{{($open_group == $group_name) || (count($maps) == 1)}}">
@@ -29,6 +29,7 @@
                 </x-accordion.item>
             @endforeach
         </x-accordion>
+        </x-slot:slot>
     </x-panel>
 </div>
 @endsection

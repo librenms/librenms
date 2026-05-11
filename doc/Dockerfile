@@ -9,4 +9,5 @@ RUN \
     'mkdocs-git-revision-date-localized-plugin' \
     'mkdocs-macros-plugin' \
     'mkdocs-include-dir-to-nav' \
+    'pymdown-extensions' \
   && rm -rf /tmp/*

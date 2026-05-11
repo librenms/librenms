@@ -25,13 +25,17 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\PortSecurity;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Enum\PortSecurityStatus;
 
+/**
+ * @extends TableController<PortSecurity>
+ */
 class PortSecurityController extends TableController
 {
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'port_id' => 'nullable|integer',
@@ -40,7 +44,7 @@ class PortSecurityController extends TableController
         ];
     }
 
-    protected function filterFields($request)
+    protected function filterFields(Request $request): array
     {
         return [
             'port_security.device_id' => 'device_id',
@@ -50,24 +54,15 @@ class PortSecurityController extends TableController
 
     /**
      * Defines the base query for this resource
-     *
-     * @param  Request  $request
-     * @return Builder|\Illuminate\Database\Query\Builder
      */
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
         return PortSecurity::hasAccess($request->user())
             ->with(['device', 'port'])
             ->select('port_security.*');
     }
 
-    /**
-     * @param  string  $search
-     * @param  Builder  $query
-     * @param  array  $fields
-     * @return Builder|\Illuminate\Database\Query\Builder
-     */
-    protected function search($search, $query, $fields = [])
+    protected function search(?string $search, Builder $query, array $fields): Builder
     {
         if ($search = trim(\Request::input('searchPhrase') ?? '')) {
             return match (\Request::input('searchby') ?? '') {
@@ -110,7 +105,7 @@ class PortSecurityController extends TableController
      * @param  Builder  $query
      * @return Builder
      */
-    public function sort($request, $query)
+    public function sort(Request $request, Builder $query): Builder
     {
         $sort = $request->input('sort');
 
@@ -152,24 +147,25 @@ class PortSecurityController extends TableController
     }
 
     /**
-     * @param  PortSecurity  $portSecurity
+     * @param  PortSecurity  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($portSecurity)
+    public function formatItem(Model $model): array
     {
-        $statusIcon = PortSecurityStatus::getIconClass($portSecurity->status);
+        $statusIcon = PortSecurityStatus::getIconClass($model->status);
 
         return [
-            'device' => Blade::render('<x-device-link :device="$device"/>', ['device' => $portSecurity->device]),
-            'interface' => $portSecurity->port ? Blade::render('<x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link>', ['port' => $portSecurity->port]) : 'N/A',
-            'port_description' => $portSecurity->port->ifAlias ?? 'N/A',
-            'status' => '<i class="fa ' . $statusIcon . '" aria-hidden="true" title="' . $portSecurity->status . '"></i> ' . $portSecurity->status,
-            'enable' => $portSecurity->port_security_enable ?? 'N/A',
-            'max_secure' => $portSecurity->max_addresses ?? 'N/A',
-            'current_secure' => $portSecurity->address_count ?? 'N/A',
-            'violation_action' => $portSecurity->violation_action ?? 'N/A',
-            'violation_count' => $portSecurity->violation_count ?? 'N/A',
-            'secure_last_mac' => $portSecurity->last_mac_address ?? 'N/A',
-            'sticky_enable' => $portSecurity->sticky_enable ?? 'N/A',
+            'device' => Blade::render('<x-device-link :device="$device"/>', ['device' => $model->device]),
+            'interface' => $model->port ? Blade::render('<x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link>', ['port' => $model->port]) : 'N/A',
+            'port_description' => $model->port->ifAlias ?? 'N/A',
+            'status' => '<i class="fa ' . $statusIcon . '" aria-hidden="true" title="' . $model->status . '"></i> ' . $model->status,
+            'enable' => $model->port_security_enable ?? 'N/A',
+            'max_secure' => $model->max_addresses ?? 'N/A',
+            'current_secure' => $model->address_count ?? 'N/A',
+            'violation_action' => $model->violation_action ?? 'N/A',
+            'violation_count' => $model->violation_count ?? 'N/A',
+            'secure_last_mac' => $model->last_mac_address ?? 'N/A',
+            'sticky_enable' => $model->sticky_enable ?? 'N/A',
         ];
     }
 }

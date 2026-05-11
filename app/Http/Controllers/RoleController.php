@@ -20,7 +20,7 @@ class RoleController
 
         return view('roles.index', [
             'roles' => Role::with('permissions')->orderBy('name')->get(),
-            'protected' => ['admin', 'global-read'],
+            'protected' => ['admin', 'global-read', 'user'],
         ]);
     }
 

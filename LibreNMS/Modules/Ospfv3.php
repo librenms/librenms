@@ -343,7 +343,7 @@ class Ospfv3 implements Module
 
     public function fetchAndFillArea(Ospfv3Area $area): void
     {
-        $area->fill(SnmpQuery::context($area->context_name)
+        $ospf_area = SnmpQuery::context($area->context_name)
             ->hideMib()->enumStrings()->get([
                 'OSPFV3-MIB::ospfv3AreaImportAsExtern.' . $area->ospfv3AreaId,
                 'OSPFV3-MIB::ospfv3AreaSpfRuns.' . $area->ospfv3AreaId,
@@ -359,7 +359,11 @@ class Ospfv3 implements Module
                 'OSPFV3-MIB::ospfv3AreaNssaTranslatorStabInterval.' . $area->ospfv3AreaId,
                 'OSPFV3-MIB::ospfv3AreaNssaTranslatorEvents.' . $area->ospfv3AreaId,
                 'OSPFV3-MIB::ospfv3AreaTEEnabled.' . $area->ospfv3AreaId,
-            ])->valuesByIndex()[$area->ospfv3AreaId] ?? []);
+            ])->valuesByIndex()["$area->ospfv3AreaId"] ?? [];
+
+        $ospf_area['ospfv3AreaScopeLsaCksumSum'] ??= 0;
+
+        $area->fill($ospf_area);
     }
 
     public function fetchAndFillPort(Ospfv3Port $port): void
@@ -385,7 +389,11 @@ class Ospfv3 implements Module
                 "OSPFV3-MIB::ospfv3IfTEDisabled.$port->ospfv3IfIndex.$port->ospfv3IfInstId",
             ])->valuesByIndex()["$port->ospfv3IfIndex.$port->ospfv3IfInstId"] ?? [];
 
-        $ospf_port['ospfv3IfBackupDesignatedRouter'] ??= '';  // missing on some devices
+        // Missing on some devices
+        $ospf_port['ospfv3IfRtrPriority'] ??= 1;
+        $ospf_port['ospfv3IfDesignatedRouter'] ??= '';
+        $ospf_port['ospfv3IfDemand'] ??= '';
+        $ospf_port['ospfv3IfBackupDesignatedRouter'] ??= '';
 
         $port->fill($ospf_port);
         $port->port_id = (int) PortCache::getIdFromIfIndex($port->ospfv3IfIndex, $port->device_id); // this was skipped in initial poll
@@ -393,7 +401,7 @@ class Ospfv3 implements Module
 
     public function fetchAndFillNeighbor(Ospfv3Nbr $nbr): void
     {
-        $nbr->fill(SnmpQuery::context($nbr->context_name)
+        $ospf_nbr = SnmpQuery::context($nbr->context_name)
             ->hideMib()->enumStrings()->get([
                 "OSPFV3-MIB::ospfv3NbrAddressType.$nbr->ospfv3NbrIfIndex.$nbr->ospfv3NbrIfInstId.$nbr->ospfv3NbrRtrId",
                 "OSPFV3-MIB::ospfv3NbrOptions.$nbr->ospfv3NbrIfIndex.$nbr->ospfv3NbrIfInstId.$nbr->ospfv3NbrRtrId",
@@ -405,8 +413,12 @@ class Ospfv3 implements Module
                 "OSPFV3-MIB::ospfv3NbrRestartHelperStatus.$nbr->ospfv3NbrIfIndex.$nbr->ospfv3NbrIfInstId.$nbr->ospfv3NbrRtrId",
                 "OSPFV3-MIB::ospfv3NbrRestartHelperAge.$nbr->ospfv3NbrIfIndex.$nbr->ospfv3NbrIfInstId.$nbr->ospfv3NbrRtrId",
                 "OSPFV3-MIB::ospfv3NbrRestartHelperExitReason.$nbr->ospfv3NbrIfIndex.$nbr->ospfv3NbrIfInstId.$nbr->ospfv3NbrRtrId",
-            ])->valuesByIndex()["$nbr->ospfv3NbrIfIndex.$nbr->ospfv3NbrIfInstId.$nbr->ospfv3NbrRtrId"] ?? []);
+            ])->valuesByIndex()["$nbr->ospfv3NbrIfIndex.$nbr->ospfv3NbrIfInstId.$nbr->ospfv3NbrRtrId"] ?? [];
 
+        // Missing on some devices
+        $ospf_nbr['ospfv3NbrHelloSuppressed'] ??= '';
+
+        $nbr->fill($ospf_nbr);
         $nbr->port_id = PortCache::getIdFromIp($nbr->ospfv3NbrAddress, $nbr->context_name); // this was skipped in initial poll
     }
 }

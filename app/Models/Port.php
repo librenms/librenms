@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\Filterable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,16 +13,58 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
 class Port extends DeviceRelatedModel
 {
     use HasFactory;
+    use Filterable;
 
     public $timestamps = false;
     protected $primaryKey = 'port_id';
     protected $guarded = [];
+    protected array $filterable = [
+        'device_id',
+        'ifName',
+        'ifDescr',
+        'portName',
+        'ifSpeed',
+        'ifIndex',
+        'ifOperStatus',
+        'ifAdminStatus',
+        'ifDuplex',
+        'ifMtu',
+        'ifType',
+        'ifAlias',
+        'ifPhysAddress',
+        'ifLastChange',
+        'ifVlan',
+        'ifTrunk',
+        'ifVrf',
+        'ignore',
+        'disabled',
+        'deleted',
+        'state',
+        'search',
+        'groups.id',
+        'device.groups.id',
+        'device.hostname',
+    ];
+
+    /**
+     * @return array{ifOperStatus: 'LibreNMS\Enum\IfOperStatus', ifOperStatus_prev: 'LibreNMS\Enum\IfOperStatus', ifAdminStatus: 'LibreNMS\Enum\IfOperStatus', ifAdminStatus_prev: 'LibreNMS\Enum\IfOperStatus'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'ifOperStatus' => IfOperStatus::class,
+            'ifOperStatus_prev' => IfOperStatus::class,
+            'ifAdminStatus' => IfOperStatus::class,
+            'ifAdminStatus_prev' => IfOperStatus::class,
+        ];
+    }
 
     /**
      * Initialize this class
@@ -200,7 +243,7 @@ class Port extends DeviceRelatedModel
             [$this->qualifyColumn('deleted'), '=', 0],
             [$this->qualifyColumn('ignore'), '=', 0],
             [$this->qualifyColumn('disabled'), '=', 0],
-            [$this->qualifyColumn('ifOperStatus'), '=', 'up'],
+            [$this->qualifyColumn('ifOperStatus'), '=', IfOperStatus::Up],
         ]);
     }
 
@@ -214,8 +257,8 @@ class Port extends DeviceRelatedModel
             [$this->qualifyColumn('deleted'), '=', 0],
             [$this->qualifyColumn('ignore'), '=', 0],
             [$this->qualifyColumn('disabled'), '=', 0],
-            [$this->qualifyColumn('ifOperStatus'), '!=', 'up'],
-            [$this->qualifyColumn('ifAdminStatus'), '=', 'up'],
+            [$this->qualifyColumn('ifOperStatus'), '!=', IfOperStatus::Up],
+            [$this->qualifyColumn('ifAdminStatus'), '=', IfOperStatus::Up],
         ]);
     }
 
@@ -229,7 +272,7 @@ class Port extends DeviceRelatedModel
             [$this->qualifyColumn('deleted'), '=', 0],
             [$this->qualifyColumn('ignore'), '=', 0],
             [$this->qualifyColumn('disabled'), '=', 0],
-            [$this->qualifyColumn('ifAdminStatus'), '=', 'down'],
+            [$this->qualifyColumn('ifAdminStatus'), '=', IfOperStatus::Down],
         ]);
     }
 
@@ -298,6 +341,80 @@ class Port extends DeviceRelatedModel
                 ->from('port_group_port')
                 ->where('port_group_id', $portGroup);
         });
+    }
+
+    /**
+     * Handle the "State" filter.
+     * up: Admin Up + Oper Up
+     * down: Admin Up + Oper NOT Up
+     * shutdown: Admin NOT Up
+     */
+    public function filterState(Builder $query, string $op, mixed $value): void
+    {
+        if ($op === 'in' || $op === 'not_in') {
+            $values = (array) $value;
+            $query->{$op === 'not_in' ? 'whereNot' : 'where'}(function ($q) use ($values): void {
+                $q->where(function ($inner) use ($values): void {
+                    foreach ($values as $i => $v) {
+                        $method = $i === 0 ? 'where' : 'orWhere';
+                        $inner->{$method}(function ($cond) use ($v) {
+                            if ($v === 'shutdown') {
+                                return $cond->where('ifAdminStatus', '!=', 'up');
+                            }
+                            $cond->where('ifAdminStatus', 'up')
+                                ->where('ifOperStatus', $v === 'up' ? '=' : '!=', 'up');
+                        });
+                    }
+                });
+            });
+
+            return;
+        }
+
+        $query->{$op === 'neq' ? 'whereNot' : 'where'}(function ($q) use ($value) {
+            if ($value === 'shutdown') {
+                return $q->where('ifAdminStatus', '!=', 'up');
+            }
+            $q->where('ifAdminStatus', 'up')
+                ->where('ifOperStatus', $value === 'up' ? '=' : '!=', 'up');
+        });
+    }
+
+    /**
+     * Handle a global text search across multiple port fields
+     */
+    public function filterSearch(Builder $query, string $op, mixed $value, array $config): void
+    {
+        // Apply the wildcard if the operator is 'contains'
+        if (isset($config['wildcard'])) {
+            $value = str_replace('?', $value, $config['wildcard']);
+        }
+
+        $operator = $config['operator'] ?? '=';
+
+        $query->where(function ($q) use ($value, $operator): void {
+            $q->where('ports.ifName', $operator, $value)
+                ->orWhere('ifAlias', $operator, $value)
+                ->orWhere('ifDescr', $operator, $value);
+        });
+    }
+
+    /**
+     * Custom filter for ifDuplex to handle "unknown" as both 'unknown' and NULL.
+     */
+    public function filterIfDuplex(Builder $query, string $op, mixed $value, array $config): void
+    {
+        if ($value === 'unknown') {
+            $query->where(function ($q): void {
+                $q->whereIn('ports.ifDuplex', ['unknown', ''])
+                    ->orWhereNull('ports.ifDuplex');
+            });
+
+            return;
+        }
+
+        $method = $config['method'];
+        $this->applyQueryLogic($query, 'ports.ifDuplex', $op, $value, $config, $method);
     }
 
     // ---- Define Relationships ----
