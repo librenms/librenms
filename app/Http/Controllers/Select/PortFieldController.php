@@ -89,7 +89,6 @@ class PortFieldController extends SelectController
     {
         $field = array_key_first($model->getAttributes());
         $value = array_first($model->getAttributes());
-        \Debugbar::log("field: $field, value: $value");
 
         return [
             'id' => $value,
