@@ -128,6 +128,9 @@ class PortsController extends Controller
         return response()->json(['message' => 'Successfully purged port ID ' . ((int) $purge)]);
     }
 
+    /**
+     * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: string[], params?: array<string, string>}>
+     */
     private function filterFields(): array
     {
         return [
@@ -238,6 +241,7 @@ class PortsController extends Controller
         }
 
         $portsQuery = Port::hasAccess(request()->user())
+            ->select(['ports.*'])
             ->with(['device' => fn ($query) => $query->select(['device_id', 'hostname', 'sysName', 'display', 'ip', 'overwrite_ip'])])
             ->isValid()
             ->whereHas('device') // a device is required for graphs to work
@@ -260,6 +264,6 @@ class PortsController extends Controller
                 ->orderBy('ifIndex'),
         };
 
-        return $portsQuery->paginate($perPage, ['ports.*']);
+        return $portsQuery->paginate($perPage);
     }
 }
