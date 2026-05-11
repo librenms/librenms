@@ -1,6 +1,5 @@
 modules:
     os:
-        sysDescr_regex: '/\b(?<features>\d+\.\d+\.\d+(?:-[^\s]+)?)\b/'
         hardware: SKYLONE-MIB::productName
         version:
             - SKYLONE-MIB::productVersion
