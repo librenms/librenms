@@ -50,6 +50,7 @@ class Port extends DeviceRelatedModel
         'search',
         'groups.id',
         'device.groups.id',
+        'device.location_id',
         'device.hostname',
     ];
 
