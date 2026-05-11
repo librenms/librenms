@@ -31,9 +31,6 @@ use Illuminate\Support\Str;
 
 trait Filterable
 {
-    /** @var string[] */
-    protected array $filterable = [];
-
     /**
      * Comprehensive map of UI operators to Eloquent methods.
      */
@@ -66,10 +63,8 @@ trait Filterable
      */
     public function scopeApplyFilters(Builder $query, array $filters): Builder
     {
-        $allowed = $this->filterable;
-
         foreach ($filters as $field => $operators) {
-            if (! in_array($field, $allowed)) {
+            if (! in_array($field, $this->filterable)) {
                 continue;
             }
             if (! is_array($operators)) {
