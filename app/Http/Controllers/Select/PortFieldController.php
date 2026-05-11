@@ -28,6 +28,7 @@ namespace App\Http\Controllers\Select;
 
 use App\Models\Port;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
