@@ -22,7 +22,6 @@
  * @author     Sofia El Khalifi <sofia.elkhalifi@netsf.fr>
  */
 
-
 // Sensors for license status
 $licenseOids = SnmpQuery::hideMib()->walk('FORTINET-FORTIGATE-MIB::fgSystemInfoAdvanced')->table(1);
 
