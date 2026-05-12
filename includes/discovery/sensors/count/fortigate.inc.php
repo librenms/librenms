@@ -27,7 +27,7 @@ $licenseOids = SnmpQuery::hideMib()->walk('FORTINET-FORTIGATE-MIB::fgSystemInfoA
 if (! empty($licenseOids)) {
     foreach ($licenseOids as $index => $entry) {
         if (isset($entry['fgLicContractExpiry'])) {
-            $descr = $entry['fgLicContractDesc'];
+            $descr = $entry['fgLicContractDesc'] ?? 'Unknown License';
 
             // Convert the human-readable timestamp (eg: Sat Jul 26 01:00:00 2025) to unix timestamp,
             // then subtract current unix timestamp to get the remaining days till license expiration
