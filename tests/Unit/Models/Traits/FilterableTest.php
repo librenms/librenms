@@ -313,7 +313,7 @@ class FilterableTest extends TestCase
 
         $results = FilterableDevice::applyFilters([
             'hostname' => ['contains' => 'core'],
-            'os' => ['eq' => 'ios']
+            'os' => ['eq' => 'ios'],
         ])->get();
 
         $this->assertCount(1, $results);
@@ -364,7 +364,7 @@ class FilterableTest extends TestCase
         $this->device(['hostname' => 'us-router']);
 
         $results = FilterableDevice::applyFilters([
-            'location.region.name' => ['eq' => 'Europe']
+            'location.region.name' => ['eq' => 'Europe'],
         ])->get();
 
         $this->assertCount(1, $results);
@@ -378,7 +378,7 @@ class FilterableTest extends TestCase
         $this->device(['hostname' => 'orphan-gw', 'location_id' => null]);
 
         $results = FilterableDevice::applyFilters([
-            'location.location' => ['neq' => 'London']
+            'location.location' => ['neq' => 'London'],
         ])->get();
 
         $this->assertCount(2, $results);

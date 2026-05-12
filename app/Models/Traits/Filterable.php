@@ -37,6 +37,7 @@ trait Filterable
 
     /**
      * Apply filters from the request to the query.
+     *
      * @param  Builder<static>  $query
      * @param  array<string, array<string, mixed>>  $filters
      * @return Builder<static>
@@ -50,7 +51,7 @@ trait Filterable
                 continue;
             }
             if (! is_array($operators)) {
-                Log::debug("Invalid operators format " . $this::class);
+                Log::debug('Invalid operators format ' . $this::class);
 
                 continue;
             }
@@ -106,6 +107,7 @@ trait Filterable
 
     /**
      * Helper to build complex filters based on a value-to-logic mapping.
+     *
      * @param  Builder<static>  $query
      * @param  scalar|scalar[]  $value
      * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config
@@ -141,12 +143,14 @@ trait Filterable
                     ? $q->whereNotNull($field)->where($field, '!=', '')
                     : $q->whereNull($field)->orWhere($field, '=', '');
             }, boolean: $boolean);
+
             return;
         }
 
         if ($config['set'] ?? false) {
             $values = is_array($value) ? $value : explode(',', (string) $value);
             $query->whereIn($field, $values, $boolean, $not);
+
             return;
         }
 
