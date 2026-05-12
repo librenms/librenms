@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 trait Filterable
 {
     /**
-     * @var array<array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}>
+     * @var array<string, array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}>
      */
     protected static array $operatorMap = [
         // Standard Comparison
@@ -37,9 +37,9 @@ trait Filterable
 
     /**
      * Apply filters from the request to the query.
-     * @param  Builder  $query
-     * @param  array<array{string, scalar|scalar[]}>  $filters
-     * @return Builder
+     * @param  Builder<static>  $query
+     * @param  array<string, array<string, mixed>>  $filters
+     * @return Builder<static>
      */
     public function scopeApplyFilters(Builder $query, array $filters): Builder
     {
@@ -84,7 +84,7 @@ trait Filterable
 
     /**
      * @param  array  $columns
-     * @param  Builder  $query
+     * @param  Builder<static>  $query
      * @param  scalar|scalar[]  $value
      * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config
      * @return void
@@ -106,7 +106,7 @@ trait Filterable
 
     /**
      * Helper to build complex filters based on a value-to-logic mapping.
-     * @param  Builder  $query
+     * @param  Builder<static>  $query
      * @param  scalar|scalar[]  $value
      * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config
      * @param  callable  $mapper  Accepts value and modifies the query
@@ -124,7 +124,7 @@ trait Filterable
     }
 
     /**
-     * @param  Builder  $query
+     * @param  Builder<static>  $query
      * @param  string  $field
      * @param  scalar|scalar[]  $value
      * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config
@@ -159,7 +159,7 @@ trait Filterable
     }
 
     /**
-     * @param  Builder  $query
+     * @param  Builder<static>  $query
      * @param  string  $field
      * @param  scalar|scalar[]  $value
      * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config

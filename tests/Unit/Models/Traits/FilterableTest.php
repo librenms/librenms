@@ -442,6 +442,7 @@ class FilterableTest extends TestCase
     {
         $this->device(['hostname' => 'router1']);
 
+        /** @phpstan-ignore-next-line */
         $results = FilterableDevice::applyFilters(['hostname' => 'not-an-array'])->get();
 
         $this->assertCount(1, $results);
@@ -452,6 +453,11 @@ class FilterableTest extends TestCase
 // Inline test doubles
 // ---------------------------------------------------------------------------
 
+/**
+ * @property int $id
+ * @property string|null $location
+ * @property int|null $region_id
+ */
 class FilterableLocation extends Model
 {
     protected $connection = 'testing_memory';
@@ -465,6 +471,10 @@ class FilterableLocation extends Model
     }
 }
 
+/**
+ * @property int $id
+ * @property string|null $region
+ */
 class FilterableRegion extends Model
 {
     protected $connection = 'testing_memory';
@@ -473,6 +483,13 @@ class FilterableRegion extends Model
     public $timestamps = false;
 }
 
+/**
+ * @property int $id
+ * @property string|null $hostname
+ * @property string|null $os
+ * @property int|null $uptime
+ * @property int|null $location_id
+ */
 class FilterableDevice extends Model
 {
     use Filterable;
