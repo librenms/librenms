@@ -38,7 +38,13 @@ class FilterableTest extends TestCase
         });
     }
 
-    private function device(array $deviceAttrs, ?string $location = null, ?string $region = null): FilterableDevice
+    /**
+     * @param  array<string, string|int|null>  $deviceAttrs
+     * @param  string|null  $location
+     * @param  string|null  $region
+     * @return void
+     */
+    private function device(array $deviceAttrs, ?string $location = null, ?string $region = null): void
     {
         if ($location) {
             $locationAttrs = ['location' => $location];
@@ -52,7 +58,7 @@ class FilterableTest extends TestCase
             $deviceAttrs['location_id'] = $loc->id;
         }
 
-        return FilterableDevice::create($deviceAttrs);
+        FilterableDevice::create($deviceAttrs);
     }
 
     // -------------------------------------------------------------------------
@@ -506,6 +512,12 @@ class FilterableDevice extends Model
         return $this->belongsTo(FilterableLocation::class, 'location_id');
     }
 
+    /**
+     * @param  Builder<static>  $query
+     * @param  scalar|scalar[]  $value
+     * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config
+     * @return void
+     */
     public function filterSearch(Builder $query, mixed $value, array $config): void
     {
         $this->applyFilterSearch(['hostname', 'os'], $query, $value, $config);
