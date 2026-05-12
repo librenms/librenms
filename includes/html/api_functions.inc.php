@@ -1749,7 +1749,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
 
     if (isset($data['builder'])) {
         // accept inline json or json as a string
-        $builder = is_array($data['builder']) ? $data['builder'] : json_decode($data['builder'], true);
+        $builder = is_array($data['builder']) ? $data['builder'] : json_decode((string) $data['builder'], true);
     } else {
         $builder = $data['rule'] ?? null;
     }
