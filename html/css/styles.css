@@ -6,7 +6,6 @@ body {
   padding-top: 0px;
   background: rgb(255,255,255); /* Old browsers */
   color: #555;
-  font-size: 10pt;
   line-height: 20px;
   overflow-y: scroll;
 }
@@ -44,16 +43,6 @@ A.purple:visited, a.purple, .purple { color: #740074; }
   font-style: normal;
   font-weight: bold;
   color: #555;
-}
-
-.graph-all-common {
-  display: block;
-  padding: 1px;
-  margin: 2px;
-  min-height:180px;
-  max-height:180px;
-  text-align: center;
-  float: left;
 }
 
 .tablehead {
