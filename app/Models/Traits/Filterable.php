@@ -34,7 +34,7 @@ trait Filterable
     /**
      * Comprehensive map of UI operators to Eloquent methods.
      */
-    protected array $operatorMap = [
+    protected static array $operatorMap = [
         // Standard Comparison
         'eq' => ['method' => 'where', 'operator' => '='],
         'neq' => ['method' => 'where', 'operator' => '!='],
@@ -72,11 +72,11 @@ trait Filterable
             }
 
             foreach ($operators as $op => $value) {
-                if (! isset($this->operatorMap[$op])) {
+                if (! isset(static::$operatorMap[$op])) {
                     continue;
                 }
 
-                $config = $this->operatorMap[$op];
+                $config = static::$operatorMap[$op];
                 $method = $config['method'];
 
                 // Check for Custom Filter Method (e.g., filterState)
@@ -104,7 +104,7 @@ trait Filterable
                         'is_not_empty' => 'is_empty',
                         default => $op,
                     };
-                    $innerConfig = $this->operatorMap[$innerOp];
+                    $innerConfig = static::$operatorMap[$innerOp];
                     $innerMethod = $innerConfig['method'];
 
                     $query->{$hasMethod}($relation, function (Builder $q) use ($column, $innerOp, $value, $innerConfig, $innerMethod): void {
@@ -120,10 +120,57 @@ trait Filterable
         return $query;
     }
 
+    /**
+     * Helper for models to build multi-column search filters.
+     * Call this from a custom filterSearch() (or any filterX()) method on the model.
+     */
+    protected function applyFilterSearch(array $columns, Builder $query, string $op, mixed $value, array $config): void
+    {
+        $isNegation = in_array($op, ['neq', 'not_contains', 'is_not_empty']);
+
+        $query->where(function (Builder $q) use ($columns, $op, $value, $config, $isNegation) {
+            foreach ($columns as $field) {
+                $boolean = $isNegation ? 'and' : 'or';
+
+                if (str_contains($field, '.')) {
+                    $parts = explode('.', $field);
+                    $column = array_pop($parts);
+                    $relation = implode('.', $parts);
+                    $hasMethod = $isNegation ? 'whereDoesntHave' : 'whereHas';
+
+                    $q->{$hasMethod}($relation, fn (Builder $r) => $this->applyQueryLogic($r, $column, $op, $value, $config, $config['method']), boolean: $boolean);
+                } else {
+                    $this->applyQueryLogic($q, $this->qualifyColumn($field), $op, $value, $config, $config['method'], $boolean);
+                }
+            }
+        });
+    }
+
+    public static function filterValidationRules(): array
+    {
+        return [
+            'filter' => ['array'],
+            'filter.*' => [
+                'array',
+                function ($attribute, $value, $fail): void {
+                    $operator = array_key_first($value);
+                    if (! in_array($operator, array_keys(static::$operatorMap))) {
+                        $fail("The operator '$operator' is not supported.");
+                    }
+                },
+            ],
+            'filter.*.*' => ['nullable', 'max:255'],
+        ];
+    }
+
     protected function applyQueryLogic($query, $field, $op, $value, $config, $method): void
     {
         if (in_array($op, ['is_empty', 'is_not_empty'])) {
-            $query->$method($field);
+            $query->where(function (Builder $q) use ($field, $op) {
+                $op === 'is_not_empty'
+                    ? $q->whereNotNull($field)->where($field, '!=', '')
+                    : $q->whereNull($field)->orWhere($field, '=', '');
+            });
 
             return;
         }

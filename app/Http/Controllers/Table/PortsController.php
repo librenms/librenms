@@ -58,19 +58,7 @@ class PortsController extends TableController
             'location' => 'nullable|integer',
             'port_descr_type' => 'nullable|string',
             'state' => 'nullable|in:up,down,admindown',
-            'filter' => ['nullable', 'array'],
-            'filter.*' => [
-                'array',
-                function ($attribute, $value, $fail): void {
-                    $allowedOps = ['eq', 'neq', 'contains', 'starts_with', 'gt', 'lt', 'in', 'not_in', 'is_empty'];
-                    $operator = array_key_first($value);
-
-                    if (! in_array($operator, $allowedOps)) {
-                        $fail("The operator '{$operator}' is not supported.");
-                    }
-                },
-            ],
-            'filter.*.*' => ['nullable', 'max:255'],
+            ...Port::filterValidationRules(),
         ];
     }
 

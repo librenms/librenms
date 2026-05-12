@@ -386,18 +386,7 @@ class Port extends DeviceRelatedModel
      */
     public function filterSearch(Builder $query, string $op, mixed $value, array $config): void
     {
-        // Apply the wildcard if the operator is 'contains'
-        if (isset($config['wildcard'])) {
-            $value = str_replace('?', $value, $config['wildcard']);
-        }
-
-        $operator = $config['operator'] ?? '=';
-
-        $query->where(function ($q) use ($value, $operator): void {
-            $q->where('ports.ifName', $operator, $value)
-                ->orWhere('ifAlias', $operator, $value)
-                ->orWhere('ifDescr', $operator, $value);
-        });
+        $this->applyFilterSearch(['ifName', 'ifAlias', 'ifDescr'], $query, $op, $value, $config);
     }
 
     /**

@@ -24,9 +24,7 @@ class PortsController extends Controller
             'page' => ['nullable', 'integer'],
             'to' => ['nullable', 'date_or_relative'],
             'from' => ['nullable', 'date_or_relative'],
-            'filter' => ['nullable', 'array'],
-            'filter.*' => ['array'],
-            'filter.*.*' => ['nullable', 'max:255'],
+            ...Port::filterValidationRules(),
             'sort' => Rule::in([ // oddly inconsistent between list and graph views
                 'traffic',
                 'traffic_in',
