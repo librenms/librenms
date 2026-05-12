@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $id
  * @property string $name
  * @property int|null $default_operation_step_duration_seconds
+ * @property bool $notifications_suppressed
  */
 class AlertOperation extends BaseModel
 {
@@ -21,10 +22,12 @@ class AlertOperation extends BaseModel
     protected $fillable = [
         'name',
         'default_operation_step_duration_seconds',
+        'notifications_suppressed',
     ];
 
     protected $casts = [
         'default_operation_step_duration_seconds' => 'integer',
+        'notifications_suppressed' => 'boolean',
     ];
 
     /**
@@ -59,6 +62,7 @@ class AlertOperation extends BaseModel
             'id' => $this->id,
             'name' => $this->name,
             'default_operation_step_duration_seconds' => $this->default_operation_step_duration_seconds,
+            'notifications_suppressed' => (bool) $this->notifications_suppressed,
             'segments' => $this->segments->map(static fn (AlertOperationSegment $s) => $s->toApiArray())->values()->all(),
         ];
     }

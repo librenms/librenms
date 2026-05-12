@@ -601,9 +601,9 @@ including the device 90 day availability widget
 - **Orange**: availability >= availablity.threshold_warning (default: 95%)
 - **Red**: availability < availablity.threshold_warning
 
-!!! setting "webui/availability-bar"
+!!! setting "webui/device"
     ```bash
-    lnms config:set availablity.threshold_ok 99
+    lnms config:set availablity.threshold_ok 99.99
     lnms config:set availablity.threshold_warning 95
     ```
 

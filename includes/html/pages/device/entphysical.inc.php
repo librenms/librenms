@@ -45,7 +45,7 @@ function printEntPhysical($device, $ent, $level, $class)
         }
 
         if ($ent['entPhysicalModelName'] && $display_entPhysicalName) {
-            echo '<strong>' . e($ent['entPhysicalModelName']) . '</strong> (' . e($display_entPhysicalName) . ')';
+            echo '<strong>' . e($ent['entPhysicalModelName']) . '</strong> (' . $display_entPhysicalName . ')';
         } elseif ($ent['entPhysicalModelName']) {
             echo '<strong>' . e($ent['entPhysicalModelName']) . '</strong>';
         } elseif (is_numeric($ent['entPhysicalName']) && $ent['entPhysicalVendorType']) {

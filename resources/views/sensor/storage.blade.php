@@ -7,11 +7,11 @@
         <div class="panel-heading">
             <div class="row" style="padding:0px 10px 0px 10px;">
                 <div class="pull-left">
-                    <x-option-bar border="none" name="Health" :options="$metrics" :selected="$metric"></x-option-bar>
+                    <x-option-bar border="none" name="{{ __('Health') }}" :options="$metrics" :selected="$metric"></x-option-bar>
                 </div>
 
                 <div class="pull-left">
-                    <x-option-bar border="none" name="Status" :options="$status_bar" :selected="$status"></x-option-bar>
+                    <x-option-bar border="none" name="{{ __('Status') }}" :options="$status_bar" :selected="$status"></x-option-bar>
                 </div>
 
                 <div class="pull-right">

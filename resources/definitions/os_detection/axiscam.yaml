@@ -8,5 +8,7 @@ discovery:
         sysDescr_regex: '/AXIS .* ((Network|Bullet|PTZ|Dome|Panoramic|Box) Camera|Security Radar|Video (Server|Decoder)|Network Video Encoder)/'
 over:
     - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
     - { graph: device_temperature, text: 'Device Temperature' }
     - { graph: device_state, text: 'Device State' }

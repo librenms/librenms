@@ -21,6 +21,13 @@ return [
     'never_polled' => 'Never polled',
     'vm_host' => 'VM Host',
     'scheduled_maintenance' => 'Scheduled Maintenance',
+    'delete_device' => 'Delete Device',
+    'delete' => 'Delete :name',
+    'confirm_delete' => 'Are you sure you want to delete device :name?',
+    'deleted' => 'Device :hostname has been deleted.',
+    'please_select' => 'Please select',
+    'warning_monitored' => 'Warning, this will remove the device from being monitored!',
+    'warning_data' => 'It will also remove historical data about this device such as:',
 
     'edit' => [
         'delete_device' => 'Delete Device',

@@ -28,24 +28,30 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\AlertSchedule;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Enum\MaintenanceBehavior;
 
+/**
+ * @extends TableController<AlertSchedule>
+ */
 class AlertScheduleController extends TableController
 {
-    protected $default_sort = ['title' => 'asc', 'start' => 'asc'];
+    protected array $default_sort = ['title' => 'asc', 'start' => 'asc'];
 
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder|\Illuminate\Database\Query\Builder
     {
         return AlertSchedule::query();
     }
 
-    protected function searchFields($request)
+    protected function searchFields(Request $request): array
     {
         return['title', 'start', 'end'];
     }
 
-    protected function sortFields($request)
+    protected function sortFields(Request $request): array
     {
         return [
             'start_recurring_dt' => DB::raw('DATE(`start`)'),
@@ -62,12 +68,12 @@ class AlertScheduleController extends TableController
     }
 
     /**
-     * @param  AlertSchedule  $schedule
-     * @return array
+     * @param  AlertSchedule  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($schedule)
+    public function formatItem(Model $model): array
     {
-        $behavior = match ($schedule->behavior) {
+        $behavior = match ($model->behavior) {
             MaintenanceBehavior::SkipAlerts->value => __('alerting.maintenance.behavior.options.skip_alerts'),
             MaintenanceBehavior::MuteAlerts->value => __('alerting.maintenance.behavior.options.mute_alerts'),
             MaintenanceBehavior::RunAlerts->value => __('alerting.maintenance.behavior.options.run_alerts'),
@@ -75,19 +81,19 @@ class AlertScheduleController extends TableController
         };
 
         return [
-            'title' => htmlentities((string) $schedule->title),
-            'notes' => htmlentities((string) $schedule->notes),
+            'title' => htmlentities((string) $model->title),
+            'notes' => htmlentities((string) $model->notes),
             'behavior' => $behavior,
-            'id' => $schedule->schedule_id,
-            'start' => $schedule->recurring ? '' : $schedule->start->toDateTimeString('minutes'),
-            'end' => $schedule->recurring ? '' : $schedule->end->toDateTimeString('minutes'),
-            'start_recurring_dt' => $schedule->recurring ? $schedule->start_recurring_dt : '',
-            'start_recurring_hr' => $schedule->recurring ? $schedule->start_recurring_hr : '',
-            'end_recurring_dt' => $schedule->recurring ? $schedule->end_recurring_dt : '',
-            'end_recurring_hr' => $schedule->recurring ? $schedule->end_recurring_hr : '',
-            'recurring' => $schedule->recurring ? __('Yes') : __('No'),
-            'recurring_day' => $schedule->recurring ? htmlentities(implode(',', $schedule->recurring_day)) : '',
-            'status' => $schedule->status,
+            'id' => $model->schedule_id,
+            'start' => $model->recurring ? '' : $model->start->toDateTimeString('minutes'),
+            'end' => $model->recurring ? '' : $model->end->toDateTimeString('minutes'),
+            'start_recurring_dt' => $model->recurring ? $model->start_recurring_dt : '',
+            'start_recurring_hr' => $model->recurring ? $model->start_recurring_hr : '',
+            'end_recurring_dt' => $model->recurring ? $model->end_recurring_dt : '',
+            'end_recurring_hr' => $model->recurring ? $model->end_recurring_hr : '',
+            'recurring' => $model->recurring ? __('Yes') : __('No'),
+            'recurring_day' => $model->recurring ? htmlentities(implode(',', $model->recurring_day)) : '',
+            'status' => $model->status,
         ];
     }
 }
