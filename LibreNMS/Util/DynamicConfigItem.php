@@ -65,6 +65,10 @@ class DynamicConfigItem implements \ArrayAccess
     public function checkValue($value)
     {
         if ($this->validate) {
+            if ($this->type == 'multiple') {
+                $value = $this->normalizeMultipleValue($value);
+            }
+
             return $this->buildValidator($value)->passes();
         } elseif ($this->type == 'boolean') {
             return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null;
@@ -74,7 +78,7 @@ class DynamicConfigItem implements \ArrayAccess
             return filter_var($value, FILTER_VALIDATE_FLOAT) !== false;
         } elseif ($this->type == 'select') {
             return in_array($value, array_keys($this->options));
-        } elseif ($this->type == 'weekdays') {
+        } elseif ($this->type == 'multiple') {
             if ($value === null) {
                 return true;
             }
@@ -83,8 +87,24 @@ class DynamicConfigItem implements \ArrayAccess
                 return false;
             }
 
+            $options = $this->options ?? [];
+
             foreach ($value as $v) {
-                if (! is_string($v) || ! array_key_exists($v, $this->options)) {
+                if (! is_string($v)) {
+                    return false;
+                }
+
+                if (is_array($options) && array_is_list($options)) {
+                    if (! in_array($v, $options, true)) {
+                        return false;
+                    }
+                } else {
+                    if (! array_key_exists($v, $options)) {
+                        return false;
+                    }
+                }
+
+                if ($v === '') {
                     return false;
                 }
             }
@@ -133,6 +153,22 @@ class DynamicConfigItem implements \ArrayAccess
         return false;
     }
 
+    /**
+     * Return the value to persist after validation passed.
+     * Ensures e.g. type "multiple" is always stored as an array (not the raw request string).
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    public function prepareValueForStorage($value)
+    {
+        if ($this->type == 'multiple') {
+            return $this->normalizeMultipleValue($value);
+        }
+
+        return $value;
+    }
+
     public function getGroup()
     {
         return $this->group;
@@ -150,13 +186,28 @@ class DynamicConfigItem implements \ArrayAccess
 
     public function getOptions()
     {
-        return array_reduce($this->options, function ($result, $option) {
-            $key = $this->optionTranslationKey($option);
-            $trans = __($key);
-            $result[$option] = ($trans === $key ? $option : $trans);
+        if (empty($this->options) || ! is_array($this->options)) {
+            return [];
+        }
 
-            return $result;
-        }, []);
+        if (array_is_list($this->options)) {
+            return array_reduce($this->options, function ($result, $option) {
+                $key = $this->optionTranslationKey($option);
+                $trans = __($key);
+                $result[$option] = ($trans === $key ? $option : $trans);
+
+                return $result;
+            }, []);
+        }
+
+        $result = [];
+        foreach ($this->options as $value => $label) {
+            $key = $this->optionTranslationKey($value);
+            $trans = __($key);
+            $result[$value] = ($trans === $key ? $label : $trans);
+        }
+
+        return $result;
     }
 
     public function isHidden()
@@ -238,6 +289,10 @@ class DynamicConfigItem implements \ArrayAccess
      */
     public function getValidationMessage($value)
     {
+        if ($this->validate && $this->type == 'multiple') {
+            $value = $this->normalizeMultipleValue($value);
+        }
+
         return $this->validate
             ? implode(" \n", $this->buildValidator($value)->messages()->all())
             : __('settings.validate.' . $this->type, ['id' => $this->name, 'value' => json_encode($value)]);
@@ -288,6 +343,27 @@ class DynamicConfigItem implements \ArrayAccess
     private function buildValidator($value)
     {
         return Validator::make(['value' => $value], $this->validate);
+    }
+
+    private function normalizeMultipleValue($value): mixed
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if (is_string($value)) {
+            return array_values(array_filter(array_map('trim', explode(',', $value)), fn ($v) => $v !== ''));
+        }
+
+        if (is_scalar($value)) {
+            return [$value];
+        }
+
+        return $value;
     }
 
     private function sanitizePath(string $path): string|false

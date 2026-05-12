@@ -1,7 +1,7 @@
 <!--
   - SettingMultiple.vue
   -
-  - Setting for multiple select option.  Value is expected to be a comma delimited string
+  - Multi-select option. Stores values as an array.
   -
   - This program is free software: you can redistribute it and/or modify
   - it under the terms of the GNU General Public License as published by
@@ -18,15 +18,12 @@
   -
   - @package    LibreNMS
   - @link       https://www.librenms.org
-  - @copyright  2020 Tony Murray
-  - @author     Tony Murray <murraytony@gmail.com>
   -->
 
 <template>
     <div>
         <multiselect
-        class="form-control"
-            @input="$emit('input', mutateInputEvent($event))"
+            class="form-control"
             :value="formattedValue"
             :required="required"
             :disabled="disabled"
@@ -34,43 +31,49 @@
             label="label"
             track-by="value"
             :options="formattedOptions"
-            :allow-empty="false"
             :multiple="true"
+            @input="$emit('input', mutateInputEvent($event))"
         >
         </multiselect>
     </div>
 </template>
 
 <script>
-    import BaseSetting from "./BaseSetting.vue";
+import BaseSetting from "./BaseSetting.vue";
 
-    export default {
-        name: "SettingMultiple",
-        mixins: [BaseSetting],
-        computed: {
-            formattedValue() {
-                if (this.value === undefined) {
-                    return []
-                }
-
-                let values = this.value.toString().split(',')
-                return this.formatOptions(_.pick(this.options, ...values))
-            },
-            formattedOptions() {
-                return this.formatOptions(this.options)
-            }
+export default {
+    name: "SettingMultiple",
+    mixins: [BaseSetting],
+    computed: {
+        formattedOptions() {
+            return this.formatOptions(this.options || {})
         },
-        methods: {
-            formatOptions(options) {
-                return Object.entries(options).map(([k, v]) => ({label: v, value: k}))
-            },
-            mutateInputEvent(options) {
-                return options.map(option => option.value).join(',');
-            }
+        formattedValue() {
+            const values = Array.isArray(this.value)
+                ? this.value
+                : (this.value ?? '').toString().split(',').map(v => v.trim()).filter(v => v.length > 0)
+
+            const allowed = new Set(Object.keys(this.options || {}))
+            const selected = values.filter(v => allowed.has(v))
+            return selected.map(v => ({label: (this.options || {})[v], value: v}))
+        }
+    },
+    methods: {
+        formatOptions(options) {
+            return Object.entries(options).map(([k, v]) => ({label: v, value: k}))
+        },
+        mutateInputEvent(selected) {
+            // Always save multiple selections as an array
+            const items = Array.isArray(selected) ? selected : (selected ? [selected] : [])
+
+            return items
+                .map(option => typeof option === 'string' ? option : option?.value)
+                .filter(v => typeof v === 'string' && v.length > 0)
         }
     }
+}
 </script>
 
 <style scoped>
-
 </style>
+

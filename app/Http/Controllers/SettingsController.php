@@ -55,6 +55,8 @@ class SettingsController
             return $this->jsonResponse($id, $config_item->getValidationMessage($value), $current, 400);
         }
 
+        $value = $config_item->prepareValueForStorage($value);
+
         if (\App\Facades\LibrenmsConfig::persist($id, $value)) {
             return $this->jsonResponse($id, "Successfully set $id", $value);
         }

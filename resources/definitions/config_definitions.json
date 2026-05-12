@@ -7301,7 +7301,7 @@
             "group": "system",
             "section": "updates",
             "order": 2,
-            "type": "weekdays",
+            "type": "multiple",
             "options": {
                 "monday": "Monday",
                 "tuesday": "Tuesday",
