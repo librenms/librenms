@@ -27,6 +27,7 @@
 namespace App\Models\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 trait Filterable
@@ -36,26 +37,26 @@ trait Filterable
      */
     protected static array $operatorMap = [
         // Standard Comparison
-        'eq' => ['method' => 'where', 'operator' => '='],
-        'neq' => ['method' => 'where', 'operator' => '!='],
-        'gt' => ['method' => 'where', 'operator' => '>'],
-        'gte' => ['method' => 'where', 'operator' => '>='],
-        'lt' => ['method' => 'where', 'operator' => '<'],
-        'lte' => ['method' => 'where', 'operator' => '<='],
+        'eq' => ['operator' => '='],
+        'neq' => ['operator' => '=', 'not' => true],
+        'gt' => ['operator' => '>'],
+        'gte' => ['operator' => '>='],
+        'lt' => ['operator' => '<'],
+        'lte' => ['operator' => '<='],
 
         // String Pattern Matching
-        'contains' => ['method' => 'where', 'operator' => 'like', 'wildcard' => '%?%'],
-        'not_contains' => ['method' => 'where', 'operator' => 'not like', 'wildcard' => '%?%'],
-        'starts_with' => ['method' => 'where', 'operator' => 'like', 'wildcard' => '?%'],
-        'ends_with' => ['method' => 'where', 'operator' => 'like', 'wildcard' => '%?'],
+        'contains' => ['operator' => 'like', 'wildcard' => '%?%'],
+        'not_contains' => ['operator' => 'like', 'wildcard' => '%?%', 'not' => true],
+        'starts_with' => ['operator' => 'like', 'wildcard' => '?%'],
+        'ends_with' => ['operator' => 'like', 'wildcard' => '%?'],
 
-        // Null / Existence Checks (Nullary)
-        'is_empty' => ['method' => 'whereNull'],
-        'is_not_empty' => ['method' => 'whereNotNull'],
+        // Null / Existence Checks
+        'is_empty' => ['null' => true],
+        'is_not_empty' => ['null' => true, 'not' => true],
 
         // Set Comparisons
-        'in' => ['method' => 'whereIn'],
-        'not_in' => ['method' => 'whereNotIn'],
+        'in' => ['set' => true],
+        'not_in' => ['set' => true, 'not' => true],
     ];
 
     /**
@@ -65,54 +66,36 @@ trait Filterable
     {
         foreach ($filters as $field => $operators) {
             if (! in_array($field, $this->filterable)) {
+                Log::debug("Field '$field' not filterable in " . $this::class);
+
                 continue;
             }
             if (! is_array($operators)) {
+                Log::debug("Invalid operators format " . $this::class);
+
                 continue;
             }
 
             foreach ($operators as $op => $value) {
                 if (! isset(static::$operatorMap[$op])) {
+                    Log::debug("Invalid filter operator '$op' in " . $this::class);
+
                     continue;
                 }
 
                 $config = static::$operatorMap[$op];
-                $method = $config['method'];
 
                 // Check for Custom Filter Method (e.g., filterState)
                 $customMethod = 'filter' . Str::studly(str_replace('.', '_', $field));
-
                 if (method_exists($this, $customMethod)) {
                     $this->$customMethod($query, $op, $value, $config);
                     continue;
                 }
 
-                // Relational Logic (dots)
                 if (str_contains((string) $field, '.')) {
-                    $parts = explode('.', (string) $field);
-                    $column = array_pop($parts);
-                    $relation = implode('.', $parts);
-
-                    $negated = in_array($op, ['neq', 'not_contains', 'not_in', 'is_not_empty']);
-                    $hasMethod = $negated ? 'whereDoesntHave' : 'whereHas';
-
-                    // Map negated operators to their positive equivalents for the inner clause
-                    $innerOp = match ($op) {
-                        'neq' => 'eq',
-                        'not_contains' => 'contains',
-                        'not_in' => 'in',
-                        'is_not_empty' => 'is_empty',
-                        default => $op,
-                    };
-                    $innerConfig = static::$operatorMap[$innerOp];
-                    $innerMethod = $innerConfig['method'];
-
-                    $query->{$hasMethod}($relation, function (Builder $q) use ($column, $innerOp, $value, $innerConfig, $innerMethod): void {
-                        $this->applyQueryLogic($q, $column, $innerOp, $value, $innerConfig, $innerMethod);
-                    });
+                    $this->applyRelationFilter($query, $field, $op, $value, $config);
                 } else {
-                    // Standard Local Logic
-                    $this->applyQueryLogic($query, $this->qualifyColumn($field), $op, $value, $config, $method);
+                    $this->applyQueryLogic($query, $this->qualifyColumn($field), $op, $value, $config);
                 }
             }
         }
@@ -126,22 +109,14 @@ trait Filterable
      */
     protected function applyFilterSearch(array $columns, Builder $query, string $op, mixed $value, array $config): void
     {
-        $isNegation = in_array($op, ['neq', 'not_contains', 'is_not_empty']);
+        $not = $config['not'] ?? false;
 
-        $query->where(function (Builder $q) use ($columns, $op, $value, $config, $isNegation) {
+        $query->where(function (Builder $q) use ($columns, $op, $value, $config, $not): void {
             foreach ($columns as $field) {
-                $boolean = $isNegation ? 'and' : 'or';
-
-                if (str_contains($field, '.')) {
-                    $parts = explode('.', $field);
-                    $column = array_pop($parts);
-                    $relation = implode('.', $parts);
-                    $hasMethod = $isNegation ? 'whereDoesntHave' : 'whereHas';
-
-                    $q->{$hasMethod}($relation, fn (Builder $r) => $this->applyQueryLogic($r, $column, $op, $value, $config, $config['method']), boolean: $boolean);
-                } else {
-                    $this->applyQueryLogic($q, $this->qualifyColumn($field), $op, $value, $config, $config['method'], $boolean);
-                }
+                $boolean = $not ? 'and' : 'or';
+                str_contains($field, '.')
+                    ? $this->applyRelationFilter($q, $field, $op, $value, $config, $boolean)
+                    : $this->applyQueryLogic($q, $this->qualifyColumn($field), $op, $value, $config, $boolean);
             }
         });
     }
@@ -163,22 +138,22 @@ trait Filterable
         ];
     }
 
-    protected function applyQueryLogic($query, $field, $op, $value, $config, $method): void
+    protected function applyQueryLogic(Builder $query, string $field, string $op, mixed $value, array $config, string $boolean = 'and'): void
     {
-        if (in_array($op, ['is_empty', 'is_not_empty'])) {
-            $query->where(function (Builder $q) use ($field, $op) {
-                $op === 'is_not_empty'
+        $not = $config['not'] ?? false;
+
+        if ($config['null'] ?? false) {
+            $query->where(function (Builder $q) use ($field, $not): void {
+                $not
                     ? $q->whereNotNull($field)->where($field, '!=', '')
                     : $q->whereNull($field)->orWhere($field, '=', '');
-            });
-
+            }, boolean: $boolean);
             return;
         }
 
-        if (in_array($op, ['in', 'not_in'])) {
+        if ($config['set'] ?? false) {
             $values = is_array($value) ? $value : explode(',', (string) $value);
-            $query->$method($field, $values);
-
+            $query->whereIn($field, $values, $boolean, $not);
             return;
         }
 
@@ -186,10 +161,17 @@ trait Filterable
             $value = str_replace('?', $value, $config['wildcard']);
         }
 
-        if (isset($config['operator'])) {
-            $query->$method($field, $config['operator'], $value);
-        } else {
-            $query->$method($field, $value);
-        }
+        $query->where($field, $config['operator'], $value, $boolean);
+    }
+
+    protected function applyRelationFilter(Builder $query, string $field, string $op, mixed $value, array $config, string $boolean = 'and'): void
+    {
+        $parts = explode('.', $field);
+        $column = array_pop($parts);
+        $relation = implode('.', $parts);
+
+        $not = in_array($op, ['is_not_empty', 'not_in']);
+
+        $query->whereHas($relation, fn (Builder $q) => $this->applyQueryLogic($q, $column, $op, $value, $config), $boolean, $not);
     }
 }
