@@ -15,13 +15,20 @@ class FilterableTest extends TestCase
     {
         parent::setUp();
 
-        Schema::connection('testing_memory')->create('filterable_locations', function ($table) {
+        Schema::connection('testing_memory')->create('filterable_regions', function ($table): void {
             $table->id();
+            $table->string('name')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::connection('testing_memory')->create('filterable_locations', function ($table): void {
+            $table->id();
+            $table->unsignedBigInteger('region_id')->nullable();
             $table->string('location')->nullable();
             $table->timestamps();
         });
 
-        Schema::connection('testing_memory')->create('filterable_devices', function ($table) {
+        Schema::connection('testing_memory')->create('filterable_devices', function ($table): void {
             $table->id();
             $table->unsignedBigInteger('location_id')->nullable();
             $table->string('hostname')->nullable();
@@ -31,15 +38,21 @@ class FilterableTest extends TestCase
         });
     }
 
-    private function device(array $attrs): FilterableDevice
+    private function device(array $deviceAttrs, ?string $location = null, ?string $region = null): FilterableDevice
     {
-        return FilterableDevice::create($attrs);
-    }
+        if ($location) {
+            $locationAttrs = ['location' => $location];
 
-    private function deviceWithLocation(array $deviceAttrs, string $location): FilterableDevice
-    {
-        $loc = FilterableLocation::create(['location' => $location]);
-        return $this->device(array_merge($deviceAttrs, ['location_id' => $loc->id]));
+            if ($region) {
+                $reg = FilterableRegion::create(['name' => $region]);
+                $locationAttrs['region_id'] = $reg->id;
+            }
+
+            $loc = FilterableLocation::create($locationAttrs);
+            $deviceAttrs['location_id'] = $loc->id;
+        }
+
+        return FilterableDevice::create($deviceAttrs);
     }
 
     // -------------------------------------------------------------------------
@@ -61,7 +74,7 @@ class FilterableTest extends TestCase
         $closure = collect($rules['filter.*'])->first(fn ($r) => $r instanceof \Closure);
 
         $failed = false;
-        $closure('filter.hostname', ['bogus_op' => 'value'], function () use (&$failed) {
+        $closure('filter.hostname', ['bogus_op' => 'value'], function () use (&$failed): void {
             $failed = true;
         });
 
@@ -74,7 +87,7 @@ class FilterableTest extends TestCase
         $closure = collect($rules['filter.*'])->first(fn ($r) => $r instanceof \Closure);
 
         $failed = false;
-        $closure('filter.hostname', ['eq' => 'router1'], function () use (&$failed) {
+        $closure('filter.hostname', ['eq' => 'router1'], function () use (&$failed): void {
             $failed = true;
         });
 
@@ -281,14 +294,41 @@ class FilterableTest extends TestCase
         $this->assertCount(2, $results);
     }
 
+    public function test_in_operator_with_empty_values(): void
+    {
+        $this->device(['hostname' => 'router1', 'os' => 'ios']);
+
+        $results = FilterableDevice::applyFilters(['os' => ['in' => []]])->get();
+        $this->assertCount(0, $results);
+
+        $results = FilterableDevice::applyFilters(['os' => ['in' => '']])->get();
+        $this->assertCount(0, $results);
+    }
+
+    public function test_multiple_fields_apply_and_logic(): void
+    {
+        $this->device(['hostname' => 'core-rt-01', 'os' => 'ios']);
+        $this->device(['hostname' => 'edge-rt-01', 'os' => 'ios']);
+        $this->device(['hostname' => 'core-rt-01', 'os' => 'junos']);
+
+        $results = FilterableDevice::applyFilters([
+            'hostname' => ['contains' => 'core'],
+            'os' => ['eq' => 'ios']
+        ])->get();
+
+        $this->assertCount(1, $results);
+        $this->assertEquals('core-rt-01', $results->first()->hostname);
+        $this->assertEquals('ios', $results->first()->os);
+    }
+
     // -------------------------------------------------------------------------
     // Relation filtering
     // -------------------------------------------------------------------------
 
     public function test_relation_eq(): void
     {
-        $this->deviceWithLocation(['hostname' => 'router1'], 'London');
-        $this->deviceWithLocation(['hostname' => 'router2'], 'Paris');
+        $this->device(['hostname' => 'router1'], 'London');
+        $this->device(['hostname' => 'router2'], 'Paris');
 
         $results = FilterableDevice::applyFilters(['location.location' => ['eq' => 'London']])->get();
 
@@ -298,8 +338,8 @@ class FilterableTest extends TestCase
 
     public function test_relation_contains(): void
     {
-        $this->deviceWithLocation(['hostname' => 'router1'], 'London DC');
-        $this->deviceWithLocation(['hostname' => 'router2'], 'Paris DC');
+        $this->device(['hostname' => 'router1'], 'London DC');
+        $this->device(['hostname' => 'router2'], 'Paris DC');
 
         $results = FilterableDevice::applyFilters(['location.location' => ['contains' => 'London']])->get();
 
@@ -309,13 +349,42 @@ class FilterableTest extends TestCase
 
     public function test_relation_neq(): void
     {
-        $this->deviceWithLocation(['hostname' => 'router1'], 'London');
-        $this->deviceWithLocation(['hostname' => 'router2'], 'Paris');
+        $this->device(['hostname' => 'router1'], 'London');
+        $this->device(['hostname' => 'router2'], 'Paris');
 
         $results = FilterableDevice::applyFilters(['location.location' => ['neq' => 'London']])->get();
 
         $this->assertCount(1, $results);
         $this->assertEquals('router2', $results->first()->hostname);
+    }
+
+    public function test_deeply_nested_relation_filtering(): void
+    {
+        $this->device(['hostname' => 'uk-router'], 'London', 'Europe');
+        $this->device(['hostname' => 'us-router']);
+
+        $results = FilterableDevice::applyFilters([
+            'location.region.name' => ['eq' => 'Europe']
+        ])->get();
+
+        $this->assertCount(1, $results);
+        $this->assertEquals('uk-router', $results->first()->hostname);
+    }
+
+    public function test_relation_neq_includes_records_with_no_relation(): void
+    {
+        $this->device(['hostname' => 'lon-gw'], 'London');
+        $this->device(['hostname' => 'par-gw'], 'Paris');
+        $this->device(['hostname' => 'orphan-gw', 'location_id' => null]);
+
+        $results = FilterableDevice::applyFilters([
+            'location.location' => ['neq' => 'London']
+        ])->get();
+
+        $this->assertCount(2, $results);
+        $hostnames = $results->pluck('hostname')->all();
+        $this->assertContains('par-gw', $hostnames);
+        $this->assertContains('orphan-gw', $hostnames);
     }
 
     // -------------------------------------------------------------------------
@@ -389,6 +458,19 @@ class FilterableLocation extends Model
     protected $table = 'filterable_locations';
     protected $guarded = [];
     public $timestamps = false;
+
+    public function region(): BelongsTo
+    {
+        return $this->belongsTo(FilterableRegion::class, 'region_id');
+    }
+}
+
+class FilterableRegion extends Model
+{
+    protected $connection = 'testing_memory';
+    protected $table = 'filterable_regions';
+    protected $guarded = [];
+    public $timestamps = false;
 }
 
 class FilterableDevice extends Model
@@ -400,15 +482,15 @@ class FilterableDevice extends Model
     protected $guarded = [];
     public $timestamps = false;
 
-    protected array $filterable = ['hostname', 'os', 'uptime', 'location.location', 'search'];
+    protected array $filterable = ['hostname', 'os', 'uptime', 'location.location', 'search', 'location.region.name'];
 
     public function location(): BelongsTo
     {
         return $this->belongsTo(FilterableLocation::class, 'location_id');
     }
 
-    public function filterSearch(Builder $query, string $op, mixed $value, array $config): void
+    public function filterSearch(Builder $query, mixed $value, array $config): void
     {
-        $this->applyFilterSearch(['hostname', 'os'], $query, $op, $value, $config);
+        $this->applyFilterSearch(['hostname', 'os'], $query, $value, $config);
     }
 }

@@ -1,29 +1,5 @@
 <?php
 
-/**
- * Filterable.php
- *
- * -Description-
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- * @link       https://www.librenms.org
- *
- * @copyright  2026 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
- */
-
 namespace App\Models\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
@@ -33,7 +9,7 @@ use Illuminate\Support\Str;
 trait Filterable
 {
     /**
-     * Comprehensive map of UI operators to Eloquent methods.
+     * @var array<array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}>
      */
     protected static array $operatorMap = [
         // Standard Comparison
@@ -61,6 +37,9 @@ trait Filterable
 
     /**
      * Apply filters from the request to the query.
+     * @param  Builder  $query
+     * @param  array<array{string, scalar|scalar[]}>  $filters
+     * @return Builder
      */
     public function scopeApplyFilters(Builder $query, array $filters): Builder
     {
@@ -88,14 +67,14 @@ trait Filterable
                 // Check for Custom Filter Method (e.g., filterState)
                 $customMethod = 'filter' . Str::studly(str_replace('.', '_', $field));
                 if (method_exists($this, $customMethod)) {
-                    $this->$customMethod($query, $op, $value, $config);
+                    $this->$customMethod($query, $value, $config);
                     continue;
                 }
 
                 if (str_contains((string) $field, '.')) {
-                    $this->applyRelationFilter($query, $field, $op, $value, $config);
+                    $this->applyRelationFilter($query, $field, $value, $config);
                 } else {
-                    $this->applyQueryLogic($query, $this->qualifyColumn($field), $op, $value, $config);
+                    $this->applyQueryLogic($query, $this->qualifyColumn($field), $value, $config);
                 }
             }
         }
@@ -104,41 +83,55 @@ trait Filterable
     }
 
     /**
-     * Helper for models to build multi-column search filters.
-     * Call this from a custom filterSearch() (or any filterX()) method on the model.
+     * @param  array  $columns
+     * @param  Builder  $query
+     * @param  scalar|scalar[]  $value
+     * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config
+     * @return void
      */
-    protected function applyFilterSearch(array $columns, Builder $query, string $op, mixed $value, array $config): void
+    protected function applyFilterSearch(array $columns, Builder $query, mixed $value, array $config): void
     {
         $not = $config['not'] ?? false;
 
-        $query->where(function (Builder $q) use ($columns, $op, $value, $config, $not): void {
+        $query->where(function (Builder $q) use ($columns, $value, $config, $not): void {
             foreach ($columns as $field) {
                 $boolean = $not ? 'and' : 'or';
+
                 str_contains($field, '.')
-                    ? $this->applyRelationFilter($q, $field, $op, $value, $config, $boolean)
-                    : $this->applyQueryLogic($q, $this->qualifyColumn($field), $op, $value, $config, $boolean);
+                    ? $this->applyRelationFilter($q, $field, $value, $config, $boolean)
+                    : $this->applyQueryLogic($q, $this->qualifyColumn($field), $value, $config, $boolean);
             }
         });
     }
 
-    public static function filterValidationRules(): array
+    /**
+     * Helper to build complex filters based on a value-to-logic mapping.
+     * @param  Builder  $query
+     * @param  scalar|scalar[]  $value
+     * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config
+     * @param  callable  $mapper  Accepts value and modifies the query
+     */
+    protected function applyMappedFilter(Builder $query, mixed $value, array $config, callable $mapper): void
     {
-        return [
-            'filter' => ['array'],
-            'filter.*' => [
-                'array',
-                function ($attribute, $value, $fail): void {
-                    $operator = array_key_first($value);
-                    if (! in_array($operator, array_keys(static::$operatorMap))) {
-                        $fail("The operator '$operator' is not supported.");
-                    }
-                },
-            ],
-            'filter.*.*' => ['nullable', 'max:255'],
-        ];
+        $values = is_array($value) ? $value : explode(',', (string) $value);
+        $not = $config['not'] ?? false;
+
+        $query->{$not ? 'whereNot' : 'where'}(function (Builder $group) use ($values, $mapper): void {
+            foreach ($values as $v) {
+                $group->orWhere(fn (Builder $q) => $mapper($q, $v));
+            }
+        });
     }
 
-    protected function applyQueryLogic(Builder $query, string $field, string $op, mixed $value, array $config, string $boolean = 'and'): void
+    /**
+     * @param  Builder  $query
+     * @param  string  $field
+     * @param  scalar|scalar[]  $value
+     * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config
+     * @param  'and'|'or'  $boolean
+     * @return void
+     */
+    protected function applyQueryLogic(Builder $query, string $field, mixed $value, array $config, string $boolean = 'and'): void
     {
         $not = $config['not'] ?? false;
 
@@ -161,17 +154,59 @@ trait Filterable
             $value = str_replace('?', $value, $config['wildcard']);
         }
 
-        $query->where($field, $config['operator'], $value, $boolean);
+        $not ? $query->whereNot($field, $config['operator'], $value, $boolean)
+            : $query->where($field, $config['operator'], $value, $boolean);
     }
 
-    protected function applyRelationFilter(Builder $query, string $field, string $op, mixed $value, array $config, string $boolean = 'and'): void
+    /**
+     * @param  Builder  $query
+     * @param  string  $field
+     * @param  scalar|scalar[]  $value
+     * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config
+     * @param  'and'|'or'  $boolean
+     * @return void
+     */
+    protected function applyRelationFilter(Builder $query, string $field, mixed $value, array $config, string $boolean = 'and'): void
     {
         $parts = explode('.', $field);
         $column = array_pop($parts);
         $relation = implode('.', $parts);
 
-        $not = in_array($op, ['is_not_empty', 'not_in']);
+        $not = $config['not'] ?? false;
 
-        $query->whereHas($relation, fn (Builder $q) => $this->applyQueryLogic($q, $column, $op, $value, $config), $boolean, $not);
+        // Callback to apply the logic inside the relationship scope
+        $callback = function (Builder $q) use ($column, $value, $config): void {
+            // When negating a relation (whereDoesntHave), we must use "positive" internal logic
+            $internalConfig = $config;
+            $internalConfig['not'] = false;
+            $this->applyQueryLogic($q, $column, $value, $internalConfig);
+        };
+
+        if ($not) {
+            $boolean === 'or'
+                ? $query->orWhereDoesntHave($relation, $callback)
+                : $query->whereDoesntHave($relation, $callback);
+        } else {
+            $boolean === 'or'
+                ? $query->orWhereHas($relation, $callback)
+                : $query->whereHas($relation, $callback);
+        }
+    }
+
+    public static function filterValidationRules(): array
+    {
+        return [
+            'filter' => ['array'],
+            'filter.*' => [
+                'array',
+                function ($attribute, $value, $fail): void {
+                    $operator = array_key_first($value);
+                    if (! isset(static::$operatorMap[$operator])) {
+                        $fail("The operator '$operator' is not supported.");
+                    }
+                },
+            ],
+            'filter.*.*' => ['nullable', 'max:255'],
+        ];
     }
 }
