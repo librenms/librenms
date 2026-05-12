@@ -48,7 +48,7 @@ class NetMapController extends Controller
         $data = [
             'page_refresh' => LibrenmsConfig::get('page_refresh', 300),
             'group_id' => $group_id,
-            'options' => json_decode(LibrenmsConfig::get('network_map_vis_options', '[]'), true) ?? [],
+            'options' => json_decode(LibrenmsConfig::get('network_map_vis_options', '[]'), true) ?: [],
             'group_name' => $group_name,
             'link_types' => LibrenmsConfig::get('network_map_items', ['xdp', 'mac']),
             'highlight_style' => [
