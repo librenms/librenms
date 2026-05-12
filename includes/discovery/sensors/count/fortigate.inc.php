@@ -16,7 +16,7 @@
  * @author     LibreNMS Contributors
  *
  * @copyright  2025 CTNET BV
- * @author     Rudy Broersma <r.broersma@ctnet.nl> 
+ * @author     Rudy Broersma <r.broersma@ctnet.nl>
  * @copyright  2026 Network Solutions Factory
  * @author     Sofia El Khalifi <sofia.elkhalifi@netsf.fr>
  */
