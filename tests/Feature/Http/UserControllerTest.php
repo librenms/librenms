@@ -250,7 +250,7 @@ class UserControllerTest extends TestCase
             'device_id' => $device->device_id,
         ]);
 
-        $addResponse->assertRedirect(route('users.permissions.edit', $targetUser));
+        $addResponse->assertRedirect(route('users.permissions.edit', [$targetUser, 'tab' => 'device']));
         $this->assertDatabaseHas('devices_perms', [
             'user_id' => $targetUser->user_id,
             'device_id' => $device->device_id,
@@ -260,7 +260,7 @@ class UserControllerTest extends TestCase
 
         $removeResponse = $this->actingAs($admin)->delete(route('users.permissions.device.detach', [$targetUser, $perm->device_id]));
 
-        $removeResponse->assertRedirect(route('users.permissions.edit', $targetUser));
+        $removeResponse->assertRedirect(route('users.permissions.edit', [$targetUser, 'tab' => 'device']));
         $this->assertDatabaseMissing('devices_perms', [
             'user_id' => $targetUser->user_id,
             'device_id' => $device->device_id,
