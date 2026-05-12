@@ -461,6 +461,18 @@ class FilterableTest extends TestCase
 
 /**
  * @property int $id
+ * @property string|null $region
+ */
+class FilterableRegion extends Model
+{
+    protected $connection = 'testing_memory';
+    protected $table = 'filterable_regions';
+    protected $guarded = [];
+    public $timestamps = false;
+}
+
+/**
+ * @property int $id
  * @property string|null $location
  * @property int|null $region_id
  */
@@ -471,22 +483,13 @@ class FilterableLocation extends Model
     protected $guarded = [];
     public $timestamps = false;
 
+    /**
+     * @return BelongsTo<FilterableRegion, $this>
+     */
     public function region(): BelongsTo
     {
         return $this->belongsTo(FilterableRegion::class, 'region_id');
     }
-}
-
-/**
- * @property int $id
- * @property string|null $region
- */
-class FilterableRegion extends Model
-{
-    protected $connection = 'testing_memory';
-    protected $table = 'filterable_regions';
-    protected $guarded = [];
-    public $timestamps = false;
 }
 
 /**
@@ -505,8 +508,12 @@ class FilterableDevice extends Model
     protected $guarded = [];
     public $timestamps = false;
 
+    /** @var list<string> */
     protected array $filterable = ['hostname', 'os', 'uptime', 'location.location', 'search', 'location.region.name'];
 
+    /**
+     * @return BelongsTo<FilterableLocation, $this>
+     */
     public function location(): BelongsTo
     {
         return $this->belongsTo(FilterableLocation::class, 'location_id');

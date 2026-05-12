@@ -197,6 +197,13 @@ trait Filterable
         }
     }
 
+    /**
+     * @return array{
+     * filter: list<string>,
+     * 'filter.*': array{0: string, 1: \Closure(string, mixed, \Closure(string): void): void},
+     * 'filter.*.*': list<string>
+     * }
+     */
     public static function filterValidationRules(): array
     {
         return [
