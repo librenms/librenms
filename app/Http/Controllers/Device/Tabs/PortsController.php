@@ -82,9 +82,7 @@ class PortsController implements DeviceTab
             'order' => 'in:asc,desc',
             'from' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
             'to' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
-            'filter' => ['nullable', 'array'],
-            'filter.*' => ['array'],
-            'filter.*.*' => ['nullable', 'max:255'],
+            ...Port::filterValidationRules(),
         ]);
 
         $this->loadSettings($request);
