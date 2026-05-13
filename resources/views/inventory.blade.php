@@ -4,28 +4,28 @@
 
 @section('content')
     <div class="container-fluid">
-        <x-panel body-class="tw:p-0!">
-            <x-slot name="heading">
-                <h3 class="panel-title">@lang('Inventory')</h3>
+        <x-panel>
+            <x-slot:heading class="tw:flex tw:justify-between">
+                <h3 class="panel-title">{{ __('Inventory') }}</h3>
                 @if($show_purge)
-                    <div class="tw:float-right">
                         <a href="{{ route('inventory.purge') }}"><i class="fa fa-trash"></i> @lang('inventory.purge')</a>
-                    </div>
                 @endif
             </x-slot>
 
+            <x-slot:slot class="tw:p-0!">
             <table id="inventory" class="table table-hover table-condensed table-striped"
                 data-url="{{ route('table.inventory') }}">
                 <thead>
                 <tr>
-                    <th data-column-id="device" data-order="asc">@lang('Device')</th>
-                    <th data-column-id="descr">@lang('Description')</th>
-                    <th data-column-id="name">@lang('inventory.name')</th>
-                    <th data-column-id="model">@lang('inventory.model')</th>
-                    <th data-column-id="serial">@lang('inventory.serial')</th>
+                    <th data-column-id="device" data-order="asc">{{ __('Device') }}</th>
+                    <th data-column-id="descr">{{ __('Description') }}</th>
+                    <th data-column-id="name">{{ __('inventory.name') }}</th>
+                    <th data-column-id="model">{{ __('inventory.model') }}</th>
+                    <th data-column-id="serial">{{ __('inventory.serial') }}</th>
                 </tr>
                 </thead>
             </table>
+            </x-slot:slot>
         </x-panel>
     </div>
 @endsection
@@ -40,21 +40,21 @@
                     "<form method=\"post\" action=\"\" class=\"tw:flex tw:flex-wrap tw:items-center\" role=\"form\" id=\"inventory_filter\">" +
                     "{!! addslashes(csrf_field()) !!}" +
                     "<div class=\"tw:flex tw:items-baseline tw:mr-3 tw:mt-2\">" +
-                    "<span class=\"tw:mr-1\">@lang('inventory.part')</span>" +
-                    "<input type=\"text\" name=\"descr\" id=\"descr\" value=\"{{ $filter['descr'] }}\" placeholder=\"@lang('Description')\" class=\"form-control\" />" +
+                    "<span class=\"tw:mr-1\">{{ __('inventory.part') }}</span>" +
+                    "<input type=\"text\" name=\"descr\" id=\"descr\" value=\"{{ $filter['descr'] }}\" placeholder=\"{{ __('Description') }}\" class=\"form-control\" />" +
                     "</div>" +
                     "<div class=\"tw:flex tw:items-baseline tw:mr-3 tw:mt-2\">" +
-                    "<span class=\"tw:mr-1\">@lang('inventory.model')</span>" +
+                    "<span class=\"tw:mr-1\">{{ __('inventory.model') }}</span>" +
                     "<select name=\"model\" id=\"model\" class=\"form-control\"></select>" +
                     "</div>" +
                     "<div class=\"tw:flex tw:items-baseline tw:mr-3 tw:mt-2\">" +
-                    "<input type=\"text\" name=\"serial\" id=\"serial\" value=\"{{ $filter['serial'] }}\" placeholder=\"@lang('inventory.serial')\" class=\"form-control\"/>" +
+                    "<input type=\"text\" name=\"serial\" id=\"serial\" value=\"{{ $filter['serial'] }}\" placeholder=\"{{ __('inventory.serial') }}\" class=\"form-control\"/>" +
                     "</div>" +
                     "<div class=\"tw:flex tw:items-baseline tw:mr-3 tw:mt-2\">" +
-                    "<span class=\"tw:mr-1\">@lang('Device')</span>" +
+                    "<span class=\"tw:mr-1\">{{ __('Device') }}</span>" +
                     "<select name=\"device\" id=\"device\" class=\"form-control tw:ml-2\"></select>" +
                     "</div>" +
-                    "<button type=\"submit\" class=\"btn btn-default tw:mr-2 tw:mt-2\">@lang('Search')</button>" +
+                    "<button type=\"submit\" class=\"btn btn-default tw:mr-2 tw:mt-2\">{{ __('Search') }}</button>" +
                     "</form>" +
                     "<div class=\"actionBar tw:ml-auto tw:relative tw:mt-2\"><div class=\"@{{css.actions}}\"></div></div>" +
                     "</div>"
@@ -68,8 +68,8 @@
 
         ?>
 
-        init_select2("#model", "inventory", @json($model_filter), @json($filter['model']), "@lang('inventory.all_parts')");
-        init_select2("#device", "device", {}, @json($device_selected) , "@lang('All Devices')");
+        init_select2("#model", "inventory", @json($model_filter), @json($filter['model']), "{{ __('inventory.all_parts') }}");
+        init_select2("#device", "device", {}, @json($device_selected) , "{{ __('device.all_devices') }}");
 </script>
 @endpush
 

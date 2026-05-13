@@ -1,4 +1,168 @@
 modules:
-  os:
-    hardware: TPDIN2-MIB::name.0
-    version: TPDIN2-MIB::version.0
+    os:
+        hardware: TPDIN2-MIB::name.0
+        version: TPDIN2-MIB::version.0
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: TPDIN2-MIB::monitor
+                    value: TPDIN2-MIB::temperature1
+                    num_oid: '.1.3.6.1.4.1.45621.2.2.13.{{ $index }}'
+                    descr: 'External Temp'
+                    index: 'temperature1'
+                    skip_values:
+                        -
+                            oid: TPDIN2-MIB::temperature1
+                            op: '='
+                            value: '.0'
+                -
+                    oid: TPDIN2-MIB::monitor
+                    value: TPDIN2-MIB::temperature2
+                    num_oid: '.1.3.6.1.4.1.45621.2.2.14.{{ $index }}'
+                    descr: 'Internal Temp'
+                    index: 'temperature2'
+                    skip_values:
+                        -
+                            oid: TPDIN2-MIB::temperature2
+                            op: '='
+                            value: '.0'
+        voltage:
+            data:
+                -
+                    oid: TPDIN2-MIB::monitor
+                    value: TPDIN2-MIB::voltage1
+                    num_oid: '.1.3.6.1.4.1.45621.2.2.5.{{ $index }}'
+                    descr: 'Voltage 1'
+                    index: 'voltage1'
+                    skip_values:
+                        -
+                            oid: TPDIN2-MIB::voltage1
+                            op: '='
+                            value: '.0'
+                -
+                    oid: TPDIN2-MIB::monitor
+                    value: TPDIN2-MIB::voltage2
+                    num_oid: '.1.3.6.1.4.1.45621.2.2.6.{{ $index }}'
+                    descr: 'Voltage 2'
+                    index: 'voltage2'
+                    skip_values:
+                        -
+                            oid: TPDIN2-MIB::voltage2
+                            op: '='
+                            value: '.0'
+                -
+                    oid: TPDIN2-MIB::monitor
+                    value: TPDIN2-MIB::voltage3
+                    num_oid: '.1.3.6.1.4.1.45621.2.2.7.{{ $index }}'
+                    descr: 'Voltage 3'
+                    index: 'voltage3'
+                    skip_values:
+                        -
+                            oid: TPDIN2-MIB::voltage3
+                            op: '='
+                            value: '.0'
+                -
+                    oid: TPDIN2-MIB::monitor
+                    value: TPDIN2-MIB::voltage4
+                    num_oid: '.1.3.6.1.4.1.45621.2.2.8.{{ $index }}'
+                    descr: 'Voltage 4'
+                    index: 'voltage4'
+                    skip_values:
+                        -
+                            oid: TPDIN2-MIB::voltage4
+                            op: '='
+                            value: '.0'
+        current:
+            data:
+                -
+                    oid: TPDIN2-MIB::monitor
+                    value: TPDIN2-MIB::current1
+                    num_oid: '.1.3.6.1.4.1.45621.2.2.9.{{ $index }}'
+                    descr: 'Current 1'
+                    index: 'current1'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: TPDIN2-MIB::current1
+                            op: '='
+                            value: '.0'
+                -
+                    oid: TPDIN2-MIB::monitor
+                    value: TPDIN2-MIB::current2
+                    num_oid: '.1.3.6.1.4.1.45621.2.2.10.{{ $index }}'
+                    descr: 'Current 2'
+                    index: 'current2'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: TPDIN2-MIB::current2
+                            op: '='
+                            value: '.0'
+                -
+                    oid: TPDIN2-MIB::monitor
+                    value: TPDIN2-MIB::current3
+                    num_oid: '.1.3.6.1.4.1.45621.2.2.11.{{ $index }}'
+                    descr: 'Current 3'
+                    index: 'current3'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: TPDIN2-MIB::current3
+                            op: '='
+                            value: '.0'
+                -
+                    oid: TPDIN2-MIB::monitor
+                    value: TPDIN2-MIB::current4
+                    num_oid: '.1.3.6.1.4.1.45621.2.2.12.{{ $index }}'
+                    descr: 'Current 4'
+                    index: 'current4'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: TPDIN2-MIB::current4
+                            op: '='
+                            value: '.0'
+
+        state:
+            data:
+                -
+                    oid: TPDIN2-MIB::monitor
+                    value: TPDIN2-MIB::relay1
+                    num_oid: '.1.3.6.1.4.1.45621.2.2.1.{{ $index }}'
+                    descr: 'Relay 1'
+                    index: 'monitor.1.{{ $index }}'
+                    state_name: monitor.1
+                    states:
+                        - { value: 1, descr: ON, generic: 0 }
+                        - { value: 0, descr: OFF, generic: 1 }
+                -
+                    oid: TPDIN2-MIB::monitor
+                    value: TPDIN2-MIB::relay2
+                    num_oid: '.1.3.6.1.4.1.45621.2.2.2.{{ $index }}'
+                    descr: 'Relay 2'
+                    index: 'monitor.2.{{ $index }}'
+                    state_name: monitor.2
+                    states:
+                        - { value: 1, descr: ON, generic: 0 }
+                        - { value: 0, descr: OFF, generic: 1 }
+                -
+                    oid: TPDIN2-MIB::monitor
+                    value: TPDIN2-MIB::relay3
+                    num_oid: '.1.3.6.1.4.1.45621.2.2.3.{{ $index }}'
+                    descr: 'Relay 3'
+                    index: 'monitor.3.{{ $index }}'
+                    state_name: monitor.3
+                    states:
+                        - { value: 1, descr: ON, generic: 0 }
+                        - { value: 0, descr: OFF, generic: 1 }
+                -
+                    oid: TPDIN2-MIB::monitor
+                    value: TPDIN2-MIB::relay4
+                    num_oid: '.1.3.6.1.4.1.45621.2.2.4.{{ $index }}'
+                    descr: 'Relay 4'
+                    index: 'monitor.4.{{ $index }}'
+                    state_name: monitor.4
+                    states:
+                        - { value: 1, descr: ON, generic: 0 }
+                        - { value: 0, descr: OFF, generic: 1 }

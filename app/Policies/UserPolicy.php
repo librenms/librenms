@@ -48,6 +48,14 @@ class UserPolicy
     }
 
     /**
+     * Determine whether the user can manage user permissions.
+     */
+    public function manage(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'manage');
+    }
+
+    /**
      * Determine whether the user can delete the user.
      */
     public function delete(User $user, ?User $target = null): bool

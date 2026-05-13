@@ -1,5 +1,18 @@
 // Alpine.js Popup Component
 export default function popup(url = '', options = {}) {
+    // Extract parameters from options
+    const params = options.params || {};
+    delete options.params;
+
+    // Append parameters to URL if any
+    if (Object.keys(params).length > 0) {
+        const urlObj = new URL(url, window.location.origin);
+        Object.entries(params).forEach(([key, value]) => {
+            urlObj.searchParams.append(key, value);
+        });
+        url = urlObj.toString();
+    }
+
     return {
         popupShow: false,
         showTimeout: null,

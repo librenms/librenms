@@ -1,3 +1,45 @@
+## 26.4.1
+*(2026-04-22)*
+
+A big thank you to the following 3 contributors this last month:
+
+  - [laf](https://github.com/laf) (5)
+  - [murrant](https://github.com/murrant) (4)
+  - [mpikzink](https://github.com/mpikzink) (3)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [laf](https://github.com/laf) (6)
+  - [murrant](https://github.com/murrant) (5)
+  - [Jellyfrog](https://github.com/Jellyfrog) (1)
+
+#### Breaking Change
+* Rename OS fujitsuiRMC to fujitsu-irmc ([#19501](https://github.com/librenms/librenms/pull/19501)) - [murrant](https://github.com/murrant)
+
+#### Device
+* Updated Ufi S9610 36d transceiver detection ([#19511](https://github.com/librenms/librenms/pull/19511)) - [laf](https://github.com/laf)
+
+#### Webui
+* Fix text colour in dark mode for port popover ([#19506](https://github.com/librenms/librenms/pull/19506)) - [laf](https://github.com/laf)
+
+#### Bug
+* Fix path to composer wrapper in ComposerHelper ([#19508](https://github.com/librenms/librenms/pull/19508)) - [laf](https://github.com/laf)
+* Failture counter limits need to be grater then 0 ([#19504](https://github.com/librenms/librenms/pull/19504)) - [mpikzink](https://github.com/mpikzink)
+
+#### Cleanup
+* Variant lowercase ([#19503](https://github.com/librenms/librenms/pull/19503)) - [murrant](https://github.com/murrant)
+* Fix YamlDiscoveryField null key deprecation ([#19502](https://github.com/librenms/librenms/pull/19502)) - [murrant](https://github.com/murrant)
+* Fix PHP deprecation message in port discovery ([#19498](https://github.com/librenms/librenms/pull/19498)) - [murrant](https://github.com/murrant)
+
+#### Documentation
+* Updated SSL Management Docs ([#19512](https://github.com/librenms/librenms/pull/19512)) - [laf](https://github.com/laf)
+
+#### Misc
+* Add Rittal hardware product number ([#19494](https://github.com/librenms/librenms/pull/19494)) - [mpikzink](https://github.com/mpikzink)
+* Update software version to 26.4.0 ([#19493](https://github.com/librenms/librenms/pull/19493)) - [laf](https://github.com/laf)
+* Cleanup convert_delay ([#19408](https://github.com/librenms/librenms/pull/19408)) - [mpikzink](https://github.com/mpikzink)
+
+
 ## 26.4.0
 *(2026-04-20)*
 
