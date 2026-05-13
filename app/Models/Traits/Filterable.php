@@ -1,118 +1,81 @@
 <?php
 
-/**
- * Filterable.php
- *
- * -Description-
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- * @link       https://www.librenms.org
- *
- * @copyright  2026 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
- */
-
 namespace App\Models\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 trait Filterable
 {
     /**
-     * Comprehensive map of UI operators to Eloquent methods.
+     * @var array<string, array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}>
      */
-    protected array $operatorMap = [
+    protected static array $operatorMap = [
         // Standard Comparison
-        'eq' => ['method' => 'where', 'operator' => '='],
-        'neq' => ['method' => 'where', 'operator' => '!='],
-        'gt' => ['method' => 'where', 'operator' => '>'],
-        'gte' => ['method' => 'where', 'operator' => '>='],
-        'lt' => ['method' => 'where', 'operator' => '<'],
-        'lte' => ['method' => 'where', 'operator' => '<='],
+        'eq' => ['operator' => '='],
+        'neq' => ['operator' => '=', 'not' => true],
+        'gt' => ['operator' => '>'],
+        'gte' => ['operator' => '>='],
+        'lt' => ['operator' => '<'],
+        'lte' => ['operator' => '<='],
 
         // String Pattern Matching
-        'contains' => ['method' => 'where', 'operator' => 'like', 'wildcard' => '%?%'],
-        'not_contains' => ['method' => 'where', 'operator' => 'not like', 'wildcard' => '%?%'],
-        'starts_with' => ['method' => 'where', 'operator' => 'like', 'wildcard' => '?%'],
-        'ends_with' => ['method' => 'where', 'operator' => 'like', 'wildcard' => '%?'],
+        'contains' => ['operator' => 'like', 'wildcard' => '%?%'],
+        'not_contains' => ['operator' => 'like', 'wildcard' => '%?%', 'not' => true],
+        'starts_with' => ['operator' => 'like', 'wildcard' => '?%'],
+        'ends_with' => ['operator' => 'like', 'wildcard' => '%?'],
 
-        // Null / Existence Checks (Nullary)
-        'is_empty' => ['method' => 'whereNull'],
-        'is_not_empty' => ['method' => 'whereNotNull'],
+        // Null / Existence Checks
+        'is_empty' => ['null' => true],
+        'is_not_empty' => ['null' => true, 'not' => true],
 
         // Set Comparisons
-        'in' => ['method' => 'whereIn'],
-        'not_in' => ['method' => 'whereNotIn'],
+        'in' => ['set' => true],
+        'not_in' => ['set' => true, 'not' => true],
     ];
 
     /**
      * Apply filters from the request to the query.
+     *
+     * @param  Builder<static>  $query
+     * @param  array<string, array<string, mixed>>  $filters
+     * @return Builder<static>
      */
     public function scopeApplyFilters(Builder $query, array $filters): Builder
     {
         foreach ($filters as $field => $operators) {
             if (! in_array($field, $this->filterable)) {
+                Log::debug("Field '$field' not filterable in " . $this::class);
+
                 continue;
             }
             if (! is_array($operators)) {
+                Log::debug('Invalid operators format ' . $this::class);
+
                 continue;
             }
 
             foreach ($operators as $op => $value) {
-                if (! isset($this->operatorMap[$op])) {
+                if (! isset(static::$operatorMap[$op])) {
+                    Log::debug("Invalid filter operator '$op' in " . $this::class);
+
                     continue;
                 }
 
-                $config = $this->operatorMap[$op];
-                $method = $config['method'];
+                $config = static::$operatorMap[$op];
 
                 // Check for Custom Filter Method (e.g., filterState)
                 $customMethod = 'filter' . Str::studly(str_replace('.', '_', $field));
-
                 if (method_exists($this, $customMethod)) {
-                    $this->$customMethod($query, $op, $value, $config);
+                    $this->$customMethod($query, $value, $config);
                     continue;
                 }
 
-                // Relational Logic (dots)
                 if (str_contains((string) $field, '.')) {
-                    $parts = explode('.', (string) $field);
-                    $column = array_pop($parts);
-                    $relation = implode('.', $parts);
-
-                    $negated = in_array($op, ['neq', 'not_contains', 'not_in', 'is_not_empty']);
-                    $hasMethod = $negated ? 'whereDoesntHave' : 'whereHas';
-
-                    // Map negated operators to their positive equivalents for the inner clause
-                    $innerOp = match ($op) {
-                        'neq' => 'eq',
-                        'not_contains' => 'contains',
-                        'not_in' => 'in',
-                        'is_not_empty' => 'is_empty',
-                        default => $op,
-                    };
-                    $innerConfig = $this->operatorMap[$innerOp];
-                    $innerMethod = $innerConfig['method'];
-
-                    $query->{$hasMethod}($relation, function (Builder $q) use ($column, $innerOp, $value, $innerConfig, $innerMethod): void {
-                        $this->applyQueryLogic($q, $column, $innerOp, $value, $innerConfig, $innerMethod);
-                    });
+                    $this->applyRelationFilter($query, $field, $value, $config);
                 } else {
-                    // Standard Local Logic
-                    $this->applyQueryLogic($query, $this->qualifyColumn($field), $op, $value, $config, $method);
+                    $this->applyQueryLogic($query, $this->qualifyColumn($field), $value, $config);
                 }
             }
         }
@@ -120,17 +83,73 @@ trait Filterable
         return $query;
     }
 
-    protected function applyQueryLogic($query, $field, $op, $value, $config, $method): void
+    /**
+     * @param  array  $columns
+     * @param  Builder<static>  $query
+     * @param  scalar|scalar[]  $value
+     * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config
+     * @return void
+     */
+    protected function applyFilterSearch(array $columns, Builder $query, mixed $value, array $config): void
     {
-        if (in_array($op, ['is_empty', 'is_not_empty'])) {
-            $query->$method($field);
+        $not = $config['not'] ?? false;
+
+        $query->where(function (Builder $q) use ($columns, $value, $config, $not): void {
+            foreach ($columns as $field) {
+                $boolean = $not ? 'and' : 'or';
+
+                str_contains($field, '.')
+                    ? $this->applyRelationFilter($q, $field, $value, $config, $boolean)
+                    : $this->applyQueryLogic($q, $this->qualifyColumn($field), $value, $config, $boolean);
+            }
+        });
+    }
+
+    /**
+     * Helper to build complex filters based on a value-to-logic mapping.
+     *
+     * @param  Builder<static>  $query
+     * @param  scalar|scalar[]  $value
+     * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config
+     * @param  callable  $mapper  Accepts value and modifies the query
+     */
+    protected function applyMappedFilter(Builder $query, mixed $value, array $config, callable $mapper): void
+    {
+        $values = is_array($value) ? $value : explode(',', (string) $value);
+        $not = $config['not'] ?? false;
+
+        $query->{$not ? 'whereNot' : 'where'}(function (Builder $group) use ($values, $mapper): void {
+            foreach ($values as $v) {
+                $group->orWhere(fn (Builder $q) => $mapper($q, $v));
+            }
+        });
+    }
+
+    /**
+     * @param  Builder<static>  $query
+     * @param  string  $field
+     * @param  scalar|scalar[]  $value
+     * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config
+     * @param  'and'|'or'  $boolean
+     * @return void
+     */
+    protected function applyQueryLogic(Builder $query, string $field, mixed $value, array $config, string $boolean = 'and'): void
+    {
+        $not = $config['not'] ?? false;
+
+        if ($config['null'] ?? false) {
+            $query->where(function (Builder $q) use ($field, $not): void {
+                $not
+                    ? $q->whereNotNull($field)->where($field, '!=', '')
+                    : $q->whereNull($field)->orWhere($field, '=', '');
+            }, boolean: $boolean);
 
             return;
         }
 
-        if (in_array($op, ['in', 'not_in'])) {
+        if ($config['set'] ?? false) {
             $values = is_array($value) ? $value : explode(',', (string) $value);
-            $query->$method($field, $values);
+            $query->whereIn($field, $values, $boolean, $not);
 
             return;
         }
@@ -139,10 +158,66 @@ trait Filterable
             $value = str_replace('?', $value, $config['wildcard']);
         }
 
-        if (isset($config['operator'])) {
-            $query->$method($field, $config['operator'], $value);
+        $not ? $query->whereNot($field, $config['operator'], $value, $boolean)
+            : $query->where($field, $config['operator'], $value, $boolean);
+    }
+
+    /**
+     * @param  Builder<static>  $query
+     * @param  string  $field
+     * @param  scalar|scalar[]  $value
+     * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config
+     * @param  'and'|'or'  $boolean
+     * @return void
+     */
+    protected function applyRelationFilter(Builder $query, string $field, mixed $value, array $config, string $boolean = 'and'): void
+    {
+        $parts = explode('.', $field);
+        $column = array_pop($parts);
+        $relation = implode('.', $parts);
+
+        $not = $config['not'] ?? false;
+
+        // Callback to apply the logic inside the relationship scope
+        $callback = function (Builder $q) use ($column, $value, $config): void {
+            // When negating a relation (whereDoesntHave), we must use "positive" internal logic
+            $internalConfig = $config;
+            $internalConfig['not'] = false;
+            $this->applyQueryLogic($q, $column, $value, $internalConfig);
+        };
+
+        if ($not) {
+            $boolean === 'or'
+                ? $query->orWhereDoesntHave($relation, $callback)
+                : $query->whereDoesntHave($relation, $callback);
         } else {
-            $query->$method($field, $value);
+            $boolean === 'or'
+                ? $query->orWhereHas($relation, $callback)
+                : $query->whereHas($relation, $callback);
         }
+    }
+
+    /**
+     * @return array{
+     * filter: list<string>,
+     * 'filter.*': array{0: string, 1: \Closure(string, mixed, \Closure(string): void): void},
+     * 'filter.*.*': list<string>
+     * }
+     */
+    public static function filterValidationRules(): array
+    {
+        return [
+            'filter' => ['array'],
+            'filter.*' => [
+                'array',
+                function ($attribute, $value, $fail): void {
+                    $operator = array_key_first($value);
+                    if (! isset(static::$operatorMap[$operator])) {
+                        $fail("The operator '$operator' is not supported.");
+                    }
+                },
+            ],
+            'filter.*.*' => ['nullable', 'max:255'],
+        ];
     }
 }
