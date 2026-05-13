@@ -21,7 +21,7 @@ class GraphRow extends Component
      * @param  int|string  $columns  Either a number or 'responsive' aka auto columns
      * @param  array  $graphs
      * @param  Device|int|null  $device
-     * @param  Port|int|array<int>|null  $port
+     * @param  Port|int|null  $port
      */
     public function __construct(
         public string $type = '',
