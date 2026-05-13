@@ -3,12 +3,14 @@ export default function filterBarComponent({
     fields,
     reload = false,
     initial = [],
+    hide = false,
 }) {
     return {
         name,
         fields,
         reload,
         initial,
+        hide,
 
         // --- Static Configuration ---
         OPS: {
