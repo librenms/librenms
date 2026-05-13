@@ -55,7 +55,7 @@ class Graph extends Component
      * @param  int|null  $height
      * @param  int  $absolute_size
      * @param  Device|int|null  $device
-     * @param  Port|int|array<int>|null  $port
+     * @param  Port|int|null  $port
      * @param  bool  $link
      * @param  string  $popupTitle
      */
@@ -92,8 +92,6 @@ class Graph extends Component
             $this->vars['id'] = $port->port_id;
         } elseif (is_numeric($port)) {
             $this->vars['id'] = $port;
-        } elseif (is_array($port)) {
-            $this->vars['id'] = implode(',', $port);
         }
     }
 

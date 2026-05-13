@@ -126,7 +126,7 @@ class PortGroupController extends Controller
 
         return view('port-group.graph', [
             'group' => $group,
-            'ports' => Port::hasAccess($request->user())->inPortGroup($group)->with('device')->withCount('macAccounting')->get(),
+            'ports' => Port::hasAccess($request->user())->inPortGroup($group->id)->with('device')->withCount('macAccounting')->get(),
         ]);
     }
 }
