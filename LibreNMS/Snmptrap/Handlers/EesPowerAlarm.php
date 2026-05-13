@@ -13,9 +13,9 @@ class EesPowerAlarm implements SnmptrapHandler
     {
         $trapOid = $trap->getTrapOid();
 
-	// Emerson sends alarmTrap plus alarmActiveTrap/alarmCeaseTrap.
+        // Emerson sends alarmTrap plus alarmActiveTrap/alarmCeaseTrap.
         // alarmTrap has the full data, so suppress the secondary trap.
-	if (
+        if (
             str_contains($trapOid, 'alarmActiveTrap') ||
             str_contains($trapOid, 'alarmCeaseTrap') ||
             str_contains($trapOid, '6302.2.1.5.2') ||
@@ -44,26 +44,19 @@ class EesPowerAlarm implements SnmptrapHandler
             $alarmTime
         );
 
-	$trap->log($message, $eventSeverity);
+        $trap->log($message, $eventSeverity);
     }
 
     private function getTrapValue(Trap $trap, string $oidName): ?string
     {
         $oid = $trap->findOid($oidName);
 
-        if (!$oid) {
+        if (! $oid) {
             return null;
         }
 
-        $value = $trap->getOidData($oid);
-
-        if ($value === null) {
-            return null;
-        }
-
-        return trim((string) $value, "\" \t\n\r\0\x0B");
+        return trim($trap->getOidData($oid), "\" \t\n\r\0\x0B");
     }
-
     private function statusText(string $trapOid, ?string $statusChange): string
     {
         if (str_contains($trapOid, 'alarmActiveTrap') || str_contains($trapOid, '6302.2.1.5.2')) {
@@ -116,7 +109,7 @@ class EesPowerAlarm implements SnmptrapHandler
             4 => Severity::Warning,
             3 => Severity::Warning,
             2 => Severity::Ok,
-	    default => Severity::Info,
+            default => Severity::Info,
         };
     }
 
