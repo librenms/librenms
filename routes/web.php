@@ -50,6 +50,7 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SslCertificateController;
 use App\Http\Controllers\Table;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserPermissionsController;
 use App\Http\Controllers\UserPreferencesController;
 use App\Http\Controllers\ValidateController;
 use App\Http\Controllers\Widgets;
@@ -122,6 +123,17 @@ Route::middleware(['auth'])->group(function (): void {
         Route::delete('api-access/{id}', [ApiAccessController::class, 'destroy'])->name('api-access.destroy')->whereNumber('id');
     });
     Route::resource('users', UserController::class);
+    Route::prefix('users/{user}/permissions')->name('users.permissions.')->group(function (): void {
+        Route::get('', [UserPermissionsController::class, 'edit'])->name('edit');
+        Route::post('device', [UserPermissionsController::class, 'attachDevice'])->name('device.attach');
+        Route::delete('device/{device}', [UserPermissionsController::class, 'detachDevice'])->name('device.detach')->whereNumber('device');
+        Route::post('device-group', [UserPermissionsController::class, 'attachDeviceGroup'])->name('device-group.attach');
+        Route::delete('device-group/{deviceGroup}', [UserPermissionsController::class, 'detachDeviceGroup'])->name('device-group.detach')->whereNumber('deviceGroup');
+        Route::post('port', [UserPermissionsController::class, 'attachPort'])->name('port.attach');
+        Route::delete('port/{port}', [UserPermissionsController::class, 'detachPort'])->name('port.detach')->whereNumber('port');
+        Route::post('bill', [UserPermissionsController::class, 'attachBill'])->name('bill.attach');
+        Route::delete('bill/{bill}', [UserPermissionsController::class, 'detachBill'])->name('bill.detach')->whereNumber('bill');
+    });
     Route::get('about', [AboutController::class, 'index'])->name('about');
     Route::delete('reporting', [AboutController::class, 'clearReportingData'])->name('reporting.clear');
     Route::get('authlog', [UserController::class, 'authlog']);

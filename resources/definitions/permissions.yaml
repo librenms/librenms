@@ -178,6 +178,7 @@ groups:
         - user.create
         - user.update
         - user.delete
+        - user.manage
 
     vlan:
         - vlan.viewAll

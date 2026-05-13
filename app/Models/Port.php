@@ -50,6 +50,7 @@ class Port extends DeviceRelatedModel
         'search',
         'groups.id',
         'device.groups.id',
+        'device.location_id',
         'device.hostname',
     ];
 
@@ -349,60 +350,27 @@ class Port extends DeviceRelatedModel
      * down: Admin Up + Oper NOT Up
      * shutdown: Admin NOT Up
      */
-    public function filterState(Builder $query, string $op, mixed $value): void
+    public function filterState(Builder $query, mixed $value, array $config): void
     {
-        if ($op === 'in' || $op === 'not_in') {
-            $values = (array) $value;
-            $query->{$op === 'not_in' ? 'whereNot' : 'where'}(function ($q) use ($values): void {
-                $q->where(function ($inner) use ($values): void {
-                    foreach ($values as $i => $v) {
-                        $method = $i === 0 ? 'where' : 'orWhere';
-                        $inner->{$method}(function ($cond) use ($v) {
-                            if ($v === 'shutdown') {
-                                return $cond->where('ifAdminStatus', '!=', 'up');
-                            }
-                            $cond->where('ifAdminStatus', 'up')
-                                ->where('ifOperStatus', $v === 'up' ? '=' : '!=', 'up');
-                        });
-                    }
-                });
-            });
-
-            return;
-        }
-
-        $query->{$op === 'neq' ? 'whereNot' : 'where'}(function ($q) use ($value) {
-            if ($value === 'shutdown') {
-                return $q->where('ifAdminStatus', '!=', 'up');
-            }
-            $q->where('ifAdminStatus', 'up')
-                ->where('ifOperStatus', $value === 'up' ? '=' : '!=', 'up');
+        $this->applyMappedFilter($query, $value, $config, fn (Builder $q, $state) => match ($state) {
+            'shutdown' => $q->where('ifAdminStatus', '!=', 'up'),
+            'up' => $q->where('ifAdminStatus', 'up')->where('ifOperStatus', 'up'),
+            default => $q->where('ifAdminStatus', 'up')->where('ifOperStatus', '!=', 'up'),
         });
     }
 
     /**
      * Handle a global text search across multiple port fields
      */
-    public function filterSearch(Builder $query, string $op, mixed $value, array $config): void
+    public function filterSearch(Builder $query, mixed $value, array $config): void
     {
-        // Apply the wildcard if the operator is 'contains'
-        if (isset($config['wildcard'])) {
-            $value = str_replace('?', $value, $config['wildcard']);
-        }
-
-        $operator = $config['operator'] ?? '=';
-
-        $query->where(function ($q) use ($value, $operator): void {
-            $q->where('ports.ifName', $operator, $value)
-                ->orWhere('ifAlias', $operator, $value)
-                ->orWhere('ifDescr', $operator, $value);
-        });
+        $this->applyFilterSearch(['ifName', 'ifAlias', 'ifDescr'], $query, $value, $config);
     }
 
     /**
      * Custom filter for ifDuplex to handle "unknown" as both 'unknown' and NULL.
      */
-    public function filterIfDuplex(Builder $query, string $op, mixed $value, array $config): void
+    public function filterIfDuplex(Builder $query, mixed $value, array $config): void
     {
         if ($value === 'unknown') {
             $query->where(function ($q): void {
@@ -413,8 +381,7 @@ class Port extends DeviceRelatedModel
             return;
         }
 
-        $method = $config['method'];
-        $this->applyQueryLogic($query, 'ports.ifDuplex', $op, $value, $config, $method);
+        $this->applyQueryLogic($query, 'ports.ifDuplex', $value, $config);
     }
 
     // ---- Define Relationships ----

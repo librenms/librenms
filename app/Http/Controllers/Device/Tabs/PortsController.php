@@ -46,6 +46,7 @@ class PortsController implements DeviceTab
 {
     private bool $detail = true;
     private array $settings = [];
+    private array $savedFilter = [];
     private array $defaults = [
         'perPage' => 32,
         'sort' => 'ifIndex',
@@ -81,12 +82,11 @@ class PortsController implements DeviceTab
             'order' => 'in:asc,desc',
             'from' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
             'to' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
-            'filter' => ['nullable', 'array'],
-            'filter.*' => ['array'],
-            'filter.*.*' => ['nullable', 'max:255'],
+            ...Port::filterValidationRules(),
         ]);
 
         $this->loadSettings($request);
+        $this->savedFilter = UserPref::getPref($request->user(), 'filters.device.ports') ?: [];
         $tab = $this->parseTab($request);
         $this->detail = $tab == 'detail';
         $data = match ($tab) {
@@ -107,7 +107,7 @@ class PortsController implements DeviceTab
                 __('Graphs') => $this->getGraphLinks(),
             ],
             'dropdownLinks' => [],
-            'filter' => UserPref::getPref($request->user(), 'filters.device.ports') ?: [],
+            'filter' => $this->savedFilter,
             'perPage' => $this->settings['perPage'],
             'sort' => $this->settings['sort'],
             'next_order' => $this->settings['order'] == 'asc' ? 'desc' : 'asc',
@@ -410,7 +410,7 @@ class PortsController implements DeviceTab
         return Port::where('device_id', $device->device_id)
             ->isNotDeleted()
             ->hasAccess(Auth::user())->with($relationships)
-            ->when($request->array('filter'), fn (Builder $q, $filters) => $q->applyFilters($filters))
+            ->when(array_merge($this->savedFilter, $request->array('filter')), fn (Builder $q, $filters) => $q->applyFilters($filters))
             ->when($this->settings['sort'] == 'port', fn (Builder $q, $sort) => $q
                 ->orderByRaw('SOUNDEX(ifName) ' . $this->settings['order'])
                 ->orderByRaw('CHAR_LENGTH(ifName) ' . $this->settings['order'])
