@@ -16,7 +16,7 @@ use App\Http\Controllers\Device;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\DeviceGroupController;
 use App\Http\Controllers\GraphController;
-use App\Http\Controllers\IftypeController;
+use App\Http\Controllers\PortTypeController;
 use App\Http\Controllers\Install;
 use App\Http\Controllers\LegacyController;
 use App\Http\Controllers\LocationController;
@@ -97,7 +97,8 @@ Route::middleware(['auth'])->group(function (): void {
     Route::resource('port', PortController::class)->only('update');
     Route::get('port/{port}/popup', App\Http\Controllers\PortPopupController::class)->name('port.popup');
     Route::get('vlans', [App\Http\Controllers\VlansController::class, 'index'])->name('vlans.index');
-    Route::get('iftype/{vars}', [IftypeController::class, 'index'])->name('iftype.index')->where('vars', '.*');
+    Route::get('porttype/{type}', [PortTypeController::class, 'graph'])->name('porttype.graph');
+    Route::get('portgroup/{group}', [PortGroupController::class, 'graph'])->name('portgroup.graph')->whereNumber('group');
     Route::prefix('poller')->group(function (): void {
         Route::get('', [PollerController::class, 'pollerTab'])->name('poller.index');
         Route::get('log', [PollerController::class, 'logTab'])->name('poller.log');

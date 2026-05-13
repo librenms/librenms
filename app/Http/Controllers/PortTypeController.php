@@ -1,7 +1,7 @@
 <?php
 
 /*
- * IftypeController.php
+ * PortTypeController.php
  *
  * -Description-
  *
@@ -31,32 +31,13 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class IftypeController extends Controller
+class PortTypeController extends Controller
 {
-    public function index(Request $request, string $vars): View
+    public function graph(Request $request, string $types): View
     {
-        $vars = array_reduce(
-            explode('/', $vars),
-            function ($output, $var) {
-                [$key, $val] = explode('=', $var, 2);
-                $output[$key] = $val;
+        $types = explode(',', (string) $types);
+        $ports = Port::hasAccess($request->user())->whereIn('port_descr_type', $types)->with('device')->withCount('macAccounting')->get();
 
-                return $output;
-            },
-            []
-        );
-
-        if (isset($vars['type'])) {
-            $types = explode(',', (string) $vars['type']);
-            $ports = Port::whereIn('port_descr_type', $types);
-        } elseif (isset($vars['group'])) {
-            $types = ['Group ' . $vars['group']];
-            $ports = Port::inPortGroup($vars['group']);
-        } else {
-            return view('iftype', ['types' => [], 'ports' => [], 'allPortIds' => []]);
-        }
-        $ports = $ports->hasAccess(Auth::user())->with('device')->withCount('macAccounting')->get();
-
-        return view('iftype', ['types' => $types, 'ports' => $ports]);
+        return view('porttype', ['types' => $types, 'ports' => $ports]);
     }
 }

@@ -349,32 +349,32 @@
                                 </li>
                                 @endconfig
                                 @config('int_l2tp')
-                                <li><a href="{{ url('iftype/type=l2tp') }}"><i class="fa fa-link fa-fw fa-lg"
+                                <li><a href="{{ url('porttype/l2tp') }}"><i class="fa fa-link fa-fw fa-lg"
                                                                                aria-hidden="true"></i> {{ __('L2TP') }}</a>
                                 </li>
                                 @endconfig
                                 @config('int_transit')
-                                <li><a href="{{ url('iftype/type=transit') }}"><i class="fa fa-truck fa-fw fa-lg"
+                                <li><a href="{{ url('porttype/transit') }}"><i class="fa fa-truck fa-fw fa-lg"
                                                                                   aria-hidden="true"></i> {{ __('Transit') }}
                                     </a></li>
                                 @endconfig
                                 @config('int_peering')
-                                <li><a href="{{ url('iftype/type=peering') }}"><i class="fa fa-handshake-o fa-fw fa-lg"
+                                <li><a href="{{ url('porttype/peering') }}"><i class="fa fa-handshake-o fa-fw fa-lg"
                                                                                   aria-hidden="true"></i> {{ __('Peering') }}
                                     </a></li>
                                 @endconfig
                                 @if(\App\Facades\LibrenmsConfig::get('int_peering') && \App\Facades\LibrenmsConfig::get('int_transit'))
-                                    <li><a href="{{ url('iftype/type=peering,transit') }}"><i
+                                    <li><a href="{{ url('porttype/peering,transit') }}"><i
                                                 class="fa fa-rocket fa-fw fa-lg"
                                                 aria-hidden="true"></i> {{ __('Peering + Transit') }}</a></li>
                                 @endif
                                 @config('int_core')
-                                <li><a href="{{ url('iftype/type=core') }}"><i class="fa fa-code-fork fa-fw fa-lg"
+                                <li><a href="{{ url('porttype/core') }}"><i class="fa fa-code-fork fa-fw fa-lg"
                                                                                aria-hidden="true"></i> {{ __('Core') }}</a>
                                 </li>
                                 @endconfig
                                 @foreach($custom_port_descr as $custom_descr)
-                                    <li><a href="{{ url('iftype/type=' . urlencode($custom_descr['name'])) }}"><i class="fa {{$custom_descr['icon']}} fa-fw fa-lg" aria-hidden="true"></i> {{ ucwords($custom_descr['name']) }}</a></li>
+                                    <li><a href="{{ url('porttype/' . urlencode($custom_descr['name'])) }}"><i class="fa {{$custom_descr['icon']}} fa-fw fa-lg" aria-hidden="true"></i> {{ ucwords($custom_descr['name']) }}</a></li>
                                 @endforeach
                             @endif
 
