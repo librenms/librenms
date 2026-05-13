@@ -57,6 +57,7 @@ class EesPowerAlarm implements SnmptrapHandler
 
         return trim($trap->getOidData($oid), "\" \t\n\r\0\x0B");
     }
+
     private function statusText(string $trapOid, ?string $statusChange): string
     {
         if (str_contains($trapOid, 'alarmActiveTrap') || str_contains($trapOid, '6302.2.1.5.2')) {
