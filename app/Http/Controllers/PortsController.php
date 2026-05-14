@@ -73,7 +73,7 @@ class PortsController extends Controller
             'show_detail' => $view === 'detail' ? 'true' : 'false',
             'show_errors' => $view === 'detail' || $request->boolean('filter.errors.eq') ? 'true' : 'false',
             'ports' => $this->getPorts($view, $perPage, $sort),
-            'group' => $request->array('filter')['group.id']['eq'] ?? 0,
+            'group' => $request->array('filter')['groups.id']['eq'] ?? 0,
             'perPage' => $perPage,
             'paginationOptions' => [12, 24, 48, 128, 568, 4096],
             'nav' => [
