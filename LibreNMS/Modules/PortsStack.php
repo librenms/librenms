@@ -115,9 +115,6 @@ class PortsStack implements Module
         }
 
         ModuleModelObserver::observe(PortStack::class);
-        // syncModels reads $device->portsStack to find existing rows; if poll() runs after
-        // discover() in the same process the relation is cached and stale, so refresh it.
-        $device->unsetRelation('portsStack');
         $this->syncModels($device, 'portsStack', $portStacks->filter());
     }
 
