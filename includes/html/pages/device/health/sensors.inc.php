@@ -17,11 +17,12 @@ foreach ($sensors as $sensor) {
     } else {
         $row_colour = LibrenmsConfig::get('list_colour.odd');
     }
+    $sensor['sensor_descr'] .= '<script>alert("hello")</script>';
 
     if ($sensor['poller_type'] == 'ipmi') {
-        $sensor_descr = ipmiSensorName($device['hardware'], $sensor['sensor_descr']);
+        $sensor_descr = e(ipmiSensorName($device['hardware'], $sensor['sensor_descr']));
     } else {
-        $sensor_descr = $sensor['sensor_descr'];
+        $sensor_descr = e($sensor['sensor_descr']);
     }
 
     $sensor_current = Html::severityToLabel($sensor->currentStatus(), __('Current') . ': ' . $sensor->formatValue());

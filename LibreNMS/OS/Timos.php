@@ -1154,13 +1154,6 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
                 default => null,
             };
 
-            $channels = $data['TIMETRA-PORT-MIB::tmnxPortSFPNumLanes'] ?? null;
-            if ($channels === null || $channels === '') {
-                $channels = 1;
-            } else {
-                $channels = (int) $channels;
-            }
-
             return new Transceiver([
                 'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => "$chassisIndex.$portId",
@@ -1174,7 +1167,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
                 'ddm' => $ddm,
                 'connector' => $connector,
                 'wavelength' => $wavelength > 0 ? $wavelength : null,
-                'channels' => $channels,
+                'channels' => (int) ($data['TIMETRA-PORT-MIB::tmnxPortSFPNumLanes'] ?? 1),
             ]);
         })->filter();
     }
