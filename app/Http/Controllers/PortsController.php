@@ -17,7 +17,6 @@ class PortsController extends Controller
     {
         $request->validate([
             'view' => 'in:list_basic,list_detail,graph_bits,graph_upkts,graph_nupkts,graph_errors', // legacy
-            'errors' => ['nullable', 'in:yes'],
             'bare' => ['nullable', 'in:yes'],
             'searchbar' => ['nullable', 'in:hide'],
             'per_page' => ['nullable', 'integer'],
@@ -67,13 +66,11 @@ class PortsController extends Controller
         if ($request->input('to')) {
             $graphTemplate['to'] = $request->input('to');
         }
-
         return view('port.index', [
             'view' => $view,
             'graph' => $graph,
-            'errors' => $errors,
             'show_detail' => $view === 'detail' ? 'true' : 'false',
-            'show_errors' => $view === 'detail' || $errors ? 'true' : 'false',
+            'show_errors' => $view === 'detail' || $request->boolean('filter.errors.eq') ? 'true' : 'false',
             'ports' => $this->getPorts($view, $perPage, $sort),
             'group' => $request->array('filter')['group.id']['eq'] ?? 0,
             'perPage' => $perPage,
@@ -207,6 +204,11 @@ class PortsController extends Controller
                 'params' => [
                     'field' => 'port_descr_type',
                 ],
+            ],
+            [
+                'key' => 'errors',
+                'label' => 'Errors',
+                'type' => 'boolean',
             ],
             [
                 'key' => 'ignore',

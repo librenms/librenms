@@ -48,6 +48,7 @@ class Port extends DeviceRelatedModel
         'deleted',
         'state',
         'search',
+        'errors',
         'groups.id',
         'device.groups.id',
         'device.location_id',
@@ -341,6 +342,17 @@ class Port extends DeviceRelatedModel
             $query->select('port_id')
                 ->from('port_group_port')
                 ->where('port_group_id', $portGroup);
+        });
+    }
+
+    public function filterErrors(Builder $query, mixed $value, array $config): void
+    {
+        $query->where(function (Builder $query) use ($value) {
+            $operator = $value ? '>' : '=';
+            $boolean = $value ? 'or' : 'and';
+
+            $query->where($this->qualifyColumn('ifInErrors_delta'), $operator, 0, $boolean)
+                ->where($this->qualifyColumn('ifOutErrors_delta'), $operator, 0, $boolean);
         });
     }
 

@@ -306,7 +306,7 @@
                                                             aria-hidden="true"></i> {{ __('All Ports') }}</a></li>
 
                         @if($port_counts['errored'] > 0)
-                            <li><a href="{{ route('ports', ['view' => 'detail', 'errors' => '1']) }}"><i class="fa fa-exclamation-circle fa-fw fa-lg"
+                            <li><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['errors' => ['eq' => '1']]]) }}"><i class="fa fa-exclamation-circle fa-fw fa-lg"
                                                                            aria-hidden="true"></i> {{ __('Errored :port_count', ['port_count' => $port_counts['errored']]) }}
                                 </a></li>
                         @endif
