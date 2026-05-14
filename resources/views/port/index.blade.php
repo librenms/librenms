@@ -11,7 +11,7 @@
                         <x-option-bar :options="$nav" name="{{ __('Ports') }}" :selected="$view" linkClass="sync-filter-url" border="none" class="tw:inline-block tw:p-1"></x-option-bar>
                         <x-option-bar :options="$graphNav" name="{{ __('Graphs') }}" :selected="$view" linkClass="sync-filter-url" border="none" class="tw:inline-block tw:p-1"></x-option-bar>
                         <span id="group-graph-link" x-data="{ group: @js($group) }"  x-show="group" x-init="window.addEventListener('filter:apply', (e) => $data.group = e.detail.filters['groups.id']?.eq);">
-                            | <a :href="'{{ url('iftype/group=:group') }}'.replace(':group', group)" title="{{ __('port.groups.graph') }}">{{ __('port.groups.combined') }}</a>
+                            | <a :href="'{{ route('portgroup.graph', [":group"]) }}'.replace(':group', group)" title="{{ __('port.groups.graph') }}">{{ __('port.groups.combined') }}</a>
                         </span>
                     </div>
                     <div class="btn-group pull-right" role="group">

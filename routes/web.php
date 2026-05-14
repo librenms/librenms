@@ -38,6 +38,7 @@ use App\Http\Controllers\PollerGroupController;
 use App\Http\Controllers\PollerSettingsController;
 use App\Http\Controllers\PortController;
 use App\Http\Controllers\PortGroupController;
+use App\Http\Controllers\PortTypeController;
 use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\RealtimeDataController;
 use App\Http\Controllers\RealtimeGraphController;
@@ -96,6 +97,8 @@ Route::middleware(['auth'])->group(function (): void {
     Route::resource('port', PortController::class)->only('update');
     Route::get('port/{port}/popup', App\Http\Controllers\PortPopupController::class)->name('port.popup');
     Route::get('vlans', [App\Http\Controllers\VlansController::class, 'index'])->name('vlans.index');
+    Route::get('porttype/{type}', [PortTypeController::class, 'graph'])->name('porttype.graph');
+    Route::get('portgroup/{group}', [PortGroupController::class, 'graph'])->name('portgroup.graph')->whereNumber('group');
     Route::prefix('poller')->group(function (): void {
         Route::get('', [PollerController::class, 'pollerTab'])->name('poller.index');
         Route::get('log', [PollerController::class, 'logTab'])->name('poller.log');
