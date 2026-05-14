@@ -66,6 +66,7 @@ class PortsController extends Controller
         if ($request->input('to')) {
             $graphTemplate['to'] = $request->input('to');
         }
+
         return view('port.index', [
             'view' => $view,
             'graph' => $graph,
