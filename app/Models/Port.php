@@ -347,7 +347,7 @@ class Port extends DeviceRelatedModel
 
     public function filterErrors(Builder $query, mixed $value, array $config): void
     {
-        $query->where(function (Builder $query) use ($value) {
+        $query->where(function (Builder $query) use ($value): void {
             $operator = $value ? '>' : '=';
             $boolean = $value ? 'or' : 'and';
 
