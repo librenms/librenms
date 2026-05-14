@@ -4,13 +4,14 @@
         name: @js($name),
         fields: @js($fields),
         reload: @js($reload),
-        initial: @js($initial)
+        initial: @js($initial),
+        hide: @js($hide)
     })"
     @click.outside="close()"
     @keydown.escape.window="close()">
 
     {{-- Main Bar --}}
-<div class="tw:group/bar tw:flex tw:flex-col tw:sm:flex-row tw:flex-nowrap" style="font-size: 16px">
+<div class="tw:group/bar tw:flex tw:flex-col tw:sm:flex-row tw:flex-nowrap" style="font-size: 16px" x-show="!hide">
     <div class="tw:flex tw:items-stretch tw:flex-col tw:sm:flex-row tw:h-auto tw:sm:h-[2.125em] tw:rounded-lg tw:border tw:border-neutral-300 tw:dark:border-dark-gray-300 tw:bg-white tw:dark:bg-dark-gray-500 tw:font-mono tw:shadow-xs tw:max-w-full">
 
         {{-- LEFT SECTION: Options Dropdown --}}
