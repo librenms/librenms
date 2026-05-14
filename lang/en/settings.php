@@ -245,14 +245,6 @@ return [
             'description' => 'Discovery on Reboot',
             'help' => 'Do a Discovery on a rebooted Device',
         ],
-        'discovery' => [
-            'ports_stack' => [
-                'preserve_lagmib_stale_members' => [
-                    'description' => 'Preserve stale LAG-MIB port-channel members',
-                    'help' => 'When polling port-channel membership from IEEE8023-LAG-MIB (e.g. on Cisco NX-OS), keep a member row when it stops appearing in the walk instead of deleting it, marking it notInService. The row flips back to active when the member is seen again. Off by default.',
-                ],
-            ],
-        ],
         'allow_duplicate_sysName' => [
             'description' => 'Allow Duplicate sysName',
             'help' => 'By default duplicate sysNames are disabled from being added to prevent a device with multiple interfaces from being added multiple times',

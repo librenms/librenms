@@ -7527,14 +7527,6 @@
             "section": "smokeping",
             "order": 3,
             "type": "text"
-        },
-        "discovery.ports_stack.preserve_lagmib_stale_members": {
-            "default": false,
-            "type": "boolean",
-            "group": "discovery",
-            "section": "general",
-            "order": 0,
-            "hidden": true
         }
     }
 }

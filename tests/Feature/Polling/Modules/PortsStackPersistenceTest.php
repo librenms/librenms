@@ -24,7 +24,6 @@
 
 namespace LibreNMS\Tests\Feature\Polling\Modules;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use DeviceCache;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -55,10 +54,8 @@ class PortsStackPersistenceTest extends DBTestCase
         (new PortsStack())->discover($os);
     }
 
-    public function test_flag_off_preserves_current_behavior(): void
+    public function test_lagmib_dropped_member_preserved_as_notInService(): void
     {
-        LibrenmsConfig::set('discovery.ports_stack.preserve_lagmib_stale_members', false);
-
         $device = Device::factory()->create(['community' => 'nxos_lag-mib', 'os' => 'nxos', 'status' => 1]);
         DeviceCache::setPrimary($device->device_id);
 
@@ -67,29 +64,12 @@ class PortsStackPersistenceTest extends DBTestCase
         $this->assertGreaterThan(0, $initial);
 
         $this->discoverWithFixture($device, 'nxos_lag-mib_member_dropped');
-        $this->assertEquals($initial - 1, $device->portsStack()->count());
-        $this->assertEquals(0, $device->portsStack()->where('ifStackStatus', 'notInService')->count());
-    }
-
-    public function test_flag_on_preserves_dropped_member_as_notInService(): void
-    {
-        LibrenmsConfig::set('discovery.ports_stack.preserve_lagmib_stale_members', true);
-
-        $device = Device::factory()->create(['community' => 'nxos_lag-mib', 'os' => 'nxos', 'status' => 1]);
-        DeviceCache::setPrimary($device->device_id);
-
-        $this->discoverWithFixture($device, 'nxos_lag-mib');
-        $initial = $device->portsStack()->count();
-
-        $this->discoverWithFixture($device, 'nxos_lag-mib_member_dropped');
         $this->assertEquals($initial, $device->portsStack()->count());
         $this->assertEquals(1, $device->portsStack()->where('ifStackStatus', 'notInService')->count());
     }
 
-    public function test_flag_on_recovers_active_when_member_returns(): void
+    public function test_lagmib_recovered_member_flips_back_to_active(): void
     {
-        LibrenmsConfig::set('discovery.ports_stack.preserve_lagmib_stale_members', true);
-
         $device = Device::factory()->create(['community' => 'nxos_lag-mib', 'os' => 'nxos', 'status' => 1]);
         DeviceCache::setPrimary($device->device_id);
 
@@ -103,10 +83,8 @@ class PortsStackPersistenceTest extends DBTestCase
         $this->assertEquals(0, $device->portsStack()->where('ifStackStatus', 'notInService')->count());
     }
 
-    public function test_flag_on_does_not_create_rows_for_never_seen_members(): void
+    public function test_first_discovery_does_not_create_notInService_rows(): void
     {
-        LibrenmsConfig::set('discovery.ports_stack.preserve_lagmib_stale_members', true);
-
         $device = Device::factory()->create(['community' => 'nxos_lag-mib_member_dropped', 'os' => 'nxos', 'status' => 1]);
         DeviceCache::setPrimary($device->device_id);
         $attrs = $device->attributesToArray();
@@ -116,10 +94,8 @@ class PortsStackPersistenceTest extends DBTestCase
         $this->assertEquals(0, $device->portsStack()->where('ifStackStatus', 'notInService')->count());
     }
 
-    public function test_flag_on_does_not_apply_to_ifstacktable_branch(): void
+    public function test_ifstacktable_branch_does_not_create_notInService_rows(): void
     {
-        LibrenmsConfig::set('discovery.ports_stack.preserve_lagmib_stale_members', true);
-
         $device = Device::factory()->create(['community' => 'arubaos-cx_10.06', 'os' => 'arubaos-cx', 'status' => 1]);
         DeviceCache::setPrimary($device->device_id);
         $attrs = $device->attributesToArray();
@@ -130,7 +106,8 @@ class PortsStackPersistenceTest extends DBTestCase
         $initial = $device->portsStack()->count();
         $this->assertGreaterThan(0, $initial);
 
-        // force a row missing from the next walk
+        // Delete a row, then re-discover. ifStackTable still reports it, so it gets re-added as active.
+        // The preservation logic is scoped to the LAG-MIB branch and should not touch this path.
         $device->portsStack()->first()->delete();
 
         $module->discover($os);
