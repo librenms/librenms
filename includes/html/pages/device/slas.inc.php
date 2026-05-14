@@ -4,11 +4,11 @@ if ($vars['id']) {
     $sla = dbFetchRow('SELECT `tag`, `sla_nr`,`rtt_type` FROM `slas` WHERE `sla_id` = ?', [$vars['id']]);
     $name = 'SLA #' . $sla['sla_nr'] . ' - ' . trans_fb("modules.slas.{$sla['rtt_type']}", ucfirst((string) $sla['rtt_type']));
     if ($sla['tag']) {
-        $name .= ': ' . $sla['tag'];
+        $name .= ': ' . e($sla['tag']);
     }
 
     if ($sla['owner']) {
-        $name .= ' (Owner: ' . $sla['owner'] . ')';
+        $name .= ' (Owner: ' . e($sla['owner']) . ')';
     }
 
     if ($sla['opstatus'] == 2) {
