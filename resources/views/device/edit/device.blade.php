@@ -211,7 +211,7 @@
             @if($device->snmpEngineID)
             <div class="form-group">
                 <label for="snmpEngineID" class="col-sm-2 control-label">{{ __('snmpEngineID') }}</label>
-                <div class="col-sm-6">
+                <div class="col-sm-6 tw:mt-2">
                     {{ $device->snmpEngineID }}
                 </div>
             </div>
