@@ -30,6 +30,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Link;
 use App\Models\Port;
+use App\Http\Controllers\PortSecurityController;
 use App\Models\PortSecurity;
 use App\Models\Pseudowire;
 use App\Models\UserPref;
@@ -83,16 +84,21 @@ class PortsController implements DeviceTab
             'from' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
             'to' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
             ...Port::filterValidationRules(),
+            ...PortSecurity::filterValidationRules(),
         ]);
 
         $this->loadSettings($request);
         $tab = $this->parseTab($request);
+        $this->savedFilter = UserPref::getPref(
+            $request->user(),
+            $tab === 'portsecurity' ? 'filters.device.port-security' : 'filters.device.ports'
+        ) ?: [];
         $this->detail = $tab == 'detail';
         $data = match ($tab) {
             'links' => $this->linksData($device),
             'transceivers' => $this->transceiversData($device),
             'xdsl' => $this->xdslData($device),
-            'portsecurity' => $this->portSecurityData($device),
+            'portsecurity' => $this->portSecurityData($device, $request),
             'graphs', 'mini_graphs' => $this->graphData($device, $request),
             default => $this->portData($device, $request),
         };
@@ -100,7 +106,9 @@ class PortsController implements DeviceTab
         return array_merge([
             'tab' => $tab,
             'details' => $this->detail,
-            'filterFields' => $this->filterFields($device->device_id),
+            'filterFields' => $tab === 'portsecurity'
+                ? PortSecurity::filterFieldDefinitions($device->device_id)
+                : $this->filterFields($device->device_id),
             'submenu' => [
                 $this->getTabs($device),
                 __('Graphs') => $this->getGraphLinks(),
@@ -282,9 +290,16 @@ class PortsController implements DeviceTab
         return ['links' => $device->links];
     }
 
-    private function portSecurityData(Device $device): array
+    private function portSecurityData(Device $device, Request $request): array
     {
-        return [];
+        return [
+            'portSecurity' => PortSecurityController::paginateForDevice(
+                $request,
+                $this->savedFilter,
+                $device->device_id,
+                $this->settings['perPage']
+            ),
+        ];
     }
 
     private function getTabs(Device $device): array
