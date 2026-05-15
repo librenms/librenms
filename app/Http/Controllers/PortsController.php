@@ -137,6 +137,11 @@ class PortsController extends Controller
                 'endpoint' => route('ajax.select.device'),
             ],
             [
+                'key' => 'device.hostname',
+                'label' => 'Hostname',
+                'type' => 'text',
+            ],
+            [
                 'key' => 'device.location_id',
                 'label' => __('Location'),
                 'type' => 'select',
@@ -192,12 +197,6 @@ class PortsController extends Controller
                 'endpoint' => route('ajax.select.port-group'),
             ],
             [
-                'key' => 'device.groups.id',
-                'label' => 'Device Group',
-                'type' => 'select',
-                'endpoint' => route('ajax.select.device-group'),
-            ],
-            [
                 'key' => 'port_type',
                 'label' => 'Port Type',
                 'type' => 'select',
@@ -205,6 +204,12 @@ class PortsController extends Controller
                 'params' => [
                     'field' => 'port_descr_type',
                 ],
+            ],
+            [
+                'key' => 'device.groups.id',
+                'label' => 'Device Group',
+                'type' => 'select',
+                'endpoint' => route('ajax.select.device-group'),
             ],
             [
                 'key' => 'errors',
