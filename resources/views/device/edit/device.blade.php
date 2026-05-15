@@ -208,6 +208,14 @@
                     />
                 </div>
             </div>
+            @if($device->snmpEngineID)
+            <div class="form-group">
+                <label for="snmpEngineID" class="col-sm-2 control-label">{{ __('snmpEngineID') }}</label>
+                <div class="col-sm-6">
+                    {{ $device->snmpEngineID }}
+                </div>
+            </div>
+            @endif
             <div class="row">
                 <div class="col-md-1 col-md-offset-2">
                     <button type="submit" name="Submit"  class="btn btn-default"><i class="fa fa-check"></i> {{ __('device.edit.save') }}</button>
