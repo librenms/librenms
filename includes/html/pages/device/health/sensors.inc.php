@@ -17,7 +17,6 @@ foreach ($sensors as $sensor) {
     } else {
         $row_colour = LibrenmsConfig::get('list_colour.odd');
     }
-    $sensor['sensor_descr'] .= '<script>alert("hello")</script>';
 
     if ($sensor['poller_type'] == 'ipmi') {
         $sensor_descr = e(ipmiSensorName($device['hardware'], $sensor['sensor_descr']));
