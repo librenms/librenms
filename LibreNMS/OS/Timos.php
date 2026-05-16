@@ -1167,7 +1167,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
                 'ddm' => $ddm,
                 'connector' => $connector,
                 'wavelength' => $wavelength > 0 ? $wavelength : null,
-                'channels' => $data['TIMETRA-PORT-MIB::tmnxPortSFPNumLanes'] ?? null,
+                'channels' => (int) ($data['TIMETRA-PORT-MIB::tmnxPortSFPNumLanes'] ?? 1),
             ]);
         })->filter();
     }
