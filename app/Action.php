@@ -37,6 +37,33 @@ class Action
      */
     public static function execute(string $action, ...$parameters)
     {
-        return app($action, $parameters)->execute();
+        return app($action, self::namedParameters($action, $parameters))->execute();
+    }
+
+    /**
+     * Map positional parameters to named keys using reflection so Laravel's
+     * IoC container resolves them by name rather than falling back to its
+     * type bindings.
+     */
+    private static function namedParameters(string $action, array $parameters): array
+    {
+        if (empty($parameters)) {
+            return [];
+        }
+
+        $constructor = (new \ReflectionClass($action))->getConstructor();
+
+        if (! $constructor) {
+            return $parameters;
+        }
+
+        $named = [];
+        foreach ($constructor->getParameters() as $i => $param) {
+            if (array_key_exists($i, $parameters)) {
+                $named[$param->getName()] = $parameters[$i];
+            }
+        }
+
+        return $named;
     }
 }
