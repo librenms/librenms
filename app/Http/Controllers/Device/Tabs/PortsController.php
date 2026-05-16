@@ -86,7 +86,10 @@ class PortsController implements DeviceTab
         ]);
 
         $this->loadSettings($request);
-        $this->savedFilter = UserPref::getPref($request->user(), 'filters.device.ports') ?: [];
+
+        $explicitClear = $request->has('filter') && empty($request->array('filter'));
+        $this->savedFilter = $explicitClear ? [] : (UserPref::getPref($request->user(), 'filters.device.ports') ?: []);
+
         $tab = $this->parseTab($request);
         $this->detail = $tab == 'detail';
         $data = match ($tab) {

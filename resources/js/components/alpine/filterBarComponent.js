@@ -51,6 +51,7 @@ export default function filterBarComponent({
 
         // --- State ---
         filters: [],
+        cleared: false,
         showAdd: false,
         showOptions: false,
         dialog: false,
@@ -101,20 +102,15 @@ export default function filterBarComponent({
             });
 
             const params = new URLSearchParams(window.location.search);
-            const hasUrlFilters = Array.from(params.keys()).some((k) =>
-                k.startsWith("filter[")
-            );
-            const sessionData = sessionStorage.getItem(
-                `filter-cache-${this.name}`
-            );
+            const hasUrlFilters = Array.from(params.keys()).some((k) => k.startsWith("filter["));
+            const explicitClear = params.has("filter") && !hasUrlFilters;
 
             if (hasUrlFilters) {
                 await this.restoreFromUrl(params);
-            } else if (sessionData !== null) {
-                this.filters = JSON.parse(sessionData);
-                await this.hydrateAll();
+            } else if (explicitClear) {
+                this.filters = []; // URL explicitly asked for no filters; bypass defaults
             } else if (Object.keys(this.initial || {}).length > 0) {
-                await this.restoreFromData(this.initial);
+                await this.restoreFromData(this.initial); // Fresh page load; load backend defaults
             }
 
             // Sync external links on load
@@ -123,7 +119,7 @@ export default function filterBarComponent({
             this.$dispatch("filter:loaded", {
                 name: this.name,
                 filters: this.formattedFilters,
-                from: hasUrlFilters ? "url" : (sessionData !== null ? "session" : "initial"),
+                from: hasUrlFilters ? "url" : (explicitClear ? "clear" : "initial"),
             });
 
             if (this.filters.length > 0 && !this.reload) {
@@ -189,25 +185,27 @@ export default function filterBarComponent({
         // --- Syncing & Persistence ---
         applyFiltersToUrl(url) {
             [...url.searchParams.keys()]
-                .filter((k) => k.startsWith("filter["))
+                .filter((k) => k.startsWith("filter[") || k === "filter")
                 .forEach((k) => url.searchParams.delete(k));
 
-            this.filters.forEach((f) => {
-                url.searchParams.set(
-                    `filter[${f.key}][${f.op}]`,
-                    this.encodeValue(f.value)
-                );
-            });
+            if (this.filters.length > 0) {
+                this.filters.forEach((f) => {
+                    url.searchParams.set(
+                        `filter[${f.key}][${f.op}]`,
+                        this.encodeValue(f.value)
+                    );
+                });
+            } else {
+                // If filters array is empty, explicitly append the empty root parameter
+                url.searchParams.set("filter", "");
+            }
 
             return url;
         },
 
         syncUrl() {
             const url = this.applyFiltersToUrl(new URL(window.location));
-            sessionStorage.setItem(
-                `filter-cache-${this.name}`,
-                JSON.stringify(this.filters)
-            );
+
             if (this.reload) {
                 window.location.href = url.href;
             } else {
@@ -411,6 +409,8 @@ export default function filterBarComponent({
             i >= 0
                 ? this.filters.splice(i, 1, entry)
                 : this.filters.push(entry);
+
+            this.cleared = false;
             this.snapshot = null;
             this.syncUrl();
             this.close();
