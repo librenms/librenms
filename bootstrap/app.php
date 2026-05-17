@@ -40,6 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'deny-demo' => \App\Http\Middleware\DenyDemoUser::class,
+            'saved-filter' => \App\Http\Middleware\MergeSavedFilter::class,
         ]);
 
         $middleware->priority([

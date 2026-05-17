@@ -251,7 +251,7 @@ class PortsController extends Controller
             ->with(['device' => fn ($query) => $query->select(['device_id', 'hostname', 'sysName', 'display', 'ip', 'overwrite_ip'])])
             ->isValid()
             ->whereHas('device') // a device is required for graphs to work
-            ->when(request()->array('filter'), fn (Builder $query, $filters) => $query->applyFilters($filters));
+            ->when(request()->array('filter'), fn (Builder $query, $filter) => $query->applyFilters($filter));
 
         $portsQuery = match ($sort) {
             'traffic' => $portsQuery->orderByRaw('ifInOctets_rate + ifOutOctets_rate desc'),
