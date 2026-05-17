@@ -392,7 +392,7 @@ if ($device->snmpEngineID) {
 <div class="form-group">
     <label for="snmpEngineID" class="col-sm-2 control-label">SNMP Engine ID</label>
     <div class="col-sm-6 tw:mt-2">
-        <?php echo htmlspecialchars($device->snmpEngineID); ?>
+        <?php echo htmlspecialchars((string) $device->snmpEngineID); ?>
     </div>
 </div>
 
