@@ -131,6 +131,9 @@ class PortSecurity extends DeviceRelatedModel implements Keyable
         return (int) $this->port_id;
     }
 
+    /**
+     * @return BelongsTo<Port, $this>
+     */
     public function port(): BelongsTo
     {
         return $this->belongsTo(Port::class, 'port_id');

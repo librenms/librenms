@@ -25,7 +25,7 @@ class PortSecurityController extends Controller
 
         return view('port-security.index', [
             'pagetitle' => __('Port Security'),
-            'portSecurity' => $this->getFilteredQuery($request, $savedFilter)
+            'portSecurity' => static::getFilteredQuery($request, $savedFilter)
                 ->paginate($perPage)
                 ->appends($request->query()),
             'filterFields' => PortSecurity::filterFieldDefinitions(),

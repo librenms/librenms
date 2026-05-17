@@ -58,27 +58,6 @@ class PortSecurityController extends TableController
     }
 
     /**
-     * @param  PortSecurity  $model
-     * @return array<string, scalar>
-     */
-    public function formatItem(Model $model): array
-    {
-        return [
-            'device' => $model->device?->displayName() ?? '',
-            'interface' => $model->port?->getShortLabel() ?? '',
-            'port_description' => $model->port?->ifAlias ?? '',
-            'enable' => $model->port_security_enable ?? '',
-            'status' => $model->status ?? '',
-            'current_secure' => $model->address_count ?? '',
-            'max_secure' => $model->max_addresses ?? '',
-            'violation_action' => $model->violation_action ?? '',
-            'violation_count' => $model->violation_count ?? '',
-            'secure_last_mac' => $model->last_mac_address ?? '',
-            'sticky_enable' => $model->sticky_enable ?? '',
-        ];
-    }
-
-    /**
      * @return list<string>
      */
     protected function getExportHeaders(): array
@@ -107,31 +86,31 @@ class PortSecurityController extends TableController
     }
 
     /**
-     * @param  PortSecurity  $item
      * @return list<scalar>
      */
     protected function formatExportRow(Model $item): array
     {
-        $row = [];
+        assert($item instanceof PortSecurity);
 
-        if (! request()->integer('device_id')) {
-            $row[] = $item->device_id;
-            $row[] = $item->device?->displayName() ?? '';
-        }
-
-        return array_merge($row, [
-            $item->port?->getShortLabel() ?? '',
-            $item->port?->ifName ?? '',
-            $item->port?->ifDescr ?? '',
-            $item->port?->ifAlias ?? '',
-            $item->port_security_enable ?? '',
-            $item->status ?? '',
-            $item->address_count ?? '',
-            $item->max_addresses ?? '',
-            $item->violation_action ?? '',
-            $item->violation_count ?? '',
-            $item->last_mac_address ?? '',
-            $item->sticky_enable ?? '',
-        ]);
+        return array_merge(
+            request()->integer('device_id') ? [] : [
+                $item->device_id,
+                $item->device?->displayName() ?? '',
+            ],
+            [
+                $item->port?->getShortLabel() ?? '',
+                $item->port?->ifName ?? '',
+                $item->port?->ifDescr ?? '',
+                $item->port?->ifAlias ?? '',
+                $item->port_security_enable ?? '',
+                $item->status ?? '',
+                $item->address_count ?? '',
+                $item->max_addresses ?? '',
+                $item->violation_action ?? '',
+                $item->violation_count ?? '',
+                $item->last_mac_address ?? '',
+                $item->sticky_enable ?? '',
+            ],
+        );
     }
 }
