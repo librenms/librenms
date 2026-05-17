@@ -363,6 +363,8 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('inventory', Table\InventoryController::class)->name('table.inventory');
             Route::get('inventory/export', [Table\InventoryController::class, 'export']);
             Route::post('location', Table\LocationController::class)->name('table.location');
+            Route::post('mdadm-array', Table\MdadmArrayController::class)->name('table.mdadm-array');
+            Route::get('mdadm-array/export', [Table\MdadmArrayController::class, 'export'])->name('table.mdadm-array.export');
             Route::post('mempools', Table\MempoolsController::class)->name('table.mempools');
             Route::get('mempools/export', [Table\MempoolsController::class, 'export']);
             Route::post('outages', Table\OutagesController::class)->name('table.outages');
