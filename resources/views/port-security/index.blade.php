@@ -4,8 +4,11 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="tw:pb-4">
-        <x-filter name="port-security" :fields="$filterFields" :initial="$filter" :reload="true"/>
+    <div class="tw:flex tw:items-center tw:justify-between tw:pb-4 tw:gap-4">
+        <div class="tw:flex-1">
+            <x-filter name="port-security" :fields="$filterFields" :initial="$filter" :reload="true"/>
+        </div>
+        <x-table-export :export-route="route('port-security.export')" class="tw:shrink-0"/>
     </div>
 
     @include('port-security.includes.table', [
