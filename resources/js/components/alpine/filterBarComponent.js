@@ -51,7 +51,6 @@ export default function filterBarComponent({
 
         // --- State ---
         filters: [],
-        cleared: false,
         showAdd: false,
         showOptions: false,
         dialog: false,
@@ -410,7 +409,6 @@ export default function filterBarComponent({
                 ? this.filters.splice(i, 1, entry)
                 : this.filters.push(entry);
 
-            this.cleared = false;
             this.snapshot = null;
             this.syncUrl();
             this.close();
