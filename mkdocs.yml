@@ -306,6 +306,8 @@ nav:
       - Merging Pull Requests: Developing/Merging-Pull-Requests.md
       - Creating Release: Developing/Creating-Release.md
       - Applications: Developing/Application-Notes.md
+     # Uses plugin include_dir_to_nav
+    - Applications: Developing/Application/
 
   - Miscellaneous:
     - Security information: General/Security.md

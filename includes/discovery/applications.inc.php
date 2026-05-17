@@ -30,7 +30,7 @@ use App\Models\Eventlog;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\Enum\Severity;
 
-echo "\nApplications: ";
+echo PHP_EOL;
 
 // fetch applications from the client
 $results = snmpwalk_cache_oid($device, 'nsExtendStatus', [], 'NET-SNMP-EXTEND-MIB');
@@ -73,13 +73,17 @@ d_echo('Checking for: ' . implode(', ', array_keys($results)) . PHP_EOL);
 }, [[], []]);
 
 // enable observer for printing changes
-ModuleModelObserver::observe(\App\Models\Application::class);
+ModuleModelObserver::observe(Application::class);
 
 // Enable applications
+$submodules = App\Facades\LibrenmsConfig::get('discovery_submodules.applications');
 $current_apps = [];
 foreach ($results as $extend => $result) {
     if (isset($applications[$extend])) {
         $app = $applications[$extend];
+        if ($submodules && ! in_array($app, $submodules)) {
+            continue;
+        }
         $current_apps[] = $app;
 
         if (! in_array($app, $enabled_apps)) {
@@ -96,15 +100,27 @@ foreach ($results as $extend => $result) {
 
 // remove non-existing apps
 $apps_to_remove = array_diff($discovered_apps, $current_apps);
+if ($submodules) {
+    $apps_to_remove = array_intersect($apps_to_remove, $submodules);
+}
 DeviceCache::getPrimary()->applications()->whereIn('app_type', $apps_to_remove)->get()->each(function (Application $app): void {
     $app->delete();
-    \App\Models\Eventlog::log("Application disabled by discovery: $app->app_type", DeviceCache::getPrimary(), 'application', \LibreNMS\Enum\Severity::Notice);
+    Eventlog::log("Application disabled by discovery: $app->app_type", DeviceCache::getPrimary(), 'application', Severity::Notice);
 });
 
 // clean application_metrics
 ApplicationMetric::doesntHave('app')->delete();
 
-echo PHP_EOL;
+// Per-app OOP discovery — OS class defines which handlers exist
+// json_app_get() and update_application() live in polling/functions.inc.php;
+// load it here since discovery does not include it by default.
+include_once base_path('includes/polling/functions.inc.php');
+foreach (DeviceCache::getPrimary()->applications()->where('discovered', 1)->get() as $app) {
+    if ($submodules && ! in_array($app->app_type, $submodules)) {
+        continue;
+    }
+    $os->discoverApplication($app);
+}
 
 unset(
     $applications,
