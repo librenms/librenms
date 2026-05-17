@@ -22,6 +22,7 @@ class MergeSavedFilter
         // Explicit clear via '?filter=' parameter
         if ($request->has('filter') && empty($filter)) {
             $request->merge(['filter' => []]);
+
             return $next($request);
         }
 

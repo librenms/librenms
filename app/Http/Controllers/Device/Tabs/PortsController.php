@@ -456,7 +456,7 @@ class PortsController implements DeviceTab
         UserPref::setPref($request->user(), 'filters.device.ports', $filter);
 
         $request->merge([
-            'filter' => array_merge($filter, $request->array('filter'))
+            'filter' => array_merge($filter, $request->array('filter')),
         ]);
 
         return $saved;
