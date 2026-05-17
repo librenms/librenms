@@ -86,10 +86,6 @@ class PortsController implements DeviceTab
         ]);
 
         $this->loadSettings($request);
-
-        $explicitClear = $request->has('filter') && empty($request->array('filter'));
-        $this->savedFilter = $explicitClear ? [] : (UserPref::getPref($request->user(), 'filters.device.ports') ?: []);
-
         $tab = $this->parseTab($request);
         $this->detail = $tab == 'detail';
         $data = match ($tab) {
@@ -110,7 +106,7 @@ class PortsController implements DeviceTab
                 __('Graphs') => $this->getGraphLinks(),
             ],
             'dropdownLinks' => [],
-            'filter' => $this->savedFilter,
+            'filter' => $request->array('filter'),
             'perPage' => $this->settings['perPage'],
             'sort' => $this->settings['sort'],
             'next_order' => $this->settings['order'] == 'asc' ? 'desc' : 'asc',
@@ -385,7 +381,7 @@ class PortsController implements DeviceTab
         if ($saved === null) {
             $saved = [];
         } elseif (array_key_exists('admin', $saved)) {
-            $saved = $this->migrateFilterSettings($saved);
+            $saved = $this->migrateFilterSettings($saved, $request);
         }
 
         $this->settings = $input + $saved + $this->defaults;
@@ -437,7 +433,7 @@ class PortsController implements DeviceTab
         return $request->route('vars', LibrenmsConfig::get('ports_page_default')); // fourth segment is called vars to handle legacy urls
     }
 
-    private function migrateFilterSettings(array $saved): array
+    private function migrateFilterSettings(array $saved, Request $request): array
     {
         $filter = [];
 
@@ -456,8 +452,12 @@ class PortsController implements DeviceTab
         }
 
         Arr::forget($saved, ['admin', 'status', 'disabled', 'ignored']);
-        UserPref::setPref(request()->user(), 'ports_ui_settings', $saved);
-        UserPref::setPref(request()->user(), 'filters.device.ports', $filter);
+        UserPref::setPref($request->user(), 'ports_ui_settings', $saved);
+        UserPref::setPref($request->user(), 'filters.device.ports', $filter);
+
+        $request->merge([
+            'filter' => array_merge($filter, $request->array('filter'))
+        ]);
 
         return $saved;
     }
