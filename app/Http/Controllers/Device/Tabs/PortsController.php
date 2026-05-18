@@ -94,7 +94,7 @@ class PortsController implements DeviceTab
             'links' => $this->linksData($device),
             'transceivers' => $this->transceiversData($device),
             'xdsl' => $this->xdslData($device),
-            'portsecurity' => $this->portSecurityData($device, $request),
+            'portsecurity' => $this->portSecurityData($device),
             'graphs', 'mini_graphs' => $this->graphData($device, $request),
             default => $this->portData($device, $request),
         };
@@ -286,11 +286,10 @@ class PortsController implements DeviceTab
         return ['links' => $device->links];
     }
 
-    private function portSecurityData(Device $device, Request $request): array
+    private function portSecurityData(Device $device): array
     {
         return [
             'portSecurity' => PortSecurityController::paginateForDevice(
-                $request,
                 $device->device_id,
                 $this->settings['perPage']
             ),

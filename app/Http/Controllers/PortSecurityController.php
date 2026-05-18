@@ -52,8 +52,9 @@ class PortSecurityController extends Controller
     /**
      * @return LengthAwarePaginator<PortSecurity>
      */
-    public static function paginateForDevice(Request $request, int $deviceId, int|string $perPage): LengthAwarePaginator
+    public static function paginateForDevice(int $deviceId, int|string $perPage): LengthAwarePaginator
     {
+        $request = request();
         $total = PortSecurity::query()
             ->where('device_id', $deviceId)
             ->hasAccess(Auth::user())
