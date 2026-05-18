@@ -50,7 +50,7 @@ class PortSecurityController extends Controller
     }
 
     /**
-     * @return LengthAwarePaginator<PortSecurity>
+     * @return LengthAwarePaginator<int, PortSecurity>
      */
     public static function paginateForDevice(int $deviceId, int|string $perPage): LengthAwarePaginator
     {

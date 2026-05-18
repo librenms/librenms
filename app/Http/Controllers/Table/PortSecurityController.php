@@ -43,6 +43,7 @@ class PortSecurityController extends TableController
             'page' => 'nullable|integer',
             'per_page' => 'nullable|integer',
             'perPage' => 'nullable',
+            'export' => 'nullable|in:page,all',
             ...PortSecurity::filterValidationRules(),
         ];
     }
@@ -64,17 +65,20 @@ class PortSecurityController extends TableController
     {
         $query = $this->baseQuery($request);
 
-        $page = (int) $request->input('current', $request->input('page', 0));
-        $perPage = $request->input('rowCount', $request->input('per_page', $request->input('perPage')));
-
-        if ($page > 0 && $perPage !== null && $perPage !== '' && $perPage !== 'all') {
-            $limit = (int) $perPage;
-            if ($limit > 0) {
-                $query->skip(($page - 1) * $limit)->take($limit);
-            }
+        if ($request->input('export') !== 'page') {
+            return $query;
         }
 
-        return $query;
+        $page = max(1, (int) $request->input('page', $request->input('current', 1)));
+        $perPage = $request->input('per_page', $request->input('perPage', $request->input('rowCount', 50)));
+
+        if ($perPage === 'all') {
+            return $query;
+        }
+
+        $limit = max(1, (int) $perPage);
+
+        return $query->skip(($page - 1) * $limit)->take($limit);
     }
 
     /**

@@ -27,10 +27,10 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Facades\LibrenmsConfig;
+use App\Http\Controllers\PortSecurityController;
 use App\Models\Device;
 use App\Models\Link;
 use App\Models\Port;
-use App\Http\Controllers\PortSecurityController;
 use App\Models\PortSecurity;
 use App\Models\Pseudowire;
 use App\Models\UserPref;

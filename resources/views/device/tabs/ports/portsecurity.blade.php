@@ -5,6 +5,10 @@
     <x-table-export
         :export-route="route('port-security.export')"
         :params="['device_id' => $device->device_id]"
+        :filters="$data['filter']"
+        :page="$data['portSecurity']->currentPage()"
+        :per-page="$data['perPage']"
+        per-page-param="perPage"
         class="tw:shrink-0"
     />
 </div>

@@ -8,7 +8,13 @@
         <div class="tw:flex-1">
             <x-filter name="port-security" :fields="$filterFields" :initial="$filter" :reload="true"/>
         </div>
-        <x-table-export :export-route="route('port-security.export')" class="tw:shrink-0"/>
+        <x-table-export
+            :export-route="route('port-security.export')"
+            :filters="$filter"
+            :page="$portSecurity->currentPage()"
+            :per-page="$perPage"
+            class="tw:shrink-0"
+        />
     </div>
 
     @include('port-security.includes.table', [
