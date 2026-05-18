@@ -182,7 +182,13 @@ export default function filterBarComponent({
         },
 
         // --- Syncing & Persistence ---
-        applyFiltersToUrl(url) {
+        applyFiltersToUrl(url, isExplicitClear = false) {
+            // Check if the browser's current URL is already in an explicitly cleared state (?filter=)
+            const currentParams = new URLSearchParams(window.location.search);
+            const currentHasUrlFilters = Array.from(currentParams.keys()).some((k) => k.startsWith("filter["));
+            const currentIsExplicitlyCleared = currentParams.has("filter") && !currentHasUrlFilters;
+
+            // Clear out any old filter mutations to keep the string clean
             [...url.searchParams.keys()]
                 .filter((k) => k.startsWith("filter[") || k === "filter")
                 .forEach((k) => url.searchParams.delete(k));
@@ -194,16 +200,15 @@ export default function filterBarComponent({
                         this.encodeValue(f.value)
                     );
                 });
-            } else {
-                // If filters array is empty, explicitly append the empty root parameter
+            } else if (isExplicitClear || currentIsExplicitlyCleared) {
                 url.searchParams.set("filter", "");
             }
 
             return url;
         },
 
-        syncUrl() {
-            const url = this.applyFiltersToUrl(new URL(window.location));
+        syncUrl(isExplicitClear = false) {
+            const url = this.applyFiltersToUrl(new URL(window.location), isExplicitClear);
 
             if (this.reload) {
                 window.location.href = url.href;
@@ -432,12 +437,12 @@ export default function filterBarComponent({
             this.filters = this.filters.filter((f) => f.key !== key);
             this.snapshot = null;
             this.close();
-            this.syncUrl();
+            this.syncUrl(this.filters.length === 0);
         },
 
         clearAll() {
             this.filters = [];
-            this.syncUrl();
+            this.syncUrl(true);
             this.showOptions = false;
         },
 
