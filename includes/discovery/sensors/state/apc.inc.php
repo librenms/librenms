@@ -44,7 +44,7 @@ foreach ($cooling_status as $index => $data) {
     $tmp_states = explode(',', (string) $data['coolingUnitStatusDiscreteIntegerReferenceKey']);
     $translations = [];
     foreach ($tmp_states as $ref) {
-        preg_match('/([\w]+) ?\\(([\d]+)\\)/', $ref, $matches);
+        preg_match('/([\w ]+) ?\\(([\d]+)\\)/', $ref, $matches);
         $severity = match (get_nagios_state($matches[1])) {
             0 => Severity::Ok,
             1 => Severity::Warning,
@@ -77,7 +77,7 @@ foreach ($cooling_unit as $index => $data) {
     $tmp_states = explode(',', (string) $data['coolingUnitExtendedDiscreteIntegerReferenceKey']);
     $translations = [];
     foreach ($tmp_states as $ref) {
-        preg_match('/([\w]+)\\(([\d]+)\\)/', $ref, $matches);
+        preg_match('/([\w ]+)\\(([\d]+)\\)/', $ref, $matches);
         $severity = match (get_nagios_state($matches[1])) {
             0 => Severity::Ok,
             1 => Severity::Warning,
