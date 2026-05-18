@@ -34,25 +34,23 @@ class DevicesController extends Controller
             ]),
         ]);
 
-        $view ??= $request->input('format', 'list_detail');
         $bare = $request->input('bare') === 'yes';
         $hideFilter = $request->input('searchbar') === 'hide';
         $perPage = $request->integer('per_page', 50); // from bootgrid rowCount
 
-        if (str_starts_with((string) $view, 'list_')) {
-            $subformat = substr((string) $view, 5);
-            $view = 'list';
-        } elseif (str_starts_with((string) $view, 'graph_')) {
-            $graph = substr((string) $view, 6);
-            $view = 'graph';
-            $subformat = $graph;
-        } else {
-            // default
-            $subformat = 'detail';
-            $view = 'list';
+        $legacyFormat = (string) $request->string('format');
+        if ($legacyFormat) {
+            if (str_starts_with($legacyFormat, 'graph_')) {
+                $view ??= 'graph';
+                $graph ??= substr($legacyFormat, 6);
+            } else {
+                $view ??= match ($legacyFormat) {
+                    'list_basic' => 'basic',
+                    default => 'detail',
+                };
+                $graph ??= '';
+            }
         }
-
-        $detailed = $subformat === 'detail';
 
         $graphTemplate = [
             'height' => 110,
@@ -71,26 +69,26 @@ class DevicesController extends Controller
 
         return view('device.index', [
             'view' => $view,
-            'subformat' => $subformat,
-            'detailed' => $detailed,
+            'graph' => $graph,
+            'detailed' => $view === 'detail',
             'devices' => $this->getDevices($view, $perPage),
             'perPage' => $perPage,
             'paginationOptions' => [50, 100, 250, -1],
             'nav' => [
-                'detail' => ['text' => 'Detail', 'link' => route('devices', ['format' => 'list_detail', ...$request->query()])],
-                'basic' => ['text' => 'Basic', 'link' => route('devices', ['format' => 'list_basic', ...$request->query()])],
+                'detail' => ['text' => 'Detail', 'link' => route('devices', ['view' => 'detail', ...$request->query()])],
+                'basic' => ['text' => 'Basic', 'link' => route('devices', ['view' => 'basic', ...$request->query()])],
             ],
             'graphNav' => [
-                'bits' => ['text' => 'Bits', 'link' => route('devices', ['format' => 'graph_bits', ...$request->query()])],
-                'processor' => ['text' => 'CPU', 'link' => route('devices', ['format' => 'graph_processor', ...$request->query()])],
-                'ucd_load' => ['text' => 'Load', 'link' => route('devices', ['format' => 'graph_ucd_load', ...$request->query()])],
-                'mempool' => ['text' => 'Memory', 'link' => route('devices', ['format' => 'graph_mempool', ...$request->query()])],
-                'uptime' => ['text' => 'Uptime', 'link' => route('devices', ['format' => 'graph_uptime', ...$request->query()])],
-                'storage' => ['text' => 'Storage', 'link' => route('devices', ['format' => 'graph_storage', ...$request->query()])],
-                'diskio' => ['text' => 'Disk I/O', 'link' => route('devices', ['format' => 'graph_diskio', ...$request->query()])],
-                'poller_perf' => ['text' => 'Poller', 'link' => route('devices', ['format' => 'graph_poller_perf', ...$request->query()])],
-                'icmp_perf' => ['text' => 'Ping', 'link' => route('devices', ['format' => 'graph_icmp_perf', ...$request->query()])],
-                'temperature' => ['text' => 'Temperature', 'link' => route('devices', ['format' => 'graph_temperature', ...$request->query()])],
+                'bits' => ['text' => 'Bits', 'link' => route('devices', ['view' => 'graph', 'graph' => 'bits', ...$request->query()])],
+                'processor' => ['text' => 'CPU', 'link' => route('devices', ['view' => 'graph', 'graph' => 'processor', ...$request->query()])],
+                'ucd_load' => ['text' => 'Load', 'link' => route('devices', ['view' => 'graph', 'graph' => 'ucd_load', ...$request->query()])],
+                'mempool' => ['text' => 'Memory', 'link' => route('devices', ['view' => 'graph', 'graph' => 'mempool', ...$request->query()])],
+                'uptime' => ['text' => 'Uptime', 'link' => route('devices', ['view' => 'graph', 'graph' => 'uptime', ...$request->query()])],
+                'storage' => ['text' => 'Storage', 'link' => route('devices', ['view' => 'graph', 'graph' => 'storage', ...$request->query()])],
+                'diskio' => ['text' => 'Disk I/O', 'link' => route('devices', ['view' => 'graph', 'graph' => 'diskio', ...$request->query()])],
+                'poller_perf' => ['text' => 'Poller', 'link' => route('devices', ['view' => 'graph', 'graph' => 'poller_perf', ...$request->query()])],
+                'icmp_perf' => ['text' => 'Ping', 'link' => route('devices', ['view' => 'graph', 'graph' => 'icmp_perf', ...$request->query()])],
+                'temperature' => ['text' => 'Temperature', 'link' => route('devices', ['view' => 'graph', 'graph' => 'temperature', ...$request->query()])],
             ],
             'bare' => $bare,
             'bareLink' => $bare ? $request->fullUrlWithoutQuery('bare') : $request->fullUrlWithQuery(['bare' => 'yes']),

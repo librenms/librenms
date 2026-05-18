@@ -66,7 +66,7 @@
                 },
                 post: function () {
                     return {
-                        format: '{{ request('format', 'list_' . $subformat) }}',
+                        format: '{{ $detailed ? 'list_detail' : 'list_basic' }}',
                         filter: filter
                     };
                 },

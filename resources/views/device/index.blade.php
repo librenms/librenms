@@ -8,8 +8,8 @@
             <x-slot name="heading">
                 <div class="tw:flex tw:justify-between">
                     <div class="tw:min-h-8">
-                        <x-option-bar :options="$nav" name="{{ __('Lists') }}" :selected="'list_' . $subformat" linkClass="sync-filter-url" border="none" class="tw:inline-block tw:p-1"></x-option-bar>
-                        <x-option-bar :options="$graphNav" name="{{ __('Graphs') }}" :selected="'graph_' . $subformat" linkClass="sync-filter-url" border="none" class="tw:inline-block tw:p-1"></x-option-bar>
+                        <x-option-bar :options="$nav" name="{{ __('Lists') }}" :selected="$view" linkClass="sync-filter-url" border="none" class="tw:inline-block tw:p-1"></x-option-bar>
+                        <x-option-bar :options="$graphNav" name="{{ __('Graphs') }}" :selected="$graph" linkClass="sync-filter-url" border="none" class="tw:inline-block tw:p-1"></x-option-bar>
                     </div>
                     <div class="btn-group pull-right" role="group">
                         <div class="btn-group" role="group">
