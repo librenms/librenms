@@ -42,7 +42,7 @@
                                 <a href="{{ url("/devices/group=$device_group->id") }}">{{ $device_group->devices_count }}</a>
                             </td>
                             <td>
-                                <a href="{{ url("/ports/devicegroup=$device_group->id") }}">View</a>
+                                <a href="{{ route('ports', ['filter' => ['device.groups.id' => ['eq' => $device_group->id]]]) }}">View</a>
                             </td>
                             <td>{{ $device_group->type == 'dynamic' ? $device_group->getParser()->toSql(false) : '' }}</td>
                             <td>

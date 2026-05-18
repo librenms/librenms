@@ -4,24 +4,26 @@
 
 @section('content')
 <div class="container-fluid">
-    <x-panel title="{{ __('Port Security') }}" body-class="tw:p-0!">
+    <x-panel title="{{ __('Port Security') }}">
+        <x-slot:slot class="tw:p-0!">
         <table id="port-security-table" class="table table-hover table-condensed table-striped tw:mt-1 tw:mb-0!">
             <thead>
                 <tr>
-                    <th data-column-id="device">@lang('Device')</th>
-                    <th data-column-id="interface">@lang('Port')</th>
-                    <th data-column-id="port_description">@lang('Description')</th>
-                    <th data-column-id="enable">@lang('Enabled')</th>
-                    <th data-column-id="status" data-formatter="status">@lang('Status')</th>
-                    <th data-column-id="current_secure">@lang('Current MACs')</th>
-                    <th data-column-id="max_secure">@lang('Max MACs')</th>
-                    <th data-column-id="violation_action">@lang('Violation Action')</th>
-                    <th data-column-id="violation_count">@lang('Violations')</th>
-                    <th data-column-id="secure_last_mac">@lang('Last MAC')</th>
-                    <th data-column-id="sticky_enable">@lang('Sticky')</th>
+                    <th data-column-id="device">{{ __('Device') }}</th>
+                    <th data-column-id="interface">{{ __('Port') }}</th>
+                    <th data-column-id="port_description">{{ __('Description') }}</th>
+                    <th data-column-id="enable">{{ __('Enabled') }}</th>
+                    <th data-column-id="status" data-formatter="status">{{ __('Status') }}</th>
+                    <th data-column-id="current_secure">{{ __('Current MACs') }}</th>
+                    <th data-column-id="max_secure">{{ __('Max MACs') }}</th>
+                    <th data-column-id="violation_action">{{ __('Violation Action') }}</th>
+                    <th data-column-id="violation_count">{{ __('Violations') }}</th>
+                    <th data-column-id="secure_last_mac">{{ __('Last MAC') }}</th>
+                    <th data-column-id="sticky_enable">{{ __('Sticky') }}</th>
                 </tr>
             </thead>
         </table>
+        </x-slot:slot>
     </x-panel>
 </div>
 @endsection

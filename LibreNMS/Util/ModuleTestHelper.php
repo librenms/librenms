@@ -586,7 +586,7 @@ class ModuleTestHelper
         }
 
         // Populate the device variable
-        $device = device_by_id_cache($device_id, true);
+        $device = DeviceCache::refresh((int) $device_id);
         DeviceCache::setPrimary($device_id);
 
         $data = [];  // array to hold dumped data

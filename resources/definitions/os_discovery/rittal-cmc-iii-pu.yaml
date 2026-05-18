@@ -3,6 +3,9 @@ modules:
         hardware: RITTAL-CMC-III-MIB::cmcIIIDevName.1
         serial: RITTAL-CMC-III-MIB::cmcIIIUnitSerial.0
         version: RITTAL-CMC-III-MIB::cmcIIIUnitFWRev.0
+        features:
+          - RITTAL-CMC-III-MIB::cmcIIIDevArtNr.2
+          - RITTAL-CMC-III-MIB::cmcIIIDevArtNr.1
     sensors:
         state:
             data:

@@ -27,14 +27,19 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Port;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Url;
 
+/**
+ * @extends TableController<Port>
+ */
 class MacSearchController extends TableController
 {
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'address' => ['nullable', 'string'],
@@ -43,7 +48,7 @@ class MacSearchController extends TableController
         ];
     }
 
-    protected function sortFields($request)
+    protected function sortFields(Request $request): array
     {
         return [
             'hostname' => 'device_hostname',
@@ -53,7 +58,7 @@ class MacSearchController extends TableController
         ];
     }
 
-    protected function baseQuery(Request $request)
+    protected function baseQuery(Request $request): Builder|\Illuminate\Database\Query\Builder
     {
         return Port::query()
             ->hasAccess($request->user())
@@ -70,9 +75,9 @@ class MacSearchController extends TableController
 
     /**
      * @param  Port  $model
-     * @return array
+     * @return array<string, scalar>
      */
-    public function formatItem($model): array
+    public function formatItem(Model $model): array
     {
         $mac = Mac::parse($model->ifPhysAddress);
 
