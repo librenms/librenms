@@ -3383,7 +3383,7 @@ This object has no default value.
                 {
                 broadcast(1),
                 multicast(2),
-                unkonwnunicast(3)
+                unknownunicast(3)
                 }
             MAX-ACCESS read-only
             STATUS current

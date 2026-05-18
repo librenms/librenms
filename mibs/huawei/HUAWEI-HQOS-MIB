@@ -1731,7 +1731,7 @@
                 {
                 broadcast(1),
                 multicast(2),
-                unkonwnUnicast(3)
+                unknownUnicast(3)
                 }
             MAX-ACCESS read-only
             STATUS current

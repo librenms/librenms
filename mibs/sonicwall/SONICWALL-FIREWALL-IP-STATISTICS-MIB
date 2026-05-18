@@ -127,7 +127,7 @@ SwSpRadioType ::= TEXTUAL-CONVENTION
     DESCRIPTION
             "Enumerated types for SonicPoint radio.
              The following enumerated values are supported:
-                other(0)                    - radio type is unkonwn n/a
+                other(0)                    - radio type is unknown n/a
                 dot11n-only-24 (1)          - 2.4GHz n Only
                 dot11n-mixed-24 (2)         - 2.4GHz n/g/b
                 dot11g-only-24 (3)          - 2.4GHz g Only

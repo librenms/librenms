@@ -2373,17 +2373,17 @@ PortList ::= TEXTUAL-CONVENTION
             "Broadcast Storm Protection includes Multicast packets"
         ::= { broadcastStormProtection 2 } 
          
-    bcastStormIncludeUnkonwnMcastUcast OBJECT-TYPE
+    bcastStormIncludeUnknownMcastUcast OBJECT-TYPE
         SYNTAX INTEGER {no(0),yes(1)}
         MAX-ACCESS read-write               
         STATUS current
         DESCRIPTION
-            "Broadcast Storm Protection includes Unkonwn Multicast and Unknown Unicast Packet packets"
+            "Broadcast Storm Protection includes Unknown Multicast and Unknown Unicast Packet packets"
         ::= { broadcastStormProtection 3 } 
 
 	unicastFilterBehavior OBJECT IDENTIFIER ::= { broadcastStormProtection 4 }
 	
-    ufbIncludeUnkonwnUcast OBJECT-TYPE
+    ufbIncludeUnknownUcast OBJECT-TYPE
         SYNTAX INTEGER {no(0),yes(1)}
         MAX-ACCESS read-write               
         STATUS current
