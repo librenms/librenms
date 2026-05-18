@@ -260,8 +260,6 @@ Route::middleware(['auth'])->group(function (): void {
     Route::any('plugin/v1/{plugin:plugin_name}/{other?}', PluginLegacyController::class)->where('other', '(.*)')->name('plugin.legacy');
     Route::get('plugin/{plugin:plugin_name}', PluginPageController::class)->name('plugin.page');
 
-    Route::permanentRedirect('search/secureports', 'port-security');
-
     Route::get('health/{metric?}/{legacyview?}', [SensorController::class, 'index'])->name('sensor.index');
     Route::get('wireless/{metric}/{legacyview?}', [WirelessSensorController::class, 'index'])->name('wireless.index');
 
