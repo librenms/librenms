@@ -101,7 +101,7 @@ class DevicesController extends Controller
         ]);
     }
 
-    private function getDevices(string $view, int $perPage): ?LengthAwarePaginator
+    private function getDevices(?string $view, int $perPage): ?LengthAwarePaginator
     {
         if ($view !== 'graph') {
             return null;
