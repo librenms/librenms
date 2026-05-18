@@ -178,6 +178,10 @@ Route::middleware(['auth'])->group(function (): void {
     });
 
     // fallback device routes
+    Route::match(['get', 'post'], 'device/{device}/{tab}/{vars}', [DeviceController::class, 'index'])
+        ->middleware('saved-filter:device.port-security')
+        ->where(['tab' => 'ports', 'vars' => 'portsecurity'])
+        ->name('device.port-security');
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', [DeviceController::class, 'index'])
         ->middleware('saved-filter:device.ports') // FIXME more specific route
         ->name('device')->where('vars', '.*');
