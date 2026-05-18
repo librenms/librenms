@@ -89,10 +89,6 @@ class PortsController implements DeviceTab
 
         $this->loadSettings($request);
         $tab = $this->parseTab($request);
-        $this->savedFilter = UserPref::getPref(
-            $request->user(),
-            $tab === 'portsecurity' ? 'filters.device.port-security' : 'filters.device.ports'
-        ) ?: [];
         $this->detail = $tab == 'detail';
         $data = match ($tab) {
             'links' => $this->linksData($device),
@@ -295,7 +291,6 @@ class PortsController implements DeviceTab
         return [
             'portSecurity' => PortSecurityController::paginateForDevice(
                 $request,
-                $this->savedFilter,
                 $device->device_id,
                 $this->settings['perPage']
             ),

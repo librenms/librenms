@@ -56,7 +56,6 @@ class PortSecurityController extends TableController
     {
         return PortSecurityPageController::getFilteredQuery(
             $request,
-            [],
             $request->integer('device_id') ?: null
         );
     }
