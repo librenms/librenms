@@ -53,6 +53,7 @@ export default function filterBarComponent({
         filters: [],
         showAdd: false,
         showOptions: false,
+        isCleared: false,
         dialog: false,
         current: null,
         snapshot: null,
@@ -102,11 +103,11 @@ export default function filterBarComponent({
 
             const params = new URLSearchParams(window.location.search);
             const hasUrlFilters = Array.from(params.keys()).some((k) => k.startsWith("filter["));
-            const explicitClear = params.has("filter") && !hasUrlFilters;
+            this.isCleared = params.has("filter") && !hasUrlFilters;
 
             if (hasUrlFilters) {
                 await this.restoreFromUrl(params);
-            } else if (explicitClear) {
+            } else if (this.isCleared) {
                 this.filters = []; // URL explicitly asked for no filters; bypass defaults
             } else if (Object.keys(this.initial || {}).length > 0) {
                 await this.restoreFromData(this.initial); // Fresh page load; load backend defaults
@@ -118,7 +119,7 @@ export default function filterBarComponent({
             this.$dispatch("filter:loaded", {
                 name: this.name,
                 filters: this.formattedFilters,
-                from: hasUrlFilters ? "url" : (explicitClear ? "clear" : "initial"),
+                from: hasUrlFilters ? "url" : (this.isCleared ? "clear" : "initial"),
             });
 
             if (this.filters.length > 0 && !this.reload) {
@@ -183,6 +184,7 @@ export default function filterBarComponent({
 
         // --- Syncing & Persistence ---
         applyFiltersToUrl(url) {
+            // Clear out any old filter mutations to keep the string clean
             [...url.searchParams.keys()]
                 .filter((k) => k.startsWith("filter[") || k === "filter")
                 .forEach((k) => url.searchParams.delete(k));
@@ -194,8 +196,7 @@ export default function filterBarComponent({
                         this.encodeValue(f.value)
                     );
                 });
-            } else {
-                // If filters array is empty, explicitly append the empty root parameter
+            } else if (this.isCleared) {
                 url.searchParams.set("filter", "");
             }
 
@@ -409,6 +410,7 @@ export default function filterBarComponent({
                 ? this.filters.splice(i, 1, entry)
                 : this.filters.push(entry);
 
+            this.isCleared = false;
             this.snapshot = null;
             this.syncUrl();
             this.close();
@@ -430,6 +432,7 @@ export default function filterBarComponent({
 
         remove(key) {
             this.filters = this.filters.filter((f) => f.key !== key);
+            this.isCleared = this.filters.length === 0;
             this.snapshot = null;
             this.close();
             this.syncUrl();
@@ -437,6 +440,7 @@ export default function filterBarComponent({
 
         clearAll() {
             this.filters = [];
+            this.isCleared = true;
             this.syncUrl();
             this.showOptions = false;
         },
