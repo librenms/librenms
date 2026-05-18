@@ -27,27 +27,34 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\ServiceTemplate;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
+/**
+ * @extends SelectController<ServiceTemplate>
+ */
 class ServiceTemplateController extends SelectController
 {
-    protected function searchFields($request)
+    protected function searchFields(Request $request): array
     {
         return ['name'];
     }
 
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
         return ServiceTemplate::hasAccess($request->user())->select(['id', 'name']);
     }
 
     /**
-     * @param  ServiceTemplate  $template
+     * @param  ServiceTemplate  $model
+     * @return array{id: int|string, text: string, icon?: string}
      */
-    public function formatItem($template)
+    public function formatItem(Model $model): array
     {
         return [
-            'id' => $template->id,
-            'text' => $template->name,
+            'id' => $model->id,
+            'text' => $model->name,
         ];
     }
 }

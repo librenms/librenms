@@ -13,37 +13,44 @@
  * @author     LibreNMS Contributors
 */
 
-function show_device_group(int|string|null $device_group_id): void {
+use App\Facades\LibrenmsConfig;
+use App\Models\Location;
+use Illuminate\Support\Facades\DB;
+use LibreNMS\Util\StringHelpers;
+use LibreNMS\Util\Url;
+
+function show_device_group(int|string|null $device_group_id): void
+{
     if (! $device_group_id) {
         return;
     }
 
     if ($device_group_id === 'none') {
-        $pre_text = 'Ungrouped Devices';
+        $pre_text = __('Ungrouped Devices');
         $device_group_name = '';
     } else {
-        $pre_text = 'Device Group: ';
-        $device_group_name = DB::table('device_groups')->where('id', $device_group_id)->value('name') ?? 'Group not found';
+        $pre_text = __('Device Group') . ': ';
+        $device_group_name = DB::table('device_groups')->where('id', $device_group_id)->value('name') ?? __('Group not found');
     }
     ?>
     <div class="panel-heading">
         <span class="devices-font-bold">
         <?php echo $pre_text ?>
         </span>
-        <?php echo htmlentities($device_group_name) ?>
+        <?php echo htmlentities((string) $device_group_name) ?>
     </div>
     <?php
 }
 
-$pagetitle[] = 'Devices';
+$pagetitle[] = __('Devices');
 
 if (! isset($vars['format'])) {
     $vars['format'] = 'list_detail';
 }
 
-$listoptions = '<span class="devices-font-bold">Lists: </span>';
+$listoptions = '<span class="devices-font-bold">' . __('Lists') . ': </span>';
 
-$menu_options = ['basic' => 'Basic', 'detail' => 'Detail'];
+$menu_options = ['basic' => __('Basic'), 'detail' => __('Detail')];
 
 $sep = '';
 foreach ($menu_options as $option => $text) {
@@ -51,25 +58,25 @@ foreach ($menu_options as $option => $text) {
     if ($vars['format'] == 'list_' . $option) {
         $listoptions .= '<span class="pagemenu-selected">';
     }
-    $listoptions .= '<a href="' . \LibreNMS\Util\Url::generate($vars, ['format' => 'list_' . $option]) . '">' . $text . '</a>';
+    $listoptions .= '<a href="' . Url::generate($vars, ['format' => 'list_' . $option]) . '">' . $text . '</a>';
     if ($vars['format'] == 'list_' . $option) {
         $listoptions .= '</span>';
     }
     $sep = ' | ';
 }
 
-$listoptions .= '&nbsp;&nbsp;&nbsp;<span class="devices-font-bold">Graphs: </span>';
+$listoptions .= '&nbsp;&nbsp;&nbsp;<span class="devices-font-bold">' . __('Graphs') . ': </span>';
 
-$menu_options = ['bits' => 'Bits',
-    'processor' => 'CPU',
-    'ucd_load' => 'Load',
-    'mempool' => 'Memory',
-    'uptime' => 'Uptime',
-    'storage' => 'Storage',
-    'diskio' => 'Disk I/O',
-    'poller_perf' => 'Poller',
-    'icmp_perf' => 'Ping',
-    'temperature' => 'Temperature',
+$menu_options = ['bits' => __('Bits'),
+    'processor' => __('CPU'),
+    'ucd_load' => __('Load'),
+    'mempool' => __('Memory'),
+    'uptime' => __('Uptime'),
+    'storage' => __('Storage'),
+    'diskio' => __('Disk I/O'),
+    'poller_perf' => __('Poller'),
+    'icmp_perf' => __('Ping'),
+    'temperature' => __('sensors.temperature.long'),
 ];
 $sep = '';
 foreach ($menu_options as $option => $text) {
@@ -77,7 +84,7 @@ foreach ($menu_options as $option => $text) {
     if ($vars['format'] == 'graph_' . $option) {
         $listoptions .= '<span class="pagemenu-selected">';
     }
-    $listoptions .= '<a href="' . \LibreNMS\Util\Url::generate($vars, ['format' => 'graph_' . $option, 'from' => '-24hour', 'to' => 'now']) . '">' . $text . '</a>';
+    $listoptions .= '<a href="' . Url::generate($vars, ['format' => 'graph_' . $option, 'from' => '-24hour', 'to' => 'now']) . '">' . $text . '</a>';
     if ($vars['format'] == 'graph_' . $option) {
         $listoptions .= '</span>';
     }
@@ -87,33 +94,33 @@ foreach ($menu_options as $option => $text) {
 $headeroptions = '<select name="type" id="type" onchange="window.open(this.options[this.selectedIndex].value,\'_top\')" class="devices-graphs-select">';
 $type = 'device';
 foreach (get_graph_subtypes($type) as $avail_type) {
-    $display_type = \LibreNMS\Util\StringHelpers::niceCase($avail_type);
+    $display_type = StringHelpers::niceCase($avail_type);
     if ('graph_' . $avail_type == $vars['format']) {
         $is_selected = 'selected';
     } else {
         $is_selected = '';
     }
     $headeroptions .= '<option value="' .
-        \LibreNMS\Util\Url::generate($vars, [
+        Url::generate($vars, [
             'format' => 'graph_' . $avail_type,
-            'from' => $vars['from'] ?? \App\Facades\LibrenmsConfig::get('time.day'),
-            'to' => $vars['to'] ?? \App\Facades\LibrenmsConfig::get('time.now'),
+            'from' => $vars['from'] ?? LibrenmsConfig::get('time.day'),
+            'to' => $vars['to'] ?? LibrenmsConfig::get('time.now'),
         ]) . '" ' . $is_selected . '>' . $display_type . '</option>';
 }
 $headeroptions .= '</select>';
 
 if (isset($vars['searchbar']) && $vars['searchbar'] == 'hide') {
-    $headeroptions .= '<a href="' . \LibreNMS\Util\Url::generate($vars, ['searchbar' => '']) . '">Restore Search</a>';
+    $headeroptions .= '<a href="' . Url::generate($vars, ['searchbar' => '']) . '">' . __('Restore Search') . '</a>';
 } else {
-    $headeroptions .= '<a href="' . \LibreNMS\Util\Url::generate($vars, ['searchbar' => 'hide']) . '">Remove Search</a>';
+    $headeroptions .= '<a href="' . Url::generate($vars, ['searchbar' => 'hide']) . '">' . __('Remove Search') . '</a>';
 }
 
 $headeroptions .= ' | ';
 
 if (isset($vars['bare']) && $vars['bare'] == 'yes') {
-    $headeroptions .= '<a href="' . \LibreNMS\Util\Url::generate($vars, ['bare' => '']) . '">Restore Header</a>';
+    $headeroptions .= '<a href="' . Url::generate($vars, ['bare' => '']) . '">' . __('Restore Header') . '</a>';
 } else {
-    $headeroptions .= '<a href="' . \LibreNMS\Util\Url::generate($vars, ['bare' => 'yes']) . '">Remove Header</a>';
+    $headeroptions .= '<a href="' . Url::generate($vars, ['bare' => 'yes']) . '">' . __('Remove Header') . '</a>';
 }
 
 [$format, $subformat] = explode('_', $vars['format'], 2);
@@ -122,12 +129,12 @@ $no_refresh = $format == 'list';
 
 if ($format == 'graph') {
     if (empty($vars['from'])) {
-        $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
+        $graph_array['from'] = LibrenmsConfig::get('time.day');
     } else {
         $graph_array['from'] = $vars['from'];
     }
     if (empty($vars['to'])) {
-        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
+        $graph_array['to'] = LibrenmsConfig::get('time.now');
     } else {
         $graph_array['to'] = $vars['to'];
     }
@@ -238,9 +245,9 @@ if ($format == 'graph') {
     $row = 1;
     foreach (dbFetchRows($query, $sql_param) as $device) {
         if (is_int($row / 2)) {
-            $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
+            $row_colour = LibrenmsConfig::get('list_colour.even');
         } else {
-            $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
+            $row_colour = LibrenmsConfig::get('list_colour.odd');
         }
 
         if (device_permitted($device['device_id'])) {
@@ -272,19 +279,19 @@ if ($format == 'graph') {
             $link_array['type'] = $graph_type;
             $link_array['device'] = $device['device_id'];
             unset($link_array['height'], $link_array['width']);
-            $overlib_link = \LibreNMS\Util\Url::generate($link_array);
+            $overlib_link = Url::generate($link_array);
             echo '<div class="devices-overlib-box" style="min-width:' . ($width + 90) . '; max-width: ' . ($width + 90) . '">';
             echo '<div class="panel panel-default">';
-            echo \LibreNMS\Util\Url::overlibLink($overlib_link, \LibreNMS\Util\Url::lazyGraphTag($graph_array_new), \LibreNMS\Util\Url::graphTag($graph_array_zoom));
+            echo Url::overlibLink($overlib_link, Url::lazyGraphTag($graph_array_new), Url::graphTag($graph_array_zoom));
             echo "</div></div>\n\n";
         }
     }
     echo '</div>';
 } else {
     $state = $vars['state'] ?? '';
-    $state_selection = "<select name='state' id='state' class='form-control'><option value=''>All</option>" .
-        "<option value='up'" . ($state == 'up' ? ' selected' : '') . '>Up</option>' .
-        "<option value='down'" . ($state == 'down' ? ' selected' : '') . '>Down</option></select>';
+    $state_selection = "<select name='state' id='state' class='form-control'><option value=''>" . __('All') . '</option>' .
+        "<option value='up'" . ($state == 'up' ? ' selected' : '') . '>' . __('Up') . '</option>' .
+        "<option value='down'" . ($state == 'down' ? ' selected' : '') . '>' . __('Down') . '</option></select>';
 
     $features_selected = isset($vars['features']) ? json_encode(['id' => $vars['features'], 'text' => $vars['features']]) : '""';
     $hardware_selected = isset($vars['hardware']) ? json_encode(['id' => $vars['hardware'], 'text' => $vars['hardware']]) : '""';
@@ -294,14 +301,14 @@ if ($format == 'graph') {
 
     $os_selected = '""';
     if (isset($vars['os'])) {
-        $os_selected = json_encode(['id' => $vars['os'], 'text' => \App\Facades\LibrenmsConfig::getOsSetting($vars['os'], 'text', $vars['os'])]);
+        $os_selected = json_encode(['id' => $vars['os'], 'text' => LibrenmsConfig::getOsSetting($vars['os'], 'text', $vars['os'])]);
     }
 
     $location_selected = '""';
     if (isset($vars['location'])) {
         $location_text = $vars['location'];
         if (is_numeric($vars['location'])) {
-            $location_text = \App\Models\Location::where('id', $vars['location'])->value('location') ?: $vars['location'];
+            $location_text = Location::where('id', $vars['location'])->value('location') ?: $vars['location'];
         }
         $location_selected = json_encode(['id' => $vars['location'], 'text' => $location_text]);
     } ?>
@@ -318,17 +325,17 @@ if ($format == 'graph') {
                data-url="<?php echo route('table.device') ?>">
             <thead>
                 <tr>
-                    <th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false"><?php echo $detailed ? 'S.' : 'Status'; ?></th>
-                    <th data-column-id="device_id" data-width="5px" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>">Id</th>
-                    <th data-column-id="maintenance" data-width="5px" data-searchable="false" data-formatter="maintenance" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>"><?php echo $detailed ? 'M.' : 'Maintenance'; ?></th>
-                    <th data-column-id="icon" data-width="70px" data-searchable="false" data-formatter="icon" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>">Vendor</th>
-                    <th data-column-id="hostname" data-order="asc" <?php echo $detailed ? 'data-formatter="device"' : ''; ?>>Device</th>
-                    <th data-column-id="metrics" data-width="<?php echo $detailed ? '100px' : '150px'; ?>" data-sortable="false" data-searchable="false" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>">Metrics</th>
-                    <th data-column-id="hardware">Platform</th>
-                    <th data-column-id="os">Operating System</th>
-                    <th data-column-id="uptime" data-formatter="uptime">Up/Down Time</th>
-                    <th data-column-id="location" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>">Location</th>
-                    <th data-column-id="actions" data-width="<?php echo $detailed ? '120px' : '240px'; ?>" data-sortable="false" data-searchable="false" data-header-css-class="device-table-header-actions">Actions</th>
+                    <th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false"><?php echo $detailed ? 'S.' : __('Status'); ?></th>
+                    <th data-column-id="device_id" data-width="5px" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>"><?= __('Id') ?></th>
+                    <th data-column-id="maintenance" data-width="5px" data-searchable="false" data-formatter="maintenance" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>"><?php echo $detailed ? 'M.' : __('Maintenance'); ?></th>
+                    <th data-column-id="icon" data-width="70px" data-searchable="false" data-formatter="icon" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>"><?= __('Vendor') ?></th>
+                    <th data-column-id="hostname" data-order="asc" <?php echo $detailed ? 'data-formatter="device"' : ''; ?>><?= __('Device') ?></th>
+                    <th data-column-id="metrics" data-width="<?php echo $detailed ? '100px' : '150px'; ?>" data-sortable="false" data-searchable="false" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>"><?= __('Metrics')?></th>
+                    <th data-column-id="hardware"><?= __('Platform') ?></th>
+                    <th data-column-id="os"><?= __('device.attributes.os') ?></th>
+                    <th data-column-id="uptime" data-formatter="uptime"><?= __('Up/Down Time') ?></th>
+                    <th data-column-id="location" data-visible="<?php echo $detailed ? 'true' : 'false'; ?>"><?= __('device.attributes.location') ?></th>
+                    <th data-column-id="actions" data-width="<?php echo $detailed ? '120px' : '240px'; ?>" data-sortable="false" data-searchable="false" data-header-css-class="device-table-header-actions"><?= __('Actions') ?></th>
                 </tr>
             </thead>
         </table>
@@ -397,7 +404,7 @@ if ($format == 'graph') {
             "<form method='post' action='' class='form-inline devices-search-header' role='form'>" +
             "<?php echo addslashes(csrf_field()) ?>"+
             "<div class='form-group'>" +
-            "<input type='text' name='searchquery' id='searchquery' value='<?php echo htmlspecialchars($vars['searchquery'] ?? ''); ?>' class='form-control' placeholder='Search'>" +
+            "<input type='text' name='searchquery' id='searchquery' value='<?php echo htmlspecialchars($vars['searchquery'] ?? ''); ?>' class='form-control' placeholder='<?= __('Search') ?>'>" +
             "</div>" +
             "<div class='form-group'><?php echo $state_selection ?></div>" +
             "<div class='form-group'><select name='os' id='os' class='form-control'></select></div>" +
@@ -406,21 +413,21 @@ if ($format == 'graph') {
             "<div class='form-group'><select name='features' id='features' class='form-control'></select></div>" +
             "<div class='form-group'><select name='location' id='location' class='form-control'></select></div>" +
             "<div class='form-group'><select name='type' id='device-type' class='form-control'></select></div>" +
-            "<input type='submit' class='btn btn-info' value='Search'>" +
-            "<a href='<?php echo \LibreNMS\Util\Url::generate(array_diff_key($vars, ['_token' => 1])) ?>' title='Update the browser URL to reflect the search criteria.' class='btn btn-default'>Update URL</a>" +
-            "<a href='<?php echo \LibreNMS\Util\Url::generate(['page' => 'devices', 'section' => $vars['section'] ?? '', 'bare' => $vars['bare'] ?? '']) ?>' title='Reset criteria to default.' class='btn btn-default'>Reset</a>" +
+            "<input type='submit' class='btn btn-info' value='<?= __('Search') ?>'>" +
+            "<a href='<?php echo Url::generate(array_diff_key($vars, ['_token' => 1])) ?>' title='Update the browser URL to reflect the search criteria.' class='btn btn-default'><?= __('Update URL') ?></a>" +
+            "<a href='<?php echo Url::generate(['page' => 'devices', 'section' => $vars['section'] ?? '', 'bare' => $vars['bare'] ?? '']) ?>' title='Reset criteria to default.' class='btn btn-default'><?= __('Reset') ?></a>" +
             "</form>" +
             "</div>"
         );
             <?php
         } ?>
 
-        init_select2("#features", "device-field", {field: 'features'}, <?php echo $features_selected ?>, 'All Featuresets');
-        init_select2("#hardware", "device-field", {field: 'hardware'}, <?php echo $hardware_selected ?>, 'All Platforms');
-        init_select2("#os", "device-field", {field: 'os'}, <?php echo $os_selected ?>, 'All OS');
-        init_select2("#device-type", "device-field", {field: 'type'}, <?php echo $type_selected ?>, 'All Device Types');
-        init_select2("#version", "device-field", {field: 'version'}, <?php echo $version_selected ?>, 'All Versions');
-        init_select2("#location", "location", {}, <?php echo $location_selected ?>, 'All Locations');
+        init_select2("#features", "device-field", {field: 'features'}, <?php echo $features_selected ?>, "<?= __('All Featuresets') ?>");
+        init_select2("#hardware", "device-field", {field: 'hardware'}, <?php echo $hardware_selected ?>, "<?= __('All Platforms') ?>");
+        init_select2("#os", "device-field", {field: 'os'}, <?php echo $os_selected ?>, "<?= __('All OS') ?>");
+        init_select2("#device-type", "device-field", {field: 'type'}, <?php echo $type_selected ?>, "<?= __('All Device Types') ?>");
+        init_select2("#version", "device-field", {field: 'version'}, <?php echo $version_selected ?>, "<?= __('All Versions') ?>");
+        init_select2("#location", "location", {}, <?php echo $location_selected ?>, "<?= __('All Locations') ?>");
     </script>
     <?php
 }

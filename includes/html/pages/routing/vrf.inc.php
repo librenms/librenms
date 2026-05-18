@@ -112,9 +112,9 @@ if (Gate::denies('viewAny', Vrf::class)) {
             echo '<tr><td></td>';
             echo '<td width=240>';
             echo '<a class=list-large href=' . \LibreNMS\Util\Url::generate($vars, ['view' => 'detail', 'vrf' => $vrf['vrf_name']]) . '>';
-            echo $vrf['vrf_name'] . '</a><br />';
-            echo '<span class=box-desc>' . $vrf['mplsVpnVrfDescription'] . '</span></td>';
-            echo '<td width=100 class=box-desc>' . $vrf['mplsVpnVrfRouteDistinguisher'] . '</td>';
+            echo e($vrf['vrf_name']) . '</a><br />';
+            echo '<span class=box-desc>' . e($vrf['mplsVpnVrfDescription']) . '</span></td>';
+            echo '<td width=100 class=box-desc>' . e($vrf['mplsVpnVrfRouteDistinguisher']) . '</td>';
             echo '<td><table class="table table-hover table-striped table-condensed">';
             $x = 1;
             foreach ($vrf_devices[$vrf['vrf_name']][$vrf['mplsVpnVrfRouteDistinguisher']] as $device) {

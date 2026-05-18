@@ -27,6 +27,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Ipv4Address;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -45,7 +46,7 @@ class Ipv4AddressSearchController extends AddressSearchController
     /**
      * @inheritDoc
      */
-    protected function baseQuery(Request $request)
+    protected function baseQuery(Request $request): Builder|\Illuminate\Database\Query\Builder
     {
         return $this->applyBaseSearchQuery(
             Ipv4Address::query()->hasAccess($request->user())->with(['port', 'port.device']),

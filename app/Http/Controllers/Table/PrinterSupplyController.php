@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\PrinterSupply;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Util\Color;
@@ -12,11 +13,14 @@ use LibreNMS\Util\Number;
 use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Url;
 
+/**
+ * @extends TableController<PrinterSupply>
+ */
 class PrinterSupplyController extends TableController
 {
-    protected $default_sort = ['device_hostname' => 'asc', 'supply_descr' => 'asc'];
+    protected array $default_sort = ['device_hostname' => 'asc', 'supply_descr' => 'asc'];
 
-    protected function sortFields($request): array
+    protected function sortFields(Request $request): array
     {
         return [
             'device_hostname',
@@ -49,20 +53,21 @@ class PrinterSupplyController extends TableController
     }
 
     /**
-     * @param  PrinterSupply  $supply
+     * @param  PrinterSupply  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($supply): array
+    public function formatItem(Model $model): array
     {
-        $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $supply->device]);
-        $type = StringHelpers::camelToTitle($supply->supply_type == 'opc' ? 'organicPhotoConductor' : $supply->supply_type);
-        $descr = $supply->supply_descr;
-        $percent = Number::calculatePercent($supply->supply_current, $supply->supply_capacity);
+        $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $model->device]);
+        $type = StringHelpers::camelToTitle($model->supply_type == 'opc' ? 'organicPhotoConductor' : $model->supply_type);
+        $descr = $model->supply_descr;
+        $percent = Number::calculatePercent($model->supply_current, $model->supply_capacity);
         $used = $percent . '%';
 
         $graph_array = [
             'type' => 'toner_usage',
-            'popup_title' => htmlentities(strip_tags($supply->device?->displayName() . ': ' . $supply->supply_descr)),
-            'id' => $supply->supply_id,
+            'popup_title' => htmlentities(strip_tags($model->device?->displayName() . ': ' . $model->supply_descr)),
+            'id' => $model->supply_id,
             'from' => '-1d',
             'height' => 20,
             'width' => 80,
@@ -82,9 +87,9 @@ class PrinterSupplyController extends TableController
         }
 
         $colors = Color::percentage(100 - $percent); // supply, not usage
-        $right = $supply->supply_capacity == 100 ? '' : $supply->supply_capacity;
+        $right = $model->supply_capacity == 100 ? '' : $model->supply_capacity;
 
-        $bar = Html::percentageBar(400, 10, $percent, $supply->supply_current, $right, colors: $colors);
+        $bar = Html::percentageBar(400, 10, $percent, $model->supply_current, $right, colors: $colors);
 
         return [
             'device_hostname' => $hostname,

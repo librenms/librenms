@@ -10,8 +10,8 @@
  * the source code distribution for details.
  */
 
+use App\Models\AlertOperationTransportMap;
 use App\Models\AlertTransport;
-use App\Models\AlertTransportMap;
 use App\Models\TransportGroupTransport;
 use Illuminate\Support\Facades\Gate;
 
@@ -32,7 +32,7 @@ if (! is_numeric($vars['transport_id'])) {
     $message = 'No transport selected';
 } else {
     if (AlertTransport::where('transport_id', $vars['transport_id'])->delete()) {
-        AlertTransportMap::where('target_type', 'single')->where('transport_or_group_id', $vars['transport_id'])->delete();
+        AlertOperationTransportMap::where('transport_or_group_id', $vars['transport_id'])->where('target_type', 'single')->delete();
         TransportGroupTransport::where('transport_id', $vars['transport_id'])->delete();
 
         $message = 'Alert transport has been deleted';
