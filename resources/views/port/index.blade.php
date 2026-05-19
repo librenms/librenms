@@ -20,7 +20,7 @@
                                 <i class="fa fa-ellipsis-v fa-lg fa-fw icon-theme"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-right">
-                                <li><a href="{{ $hideFilterLink }}"><i class="fa fa-regular @if($hideFilter) fa-square @else fa-square-check @endif fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ __('port.show_fitler') }}</a></li>
+                                <li><a href="{{ $hideFilterLink }}"><i class="fa fa-regular @if($hideFilter) fa-square @else fa-square-check @endif fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ __('port.show_filter') }}</a></li>
                                 <li><a href="{{ $bareLink }}"><i class="fa fa-regular @if($bare) fa-square @else fa-square-check @endif fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ __('port.show_header') }}</a></li>
                                 @can('delete', \App\Models\Port::class)
                                 <li><a href="#" @click.prevent="purgeDeleted()">
