@@ -448,7 +448,7 @@ modules:
                     snmp_flags: ['-OteQUsab', '-Pu']
                     divisor: 100
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.3.1.14.{{ $index }}'
-                    descr: '{{ lgpPwrMeasurementPoint }}.{{ $index }}'
+                    descr: '{{ LIEBERT-GP-POWER-MIB::lgpPwrMeasurementPoint }}.{{ $index }}'
                     index: 'lgpPwrLineMeasurementPowerFactor.{{ $index }}'
                 -
                     oid: LIEBERT-GP-PDU-MIB::lgpPduRcpTable
