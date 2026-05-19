@@ -207,7 +207,7 @@ trait Filterable
     public static function filterValidationRules(): array
     {
         return [
-            'filter' => ['array'],
+            'filter' => ['nullable', 'array'],
             'filter.*' => [
                 'array',
                 function ($attribute, $value, $fail): void {

@@ -53,6 +53,7 @@ export default function filterBarComponent({
         filters: [],
         showAdd: false,
         showOptions: false,
+        isCleared: false,
         dialog: false,
         current: null,
         snapshot: null,
@@ -101,20 +102,15 @@ export default function filterBarComponent({
             });
 
             const params = new URLSearchParams(window.location.search);
-            const hasUrlFilters = Array.from(params.keys()).some((k) =>
-                k.startsWith("filter[")
-            );
-            const sessionData = sessionStorage.getItem(
-                `filter-cache-${this.name}`
-            );
+            const hasUrlFilters = Array.from(params.keys()).some((k) => k.startsWith("filter["));
+            this.isCleared = params.has("filter") && !hasUrlFilters;
 
             if (hasUrlFilters) {
                 await this.restoreFromUrl(params);
-            } else if (sessionData !== null) {
-                this.filters = JSON.parse(sessionData);
-                await this.hydrateAll();
+            } else if (this.isCleared) {
+                this.filters = []; // URL explicitly asked for no filters; bypass defaults
             } else if (Object.keys(this.initial || {}).length > 0) {
-                await this.restoreFromData(this.initial);
+                await this.restoreFromData(this.initial); // Fresh page load; load backend defaults
             }
 
             // Sync external links on load
@@ -123,7 +119,7 @@ export default function filterBarComponent({
             this.$dispatch("filter:loaded", {
                 name: this.name,
                 filters: this.formattedFilters,
-                from: hasUrlFilters ? "url" : (sessionData !== null ? "session" : "initial"),
+                from: hasUrlFilters ? "url" : (this.isCleared ? "clear" : "initial"),
             });
 
             if (this.filters.length > 0 && !this.reload) {
@@ -188,26 +184,28 @@ export default function filterBarComponent({
 
         // --- Syncing & Persistence ---
         applyFiltersToUrl(url) {
+            // Clear out any old filter mutations to keep the string clean
             [...url.searchParams.keys()]
-                .filter((k) => k.startsWith("filter["))
+                .filter((k) => k.startsWith("filter[") || k === "filter")
                 .forEach((k) => url.searchParams.delete(k));
 
-            this.filters.forEach((f) => {
-                url.searchParams.set(
-                    `filter[${f.key}][${f.op}]`,
-                    this.encodeValue(f.value)
-                );
-            });
+            if (this.filters.length > 0) {
+                this.filters.forEach((f) => {
+                    url.searchParams.set(
+                        `filter[${f.key}][${f.op}]`,
+                        this.encodeValue(f.value)
+                    );
+                });
+            } else if (this.isCleared) {
+                url.searchParams.set("filter", "");
+            }
 
             return url;
         },
 
         syncUrl() {
             const url = this.applyFiltersToUrl(new URL(window.location));
-            sessionStorage.setItem(
-                `filter-cache-${this.name}`,
-                JSON.stringify(this.filters)
-            );
+
             if (this.reload) {
                 window.location.href = url.href;
             } else {
@@ -411,6 +409,8 @@ export default function filterBarComponent({
             i >= 0
                 ? this.filters.splice(i, 1, entry)
                 : this.filters.push(entry);
+
+            this.isCleared = false;
             this.snapshot = null;
             this.syncUrl();
             this.close();
@@ -432,6 +432,7 @@ export default function filterBarComponent({
 
         remove(key) {
             this.filters = this.filters.filter((f) => f.key !== key);
+            this.isCleared = this.filters.length === 0;
             this.snapshot = null;
             this.close();
             this.syncUrl();
@@ -439,6 +440,7 @@ export default function filterBarComponent({
 
         clearAll() {
             this.filters = [];
+            this.isCleared = true;
             this.syncUrl();
             this.showOptions = false;
         },
