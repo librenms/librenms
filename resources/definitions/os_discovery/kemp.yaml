@@ -15,7 +15,7 @@ modules:
                     states:
                         - { value: 1, generic: 0, descr: 'In Service' }
                         - { value: 2, generic: 2, descr: 'Out of Service' }
-                        - { value: 4, generic: 1, descr: Disabled' }
+                        - { value: 4, generic: 1, descr: 'Disabled' }
                         - { value: 5, generic: 1, descr: 'Sorry' }
                         - { value: 6, generic: 0, descr: 'Redirect' }
                         - { value: 7, generic: 2, descr: 'Error Message' }
