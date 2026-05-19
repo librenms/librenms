@@ -38,6 +38,7 @@ use App\Http\Controllers\PollerGroupController;
 use App\Http\Controllers\PollerSettingsController;
 use App\Http\Controllers\PortController;
 use App\Http\Controllers\PortGroupController;
+use App\Http\Controllers\PortTypeController;
 use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\RealtimeDataController;
 use App\Http\Controllers\RealtimeGraphController;
@@ -50,6 +51,7 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SslCertificateController;
 use App\Http\Controllers\Table;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserPermissionsController;
 use App\Http\Controllers\UserPreferencesController;
 use App\Http\Controllers\ValidateController;
 use App\Http\Controllers\Widgets;
@@ -93,7 +95,10 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('inventory/purge', [App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
     Route::get('outages', [OutagesController::class, 'index'])->name('outages');
     Route::resource('port', PortController::class)->only('update');
+    Route::get('port/{port}/popup', App\Http\Controllers\PortPopupController::class)->name('port.popup');
     Route::get('vlans', [App\Http\Controllers\VlansController::class, 'index'])->name('vlans.index');
+    Route::get('porttype/{type}', [PortTypeController::class, 'graph'])->name('porttype.graph');
+    Route::get('portgroup/{group}', [PortGroupController::class, 'graph'])->name('portgroup.graph')->whereNumber('group');
     Route::prefix('poller')->group(function (): void {
         Route::get('', [PollerController::class, 'pollerTab'])->name('poller.index');
         Route::get('log', [PollerController::class, 'logTab'])->name('poller.log');
@@ -102,6 +107,9 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('performance', [PollerController::class, 'performanceTab'])->name('poller.performance');
         Route::resource('{id}/settings', PollerSettingsController::class, ['as' => 'poller'])->only(['update', 'destroy']);
     });
+    Route::delete('ports/purge', [\App\Http\Controllers\PortsController::class, 'purge'])->name('ports.purge');
+    Route::get('ports/{view?}/{graph?}', [\App\Http\Controllers\PortsController::class, 'index'])
+        ->middleware('saved-filter:ports')->name('ports');
     Route::prefix('services')->name('services.')->group(function (): void {
         Route::resource('templates', ServiceTemplateController::class);
         Route::post('templates/applyAll', [ServiceTemplateController::class, 'applyAll'])->name('templates.applyAll');
@@ -110,7 +118,7 @@ Route::middleware(['auth'])->group(function (): void {
     });
     Route::get('locations', [LocationController::class, 'index']);
     Route::resource('ssl-certificates', SslCertificateController::class)->except(['edit']);
-    Route::resource('preferences', UserPreferencesController::class)->only('index', 'store');
+    Route::resource('preferences', UserPreferencesController::class)->only('index', 'store', 'update');
     Route::middleware('can:api.access')->group(function (): void {
         Route::get('api-access', [ApiAccessController::class, 'index'])->name('api-access.index');
         Route::post('api-access', [ApiAccessController::class, 'store'])->name('api-access.store');
@@ -119,6 +127,17 @@ Route::middleware(['auth'])->group(function (): void {
         Route::delete('api-access/{id}', [ApiAccessController::class, 'destroy'])->name('api-access.destroy')->whereNumber('id');
     });
     Route::resource('users', UserController::class);
+    Route::prefix('users/{user}/permissions')->name('users.permissions.')->group(function (): void {
+        Route::get('', [UserPermissionsController::class, 'edit'])->name('edit');
+        Route::post('device', [UserPermissionsController::class, 'attachDevice'])->name('device.attach');
+        Route::delete('device/{device}', [UserPermissionsController::class, 'detachDevice'])->name('device.detach')->whereNumber('device');
+        Route::post('device-group', [UserPermissionsController::class, 'attachDeviceGroup'])->name('device-group.attach');
+        Route::delete('device-group/{deviceGroup}', [UserPermissionsController::class, 'detachDeviceGroup'])->name('device-group.detach')->whereNumber('deviceGroup');
+        Route::post('port', [UserPermissionsController::class, 'attachPort'])->name('port.attach');
+        Route::delete('port/{port}', [UserPermissionsController::class, 'detachPort'])->name('port.detach')->whereNumber('port');
+        Route::post('bill', [UserPermissionsController::class, 'attachBill'])->name('bill.attach');
+        Route::delete('bill/{bill}', [UserPermissionsController::class, 'detachBill'])->name('bill.detach')->whereNumber('bill');
+    });
     Route::get('about', [AboutController::class, 'index'])->name('about');
     Route::delete('reporting', [AboutController::class, 'clearReportingData'])->name('reporting.clear');
     Route::get('authlog', [UserController::class, 'authlog']);
@@ -141,7 +160,11 @@ Route::middleware(['auth'])->group(function (): void {
         Route::post('/device/{device}/rediscover', [DeviceController::class, 'rediscover'])->name('device.rediscover');
     });
 
+    Route::get('/device/delete', [DeviceController::class, 'deleteIndex'])->name('device.delete');
     Route::prefix('device/{device}')->name('device.')->group(function (): void {
+        Route::get('delete', [DeviceController::class, 'deleteConfirm'])->name('delete.confirm');
+        Route::delete('', [DeviceController::class, 'destroy'])->name('destroy');
+
         Route::redirect('logs', 'logs/eventlog')->name('logs');
         Route::get('logs/eventlog', Device\Tabs\EventlogController::class)->name('eventlog');
         Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');
@@ -155,6 +178,7 @@ Route::middleware(['auth'])->group(function (): void {
 
     // fallback device routes
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', [DeviceController::class, 'index'])
+        ->middleware('saved-filter:device.ports') // FIXME more specific route
         ->name('device')->where('vars', '.*');
 
     // Maps
@@ -374,6 +398,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('generic-image', Widgets\ImageController::class);
             Route::post('globe', Widgets\GlobeController::class);
             Route::post('graylog', Widgets\GraylogController::class);
+            Route::post('health-sensors', Widgets\HealthSensorsController::class);
             Route::post('placeholder', Widgets\PlaceholderController::class);
             Route::post('notes', Widgets\NotesController::class);
             Route::post('server-stats', Widgets\ServerStatsController::class);

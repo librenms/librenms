@@ -209,17 +209,17 @@ $rrd_cmd = false;
 if (isset($MetaGraphDefs[$type])) {
     $identifiers = [];
     foreach ($all_tinst as &$atinst) {
-        $identifiers[] = collectd_identifier($host, $plugin, $type, is_null($pinst) ? '' : $pinst, $atinst);
+        $identifiers[] = collectd_identifier($host, $plugin, $type, $pinst ?? '', $atinst);
     }
 
     collectd_flush($identifiers);
     $rrd_cmd = $MetaGraphDefs[$type]($host, $plugin, $pinst, $type, $all_tinst, $opts);
 } else {
-    if (! in_array(is_null($tinst) ? '' : $tinst, $all_tinst)) {
+    if (! in_array($tinst ?? '', $all_tinst)) {
         return error404($host . '/' . $plugin . (! is_null($pinst) ? '-' . $pinst : '') . '/' . $type . (! is_null($tinst) ? '-' . $tinst : ''), 'No rrd file found for graphing');
     }
 
-    collectd_flush(collectd_identifier($host, $plugin, $type, is_null($pinst) ? '' : $pinst, is_null($tinst) ? '' : $tinst));
+    collectd_flush(collectd_identifier($host, $plugin, $type, $pinst ?? '', $tinst ?? ''));
     if (isset($GraphDefs[$type])) {
         $rrd_cmd = collectd_draw_generic($timespan, $host, $plugin, $type, $pinst, $tinst);
     } else {

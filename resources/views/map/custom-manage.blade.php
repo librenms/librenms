@@ -8,8 +8,8 @@
     @include('map.custom-map-delete-modal')
     @include('map.custom-map-clone-modal')
 
-    <x-panel id="manage-custom-maps" body-class="tw:pb-0!" class="tw:mx-auto tw:max-w-(--breakpoint-lg)">
-        <x-slot name="title">
+    <x-panel id="manage-custom-maps" class="tw:mx-auto tw:max-w-(--breakpoint-lg)">
+        <x-slot:title>
             <div class="tw:flex tw:justify-between tw:items-center">
                 <div>
                     {{ __('map.custom.title.manage') }}
@@ -20,13 +20,14 @@
                     </button>
                 </div>
             </div>
-        </x-slot>
-
+        </x-slot:title>
+        <x-slot:slot class="tw:p-0!">
         @foreach($maps as $group_name => $group)
-            <x-panel id="map-group-{{ $group_uuid = uniqid() }}" body-class="tw:p-0!">
+            <x-panel id="map-group-{{ $group_uuid = uniqid() }}">
                 @if($group_name)
-                    <x-slot name="title">{{ $group_name }}</x-slot>
+                    <x-slot:title>{{ $group_name }}</x-slot:title>
                 @endif
+                <x-slot:slot class="tw:p-0!">
                 @foreach($group as $map)
                     <div id="map-{{ $map->custom_map_id }}" class="tw:even:bg-gray-50 tw:dark:even:bg-zinc-900">
                         <div class="tw:flex tw:justify-between tw:p-3 tw:items-center tw:hover:bg-gray-100 tw:dark:hover:bg-gray-600">
@@ -58,8 +59,10 @@
                         </div>
                     </div>
                 @endforeach
+                </x-slot:slot>
             </x-panel>
         @endforeach
+        </x-slot:slot>
     </x-panel>
 </div>
 @endsection

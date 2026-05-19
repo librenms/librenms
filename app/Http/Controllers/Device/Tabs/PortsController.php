@@ -36,6 +36,7 @@ use App\Models\UserPref;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -45,14 +46,11 @@ class PortsController implements DeviceTab
 {
     private bool $detail = true;
     private array $settings = [];
+    private array $savedFilter = [];
     private array $defaults = [
         'perPage' => 32,
         'sort' => 'ifIndex',
         'order' => 'asc',
-        'disabled' => false,
-        'ignored' => false,
-        'admin' => 'up',
-        'status' => 'any',
     ];
 
     public function visible(Device $device): bool
@@ -82,14 +80,9 @@ class PortsController implements DeviceTab
             'perPage' => ['regex:/^(\d+|all)$/'],
             'sort' => 'in:media,mac,port,traffic,speed,index',
             'order' => 'in:asc,desc',
-            'disabled' => 'in:0,1',
-            'ignored' => 'in:0,1',
-            'admin' => 'in:up,down,testing,any',
-            'status' => 'in:up,down,testing,unknown,dormant,notPresent,lowerLayerDown,any',
-            'type' => 'in:bits,upkts,nupkts,errors,etherlike',
             'from' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
             'to' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
-            'searchPort' => 'nullable|string|max:255',
+            ...Port::filterValidationRules(),
         ]);
 
         $this->loadSettings($request);
@@ -107,11 +100,13 @@ class PortsController implements DeviceTab
         return array_merge([
             'tab' => $tab,
             'details' => $this->detail,
+            'filterFields' => $this->filterFields($device->device_id),
             'submenu' => [
                 $this->getTabs($device),
                 __('Graphs') => $this->getGraphLinks(),
             ],
-            'dropdownLinks' => $this->pageLinks($request),
+            'dropdownLinks' => [],
+            'filter' => $request->array('filter'),
             'perPage' => $this->settings['perPage'],
             'sort' => $this->settings['sort'],
             'next_order' => $this->settings['order'] == 'asc' ? 'desc' : 'asc',
@@ -139,8 +134,7 @@ class PortsController implements DeviceTab
         /** @var Collection<int, Port>|LengthAwarePaginator<Port> $ports */
         $ports = $this->getFilteredPortsQuery($device, $relationships, $request)
             ->paginate(fn ($total) => $this->settings['perPage'] == 'all' ? $total : (int) $this->settings['perPage']) // @phpstan-ignore-line missing closure type
-            ->appends('perPage', $this->settings['perPage'])
-            ->appends('searchPort', $request->input('searchPort'));
+            ->appends('perPage', $this->settings['perPage']);
 
         $data = [
             'ports' => $ports,
@@ -296,8 +290,8 @@ class PortsController implements DeviceTab
     private function getTabs(Device $device): array
     {
         $tabs = [
-            ['name' => __('Basic'), 'url' => 'basic'],
-            ['name' => __('Detail'), 'url' => 'detail'],
+            ['name' => __('Basic'), 'url' => 'basic', 'class' => 'sync-filter-url'],
+            ['name' => __('Detail'), 'url' => 'detail', 'class' => 'sync-filter-url'],
         ];
 
         if ($device->macs()->exists()) {
@@ -340,24 +334,28 @@ class PortsController implements DeviceTab
             [
                 'name' => __('port.graphs.bits'),
                 'url' => 'graphs?type=bits',
+                'class' => 'sync-filter-url',
                 'sub_name' => __('Mini'),
                 'sub_url' => 'mini_graphs?type=bits',
             ],
             [
                 'name' => __('port.graphs.upkts'),
                 'url' => 'graphs?type=upkts',
+                'class' => 'sync-filter-url',
                 'sub_name' => __('Mini'),
                 'sub_url' => 'mini_graphs?type=upkts',
             ],
             [
                 'name' => __('port.graphs.nupkts'),
                 'url' => 'graphs?type=nupkts',
+                'class' => 'sync-filter-url',
                 'sub_name' => __('Mini'),
                 'sub_url' => 'mini_graphs?type=nupkts',
             ],
             [
                 'name' => __('port.graphs.errors'),
                 'url' => 'graphs?type=errors',
+                'class' => 'sync-filter-url',
                 'sub_name' => __('Mini'),
                 'sub_url' => 'mini_graphs?type=errors',
             ],
@@ -377,8 +375,14 @@ class PortsController implements DeviceTab
 
     private function loadSettings(Request $request): void
     {
-        $input = $request->only(['perPage', 'sort', 'order', 'disabled', 'ignored', 'admin', 'status']);
-        $saved = UserPref::getPref($request->user(), 'ports_ui_settings') ?? [];
+        $input = $request->only(['perPage', 'sort', 'order']);
+        $saved = UserPref::getPref($request->user(), 'ports_ui_settings');
+
+        if ($saved === null) {
+            $saved = [];
+        } elseif (array_key_exists('admin', $saved)) {
+            $saved = $this->migrateFilterSettings($saved, $request);
+        }
 
         $this->settings = $input + $saved + $this->defaults;
 
@@ -402,21 +406,10 @@ class PortsController implements DeviceTab
             default => 'ifIndex',
         };
 
-        // Get search parameter
-        $searchPort = $request?->input('searchPort');
-
         return Port::where('device_id', $device->device_id)
             ->isNotDeleted()
             ->hasAccess(Auth::user())->with($relationships)
-            ->when(! $this->settings['disabled'], fn (Builder $q, $disabled) => $q->where('disabled', 0))
-            ->when(! $this->settings['ignored'], fn (Builder $q, $disabled) => $q->where('ignore', 0))
-            ->when($this->settings['admin'] != 'any', fn (Builder $q, $admin) => $q->where('ifAdminStatus', $this->settings['admin']))
-            ->when($this->settings['status'] != 'any', fn (Builder $q, $admin) => $q->where('ifOperStatus', $this->settings['status']))
-            ->when($searchPort, fn (Builder $q) => $q->where(function (Builder $q) use ($searchPort): void {
-                $q->where('ifName', 'LIKE', '%' . $searchPort . '%')
-                    ->orWhere('ifDescr', 'LIKE', '%' . $searchPort . '%')
-                    ->orWhere('ifAlias', 'LIKE', '%' . $searchPort . '%');
-            }))
+            ->when(array_merge($this->savedFilter, $request->array('filter')), fn (Builder $q, $filters) => $q->applyFilters($filters))
             ->when($this->settings['sort'] == 'port', fn (Builder $q, $sort) => $q
                 ->orderByRaw('SOUNDEX(ifName) ' . $this->settings['order'])
                 ->orderByRaw('CHAR_LENGTH(ifName) ' . $this->settings['order'])
@@ -440,37 +433,93 @@ class PortsController implements DeviceTab
         return $request->route('vars', LibrenmsConfig::get('ports_page_default')); // fourth segment is called vars to handle legacy urls
     }
 
-    private function pageLinks(Request $request): array
+    private function migrateFilterSettings(array $saved, Request $request): array
     {
-        $disabled = $this->settings['disabled'];
-        $ignored = $this->settings['ignored'];
-        $admin = $this->settings['admin'] == 'any';
-        $status = $this->settings['status'] == 'up';
+        $filter = [];
 
+        if (! $saved['disabled']) {  // 0: disabled hidden 1: not filtered
+            $filter['disabled'] = ['eq' => 0];
+        }
+
+        if (! $saved['ignored']) { // 0: ignored hidden 1: not filtered
+            $filter['ignore'] = ['eq' => 0];
+        }
+
+        if ($saved['status'] == 'up') { // up: only status up, any: not filtered
+            $filter['state'] = ['eq' => 'up'];
+        } elseif ($saved['admin'] == 'up') { // up: only != shutdown, any: not filtered
+            $filter['state'] = ['neq' => 'shutdown'];
+        }
+
+        Arr::forget($saved, ['admin', 'status', 'disabled', 'ignored']);
+        UserPref::setPref($request->user(), 'ports_ui_settings', $saved);
+        UserPref::setPref($request->user(), 'filters.device.ports', $filter);
+
+        $request->merge([
+            'filter' => array_merge($filter, $request->array('filter')),
+        ]);
+
+        return $saved;
+    }
+
+    private function filterFields(int $device_id): array
+    {
         return [
             [
-                'icon' => $status ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
-                'url' => $request->fullUrlWithQuery(['status' => $status ? $this->defaults['status'] : 'up']),
-                'title' => __('port.filters.status_up'),
-                'external' => false,
+                'key' => 'search',
+                'label' => 'Description',
+                'type' => 'text',
             ],
             [
-                'icon' => $admin ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
-                'url' => $request->fullUrlWithQuery(['admin' => $admin ? $this->defaults['admin'] : 'any']),
-                'title' => __('port.filters.admin_down'),
-                'external' => false,
+                'key' => 'state',
+                'label' => 'Oper Status',
+                'type' => 'select',
+                'options' => ['up', 'down', 'shutdown'],
             ],
             [
-                'icon' => $disabled ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
-                'url' => $request->fullUrlWithQuery(['disabled' => ! $disabled]),
-                'title' => __('port.filters.disabled'),
-                'external' => false,
+                'key' => 'ifSpeed',
+                'label' => 'Speed',
+                'type' => 'select',
+                'endpoint' => route('ajax.select.port-field'),
+                'params' => [
+                    'field' => 'ifSpeed',
+                    'device' => $device_id,
+                ],
             ],
             [
-                'icon' => $ignored ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
-                'url' => $request->fullUrlWithQuery(['ignored' => ! $ignored]),
-                'title' => __('port.filters.ignored'),
-                'external' => false,
+                'key' => 'ifType',
+                'label' => 'Media',
+                'type' => 'select',
+                'endpoint' => route('ajax.select.port-field'),
+                'params' => [
+                    'field' => 'ifType',
+                    'device' => $device_id,
+                ],
+            ],
+            [
+                'key' => 'port_type',
+                'label' => 'Port Type',
+                'type' => 'select',
+                'endpoint' => route('ajax.select.port-field'),
+                'params' => [
+                    'field' => 'port_descr_type',
+                    'device' => $device_id,
+                ],
+            ],
+            [
+                'key' => 'ignore',
+                'label' => 'Ignored',
+                'type' => 'boolean',
+            ],
+            [
+                'key' => 'disabled',
+                'label' => 'Disabled',
+                'type' => 'boolean',
+            ],
+            [
+                'key' => 'deleted',
+                'label' => 'Deleted',
+                'type' => 'boolean',
             ],
         ];
     }

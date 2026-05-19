@@ -91,7 +91,7 @@ class AlertUtil
         unset($rextra['_stop_notifications']);
 
         $ruleRow = AlertRule::query()
-            ->with('alertOperation:id,default_operation_step_duration_seconds')
+            ->with('alertOperation:id,default_operation_step_duration_seconds,notifications_suppressed')
             ->whereKey($ruleId)
             ->first(['id', 'alert_operation_id']);
         if ($ruleRow === null || $ruleRow->alert_operation_id === null) {
@@ -122,6 +122,12 @@ class AlertUtil
         $op = self::selectOperationForEscalationStep($ops, $nextStep);
         if ($op === null) {
             $rextra['_stop_notifications'] = true;
+
+            return;
+        }
+
+        if ($ruleRow->alertOperation === null || (bool) $ruleRow->alertOperation->notifications_suppressed) {
+            $rextra['mute'] = true;
 
             return;
         }

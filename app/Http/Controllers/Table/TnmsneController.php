@@ -27,18 +27,23 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\TnmsneInfo;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
+/**
+ * @extends TableController<TnmsneInfo>
+ */
 class TnmsneController extends TableController
 {
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'device_id' => 'nullable|integer',
         ];
     }
 
-    protected function sortFields($request)
+    protected function sortFields(Request $request): array
     {
         return [
             'neName',
@@ -50,7 +55,7 @@ class TnmsneController extends TableController
         ];
     }
 
-    protected function searchFields(Request $request)
+    protected function searchFields(Request $request): array
     {
         return [
             'neName',
@@ -62,7 +67,7 @@ class TnmsneController extends TableController
         ];
     }
 
-    protected function filterFields(Request $request)
+    protected function filterFields(Request $request): array
     {
         return ['device_id'];
     }
@@ -70,31 +75,31 @@ class TnmsneController extends TableController
     /**
      * @inheritDoc
      */
-    protected function baseQuery(Request $request)
+    protected function baseQuery(Request $request): Builder
     {
         return TnmsneInfo::query();
     }
 
     /**
-     * @param  TnmsneInfo  $tnmsne
-     * @return array
+     * @param  TnmsneInfo  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($tnmsne)
+    public function formatItem(Model $model): array
     {
-        $neOp = $tnmsne->neOpMode == 'operation'
+        $neOp = $model->neOpMode == 'operation'
             ? '<span style="min-width:40px;" class="label label-success">operation</span>'
-            : '<span style="min-width:40px;" class="label label-danger">' . htmlspecialchars((string) $tnmsne->neOpMode) . '</span>';
+            : '<span style="min-width:40px;" class="label label-danger">' . htmlspecialchars((string) $model->neOpMode) . '</span>';
 
-        $opState = $tnmsne->neOpState == 'enabled'
+        $opState = $model->neOpState == 'enabled'
             ? '<td class="list"><span style="min-width:40px;" class="label label-success">enabled</span></td>'
-            : '<td class="list"><span style="min-width:40px;" class="label label-danger">' . htmlspecialchars((string) $tnmsne->neOpState) . '</span></td>';
+            : '<td class="list"><span style="min-width:40px;" class="label label-danger">' . htmlspecialchars((string) $model->neOpState) . '</span></td>';
 
         return [
-            'neName' => htmlspecialchars((string) $tnmsne->neName),
-            'neLocation' => htmlspecialchars((string) $tnmsne->neLocation),
-            'neType' => htmlspecialchars((string) $tnmsne->neType),
+            'neName' => htmlspecialchars((string) $model->neName),
+            'neLocation' => htmlspecialchars((string) $model->neLocation),
+            'neType' => htmlspecialchars((string) $model->neType),
             'neOpMode' => $neOp,
-            'neAlarm' => $this->getAlarmLabel($tnmsne->neAlarm),
+            'neAlarm' => $this->getAlarmLabel($model->neAlarm),
             'neOpState' => $opState,
         ];
     }
