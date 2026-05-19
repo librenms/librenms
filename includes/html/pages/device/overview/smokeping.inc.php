@@ -1,7 +1,7 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
-use LibreNMS\Data\Store\Rrd;
+use App\Facades\Rrd;
 use LibreNMS\Util\Smokeping;
 use LibreNMS\Util\Url;
 
@@ -65,7 +65,7 @@ if ($smokeping && $smokeping->hasGraphs()) {
 
 // Fallback: ICMP Performance graph when smokeping is not available.
 // Skip for os=ping devices — overview/ping.inc.php already shows this graph as "Ping Response".
-if ($device_obj->os === 'ping' || ! (new Rrd())->checkRrdExists((new Rrd())->name($device_obj->hostname, 'icmp-perf'))) {
+if ($device_obj->os === 'ping' || ! Rrd::checkRrdExists(Rrd::name($device_obj->hostname, 'icmp-perf'))) {
     return;
 }
 
