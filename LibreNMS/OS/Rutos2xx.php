@@ -87,6 +87,8 @@ class Rutos2xx extends OS implements
         if ($oid !== null) {
             return [new WirelessSensor(WirelessSensorType::Snr, $this->getDeviceId(), $oid, 'rutos-2xx', 1, 'SINR', null, -1, 1)];
         }
+
+        return [];
     }
 
     public function discoverWirelessRssi()
@@ -105,5 +107,7 @@ class Rutos2xx extends OS implements
         if ($oid !== null) {
             return [new WirelessSensor(WirelessSensorType::Rssi, $this->getDeviceId(), $oid, 'rutos-2xx', 1, 'RSRP', null, 1, 1)];
         }
+
+        return [];
     }
 }
