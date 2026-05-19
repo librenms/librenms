@@ -205,7 +205,7 @@ class Device extends BaseModel
      */
     public function displayName(): string
     {
-        return $this->display ?: $this->hostname;
+        return $this->display ?: $this->hostname ?: '';
     }
 
     /**
