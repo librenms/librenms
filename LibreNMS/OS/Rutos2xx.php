@@ -50,10 +50,10 @@ class Rutos2xx extends OS implements
             '.1.3.6.1.4.1.48690.2.2.1.26.1',
         ])->values();
 
-        $usage_sent = $this->firstNumeric($usage, ['.1.3.6.1.4.1.48690.2.11.0', '.1.3.6.1.4.1.48690.2.2.1.25.1']);
-        $usage_received = $this->firstNumeric($usage, ['.1.3.6.1.4.1.48690.2.10.0', '.1.3.6.1.4.1.48690.2.2.1.26.1']);
+        $usage_sent = $usage['.1.3.6.1.4.1.48690.2.11.0'] ?? $usage['.1.3.6.1.4.1.48690.2.2.1.25.1'] ?? null;
+        $usage_received = $usage['.1.3.6.1.4.1.48690.2.10.0'] ?? $usage['.1.3.6.1.4.1.48690.2.2.1.26.1'] ?? null;
 
-        if ($usage_sent !== null && $usage_received !== null
+        if (is_numeric($usage_sent) && is_numeric($usage_received)
             && $usage_sent >= 0 && $usage_received >= 0
         ) {
             $rrd_def = RrdDefinition::make()
@@ -71,51 +71,39 @@ class Rutos2xx extends OS implements
         }
     }
 
-    public function discoverWirelessSnr(): array
+    public function discoverWirelessSnr()
     {
-        $oid = $this->resolveModemOid('.1.3.6.1.4.1.48690.2.22.0', '.1.3.6.1.4.1.48690.2.2.1.19.1');
-        if ($oid === null) {
-            return [];
-        }
+        $values = SnmpQuery::numeric()->get([
+            '.1.3.6.1.4.1.48690.2.22.0',
+            '.1.3.6.1.4.1.48690.2.2.1.19.1',
+        ])->values();
 
-        return [
-            new WirelessSensor(WirelessSensorType::Snr, $this->getDeviceId(), $oid, 'rutos-2xx', 1, 'SINR', null, -1, 1),
-        ];
+        $oid = ! empty($values['.1.3.6.1.4.1.48690.2.22.0'])
+            ? '.1.3.6.1.4.1.48690.2.22.0'
+            : (! empty($values['.1.3.6.1.4.1.48690.2.2.1.19.1'])
+                ? '.1.3.6.1.4.1.48690.2.2.1.19.1'
+                : null);
+
+        if ($oid !== null) {
+            return [new WirelessSensor(WirelessSensorType::Snr, $this->getDeviceId(), $oid, 'rutos-2xx', 1, 'SINR', null, -1, 1)];
+        }
     }
 
-    public function discoverWirelessRssi(): array
+    public function discoverWirelessRssi()
     {
-        $oid = $this->resolveModemOid('.1.3.6.1.4.1.48690.2.23.0', '.1.3.6.1.4.1.48690.2.2.1.20.1');
-        if ($oid === null) {
-            return [];
+        $values = SnmpQuery::numeric()->get([
+            '.1.3.6.1.4.1.48690.2.23.0',
+            '.1.3.6.1.4.1.48690.2.2.1.20.1',
+        ])->values();
+
+        $oid = ! empty($values['.1.3.6.1.4.1.48690.2.23.0'])
+            ? '.1.3.6.1.4.1.48690.2.23.0'
+            : (! empty($values['.1.3.6.1.4.1.48690.2.2.1.20.1'])
+                ? '.1.3.6.1.4.1.48690.2.2.1.20.1'
+                : null);
+
+        if ($oid !== null) {
+            return [new WirelessSensor(WirelessSensorType::Rssi, $this->getDeviceId(), $oid, 'rutos-2xx', 1, 'RSRP', null, 1, 1)];
         }
-
-        return [
-            new WirelessSensor(WirelessSensorType::Rssi, $this->getDeviceId(), $oid, 'rutos-2xx', 1, 'RSRP', null, 1, 1),
-        ];
-    }
-
-    private function firstNumeric(array $values, array $oids): ?float
-    {
-        foreach ($oids as $oid) {
-            if (isset($values[$oid]) && is_numeric($values[$oid])) {
-                return (float) $values[$oid];
-            }
-        }
-
-        return null;
-    }
-
-    private function resolveModemOid(string $legacyOid, string $tableOid): ?string
-    {
-        $values = SnmpQuery::numeric()->get([$legacyOid, $tableOid])->values();
-
-        foreach ([$legacyOid, $tableOid] as $oid) {
-            if (isset($values[$oid]) && $values[$oid] !== '') {
-                return $oid;
-            }
-        }
-
-        return null;
     }
 }
