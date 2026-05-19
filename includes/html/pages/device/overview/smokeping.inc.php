@@ -1,6 +1,7 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Util\Smokeping;
 use LibreNMS\Util\Url;
 
