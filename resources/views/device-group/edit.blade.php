@@ -18,6 +18,12 @@
                         <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
                         <a type="button" class="btn btn-danger"
                            href="{{ route('device-groups.index') }}">{{ __('Cancel') }}</a>
+                        @can('admin')
+                            <a type="button" class="btn btn-default pull-right"
+                               href="{{ route('device-group.bulk-snmp.show', $device_group->id) }}">
+                                <i class="fa fa-key"></i> {{ __('Bulk SNMP Edit') }}
+                            </a>
+                        @endcan
                     </div>
                 </div>
             </form>

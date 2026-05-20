@@ -435,6 +435,18 @@ Route::prefix('install')->group(function (): void {
     Route::any('{path?}', [Install\InstallationController::class, 'invalid'])->where('path', '.*'); // 404
 });
 
+// Bulk SNMP routes (must be placed BEFORE the Legacy catch-all route)
+Route::middleware(['auth'])->group(function () {
+    Route::prefix('device-groups/{device_group}/bulk-snmp')->group(function () {
+        Route::get('/', [\App\Http\Controllers\BulkSnmpController::class, 'show'])
+            ->name('device-group.bulk-snmp.show');
+        Route::post('/test', [\App\Http\Controllers\BulkSnmpController::class, 'test'])
+            ->name('device-group.bulk-snmp.test');
+        Route::post('/apply', [\App\Http\Controllers\BulkSnmpController::class, 'apply'])
+            ->name('device-group.bulk-snmp.apply');
+    });
+});
+
 // Legacy routes
 Route::any('/dummy_legacy_auth/{path?}', [LegacyController::class, 'dummy'])->middleware('auth');
 Route::any('/dummy_legacy_unauth/{path?}', [LegacyController::class, 'dummy']);
