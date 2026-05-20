@@ -55,9 +55,6 @@ class Port extends DeviceRelatedModel
         'device.hostname',
     ];
 
-    /**
-     * @return array{ifOperStatus: 'LibreNMS\Enum\IfOperStatus', ifOperStatus_prev: 'LibreNMS\Enum\IfOperStatus', ifAdminStatus: 'LibreNMS\Enum\IfOperStatus', ifAdminStatus_prev: 'LibreNMS\Enum\IfOperStatus'}
-     */
     protected function casts(): array
     {
         return [
