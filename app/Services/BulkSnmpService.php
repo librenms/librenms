@@ -6,7 +6,6 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\Severity;
 
