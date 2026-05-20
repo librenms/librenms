@@ -197,7 +197,7 @@ class PingCheck implements ShouldQueue
             Log::debug("Device $device->hostname changed status to $type, running alerts");
 
             if (count($waiting_on) === 0) {
-                Action::execute(RunAlertRulesAction::class, $device);
+                Action::execute(RunAlertRulesAction::class, device: $device);
             } else {
                 Log::debug('Alerts Deferred');
 
