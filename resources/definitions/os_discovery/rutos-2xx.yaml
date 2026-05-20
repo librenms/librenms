@@ -1,11 +1,13 @@
 modules:
     os:
+        # RutOS 7.x and 6.x reuse the same numeric OIDs under .48690.1 with different MIB names,
+        # so the v6 fallback entries below use the RUT2 names net-snmp returns for those OIDs.
         hardware:
             - TELTONIKA-RUT2-MIB::rut2DeviceName.0
-            - TELTONIKA-MIB::RouterName.0
+            - TELTONIKA-RUT2-MIB::rut2DeviceUptime.0
         serial:
             - TELTONIKA-RUT2-MIB::rut2Serial.0
-            - TELTONIKA-MIB::ModemSerial.0
+            - TELTONIKA-RUT2-MIB::rut2HardwareRevision.0
         version:
             - TELTONIKA-RUT2-MIB::rut2FwVersion.0
             - TELTONIKA-MIB::FirmwareVersion.0
