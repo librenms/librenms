@@ -51,7 +51,7 @@ foreach ($cooling_status as $index => $data) {
             2 => Severity::Error,
             default => Severity::Unknown,
         };
-        $translations[] = StateTranslation::define($matches[1], 0, $severity);
+        $translations[] = StateTranslation::define($matches[1], $matches[2], $severity);
     }
 
     app('sensor-discovery')->discover(new Sensor([
@@ -84,7 +84,7 @@ foreach ($cooling_unit as $index => $data) {
             2 => Severity::Error,
             default => Severity::Unknown,
         };
-        $translations[] = StateTranslation::define($matches[1], 0, $severity);
+        $translations[] = StateTranslation::define($matches[1], $matches[2], $severity);
     }
 
     app('sensor-discovery')->discover(new Sensor([
