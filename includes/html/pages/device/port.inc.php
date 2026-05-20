@@ -1,5 +1,7 @@
 <?php
 
+use App\Facades\DeviceCache;
+use App\Facades\PortCache;
 use App\Models\Bill;
 use App\Models\JuniAtmVp;
 use App\Models\MacAccounting;
@@ -11,19 +13,21 @@ use App\Models\Sensor;
 use App\Plugins\Hooks\PortTabHook;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\IfOperStatus;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
 $vars['view'] = basename($vars['view'] ?? 'graphs');
 
-$port = \App\Facades\PortCache::get($vars['port']);
+$port = PortCache::get($vars['port']);
+$device = DeviceCache::getPrimary();
 
 $port_details = 1;
 
 $hostname = $device['hostname'];
 $ifname = $port->ifDescr;
 $ifIndex = $port->ifIndex;
-$speed = \LibreNMS\Util\Number::formatSi($port->ifSpeed, 2, 0, 'bps');
+$speed = Number::formatSi($port->ifSpeed, 2, 0, 'bps');
 
 $ifalias = $port->getLabel();
 
@@ -107,13 +111,13 @@ if ($port->fdbEntries()->exists()) {
     $menu_options['fdb'] = 'FDB Table';
 }
 $menu_options['events'] = 'Eventlog';
-$menu_options['notes'] = (get_dev_attrib($device, 'port_id_notes:' . $port->port_id) ?? '') == '' ? 'Notes' : 'Notes*';
+$menu_options['notes'] = ($device->getAttrib('port_id_notes:' . $port->port_id) ?? '') == '' ? 'Notes' : 'Notes*';
 
 if ($port->transceivers()->exists()) {
     $menu_options['transceiver'] = __('port.transceiver');
 }
 
-if (Sensor::where('device_id', $device['device_id'])->where('entPhysicalIndex', $port->ifIndex)->where('entPhysicalIndex_measured', 'ports')->exists()) {
+if (Sensor::where('device_id', $device->device_id)->where('entPhysicalIndex', $port->ifIndex)->where('entPhysicalIndex_measured', 'ports')->exists()) {
     $menu_options['sensors'] = 'Health';
 }
 
@@ -127,11 +131,11 @@ if (PortsNac::where('port_id', $port->port_id)->exists()) {
     $menu_options['nac'] = 'NAC';
 }
 
-if (DeviceCache::getPrimary()->ports()->where('pagpGroupIfIndex', $port->ifIndex)->exists()) {
+if ($device->ports()->where('pagpGroupIfIndex', $port->ifIndex)->exists()) {
     $menu_options['pagp'] = 'PAgP';
 }
 
-if (PortVlan::where('port_id', $port->port_id)->where('device_id', $device['device_id'])->exists()) {
+if (PortVlan::where('port_id', $port->port_id)->where('device_id', $device->device_id)->exists()) {
     $menu_options['vlans'] = 'VLANs';
 }
 
@@ -235,7 +239,7 @@ if (JuniAtmVp::where('port_id', $port->port_id)->exists()) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port->port_id]) . "/junose-atm-vp/bits/'>Bits</a>";
+    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device->device_id, 'tab' => 'port', 'port' => $port->port_id]) . "/junose-atm-vp/bits/'>Bits</a>";
     if ($vars['view'] == 'junose-atm-vp' && $vars['graph'] == 'bits') {
         echo '</span>';
     }
@@ -245,7 +249,7 @@ if (JuniAtmVp::where('port_id', $port->port_id)->exists()) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port->port_id]) . "/junose-atm-vp/packets/'>Packets</a>";
+    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device->device_id, 'tab' => 'port', 'port' => $port->port_id]) . "/junose-atm-vp/packets/'>Packets</a>";
     if ($vars['view'] == 'junose-atm-vp' && $vars['graph'] == 'bits') {
         echo '</span>';
     }
@@ -255,7 +259,7 @@ if (JuniAtmVp::where('port_id', $port->port_id)->exists()) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port->port_id]) . "/junose-atm-vp/cells/'>Cells</a>";
+    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device->device_id, 'tab' => 'port', 'port' => $port->port_id]) . "/junose-atm-vp/cells/'>Cells</a>";
     if ($vars['view'] == 'junose-atm-vp' && $vars['graph'] == 'bits') {
         echo '</span>';
     }
@@ -265,7 +269,7 @@ if (JuniAtmVp::where('port_id', $port->port_id)->exists()) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port->port_id]) . "/junose-atm-vp/errors/'>Errors</a>";
+    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device->device_id, 'tab' => 'port', 'port' => $port->port_id]) . "/junose-atm-vp/errors/'>Errors</a>";
     if ($vars['view'] == 'junose-atm-vp' && $vars['graph'] == 'bits') {
         echo '</span>';
     }

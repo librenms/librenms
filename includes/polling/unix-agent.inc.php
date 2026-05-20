@@ -4,10 +4,12 @@ use App\Models\Process;
 use Illuminate\Support\Facades\Cache;
 use LibreNMS\RRD\RrdDefinition;
 
-if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
+$device = DeviceCache::getPrimary();
+
+if ($device->os_group == 'unix' || $device->os == 'windows') {
     echo \App\Facades\LibrenmsConfig::get('project_name') . ' UNIX Agent: ';
 
-    $agent_port = get_dev_attrib($device, 'override_Unixagent_port');
+    $agent_port = $device->getAttrib('override_Unixagent_port');
     if (empty($agent_port)) {
         $agent_port = \App\Facades\LibrenmsConfig::get('unix-agent.port');
     }
@@ -15,7 +17,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
     $agent_start = microtime(true);
     $agent = null;
     try {
-        $poller_target = \LibreNMS\Util\Rewrite::addIpv6Brackets(DeviceCache::getPrimary()->pollerTarget());
+        $poller_target = \LibreNMS\Util\Rewrite::addIpv6Brackets($device->pollerTarget());
         $agent = @fsockopen($poller_target, $agent_port, $errno, $errstr, \App\Facades\LibrenmsConfig::get('unix-agent.connection-timeout'));
     } catch (ErrorException $e) {
         echo $e->getMessage() . PHP_EOL; // usually connection timed out
@@ -111,12 +113,12 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         // Unix Processes
         if (! empty($agent_data['ps'])) {
             echo 'Processes: ';
-            \App\Models\Process::where('device_id', $device['device_id'])->delete();
+            Process::where('device_id', $device->device_id)->delete();
             $data = [];
             foreach (explode("\n", $agent_data['ps']) as $process) {
                 if (preg_match('/\((.*),([0-9]*),([0-9]*),([-0-9:.]*),([0-9]*)\) (.+)/', $process, $process_matches)) {
                     [, $user, $vsz, $rss, $cputime, $pid, $command] = $process_matches;
-                    $data[] = ['device_id' => $device['device_id'], 'pid' => $pid, 'user' => $user, 'vsz' => $vsz, 'rss' => $rss, 'cputime' => $cputime, 'command' => $command];
+                    $data[] = ['device_id' => $device->device_id, 'pid' => $pid, 'user' => $user, 'vsz' => $vsz, 'rss' => $rss, 'cputime' => $cputime, 'command' => $command];
                 }
             }
             if (count($data) > 0) {
@@ -130,7 +132,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         // Windows Processes
         if (! empty($agent_data['ps:sep(9)'])) {
             echo 'Processes: ';
-            \App\Models\Process::where('device_id', $device['device_id'])->delete();
+            Process::where('device_id', $device->device_id)->delete();
             $data = [];
             foreach (explode("\n", $agent_data['ps:sep(9)']) as $process) {
                 $process = preg_replace('/\(([^,;]+),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*)?,?([0-9]*)\)(.*)/', '\\1|\\2|\\3|\\4|\\5|\\6|\\7|\\8|\\9|\\10|\\11|\\12', $process);
@@ -142,7 +144,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
                     $minutes = str_pad(floor(($cputime / 60) % 60), 2, '0', STR_PAD_LEFT);
                     $seconds = str_pad($cputime % 60, 2, '0', STR_PAD_LEFT);
                     $cputime = ($days > 0 ? "$days-" : '') . "$hours:$minutes:$seconds";
-                    $data[] = ['device_id' => $device['device_id'], 'pid' => $processId, 'user' => $user, 'vsz' => $PageFileUsage + $WorkingSetSize, 'rss' => $WorkingSetSize, 'cputime' => $cputime, 'command' => $process_name];
+                    $data[] = ['device_id' => $device->device_id, 'pid' => $processId, 'user' => $user, 'vsz' => $PageFileUsage + $WorkingSetSize, 'rss' => $WorkingSetSize, 'cputime' => $cputime, 'command' => $process_name];
                 }
             }
             if (count($data) > 0) {
@@ -155,12 +157,12 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
 
         foreach (array_keys($agent_data['app'] ?? []) as $key) {
             if (file_exists(base_path("includes/polling/applications/$key.inc.php"))) {
-                d_echo("Enabling $key for " . $device['hostname'] . " if not yet enabled\n");
+                d_echo("Enabling $key for " . $device->hostname . " if not yet enabled\n");
 
                 if (in_array($key, $agentapps)) {
-                    if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?', [$device['device_id'], $key]) == '0') {
+                    if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?', [$device->device_id, $key]) == '0') {
                         echo "Found new application '$key'\n";
-                        dbInsert(['device_id' => $device['device_id'], 'app_type' => $key, 'app_status' => '', 'app_instance' => ''], 'applications');
+                        dbInsert(['device_id' => $device->device_id, 'app_type' => $key, 'app_status' => '', 'app_instance' => ''], 'applications');
                     }
                 }
             }
@@ -170,9 +172,9 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         if (! empty($agent_data['app']['memcached'])) {
             $agent_data['app']['memcached'] = json_decode($agent_data['app']['memcached'], true);
             foreach ($agent_data['app']['memcached'] as $memcached_host => $memcached_data) {
-                if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ? AND `app_instance` = ?', [$device['device_id'], 'memcached', $memcached_host]) == '0') {
+                if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ? AND `app_instance` = ?', [$device->device_id, 'memcached', $memcached_host]) == '0') {
                     echo "Found new application 'Memcached' $memcached_host\n";
-                    dbInsert(['device_id' => $device['device_id'], 'app_type' => 'memcached', 'app_status' => '', 'app_instance' => $memcached_host], 'applications');
+                    dbInsert(['device_id' => $device->device_id, 'app_type' => 'memcached', 'app_status' => '', 'app_instance' => $memcached_host], 'applications');
                 }
             }
         }
@@ -184,9 +186,9 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
                 [$drbd_dev, $drbd_data] = explode(':', $drbd_entry);
                 if (preg_match('/^drbd/', $drbd_dev)) {
                     $agent_data['app']['drbd'][$drbd_dev] = $drbd_data;
-                    if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ? AND `app_instance` = ?', [$device['device_id'], 'drbd', $drbd_dev]) == '0') {
+                    if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ? AND `app_instance` = ?', [$device->device_id, 'drbd', $drbd_dev]) == '0') {
                         echo "Found new application 'DRBd' $drbd_dev\n";
-                        dbInsert(['device_id' => $device['device_id'], 'app_type' => 'drbd', 'app_status' => '', 'app_instance' => $drbd_dev], 'applications');
+                        dbInsert(['device_id' => $device->device_id, 'app_type' => 'drbd', 'app_status' => '', 'app_instance' => $drbd_dev], 'applications');
                     }
                 }
             }

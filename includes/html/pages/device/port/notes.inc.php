@@ -9,10 +9,12 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
+use App\Facades\DeviceCache;
+
 $pagetitle[] = 'Notes';
 $port_id_notes = 'port_id_notes:' . $port['port_id'];
-$device_id = $device['device_id'];
-$data = get_dev_attrib($device, $port_id_notes) ?? '';
+$device = DeviceCache::getPrimary();
 ?>
 
 <form class="form-horizontal" action="" method="post">
@@ -22,7 +24,7 @@ $data = get_dev_attrib($device, $port_id_notes) ?? '';
     <div class="form-group">
         <div class="col-sm-10">
             <textarea class="form-control" rows="6" name="notes" id="port-notes"><?php
-            echo htmlentities($data); ?></textarea>
+            echo htmlentities($device->getAttrib($port_id_notes) ?? ''); ?></textarea>
         </div>
     </div>
     <div class="form-group">
@@ -39,7 +41,7 @@ $data = get_dev_attrib($device, $port_id_notes) ?? '';
 $("[name='btn-update-notes']").on('click', function(event) {
     event.preventDefault();
     var $this = $(this);
-    var device_id = "<?php echo $device_id; ?>";
+    var device_id = "<?php echo $device->device_id; ?>";
     var port_id_notes = "<?php echo $port_id_notes; ?>";
     var notes = $("#port-notes").val();
     $.ajax({

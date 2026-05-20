@@ -169,11 +169,6 @@ function set_dev_attrib($device, $attrib_type, $attrib_value)
     return DeviceCache::get((int) $device['device_id'])->setAttrib($attrib_type, $attrib_value);
 }
 
-function get_dev_attrib($device, $attrib_type)
-{
-    return DeviceCache::get((int) $device['device_id'])->getAttrib($attrib_type);
-}
-
 /**
  * Output using console color if possible
  * https://github.com/pear/Console_Color2/blob/master/examples/documentation

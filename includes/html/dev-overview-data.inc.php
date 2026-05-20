@@ -1,11 +1,14 @@
 <?php
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Location;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Time;
+
+$device = DeviceCache::getPrimary();
 
 echo "<div class='row'>
       <div class='col-md-12'>
@@ -14,7 +17,7 @@ echo "<div class='row'>
 
 if (LibrenmsConfig::get('overview_show_sysDescr')) {
     echo '<i class="fa fa-id-card fa-lg icon-theme" aria-hidden="true"></i> <strong>';
-    echo LibrenmsConfig::get('overview_show_sysDescr', true) ? Clean::html($device['sysDescr'], []) : 'System';
+    echo LibrenmsConfig::get('overview_show_sysDescr', true) ? Clean::html($device->sysDescr, []) : 'System';
     echo '</strong>';
 }
 
@@ -25,28 +28,28 @@ echo '<script src="js/L.Control.Locate.min.js"></script>';
 echo '<script src="js/leaflet.markercluster.js"></script>';
 echo '<script src="js/leaflet.awesome-markers.min.js"></script>';
 
-if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
+if ($device->os == 'ios' || $device->os == 'iosxe') {
     \LibreNMS\Util\Rewrite::ciscoHardware($device, false);
 }
 
-if ($device['features']) {
-    $device['features'] = '(' . $device['features'] . ')';
+if ($device->features) {
+    $device->features = '(' . $device->features . ')';
 }
 
-$device['os_text'] = LibrenmsConfig::getOsSetting($device['os'], 'text');
+$device->os_text = LibrenmsConfig::getOsSetting($device->os, 'text');
 
 echo '<div class="row">
         <div class="col-sm-4">System Name</div>
-        <div class="col-sm-8">' . Clean::html($device['sysName'], []) . ' </div>
+        <div class="col-sm-8">' . Clean::html($device->sysName, []) . ' </div>
       </div>';
 
-if (! empty($device['overwrite_ip'])) {
-    echo "<div class='row'><div class='col-sm-4'>Assigned IP</div><div class='col-sm-8'>" . htmlentities((string) $device['overwrite_ip']) . '</div></div>';
-} elseif (! empty($device['ip'])) {
-    echo "<div class='row'><div class='col-sm-4'>Resolved IP</div><div class='col-sm-8'>" . htmlentities((string) $device['ip']) . '</div></div>';
+if (! empty($device->overwrite_ip)) {
+    echo "<div class='row'><div class='col-sm-4'>Assigned IP</div><div class='col-sm-8'>" . htmlentities((string) $device->overwrite_ip) . '</div></div>';
+} elseif (! empty($device->ip)) {
+    echo "<div class='row'><div class='col-sm-4'>Resolved IP</div><div class='col-sm-8'>" . htmlentities((string) $device->ip) . '</div></div>';
 } else {
     try {
-        $ip = (string) IP::parse($device['hostname']);
+        $ip = (string) IP::parse($device->hostname);
         if ($ip !== format_hostname($device)) {
             echo "<div class='row'><div class='col-sm-4'>IP Address</div><div class='col-sm-8'>" . htmlentities($ip) . '</div></div>';
         }
@@ -55,46 +58,46 @@ if (! empty($device['overwrite_ip'])) {
     }
 }
 
-if ($device['purpose']) {
+if ($device->purpose) {
     echo '<div class="row">
         <div class="col-sm-4">Description</div>
-        <div class="col-sm-8">' . Clean::html($device['purpose'], []) . '</div>
+        <div class="col-sm-8">' . Clean::html($device->purpose, []) . '</div>
       </div>';
 }
 
-if ($device['hardware']) {
+if ($device->hardware) {
     echo '<div class="row">
         <div class="col-sm-4">Hardware</div>
-        <div class="col-sm-8">' . Clean::html($device['hardware'], []) . '</div>
+        <div class="col-sm-8">' . Clean::html($device->hardware, []) . '</div>
       </div>';
 }
 
 echo '<div class="row">
         <div class="col-sm-4 text-nowrap">Operating System</div>
-        <div class="col-sm-8">' . Clean::html($device['os_text'] . ' ' . $device['version'] . ' ' . $device['features'], []) . ' </div>
+        <div class="col-sm-8">' . Clean::html($device->os_text . ' ' . $device->version . ' ' . $device->features, []) . ' </div>
       </div>';
 
-if ($device['serial']) {
+if ($device->serial) {
     echo '<div class="row">
         <div class="col-sm-4">Serial</div>
-        <div class="col-sm-8">' . Clean::html($device['serial'], []) . '</div>
+        <div class="col-sm-8">' . Clean::html($device->serial, []) . '</div>
       </div>';
 }
 
-if ($device['sysObjectID']) {
+if ($device->sysObjectID) {
     echo '<div class="row">
         <div class="col-sm-4">Object ID</div>
-        <div class="col-sm-8">' . Clean::html($device['sysObjectID'], []) . '</div>
+        <div class="col-sm-8">' . Clean::html($device->sysObjectID, []) . '</div>
       </div>';
 }
 
-if ($device['sysContact']) {
+if ($device->sysContact) {
     echo '<div class="row">
         <div class="col-sm-4">Contact</div>';
 
-    $contactText = get_dev_attrib($device, 'override_sysContact_bool')
-        ? get_dev_attrib($device, 'override_sysContact_string')
-        : $device['sysContact'];
+    $contactText = $device->getAttrib('override_sysContact_bool')
+        ? $device->getAttrib('override_sysContact_string')
+        : $device->sysContact;
 
     $emails = \LibreNMS\Util\Mail::parseEmails($contactText);
 
@@ -114,12 +117,12 @@ if ($device['sysContact']) {
 
     $displayText ??= Clean::html($contactText);
 
-    if (get_dev_attrib($device, 'override_sysContact_bool')) {
+    if ($device->getAttrib('override_sysContact_bool')) {
         echo '<div class="col-sm-8">' . $displayText . '</div>
             </div>
             <div class="row">
                 <div class="col-sm-4">SNMP Contact</div>
-                <div class="col-sm-8">' . Clean::html($device['sysContact']) . '</div>
+                <div class="col-sm-8">' . Clean::html($device->sysContact) . '</div>
             </div>';
     } else {
         echo '<div class="col-sm-8">' . $displayText . '</div>
@@ -127,24 +130,24 @@ if ($device['sysContact']) {
     }
 }
 
-if (! empty($device['inserted']) && preg_match('/^0/', (string) $device['inserted']) == 0) {
+if (! empty($device->inserted) && preg_match('/^0/', (string) $device->inserted) == 0) {
     $inserted_text = 'Device Added';
-    $inserted = (Time::formatInterval(-(time() - strtotime((string) $device['inserted']))));
-    echo "<div class='row'><div class='col-sm-4'>$inserted_text</div><div class='col-sm-8' title='$inserted_text on " . $device['inserted'] . "'>$inserted</div></div>";
+    $inserted = (Time::formatInterval(-(time() - strtotime((string) $device->inserted))));
+    echo "<div class='row'><div class='col-sm-4'>$inserted_text</div><div class='col-sm-8' title='$inserted_text on " . $device->inserted . "'>$inserted</div></div>";
 }
 
-if (! empty($device['last_discovered'])) {
+if (! empty($device->last_discovered)) {
     $last_discovered_text = 'Last Discovered';
-    $last_discovered = (empty($device['last_discovered']) ? 'Never' : Time::formatInterval(-(time() - strtotime((string) $device['last_discovered']))));
-    echo "<div class='row'><div class='col-sm-4'>$last_discovered_text</div><div class='col-sm-8' title='$last_discovered_text at " . $device['last_discovered'] . "'>$last_discovered</div></div>";
+    $last_discovered = (empty($device->last_discovered) ? 'Never' : Time::formatInterval(-(time() - strtotime((string) $device->last_discovered))));
+    echo "<div class='row'><div class='col-sm-4'>$last_discovered_text</div><div class='col-sm-8' title='$last_discovered_text at " . $device->last_discovered . "'>$last_discovered</div></div>";
 }
 
 
-if (! $device['status'] && ! $device['last_polled']) {
+if (! $device->status && ! $device->last_polled) {
     $uptime = __('Never polled');
     $uptime_text = 'Uptime';
-} elseif ($device['status']) {
-    $uptime = Time::formatInterval($device['uptime']);
+} elseif ($device->status) {
+    $uptime = Time::formatInterval($device->uptime);
     $uptime_text = 'Uptime';
 } else {
     $uptime = Time::formatInterval((int) DeviceCache::getPrimary()->downSince()->diffInSeconds(null, true));
@@ -155,7 +158,7 @@ if ($uptime) {
     echo "<div class='row'><div class='col-sm-4'>$uptime_text</div><div class='col-sm-8'>$uptime</div></div>";
 }
 
-if ($device['location_id'] && $location = Location::find($device['location_id'])) {
+if ($location = Location::find($device->location_id)) {
     $maps_api = LibrenmsConfig::get('geoloc.api_key');
     $maps_engine = $maps_api ? LibrenmsConfig::get('geoloc.engine') : '';
     $location_valid = ($location && $location->coordinatesValid());
@@ -263,8 +266,8 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
                       $.each( data, function( device_id, device ) {
                         var icon = greenMarker;
                         var z_offset = 0;
-                        if (device["status"] == 0) {
-                            if (device["maintenance"] != 0) {
+                        if (device->status == 0) {
+                            if (device->maintenance != 0) {
                                 icon = blueMarker;
                                 z_offset = 5000;
                             } else {
@@ -272,16 +275,16 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
                                 z_offset = 10000;
                             }
                         }
-                        var marker = L.marker(new L.LatLng(device["lat"],device["lng"]), {title: device["sname"], icon: icon, zIndexOffset: z_offset});
-                        marker.bindPopup("<a href=\"" + device["url"] + "\"><img src=\"" + device["icon"] + "\" width=\"32\" height=\"32\" alt=\"\"> " + device["sname"] + "</a>");
+                        var marker = L.marker(new L.LatLng(device->lat,device->lng), {title: device->sname, icon: icon, zIndexOffset: z_offset});
+                        marker.bindPopup("<a href=\"" + device->url + "\"><img src=\"" + device->icon + "\" width=\"32\" height=\"32\" alt=\"\"> " + device->sname + "</a>");
                         device_marker_cluster.addLayer(marker);
         ';
         # If we are configured to show dependencies
         if (LibrenmsConfig::get('device_location_map_show_device_dependencies')) {
             echo'
-                        $.each( device["parents"], function( parent_idx, parent_id ) {
-                            if (parent_id in data && (data[parent_id]["lat"] != device["lat"] || data[parent_id]["lng"] != device["lng"])) {
-                                var line = new L.Polyline([new L.LatLng(device["lat"],device["lng"]), new L.LatLng(data[parent_id]["lat"],data[parent_id]["lng"])], {
+                        $.each( device->parents, function( parent_idx, parent_id ) {
+                            if (parent_id in data && (data[parent_id]["lat"] != device->lat || data[parent_id]["lng"] != device->lng)) {
+                                var line = new L.Polyline([new L.LatLng(device->lat,device->lng), new L.LatLng(data[parent_id]["lat"],data[parent_id]["lng"])], {
                                     color: "blue",
                                     weight: 2,
                                     opacity: 0.8,
