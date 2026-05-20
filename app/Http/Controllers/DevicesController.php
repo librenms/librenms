@@ -6,8 +6,11 @@ use App\Models\Device;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use LibreNMS\Util\Url;
 
 class DevicesController extends Controller
 {
@@ -36,7 +39,7 @@ class DevicesController extends Controller
 
         $bare = $request->input('bare') === 'yes';
         $hideFilter = $request->input('searchbar') === 'hide';
-        $perPage = $request->integer('per_page', 50); // from bootgrid rowCount
+        $perPage = $request->integer('per_page', 50);
 
         $legacyFormat = (string) $request->string('format');
         if ($legacyFormat) {
@@ -57,21 +60,29 @@ class DevicesController extends Controller
             'width' => session('widescreen') ? 270 : 315,
             'id' => 0,
             'type' => 'device_' . $graph,
-            'from' => $request->input('from', '-24hour'), // from devices.inc.php
+            'from' => $request->input('from', '-1d'),
             'legend' => 'no',
             'title' => 'yes',
         ];
         if ($request->input('to')) {
             $graphTemplate['to'] = $request->input('to');
-        } else {
-            $graphTemplate['to'] = 'now';
         }
+
+        $devices = $this->getDevices($view, $perPage);
 
         return view('device.index', [
             'view' => $view,
             'graph' => $graph,
             'detailed' => $view === 'detail',
-            'devices' => $this->getDevices($view, $perPage),
+            'devices' => $devices,
+            'deviceGraphs' => $devices->map(function (Device $device) use ($graphTemplate) {
+                $graph = array_merge($graphTemplate, ['device' => $device->device_id]);
+                return [
+                    'link' => Url::graphPageUrl($graph['type'], Arr::except($graph, ['height', 'width', 'legend', 'title'])),
+                    'graphTag' => Url::lazyGraphTag($graph, 'tw:w-full tw:h-auto'),
+                    'deviceLinkOptions' => ['device_id' => $device->device_id, 'params' => ['type' => $graph['type']]],
+                ];
+            }),
             'perPage' => $perPage,
             'paginationOptions' => [50, 100, 250, -1],
             'nav' => [
@@ -97,14 +108,14 @@ class DevicesController extends Controller
             'hideFilter' => $hideFilter,
             'filterFields' => $this->filterFields(),
             'graphTemplate' => $graphTemplate,
-            'group' => $request->input('filter.group.eq'),
+            'group' => $request->input('filter.groups\.id.eq'),
         ]);
     }
 
-    private function getDevices(?string $view, int $perPage): ?LengthAwarePaginator
+    private function getDevices(?string $view, int $perPage): LengthAwarePaginator|Collection
     {
         if ($view !== 'graph') {
-            return null;
+            return new Collection;
         }
 
         $devicesQuery = Device::hasAccess(request()->user())
