@@ -60,10 +60,8 @@ class PortSecurityController extends Controller
             ->hasAccess(Auth::user())
             ->count();
 
-        $limit = $perPage === 'all' ? max($total, 1) : (int) $perPage;
-
         return self::getFilteredQuery($request, $deviceId)
-            ->paginate($limit)
+            ->paginate(fn ($total) => $perPage == 'all' ? $total : $perPage)
             ->appends($request->query());
     }
 }
