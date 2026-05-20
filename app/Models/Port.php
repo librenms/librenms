@@ -17,6 +17,12 @@ use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
+/**
+ * @property IfOperStatus|null $ifOperStatus
+ * @property IfOperStatus|null $ifOperStatus_prev
+ * @property IfOperStatus|null $ifAdminStatus
+ * @property IfOperStatus|null $ifAdminStatus_prev
+ */
 class Port extends DeviceRelatedModel
 {
     use HasFactory;
