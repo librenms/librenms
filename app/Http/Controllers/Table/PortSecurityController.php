@@ -52,6 +52,9 @@ class PortSecurityController extends TableController
         return [];
     }
 
+    /**
+     * @return Builder<PortSecurity>
+     */
     protected function baseQuery(Request $request): Builder
     {
         return PortSecurityPageController::getFilteredQuery(
@@ -60,6 +63,9 @@ class PortSecurityController extends TableController
         );
     }
 
+    /**
+     * @return Builder<PortSecurity>
+     */
     protected function prepareExportQuery(Request $request): Builder
     {
         $query = $this->baseQuery($request);
@@ -109,12 +115,11 @@ class PortSecurityController extends TableController
     }
 
     /**
+     * @param  PortSecurity  $item
      * @return list<scalar>
      */
     protected function formatExportRow(Model $item): array
     {
-        assert($item instanceof PortSecurity);
-
         return array_merge(
             request()->integer('device_id') ? [] : [
                 $item->device_id,
@@ -122,9 +127,9 @@ class PortSecurityController extends TableController
             ],
             [
                 $item->port?->getShortLabel() ?? '',
-                $item->port->ifName ?? '',
-                $item->port->ifDescr ?? '',
-                $item->port->ifAlias ?? '',
+                $item->port?->ifName ?? '',
+                $item->port?->ifDescr ?? '',
+                $item->port?->ifAlias ?? '',
                 $item->port_security_enable === null ? '' : ($item->port_security_enable ? 'true' : 'false'),
                 $item->status ?? '',
                 $item->address_count ?? '',
