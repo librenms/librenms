@@ -50,21 +50,24 @@ if (! empty($rectifiersCurrent)) {
         }
     }
 
-    // Determine if this is a SmartpackS device
+    // Determine if this is a SmartpackS device. The MIB OID reports "System
+    // Output Current" on SmartpackS hardware regardless of firmware; only the
+    // divisor differs by firmware version.
     $isSmartpackS = (bool) preg_match('/^Smart[Pp]ack S/', (string) $hardware);
+    $descr = $isSmartpackS ? 'System Output Current' : 'Rectifier Output Current';
 
     // Determine the divisor based on hardware type and version
     // SmartpackS with version < 2.11 returns 10ths of an amp
     // SmartpackS with version >= 2.11 returns amps (no divisor needed)
     // Non-SmartpackS devices return amps (no divisor needed)
+    // If version cannot be determined on SmartpackS hardware, fall back to the
+    // legacy divisor of 10 to avoid silently scaling values 10x for older units.
     $divisor = 1;
-    $descr = 'Rectifier Output Current';
 
     if ($isSmartpackS) {
-        // Compare version - if version < 2.11, use divisor 10
-        if (version_compare($version, '2.11', '<')) {
+        $normalizedVersion = trim((string) $version);
+        if ($normalizedVersion === '' || version_compare($normalizedVersion, '2.11', '<')) {
             $divisor = 10;
-            $descr = 'System Output Current';
         }
     }
 
@@ -77,9 +80,9 @@ if (! empty($rectifiersCurrent)) {
             $oid = '.1.3.6.1.4.1.12148.10.5.2.5.' . $index;
             $sensorIndex = 'current.' . $index;
 
-            // Apply divisor to limits as well for consistency
-            $warnLimitDivided = $warnLimit !== null ? Number::cast($warnLimit) / $divisor : null;
-            $highLimitDivided = $highLimit !== null ? Number::cast($highLimit) / $divisor : null;
+            // Apply divisor to numeric limits only so invalid/missing SNMP data stays null
+            $warnLimitDivided = is_numeric($warnLimit) ? Number::cast($warnLimit) / $divisor : null;
+            $highLimitDivided = is_numeric($highLimit) ? Number::cast($highLimit) / $divisor : null;
 
             discover_sensor(
                 null,
