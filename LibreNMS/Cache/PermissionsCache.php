@@ -83,7 +83,7 @@ class PermissionsCache
 
         // Find all ports that are not allowed by port ID and not allowed by device ID, making sure that there are no matches
         return $portGroup->ports->filter(function ($port, $key) use ($ports_allowed, $devices_allowed) {
-            return (!$ports_allowed->contains($port->port_id) && !$devices_allowed->contains($port->device_id));
+            return ! $ports_allowed->contains($port->port_id) && ! $devices_allowed->contains($port->device_id);
         })->count() == 0;
     }
 

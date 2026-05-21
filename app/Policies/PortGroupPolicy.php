@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Facades\Permissions;
 use App\Facades\LibrenmsConfig;
+use App\Facades\Permissions;
 use App\Models\PortGroup;
 use App\Models\User;
 
