@@ -41,6 +41,6 @@ modules:
                             op: '!='
                             value: 12
                     states:
-                        - { value: 1, descr: OK, graph: 1, generic: 0 }
-                        - { value: 2, descr: Unavailable, graph: 1, generic: 2 }
-                        - { value: 3, descr: Non Operational, graph: 1, generic: 2 }
+                        - { value: 1, descr: OK, generic: 0 }
+                        - { value: 2, descr: Unavailable, generic: 2 }
+                        - { value: 3, descr: Non Operational, generic: 2 }

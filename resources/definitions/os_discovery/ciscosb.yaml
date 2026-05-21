@@ -23,12 +23,12 @@ modules:
                     descr: 'FAN {{ $index }} Status'
                     index: '{{ $index }}'
                     states:
-                        - { value: 1, descr: normal, graph: 1, generic: 0 }
-                        - { value: 2, descr: wrning, graph: 1, generic: 1 }
-                        - { value: 3, descr: critical, graph: 1, generic: 2 }
-                        - { value: 4, descr: shutdown, graph: 1, generic: 2 }
-                        - { value: 5, descr: notPresent, graph: 1, generic: 3 }
-                        - { value: 6, descr: notFunctioning, graph: 1, generic: 2 }
+                        - { value: 1, descr: normal, generic: 0 }
+                        - { value: 2, descr: wrning, generic: 1 }
+                        - { value: 3, descr: critical, generic: 2 }
+                        - { value: 4, descr: shutdown, generic: 2 }
+                        - { value: 5, descr: notPresent, generic: 3 }
+                        - { value: 6, descr: notFunctioning, generic: 2 }
                     skip_values:
                         -
                             oid: CISCOSB-HWENVIROMENT::rlEnvMonFanState
@@ -42,12 +42,12 @@ modules:
                     descr: 'PSU {{ $index }} Status'
                     index: '{{ $index }}'
                     states:
-                        - { value: 1, descr: normal, graph: 1, generic: 0 }
-                        - { value: 2, descr: wrning, graph: 1, generic: 1 }
-                        - { value: 3, descr: critical, graph: 1, generic: 2 }
-                        - { value: 4, descr: shutdown, graph: 1, generic: 2 }
-                        - { value: 5, descr: notPresent, graph: 1, generic: 3 }
-                        - { value: 6, descr: notFunctioning, graph: 1, generic: 2 }
+                        - { value: 1, descr: normal, generic: 0 }
+                        - { value: 2, descr: wrning, generic: 1 }
+                        - { value: 3, descr: critical, generic: 2 }
+                        - { value: 4, descr: shutdown, generic: 2 }
+                        - { value: 5, descr: notPresent, generic: 3 }
+                        - { value: 6, descr: notFunctioning, generic: 2 }
                     skip_values:
                         -
                             oid: CISCOSB-HWENVIROMENT::rlEnvMonSupplyState

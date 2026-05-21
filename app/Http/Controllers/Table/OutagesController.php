@@ -30,13 +30,17 @@ use App\Models\DeviceOutage;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
 
+/**
+ * @extends TableController<DeviceOutage>
+ */
 class OutagesController extends TableController
 {
-    protected $model = DeviceOutage::class;
+    protected ?string $model = DeviceOutage::class;
 
     public function rules(): array
     {
@@ -48,14 +52,14 @@ class OutagesController extends TableController
         ];
     }
 
-    protected function filterFields($request): array
+    protected function filterFields(Request $request): array
     {
         return [
             'device_id' => 'device',
         ];
     }
 
-    protected function sortFields($request): array
+    protected function sortFields(Request $request): array
     {
         return ['going_down', 'up_again', 'device_id'];
     }
@@ -107,19 +111,20 @@ class OutagesController extends TableController
     }
 
     /**
-     * @param  DeviceOutage  $outage
+     * @param  DeviceOutage  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($outage): array
+    public function formatItem(Model $model): array
     {
-        $start = $this->formatDatetime($outage->going_down);
-        $end = $outage->up_again ? $this->formatDatetime($outage->up_again) : '-';
+        $start = $this->formatDatetime($model->going_down);
+        $end = $model->up_again ? $this->formatDatetime($model->up_again) : '-';
 
         return [
-            'status' => $this->statusLabel($outage),
+            'status' => $this->statusLabel($model),
             'going_down' => $start,
             'up_again' => $end,
-            'device_id' => Url::modernDeviceLink($outage->device),
-            'duration' => $this->asDuration($outage)->forHumans(['parts' => 2]),
+            'device_id' => Url::modernDeviceLink($model->device),
+            'duration' => $this->asDuration($model)->forHumans(['parts' => 2]),
         ];
     }
 
@@ -156,8 +161,6 @@ class OutagesController extends TableController
 
     /**
      * Get headers for CSV export
-     *
-     * @return array
      */
     protected function getExportHeaders(): array
     {
@@ -173,9 +176,9 @@ class OutagesController extends TableController
      * Format a row for CSV export
      *
      * @param  DeviceOutage  $outage
-     * @return array
+     * @return array<scalar>
      */
-    protected function formatExportRow($outage): array
+    protected function formatExportRow(Model $outage): array
     {
         return [
             $outage->device ? $outage->device->displayName() : '',

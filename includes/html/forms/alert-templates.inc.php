@@ -71,7 +71,7 @@ try {
             Gate::authorize('update', AlertTemplate::class);
             $create = false;
             $template_id = $vars['template_id'];
-            if (! dbUpdate(['template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']], 'alert_templates', 'id = ?', [$template_id]) >= 0) {
+            if (AlertTemplate::where('id', $template_id)->update(['template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']]) >= 0) {
                 $status = 'ok';
             } else {
                 $message = 'Failed to update the template';

@@ -179,9 +179,9 @@ $oids = ['.1.3.6.1.4.1.17409.1.1.2.1.4.11.1.3.6.1.4.1.17409.1.11.100.0.2', '.1.3
 
 $state_name = 'PowerSupplyState';
 $states = [
-    ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'normal'],
-    ['value' => 7, 'generic' => 1, 'graph' => 0, 'descr' => 'warning'],
-    ['value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'critical'],
+    ['value' => 1, 'generic' => 0, 'descr' => 'normal'],
+    ['value' => 7, 'generic' => 1, 'descr' => 'warning'],
+    ['value' => 6, 'generic' => 2, 'descr' => 'critical'],
 ];
 create_state_index($state_name, $states);
 $n = 1;

@@ -101,7 +101,7 @@ class PollerCluster extends Model
     /**
      * Get the frontend config definition for this poller
      *
-     * @param  \Illuminate\Support\Collection|bool|null  $groups  optionally supply full list of poller groups to avoid fetching multiple times
+     * @param  \Illuminate\Support\Collection<int, mixed>|bool|null  $groups  optionally supply full list of poller groups to avoid fetching multiple times
      * @return array[]
      */
     public function configDefinition($groups = null)

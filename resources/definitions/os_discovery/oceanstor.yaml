@@ -31,21 +31,21 @@ modules:
                     group: 'Controllers'
                     state_name: hwInfoControllerHealthStatus
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Normal' }
-                        - { value:  2, generic: 2, graph: 0, descr: 'Fault' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Pre-fail' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Partially broken' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Degraded' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Bad sectors found' }
-                        - { value:  7, generic: 1, graph: 0, descr: 'Bit sectors found' }
-                        - { value:  8, generic: 1, graph: 0, descr: 'Consistent' }
-                        - { value:  9, generic: 1, graph: 0, descr: 'Inconsistent' }
-                        - { value: 10, generic: 1, graph: 0, descr: 'Busy' }
-                        - { value: 11, generic: 1, graph: 0, descr: 'No input' }
-                        - { value: 12, generic: 1, graph: 0, descr: 'Low battery' }
-                        - { value: 13, generic: 1, graph: 0, descr: 'Single link fault' }
-                        - { value: 14, generic: 1, graph: 0, descr: 'Invalid' }
-                        - { value: 15, generic: 1, graph: 0, descr: 'Write protect' }
+                        - { value:  1, generic: 0, descr: 'Normal' }
+                        - { value:  2, generic: 2, descr: 'Fault' }
+                        - { value:  3, generic: 1, descr: 'Pre-fail' }
+                        - { value:  4, generic: 1, descr: 'Partially broken' }
+                        - { value:  5, generic: 2, descr: 'Degraded' }
+                        - { value:  6, generic: 2, descr: 'Bad sectors found' }
+                        - { value:  7, generic: 1, descr: 'Bit sectors found' }
+                        - { value:  8, generic: 1, descr: 'Consistent' }
+                        - { value:  9, generic: 1, descr: 'Inconsistent' }
+                        - { value: 10, generic: 1, descr: 'Busy' }
+                        - { value: 11, generic: 1, descr: 'No input' }
+                        - { value: 12, generic: 1, descr: 'Low battery' }
+                        - { value: 13, generic: 1, descr: 'Single link fault' }
+                        - { value: 14, generic: 1, descr: 'Invalid' }
+                        - { value: 15, generic: 1, descr: 'Write protect' }
                 -
                     oid: HUAWEI-STORAGE-SPACE-MIB::hwInfoStoragePoolTable
                     value: HUAWEI-STORAGE-SPACE-MIB::hwInfoStoragePoolHealthStatus
@@ -54,21 +54,21 @@ modules:
                     group: 'Storage Pools'
                     state_name: hwInfoStoragePoolHealthStatus
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Normal' }
-                        - { value:  2, generic: 2, graph: 0, descr: 'Fault' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Pre-fail' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Partially broken' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Degraded' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Bad sectors found' }
-                        - { value:  7, generic: 1, graph: 0, descr: 'Bit sectors found' }
-                        - { value:  8, generic: 1, graph: 0, descr: 'Consistent' }
-                        - { value:  9, generic: 1, graph: 0, descr: 'Inconsistent' }
-                        - { value: 10, generic: 1, graph: 0, descr: 'Busy' }
-                        - { value: 11, generic: 1, graph: 0, descr: 'No input' }
-                        - { value: 12, generic: 1, graph: 0, descr: 'Low battery' }
-                        - { value: 13, generic: 1, graph: 0, descr: 'Single link fault' }
-                        - { value: 14, generic: 1, graph: 0, descr: 'Invalid' }
-                        - { value: 15, generic: 1, graph: 0, descr: 'Write protect' }
+                        - { value:  1, generic: 0, descr: 'Normal' }
+                        - { value:  2, generic: 2, descr: 'Fault' }
+                        - { value:  3, generic: 1, descr: 'Pre-fail' }
+                        - { value:  4, generic: 1, descr: 'Partially broken' }
+                        - { value:  5, generic: 2, descr: 'Degraded' }
+                        - { value:  6, generic: 2, descr: 'Bad sectors found' }
+                        - { value:  7, generic: 1, descr: 'Bit sectors found' }
+                        - { value:  8, generic: 1, descr: 'Consistent' }
+                        - { value:  9, generic: 1, descr: 'Inconsistent' }
+                        - { value: 10, generic: 1, descr: 'Busy' }
+                        - { value: 11, generic: 1, descr: 'No input' }
+                        - { value: 12, generic: 1, descr: 'Low battery' }
+                        - { value: 13, generic: 1, descr: 'Single link fault' }
+                        - { value: 14, generic: 1, descr: 'Invalid' }
+                        - { value: 15, generic: 1, descr: 'Write protect' }
                 -
                     oid: HUAWEI-STORAGE-SPACE-MIB::hwInfoLunTable
                     value: HUAWEI-STORAGE-SPACE-MIB::hwInfoLunHealthStatus
@@ -77,21 +77,21 @@ modules:
                     group: 'LUNs'
                     state_name: hwInfoLunHealthStatus
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Normal' }
-                        - { value:  2, generic: 2, graph: 0, descr: 'Fault' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Pre-fail' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Partially broken' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Degraded' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Bad sectors found' }
-                        - { value:  7, generic: 1, graph: 0, descr: 'Bit sectors found' }
-                        - { value:  8, generic: 1, graph: 0, descr: 'Consistent' }
-                        - { value:  9, generic: 1, graph: 0, descr: 'Inconsistent' }
-                        - { value: 10, generic: 1, graph: 0, descr: 'Busy' }
-                        - { value: 11, generic: 1, graph: 0, descr: 'No input' }
-                        - { value: 12, generic: 1, graph: 0, descr: 'Low battery' }
-                        - { value: 13, generic: 1, graph: 0, descr: 'Single link fault' }
-                        - { value: 14, generic: 1, graph: 0, descr: 'Invalid' }
-                        - { value: 15, generic: 1, graph: 0, descr: 'Write protect' }
+                        - { value:  1, generic: 0, descr: 'Normal' }
+                        - { value:  2, generic: 2, descr: 'Fault' }
+                        - { value:  3, generic: 1, descr: 'Pre-fail' }
+                        - { value:  4, generic: 1, descr: 'Partially broken' }
+                        - { value:  5, generic: 2, descr: 'Degraded' }
+                        - { value:  6, generic: 2, descr: 'Bad sectors found' }
+                        - { value:  7, generic: 1, descr: 'Bit sectors found' }
+                        - { value:  8, generic: 1, descr: 'Consistent' }
+                        - { value:  9, generic: 1, descr: 'Inconsistent' }
+                        - { value: 10, generic: 1, descr: 'Busy' }
+                        - { value: 11, generic: 1, descr: 'No input' }
+                        - { value: 12, generic: 1, descr: 'Low battery' }
+                        - { value: 13, generic: 1, descr: 'Single link fault' }
+                        - { value: 14, generic: 1, descr: 'Invalid' }
+                        - { value: 15, generic: 1, descr: 'Write protect' }
                 -
                     oid: HUAWEI-STORAGE-HARDWARE-MIB::hwInfoDiskTable
                     value: HUAWEI-STORAGE-HARDWARE-MIB::hwInfoDiskHealthStatus
@@ -101,21 +101,21 @@ modules:
                     group: 'Disks'
                     state_name: hwInfoDiskHealthStatus
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Normal' }
-                        - { value:  2, generic: 2, graph: 0, descr: 'Fault' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Pre-fail' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Partially broken' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Degraded' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Bad sectors found' }
-                        - { value:  7, generic: 1, graph: 0, descr: 'Bit sectors found' }
-                        - { value:  8, generic: 1, graph: 0, descr: 'Consistent' }
-                        - { value:  9, generic: 1, graph: 0, descr: 'Inconsistent' }
-                        - { value: 10, generic: 1, graph: 0, descr: 'Busy' }
-                        - { value: 11, generic: 1, graph: 0, descr: 'No input' }
-                        - { value: 12, generic: 1, graph: 0, descr: 'Low battery' }
-                        - { value: 13, generic: 1, graph: 0, descr: 'Single link fault' }
-                        - { value: 14, generic: 1, graph: 0, descr: 'Invalid' }
-                        - { value: 15, generic: 1, graph: 0, descr: 'Write protect' }
+                        - { value:  1, generic: 0, descr: 'Normal' }
+                        - { value:  2, generic: 2, descr: 'Fault' }
+                        - { value:  3, generic: 1, descr: 'Pre-fail' }
+                        - { value:  4, generic: 1, descr: 'Partially broken' }
+                        - { value:  5, generic: 2, descr: 'Degraded' }
+                        - { value:  6, generic: 2, descr: 'Bad sectors found' }
+                        - { value:  7, generic: 1, descr: 'Bit sectors found' }
+                        - { value:  8, generic: 1, descr: 'Consistent' }
+                        - { value:  9, generic: 1, descr: 'Inconsistent' }
+                        - { value: 10, generic: 1, descr: 'Busy' }
+                        - { value: 11, generic: 1, descr: 'No input' }
+                        - { value: 12, generic: 1, descr: 'Low battery' }
+                        - { value: 13, generic: 1, descr: 'Single link fault' }
+                        - { value: 14, generic: 1, descr: 'Invalid' }
+                        - { value: 15, generic: 1, descr: 'Write protect' }
         percent:
             data:
                 -

@@ -20,5 +20,5 @@ modules:
                     descr: 'Device Status'
                     index: 'deviceStatus.{{ $index }}'
                     states:
-                        - { value: 0, descr: Bad, graph: 1, generic: 2 }
-                        - { value: 1, descr: Good, graph: 1, generic: 0 }
+                        - { value: 0, descr: Bad, generic: 2 }
+                        - { value: 1, descr: Good, generic: 0 }

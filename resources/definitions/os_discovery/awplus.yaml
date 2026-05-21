@@ -131,9 +131,9 @@ modules:
                     index: 'atEnvMonv2FanIndex.{{ $index }}'
                     state_name: 'AtFanState'
                     states:
-                        - { descr: 'null', graph: 0, value: -1, generic: 3 }
-                        - { descr: failed, graph: 0, value: 1, generic: 2 }
-                        - { descr: good, graph: 0, value: 2, generic: 0 }
+                        - { descr: 'null', value: -1, generic: 3 }
+                        - { descr: failed, value: 1, generic: 2 }
+                        - { descr: good, value: 2, generic: 0 }
                 -
                     oid: AT-ENVMONv2-MIB::atEnvMonv2VoltageTable
                     value: AT-ENVMONv2-MIB::atEnvMonv2VoltageStatus
@@ -142,9 +142,9 @@ modules:
                     index: 'atEnvMonv2VoltageIndex.{{ $index }}'
                     state_name: 'AtVoltageState'
                     states:
-                        - { descr: 'null', graph: 0, value: -1, generic: 3 }
-                        - { descr: outOfRange, graph: 0, value: 1, generic: 2 }
-                        - { descr: inRange, graph: 0, value: 2, generic: 0 }
+                        - { descr: 'null', value: -1, generic: 3 }
+                        - { descr: outOfRange, value: 1, generic: 2 }
+                        - { descr: inRange, value: 2, generic: 0 }
                 -
                     oid: AT-ENVMONv2-MIB::atEnvMonv2TemperatureTable
                     value: AT-ENVMONv2-MIB::atEnvMonv2TemperatureStatus
@@ -153,9 +153,9 @@ modules:
                     index: 'atEnvMonv2TemperatureIndex.{{ $index }}'
                     state_name: 'AtTemperatureState'
                     states:
-                        - { descr: 'null', graph: 0, value: -1, generic: 3 }
-                        - { descr: outOfRange, graph: 0, value: 1, generic: 2 }
-                        - { descr: inRange, graph: 0, value: 2, generic: 0 }
+                        - { descr: 'null', value: -1, generic: 3 }
+                        - { descr: outOfRange, value: 1, generic: 2 }
+                        - { descr: inRange, value: 2, generic: 0 }
                 -
                     oid: AT-ENVMONv2-MIB::atEnvMonv2PsbSensorTable
                     value: AT-ENVMONv2-MIB::atEnvMonv2PsbSensorStatus
@@ -164,7 +164,7 @@ modules:
                     index: 'atEnvMonv2PsbSensorIndex.{{ $index }}'
                     state_name: 'AtPowerSupplyState'
                     states:
-                        - { descr: 'null', graph: 0, value: -1, generic: 3 }
-                        - { descr: failed, graph: 0, value: 1, generic: 2 }
-                        - { descr: good, graph: 0, value: 2, generic: 0 }
-                        - { descr: notPowered, graph: 0, value: 3, generic: 3 }
+                        - { descr: 'null', value: -1, generic: 3 }
+                        - { descr: failed, value: 1, generic: 2 }
+                        - { descr: good, value: 2, generic: 0 }
+                        - { descr: notPowered, value: 3, generic: 3 }

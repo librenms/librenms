@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Facades\LibrenmsConfig;
 use App\View\SimpleTemplate;
 use Carbon\Carbon;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
@@ -56,7 +57,7 @@ class Device extends BaseModel
         'features',
         'hardware',
         'hostname',
-        'display',
+        'display_template',
         'icon',
         'ignore',
         'ignore_status',
@@ -200,19 +201,11 @@ class Device extends BaseModel
     }
 
     /**
-     * Get the display name of this device based on the display format string
-     * The default is {{ $hostname }} controlled by the device_display_default setting
+     * @deprecated use display field directly
      */
     public function displayName(): string
     {
-        $hostname_is_ip = IP::isValid($this->hostname);
-
-        return SimpleTemplate::parse($this->display ?: \App\Facades\LibrenmsConfig::get('device_display_default', '{{ $hostname }}'), [
-            'hostname' => $this->hostname,
-            'sysName' => $this->sysName ?: $this->hostname,
-            'sysName_fallback' => $hostname_is_ip ? $this->sysName : $this->hostname,
-            'ip' => $this->overwrite_ip ?: ($hostname_is_ip ? $this->hostname : $this->ip),
-        ]);
+        return $this->display ?: $this->hostname ?: '';
     }
 
     /**
@@ -229,6 +222,21 @@ class Device extends BaseModel
         }
 
         return '';
+    }
+
+    public function regenerateDisplayName(): void
+    {
+        $hostname_is_ip = IP::isValid($this->hostname);
+
+        $display = SimpleTemplate::parse($this->display_template ?: LibrenmsConfig::get('device_display_default',
+            '{{ $hostname }}'), [
+                'hostname' => $this->hostname,
+                'sysName' => $this->sysName ?: $this->hostname,
+                'sysName_fallback' => $hostname_is_ip ? $this->sysName : $this->hostname,
+                'ip' => $this->overwrite_ip ?: ($hostname_is_ip ? $this->hostname : $this->ip),
+            ]);
+
+        $this->display = substr($display, 0, 128);
     }
 
     public function isUnderMaintenance(): bool
@@ -891,6 +899,9 @@ class Device extends BaseModel
         return $this->hasMany(Link::class, 'remote_device_id');
     }
 
+    /**
+     * @return \Illuminate\Support\Collection<int, \App\Models\Link>
+     */
     public function allLinks(): \Illuminate\Support\Collection
     {
         return $this->links->merge($this->remoteLinks);
@@ -1320,6 +1331,14 @@ class Device extends BaseModel
     public function slas(): HasMany
     {
         return $this->hasMany(Sla::class, 'device_id');
+    }
+
+    /**
+     * @return HasMany<SslCertificate, $this>
+     */
+    public function sslCertificates(): HasMany
+    {
+        return $this->hasMany(SslCertificate::class, 'device_id');
     }
 
     /**

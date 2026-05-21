@@ -28,8 +28,8 @@ $oids = snmpwalk_cache_oid($device, 'outputEntry', [], 'ICT-PDU-MIB');
 if (is_array($oids)) {
     $state_name = 'outputFuseStatus';
     $states = [
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'OK'],
-        ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'OPEN'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'OK'],
+        ['value' => 2, 'generic' => 2, 'descr' => 'OPEN'],
     ];
     create_state_index($state_name, $states);
 

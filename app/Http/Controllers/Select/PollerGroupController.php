@@ -27,19 +27,26 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\PollerGroup;
+use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * @extends SelectController<PollerGroup>
+ */
 class PollerGroupController extends SelectController
 {
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return ['group_name', 'descr'];
     }
 
-    protected function baseQuery($request)
+    protected function baseQuery($request): Builder
     {
         return PollerGroup::query()->select(['id', 'group_name']);
     }
 
+    /**
+     * @return array{id: int|string, text: string, icon?: string}
+     */
     protected function prependItem(): array
     {
         return [

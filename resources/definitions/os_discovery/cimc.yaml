@@ -94,19 +94,19 @@ modules:
                             op: '='
                             value: '6'
                     states:
-                        - { value:  0, generic: 3, graph: 0, descr: unknown }
-                        - { value:  1, generic: 0, graph: 0, descr: operable }
-                        - { value:  2, generic: 2, graph: 0, descr: inoperable }
-                        - { value:  3, generic: 2, graph: 0, descr: degraded }
-                        - { value:  4, generic: 2, graph: 0, descr: poweroff }
-                        - { value:  5, generic: 2, graph: 0, descr: powerproblem }
-                        - { value:  6, generic: 3, graph: 0, descr: removed }
-                        - { value:  7, generic: 2, graph: 0, descr: voltage problem }
-                        - { value:  8, generic: 2, graph: 0, descr: thermal problem }
-                        - { value:  9, generic: 2, graph: 0, descr: performance problem }
-                        - { value:  10, generic: 2, graph: 0, descr: accessibility problem }
-                        - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
-                        - { value:  13, generic: 1, graph: 0, descr: disabled }
+                        - { value:  0, generic: 3, descr: unknown }
+                        - { value:  1, generic: 0, descr: operable }
+                        - { value:  2, generic: 2, descr: inoperable }
+                        - { value:  3, generic: 2, descr: degraded }
+                        - { value:  4, generic: 2, descr: poweroff }
+                        - { value:  5, generic: 2, descr: powerproblem }
+                        - { value:  6, generic: 3, descr: removed }
+                        - { value:  7, generic: 2, descr: voltage problem }
+                        - { value:  8, generic: 2, descr: thermal problem }
+                        - { value:  9, generic: 2, descr: performance problem }
+                        - { value:  10, generic: 2, descr: accessibility problem }
+                        - { value:  11, generic: 2, descr: identity Unestablishable }
+                        - { value:  13, generic: 1, descr: disabled }
                 -
                     oid: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageLocalLunTable
                     value: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageLocalLunOperability
@@ -116,19 +116,19 @@ modules:
                     index: 'virtual-drive-operability.{{ $index }}'
                     group: 'Local Storage'
                     states:
-                        - { value:  0, generic: 3, graph: 0, descr: unknown }
-                        - { value:  1, generic: 0, graph: 0, descr: operable }
-                        - { value:  2, generic: 2, graph: 0, descr: inoperable }
-                        - { value:  3, generic: 2, graph: 0, descr: degraded }
-                        - { value:  4, generic: 2, graph: 0, descr: poweroff }
-                        - { value:  5, generic: 2, graph: 0, descr: powerproblem }
-                        - { value:  6, generic: 3, graph: 0, descr: removed }
-                        - { value:  7, generic: 2, graph: 0, descr: voltage problem }
-                        - { value:  8, generic: 2, graph: 0, descr: thermal problem }
-                        - { value:  9, generic: 2, graph: 0, descr: performance problem }
-                        - { value:  10, generic: 2, graph: 0, descr: accessibility problem }
-                        - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
-                        - { value:  13, generic: 1, graph: 0, descr: disabled }
+                        - { value:  0, generic: 3, descr: unknown }
+                        - { value:  1, generic: 0, descr: operable }
+                        - { value:  2, generic: 2, descr: inoperable }
+                        - { value:  3, generic: 2, descr: degraded }
+                        - { value:  4, generic: 2, descr: poweroff }
+                        - { value:  5, generic: 2, descr: powerproblem }
+                        - { value:  6, generic: 3, descr: removed }
+                        - { value:  7, generic: 2, descr: voltage problem }
+                        - { value:  8, generic: 2, descr: thermal problem }
+                        - { value:  9, generic: 2, descr: performance problem }
+                        - { value:  10, generic: 2, descr: accessibility problem }
+                        - { value:  11, generic: 2, descr: identity Unestablishable }
+                        - { value:  13, generic: 1, descr: disabled }
                 -
                     oid: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageControllerTable
                     value: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageControllerOperability
@@ -138,19 +138,19 @@ modules:
                     index: 'storage-controller-operability.{{ $index }}'
                     group: 'Storage Controller'
                     states:
-                        - { value:  0, generic: 3, graph: 0, descr: unknown }
-                        - { value:  1, generic: 0, graph: 0, descr: operable }
-                        - { value:  2, generic: 2, graph: 0, descr: inoperable }
-                        - { value:  3, generic: 2, graph: 0, descr: degraded }
-                        - { value:  4, generic: 2, graph: 0, descr: poweroff }
-                        - { value:  5, generic: 2, graph: 0, descr: powerproblem }
-                        - { value:  6, generic: 3, graph: 0, descr: removed }
-                        - { value:  7, generic: 2, graph: 0, descr: voltage problem }
-                        - { value:  8, generic: 2, graph: 0, descr: thermal problem }
-                        - { value:  9, generic: 2, graph: 0, descr: performance problem }
-                        - { value:  10, generic: 2, graph: 0, descr: accessibility problem }
-                        - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
-                        - { value:  13, generic: 1, graph: 0, descr: disabled }
+                        - { value:  0, generic: 3, descr: unknown }
+                        - { value:  1, generic: 0, descr: operable }
+                        - { value:  2, generic: 2, descr: inoperable }
+                        - { value:  3, generic: 2, descr: degraded }
+                        - { value:  4, generic: 2, descr: poweroff }
+                        - { value:  5, generic: 2, descr: powerproblem }
+                        - { value:  6, generic: 3, descr: removed }
+                        - { value:  7, generic: 2, descr: voltage problem }
+                        - { value:  8, generic: 2, descr: thermal problem }
+                        - { value:  9, generic: 2, descr: performance problem }
+                        - { value:  10, generic: 2, descr: accessibility problem }
+                        - { value:  11, generic: 2, descr: identity Unestablishable }
+                        - { value:  13, generic: 1, descr: disabled }
                 -
                     oid: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageFlexFlashControllerTable
                     value: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageFlexFlashControllerOperability
@@ -160,19 +160,19 @@ modules:
                     index: 'flexflash-controller-operability.{{ $index }}'
                     group: 'Storage Controller'
                     states:
-                        - { value:  0, generic: 3, graph: 0, descr: unknown }
-                        - { value:  1, generic: 0, graph: 0, descr: operable }
-                        - { value:  2, generic: 2, graph: 0, descr: inoperable }
-                        - { value:  3, generic: 2, graph: 0, descr: degraded }
-                        - { value:  4, generic: 2, graph: 0, descr: poweroff }
-                        - { value:  5, generic: 2, graph: 0, descr: powerproblem }
-                        - { value:  6, generic: 3, graph: 0, descr: removed }
-                        - { value:  7, generic: 2, graph: 0, descr: voltage problem }
-                        - { value:  8, generic: 2, graph: 0, descr: thermal problem }
-                        - { value:  9, generic: 2, graph: 0, descr: performance problem }
-                        - { value:  10, generic: 2, graph: 0, descr: accessibility problem }
-                        - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
-                        - { value:  13, generic: 1, graph: 0, descr: disabled }
+                        - { value:  0, generic: 3, descr: unknown }
+                        - { value:  1, generic: 0, descr: operable }
+                        - { value:  2, generic: 2, descr: inoperable }
+                        - { value:  3, generic: 2, descr: degraded }
+                        - { value:  4, generic: 2, descr: poweroff }
+                        - { value:  5, generic: 2, descr: powerproblem }
+                        - { value:  6, generic: 3, descr: removed }
+                        - { value:  7, generic: 2, descr: voltage problem }
+                        - { value:  8, generic: 2, descr: thermal problem }
+                        - { value:  9, generic: 2, descr: performance problem }
+                        - { value:  10, generic: 2, descr: accessibility problem }
+                        - { value:  11, generic: 2, descr: identity Unestablishable }
+                        - { value:  13, generic: 1, descr: disabled }
                 -
                     oid: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageRaidBatteryTable
                     value: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageRaidBatteryOperability
@@ -182,19 +182,19 @@ modules:
                     index: 'raid-battery-operability.{{ $index }}'
                     group: 'Storage Controller'
                     states:
-                        - { value:  0, generic: 3, graph: 0, descr: unknown }
-                        - { value:  1, generic: 0, graph: 0, descr: operable }
-                        - { value:  2, generic: 2, graph: 0, descr: inoperable }
-                        - { value:  3, generic: 2, graph: 0, descr: degraded }
-                        - { value:  4, generic: 2, graph: 0, descr: poweroff }
-                        - { value:  5, generic: 2, graph: 0, descr: powerproblem }
-                        - { value:  6, generic: 3, graph: 0, descr: removed }
-                        - { value:  7, generic: 2, graph: 0, descr: voltage problem }
-                        - { value:  8, generic: 2, graph: 0, descr: thermal problem }
-                        - { value:  9, generic: 2, graph: 0, descr: performance problem }
-                        - { value:  10, generic: 2, graph: 0, descr: accessibility problem }
-                        - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
-                        - { value:  13, generic: 1, graph: 0, descr: disabled }
+                        - { value:  0, generic: 3, descr: unknown }
+                        - { value:  1, generic: 0, descr: operable }
+                        - { value:  2, generic: 2, descr: inoperable }
+                        - { value:  3, generic: 2, descr: degraded }
+                        - { value:  4, generic: 2, descr: poweroff }
+                        - { value:  5, generic: 2, descr: powerproblem }
+                        - { value:  6, generic: 3, descr: removed }
+                        - { value:  7, generic: 2, descr: voltage problem }
+                        - { value:  8, generic: 2, descr: thermal problem }
+                        - { value:  9, generic: 2, descr: performance problem }
+                        - { value:  10, generic: 2, descr: accessibility problem }
+                        - { value:  11, generic: 2, descr: identity Unestablishable }
+                        - { value:  13, generic: 1, descr: disabled }
                 -
                     oid: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentFanTable
                     value: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentFanOperability
@@ -204,19 +204,19 @@ modules:
                     index: 'fan-operability.{{ $index }}'
                     group: 'Fans'
                     states:
-                        - { value:  0, generic: 3, graph: 0, descr: unknown }
-                        - { value:  1, generic: 0, graph: 0, descr: operable }
-                        - { value:  2, generic: 2, graph: 0, descr: inoperable }
-                        - { value:  3, generic: 2, graph: 0, descr: degraded }
-                        - { value:  4, generic: 2, graph: 0, descr: poweroff }
-                        - { value:  5, generic: 2, graph: 0, descr: powerproblem }
-                        - { value:  6, generic: 3, graph: 0, descr: removed }
-                        - { value:  7, generic: 2, graph: 0, descr: voltage problem }
-                        - { value:  8, generic: 2, graph: 0, descr: thermal problem }
-                        - { value:  9, generic: 2, graph: 0, descr: performance problem }
-                        - { value:  10, generic: 2, graph: 0, descr: accessibility problem }
-                        - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
-                        - { value:  13, generic: 1, graph: 0, descr: disabled }
+                        - { value:  0, generic: 3, descr: unknown }
+                        - { value:  1, generic: 0, descr: operable }
+                        - { value:  2, generic: 2, descr: inoperable }
+                        - { value:  3, generic: 2, descr: degraded }
+                        - { value:  4, generic: 2, descr: poweroff }
+                        - { value:  5, generic: 2, descr: powerproblem }
+                        - { value:  6, generic: 3, descr: removed }
+                        - { value:  7, generic: 2, descr: voltage problem }
+                        - { value:  8, generic: 2, descr: thermal problem }
+                        - { value:  9, generic: 2, descr: performance problem }
+                        - { value:  10, generic: 2, descr: accessibility problem }
+                        - { value:  11, generic: 2, descr: identity Unestablishable }
+                        - { value:  13, generic: 1, descr: disabled }
                 -
                     oid: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentPsuTable
                     value: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentPsuOperability
@@ -226,19 +226,19 @@ modules:
                     index: 'power-supply-operability.{{ $index }}'
                     group: 'Power Supply'
                     states:
-                        - { value:  0, generic: 3, graph: 0, descr: unknown }
-                        - { value:  1, generic: 0, graph: 0, descr: operable }
-                        - { value:  2, generic: 2, graph: 0, descr: inoperable }
-                        - { value:  3, generic: 2, graph: 0, descr: degraded }
-                        - { value:  4, generic: 2, graph: 0, descr: poweroff }
-                        - { value:  5, generic: 2, graph: 0, descr: powerproblem }
-                        - { value:  6, generic: 3, graph: 0, descr: removed }
-                        - { value:  7, generic: 2, graph: 0, descr: voltage problem }
-                        - { value:  8, generic: 2, graph: 0, descr: thermal problem }
-                        - { value:  9, generic: 2, graph: 0, descr: performance problem }
-                        - { value:  10, generic: 2, graph: 0, descr: accessibility problem }
-                        - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
-                        - { value:  13, generic: 1, graph: 0, descr: disabled }
+                        - { value:  0, generic: 3, descr: unknown }
+                        - { value:  1, generic: 0, descr: operable }
+                        - { value:  2, generic: 2, descr: inoperable }
+                        - { value:  3, generic: 2, descr: degraded }
+                        - { value:  4, generic: 2, descr: poweroff }
+                        - { value:  5, generic: 2, descr: powerproblem }
+                        - { value:  6, generic: 3, descr: removed }
+                        - { value:  7, generic: 2, descr: voltage problem }
+                        - { value:  8, generic: 2, descr: thermal problem }
+                        - { value:  9, generic: 2, descr: performance problem }
+                        - { value:  10, generic: 2, descr: accessibility problem }
+                        - { value:  11, generic: 2, descr: identity Unestablishable }
+                        - { value:  13, generic: 1, descr: disabled }
                 -
                     oid: CISCO-UNIFIED-COMPUTING-MEMORY-MIB::cucsMemoryUnitTable
                     value: CISCO-UNIFIED-COMPUTING-MEMORY-MIB::cucsMemoryUnitOperability
@@ -253,19 +253,19 @@ modules:
                             op: '='
                             value: '0'
                     states:
-                        - { value:  0, generic: 3, graph: 0, descr: unknown }
-                        - { value:  1, generic: 0, graph: 0, descr: operable }
-                        - { value:  2, generic: 2, graph: 0, descr: inoperable }
-                        - { value:  3, generic: 2, graph: 0, descr: degraded }
-                        - { value:  4, generic: 2, graph: 0, descr: poweroff }
-                        - { value:  5, generic: 2, graph: 0, descr: powerproblem }
-                        - { value:  6, generic: 3, graph: 0, descr: removed }
-                        - { value:  7, generic: 2, graph: 0, descr: voltage problem }
-                        - { value:  8, generic: 2, graph: 0, descr: thermal problem }
-                        - { value:  9, generic: 2, graph: 0, descr: performance problem }
-                        - { value:  10, generic: 2, graph: 0, descr: accessibility problem }
-                        - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
-                        - { value:  13, generic: 1, graph: 0, descr: disabled }
+                        - { value:  0, generic: 3, descr: unknown }
+                        - { value:  1, generic: 0, descr: operable }
+                        - { value:  2, generic: 2, descr: inoperable }
+                        - { value:  3, generic: 2, descr: degraded }
+                        - { value:  4, generic: 2, descr: poweroff }
+                        - { value:  5, generic: 2, descr: powerproblem }
+                        - { value:  6, generic: 3, descr: removed }
+                        - { value:  7, generic: 2, descr: voltage problem }
+                        - { value:  8, generic: 2, descr: thermal problem }
+                        - { value:  9, generic: 2, descr: performance problem }
+                        - { value:  10, generic: 2, descr: accessibility problem }
+                        - { value:  11, generic: 2, descr: identity Unestablishable }
+                        - { value:  13, generic: 1, descr: disabled }
                 -
                     oid: CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB::cucsProcessorUnitTable
                     value: CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB::cucsProcessorUnitOperability
@@ -280,16 +280,16 @@ modules:
                             op: '='
                             value: '11'
                     states:
-                        - { value:  0, generic: 3, graph: 0, descr: unknown }
-                        - { value:  1, generic: 0, graph: 0, descr: operable }
-                        - { value:  2, generic: 2, graph: 0, descr: inoperable }
-                        - { value:  3, generic: 2, graph: 0, descr: degraded }
-                        - { value:  4, generic: 2, graph: 0, descr: poweroff }
-                        - { value:  5, generic: 2, graph: 0, descr: powerproblem }
-                        - { value:  6, generic: 3, graph: 0, descr: removed }
-                        - { value:  7, generic: 2, graph: 0, descr: voltage problem }
-                        - { value:  8, generic: 2, graph: 0, descr: thermal problem }
-                        - { value:  9, generic: 2, graph: 0, descr: performance problem }
-                        - { value:  10, generic: 2, graph: 0, descr: accessibility problem }
-                        - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
-                        - { value:  13, generic: 1, graph: 0, descr: disabled }
+                        - { value:  0, generic: 3, descr: unknown }
+                        - { value:  1, generic: 0, descr: operable }
+                        - { value:  2, generic: 2, descr: inoperable }
+                        - { value:  3, generic: 2, descr: degraded }
+                        - { value:  4, generic: 2, descr: poweroff }
+                        - { value:  5, generic: 2, descr: powerproblem }
+                        - { value:  6, generic: 3, descr: removed }
+                        - { value:  7, generic: 2, descr: voltage problem }
+                        - { value:  8, generic: 2, descr: thermal problem }
+                        - { value:  9, generic: 2, descr: performance problem }
+                        - { value:  10, generic: 2, descr: accessibility problem }
+                        - { value:  11, generic: 2, descr: identity Unestablishable }
+                        - { value:  13, generic: 1, descr: disabled }

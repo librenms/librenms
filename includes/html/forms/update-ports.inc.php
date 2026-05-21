@@ -34,7 +34,7 @@ foreach ($_POST as $key => $val) {
             continue;
         }
 
-        $n = dbUpdate(['ignore' => $newign], 'ports', '`device_id` = ? AND `port_id` = ?', [$device_id, $port_id]);
+        $n = Port::where('device_id', $device_id)->where('port_id', $port_id)->update(['ignore' => $newign]);
 
         if ($n < 0) {
             $rows_updated = -1;
@@ -55,7 +55,7 @@ foreach ($_POST as $key => $val) {
             continue;
         }
 
-        $n = dbUpdate(['disabled' => $newdis], 'ports', '`device_id` = ? AND `port_id` = ?', [$device_id, $port_id]);
+        $n = Port::where('device_id', $device_id)->where('port_id', $port_id)->update(['disabled' => $newdis]);
 
         if ($n < 0) {
             $rows_updated = -1;

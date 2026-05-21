@@ -16,8 +16,8 @@ modules:
                     high_limit: 2
                     descr: '{{ UBNT-UFIBER-MIB::ubntSfpName }}'
                     states:
-                        - { descr: Up, graph: 0, value: 1, generic: 0 }
-                        - { descr: Down, graph: 0, value: 2, generic: 2 }
+                        - { descr: Up, value: 1, generic: 0 }
+                        - { descr: Down, value: 2, generic: 2 }
                 -
                     oid: UBNT-UFIBER-MIB::ubntOnusTable
                     value: UBNT-UFIBER-MIB::ubntOnuOnline
@@ -26,8 +26,8 @@ modules:
                     high_limit: 2
                     descr: 'ONU {{ UBNT-UFIBER-MIB::ubntOnuName }} Connection State'
                     states:
-                        - { descr: Up, graph: 0, value: 1, generic: 0 }
-                        - { descr: Down, graph: 0, value: 2, generic: 2 }
+                        - { descr: Up, value: 1, generic: 0 }
+                        - { descr: Down, value: 2, generic: 2 }
         count:
             data:
                 -

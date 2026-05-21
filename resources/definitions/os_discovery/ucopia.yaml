@@ -16,11 +16,11 @@ modules:
                     index: 'highAvailabilityStatus.{{ $index }}'
                     state_name: highAvailabilityStatus
                     states:
-                        - { descr: Standalone, graph: 1, value: 0, generic: 0 }
-                        - { descr: Master, graph: 1, value: 1, generic: 0 }
-                        - { descr: Active, graph: 1, value: 2, generic: 0 }
-                        - { descr: Passive, graph: 1, value: 3, generic: 0 }
-                        - { descr: Fault, graph: 1, value: 4, generic: 2 }
+                        - { descr: Standalone, value: 0, generic: 0 }
+                        - { descr: Master, value: 1, generic: 0 }
+                        - { descr: Active, value: 2, generic: 0 }
+                        - { descr: Passive, value: 3, generic: 0 }
+                        - { descr: Fault, value: 4, generic: 2 }
                 -
                     oid: CONTROLLER-MIB::debugValue
                     value: CONTROLLER-MIB::debugValue
@@ -29,14 +29,14 @@ modules:
                     index: 'debugValue.{{ $index }}'
                     state_name: debugValue
                     states:
-                        - { descr: Emergency, graph: 1, value: 0, generic: 2 }
-                        - { descr: Alert, graph: 1, value: 1, generic: 2 }
-                        - { descr: Critical, graph: 1, value: 2, generic: 2 }
-                        - { descr: Error, graph: 1, value: 3, generic: 2 }
-                        - { descr: Warning, graph: 1, value: 4, generic: 1 }
-                        - { descr: Notice, graph: 1, value: 5, generic: 0 }
-                        - { descr: Informational, graph: 1, value: 6, generic: 0 }
-                        - { descr: Debug, graph: 1, value: 7, generic: 0 }
+                        - { descr: Emergency, value: 0, generic: 2 }
+                        - { descr: Alert, value: 1, generic: 2 }
+                        - { descr: Critical, value: 2, generic: 2 }
+                        - { descr: Error, value: 3, generic: 2 }
+                        - { descr: Warning, value: 4, generic: 1 }
+                        - { descr: Notice, value: 5, generic: 0 }
+                        - { descr: Informational, value: 6, generic: 0 }
+                        - { descr: Debug, value: 7, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::webServerService
                     value: CONTROLLER-MIB::webServerService
@@ -45,9 +45,9 @@ modules:
                     index: 'webServerService.{{ $index }}'
                     state_name: webServerService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::sqlServerService
                     value: CONTROLLER-MIB::sqlServerService
@@ -56,9 +56,9 @@ modules:
                     index: 'sqlServerService.{{ $index }}'
                     state_name: sqlServerService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::urlSnifferService
                     value: CONTROLLER-MIB::urlSnifferService
@@ -67,9 +67,9 @@ modules:
                     index: 'urlSnifferService.{{ $index }}'
                     state_name: urlSnifferService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::portalService
                     value: CONTROLLER-MIB::portalService
@@ -78,9 +78,9 @@ modules:
                     index: 'portalService.{{ $index }}'
                     state_name: portalService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::webProxyService
                     value: CONTROLLER-MIB::webProxyService
@@ -89,9 +89,9 @@ modules:
                     index: 'webProxyService.{{ $index }}'
                     state_name: webProxyService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::autodisconnectService
                     value: CONTROLLER-MIB::autodisconnectService
@@ -100,9 +100,9 @@ modules:
                     index: 'autodisconnectService.{{ $index }}'
                     state_name: autodisconnectService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::printingServerService
                     value: CONTROLLER-MIB::printingServerService
@@ -111,9 +111,9 @@ modules:
                     index: 'printingServerService.{{ $index }}'
                     state_name: printingServerService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::dhcpServerService
                     value: CONTROLLER-MIB::dhcpServerService
@@ -122,9 +122,9 @@ modules:
                     index: 'dhcpServerService.{{ $index }}'
                     state_name: dhcpServerService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::dnsServerService
                     value: CONTROLLER-MIB::dnsServerService
@@ -133,9 +133,9 @@ modules:
                     index: 'dnsServerService.{{ $index }}'
                     state_name: dnsServerService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::staticIpManagerService
                     value: CONTROLLER-MIB::staticIpManagerService
@@ -144,9 +144,9 @@ modules:
                     index: 'staticIpManagerService.{{ $index }}'
                     state_name: staticIpManagerService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::highAvailabilityService
                     value: CONTROLLER-MIB::highAvailabilityService
@@ -155,9 +155,9 @@ modules:
                     index: 'highAvailabilityService.{{ $index }}'
                     state_name: highAvailabilityService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::ldapDirectoryService
                     value: CONTROLLER-MIB::ldapDirectoryService
@@ -166,9 +166,9 @@ modules:
                     index: 'ldapDirectoryService.{{ $index }}'
                     state_name: ldapDirectoryService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::ldapReplicationManagerService
                     value: CONTROLLER-MIB::ldapReplicationManagerService
@@ -177,9 +177,9 @@ modules:
                     index: 'ldapReplicationManagerService.{{ $index }}'
                     state_name: ldapReplicationManagerService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::timeServerService
                     value: CONTROLLER-MIB::timeServerService
@@ -188,9 +188,9 @@ modules:
                     index: 'timeServerService.{{ $index }}'
                     state_name: timeServerService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::radiusServerService
                     value: CONTROLLER-MIB::radiusServerService
@@ -199,9 +199,9 @@ modules:
                     index: 'radiusServerService.{{ $index }}'
                     state_name: radiusServerService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::sambaService
                     value: CONTROLLER-MIB::sambaService
@@ -210,9 +210,9 @@ modules:
                     index: 'sambaService.{{ $index }}'
                     state_name: sambaService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::sshService
                     value: CONTROLLER-MIB::sshService
@@ -221,9 +221,9 @@ modules:
                     index: 'sshService.{{ $index }}'
                     state_name: sshService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::syslogService
                     value: CONTROLLER-MIB::syslogService
@@ -232,9 +232,9 @@ modules:
                     index: 'syslogService.{{ $index }}'
                     state_name: syslogService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::syslogService
                     value: CONTROLLER-MIB::usersLogService
@@ -243,9 +243,9 @@ modules:
                     index: 'usersLogService.{{ $index }}'
                     state_name: usersLogService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
                 -
                     oid: CONTROLLER-MIB::pmsClientService
                     value: CONTROLLER-MIB::pmsClientService
@@ -254,9 +254,9 @@ modules:
                     index: 'pmsClientService.{{ $index }}'
                     state_name: pmsClientService
                     states:
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
-                        - { descr: Stopped, graph: 1, value: 2, generic: 2 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 2, generic: 2 }
+                        - { descr: Disabled, value: 3, generic: 0 }
         count:
             data:
                 -

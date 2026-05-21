@@ -36,6 +36,7 @@ use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\StringHelpers;
 
 class PrinterSupplies implements Module
 {
@@ -64,12 +65,12 @@ class PrinterSupplies implements Module
     {
         $device = $os->getDeviceArray();
 
-        ModuleModelObserver::observe(PrinterSupply::class, 'Printer Supplies');
+        ModuleModelObserver::observe(PrinterSupply::class, __('Printer Supplies'));
         $levels = $this->discoveryLevels($device);
         $this->syncModelsByGroup($os->getDevice(), 'printerSupplies', $levels, [['supply_type', '!=', 'input']]);
         ModuleModelObserver::done();
 
-        ModuleModelObserver::observe(PrinterSupply::class, 'Tray Paper Level');
+        ModuleModelObserver::observe(PrinterSupply::class, __('Tray Paper Level'));
         $papers = $this->discoveryPapers($device);
         $this->syncModelsByGroup($os->getDevice(), 'printerSupplies', $papers, ['supply_type' => 'input']);
         ModuleModelObserver::done();
@@ -189,7 +190,7 @@ class PrinterSupplies implements Module
                 $new_descr = '';
                 foreach (explode("\n", (string) $descr) as $line) {
                     if (preg_match('/^([A-F\d]{2} )*[A-F\d]{1,2} ?$/', $line)) {
-                        $line = snmp_hexstring($line);
+                        $line = StringHelpers::hexToAscii($line, ' ');
                     }
                     $new_descr .= $line;
                 }

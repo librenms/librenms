@@ -10,8 +10,8 @@ modules:
                     descr: License Status
                     index: '{{ $index }}'
                     states:
-                        - { descr: Starting, graph: 0, value: 0, generic: 1 }
-                        - { descr: DMI_OK, graph: 0, value: 1, generic: 1 }
-                        - { descr: OK, graph: 0, value: 2, generic: 0 }
-                        - { descr: Failed, graph: 0, value: 3, generic: 2 }
+                        - { descr: Starting, value: 0, generic: 1 }
+                        - { descr: DMI_OK, value: 1, generic: 1 }
+                        - { descr: OK, value: 2, generic: 0 }
+                        - { descr: Failed, value: 3, generic: 2 }
 

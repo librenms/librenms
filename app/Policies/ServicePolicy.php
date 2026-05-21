@@ -26,6 +26,11 @@ class ServicePolicy
             || $this->hasGlobalPermission($user, 'delete');
     }
 
+    public function viewAll(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'viewAll');
+    }
+
     /**
      * Determine whether the user can view the model.
      */

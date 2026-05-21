@@ -14,7 +14,7 @@ modules:
                     descr: 'TFO Load Status'
                     index: '{{ $index }}'
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 0 }
-                        - { value: 3, descr: ok, graph: 1, generic: 1 }
-                        - { value: 4, descr: non-critical, graph: 1, generic: 2 }
+                        - { value: 1, descr: other, generic: 3 }
+                        - { value: 2, descr: unknown, generic: 0 }
+                        - { value: 3, descr: ok, generic: 1 }
+                        - { value: 4, descr: non-critical, generic: 2 }

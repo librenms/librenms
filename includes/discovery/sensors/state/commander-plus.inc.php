@@ -29,8 +29,8 @@ $x = 1;
 foreach ($state_table[0] ?? [] as $state_name => $state_value) {
     //Create State Translation
     $states = [
-        ['value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'inactive'],
-        ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'active'],
+        ['value' => 1, 'generic' => 2, 'descr' => 'inactive'],
+        ['value' => 2, 'generic' => 0, 'descr' => 'active'],
     ];
     create_state_index($state_name, $states);
 

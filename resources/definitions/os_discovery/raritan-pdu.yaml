@@ -186,8 +186,8 @@ modules:
                   group: Inlet
                   state_name: PDU2-MIB::inletSensorMeasurementsTable
                   states:
-                      - { value: 0, descr: On, graph: 0, generic: 0 }
-                      - { value: 1, descr: Off, graph: 0, generic: 1 }
+                      - { value: 0, descr: On, generic: 0 }
+                      - { value: 1, descr: Off, generic: 1 }
                   skip_values:
                       - oid: index
                         op: not_ends
@@ -200,8 +200,8 @@ modules:
                   group: Outlet
                   state_name: PDU2-MIB::outletSensorMeasurementsTable
                   states:
-                      - { value: 0, descr: On, graph: 0, generic: 0 }
-                      - { value: 1, descr: Off, graph: 0, generic: 1 }
+                      - { value: 0, descr: On, generic: 0 }
+                      - { value: 1, descr: Off, generic: 1 }
                   skip_values:
                       - oid: index
                         op: not_ends
@@ -214,8 +214,8 @@ modules:
                   group: Door
                   state_name: PDU2-MIB::externalSensorMeasurementsTable
                   states:
-                      - { value: 0, descr: Closed, graph: 0, generic: 0 }
-                      - { value: 1, descr: Open, graph: 0, generic: 1 }
+                      - { value: 0, descr: Closed, generic: 0 }
+                      - { value: 1, descr: Open, generic: 1 }
                   skip_values:
                       - oid: PDU2-MIB::externalSensorType
                         op: '!='
@@ -228,8 +228,8 @@ modules:
                   group: Lock
                   state_name: PDU2-MIB::externalSensorMeasurementsTable
                   states:
-                      - { value: 0, descr: Locked, graph: 0, generic: 0 }
-                      - { value: 1, descr: Unlocked, graph: 0, generic: 1 }
+                      - { value: 0, descr: Locked, generic: 0 }
+                      - { value: 1, descr: Unlocked, generic: 1 }
                   skip_values:
                       - oid: PDU2-MIB::externalSensorType
                         op: '!='
@@ -242,8 +242,8 @@ modules:
                   group: Door Handle
                   state_name: PDU2-MIB::externalSensorMeasurementsTable
                   states:
-                      - { value: 0, descr: Locked, graph: 0, generic: 0 }
-                      - { value: 1, descr: Unlocked, graph: 0, generic: 1 }
+                      - { value: 0, descr: Locked, generic: 0 }
+                      - { value: 1, descr: Unlocked, generic: 1 }
                   skip_values:
                       - oid: PDU2-MIB::externalSensorType
                         op: '!='

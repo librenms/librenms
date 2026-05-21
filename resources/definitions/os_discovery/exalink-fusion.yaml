@@ -28,8 +28,8 @@ modules:
                     index: 'fusionPsuPresent.{{ $index }}'
                     state_name: fusionPsuPresent
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: Present }
-                        - { value:  2, generic: 3, graph: 0, descr: Missing }
+                        - { value:  1, generic: 0, descr: Present }
+                        - { value:  2, generic: 3, descr: Missing }
         temperature:
             data:
                 -

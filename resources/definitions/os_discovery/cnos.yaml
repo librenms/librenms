@@ -9,11 +9,11 @@ modules:
                     descr: 'PS{{ LENOVO-ENV-MIB::lenovoEnvMibPowerSupplyID }}'
                     index: 'lenovoEnvMibPowerSupplyState.{{ $index }}'
                     states:
-                        - { value: 0, descr: off, graph: 1, generic: 1 }
-                        - { value: 1, descr: on, graph: 1, generic: 0 }
-                        - { value: 2, descr: absent, graph: 1, generic: 1 }
-                        - { value: 3, descr: outputFault, graph: 1, generic: 2 }
-                        - { value: -1, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 0, descr: off, generic: 1 }
+                        - { value: 1, descr: on, generic: 0 }
+                        - { value: 2, descr: absent, generic: 1 }
+                        - { value: 3, descr: outputFault, generic: 2 }
+                        - { value: -1, descr: unknown, generic: 3 }
                 -
                     oid: LENOVO-ENV-MIB::lenovoEnvMibFanEntry
                     value: LENOVO-ENV-MIB::lenovoEnvMibFanState
@@ -21,10 +21,10 @@ modules:
                     descr: LENOVO-ENV-MIB::lenovoEnvMibFanName
                     index: 'lenovoEnvMibFanState.{{ $index }}'
                     states:
-                        - { value: 0, descr: ok, graph: 1, generic: 0 }
-                        - { value: 1, descr: absent, graph: 1, generic: 1 }
-                        - { value: 2, descr: fault, graph: 1, generic: 2 }
-                        - { value: -1, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 0, descr: ok, generic: 0 }
+                        - { value: 1, descr: absent, generic: 1 }
+                        - { value: 2, descr: fault, generic: 2 }
+                        - { value: -1, descr: unknown, generic: 3 }
                 -
                     oid: LENOVO-ENV-MIB::lenovoEnvMibTempSensorEntry
                     value: LENOVO-ENV-MIB::lenovoEnvMibTempSensorState
@@ -32,9 +32,9 @@ modules:
                     descr: LENOVO-ENV-MIB::lenovoEnvMibTempSensorDesc
                     index: 'lenovoEnvMibTempSensorState.{{ $index }}'
                     states:
-                        - { value: 0, descr: ok, graph: 1, generic: 0 }
-                        - { value: 1, descr: fault, graph: 1, generic: 2 }
-                        - { value: -1, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 0, descr: ok, generic: 0 }
+                        - { value: 1, descr: fault, generic: 2 }
+                        - { value: -1, descr: unknown, generic: 3 }
         fanspeed:
             data:
                 -

@@ -15,8 +15,8 @@ modules:
                     descr: "Lan {{ VEL-HOST2-MIB::host2DevIndex }} State"
                     state_name: host2DevLanState
                     states:
-                        - { value: 0, generic: 2, graph: 1, descr: 'disconnected' }
-                        - { value: 1, generic: 0, graph: 1, descr: 'connected' }
+                        - { value: 0, generic: 2, descr: 'disconnected' }
+                        - { value: 1, generic: 0, descr: 'connected' }
         temperature:
             data:
                 -

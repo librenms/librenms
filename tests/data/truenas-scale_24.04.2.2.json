@@ -1038,42 +1038,36 @@
                 {
                     "state_name": "zpoolTable",
                     "state_descr": "ONLINE",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "zpoolTable",
                     "state_descr": "DEGRADED",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "zpoolTable",
                     "state_descr": "FAULTED",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "zpoolTable",
                     "state_descr": "OFFLINE",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "zpoolTable",
                     "state_descr": "UNAVAIL",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "zpoolTable",
                     "state_descr": "REMOVED",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 }
@@ -1561,42 +1555,36 @@
                 {
                     "state_name": "zpoolTable",
                     "state_descr": "ONLINE",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "zpoolTable",
                     "state_descr": "DEGRADED",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "zpoolTable",
                     "state_descr": "FAULTED",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "zpoolTable",
                     "state_descr": "OFFLINE",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "zpoolTable",
                     "state_descr": "UNAVAIL",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "zpoolTable",
                     "state_descr": "REMOVED",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 }

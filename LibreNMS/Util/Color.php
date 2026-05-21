@@ -29,6 +29,7 @@ namespace LibreNMS\Util;
 use App\Models\BgpPeer;
 use App\Models\Device;
 use App\Models\Port;
+use LibreNMS\Enum\IfOperStatus;
 
 class Color
 {
@@ -122,12 +123,12 @@ class Color
         }
 
         // Shutdown ports
-        if ($port->ifAdminStatus === 'down') {
+        if ($port->ifAdminStatus == IfOperStatus::Down) {
             return '#808080';
         }
 
         // Down Ports
-        if ($port->ifOperStatus !== 'up') {
+        if ($port->ifOperStatus != IfOperStatus::Up) {
             return '#ff0000';
         }
 

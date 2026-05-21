@@ -93,17 +93,6 @@ function cleanPort($interface, $device = null)
     return $interface;
 }
 
-function rewrite_generic_hardware($hardware)
-{
-    $rewrite_GenericHW = [
-        ' Computer Corporation' => '',
-        ' Corporation' => '',
-        ' Inc.' => '',
-    ];
-
-    return str_replace(array_keys($rewrite_GenericHW), array_values($rewrite_GenericHW), $hardware);
-}
-
 function short_hrDeviceDescr($dev)
 {
     $rewrite_hrDevice = [
@@ -132,11 +121,6 @@ function short_port_descr($desc)
     $desc = trim($desc);
 
     return $desc;
-}
-
-function rewrite_adslLineType($adslLineType)
-{
-    return \LibreNMS\Util\Rewrite::dslLineType($adslLineType);
 }
 
 function ipmiSensorName($hardwareId, $sensorIpmi)

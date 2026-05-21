@@ -17,12 +17,12 @@ modules:
                     descr: 'Current Status'
                     index: '{{ $index }}'
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: non-critical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: non-recoverable, graph: 1, generic: 2 }
+                        - { value: 1, descr: other, generic: 3 }
+                        - { value: 2, descr: unknown, generic: 3 }
+                        - { value: 3, descr: ok, generic: 0 }
+                        - { value: 4, descr: non-critical, generic: 1 }
+                        - { value: 5, descr: critical, generic: 2 }
+                        - { value: 6, descr: non-recoverable, generic: 2 }
         runtime:
             data:
                 -

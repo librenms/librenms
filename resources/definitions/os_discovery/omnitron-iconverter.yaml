@@ -14,11 +14,11 @@ modules:
                     state_name: PoePortPseStatus
                     index: 'pseStatus.{{ $index }}'
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: notApplicable }
-                        - { value: 2, generic: 0, graph: 0, descr: pdNormal }
-                        - { value: 3, generic: 1, graph: 0, descr: pdOverCurrent }
-                        - { value: 4, generic: 1, graph: 0, descr: pdBrownOut }
-                        - { value: 5, generic: 2, graph: 0, descr: pdInusfficientPower }
+                        - { value: 1, generic: 3, descr: notApplicable }
+                        - { value: 2, generic: 0, descr: pdNormal }
+                        - { value: 3, generic: 1, descr: pdOverCurrent }
+                        - { value: 4, generic: 1, descr: pdBrownOut }
+                        - { value: 5, generic: 2, descr: pdInusfficientPower }
                 -
                     oid: OMNITRON-POE-MIB::ostPoePortCfgTable
                     value: OMNITRON-POE-MIB::ostPoEPortHeartbeatStatus
@@ -28,11 +28,11 @@ modules:
                     index: 'pseHeart.{{ $index }}'
                     state_name: PoePortHeartbeatStatus
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: disabled }
-                        - { value: 2, generic: 0, graph: 0, descr: available }
-                        - { value: 3, generic: 1, graph: 0, descr: errored }
-                        - { value: 4, generic: 2, graph: 0, descr: pseRestart }
-                        - { value: 5, generic: 3, graph: 0, descr: pseShutdown }
+                        - { value: 1, generic: 3, descr: disabled }
+                        - { value: 2, generic: 0, descr: available }
+                        - { value: 3, generic: 1, descr: errored }
+                        - { value: 4, generic: 2, descr: pseRestart }
+                        - { value: 5, generic: 3, descr: pseShutdown }
                 -
                     oid: OMNITRON-MIB::ostEnvironmentalStatusTable
                     value: OMNITRON-MIB::ostEnvironmentalPs1Status
@@ -42,10 +42,10 @@ modules:
                     index: 'ps1Status.{{ $index }}'
                     state_name: PSstatus
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: notSupported }
-                        - { value: 1, generic: 3, graph: 0, descr: notInstalled }
-                        - { value: 2, generic: 2, graph: 0, descr: notPowered }
-                        - { value: 3, generic: 0, graph: 0, descr: powered }
+                        - { value: 0, generic: 3, descr: notSupported }
+                        - { value: 1, generic: 3, descr: notInstalled }
+                        - { value: 2, generic: 2, descr: notPowered }
+                        - { value: 3, generic: 0, descr: powered }
                 -
                     oid: OMNITRON-MIB::ostEnvironmentalStatusTable
                     value: OMNITRON-MIB::ostEnvironmentalPs2Status
@@ -55,10 +55,10 @@ modules:
                     index: 'ps2Status.{{ $index }}'
                     state_name: PSstatus
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: notSupported }
-                        - { value: 1, generic: 3, graph: 0, descr: notInstalled }
-                        - { value: 2, generic: 2, graph: 0, descr: notPowered }
-                        - { value: 3, generic: 0, graph: 0, descr: powered }
+                        - { value: 0, generic: 3, descr: notSupported }
+                        - { value: 1, generic: 3, descr: notInstalled }
+                        - { value: 2, generic: 2, descr: notPowered }
+                        - { value: 3, generic: 0, descr: powered }
         current:
             data:
                 -

@@ -34,8 +34,8 @@ modules:
                     state_name: ponCardRunningStatus
                     descr: 'Pon Card {{ $index }} status'
                     states:
-                        - { descr: Normal, graph: 0, value: 0, generic: 0 }
-                        - { descr: Abnormal, graph: 0, value: 1, generic: 2 }
+                        - { descr: Normal, value: 0, generic: 0 }
+                        - { descr: Abnormal, value: 1, generic: 2 }
                 -
                     oid: CDATA-GPON-MIB::sysServices
                     value: CDATA-GPON-MIB::sysServices
@@ -43,5 +43,5 @@ modules:
                     descr: 'System services status'
                     state_name: sysServices
                     states:
-                        - { descr: Normal, graph: 0, value: 0, generic: 0 }
-                        - { descr: Abnormal, graph: 0, value: 1, generic: 2 }
+                        - { descr: Normal, value: 0, generic: 0 }
+                        - { descr: Abnormal, value: 1, generic: 2 }

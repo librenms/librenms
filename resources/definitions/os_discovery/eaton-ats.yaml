@@ -23,13 +23,13 @@ modules:
                     index: 'ats2OperationMode.{{ $index }}'
                     state_name: ats2OperationMode
                     states:
-                        - { descr: initialization, graph: 0, value: 1, generic: 1 }
-                        - { descr: diagnosis, graph: 0, value: 2, generic: 1 }
-                        - { descr: off, graph: 0, value: 3, generic: 2 }
-                        - { descr: source1, graph: 0, value: 4, generic: 0 }
-                        - { descr: source2, graph: 0, value: 5, generic: 0 }
-                        - { descr: safe, graph: 0, value: 6, generic: 1 }
-                        - { descr: fault, graph: 0, value: 7, generic: 2 }
+                        - { descr: initialization, value: 1, generic: 1 }
+                        - { descr: diagnosis, value: 2, generic: 1 }
+                        - { descr: off, value: 3, generic: 2 }
+                        - { descr: source1, value: 4, generic: 0 }
+                        - { descr: source2, value: 5, generic: 0 }
+                        - { descr: safe, value: 6, generic: 1 }
+                        - { descr: fault, value: 7, generic: 2 }
                 -
                     oid: EATON-ATS2-MIB::ats2InputStatusDephasing
                     value: EATON-ATS2-MIB::ats2InputStatusDephasing
@@ -38,6 +38,6 @@ modules:
                     index: 'ats2InputStatusDephasing.{{ $index }}'
                     state_name: ats2InputStatusDephasing
                     states:
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: outOfRange, graph: 0, value: 2, generic: 1 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: outOfRange, value: 2, generic: 1 }
 

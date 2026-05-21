@@ -95,10 +95,10 @@ modules:
                     entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcPortIfIndex }}38'
                     state_name: nbsCmmcPortDigitalDiags
                     states:
-                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
-                        - { value: 2, descr: diagsOk, graph: 0, generic: 0 }
-                        - { value: 3, descr: diagsWarning, graph: 1, generic: 1 }
-                        - { value: 4, descr: diagsAlarm, graph: 2, generic: 2 }
+                        - { value: 1, descr: notSupported, generic: 3 }
+                        - { value: 2, descr: diagsOk, generic: 0 }
+                        - { value: 3, descr: diagsWarning, generic: 1 }
+                        - { value: 4, descr: diagsAlarm, generic: 2 }
                 -
                     oid: NBS-CMMC-MIB::nbsCmmcChassisTable
                     value: NBS-CMMC-MIB::nbsCmmcChassisPowerStatus
@@ -109,9 +109,9 @@ modules:
                     entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}51'
                     state_name: nbsCmmcChassisPowerStatus
                     states:
-                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
-                        - { value: 2, descr: sufficient, graph: 1, generic: 0 }
-                        - { value: 3, descr: insufficient, graph: -1, generic: 2 }
+                        - { value: 1, descr: notSupported, generic: 3 }
+                        - { value: 2, descr: sufficient, generic: 0 }
+                        - { value: 3, descr: insufficient, generic: 2 }
                 -
                     oid: NBS-CMMC-MIB::nbsCmmcChassisTable
                     value: NBS-CMMC-MIB::nbsCmmcChassisPS1Status
@@ -122,14 +122,14 @@ modules:
                     entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}7'
                     state_name: nbsCmmcChassisPSStatus
                     states:
-                        - { value: 1, descr: notInstalled, graph: 0, generic: 2 }
-                        - { value: 2, descr: acBad, graph: -1, generic: 2 }
-                        - { value: 3, descr: dcBad, graph: -1, generic: 2 }
-                        - { value: 4, descr: acGood, graph: 1, generic: 0 }
-                        - { value: 5, descr: dcGood, graph: 1, generic: 0 }
-                        - { value: 6, descr: notSupported, graph: 0, generic: 3 }
-                        - { value: 7, descr: good, graph: 1, generic: 0 }
-                        - { value: 8, descr: bad, graph: -1, generic: 2 }
+                        - { value: 1, descr: notInstalled, generic: 2 }
+                        - { value: 2, descr: acBad, generic: 2 }
+                        - { value: 3, descr: dcBad, generic: 2 }
+                        - { value: 4, descr: acGood, generic: 0 }
+                        - { value: 5, descr: dcGood, generic: 0 }
+                        - { value: 6, descr: notSupported, generic: 3 }
+                        - { value: 7, descr: good, generic: 0 }
+                        - { value: 8, descr: bad, generic: 2 }
                 -
                     oid: NBS-CMMC-MIB::nbsCmmcChassisTable
                     value: NBS-CMMC-MIB::nbsCmmcChassisPS2Status
@@ -140,14 +140,14 @@ modules:
                     entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}8'
                     state_name: nbsCmmcChassisPSStatus
                     states:
-                        - { value: 1, descr: notInstalled, graph: 0, generic: 2 }
-                        - { value: 2, descr: acBad, graph: -1, generic: 2 }
-                        - { value: 3, descr: dcBad, graph: -1, generic: 2 }
-                        - { value: 4, descr: acGood, graph: 1, generic: 0 }
-                        - { value: 5, descr: dcGood, graph: 1, generic: 0 }
-                        - { value: 6, descr: notSupported, graph: 0, generic: 3 }
-                        - { value: 7, descr: good, graph: 1, generic: 0 }
-                        - { value: 8, descr: bad, graph: -1, generic: 2 }
+                        - { value: 1, descr: notInstalled, generic: 2 }
+                        - { value: 2, descr: acBad, generic: 2 }
+                        - { value: 3, descr: dcBad, generic: 2 }
+                        - { value: 4, descr: acGood, generic: 0 }
+                        - { value: 5, descr: dcGood, generic: 0 }
+                        - { value: 6, descr: notSupported, generic: 3 }
+                        - { value: 7, descr: good, generic: 0 }
+                        - { value: 8, descr: bad, generic: 2 }
                 -
                     oid: NBS-CMMC-MIB::nbsCmmcChassisTable
                     value: NBS-CMMC-MIB::nbsCmmcChassisPS3Status
@@ -158,14 +158,14 @@ modules:
                     entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}9'
                     state_name: nbsCmmcChassisPSStatus
                     states:
-                        - { value: 1, descr: notInstalled, graph: 0, generic: 2 }
-                        - { value: 2, descr: acBad, graph: -1, generic: 2 }
-                        - { value: 3, descr: dcBad, graph: -1, generic: 2 }
-                        - { value: 4, descr: acGood, graph: 1, generic: 0 }
-                        - { value: 5, descr: dcGood, graph: 1, generic: 0 }
-                        - { value: 6, descr: notSupported, graph: 0, generic: 3 }
-                        - { value: 7, descr: good, graph: 1, generic: 0 }
-                        - { value: 8, descr: bad, graph: -1, generic: 2 }
+                        - { value: 1, descr: notInstalled, generic: 2 }
+                        - { value: 2, descr: acBad, generic: 2 }
+                        - { value: 3, descr: dcBad, generic: 2 }
+                        - { value: 4, descr: acGood, generic: 0 }
+                        - { value: 5, descr: dcGood, generic: 0 }
+                        - { value: 6, descr: notSupported, generic: 3 }
+                        - { value: 7, descr: good, generic: 0 }
+                        - { value: 8, descr: bad, generic: 2 }
                 -
                     oid: NBS-CMMC-MIB::nbsCmmcChassisTable
                     value: NBS-CMMC-MIB::nbsCmmcChassisPS4Status
@@ -176,14 +176,14 @@ modules:
                     entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}10'
                     state_name: nbsCmmcChassisPSStatus
                     states:
-                        - { value: 1, descr: notInstalled, graph: 0, generic: 2 }
-                        - { value: 2, descr: acBad, graph: -1, generic: 2 }
-                        - { value: 3, descr: dcBad, graph: -1, generic: 2 }
-                        - { value: 4, descr: acGood, graph: 1, generic: 0 }
-                        - { value: 5, descr: dcGood, graph: 1, generic: 0 }
-                        - { value: 6, descr: notSupported, graph: 0, generic: 3 }
-                        - { value: 7, descr: good, graph: 1, generic: 0 }
-                        - { value: 8, descr: bad, graph: -1, generic: 2 }
+                        - { value: 1, descr: notInstalled, generic: 2 }
+                        - { value: 2, descr: acBad, generic: 2 }
+                        - { value: 3, descr: dcBad, generic: 2 }
+                        - { value: 4, descr: acGood, generic: 0 }
+                        - { value: 5, descr: dcGood, generic: 0 }
+                        - { value: 6, descr: notSupported, generic: 3 }
+                        - { value: 7, descr: good, generic: 0 }
+                        - { value: 8, descr: bad, generic: 2 }
                 -
                     oid: NBS-CMMC-MIB::nbsCmmcChassisTable
                     value: NBS-CMMC-MIB::nbsCmmcChassisFan1Status
@@ -194,10 +194,10 @@ modules:
                     entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}11'
                     state_name: nbsCmmcChassisFanStatus
                     states:
-                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
-                        - { value: 2, descr: bad, graph: -1, generic: 2 }
-                        - { value: 3, descr: good, graph: 1, generic: 0 }
-                        - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
+                        - { value: 1, descr: notSupported, generic: 3 }
+                        - { value: 2, descr: bad, generic: 2 }
+                        - { value: 3, descr: good, generic: 0 }
+                        - { value: 4, descr: notInstalled, generic: 2 }
                 -
                     oid: NBS-CMMC-MIB::nbsCmmcChassisTable
                     value: NBS-CMMC-MIB::nbsCmmcChassisFan2Status
@@ -208,10 +208,10 @@ modules:
                     entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}12'
                     state_name: nbsCmmcChassisFanStatus
                     states:
-                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
-                        - { value: 2, descr: bad, graph: -1, generic: 2 }
-                        - { value: 3, descr: good, graph: 1, generic: 0 }
-                        - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
+                        - { value: 1, descr: notSupported, generic: 3 }
+                        - { value: 2, descr: bad, generic: 2 }
+                        - { value: 3, descr: good, generic: 0 }
+                        - { value: 4, descr: notInstalled, generic: 2 }
                 -
                     oid: NBS-CMMC-MIB::nbsCmmcChassisTable
                     value: NBS-CMMC-MIB::nbsCmmcChassisFan3Status
@@ -222,10 +222,10 @@ modules:
                     entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}13'
                     state_name: nbsCmmcChassisFanStatus
                     states:
-                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
-                        - { value: 2, descr: bad, graph: -1, generic: 2 }
-                        - { value: 3, descr: good, graph: 1, generic: 0 }
-                        - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
+                        - { value: 1, descr: notSupported, generic: 3 }
+                        - { value: 2, descr: bad, generic: 2 }
+                        - { value: 3, descr: good, generic: 0 }
+                        - { value: 4, descr: notInstalled, generic: 2 }
                 -
                     oid: NBS-CMMC-MIB::nbsCmmcChassisTable
                     value: NBS-CMMC-MIB::nbsCmmcChassisFan4Status
@@ -236,10 +236,10 @@ modules:
                     entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}14'
                     state_name: nbsCmmcChassisFanStatus
                     states:
-                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
-                        - { value: 2, descr: bad, graph: -1, generic: 2 }
-                        - { value: 3, descr: good, graph: 1, generic: 0 }
-                        - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
+                        - { value: 1, descr: notSupported, generic: 3 }
+                        - { value: 2, descr: bad, generic: 2 }
+                        - { value: 3, descr: good, generic: 0 }
+                        - { value: 4, descr: notInstalled, generic: 2 }
                 -
                     oid: NBS-CMMC-MIB::nbsCmmcChassisTable
                     value: NBS-CMMC-MIB::nbsCmmcChassisFan5Status
@@ -250,10 +250,10 @@ modules:
                     entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}36'
                     state_name: nbsCmmcChassisFanStatus
                     states:
-                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
-                        - { value: 2, descr: bad, graph: -1, generic: 2 }
-                        - { value: 3, descr: good, graph: 1, generic: 0 }
-                        - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
+                        - { value: 1, descr: notSupported, generic: 3 }
+                        - { value: 2, descr: bad, generic: 2 }
+                        - { value: 3, descr: good, generic: 0 }
+                        - { value: 4, descr: notInstalled, generic: 2 }
                 -
                     oid: NBS-CMMC-MIB::nbsCmmcChassisTable
                     value: NBS-CMMC-MIB::nbsCmmcChassisFan6Status
@@ -264,10 +264,10 @@ modules:
                     entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}37'
                     state_name: nbsCmmcChassisFanStatus
                     states:
-                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
-                        - { value: 2, descr: bad, graph: -1, generic: 2 }
-                        - { value: 3, descr: good, graph: 1, generic: 0 }
-                        - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
+                        - { value: 1, descr: notSupported, generic: 3 }
+                        - { value: 2, descr: bad, generic: 2 }
+                        - { value: 3, descr: good, generic: 0 }
+                        - { value: 4, descr: notInstalled, generic: 2 }
                 -
                     oid: NBS-CMMC-MIB::nbsCmmcChassisTable
                     value: NBS-CMMC-MIB::nbsCmmcChassisFan7Status
@@ -278,10 +278,10 @@ modules:
                     entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}38'
                     state_name: nbsCmmcChassisFanStatus
                     states:
-                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
-                        - { value: 2, descr: bad, graph: -1, generic: 2 }
-                        - { value: 3, descr: good, graph: 1, generic: 0 }
-                        - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
+                        - { value: 1, descr: notSupported, generic: 3 }
+                        - { value: 2, descr: bad, generic: 2 }
+                        - { value: 3, descr: good, generic: 0 }
+                        - { value: 4, descr: notInstalled, generic: 2 }
                 -
                     oid: NBS-CMMC-MIB::nbsCmmcChassisTable
                     value: NBS-CMMC-MIB::nbsCmmcChassisFan8Status
@@ -292,7 +292,7 @@ modules:
                     entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}39'
                     state_name: nbsCmmcChassisFanStatus
                     states:
-                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
-                        - { value: 2, descr: bad, graph: -1, generic: 2 }
-                        - { value: 3, descr: good, graph: 1, generic: 0 }
-                        - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
+                        - { value: 1, descr: notSupported, generic: 3 }
+                        - { value: 2, descr: bad, generic: 2 }
+                        - { value: 3, descr: good, generic: 0 }
+                        - { value: 4, descr: notInstalled, generic: 2 }

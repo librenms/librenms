@@ -14,11 +14,11 @@ modules:
                     index: '{{ $index }}'
                     state_name: netonixPoeStatus
                     states:
-                        - { descr: Off, graph: 0, value: 1, generic: -1 }
-                        - { descr: 24V, graph: 0, value: 2, generic: 0 }
-                        - { descr: 48V, graph: 0, value: 3, generic: 0 }
-                        - { descr: 24VH, graph: 0, value: 4, generic: 0 }
-                        - { descr: 48VH, graph: 0, value: 5, generic: 0 }
+                        - { descr: Off, value: 1, generic: -1 }
+                        - { descr: 24V, value: 2, generic: 0 }
+                        - { descr: 48V, value: 3, generic: 0 }
+                        - { descr: 24VH, value: 4, generic: 0 }
+                        - { descr: 48VH, value: 5, generic: 0 }
         voltage:
             data:
                 -

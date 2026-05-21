@@ -34,6 +34,7 @@
         "fico7489/laravel-pivot": "^3.0",
         "influxdata/influxdb-client-php": "^3.8",
         "influxdb/influxdb-php": "^1.15",
+        "jalle19/certificate-parser": "^4.0",
         "justinrainbow/json-schema": "^6.4",
         "laravel-notification-channels/webpush": "^10.0",
         "laravel/framework": "^12.10",
@@ -70,6 +71,7 @@
         "php-parallel-lint/php-parallel-lint": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-mockery": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.0",
         "phpunit/phpunit": "^11.5.33 || ^12.3.7",
         "rector/rector": "^2.1"
     },

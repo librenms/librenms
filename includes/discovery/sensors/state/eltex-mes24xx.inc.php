@@ -42,8 +42,8 @@ if (isset($eltexPhyTransceiverDiagnosticTable['lossOfSignal'])) {
     //Create State Index
     $state_name = 'mes24xx_sfpLoss';
     $states = [
-        ['value' => 0, 'generic' => 0, 'graph' => 1, 'descr' => 'false'],
-        ['value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'true'],
+        ['value' => 0, 'generic' => 0, 'descr' => 'false'],
+        ['value' => 1, 'generic' => 2, 'descr' => 'true'],
     ];
     create_state_index($state_name, $states);
 

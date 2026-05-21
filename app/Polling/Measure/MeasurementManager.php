@@ -38,7 +38,7 @@ class MeasurementManager
     const NO_COLOR = "\e[0m";
 
     /**
-     * @var \Illuminate\Support\Collection<MeasurementCollection>
+     * @var \Illuminate\Support\Collection<string, MeasurementCollection>
      */
     private static $categories;
 

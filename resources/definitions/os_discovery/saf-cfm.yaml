@@ -16,10 +16,10 @@ modules:
                     oid: SAF-MPMUX-MIB::activeLink
                     state_name: activeLink
                     states:
-                        - { value: 0, descr: Unknown, graph: 1, generic: 1 }
-                        - { value: 1, descr: 'Link 1', graph: 1, generic: 0 }
-                        - { value: 2, descr: 'Link 2', graph: 1, generic: 0 }
-                        - { value: 255, descr: Error, graph: 1, generic: 2 }
+                        - { value: 0, descr: Unknown, generic: 1 }
+                        - { value: 1, descr: 'Link 1', generic: 0 }
+                        - { value: 2, descr: 'Link 2', generic: 0 }
+                        - { value: 255, descr: Error, generic: 2 }
                 -
                     descr: 'Active TX'
                     index: 'activeTx.{{ $index }}'
@@ -27,10 +27,10 @@ modules:
                     oid: SAF-MPMUX-MIB::activeTx
                     state_name: activeTx
                     states:
-                        - { value: 0, descr: None, graph: 1, generic: 2 }
-                        - { value: 1, descr: 'Link 1', graph: 1, generic: 0 }
-                        - { value: 2, descr: 'Link 2', graph: 1, generic: 0 }
-                        - { value: 3, descr: Both, graph: 1, generic: 0 }
+                        - { value: 0, descr: None, generic: 2 }
+                        - { value: 1, descr: 'Link 1', generic: 0 }
+                        - { value: 2, descr: 'Link 2', generic: 0 }
+                        - { value: 3, descr: Both, generic: 0 }
                 -
                     descr: 'Forced link'
                     index: 'forcedLink.{{ $index }}'
@@ -38,10 +38,10 @@ modules:
                     oid: SAF-MPMUX-MIB::forcedLink
                     state_name: forcedLink
                     states:
-                        - { value: 0, descr: Off, graph: 1, generic: 0 }
-                        - { value: 1, descr: 'Link 1', graph: 1, generic: 0 }
-                        - { value: 2, descr: 'Link 2', graph: 1, generic: 0 }
-                        - { value: 255, descr: Error, graph: 1, generic: 2 }
+                        - { value: 0, descr: Off, generic: 0 }
+                        - { value: 1, descr: 'Link 1', generic: 0 }
+                        - { value: 2, descr: 'Link 2', generic: 0 }
+                        - { value: 255, descr: Error, generic: 2 }
                 -
                     descr: 'Switch mode'
                     index: 'switchMode.{{ $index }}'
@@ -49,10 +49,10 @@ modules:
                     oid: SAF-MPMUX-MIB::switchMode
                     state_name: switchMode
                     states:
-                        - { value: 0, descr: Unknown, graph: 1, generic: 1 }
-                        - { value: 1, descr: 'Frequency diversity', graph: 1, generic: 0 }
-                        - { value: 2, descr: 'Hot standby', graph: 1, generic: 0 }
-                        - { value: 3, descr: Independent, graph: 1, generic: 0 }
+                        - { value: 0, descr: Unknown, generic: 1 }
+                        - { value: 1, descr: 'Frequency diversity', generic: 0 }
+                        - { value: 2, descr: 'Hot standby', generic: 0 }
+                        - { value: 3, descr: Independent, generic: 0 }
                 -
                     descr: 'Switch enabled for RX BER'
                     index: 'switchEnabledForRxBer.{{ $index }}'
@@ -60,8 +60,8 @@ modules:
                     oid: SAF-MPMUX-MIB::switchEnabledForRxBer
                     state_name: switchEnabledForRxBer
                     states:
-                        - { value: 0, descr: Disabled, graph: 1, generic: 0 }
-                        - { value: 1, descr: Enabled, graph: 1, generic: 0 }
+                        - { value: 0, descr: Disabled, generic: 0 }
+                        - { value: 1, descr: Enabled, generic: 0 }
                 -
                     descr: Sync
                     index: 'bbSyncLostAlarm.{{ $index }}'
@@ -69,8 +69,8 @@ modules:
                     oid: SAF-MPMUX-MIB::bbSyncLostAlarm
                     state_name: bbSyncLostAlarm
                     states:
-                        - { value: 0, descr: Ok, graph: 1, generic: 0 }
-                        - { value: 1, descr: Alarm, graph: 1, generic: 2 }
+                        - { value: 0, descr: Ok, generic: 0 }
+                        - { value: 1, descr: Alarm, generic: 2 }
                 -
                     descr: 'R1 Operation'
                     index: 'rf1Operation.{{ $index }}'
@@ -78,12 +78,12 @@ modules:
                     oid: SAF-MPMUX-MIB::rf1Operation
                     state_name: rf1Operation
                     states:
-                        - { value: 0, descr: None, graph: 1, generic: 1 }
-                        - { value: 1, descr: Booting, graph: 1, generic: 1 }
-                        - { value: 2, descr: Ok, graph: 1, generic: 0 }
-                        - { value: 3, descr: Testing, graph: 1, generic: 1 }
-                        - { value: 4, descr: Error, graph: 1, generic: 2 }
-                        - { value: 5, descr: 'No data from ODU', graph: 1, generic: 2 }
+                        - { value: 0, descr: None, generic: 1 }
+                        - { value: 1, descr: Booting, generic: 1 }
+                        - { value: 2, descr: Ok, generic: 0 }
+                        - { value: 3, descr: Testing, generic: 1 }
+                        - { value: 4, descr: Error, generic: 2 }
+                        - { value: 5, descr: 'No data from ODU', generic: 2 }
                 -
                     descr: 'R2 Operation'
                     index: 'rf2Operation.{{ $index }}'
@@ -91,12 +91,12 @@ modules:
                     oid: SAF-MPMUX-MIB::rf2Operation
                     state_name: rf2Operation
                     states:
-                        - { value: 0, graph: 1, generic: 1, descr: None }
-                        - { value: 1, graph: 1, generic: 1, descr: Booting }
-                        - { value: 2, graph: 1, generic: 0, descr: Ok }
-                        - { value: 3, graph: 1, generic: 1, descr: Testing }
-                        - { value: 4, graph: 1, generic: 2, descr: Error }
-                        - { value: 5, graph: 1, generic: 2, descr: 'No data from ODU' }
+                        - { value: 0, generic: 1, descr: None }
+                        - { value: 1, generic: 1, descr: Booting }
+                        - { value: 2, generic: 0, descr: Ok }
+                        - { value: 3, generic: 1, descr: Testing }
+                        - { value: 4, generic: 2, descr: Error }
+                        - { value: 5, generic: 2, descr: 'No data from ODU' }
                 -
                     descr: 'R1 Humidity'
                     index: 'rf1OduHumidity.{{ $index }}'
@@ -104,8 +104,8 @@ modules:
                     oid: SAF-MPMUX-MIB::rf1OduHumidity
                     state_name: rf1OduHumidity
                     states:
-                        - { value: 0, descr: Low, graph: 1, generic: 0 }
-                        - { value: 1, descr: High, graph: 1, generic: 1 }
+                        - { value: 0, descr: Low, generic: 0 }
+                        - { value: 1, descr: High, generic: 1 }
                 -
                     descr: 'R2 Humidity'
                     index: 'rf2OduHumidity.{{ $index }}'
@@ -113,8 +113,8 @@ modules:
                     oid: SAF-MPMUX-MIB::rf2OduHumidity
                     state_name: rf2OduHumidity
                     states:
-                        - { value: 0, descr: Low, graph: 1, generic: 0 }
-                        - { value: 1, descr: High, graph: 1, generic: 1 }
+                        - { value: 0, descr: Low, generic: 0 }
+                        - { value: 1, descr: High, generic: 1 }
                 -
                     descr: R1CblPwrStat
                     index: 'termRf1CablePowerStatus.{{ $index }}'
@@ -122,11 +122,11 @@ modules:
                     oid: SAF-MPMUX-MIB::termRf1CablePowerStatus
                     state_name: termRf1CablePowerStatus
                     states:
-                        - { value: 0, descr: 'false', graph: 1, generic: 1 }
-                        - { value: 1, descr: ok, graph: 1, generic: 0 }
-                        - { value: 2, descr: short, graph: 1, generic: 2 }
-                        - { value: 3, descr: error, graph: 1, generic: 2 }
-                        - { value: 4, descr: power-off, graph: 1, generic: 2 }
+                        - { value: 0, descr: 'false', generic: 1 }
+                        - { value: 1, descr: ok, generic: 0 }
+                        - { value: 2, descr: short, generic: 2 }
+                        - { value: 3, descr: error, generic: 2 }
+                        - { value: 4, descr: power-off, generic: 2 }
                 -
                     descr: R2CblPwrStat
                     index: 'termRf2CablePowerStatus.{{ $index }}'
@@ -134,11 +134,11 @@ modules:
                     oid: SAF-MPMUX-MIB::termRf2CablePowerStatus
                     state_name: termRf2CablePowerStatus
                     states:
-                        - { value: 0, descr: 'false', graph: 1, generic: 1 }
-                        - { value: 1, descr: ok, graph: 1, generic: 0 }
-                        - { value: 2, descr: short, graph: 1, generic: 2 }
-                        - { value: 3, descr: error, graph: 1, generic: 2 }
-                        - { value: 4, descr: power-off, graph: 1, generic: 2 }
+                        - { value: 0, descr: 'false', generic: 1 }
+                        - { value: 1, descr: ok, generic: 0 }
+                        - { value: 2, descr: short, generic: 2 }
+                        - { value: 3, descr: error, generic: 2 }
+                        - { value: 4, descr: power-off, generic: 2 }
         signal:
             data:
                 -

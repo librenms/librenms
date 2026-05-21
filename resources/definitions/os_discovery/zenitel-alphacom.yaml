@@ -14,8 +14,8 @@ modules:
                     descr: 'Node State'
                     index: 'nodeState.{{ $index }}'
                     states:
-                        - { descr: 'Disabled', graph: 1, value: 0, generic: 2 }
-                        - { descr: 'Enabled', graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Disabled', value: 0, generic: 2 }
+                        - { descr: 'Enabled', value: 1, generic: 0 }
 
         runtime:
             data:

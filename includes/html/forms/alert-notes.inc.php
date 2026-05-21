@@ -23,6 +23,8 @@
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
+use App\Models\Alert;
+
 header('Content-type: application/json');
 
 $alert_id = $vars['alert_id'];
@@ -32,11 +34,11 @@ $status = 'error';
 
 if (is_numeric($alert_id)) {
     if ($sub_type === 'get_note') {
-        $note = dbFetchCell('SELECT `note` FROM `alerts` WHERE `id` = ?', [$alert_id]);
+        $note = Alert::where('id', $alert_id)->value('note');
         $message = 'Alert note retrieved';
         $status = 'ok';
     } else {
-        if (dbUpdate(['note' => $note], 'alerts', '`id` = ?', [$alert_id])) {
+        if (Alert::where('id', $alert_id)->update(['note' => $note])) {
             $status = 'ok';
             $message = 'Note updated';
         } else {
