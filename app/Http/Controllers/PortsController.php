@@ -125,7 +125,7 @@ class PortsController extends Controller
     }
 
     /**
-     * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: string[], params?: array<string, string>}>
+     * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: string[]|array<string, string>, params?: array<string, string>}>
      */
     private function filterFields(): array
     {

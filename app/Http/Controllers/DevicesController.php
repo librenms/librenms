@@ -113,6 +113,9 @@ class DevicesController extends Controller
         ]);
     }
 
+    /**
+     * @return LengthAwarePaginator<Device>|Collection<Device>
+     */
     private function getDevices(?string $view, int $perPage): LengthAwarePaginator|Collection
     {
         if ($view !== 'graph') {
@@ -129,6 +132,9 @@ class DevicesController extends Controller
         return $devicesQuery->paginate($perPage);
     }
 
+    /**
+     * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: string[]|array<string, string>, params?: array<string, string>}>
+     */
     private function filterFields(): array
     {
         return [
