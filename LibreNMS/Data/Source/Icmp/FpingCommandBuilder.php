@@ -7,7 +7,7 @@ use LibreNMS\Enum\AddressFamily;
 
 class FpingCommandBuilder
 {
-    // @param array<string> $args
+    // @var array<string> $args
     private array $args = [];
     private ?AddressFamily $addressFamily = null;
 
@@ -83,9 +83,6 @@ class FpingCommandBuilder
         return $this;
     }
 
-    /**
-     * @param array<string> $hosts
-     */
     public function build(string ...$hosts): array
     {
         $base = LibrenmsConfig::fpingCommand($this->addressFamily ?? AddressFamily::IPv4);
