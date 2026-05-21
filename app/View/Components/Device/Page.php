@@ -60,8 +60,8 @@ class Page extends Component
     public function overviewGraphs(): array
     {
         $graph_array = [
-            'width' => 350,
-            'height' => 70,
+            'width' => 150,
+            'height' => 45,
             'device' => $this->device->device_id,
             'type' => 'device_bits',
             'from' => '-1d',

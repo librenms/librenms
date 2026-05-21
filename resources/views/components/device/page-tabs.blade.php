@@ -15,4 +15,5 @@
             </li>
         @endif
     @endforeach
+    <x-device.page-links :device="$device" :dropdown-links="$dropdownLinks"/>
 </ul>

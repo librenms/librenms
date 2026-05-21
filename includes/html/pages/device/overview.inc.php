@@ -12,7 +12,7 @@ echo '
     </div>
   </div>
   <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-6 tw:pl-0! tw:pr-2">
 ';
 require 'includes/html/dev-overview-data.inc.php';
 require 'overview/maps.inc.php';
@@ -34,7 +34,7 @@ if ($device['os'] == 'ping') {
 
 echo '
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6 tw:pr-0! tw:pl-2">
 ';
 // Right Pane
 require 'overview/processors.inc.php';

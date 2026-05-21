@@ -83,7 +83,7 @@ class PageLinks extends Component
             }
 
             $device_links['edit'] = [
-                'icon' => 'fa-pencil',
+                'icon' => 'fa-gear',
                 'url' => route('device', [$device->device_id, $suffix]),
                 'title' => $title,
                 'external' => false,

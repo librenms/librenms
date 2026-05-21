@@ -6,7 +6,7 @@ if (count($processors)) {
     echo '
       <div class="row">
         <div class="col-md-12 ">
-          <div class="panel panel-default panel-condensed">
+          <div class="panel panel-default panel-condensed tw:rounded-2xl tw:overflow-hidden tw:border tw:border-gray-300 tw:shadow-sm tw:dark:border-dark-gray-200">
             <div class="panel-heading">
 ';
     echo '<a href="device/device=' . $device['device_id'] . '/tab=health/metric=processor/">';

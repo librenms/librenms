@@ -21,33 +21,27 @@
                     <i class="fa-solid fa-{{ $typeIcon }}" title="{{ $typeText }}"></i>
                 @endif
             </div>
-            <div class="tw:mt-4"><a href="{{ url('/devices/location=' . urlencode((string) $device->location)) }}"><i class="fa fa-location-dot fa-fw fa-lg"></i> {{ $device->location }}</a> {{ $device->ports_count }} ports, {{ $device->sensors_count }} sensors, {{ $device->wireless_sensors_count }} wireless sensors</div>
+            <div class="tw:mt-4"><a href="{{ url('/devices/location=' . urlencode((string) $device->location)) }}"><i class="fa fa-location-dot fa-fw fa-lg"></i> {{ $device->location }}</a> {{ $device->ports_count }}, {{ $device->sensors_count }} sensors, {{ $device->wireless_sensors_count }} wireless sensors</div>
         </div>
-        <div class="pull-right tw:mt-2 tw:mr-2">
-            <x-device.page-links :device="$device" :dropdown-links="$dropdownLinks"/>
-            <br style="clear: both;"/>
+        <div class="pull-right tw:mr-2">
+                @if($overviewGraphs())
+                    <div
+                        class="tw:flex tw:flex-row tw:flex-wrap tw:items-end tw:justify-start tw:gap-4 tw:mx-6 tw:px-6 tw:pt-3 tw:pb-5 tw:rounded-2xl">
+                        @foreach($overviewGraphs() as $graph)
+                            <div class="tw:flex tw:flex-col tw:items-center tw:text-center tw:shrink-0">
+                                <x-graph-popup :vars="$graph" :type="$graph['type']" :width="$graph['width']" :height="$graph['height']"
+                                    :popup-title="$graph['popup_title']" :device="$device" />
+                                <div class="tw:mt-1 tw:font-semibold tw:text-gray-700 tw:dark:text-dark-white-300">
+                                    {{ $graph['popup_title'] }}
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
         </div>
         </x-slot:slot>
     </x-panel>
-
-    @if($overviewGraphs())
-        <div class="tw:flex tw:flex-row tw:flex-wrap tw:items-end tw:justify-start tw:gap-1 tw:mt-4 tw:mb-2 tw:mx-6 tw:px-6 tw:pt-3 tw:pb-5 tw:rounded-2xl tw:border tw:border-gray-300 tw:bg-white tw:shadow-sm tw:dark:border-dark-gray-200 tw:dark:bg-dark-gray-400">
-            @foreach($overviewGraphs() as $graph)
-                <div class="tw:flex tw:flex-col tw:items-center tw:text-center tw:shrink-0">
-                    <x-graph-popup :vars="$graph"
-                                   :type="$graph['type']"
-                                   :width="$graph['width']"
-                                   :height="$graph['height']"
-                                   :popup-title="$graph['popup_title']"
-                                   :device="$device"/>
-                    <div class="tw:mt-1 tw:font-semibold tw:text-gray-700 tw:dark:text-dark-white-300">
-                        {{ $graph['popup_title'] }}
-                    </div>
-                </div>
-            @endforeach
-        </div>
-    @endif
-
+    
     <x-device.page-tabs :device="$device" :dropdown-links="$dropdownLinks"/>
 
     <div class="tab-content tw:mt-4">
