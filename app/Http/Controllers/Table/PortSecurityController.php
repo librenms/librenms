@@ -41,8 +41,7 @@ class PortSecurityController extends TableController
         return [
             'device_id' => 'nullable|integer',
             'page' => 'nullable|integer',
-            'per_page' => 'nullable|integer',
-            'perPage' => 'nullable',
+            'perPage' => ['nullable', 'regex:/^(\d+|all)$/'],
             'export' => 'nullable|in:page,all',
             ...PortSecurity::filterValidationRules(),
         ];
@@ -70,7 +69,7 @@ class PortSecurityController extends TableController
         }
 
         $page = max(1, (int) $request->input('page', $request->input('current', 1)));
-        $perPage = $request->input('per_page', $request->input('perPage', $request->input('rowCount', 50)));
+        $perPage = $request->input('perPage', 50);
 
         if ($perPage === 'all') {
             return $query;
@@ -126,14 +125,14 @@ class PortSecurityController extends TableController
                 $item->port->ifName ?? '',
                 $item->port->ifDescr ?? '',
                 $item->port->ifAlias ?? '',
-                $item->port_security_enable ?? '',
+                $item->port_security_enable === null ? '' : ($item->port_security_enable ? 'true' : 'false'),
                 $item->status ?? '',
                 $item->address_count ?? '',
                 $item->max_addresses ?? '',
                 $item->violation_action ?? '',
                 $item->violation_count ?? '',
                 $item->last_mac_address ?? '',
-                $item->sticky_enable ?? '',
+                $item->sticky_enable === null ? '' : ($item->sticky_enable ? 'true' : 'false'),
             ],
         );
     }

@@ -12,7 +12,13 @@
         @endif
     </td>
     <td>{{ $entry->port->ifAlias ?? 'N/A' }}</td>
-    <td>{{ $entry->port_security_enable ?? 'N/A' }}</td>
+    <td>
+        @if($entry->port_security_enable === null)
+            N/A
+        @else
+            {{ $entry->port_security_enable ? __('Yes') : __('No') }}
+        @endif
+    </td>
     <td>
         <i class="fa {{ \LibreNMS\Enum\PortSecurityStatus::getIconClass($entry->status ?? '') }}" aria-hidden="true" title="{{ $entry->status }}"></i>
         {{ $entry->status ?? 'N/A' }}
@@ -22,5 +28,11 @@
     <td>{{ $entry->violation_action ?? 'N/A' }}</td>
     <td>{{ $entry->violation_count ?? 'N/A' }}</td>
     <td>{{ $entry->last_mac_address ?? 'N/A' }}</td>
-    <td>{{ $entry->sticky_enable ?? 'N/A' }}</td>
+    <td>
+        @if($entry->sticky_enable === null)
+            N/A
+        @else
+            {{ $entry->sticky_enable ? __('Yes') : __('No') }}
+        @endif
+    </td>
 </tr>

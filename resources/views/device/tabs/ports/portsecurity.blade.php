@@ -8,7 +8,6 @@
         :filters="$data['filter']"
         :page="$data['portSecurity']->currentPage()"
         :per-page="$data['perPage']"
-        per-page-param="perPage"
         class="tw:shrink-0"
     />
 </div>
@@ -17,6 +16,5 @@
     'portSecurity' => $data['portSecurity'],
     'showDevice' => false,
     'perPage' => $data['perPage'],
-    'perPageParam' => 'perPage',
     'paginationOptions' => ['16', '32', '128', 'all'],
 ])

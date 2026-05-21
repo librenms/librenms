@@ -29,6 +29,14 @@ class PortSecurity extends DeviceRelatedModel implements Keyable
         'sticky_enable',
     ];
 
+    /**
+     * @return array<string, string>
+     */
+    protected $casts = [
+        'port_security_enable' => 'boolean',
+        'sticky_enable' => 'boolean',
+    ];
+
     protected array $filterable = [
         'device_id',
         'port_security_enable',
@@ -150,42 +158,5 @@ class PortSecurity extends DeviceRelatedModel implements Keyable
     public function filterSearch(Builder $query, mixed $value, array $config): void
     {
         $this->applyFilterSearch(['port.ifName', 'port.ifDescr', 'port.ifAlias'], $query, $value, $config);
-    }
-
-    public function filterPortSecurityEnable(Builder $query, mixed $value, array $config): void
-    {
-        $this->filterTruthValue($query, 'port_security_enable', $value, $config);
-    }
-
-    public function filterStickyEnable(Builder $query, mixed $value, array $config): void
-    {
-        $this->filterTruthValue($query, 'sticky_enable', $value, $config);
-    }
-
-    /**
-     * @param  Builder<static>  $query
-     */
-    protected function filterTruthValue(Builder $query, string $column, mixed $value, array $config): void
-    {
-        $enabled = filter_var($value, FILTER_VALIDATE_BOOLEAN);
-        $truthy = ['true', '1', 'yes', 'enabled', 'on'];
-        $field = $this->qualifyColumn($column);
-        $not = $config['not'] ?? false;
-
-        if ($not) {
-            $enabled = ! $enabled;
-        }
-
-        $query->where(function (Builder $q) use ($field, $enabled, $truthy): void {
-            if ($enabled) {
-                $q->whereIn($field, $truthy);
-            } else {
-                $q->where(function (Builder $inner) use ($field, $truthy): void {
-                    $inner->whereNotIn($field, $truthy)
-                        ->orWhereNull($field)
-                        ->orWhere($field, '=', '');
-                });
-            }
-        });
     }
 }

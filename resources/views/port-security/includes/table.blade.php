@@ -35,12 +35,12 @@
                 <x-select :options="$paginationOptions"
                           x-on:change="
                           const params = new URLSearchParams(window.location.search);
-                          params.set('{{ $perPageParam ?? 'per_page' }}', $event.target.value);
+                          params.set('perPage', $event.target.value);
                           params.delete('page');
                           window.location.search = params.toString();
                           " x-data="{}"
                           selected="{{ $perPage }}"
-                          name="per_page"
+                          name="perPage"
                           label="{{ __('Per Page') }}"
                           class="tw:mx-4"></x-select>
             @endisset

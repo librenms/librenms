@@ -15,11 +15,11 @@ class PortSecurityController extends Controller
     {
         $request->validate([
             'page' => 'integer',
-            'per_page' => 'integer',
+            'perPage' => 'integer',
             ...PortSecurity::filterValidationRules(),
         ]);
 
-        $perPage = $request->integer('per_page', 50);
+        $perPage = $request->integer('perPage', 50);
 
         return view('port-security.index', [
             'pagetitle' => __('Port Security'),

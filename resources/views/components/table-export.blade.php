@@ -4,7 +4,7 @@
     'filters' => [],
     'page' => 1,
     'perPage' => 50,
-    'perPageParam' => 'per_page',
+    'perPageParam' => 'perPage',
 ])
 
 <div {{ $attributes->merge(['class' => 'btn-group pull-right']) }}
@@ -65,7 +65,7 @@
             const $group = $(this).closest('.btn-group');
             const defaultPage = $group.data('page') || 1;
             const defaultPerPage = $group.data('perPage') || 50;
-            const perPageParam = $group.data('perPageParam') || 'per_page';
+            const perPageParam = $group.data('perPageParam') || 'perPage';
             const serverFilters = $group.data('filters') || {};
             const params = new URLSearchParams(window.location.search);
 
@@ -82,15 +82,13 @@
                 params.set('page', params.get('page') || String(defaultPage));
                 params.set(
                     perPageParam,
-                    params.get(perPageParam) || params.get('per_page') || params.get('perPage') || String(defaultPerPage)
+                    params.get(perPageParam) || String(defaultPerPage)
                 );
             } else {
                 params.set('export', 'all');
                 params.delete('page');
                 params.delete('current');
-                params.delete('per_page');
-                params.delete('perPage');
-                params.delete('rowCount');
+                params.delete(perPageParam);
             }
 
             window.location.href = exportRoute + '?' + params.toString();
