@@ -476,10 +476,14 @@ class Rrd extends BaseDatastore
     public function checkRrdExists($filename): bool
     {
         if ($this->rrdcached && version_compare($this->version, '1.5', '>=')) {
-            $check_output = $this->command('last', $filename);
-            $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
+            try {
+                $check_output = $this->command('last', $filename);
+                $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
 
-            return ! (str_contains($check_output, $filename) && str_contains($check_output, 'No such file or directory'));
+                return ! (str_contains($check_output, $filename) && str_contains($check_output, 'No such file or directory'));
+            } catch (RrdNotFoundException) {
+                return false;
+            }
         } else {
             return is_file($filename);
         }
