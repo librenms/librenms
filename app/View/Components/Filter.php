@@ -26,19 +26,14 @@ class Filter extends Component
     ) {
     }
 
-    /**
-     *
-     * @param string|null $type
-     * @return string
-     */
     public function getFieldIcon(?string $type): string
     {
         return match ($type) {
-            'select'        => 'fa-solid fa-square-caret-down',
-            'boolean'       => 'fa-solid fa-toggle-on',
-            'number'        => 'fa-solid fa-hashtag',
-            'date'          => 'fa-solid fa-calendar-days',
-            default         => 'fa-solid fa-magnifying-glass',
+            'select' => 'fa-solid fa-square-caret-down',
+            'boolean' => 'fa-solid fa-toggle-on',
+            'number' => 'fa-solid fa-hashtag',
+            'date' => 'fa-solid fa-calendar-days',
+            default => 'fa-solid fa-magnifying-glass',
         };
     }
 
