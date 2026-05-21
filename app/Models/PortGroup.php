@@ -40,8 +40,13 @@ class PortGroup extends BaseModel
             return $query;
         }
 
-        // maybe filtered in future
-        return $query->limit(0);
+        // Return port groups where there are 0 ports that are not permitted by port and not permitted by device
+        return $query->withCount([
+            'ports' => function($q) {
+                $q->whereIntegerNotInRaw('port_id', \Permissions::portsForUser($user))->whereIntegerNotInRaw('device_id', \Permissions::devicesForUser($user));
+            }
+        ])->having('ports_count','=',0);
+
     }
 
     /**
