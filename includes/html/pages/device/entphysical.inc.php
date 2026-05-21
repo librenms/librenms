@@ -41,7 +41,7 @@ function printEntPhysical($device, $ent, $level, $class)
         $display_entPhysicalName = e($ent['entPhysicalName']);
         if ($ent['ifIndex']) {
             $port = PortCache::getByIfIndex($ent['ifIndex'], $device['device_id']);
-            $display_entPhysicalName = \LibreNMS\Util\Url::portLink($port);
+            $display_entPhysicalName = \LibreNMS\Util\Url::modernPortLink($port);
         }
 
         if ($ent['entPhysicalModelName'] && $display_entPhysicalName) {
