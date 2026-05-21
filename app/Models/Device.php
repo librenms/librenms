@@ -81,6 +81,7 @@ class Device extends BaseModel
         'sysDescr',
         'sysName',
         'sysObjectID',
+        'snmpEngineID',
         'timeout',
         'transport',
         'type',
