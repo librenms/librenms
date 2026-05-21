@@ -133,21 +133,21 @@ class DevicesController extends Controller
         return [
             [
                 'key' => 'search',
-                'label' => 'Search',
+                'label' => __('Search'),
                 'type' => 'text',
             ],
             [
                 'key' => 'state',
-                'label' => 'Status',
+                'label' => __('device.status'),
                 'type' => 'select',
                 'options' => [
-                    'up' => 'Up',
-                    'down' => 'Down',
+                    'up' => __('device.status_up'),
+                    'down' => __('device.status_down'),
                 ],
             ],
             [
                 'key' => 'os',
-                'label' => 'OS',
+                'label' => __('device.os'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.device-field'),
                 'params' => [
@@ -156,7 +156,7 @@ class DevicesController extends Controller
             ],
             [
                 'key' => 'version',
-                'label' => 'Version',
+                'label' => __('Version'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.device-field'),
                 'params' => [
@@ -165,7 +165,7 @@ class DevicesController extends Controller
             ],
             [
                 'key' => 'hardware',
-                'label' => 'Platform',
+                'label' => __('Platform'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.device-field'),
                 'params' => [
@@ -174,7 +174,7 @@ class DevicesController extends Controller
             ],
             [
                 'key' => 'features',
-                'label' => 'Featureset',
+                'label' => __('Featureset'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.device-field'),
                 'params' => [
@@ -183,13 +183,13 @@ class DevicesController extends Controller
             ],
             [
                 'key' => 'location_id',
-                'label' => 'Location',
+                'label' => __('Location'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.location'),
             ],
             [
                 'key' => 'type',
-                'label' => 'Device Type',
+                'label' => __('device.device_type'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.device-field'),
                 'params' => [
@@ -198,29 +198,29 @@ class DevicesController extends Controller
             ],
             [
                 'key' => 'groups.id',
-                'label' => 'Group',
+                'label' => __('device.device_group'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.device-group'),
             ],
             [
                 'key' => 'poller_group',
-                'label' => 'Poller Group',
+                'label' => __('device.edit.poller_group'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.poller-group'),
             ],
             [
                 'key' => 'disabled',
-                'label' => 'Disabled',
+                'label' => __('Disabled'),
                 'type' => 'boolean',
             ],
             [
                 'key' => 'ignore',
-                'label' => 'Ignored',
+                'label' => __('Ignored'),
                 'type' => 'boolean',
             ],
             [
                 'key' => 'disable_notify',
-                'label' => 'Alerts Disabled',
+                'label' => __('device.alerts_disabled'),
                 'type' => 'boolean',
             ],
         ];

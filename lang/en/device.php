@@ -31,6 +31,13 @@ return [
     'device_group' => 'Device Group',
     'show_filter' => 'Show Filter',
     'show_header' => 'Show Header',
+    'os' => 'OS',
+    'status' => 'Status',
+    'status_up' => 'Up',
+    'status_down' => 'Down',
+    'device_type' => 'Device Type',
+    'device_group' => 'Device Group',
+    'alerts_disabled' => 'Alerts Disabled',
 
     'edit' => [
         'delete_device' => 'Delete Device',
