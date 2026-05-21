@@ -6,8 +6,8 @@ use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Spatie\Permission\Models\Role;
 use LibreNMS\Tests\DBTestCase;
+use Spatie\Permission\Models\Role;
 
 /**
  * Feature tests for the bulk SNMP credentials feature.
