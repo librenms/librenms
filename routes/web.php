@@ -107,8 +107,8 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('performance', [PollerController::class, 'performanceTab'])->name('poller.performance');
         Route::resource('{id}/settings', PollerSettingsController::class, ['as' => 'poller'])->only(['update', 'destroy']);
     });
-    Route::delete('ports/purge', [\App\Http\Controllers\PortsController::class, 'purge'])->name('ports.purge');
-    Route::get('ports/{view?}/{graph?}', [\App\Http\Controllers\PortsController::class, 'index'])
+    Route::delete('ports/purge', [App\Http\Controllers\PortsController::class, 'purge'])->name('ports.purge');
+    Route::get('ports/{view?}/{graph?}', [App\Http\Controllers\PortsController::class, 'index'])
         ->middleware('saved-filter:ports')->name('ports');
     Route::prefix('services')->name('services.')->group(function (): void {
         Route::resource('templates', ServiceTemplateController::class);
@@ -436,13 +436,13 @@ Route::prefix('install')->group(function (): void {
 });
 
 // Bulk SNMP routes (must be placed BEFORE the Legacy catch-all route)
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth'])->group(function (): void {
     Route::prefix('device-groups/{device_group}/bulk-snmp')->group(function () {
-        Route::get('/', [\App\Http\Controllers\BulkSnmpController::class, 'show'])
+        Route::get('/', [App\Http\Controllers\BulkSnmpController::class, 'show'])
             ->name('device-group.bulk-snmp.show');
-        Route::post('/test', [\App\Http\Controllers\BulkSnmpController::class, 'test'])
+        Route::post('/test', [App\Http\Controllers\BulkSnmpController::class, 'test'])
             ->name('device-group.bulk-snmp.test');
-        Route::post('/apply', [\App\Http\Controllers\BulkSnmpController::class, 'apply'])
+        Route::post('/apply', [App\Http\Controllers\BulkSnmpController::class, 'apply'])
             ->name('device-group.bulk-snmp.apply');
     });
 });

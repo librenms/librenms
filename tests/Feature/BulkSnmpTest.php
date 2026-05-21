@@ -3,7 +3,6 @@
 namespace LibreNMS\Tests\Feature;
 
 use App\Models\Device;
-use App\Models\DeviceGroup;
 use App\Models\User;
 use Database\Factories\DeviceGroupFactory;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
