@@ -6,6 +6,7 @@ use App\Http\Requests\BulkSnmpRequest;
 use App\Models\DeviceGroup;
 use App\Services\BulkSnmpService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -20,10 +21,15 @@ class BulkSnmpController extends Controller
     /**
      * Render the bulk SNMP edit form for a Device Group.
      */
-    public function show(int $deviceGroup): View
+    public function show(int $deviceGroup): View|RedirectResponse
     {
-        // Non-admins get a friendly explanation instead of a raw 403 page.
-        if (! Auth::user()?->hasRole('admin')) {
+        // Not logged in -> send to login.
+        if (! Auth::check()) {
+            return redirect()->guest(route('login'));
+        }
+
+        // Logged in but not an admin -> friendly explanation, not a raw 403.
+        if (! Auth::user()->hasRole('admin')) {
             return view('device-group.bulk-snmp-denied');
         }
 
