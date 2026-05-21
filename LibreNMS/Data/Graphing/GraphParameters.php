@@ -284,8 +284,8 @@ class GraphParameters implements \Stringable
     private function extractType(string $type): array
     {
         preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $type, $graphtype);
-        $type = basename($graphtype['type']);
-        $subtype = basename($graphtype['subtype']);
+        $type = basename($graphtype['type'] ?? '');
+        $subtype = basename($graphtype['subtype'] ?? '');
 
         return [$type, $subtype];
     }
