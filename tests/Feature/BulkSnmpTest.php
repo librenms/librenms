@@ -2,28 +2,34 @@
 
 namespace LibreNMS\Tests\Feature;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\User;
 use Database\Factories\DeviceGroupFactory;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use LibreNMS\Tests\DBTestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use LibreNMS\Tests\TestCase;
 use Spatie\Permission\Models\Role;
 
 /**
  * Feature tests for the bulk SNMP credentials feature.
- *
- * NOTE: LibreNMS uses Spatie Laravel Permission for roles. These tests
- * assign the 'admin' role explicitly. Adjust to match LibreNMS' own test
- * conventions/seeders if the project provides role helpers.
  */
-final class BulkSnmpTest extends DBTestCase
+class BulkSnmpTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
-    protected function makeAdmin(): User
+    protected function setUp(): void
     {
-        Role::findOrCreate('admin', 'web');
-        $user = User::factory()->create();
+        parent::setUp();
+
+        Role::findOrCreate('admin');
+        Role::findOrCreate('user');
+
+        LibrenmsConfig::set('auth_mechanism', 'mysql');
+    }
+
+    private function makeAdmin(): User
+    {
+        $user = User::factory()->create(['enabled' => 1]);
         $user->assignRole('admin');
 
         return $user;
@@ -34,12 +40,12 @@ final class BulkSnmpTest extends DBTestCase
         $group = DeviceGroupFactory::new()->create();
 
         $this->get(route('device-group.bulk-snmp.show', $group))
-            ->assertRedirect(); // redirected to login
+            ->assertRedirect();
     }
 
     public function testNonAdminSeesFriendlyDeniedPage(): void
     {
-        $user = User::factory()->create(); // no admin role
+        $user = User::factory()->create(['enabled' => 1]);
         $group = DeviceGroupFactory::new()->create();
 
         $this->actingAs($user)
@@ -50,7 +56,7 @@ final class BulkSnmpTest extends DBTestCase
 
     public function testNonAdminCannotApply(): void
     {
-        $user = User::factory()->create(); // no admin role
+        $user = User::factory()->create(['enabled' => 1]);
         $group = DeviceGroupFactory::new()->create();
 
         $this->actingAs($user)
@@ -80,7 +86,6 @@ final class BulkSnmpTest extends DBTestCase
         $this->actingAs($admin)
             ->postJson(route('device-group.bulk-snmp.apply', $group), [
                 'snmpver' => 'v3',
-                // missing authname, authalgo, etc.
             ])
             ->assertStatus(422)
             ->assertJsonValidationErrors(['authname', 'authalgo', 'cryptoalgo', 'authlevel']);
@@ -94,7 +99,6 @@ final class BulkSnmpTest extends DBTestCase
         $this->actingAs($admin)
             ->postJson(route('device-group.bulk-snmp.apply', $group), [
                 'snmpver' => 'v2c',
-                // missing community
             ])
             ->assertStatus(422)
             ->assertJsonValidationErrors(['community']);
@@ -131,9 +135,9 @@ final class BulkSnmpTest extends DBTestCase
     {
         $admin = $this->makeAdmin();
         $group = DeviceGroupFactory::new()->create();
-        Device::factory()->count(2)->create(['status' => 1]); // up
-        Device::factory()->count(1)->create(['status' => 0]); // down
-        $group->devices()->sync(Device::pluck('device_id'));
+        $up = Device::factory()->count(2)->create(['status' => 1]);
+        $down = Device::factory()->count(1)->create(['status' => 0]);
+        $group->devices()->sync($up->pluck('device_id')->merge($down->pluck('device_id')));
 
         $response = $this->actingAs($admin)
             ->postJson(route('device-group.bulk-snmp.apply', $group), [
