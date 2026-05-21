@@ -21,7 +21,7 @@ readonly class FpingAvailabilityService
     }
 
     /**
-     * @param  array  $hosts
+     * @param  array<string>  $hosts
      * @param  callable  $callback
      * @return void
      */
