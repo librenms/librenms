@@ -127,9 +127,9 @@ class PortSecurityController extends TableController
             ],
             [
                 $item->port?->getShortLabel() ?? '',
-                $item->port?->ifName ?? '',
-                $item->port?->ifDescr ?? '',
-                $item->port?->ifAlias ?? '',
+                $item->port->ifName ?? '',
+                $item->port->ifDescr ?? '',
+                $item->port->ifAlias ?? '',
                 $item->port_security_enable === null ? '' : ($item->port_security_enable ? 'true' : 'false'),
                 $item->status ?? '',
                 $item->address_count ?? '',
