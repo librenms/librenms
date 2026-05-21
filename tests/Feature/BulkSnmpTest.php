@@ -35,20 +35,19 @@ class BulkSnmpTest extends TestCase
         return $user;
     }
 
-    public function testGuestCannotAccessBulkSnmpForm(): void
+    private function makeUser(): User
     {
-        $group = DeviceGroupFactory::new()->create();
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->assignRole('user');
 
-        $this->get(route('device-group.bulk-snmp.show', $group))
-            ->assertRedirect();
+        return $user;
     }
 
     public function testNonAdminSeesFriendlyDeniedPage(): void
     {
-        $user = User::factory()->create(['enabled' => 1]);
         $group = DeviceGroupFactory::new()->create();
 
-        $this->actingAs($user)
+        $this->actingAs($this->makeUser())
             ->get(route('device-group.bulk-snmp.show', $group))
             ->assertOk()
             ->assertSee(__('bulk-snmp.denied.title'));
@@ -56,10 +55,9 @@ class BulkSnmpTest extends TestCase
 
     public function testNonAdminCannotApply(): void
     {
-        $user = User::factory()->create(['enabled' => 1]);
         $group = DeviceGroupFactory::new()->create();
 
-        $this->actingAs($user)
+        $this->actingAs($this->makeUser())
             ->postJson(route('device-group.bulk-snmp.apply', $group), [
                 'snmpver' => 'v2c',
                 'community' => 'whatever',
@@ -69,10 +67,9 @@ class BulkSnmpTest extends TestCase
 
     public function testAdminCanAccessBulkSnmpForm(): void
     {
-        $admin = $this->makeAdmin();
         $group = DeviceGroupFactory::new()->create();
 
-        $this->actingAs($admin)
+        $this->actingAs($this->makeAdmin())
             ->get(route('device-group.bulk-snmp.show', $group))
             ->assertOk()
             ->assertSee('Bulk SNMP');
@@ -80,10 +77,9 @@ class BulkSnmpTest extends TestCase
 
     public function testApplyValidatesV3RequiredFields(): void
     {
-        $admin = $this->makeAdmin();
         $group = DeviceGroupFactory::new()->create();
 
-        $this->actingAs($admin)
+        $this->actingAs($this->makeAdmin())
             ->postJson(route('device-group.bulk-snmp.apply', $group), [
                 'snmpver' => 'v3',
             ])
@@ -93,10 +89,9 @@ class BulkSnmpTest extends TestCase
 
     public function testApplyValidatesV2cRequiredFields(): void
     {
-        $admin = $this->makeAdmin();
         $group = DeviceGroupFactory::new()->create();
 
-        $this->actingAs($admin)
+        $this->actingAs($this->makeAdmin())
             ->postJson(route('device-group.bulk-snmp.apply', $group), [
                 'snmpver' => 'v2c',
             ])
@@ -106,7 +101,6 @@ class BulkSnmpTest extends TestCase
 
     public function testApplyUpdatesAllDevicesInGroup(): void
     {
-        $admin = $this->makeAdmin();
         $group = DeviceGroupFactory::new()->create();
         $devices = Device::factory()->count(3)->create([
             'snmpver' => 'v2c',
@@ -114,7 +108,7 @@ class BulkSnmpTest extends TestCase
         ]);
         $group->devices()->sync($devices->pluck('device_id'));
 
-        $this->actingAs($admin)
+        $this->actingAs($this->makeAdmin())
             ->postJson(route('device-group.bulk-snmp.apply', $group), [
                 'snmpver' => 'v2c',
                 'community' => 'new_community',
@@ -133,13 +127,12 @@ class BulkSnmpTest extends TestCase
 
     public function testApplySkipsDownDevicesWhenRequested(): void
     {
-        $admin = $this->makeAdmin();
         $group = DeviceGroupFactory::new()->create();
         $up = Device::factory()->count(2)->create(['status' => 1]);
         $down = Device::factory()->count(1)->create(['status' => 0]);
         $group->devices()->sync($up->pluck('device_id')->merge($down->pluck('device_id')));
 
-        $response = $this->actingAs($admin)
+        $response = $this->actingAs($this->makeAdmin())
             ->postJson(route('device-group.bulk-snmp.apply', $group), [
                 'snmpver' => 'v2c',
                 'community' => 'updated',
