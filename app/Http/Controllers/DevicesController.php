@@ -114,7 +114,7 @@ class DevicesController extends Controller
     }
 
     /**
-     * @return LengthAwarePaginator<Device>|Collection<Device>
+     * @return LengthAwarePaginator<int, Device>|Collection<int, Device>
      */
     private function getDevices(?string $view, int $perPage): LengthAwarePaginator|Collection
     {
