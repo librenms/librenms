@@ -467,18 +467,22 @@ class PortsController implements DeviceTab
         return [
             [
                 'key' => 'search',
-                'label' => 'Description',
+                'label' => __('Description'),
                 'type' => 'text',
             ],
             [
                 'key' => 'state',
-                'label' => 'Oper Status',
+                'label' => __('port.oper_status'),
                 'type' => 'select',
-                'options' => ['up', 'down', 'shutdown'],
+                'options' => [
+                    'up' => __('Up'),
+                    'down' => __('Down'),
+                    'shutdown' => __('Shutdown'),
+                ],
             ],
             [
                 'key' => 'ifSpeed',
-                'label' => 'Speed',
+                'label' => __('port.speed'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.port-field'),
                 'params' => [
@@ -488,7 +492,7 @@ class PortsController implements DeviceTab
             ],
             [
                 'key' => 'ifType',
-                'label' => 'Media',
+                'label' => __('port.media'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.port-field'),
                 'params' => [
@@ -497,8 +501,18 @@ class PortsController implements DeviceTab
                 ],
             ],
             [
+                'key' => 'ifDuplex',
+                'label' => __('port.duplex'),
+                'type' => 'select',
+                'options' => [
+                    'fullDuplex' => __('port.duplex_full'),
+                    'halfDuplex' => __('port.duplex_half'),
+                    'unknown' => __('port.duplex_unknown'),
+                ],
+            ],
+            [
                 'key' => 'port_type',
-                'label' => 'Port Type',
+                'label' => __('port.port_type'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.port-field'),
                 'params' => [
@@ -507,18 +521,23 @@ class PortsController implements DeviceTab
                 ],
             ],
             [
+                'key' => 'errors',
+                'label' => __('port.errors'),
+                'type' => 'boolean',
+            ],
+            [
                 'key' => 'ignore',
-                'label' => 'Ignored',
+                'label' => __('Ignored'),
                 'type' => 'boolean',
             ],
             [
                 'key' => 'disabled',
-                'label' => 'Disabled',
+                'label' => __('Disabled'),
                 'type' => 'boolean',
             ],
             [
                 'key' => 'deleted',
-                'label' => 'Deleted',
+                'label' => __('Deleted'),
                 'type' => 'boolean',
             ],
         ];
