@@ -437,7 +437,7 @@ Route::prefix('install')->group(function (): void {
 
 // Bulk SNMP routes (must be placed BEFORE the Legacy catch-all route)
 Route::middleware(['auth'])->group(function (): void {
-    Route::prefix('device-groups/{device_group}/bulk-snmp')->group(function () {
+    Route::prefix('device-groups/{device_group}/bulk-snmp')->group(function (): void {
         Route::get('/', [App\Http\Controllers\BulkSnmpController::class, 'show'])
             ->name('device-group.bulk-snmp.show');
         Route::post('/test', [App\Http\Controllers\BulkSnmpController::class, 'test'])
