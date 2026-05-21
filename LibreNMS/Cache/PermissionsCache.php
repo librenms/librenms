@@ -29,6 +29,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Bill;
 use App\Models\Device;
 use App\Models\Port;
+use App\Models\PortGroup;
 use App\Models\User;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
@@ -69,6 +70,21 @@ class PermissionsCache
             ->where('user_id', $this->getUserId($user))
             ->where('port_id', $this->getPortId($port))
             ->isNotEmpty();
+    }
+
+    /**
+     * Check if a access can be accessed by user (non-global read/admin)
+     * If no user is given, use the logged in user
+     */
+    public function canAccessPortGroup(PortGroup $portGroup, User|int|null $user = null): bool
+    {
+        $ports_allowed = $this->portsForUser($user);
+        $devices_allowed = $this->devicesForUser($user);
+
+        // Find all ports that are not allowed by port ID and not allowed by device ID, making sure that there are no matches
+        return $portGroup->ports->filter(function ($port, $key) use ($ports_allowed, $devices_allowed) {
+            return (!$ports_allowed->contains($port->port_id) && !$devices_allowed->contains($port->device_id));
+        })->count() == 0;
     }
 
     /**
