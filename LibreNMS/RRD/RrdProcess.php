@@ -66,9 +66,10 @@ class RrdProcess
      */
     public function run(string $command, string $waitFor = self::COMMAND_COMPLETE): string
     {
+        $this->process->clearOutput();
+
         $this->runAsync($command);
 
-        $this->process->clearOutput();
         $this->process->waitUntil(function ($type, $buffer) use ($waitFor) {
             if ($type === Process::ERR) {
                 throw new RrdException($buffer);
