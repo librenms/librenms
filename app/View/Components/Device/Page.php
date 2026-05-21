@@ -49,6 +49,7 @@ class Page extends Component
         public readonly array $dropdownLinks = [],
         public readonly string $subtitle = '',
     ) {
+        $device->loadCount(['ports', 'sensors', 'wirelessSensors']);
         DeviceCache::setPrimary($device->device_id); // set primary device in case it was not set by controller
         $this->pagetitle = $subtitle ? ($device->displayName() . ': ' . $subtitle) : $device->displayName();
         $this->alertClass = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
@@ -59,8 +60,8 @@ class Page extends Component
     public function overviewGraphs(): array
     {
         $graph_array = [
-            'width' => 150,
-            'height' => 45,
+            'width' => 350,
+            'height' => 70,
             'device' => $this->device->device_id,
             'type' => 'device_bits',
             'from' => '-1d',
