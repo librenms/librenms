@@ -66,8 +66,6 @@ class RrdProcess
      */
     public function run(string $command, string $waitFor = self::COMMAND_COMPLETE): string
     {
-        $this->process->clearOutput();
-
         $this->runAsync($command);
 
         $this->process->waitUntil(function ($type, $buffer) use ($waitFor) {
@@ -106,6 +104,7 @@ class RrdProcess
         }
 
         $this->logger->debug("RRD[%g$command%n]", ['color' => true]);
+        $this->process->clearOutput();
         $this->input->write("$command\n");
     }
 
