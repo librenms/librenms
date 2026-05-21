@@ -1,13 +1,13 @@
 <?php
 
-namespace Tests\Feature;
+namespace LibreNMS\Tests\Feature;
 
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Spatie\Permission\Models\Role;
-use Tests\TestCase;
+use LibreNMS\Tests\DBTestCase;
 
 /**
  * Feature tests for the bulk SNMP credentials feature.
@@ -16,7 +16,7 @@ use Tests\TestCase;
  * assign the 'admin' role explicitly. Adjust to match LibreNMS' own test
  * conventions/seeders if the project provides role helpers.
  */
-class BulkSnmpTest extends TestCase
+final class BulkSnmpTest extends DBTestCase
 {
     use DatabaseTransactions;
 
