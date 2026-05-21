@@ -19,7 +19,7 @@ return [
     ],
     'delete_device' => 'Lösche Gerät',
     'delete' => 'Lösche :name',
-    'confirm_delete' => 'Sind Sie sicher, dass Sie das Gerät :name löschen möchten?',    
+    'confirm_delete' => 'Sind Sie sicher, dass Sie das Gerät :name löschen möchten?',
     'never_polled' => 'Nie abgefragt',
     'vm_host' => 'VM Host',
     'scheduled_maintenance' => 'Geplante Wartungsarbeiten',
