@@ -46,7 +46,6 @@ class PortsController implements DeviceTab
 {
     private bool $detail = true;
     private array $settings = [];
-    private array $savedFilter = [];
     private array $defaults = [
         'perPage' => 32,
         'sort' => 'ifIndex',
@@ -409,7 +408,7 @@ class PortsController implements DeviceTab
         return Port::where('device_id', $device->device_id)
             ->isNotDeleted()
             ->hasAccess(Auth::user())->with($relationships)
-            ->when(array_merge($this->savedFilter, $request->array('filter')), fn (Builder $q, $filters) => $q->applyFilters($filters))
+            ->when($request->array('filter'), fn (Builder $q, $filters) => $q->applyFilters($filters))
             ->when($this->settings['sort'] == 'port', fn (Builder $q, $sort) => $q
                 ->orderByRaw('SOUNDEX(ifName) ' . $this->settings['order'])
                 ->orderByRaw('CHAR_LENGTH(ifName) ' . $this->settings['order'])
