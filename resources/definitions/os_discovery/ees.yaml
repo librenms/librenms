@@ -4,7 +4,7 @@ modules:
     hardware: .1.3.6.1.4.1.6302.2.1.1.2.0
     version: EES-POWER-MIB::identControllerFirmwareVersion.0
     serial: EES-POWER-MIB::identControllerSerialNumber.0
-    sysName: .1.3.6.1.4.1.6302.2.1.1.4.0
+    features: EES-POWER-MIB::identName.0
 
   sensors:
     temperature:

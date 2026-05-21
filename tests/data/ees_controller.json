@@ -3,13 +3,13 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "site",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
                     "sysDescr": "Linux ES_Controller 4.19.94-gbe5389fd85 #78 PREEMPT Mon Apr 11 17:10:45 CST 2022 armv7l",
                     "sysContact": "<private>",
                     "version": "5.2.05BP32",
                     "hardware": "NCU",
-                    "features": null,
+                    "features": "SITE",
                     "location": "<private>",
                     "os": "ees",
                     "type": "power",
