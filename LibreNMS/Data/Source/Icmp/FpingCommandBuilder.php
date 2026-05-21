@@ -7,7 +7,7 @@ use LibreNMS\Enum\AddressFamily;
 
 class FpingCommandBuilder
 {
-    // @var array<string> $args
+    /** @var string[] */
     private array $args = [];
     private ?AddressFamily $addressFamily = null;
 
