@@ -9,9 +9,9 @@
                 <div class="tw:flex tw:justify-between">
                     <div class="tw:min-h-8">
                         <x-option-bar :options="$nav" name="{{ __('Ports') }}" :selected="$view" linkClass="sync-filter-url" border="none" class="tw:inline-block tw:p-1"></x-option-bar>
-                        <x-option-bar :options="$graphNav" name="{{ __('Graphs') }}" :selected="$view" linkClass="sync-filter-url" border="none" class="tw:inline-block tw:p-1"></x-option-bar>
-                        <span id="group-graph-link" x-data="{ group: @js($group) }"  x-show="group" x-init="window.addEventListener('filter:apply', (e) => $data.group = e.detail.filters.group?.eq);">
-                            | <a :href="'{{ url('iftype/group=:group') }}'.replace(':group', group)" title="{{ __('port.groups.graph') }}">{{ __('port.groups.combined') }}</a>
+                        <x-option-bar :options="$graphNav" name="{{ __('Graphs') }}" :selected="$graph" linkClass="sync-filter-url" border="none" class="tw:inline-block tw:p-1"></x-option-bar>
+                        <span id="group-graph-link" x-data="{ group: @js($group) }"  x-show="group" x-init="window.addEventListener('filter:apply', (e) => $data.group = e.detail.filters['groups.id']?.eq);">
+                            | <a :href="'{{ route('portgroup.graph', [":group"]) }}'.replace(':group', group)" title="{{ __('port.groups.graph') }}">{{ __('port.groups.combined') }}</a>
                         </span>
                     </div>
                     <div class="btn-group pull-right" role="group">
@@ -20,7 +20,7 @@
                                 <i class="fa fa-ellipsis-v fa-lg fa-fw icon-theme"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-right">
-                                <li><a href="{{ $hideFilterLink }}"><i class="fa fa-regular @if($hideFilter) fa-square @else fa-square-check @endif fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ __('port.show_fitler') }}</a></li>
+                                <li><a href="{{ $hideFilterLink }}"><i class="fa fa-regular @if($hideFilter) fa-square @else fa-square-check @endif fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ __('port.show_filter') }}</a></li>
                                 <li><a href="{{ $bareLink }}"><i class="fa fa-regular @if($bare) fa-square @else fa-square-check @endif fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ __('port.show_header') }}</a></li>
                                 @can('delete', \App\Models\Port::class)
                                 <li><a href="#" @click.prevent="purgeDeleted()">

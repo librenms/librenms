@@ -306,7 +306,7 @@
                                                             aria-hidden="true"></i> {{ __('All Ports') }}</a></li>
 
                         @if($port_counts['errored'] > 0)
-                            <li><a href="{{ route('ports', ['view' => 'detail', 'errors' => '1']) }}"><i class="fa fa-exclamation-circle fa-fw fa-lg"
+                            <li><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['errors' => ['eq' => '1']]]) }}"><i class="fa fa-exclamation-circle fa-fw fa-lg"
                                                                            aria-hidden="true"></i> {{ __('Errored :port_count', ['port_count' => $port_counts['errored']]) }}
                                 </a></li>
                         @endif
@@ -349,32 +349,32 @@
                                 </li>
                                 @endconfig
                                 @config('int_l2tp')
-                                <li><a href="{{ url('iftype/type=l2tp') }}"><i class="fa fa-link fa-fw fa-lg"
+                                <li><a href="{{ route('porttype.graph', ['l2tp']) }}"><i class="fa fa-link fa-fw fa-lg"
                                                                                aria-hidden="true"></i> {{ __('L2TP') }}</a>
                                 </li>
                                 @endconfig
                                 @config('int_transit')
-                                <li><a href="{{ url('iftype/type=transit') }}"><i class="fa fa-truck fa-fw fa-lg"
+                                <li><a href="{{ route('porttype.graph', ['transit']) }}"><i class="fa fa-truck fa-fw fa-lg"
                                                                                   aria-hidden="true"></i> {{ __('Transit') }}
                                     </a></li>
                                 @endconfig
                                 @config('int_peering')
-                                <li><a href="{{ url('iftype/type=peering') }}"><i class="fa fa-handshake-o fa-fw fa-lg"
+                                <li><a href="{{ route('porttype.graph', ['peering']) }}"><i class="fa fa-handshake-o fa-fw fa-lg"
                                                                                   aria-hidden="true"></i> {{ __('Peering') }}
                                     </a></li>
                                 @endconfig
                                 @if(\App\Facades\LibrenmsConfig::get('int_peering') && \App\Facades\LibrenmsConfig::get('int_transit'))
-                                    <li><a href="{{ url('iftype/type=peering,transit') }}"><i
+                                    <li><a href="{{ route('porttype.graph', ['peering,transit']) }}"><i
                                                 class="fa fa-rocket fa-fw fa-lg"
                                                 aria-hidden="true"></i> {{ __('Peering + Transit') }}</a></li>
                                 @endif
                                 @config('int_core')
-                                <li><a href="{{ url('iftype/type=core') }}"><i class="fa fa-code-fork fa-fw fa-lg"
+                                <li><a href="{{ route('porttype.graph', ['core']) }}"><i class="fa fa-code-fork fa-fw fa-lg"
                                                                                aria-hidden="true"></i> {{ __('Core') }}</a>
                                 </li>
                                 @endconfig
                                 @foreach($custom_port_descr as $custom_descr)
-                                    <li><a href="{{ url('iftype/type=' . urlencode($custom_descr['name'])) }}"><i class="fa {{$custom_descr['icon']}} fa-fw fa-lg" aria-hidden="true"></i> {{ ucwords($custom_descr['name']) }}</a></li>
+                                    <li><a href="{{ route('porttype.graph', [urlencode($custom_descr['name'])]) }}"><i class="fa {{$custom_descr['icon']}} fa-fw fa-lg" aria-hidden="true"></i> {{ ucwords($custom_descr['name']) }}</a></li>
                                 @endforeach
                             @endif
 
@@ -387,7 +387,7 @@
                                 <a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Port Groups') }}</a>
                                 <ul class="dropdown-menu scrollable-menu">
                                 @foreach($port_groups as $group)
-                                    <li><a href="{{ url("ports/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($group->name) }}</a></li>
+                                    <li><a href="{{ route('ports', ['filter' => ['groups.id' => ['eq' => $group->id]]]) }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($group->name) }}</a></li>
                                 @endforeach
                                 </ul>
                                 </li>

@@ -17,7 +17,6 @@ class PortsController extends Controller
     {
         $request->validate([
             'view' => 'in:list_basic,list_detail,graph_bits,graph_upkts,graph_nupkts,graph_errors', // legacy
-            'errors' => ['nullable', 'in:yes'],
             'bare' => ['nullable', 'in:yes'],
             'searchbar' => ['nullable', 'in:hide'],
             'per_page' => ['nullable', 'integer'],
@@ -71,11 +70,10 @@ class PortsController extends Controller
         return view('port.index', [
             'view' => $view,
             'graph' => $graph,
-            'errors' => $errors,
             'show_detail' => $view === 'detail' ? 'true' : 'false',
-            'show_errors' => $view === 'detail' || $errors ? 'true' : 'false',
+            'show_errors' => $view === 'detail' || $request->boolean('filter.errors.eq') ? 'true' : 'false',
             'ports' => $this->getPorts($view, $perPage, $sort),
-            'group' => $request->input('filter.group.eq'),
+            'group' => $request->array('filter')['groups.id']['eq'] ?? 0,
             'perPage' => $perPage,
             'paginationOptions' => [12, 24, 48, 128, 568, 4096],
             'nav' => [
@@ -139,6 +137,11 @@ class PortsController extends Controller
                 'endpoint' => route('ajax.select.device'),
             ],
             [
+                'key' => 'device.hostname',
+                'label' => 'Hostname',
+                'type' => 'text',
+            ],
+            [
                 'key' => 'device.location_id',
                 'label' => __('Location'),
                 'type' => 'select',
@@ -194,12 +197,6 @@ class PortsController extends Controller
                 'endpoint' => route('ajax.select.port-group'),
             ],
             [
-                'key' => 'device.groups.id',
-                'label' => 'Device Group',
-                'type' => 'select',
-                'endpoint' => route('ajax.select.device-group'),
-            ],
-            [
                 'key' => 'port_type',
                 'label' => 'Port Type',
                 'type' => 'select',
@@ -207,6 +204,17 @@ class PortsController extends Controller
                 'params' => [
                     'field' => 'port_descr_type',
                 ],
+            ],
+            [
+                'key' => 'device.groups.id',
+                'label' => 'Device Group',
+                'type' => 'select',
+                'endpoint' => route('ajax.select.device-group'),
+            ],
+            [
+                'key' => 'errors',
+                'label' => 'Errors',
+                'type' => 'boolean',
             ],
             [
                 'key' => 'ignore',
@@ -243,7 +251,7 @@ class PortsController extends Controller
             ->with(['device' => fn ($query) => $query->select(['device_id', 'hostname', 'sysName', 'display', 'ip', 'overwrite_ip'])])
             ->isValid()
             ->whereHas('device') // a device is required for graphs to work
-            ->when(request()->array('filter'), fn (Builder $query, $filters) => $query->applyFilters($filters));
+            ->when(request()->array('filter'), fn (Builder $query, $filter) => $query->applyFilters($filter));
 
         $portsQuery = match ($sort) {
             'traffic' => $portsQuery->orderByRaw('ifInOctets_rate + ifOutOctets_rate desc'),
