@@ -36,7 +36,6 @@ return [
     'status_up' => 'Up',
     'status_down' => 'Down',
     'device_type' => 'Device Type',
-    'device_group' => 'Device Group',
     'alerts_disabled' => 'Alerts Disabled',
 
     'edit' => [
