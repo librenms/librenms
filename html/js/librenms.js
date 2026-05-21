@@ -376,6 +376,10 @@ function init_map(id, config = {}) {
     leaflet = L.map(id, {
         preferCanvas: true,
         zoom: config.zoom !== undefined ? config.zoom : 3,
+        // --- ADDED !--
+        zoomSnap: config.zoomSnap !== undefined ? config.zoomSnap : 0.25,
+        zoomDelta: config.zoomDelta !== undefined ? config.zoomDelta : 0.25,
+        // !--
         center: (config.lat !== undefined && config.lng !== undefined) ? [config.lat, config.lng] : [40,-20]
     });
     window.maps[id] = leaflet;

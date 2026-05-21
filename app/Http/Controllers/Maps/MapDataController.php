@@ -52,7 +52,7 @@ class MapDataController extends Controller
             return collect();
         }
 
-        $linkQuery = Link::with('port', 'device', 'remoteDevice', 'device.location', 'remoteDevice.location')
+        $linkQuery = Link::with('port', 'remotePort', 'device', 'remoteDevice', 'device.location', 'remoteDevice.location') // --- UPDATED
             ->whereHas('device', function (Builder $q) use ($user): void {
                 $q->whereIn('status', [0, 1])
                     ->where('disabled', 0)
@@ -385,6 +385,29 @@ class MapDataController extends Controller
 
         return LibrenmsConfig::get("network_map_legend.$link_pct", '#000000');
     }
+
+    // --- ADDED: function to calculate color by speed capability !--
+    protected function linkUseColourCapability(int|float $bps): string
+    {
+        $gbps = $bps / 1_000_000_000;
+
+        if ($gbps >= 100) return '#00C49F'; // 100G green
+        if ($gbps >= 40)  return '#7641E8'; // 40G purple
+        if ($gbps >= 25)  return '#3261C7'; // 25G blue
+        if ($gbps >= 10)  return '#E66A2E'; // 10G orange
+        return '#222222';                   // <10G black
+    }
+    // !--
+
+    // --- ADDED: function to calculate effective port speed !--
+    protected function effectivePortSpeed(?Port $port): int
+    {
+        $ifSpeed = (int) ($port?->ifSpeed ?? 0);
+        $ifHigh = (int) ($port?->ifHighSpeed ?? 0) * 1_000_000;
+
+        return max($ifSpeed, $ifHigh);
+    }
+    // !--
 
     protected function nodeDisabledStyle(): array
     {
@@ -729,29 +752,64 @@ class MapDataController extends Controller
         // List all links
         $link_list = [];
         foreach (self::geoLinks($request) as $location) {
-            $link = $location[0];
-            $capacity = $location->sum(fn (Link $l) => $l->port->ifSpeed);
-            $inRate = $location->sum(fn (Link $l) => $l->port->ifInOctets_rate * 8);
-            $outRate = $location->sum(fn (Link $l) => $l->port->ifOutOctets_rate * 8);
-            if ($capacity > 0) {
-                $link_used = max($inRate / $capacity * 100, $outRate / $capacity * 100);
-            } elseif ($inRate > 0 || $outRate > 0) {
-                $link_used = 100;
-            } else {
-                $link_used = 0;
+            // --- ADDED: retrieve all links from one location to another !--
+            $members = $location->map(function (Link $l) {
+                $speed = $this->effectivePortSpeed($l->port);
+                $localUp = ($l->port?->ifOperStatus ?? 'down') === 'up';
+                $remoteUp = ($l->remotePort?->ifOperStatus ?? 'down') === 'up';
+                $linkActive = (bool) ($l->active ?? true);
+                $up = $linkActive && $localUp && $remoteUp;
+
+                return [
+                    'link_id' => $l->id ?? ($l->local_device_id . '.' . $l->remote_device_id . '.' . $l->local_port_id . '.' . $l->remote_port_id),
+                    'local_device_id' => $l->device?->device_id,
+                    'local_name' => $l->device?->sysName,
+                    'local_port_id' => $l->local_port_id,
+                    
+                    'remote_device_id' => $l->remoteDevice?->device_id,
+                    'remote_name' => $l->remoteDevice?->sysName,
+                    'remote_port_id' => $l->remote_port_id,
+                    
+                    'up' => $up,
+                    'speed' => $speed,
+                    'color' => $this->linkUseColourCapability($speed),
+                ];
+            })->sort(function (array $a, array $b) {
+                if ($a['up'] !== $b['up']) {
+                    return $a['up'] ? 1 : -1;
+                }
+                return $b['speed'] <=> $a['speed'];
+            })->values();
+
+            if ($members->isEmpty()) {
+                continue;
             }
 
-            $width = $this->linkSpeedWidth($capacity);
-            $link_color = $this->linkUseColour($link_used);
+            $primary = $members->first();
+            $repLink = $location->first();
 
-            $link_list[$link->device->location_id . '.' . $link->remoteDevice->location_id] = [
-                'local_lat' => $link->device->location->lat,
-                'local_lng' => $link->device->location->lng,
-                'remote_lat' => $link->remoteDevice->location->lat,
-                'remote_lng' => $link->remoteDevice->location->lng,
-                'color' => $link_color,
+            $capacity = $members->sum('speed');
+            $width = $this->linkSpeedWidth($capacity);
+
+            $link_list[$repLink->device->location_id . '.' . $repLink->remoteDevice->location_id] = [
+                'local_lat' => $repLink->device->location->lat,
+                'local_lng' => $repLink->device->location->lng,
+                'remote_lat' => $repLink->remoteDevice->location->lat,
+                'remote_lng' => $repLink->remoteDevice->location->lng,
+                
+                'local_device_id' => $primary['local_device_id'],
+                'local_name' => $primary['local_name'],
+                'local_port_id' => $primary['local_port_id'],
+                'remote_device_id' => $primary['remote_device_id'],
+                'remote_name' => $primary['remote_name'],
+                'remote_port_id' => $primary['remote_port_id'],
+                
+                'up' => $primary['up'],
+                'color' => $primary['color'],
                 'width' => $width,
+                'members' => $members,
             ];
+            // !--
         }
 
         return response()->json($link_list);
