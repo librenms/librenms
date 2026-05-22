@@ -23,6 +23,16 @@ if (isset($_POST['editing'])) {
             $device->retries = $_POST['retries'] ?: null;
             $device->timeout = $_POST['timeout'] ?: null;
 
+            $snmp_contexts = json_decode($_POST['snmp_contexts'] ?? '[]', true);
+            if (! is_array($snmp_contexts)) {
+                $snmp_contexts = [];
+            }
+            $snmp_contexts = array_values(array_unique(array_filter(array_map(
+                fn ($context) => trim((string) $context),
+                $snmp_contexts
+            ))));
+            $device->snmp_contexts = $snmp_contexts !== [] ? $snmp_contexts : null;
+
             if ($device->snmpver == 'v3') {
                 $device->community = ''; // if v3 works, we don't need a community
                 $device->authalgo = $_POST['authalgo'];
@@ -152,6 +162,7 @@ unset($community, $max_repeaters, $max_oid, $port, $port_assoc_mode, $retries, $
 // get up-to-date database values for use on the form
 $max_oid = $device->getAttrib('snmp_max_oid');
 $max_repeaters = $device->getAttrib('snmp_max_repeaters');
+$snmp_contexts = $device->snmp_contexts ?? [];
 
 // use PHP Flasher to print normal (success) messages, similar to Device Settings
 if (isset($update_message)) {
@@ -279,6 +290,16 @@ echo "        </select>
         <label for='max_oid' class='col-sm-2 control-label'>Max OIDs</label>
         <div class='col-sm-1'>
             <input type='number' id='max_oid' name='max_oid' class='form-control input-sm' value='" . htmlspecialchars($max_oid ?? '') . "' placeholder='max oids' />
+        </div>
+    </div>
+    <div class='form-group'>
+        <label for='snmp_contexts_input' class='col-sm-2 control-label'>SNMP Contexts</label>
+        <div class='col-sm-4'>
+            <div id='snmp_contexts_field' class='form-control' style='height:auto; min-height:34px; padding:4px 8px; display:flex; flex-wrap:wrap; align-items:center; gap:4px;'>
+                <input type='text' id='snmp_contexts_input' placeholder='Type context and press Enter' autocomplete='off' style='border:none; box-shadow:none; outline:none; flex:1; min-width:140px; height:26px; padding:0; background:transparent;'>
+            </div>
+            <input type='hidden' name='snmp_contexts' id='snmp_contexts' value='" . htmlspecialchars(json_encode($snmp_contexts)) . "'>
+            <p class='help-block'>Optional SNMP contexts used in some modules. Press Enter to add each context.</p>
         </div>
     </div>
     <div id='snmpv1_2'>
@@ -442,6 +463,49 @@ var current_os = <?php echo json_encode(['id' => $device->os, 'text' => Librenms
 init_select2('#os', 'os', {}, current_os, 'OS (optional)');
 
 $("[name='snmp']").bootstrapSwitch('offColor','danger');
+
+var snmpContexts = <?php echo json_encode($snmp_contexts, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS); ?>;
+
+function updateSnmpContextsHidden() {
+    $('#snmp_contexts').val(JSON.stringify(snmpContexts));
+}
+
+function renderSnmpContextChips() {
+    var $input = $('#snmp_contexts_input');
+    $('#snmp_contexts_field .snmp-context-chip').remove();
+    snmpContexts.forEach(function(context, index) {
+        var $chip = $('<span class="label label-info snmp-context-chip" style="display:inline-flex; align-items:center; padding:5px 8px; font-size:12px; margin:0;"></span>');
+        $chip.append(document.createTextNode(context + ' '));
+        $chip.append(
+            $('<a href="#" style="color:white;font-weight:bold;text-decoration:none;">&times;</a>')
+                .on('click', function(e) {
+                    e.preventDefault();
+                    snmpContexts.splice(index, 1);
+                    renderSnmpContextChips();
+                    updateSnmpContextsHidden();
+                })
+        );
+        $input.before($chip);
+    });
+    updateSnmpContextsHidden();
+}
+
+$('#snmp_contexts_input').on('keydown', function(e) {
+    if (e.keyCode !== 13) {
+        return;
+    }
+    e.preventDefault();
+    var context = $(this).val().trim();
+    if (context === '' || snmpContexts.indexOf(context) !== -1) {
+        $(this).val('');
+        return;
+    }
+    snmpContexts.push(context);
+    $(this).val('');
+    renderSnmpContextChips();
+});
+
+renderSnmpContextChips();
 
 <?php
 if ($device->snmpver == 'v3') {

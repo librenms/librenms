@@ -16,7 +16,9 @@ if (empty($bgpLocalAs)) {
     $bgpLocalAs = \SnmpQuery::get('BGP4-MIB::bgpLocalAs.0')->value();
 }
 
-foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
+$contexts = array_merge(DeviceCache::getPrimary()->getVrfContexts(), $device['snmp_contexts']);
+
+foreach ($contexts as $context_name) {
     $device['context_name'] = $context_name;
     $peer2 = false;
     $peers_data = '';
@@ -55,7 +57,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     }
 
     $peerlist = build_bgp_peers($device, $peers_data, $peer2);
-
+    
     // Process discovered peers
     if (! empty($peerlist)) {
         $af_data = [];
@@ -157,7 +159,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     }
 
     // clean up peers
-    $bgpQuery = \App\Models\BgpPeer::where('device_id', $device['device_id'])
+    $bgpQuery = BgpPeer::where('device_id', $device['device_id'])
         ->where('context_name', $device['context_name']);
     $cbgpQuery = BgpPeerCbgp::where('device_id', $device['device_id'])
         ->where('context_name', $device['context_name']);
@@ -165,8 +167,8 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         $bgpQuery->whereNotIn('bgpPeerIdentifier', array_column($peerlist, 'ip'));
         $cbgpQuery->whereNotIn('bgpPeerIdentifier', array_column($peerlist, 'ip'));
     }
-    $deleted = $bgpQuery->delete();
-    $cbgpQuery->delete();
+    //$deleted = $bgpQuery->delete();
+    //$cbgpQuery->delete();
 
     echo str_repeat('-', $deleted);
     echo PHP_EOL;
@@ -184,11 +186,11 @@ $contexts = BgpPeer::where('device_id', $device['device_id'])
     ->pluck('context_name')
     ->all();
 
-$existing_contexts = DeviceCache::getPrimary()->getVrfContexts();
+$existing_contexts = array_merge(DeviceCache::getPrimary()->getVrfContexts(), $device['snmp_contexts']);
 foreach ($contexts as $context) {
     if (! in_array($context, $existing_contexts)) {
-        \App\Models\BgpPeer::where('device_id', $device['device_id'])->where('context_name', $context)->delete();
-        BgpPeerCbgp::where('device_id', $device['device_id'])->where('context_name', $context)->delete();
+        //BgpPeer::where('device_id', $device['device_id'])->where('context_name', $context)->delete();
+        //BgpPeerCbgp::where('device_id', $device['device_id'])->where('context_name', $context)->delete();
         echo '-';
     }
 }

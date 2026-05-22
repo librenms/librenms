@@ -82,6 +82,7 @@ class Device extends BaseModel
         'sysName',
         'sysObjectID',
         'snmpEngineID',
+        'snmp_contexts',
         'timeout',
         'transport',
         'type',
@@ -105,6 +106,7 @@ class Device extends BaseModel
             'ignore_status' => 'boolean',
             'disabled' => 'boolean',
             'snmp_disable' => 'boolean',
+            'snmp_contexts' => 'array',
             'disable_notify' => 'boolean',
             'override_sysLocation' => 'boolean',
         ];
