@@ -5,7 +5,7 @@ if (\App\Facades\LibrenmsConfig::get('enable_syslog')) {
     if (count($syslog)) {
         echo '<div class="row">
           <div class="col-md-12">
-            <div class="panel panel-default panel-condensed">
+            <div class="panel panel-default panel-condensed overview-panel">
               <div class="panel-heading">';
         echo '<a href="' . route('device.syslog', ['device' => $device['device_id']]) . '"><i class="fa fa-clone fa-lg icon-theme" aria-hidden="true"></i> <strong>Recent Syslog</strong></a>';
         echo '        </div>

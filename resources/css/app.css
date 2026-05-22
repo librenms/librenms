@@ -2,6 +2,7 @@
 
 @import "tailwindcss" prefix(tw);
 @source "../../includes/html/pages/**/*.php";
+@source "../../includes/html/**/*.inc.php";
 @import "../../html/css/bootstrap.min.css" layer(components);
 @custom-variant dark (&:where(.dark, .dark *));
 @layer base {
@@ -63,4 +64,68 @@
 
 #coordinates-text  {
   @apply tw:underline;
+}
+
+.overview-panel {
+  @apply tw:rounded-xl tw:overflow-hidden tw:border tw:border-gray-300 tw:shadow-sm tw:dark:border-dark-gray-200;
+}
+
+.device-overview-columns {
+  @apply tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4;
+}
+
+.device-panel-status-up {
+  @apply tw:border-l-4 tw:border-l-green-600!;
+}
+
+.device-panel-status-down {
+  @apply tw:border-l-4 tw:border-l-red-600!;
+}
+
+.device-panel-status-maintenance {
+  @apply tw:border-l-4 tw:border-l-blue-500!;
+}
+
+.device-panel-status-disabled {
+  @apply tw:border-l-4 tw:border-l-black!;
+}
+
+.port-stat-btn {
+  @apply tw:inline-flex tw:items-center tw:gap-2 tw:rounded tw:px-4 tw:py-2 tw:font-normal tw:no-underline tw:text-black tw:dark:text-white!;
+}
+
+.port-stat-badge {
+  @apply tw:inline-flex tw:min-w-9 tw:items-center tw:justify-center tw:rounded-xl tw:px-2.5 tw:py-0.5 tw:text-base tw:font-bold tw:text-black tw:dark:text-black;
+}
+
+.port-stat-default {
+  @apply tw:bg-gray-200 tw:hover:bg-gray-300 tw:dark:bg-gray-700 tw:dark:hover:bg-gray-600;
+}
+
+.port-stat-default .port-stat-badge {
+  @apply tw:bg-gray-500;
+}
+
+.port-stat-success {
+  @apply tw:bg-green-500/80 tw:hover:bg-green-600/80;
+}
+
+.port-stat-success .port-stat-badge {
+  @apply tw:bg-white;
+}
+
+.port-stat-danger {
+  @apply tw:bg-red-500/80 tw:hover:bg-red-600/80;
+}
+
+.port-stat-danger .port-stat-badge {
+  @apply tw:bg-white;
+}
+
+.port-stat-primary {
+  @apply tw:bg-sky-500/80 tw:hover:bg-sky-600/80;
+}
+
+.port-stat-primary .port-stat-badge {
+  @apply tw:bg-white;
 }

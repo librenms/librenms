@@ -39,6 +39,7 @@ use LibreNMS\Util\Graph;
 class Page extends Component
 {
     public string $alertClass;
+    public string $statusBorderClass;
     public ?int $parentDeviceId;
     public ?string $typeIcon = null;
     public string $typeText = '';
@@ -53,6 +54,7 @@ class Page extends Component
         DeviceCache::setPrimary($device->device_id); // set primary device in case it was not set by controller
         $this->pagetitle = $subtitle ? ($device->displayName() . ': ' . $subtitle) : $device->displayName();
         $this->alertClass = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
+        $this->statusBorderClass = $this->statusIndicator($device);
         $this->parentDeviceId = Vminfo::guessFromDevice($device)->value('device_id');
         $this->populateTypeFields();
     }
@@ -96,5 +98,25 @@ class Page extends Component
                 break;
             }
         }
+    }
+
+    /**
+     * @return string
+     */
+    private function statusIndicator(Device $device): string
+    {
+        if ($device->disabled) {
+            return 'device-panel-status-disabled';
+        }
+
+        if ($device->isUnderMaintenance()) {
+            return 'device-panel-status-maintenance';
+        }
+
+        if ($device->status) {
+            return 'device-panel-status-up';
+        }
+
+        return 'device-panel-status-down';
     }
 }

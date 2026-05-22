@@ -14,7 +14,7 @@ echo '<script src="js/leaflet.awesome-markers.min.js"></script>';
 
 echo "<div class='row'>
       <div class='col-md-12'>
-          <div class='panel panel-default panel-condensed device-overview tw:rounded-2xl tw:overflow-hidden tw:border tw:border-gray-300 tw:shadow-sm tw:dark:border-dark-gray-200'>
+          <div class='panel panel-default panel-condensed device-overview overview-panel'>
             <div class='panel-heading'>";
 
 if (LibrenmsConfig::get('overview_show_sysDescr')) {

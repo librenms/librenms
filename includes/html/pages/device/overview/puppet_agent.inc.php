@@ -7,7 +7,7 @@ if ($app) {
     $metrics = $app->metrics->pluck('value', 'metric');
     ?><div class='row'>
           <div class='col-md-12'>
-              <div class='panel panel-default panel-condensed device-overview'>
+              <div class='panel panel-default panel-condensed device-overview overview-panel'>
                   <div class='panel-heading'>
                       <a href="device/device=<?php echo $device['device_id']?>/tab=apps/app=puppet-agent/">
                           <i class="fa fa-cogs fa-lg icon-theme" aria-hidden="true"></i>
