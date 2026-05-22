@@ -66,6 +66,9 @@ class Core implements Module
             'SNMPv2-MIB::sysObjectID.0',
             'SNMPv2-MIB::sysDescr.0',
             'SNMPv2-MIB::sysName.0',
+        ])->values();
+
+        $snmp_engine = SnmpQuery::numeric()->get([
             'SNMP-FRAMEWORK-MIB::snmpEngineID.0',
         ])->values();
 
@@ -74,7 +77,7 @@ class Core implements Module
             'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'] ?? null,
             'sysName' => $snmpdata['.1.3.6.1.2.1.1.5.0'] ?? null,
             'sysDescr' => $snmpdata['.1.3.6.1.2.1.1.1.0'] ?? null,
-            'snmpEngineID' => $snmpdata['.1.3.6.1.6.3.10.2.1.1.0'] ?? null,
+            'snmpEngineID' => $snmp_engine['.1.3.6.1.6.3.10.2.1.1.0'] ?? null,
         ]);
 
         foreach (['sysObjectID', 'sysName', 'sysDescr', 'snmpEngineID'] as $attribute) {
