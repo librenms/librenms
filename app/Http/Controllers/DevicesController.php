@@ -42,6 +42,7 @@ class DevicesController extends Controller
         $perPage = $request->integer('per_page', 50);
 
         $legacyFormat = (string) $request->string('format');
+        $view ??= 'detail';
         if ($legacyFormat) {
             if (str_starts_with($legacyFormat, 'graph_')) {
                 $view ??= 'graph';
