@@ -2545,70 +2545,60 @@
                 {
                     "state_name": "mtxrOpticalRxLoss",
                     "state_descr": "no",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mtxrOpticalRxLoss",
                     "state_descr": "yes",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mtxrOpticalRxLoss",
                     "state_descr": "null",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mtxrOpticalTxFault",
                     "state_descr": "no",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mtxrOpticalTxFault",
                     "state_descr": "yes",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mtxrOpticalTxFault",
                     "state_descr": "null",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mtxrPOEStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mtxrPOEStatus",
                     "state_descr": "waitingForLoad",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mtxrPOEStatus",
                     "state_descr": "poweredOn",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mtxrPOEStatus",
                     "state_descr": "overload",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 2
                 }

@@ -54,8 +54,8 @@ modules:
                     index: 'upsmgOutputOnBattery.{{ $index }}'
                     state_name: upsmgOutputOnBattery
                     states:
-                        - { descr: On Battery, graph: 0, value: 1, generic: 2 }
-                        - { descr: On Input Power, graph: 0, value: 2, generic: 0 }
+                        - { descr: On Battery, value: 1, generic: 2 }
+                        - { descr: On Input Power, value: 2, generic: 0 }
                 -
                     oid: MG-SNMP-UPS-MIB::upsmgOutputOnByPass
                     value: MG-SNMP-UPS-MIB::upsmgOutputOnByPass
@@ -64,8 +64,8 @@ modules:
                     index: 'upsmgOutputOnBypass.{{ $index }}'
                     state_name: upsmgOutputOnByPass
                     states:
-                        - { descr: On ByPass, graph: 0, value: 1, generic: 2 }
-                        - { descr: Not Active, graph: 0, value: 2, generic: 0 }
+                        - { descr: On ByPass, value: 1, generic: 2 }
+                        - { descr: Not Active, value: 2, generic: 0 }
                 -
                     oid: MG-SNMP-UPS-MIB::upsmgOutputUtilityOff
                     value: MG-SNMP-UPS-MIB::upsmgOutputUtilityOff
@@ -74,8 +74,8 @@ modules:
                     index: 'upsmgOutputUtilityOff.{{ $index }}'
                     state_name: upsmgOutputUtilityOff
                     states:
-                        - { descr: No Voltage, graph: 0, value: 1, generic: 2 }
-                        - { descr: Output OK, graph: 0, value: 2, generic: 0 }
+                        - { descr: No Voltage, value: 1, generic: 2 }
+                        - { descr: Output OK, value: 2, generic: 0 }
                 -
                     oid: MG-SNMP-UPS-MIB::upsmgOutputInverterOff
                     value: MG-SNMP-UPS-MIB::upsmgOutputInverterOff
@@ -84,8 +84,8 @@ modules:
                     index: 'upsmgOutputInverterOff.{{ $index }}'
                     state_name: upsmgOutputInverterOff
                     states:
-                        - { descr: Inverter Off, graph: 0, value: 1, generic: 2 }
-                        - { descr: OK, graph: 0, value: 2, generic: 0 }
+                        - { descr: Inverter Off, value: 1, generic: 2 }
+                        - { descr: OK, value: 2, generic: 0 }
                 -
                     oid: MG-SNMP-UPS-MIB::upsmgOutputOverLoad
                     value: MG-SNMP-UPS-MIB::upsmgOutputOverLoad
@@ -94,8 +94,8 @@ modules:
                     index: 'upsmgOutputOverLoad.{{ $index }}'
                     state_name: upsmgOutputOverLoad
                     states:
-                        - { descr: Yes, graph: 0, value: 1, generic: 2 }
-                        - { descr: No, graph: 0, value: 2, generic: 0 }
+                        - { descr: Yes, value: 1, generic: 2 }
+                        - { descr: No, value: 2, generic: 0 }
                 -
                     oid: MG-SNMP-UPS-MIB::upsmgOutputOverTemp
                     value: MG-SNMP-UPS-MIB::upsmgOutputOverTemp
@@ -104,8 +104,8 @@ modules:
                     index: 'upsmgOutputOverTemp.{{ $index }}'
                     state_name: upsmgOutputOverTemp
                     states:
-                        - { descr: Over Temperature, graph: 0, value: 1, generic: 2 }
-                        - { descr: OK, graph: 0, value: 2, generic: 0 }
+                        - { descr: Over Temperature, value: 1, generic: 2 }
+                        - { descr: OK, value: 2, generic: 0 }
                 -
                     oid: MG-SNMP-UPS-MIB::upsmgBattery
                     value: MG-SNMP-UPS-MIB::upsmgBatteryFaultBattery
@@ -114,8 +114,8 @@ modules:
                     index: 'upsmgBatteryFaultBattery.{{ $index }}'
                     state_name: upsmgBatteryFaultBattery
                     states:
-                        - { descr: Fault, graph: 0, value: 1, generic: 2 }
-                        - { descr: OK, graph: 0, value: 2, generic: 0 }
+                        - { descr: Fault, value: 1, generic: 2 }
+                        - { descr: OK, value: 2, generic: 0 }
                 -
                     oid: MG-SNMP-UPS-MIB::upsmgBattery
                     value: MG-SNMP-UPS-MIB::upsmgBatteryReplacement
@@ -124,8 +124,8 @@ modules:
                     index: 'upsmgBatteryReplacement.{{ $index }}'
                     state_name: upsmgBatteryReplacement
                     states:
-                        - { descr: To be replaced, graph: 0, value: 1, generic: 2 }
-                        - { descr: OK, graph: 0, value: 2, generic: 0 }
+                        - { descr: To be replaced, value: 1, generic: 2 }
+                        - { descr: OK, value: 2, generic: 0 }
                 -
                     oid: MG-SNMP-UPS-MIB::upsmgBattery
                     value: MG-SNMP-UPS-MIB::upsmgBatteryLowBattery
@@ -134,8 +134,8 @@ modules:
                     index: 'upsmgBatteryLowBattery.{{ $index }}'
                     state_name: upsmgBatteryLowBattery
                     states:
-                        - { descr: Low Battery, graph: 0, value: 1, generic: 2 }
-                        - { descr: OK, graph: 0, value: 2, generic: 0 }
+                        - { descr: Low Battery, value: 1, generic: 2 }
+                        - { descr: OK, value: 2, generic: 0 }
                 -
                     oid: MG-SNMP-UPS-MIB::upsmgBattery
                     value: MG-SNMP-UPS-MIB::upsmgBatteryChargerFault
@@ -144,8 +144,8 @@ modules:
                     index: 'upsmgBatteryChargerFault.{{ $index }}'
                     state_name: upsmgBatteryChargerFault
                     states:
-                        - { descr: Fault, graph: 0, value: 1, generic: 2 }
-                        - { descr: OK, graph: 0, value: 2, generic: 0 }
+                        - { descr: Fault, value: 1, generic: 2 }
+                        - { descr: OK, value: 2, generic: 0 }
                 -
                     oid: MG-SNMP-UPS-MIB::upsmgBattery
                     value: MG-SNMP-UPS-MIB::upsmgBatteryLowCondition
@@ -154,8 +154,8 @@ modules:
                     index: 'upsmgBatteryLowCondition.{{ $index }}'
                     state_name: upsmgBatteryLowCondition
                     states:
-                        - { descr: Low Condition, graph: 0, value: 1, generic: 2 }
-                        - { descr: OK, graph: 0, value: 2, generic: 0 }
+                        - { descr: Low Condition, value: 1, generic: 2 }
+                        - { descr: OK, value: 2, generic: 0 }
                 -
                     oid: MG-SNMP-UPS-MIB::upsmgInputBadStatus
                     value: MG-SNMP-UPS-MIB::upsmgInputBadStatus
@@ -164,8 +164,8 @@ modules:
                     index: 'upsmgInputBadStatus.{{ $index }}'
                     state_name: upsmgInputBadStatus
                     states:
-                        - { descr: Bad Status, graph: 0, value: 1, generic: 2 }
-                        - { descr: OK, graph: 0, value: 2, generic: 0 }
+                        - { descr: Bad Status, value: 1, generic: 2 }
+                        - { descr: OK, value: 2, generic: 0 }
                 -
                     oid: MG-SNMP-UPS-MIB::upsmgInputLineFailCause
                     value: MG-SNMP-UPS-MIB::upsmgInputLineFailCause
@@ -174,10 +174,10 @@ modules:
                     index: 'upsmgInputLineFailCause.{{ $index }}'
                     state_name: upsmgInputLineFailCause
                     states:
-                        - { descr: 'No Failure', graph: 0, value: 1, generic: 0 }
-                        - { descr: 'Tolerance Volt. Out', graph: 0, value: 2, generic: 2 }
-                        - { descr: 'Tolerance Freq. Out', graph: 0, value: 3, generic: 2 }
-                        - { descr: 'No Voltage', graph: 0, value: 4, generic: 2 }
+                        - { descr: 'No Failure', value: 1, generic: 0 }
+                        - { descr: 'Tolerance Volt. Out', value: 2, generic: 2 }
+                        - { descr: 'Tolerance Freq. Out', value: 3, generic: 2 }
+                        - { descr: 'No Voltage', value: 4, generic: 2 }
                 -
                     oid: XUPS-MIB::xupsAlarms
                     value: XUPS-MIB::xupsAlarms
@@ -186,9 +186,9 @@ modules:
                     index: 'xupsAlarms.{{ $index }}'
                     state_name: xupsAlarms
                     states:
-                        - { descr: 'No Alarm', graph: 0, value: 0, generic: 0 }
-                        - { descr: 'Alarm raised', graph: 0, value: 1, generic: 2 }
-                        - { descr: 'Alarms raised', graph: 0, value: 2, generic: 2 }
-                        - { descr: 'Alarms raised', graph: 0, value: 3, generic: 2 }
-                        - { descr: 'Alarms raised', graph: 0, value: 4, generic: 2 }
+                        - { descr: 'No Alarm', value: 0, generic: 0 }
+                        - { descr: 'Alarm raised', value: 1, generic: 2 }
+                        - { descr: 'Alarms raised', value: 2, generic: 2 }
+                        - { descr: 'Alarms raised', value: 3, generic: 2 }
+                        - { descr: 'Alarms raised', value: 4, generic: 2 }
 

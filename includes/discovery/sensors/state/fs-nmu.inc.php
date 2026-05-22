@@ -35,8 +35,8 @@ $index = '0';
 if (is_numeric($power1)) {
     $state_name = 'power1State';
     $states = [
-        ['value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'off'],
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'on'],
+        ['value' => 0, 'generic' => 2, 'descr' => 'off'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'on'],
     ];
     create_state_index($state_name, $states);
 
@@ -48,8 +48,8 @@ if (is_numeric($power1)) {
 if (is_numeric($power2)) {
     $state_name = 'power2State';
     $states = [
-        ['value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'off'],
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'on'],
+        ['value' => 0, 'generic' => 2, 'descr' => 'off'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'on'],
     ];
     create_state_index($state_name, $states);
 
@@ -61,8 +61,8 @@ if (is_numeric($power2)) {
 if (is_numeric($fan)) {
     $state_name = 'fanState';
     $states = [
-        ['value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'off'],
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'on'],
+        ['value' => 0, 'generic' => 2, 'descr' => 'off'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'on'],
     ];
     create_state_index($state_name, $states);
 

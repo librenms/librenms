@@ -26,8 +26,8 @@ modules:
                     state_name: powerSourceState
                     descr: 'Power state'
                     states:
-                        - { descr: Battery, graph: 0, value: 1, generic: 1 }
-                        - { descr: Online, graph: 0, value: 0, generic: 0 }
+                        - { descr: Battery, value: 1, generic: 1 }
+                        - { descr: Online, value: 0, generic: 0 }
                 -
                     oid: PNETMOD-MIB::gridState
                     value: PNETMOD-MIB::gridState
@@ -36,8 +36,8 @@ modules:
                     state_name: gridState
                     descr: 'Grid state'
                     states:
-                        - { descr: Fail, graph: 0, value: 1, generic: 1 }
-                        - { descr: Ok, graph: 0, value: 0, generic: 0 }
+                        - { descr: Fail, value: 1, generic: 1 }
+                        - { descr: Ok, value: 0, generic: 0 }
                 -
                     oid: PNETMOD-MIB::gridFuse
                     value: PNETMOD-MIB::gridFuse
@@ -46,8 +46,8 @@ modules:
                     state_name: gridFuse
                     descr: 'Grid fuse state'
                     states:
-                        - { descr: Fail, graph: 0, value: 1, generic: 1 }
-                        - { descr: Ok, graph: 0, value: 0, generic: 0 }
+                        - { descr: Fail, value: 1, generic: 1 }
+                        - { descr: Ok, value: 0, generic: 0 }
                 -
                     oid: PNETMOD-MIB::outState
                     value: PNETMOD-MIB::outState
@@ -56,8 +56,8 @@ modules:
                     state_name: outState
                     descr: 'Output state'
                     states:
-                        - { descr: On, graph: 0, value: 1, generic: 0 }
-                        - { descr: Off, graph: 0, value: 2, generic: 1 }
+                        - { descr: On, value: 1, generic: 0 }
+                        - { descr: Off, value: 2, generic: 1 }
                 -
                     oid: PNETMOD-MIB::outFuse
                     value: PNETMOD-MIB::outFuse
@@ -66,8 +66,8 @@ modules:
                     state_name: outFuse
                     descr: 'Output fuse state'
                     states:
-                        - { descr: Fail, graph: 0, value: 1, generic: 1 }
-                        - { descr: Ok, graph: 0, value: 0, generic: 0 }
+                        - { descr: Fail, value: 1, generic: 1 }
+                        - { descr: Ok, value: 0, generic: 0 }
                 -
                     oid: PNETMOD-MIB::accuFuse
                     value: PNETMOD-MIB::accuFuse
@@ -76,8 +76,8 @@ modules:
                     state_name: accuFuse
                     descr: 'Accumulator fuse state'
                     states:
-                        - { descr: Fail, graph: 0, value: 1, generic: 1 }
-                        - { descr: Ok, graph: 0, value: 0, generic: 0 }
+                        - { descr: Fail, value: 1, generic: 1 }
+                        - { descr: Ok, value: 0, generic: 0 }
 
         current:
             data:

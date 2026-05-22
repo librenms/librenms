@@ -34,7 +34,7 @@ $status = 'error';
 
 if (is_numeric($alert_id)) {
     if ($sub_type === 'get_note') {
-        $note = dbFetchCell('SELECT `note` FROM `alerts` WHERE `id` = ?', [$alert_id]);
+        $note = Alert::where('id', $alert_id)->value('note');
         $message = 'Alert note retrieved';
         $status = 'ok';
     } else {

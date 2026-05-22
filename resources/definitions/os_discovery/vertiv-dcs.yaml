@@ -14,15 +14,15 @@ modules:
                     index: 'mpduMpscom2ProductType.{{ $index }}'
                     state_name: mpduMpscom2ProductType
                     states:
-                        - { descr: 'undefined',                graph: 1, value: 0, generic: 3 }
-                        - { descr: 'totalcurrentcommeter',     graph: 1, value: 1, generic: 0 }
-                        - { descr: 'totalcurrentcomswitch',    graph: 1, value: 2, generic: 0 }
-                        - { descr: 'totalcurrentipmeter',      graph: 1, value: 3, generic: 0 }
-                        - { descr: 'totalcurrentipswitch',     graph: 1, value: 4, generic: 0 }
-                        - { descr: 'bitcurrentcommeter',       graph: 1, value: 5, generic: 0 }
-                        - { descr: 'bitcurrentcomswitch',      graph: 1, value: 6, generic: 0 }
-                        - { descr: 'bitcurrentipmeter',        graph: 1, value: 7, generic: 0 }
-                        - { descr: 'bitcurrentipswitch',       graph: 1, value: 1, generic: 0 }
+                        - { descr: 'undefined',                value: 0, generic: 3 }
+                        - { descr: 'totalcurrentcommeter',     value: 1, generic: 0 }
+                        - { descr: 'totalcurrentcomswitch',    value: 2, generic: 0 }
+                        - { descr: 'totalcurrentipmeter',      value: 3, generic: 0 }
+                        - { descr: 'totalcurrentipswitch',     value: 4, generic: 0 }
+                        - { descr: 'bitcurrentcommeter',       value: 5, generic: 0 }
+                        - { descr: 'bitcurrentcomswitch',      value: 6, generic: 0 }
+                        - { descr: 'bitcurrentipmeter',        value: 7, generic: 0 }
+                        - { descr: 'bitcurrentipswitch',       value: 1, generic: 0 }
                 -
                     oid: DCS-MIB::mpduMpscomTable
                     value: DCS-MIB::mpduMpscom51CommunicateStatus
@@ -31,8 +31,8 @@ modules:
                     index: 'mpduMpscom51CommunicateStatus.{{ $index }}'
                     state_name: mpduMpscom51CommunicateStatus
                     states:
-                        - { descr: 'normal',    graph: 1, value: 0, generic: 0 }
-                        - { descr: 'alarm',     graph: 1, value: 1, generic: 2 }
+                        - { descr: 'normal',    value: 0, generic: 0 }
+                        - { descr: 'alarm',     value: 1, generic: 2 }
                 -
                     oid: DCS-MIB::mpduMpscomTable
                     value: DCS-MIB::mpduMpscom52Outlet1Status
@@ -41,8 +41,8 @@ modules:
                     index: 'mpduMpscom52Outlet1Status.{{ $index }}'
                     state_name: mpduMpscom52Outlet1Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom52Outlet1Status
@@ -56,8 +56,8 @@ modules:
                     index: 'mpduMpscom53Outlet2Status.{{ $index }}'
                     state_name: mpduMpscom53Outlet2Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom53Outlet2Status
@@ -71,8 +71,8 @@ modules:
                     index: 'mpduMpscom54Outlet3Status.{{ $index }}'
                     state_name: mpduMpscom54Outlet3Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom54Outlet3Status
@@ -86,8 +86,8 @@ modules:
                     index: 'mpduMpscom55Outlet4Status.{{ $index }}'
                     state_name: mpduMpscom55Outlet4Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom55Outlet4Status
@@ -101,8 +101,8 @@ modules:
                     index: 'mpduMpscom56Outlet5Status.{{ $index }}'
                     state_name: mpduMpscom56Outlet5Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom56Outlet5Status
@@ -116,8 +116,8 @@ modules:
                     index: 'mpduMpscom57Outlet6Status.{{ $index }}'
                     state_name: mpduMpscom57Outlet6Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom57Outlet6Status
@@ -131,8 +131,8 @@ modules:
                     index: 'mpduMpscom58Outlet7Status.{{ $index }}'
                     state_name: mpduMpscom58Outlet7Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom58Outlet7Status
@@ -146,8 +146,8 @@ modules:
                     index: 'mpduMpscom59Outlet8Status.{{ $index }}'
                     state_name: mpduMpscom59Outlet8Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom59Outlet8Status
@@ -161,8 +161,8 @@ modules:
                     index: 'mpduMpscom60Outlet9Status.{{ $index }}'
                     state_name: mpduMpscom60Outlet9Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom60Outlet9Status
@@ -176,8 +176,8 @@ modules:
                     index: 'mpduMpscom61Outlet10Status.{{ $index }}'
                     state_name: mpduMpscom61Outlet10Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom61Outlet10Status
@@ -191,8 +191,8 @@ modules:
                     index: 'mpduMpscom62Outlet11Status.{{ $index }}'
                     state_name: mpduMpscom62Outlet11Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom62Outlet11Status
@@ -206,8 +206,8 @@ modules:
                     index: 'mpduMpscom63Outlet12Status.{{ $index }}'
                     state_name: mpduMpscom63Outlet12Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom63Outlet12Status
@@ -221,8 +221,8 @@ modules:
                     index: 'mpduMpscom64Outlet13Status.{{ $index }}'
                     state_name: mpduMpscom64Outlet13Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom64Outlet13Status
@@ -236,8 +236,8 @@ modules:
                     index: 'mpduMpscom65Outlet14Status.{{ $index }}'
                     state_name: mpduMpscom65Outlet14Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom65Outlet14Status
@@ -251,8 +251,8 @@ modules:
                     index: 'mpduMpscom66Outlet15Status.{{ $index }}'
                     state_name: mpduMpscom66Outlet15Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom66Outlet15Status
@@ -266,8 +266,8 @@ modules:
                     index: 'mpduMpscom67Outlet16Status.{{ $index }}'
                     state_name: mpduMpscom67Outlet16Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom67Outlet16Status
@@ -281,8 +281,8 @@ modules:
                     index: 'mpduMpscom68Outlet17Status.{{ $index }}'
                     state_name: mpduMpscom68Outlet17Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom68Outlet17Status
@@ -296,8 +296,8 @@ modules:
                     index: 'mpduMpscom69Outlet18Status.{{ $index }}'
                     state_name: mpduMpscom69Outlet18Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom69Outlet18Status
@@ -311,8 +311,8 @@ modules:
                     index: 'mpduMpscom70Outlet19Status.{{ $index }}'
                     state_name: mpduMpscom70Outlet19Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom70Outlet19Status
@@ -326,8 +326,8 @@ modules:
                     index: 'mpduMpscom71Outlet20Status.{{ $index }}'
                     state_name: mpduMpscom71Outlet20Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom71Outlet20Status
@@ -341,8 +341,8 @@ modules:
                     index: 'mpduMpscom72Outlet21Status.{{ $index }}'
                     state_name: mpduMpscom72Outlet21Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom72Outlet21Status
@@ -356,8 +356,8 @@ modules:
                     index: 'mpduMpscom73Outlet22Status.{{ $index }}'
                     state_name: mpduMpscom73Outlet22Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom73Outlet22Status
@@ -371,8 +371,8 @@ modules:
                     index: 'mpduMpscom74Outlet23Status.{{ $index }}'
                     state_name: mpduMpscom74Outlet23Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom74Outlet23Status
@@ -386,8 +386,8 @@ modules:
                     index: 'mpduMpscom75Outlet24Status.{{ $index }}'
                     state_name: mpduMpscom75Outlet24Status
                     states:
-                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
-                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'poweroff',    value: 0, generic: 1 }
+                        - { descr: 'poweron',     value: 1, generic: 0 }
                     skip_values:
                     -
                       oid: DCS-MIB::mpduMpscom75Outlet24Status
@@ -401,8 +401,8 @@ modules:
                     index: 'acOu72CommunicateStatus.{{ $index }}'
                     state_name: acOu72CommunicateStatus
                     states:
-                        - { descr: 'normal',    graph: 1, value: 0, generic: 0 }
-                        - { descr: 'alarm',     graph: 1, value: 1, generic: 2 }
+                        - { descr: 'normal',    value: 0, generic: 0 }
+                        - { descr: 'alarm',     value: 1, generic: 2 }
                     skip_values:
                     -
                       oid: DCS-MIB::acOu72CommunicateStatus
@@ -416,8 +416,8 @@ modules:
                     index: 'acOu75Airconditioningrunningstatus.{{ $index }}'
                     state_name: acOu75Airconditioningrunningstatus
                     states:
-                        - { descr: 'on',    graph: 1, value: 0, generic: 0 }
-                        - { descr: 'off',   graph: 1, value: 1, generic: 2 }
+                        - { descr: 'on',    value: 0, generic: 0 }
+                        - { descr: 'off',   value: 1, generic: 2 }
                     skip_values:
                     -
                       oid: DCS-MIB::acOu75Airconditioningrunningstatus
@@ -431,8 +431,8 @@ modules:
                     index: 'acOu111Filtermaintenance.{{ $index }}'
                     state_name: acOu111Filtermaintenance
                     states:
-                        - { descr: 'no',    graph: 1, value: 0, generic: 0 }
-                        - { descr: 'yes',   graph: 1, value: 1, generic: 2 }
+                        - { descr: 'no',    value: 0, generic: 0 }
+                        - { descr: 'yes',   value: 1, generic: 2 }
                     skip_values:
                     -
                       oid: DCS-MIB::acOu111Filtermaintenance
@@ -446,10 +446,10 @@ modules:
                     index: 'upsIta2com75PowerSupply.{{ $index }}'
                     state_name: upsIta2com75PowerSupply
                     states:
-                        - { descr: 'upsshutdown',     graph: 1, value: 0, generic: 1 }
-                        - { descr: 'utilityonline',   graph: 1, value: 1, generic: 0 }
-                        - { descr: 'onbypass',        graph: 1, value: 2, generic: 1 }
-                        - { descr: 'upsonunionmode',  graph: 1, value: 3, generic: 0 }
+                        - { descr: 'upsshutdown',     value: 0, generic: 1 }
+                        - { descr: 'utilityonline',   value: 1, generic: 0 }
+                        - { descr: 'onbypass',        value: 2, generic: 1 }
+                        - { descr: 'upsonunionmode',  value: 3, generic: 0 }
                 -
                     oid: DCS-MIB::upsIta2comTable
                     value: DCS-MIB::upsIta2com76InputPowerStatus
@@ -458,10 +458,10 @@ modules:
                     index: 'upsIta2com76InputPowerStatus.{{ $index }}'
                     state_name: upsIta2com76InputPowerStatus
                     states:
-                        - { descr: 'utilityonline',    graph: 1, value: 0, generic: 0 }
-                        - { descr: 'onbat',            graph: 1, value: 1, generic: 1 }
-                        - { descr: 'upsonunionmode',   graph: 1, value: 2, generic: 0 }
-                        - { descr: 'upsshutdown',      graph: 1, value: 3, generic: 2 }
+                        - { descr: 'utilityonline',    value: 0, generic: 0 }
+                        - { descr: 'onbat',            value: 1, generic: 1 }
+                        - { descr: 'upsonunionmode',   value: 2, generic: 0 }
+                        - { descr: 'upsshutdown',      value: 3, generic: 2 }
                 -
                     oid: DCS-MIB::upsIta2comTable
                     value: DCS-MIB::upsIta2com77BatStatus
@@ -470,15 +470,15 @@ modules:
                     index: 'upsIta2com77BatStatus.{{ $index }}'
                     state_name: upsIta2com77BatStatus
                     states:
-                        - { descr: 'idle',                 graph: 1, value: 0, generic: 0 }
-                        - { descr: 'floatcharging',        graph: 1, value: 1, generic: 0 }
-                        - { descr: 'equalizationcharging', graph: 1, value: 2, generic: 0 }
-                        - { descr: 'discharging',          graph: 1, value: 3, generic: 1 }
-                        - { descr: 'selftesting',          graph: 1, value: 4, generic: 0 }
-                        - { descr: 'nobat',                graph: 1, value: 5, generic: 2 }
-                        - { descr: 'full',                 graph: 1, value: 6, generic: 0 }
-                        - { descr: 'precharge',            graph: 1, value: 7, generic: 0 }
-                        - { descr: 'fastcharging',         graph: 1, value: 8, generic: 0 }
+                        - { descr: 'idle',                 value: 0, generic: 0 }
+                        - { descr: 'floatcharging',        value: 1, generic: 0 }
+                        - { descr: 'equalizationcharging', value: 2, generic: 0 }
+                        - { descr: 'discharging',          value: 3, generic: 1 }
+                        - { descr: 'selftesting',          value: 4, generic: 0 }
+                        - { descr: 'nobat',                value: 5, generic: 2 }
+                        - { descr: 'full',                 value: 6, generic: 0 }
+                        - { descr: 'precharge',            value: 7, generic: 0 }
+                        - { descr: 'fastcharging',         value: 8, generic: 0 }
                 -
                     oid: DCS-MIB::upsIta2comTable
                     value: DCS-MIB::upsIta2com79ChargerStatus
@@ -487,8 +487,8 @@ modules:
                     index: 'upsIta2com79ChargerStatus.{{ $index }}'
                     state_name: upsIta2com79ChargerStatus
                     states:
-                        - { descr: 'chargeron',      graph: 1, value: 0, generic: 0 }
-                        - { descr: 'chargeroff',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'chargeron',      value: 0, generic: 0 }
+                        - { descr: 'chargeroff',     value: 1, generic: 0 }
                 -
                     oid: DCS-MIB::envTdicomEntry
                     value: DCS-MIB::envTdicom4FrontDoor
@@ -497,10 +497,10 @@ modules:
                     index: 'envTdicom4FrontDoor.{{ $index }}'
                     state_name: envTdicom4FrontDoor
                     states:
-                        - { descr: 'close',          graph: 1, value: 0, generic: 0 }
-                        - { descr: 'open',           graph: 1, value: 1, generic: 1 }
-                        - { descr: 'uninstalled',    graph: 1, value: 2, generic: 1 }
-                        - { descr: 'leave',          graph: 1, value: 3, generic: 3 }
+                        - { descr: 'close',          value: 0, generic: 0 }
+                        - { descr: 'open',           value: 1, generic: 1 }
+                        - { descr: 'uninstalled',    value: 2, generic: 1 }
+                        - { descr: 'leave',          value: 3, generic: 3 }
                 -
                     oid: DCS-MIB::envTdicomEntry
                     value: DCS-MIB::envTdicom5RearDoor
@@ -509,10 +509,10 @@ modules:
                     index: 'envTdicom5RearDoor.{{ $index }}'
                     state_name: envTdicom5RearDoor
                     states:
-                        - { descr: 'close',          graph: 1, value: 0, generic: 0 }
-                        - { descr: 'open',           graph: 1, value: 1, generic: 1 }
-                        - { descr: 'uninstalled',    graph: 1, value: 2, generic: 1 }
-                        - { descr: 'leave',          graph: 1, value: 3, generic: 3 }
+                        - { descr: 'close',          value: 0, generic: 0 }
+                        - { descr: 'open',           value: 1, generic: 1 }
+                        - { descr: 'uninstalled',    value: 2, generic: 1 }
+                        - { descr: 'leave',          value: 3, generic: 3 }
                 -
                     oid: DCS-MIB::envTdicomEntry
                     value: DCS-MIB::envTdicom6Water
@@ -521,10 +521,10 @@ modules:
                     index: 'envTdicom6Water.{{ $index }}'
                     state_name: envTdicom6Water
                     states:
-                        - { descr: 'normal',         graph: 1, value: 0, generic: 0 }
-                        - { descr: 'alarm',          graph: 1, value: 1, generic: 1 }
-                        - { descr: 'uninstalled',    graph: 1, value: 2, generic: 1 }
-                        - { descr: 'leave',          graph: 1, value: 3, generic: 3 }
+                        - { descr: 'normal',         value: 0, generic: 0 }
+                        - { descr: 'alarm',          value: 1, generic: 1 }
+                        - { descr: 'uninstalled',    value: 2, generic: 1 }
+                        - { descr: 'leave',          value: 3, generic: 3 }
                 -
                     oid: DCS-MIB::envFirefightingTable
                     value: DCS-MIB::envFirefighting2FireAlarmStatus
@@ -533,10 +533,10 @@ modules:
                     index: 'envFirefighting2FireAlarmStatus.{{ $index }}'
                     state_name: envFirefighting2FireAlarmStatus
                     states:
-                        - { descr: 'normal',         graph: 1, value: 0, generic: 0 }
-                        - { descr: 'alarm',          graph: 1, value: 1, generic: 2 }
-                        - { descr: 'uninstalled',    graph: 1, value: 2, generic: 2 }
-                        - { descr: 'leave',          graph: 1, value: 3, generic: 3 }
+                        - { descr: 'normal',         value: 0, generic: 0 }
+                        - { descr: 'alarm',          value: 1, generic: 2 }
+                        - { descr: 'uninstalled',    value: 2, generic: 2 }
+                        - { descr: 'leave',          value: 3, generic: 3 }
                 -
                     oid: DCS-MIB::envFirefightingTable
                     value: DCS-MIB::envFirefighting3FireSensor4DICommStatus
@@ -545,8 +545,8 @@ modules:
                     index: 'envFirefighting3FireSensor4DICommStatus.{{ $index }}'
                     state_name: envFirefighting3FireSensor4DICommStatus
                     states:
-                        - { descr: 'normal',         graph: 1, value: 0, generic: 0 }
-                        - { descr: 'failure',        graph: 1, value: 1, generic: 2 }
+                        - { descr: 'normal',         value: 0, generic: 0 }
+                        - { descr: 'failure',        value: 1, generic: 2 }
         voltage:
             data:
                 -

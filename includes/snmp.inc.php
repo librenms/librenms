@@ -421,26 +421,6 @@ function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = n
 }//end snmpwalk_cache_oid()
 
 /**
- * Just like snmpwalk_cache_oid except that it returns the numerical oid as the index
- * this is useful when the oid is indexed by the mac address and snmpwalk would
- * return periods (.) for non-printable numbers, thus making many different indexes appear
- * to be the same.
- *
- * @param  array  $device
- * @param  string  $oid
- * @param  array  $array  Pass an array to add the cache to, useful for multiple calls
- * @param  string  $mib
- * @param  string  $mibdir
- * @return bool|array
- *
- * @deprecated Please use SnmpQuery instead
- */
-function snmpwalk_cache_oid_num($device, $oid, $array = [], $mib = null, $mibdir = null)
-{
-    return snmpwalk_cache_oid($device, $oid, $array, $mib, $mibdir, $snmpflags = '-OQUn');
-}//end snmpwalk_cache_oid_num()
-
-/**
  * @deprecated Please use SnmpQuery instead
  */
 function snmpwalk_cache_multi_oid($device, $oid, $array = [], $mib = null, $mibdir = null, $snmpflags = '-OQUs')

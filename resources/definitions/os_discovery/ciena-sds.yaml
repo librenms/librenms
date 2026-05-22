@@ -271,10 +271,10 @@ modules:
                     descr: '5 Second CPU State'
                     state_name: wwpLeosSystemCpuUtilizationLast5SecondsState
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: normal }
-                        - { value: 2, generic: 1, graph: 0, descr: warning }
-                        - { value: 3, generic: 1, graph: 0, descr: degraded }
-                        - { value: 4, generic: 1, graph: 0, descr: faulted }
+                        - { value: 1, generic: 0, descr: normal }
+                        - { value: 2, generic: 1, descr: warning }
+                        - { value: 3, generic: 1, descr: degraded }
+                        - { value: 4, generic: 1, descr: faulted }
                     group: 'CPU'
                 -
                     oid: WWP-LEOS-SYSTEM-CONFIG-MIB::wwpLeosSystemCpuUtilization
@@ -283,10 +283,10 @@ modules:
                     descr: '10 Second CPU State'
                     state_name: wwpLeosSystemCpuUtilizationLast10SecondsState
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: normal }
-                        - { value: 2, generic: 1, graph: 0, descr: warning }
-                        - { value: 3, generic: 1, graph: 0, descr: degraded }
-                        - { value: 4, generic: 1, graph: 0, descr: faulted }
+                        - { value: 1, generic: 0, descr: normal }
+                        - { value: 2, generic: 1, descr: warning }
+                        - { value: 3, generic: 1, descr: degraded }
+                        - { value: 4, generic: 1, descr: faulted }
                     group: 'CPU'
                 -
                     oid: WWP-LEOS-SYSTEM-CONFIG-MIB::wwpLeosSystemCpuUtilization
@@ -295,10 +295,10 @@ modules:
                     descr: '60 Second CPU State'
                     state_name: wwpLeosSystemCpuUtilizationLast60SecondsState
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: normal }
-                        - { value: 2, generic: 1, graph: 0, descr: warning }
-                        - { value: 3, generic: 1, graph: 0, descr: degraded }
-                        - { value: 4, generic: 1, graph: 0, descr: faulted }
+                        - { value: 1, generic: 0, descr: normal }
+                        - { value: 2, generic: 1, descr: warning }
+                        - { value: 3, generic: 1, descr: degraded }
+                        - { value: 4, generic: 1, descr: faulted }
                     group: 'CPU'
                 -
                     oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable
@@ -318,9 +318,9 @@ modules:
                             op: 'in_array'
                             value: [4]
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: disabled }
-                        - { value: 2, generic: 0, graph: 0, descr: generic }
-                        - { value: 3, generic: 0, graph: 0, descr: enhanced }
+                        - { value: 1, generic: 0, descr: disabled }
+                        - { value: 2, generic: 0, descr: generic }
+                        - { value: 3, generic: 0, descr: enhanced }
                     group: 'Transceiver FEC Mode'
                 -
                     oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable
@@ -340,8 +340,8 @@ modules:
                             op: 'in_array'
                             value: [4]
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: enabled }
-                        - { value: 2, generic: 0, graph: 0, descr: disabled }
+                        - { value: 1, generic: 0, descr: enabled }
+                        - { value: 2, generic: 0, descr: disabled }
                     group: 'Transceiver Tx State'
                 -
                     oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable
@@ -361,8 +361,8 @@ modules:
                             op: 'in_array'
                             value: [4]
                     states:
-                        - { value: 1, generic: 2, graph: 0, descr: fault }
-                        - { value: 2, generic: 0, graph: 0, descr: noFault }
+                        - { value: 1, generic: 2, descr: fault }
+                        - { value: 2, generic: 0, descr: noFault }
                     group: 'Transceiver Tx Fault'
                 -
                     oid: CIENA-CES-FEATURE-LICENSE-MIB::cienaCesPremiumFeatureStatusTable
@@ -372,12 +372,12 @@ modules:
                     state_name: cienaCesPremiumFeatureOperStatus
                     skip_values: 1
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: unknown }
-                        - { value: 1, generic: 0, graph: 0, descr: disabled }
-                        - { value: 2, generic: 0, graph: 0, descr: restrictedUse }
-                        - { value: 3, generic: 0, graph: 0, descr: fullyActive }
-                        - { value: 4, generic: 1, graph: 0, descr: someLicenseKeyMissing }
-                        - { value: 5, generic: 1, graph: 0, descr: licenseViolation }
+                        - { value: 0, generic: 3, descr: unknown }
+                        - { value: 1, generic: 0, descr: disabled }
+                        - { value: 2, generic: 0, descr: restrictedUse }
+                        - { value: 3, generic: 0, descr: fullyActive }
+                        - { value: 4, generic: 1, descr: someLicenseKeyMissing }
+                        - { value: 5, generic: 1, descr: licenseViolation }
                     group: 'License Status'
                 -
                     oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisProcessHealthTable
@@ -386,11 +386,11 @@ modules:
                     descr: 'Slot {{ $subindex1 }} Process Health'
                     state_name: cienaCesChassisProcessHealthState
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Process Health'
                 -
                     oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisThreadHealthTable
@@ -399,11 +399,11 @@ modules:
                     descr: 'Slot {{ $subindex1 }} Thread Health'
                     state_name: cienaCesChassisThreadHealthState
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Thread Health'
                 -
                     oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisFanTrayTable
@@ -413,11 +413,11 @@ modules:
                     entPhysicalIndex: '530'
                     state_name: cienaCesChassisFanTrayStatus
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: ok }
-                        - { value: 2, generic: 1, graph: 0, descr: pending }
-                        - { value: 3, generic: 2, graph: 0, descr: rpm-warning }
-                        - { value: 4, generic: 2, graph: 0, descr: uninstalled }
-                        - { value: 5, generic: 3, graph: 0, descr: unknown }
+                        - { value: 1, generic: 0, descr: ok }
+                        - { value: 2, generic: 1, descr: pending }
+                        - { value: 3, generic: 2, descr: rpm-warning }
+                        - { value: 4, generic: 2, descr: uninstalled }
+                        - { value: 5, generic: 3, descr: unknown }
                     group: 'Fan Trays'
                 -
                     oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisFanTable
@@ -426,11 +426,11 @@ modules:
                     descr: CIENA-CES-CHASSIS-MIB::cienaCesChassisFanName
                     state_name: cienaCesChassisFanStatus
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: ok }
-                        - { value: 2, generic: 1, graph: 0, descr: pending }
-                        - { value: 3, generic: 2, graph: 0, descr: rpm-warning }
-                        - { value: 4, generic: 2, graph: 0, descr: uninstalled }
-                        - { value: 5, generic: 3, graph: 0, descr: unknown }
+                        - { value: 1, generic: 0, descr: ok }
+                        - { value: 2, generic: 1, descr: pending }
+                        - { value: 3, generic: 2, descr: rpm-warning }
+                        - { value: 4, generic: 2, descr: uninstalled }
+                        - { value: 5, generic: 3, descr: unknown }
                     group: 'Fans'
                 -
                     oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerOutputVoltageHealthTable
@@ -439,11 +439,11 @@ modules:
                     descr: 'PS {{ $subindex1 }} Output Voltage'
                     state_name: cienaCesChassisPowerOutputVoltageHealthTable
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Power Supplies'
                 -
                     oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerTable
@@ -452,10 +452,10 @@ modules:
                     descr: 'PS {{ $index }} Type'
                     state_name: cienaCesChassisPowerSupplyType
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: ac }
-                        - { value: 2, generic: 0, graph: 0, descr: dc }
-                        - { value: 3, generic: 1, graph: 0, descr: unequipped }
-                        - { value: 99, generic: 3, graph: 0, descr: unknown }
+                        - { value: 1, generic: 0, descr: ac }
+                        - { value: 2, generic: 0, descr: dc }
+                        - { value: 3, generic: 1, descr: unequipped }
+                        - { value: 99, generic: 3, descr: unknown }
                     skip_values: 99
                     group: 'Power Supplies'
                 -
@@ -465,10 +465,10 @@ modules:
                     descr: 'PS {{ $index }} State'
                     state_name: cienaCesChassisPowerSupplyState
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: online }
-                        - { value: 2, generic: 2, graph: 0, descr: faulted }
-                        - { value: 3, generic: 2, graph: 0, descr: offline }
-                        - { value: 4, generic: 2, graph: 0, descr: uninstalled }
+                        - { value: 1, generic: 0, descr: online }
+                        - { value: 2, generic: 2, descr: faulted }
+                        - { value: 3, generic: 2, descr: offline }
+                        - { value: 4, generic: 2, descr: uninstalled }
                     group: 'Power Supplies'
                 -
                     oid: CIENA-CES-MODULE-MIB::cienaCesModuleTable
@@ -477,9 +477,9 @@ modules:
                     descr: 'Slot {{ $subindex2 }} Admin State - {{ CIENA-CES-MODULE-MIB::cienaCesModuleModel }}'
                     state_name: cienaCesModuleAdminState
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: enabled }
-                        - { value: 2, generic: 0, graph: 0, descr: disabled }
-                        - { value: 3, generic: 0, graph: 0, descr: shutdown }
+                        - { value: 1, generic: 0, descr: enabled }
+                        - { value: 2, generic: 0, descr: disabled }
+                        - { value: 3, generic: 0, descr: shutdown }
                     group: 'Module Admin State'
                 -
                     oid: CIENA-CES-MODULE-MIB::cienaCesModuleTable
@@ -489,24 +489,24 @@ modules:
                     entPhysicalIndex: '55{{ $subindex2 }}'
                     state_name: cienaCesModuleOperState
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: uninstalled }
-                        - { value:  2, generic: 0, graph: 0, descr: unequipped }
-                        - { value:  3, generic: 1, graph: 0, descr: init }
-                        - { value:  4, generic: 0, graph: 0, descr: disabled }
-                        - { value:  5, generic: 0, graph: 0, descr: enabled }
-                        - { value:  6, generic: 2, graph: 0, descr: faulted }
-                        - { value:  7, generic: 0, graph: 0, descr: hotswap }
-                        - { value:  8, generic: 1, graph: 0, descr: poweroff }
-                        - { value:  9, generic: 1, graph: 0, descr: hitlessInit }
-                        - { value: 10, generic: 1, graph: 0, descr: fastReload }
-                        - { value: 11, generic: 1, graph: 0, descr: krnInit }
-                        - { value: 12, generic: 2, graph: 0, descr: unsupported }
-                        - { value: 13, generic: 1, graph: 0, descr: installing }
-                        - { value: 14, generic: 2, graph: 0, descr: failed }
-                        - { value: 15, generic: 1, graph: 0, descr: krnDisable }
-                        - { value: 16, generic: 2, graph: 0, descr: appFault }
-                        - { value: 17, generic: 1, graph: 0, descr: booting }
-                        - { value: 18, generic: 1, graph: 0, descr: powerdown }
+                        - { value:  1, generic: 0, descr: uninstalled }
+                        - { value:  2, generic: 0, descr: unequipped }
+                        - { value:  3, generic: 1, descr: init }
+                        - { value:  4, generic: 0, descr: disabled }
+                        - { value:  5, generic: 0, descr: enabled }
+                        - { value:  6, generic: 2, descr: faulted }
+                        - { value:  7, generic: 0, descr: hotswap }
+                        - { value:  8, generic: 1, descr: poweroff }
+                        - { value:  9, generic: 1, descr: hitlessInit }
+                        - { value: 10, generic: 1, descr: fastReload }
+                        - { value: 11, generic: 1, descr: krnInit }
+                        - { value: 12, generic: 2, descr: unsupported }
+                        - { value: 13, generic: 1, descr: installing }
+                        - { value: 14, generic: 2, descr: failed }
+                        - { value: 15, generic: 1, descr: krnDisable }
+                        - { value: 16, generic: 2, descr: appFault }
+                        - { value: 17, generic: 1, descr: booting }
+                        - { value: 18, generic: 1, descr: powerdown }
                     group: 'Module Operational State'
                 -
                     oid: CIENA-CES-MODULE-MIB::cienaCesModuleTable
@@ -515,25 +515,25 @@ modules:
                     descr: 'Slot {{ $subindex2 }} Reboot Reason'
                     state_name: cienaCesModuleLastRebootReason
                     states:
-                        - { value:  1, generic: 3, graph: 0, descr: unknown }
-                        - { value:  2, generic: 0, graph: 0, descr: snmp }
-                        - { value:  3, generic: 0, graph: 0, descr: pwrFail }
-                        - { value:  4, generic: 0, graph: 0, descr: appLoad }
-                        - { value:  5, generic: 0, graph: 0, descr: errorHandler }
-                        - { value:  6, generic: 0, graph: 0, descr: watchdog }
-                        - { value:  7, generic: 0, graph: 0, descr: upgrade }
-                        - { value:  8, generic: 0, graph: 0, descr: cli }
-                        - { value:  9, generic: 0, graph: 0, descr: resetButton }
-                        - { value: 10, generic: 0, graph: 0, descr: failOver }
-                        - { value: 11, generic: 0, graph: 0, descr: faultManager }
-                        - { value: 12, generic: 0, graph: 0, descr: communicationFailure }
-                        - { value: 13, generic: 0, graph: 0, descr: configurationRevert }
-                        - { value: 14, generic: 0, graph: 0, descr: unprotectedFailure }
-                        - { value: 15, generic: 0, graph: 0, descr: bootFailure }
-                        - { value: 16, generic: 0, graph: 0, descr: softwareRevert }
-                        - { value: 17, generic: 0, graph: 0, descr: processorWarmRestart }
-                        - { value: 18, generic: 0, graph: 0, descr: coldRestart }
-                        - { value: 19, generic: 0, graph: 0, descr: primaryRestart }
+                        - { value:  1, generic: 3, descr: unknown }
+                        - { value:  2, generic: 0, descr: snmp }
+                        - { value:  3, generic: 0, descr: pwrFail }
+                        - { value:  4, generic: 0, descr: appLoad }
+                        - { value:  5, generic: 0, descr: errorHandler }
+                        - { value:  6, generic: 0, descr: watchdog }
+                        - { value:  7, generic: 0, descr: upgrade }
+                        - { value:  8, generic: 0, descr: cli }
+                        - { value:  9, generic: 0, descr: resetButton }
+                        - { value: 10, generic: 0, descr: failOver }
+                        - { value: 11, generic: 0, descr: faultManager }
+                        - { value: 12, generic: 0, descr: communicationFailure }
+                        - { value: 13, generic: 0, descr: configurationRevert }
+                        - { value: 14, generic: 0, descr: unprotectedFailure }
+                        - { value: 15, generic: 0, descr: bootFailure }
+                        - { value: 16, generic: 0, descr: softwareRevert }
+                        - { value: 17, generic: 0, descr: processorWarmRestart }
+                        - { value: 18, generic: 0, descr: coldRestart }
+                        - { value: 19, generic: 0, descr: primaryRestart }
                     group: 'Module Last Reboot Reason'
                 -
                     oid: CIENA-CES-MODULE-MIB::cienaCesModuleTable
@@ -543,9 +543,9 @@ modules:
                     state_name: cienaCesModuleProtectionRole
                     skip_values: 1
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: none }
-                        - { value:  2, generic: 0, graph: 0, descr: primary }
-                        - { value:  3, generic: 0, graph: 0, descr: secondary }
+                        - { value:  1, generic: 0, descr: none }
+                        - { value:  2, generic: 0, descr: primary }
+                        - { value:  3, generic: 0, descr: secondary }
                     group: 'Module Protection Role'
                 -
                     oid: CIENA-CES-MODULE-MIB::cienaCesModuleTable
@@ -555,11 +555,11 @@ modules:
                     state_name: cienaCesModuleStandbyStatus
                     skip_values: 0
                     states:
-                        - { value:  0, generic: 0, graph: 0, descr: none }
-                        - { value:  1, generic: 0, graph: 0, descr: cold }
-                        - { value:  2, generic: 0, graph: 0, descr: warm }
-                        - { value:  3, generic: 0, graph: 0, descr: hot }
-                        - { value:  4, generic: 0, graph: 0, descr: protected }
+                        - { value:  0, generic: 0, descr: none }
+                        - { value:  1, generic: 0, descr: cold }
+                        - { value:  2, generic: 0, descr: warm }
+                        - { value:  3, generic: 0, descr: hot }
+                        - { value:  4, generic: 0, descr: protected }
                     group: 'Module Standby Status'
                 -
                     oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisDiskHealthTable
@@ -568,11 +568,11 @@ modules:
                     descr: 'Slot {{ $subindex1 }} Disk Health - Flash0'
                     state_name: cienaCesChassisDiskHealthStateFlash0
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Disk'
                     skip_values:
                         -
@@ -586,11 +586,11 @@ modules:
                     descr: 'Slot {{ $subindex1 }} Disk Health - RAM'
                     state_name: cienaCesChassisDiskHealthStateRAM
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Disk'
                     skip_values:
                         -
@@ -604,11 +604,11 @@ modules:
                     descr: 'Slot {{ $subindex1 }} Disk Health - USB'
                     state_name: cienaCesChassisDiskHealthStateUSB
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Disk'
                     skip_values:
                         -
@@ -622,11 +622,11 @@ modules:
                     descr: 'PS {{ $subindex1 }} Load Fuse'
                     state_name: cienaCesChassisPowerParamsHealthStateLoadFuse
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Power Supplies'
                     skip_values:
                         -
@@ -640,11 +640,11 @@ modules:
                     descr: 'PS {{ $subindex1 }} Internal Fuse'
                     state_name: cienaCesChassisPowerParamsHealthStateInternalFuse
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Power Supplies'
                     skip_values:
                         -
@@ -658,11 +658,11 @@ modules:
                     descr: 'PS {{ $subindex1 }} Voltage Regulator'
                     state_name: cienaCesChassisPowerParamsHealthStateVoltageRegulator
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Power Supplies'
                     skip_values:
                         -
@@ -676,11 +676,11 @@ modules:
                     descr: 'PS {{ $subindex1 }} Temperature'
                     state_name: cienaCesChassisPowerParamsHealthStateTemperature
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Power Supplies'
                     skip_values:
                         -
@@ -694,11 +694,11 @@ modules:
                     descr: 'PS {{ $subindex1 }} AC Input'
                     state_name: cienaCesChassisPowerParamsHealthStateACInput
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Power Supplies'
                     skip_values:
                         -
@@ -712,11 +712,11 @@ modules:
                     descr: 'PS {{ $subindex1 }} Overload Protection'
                     state_name: cienaCesChassisPowerParamsHealthStateOverloadProtection
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Power Supplies'
                     skip_values:
                         -
@@ -730,11 +730,11 @@ modules:
                     descr: 'PS {{ $subindex1 }} Fan'
                     state_name: cienaCesChassisPowerParamsHealthStateOverloadFan
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Power Supplies'
                     skip_values:
                         -
@@ -748,11 +748,11 @@ modules:
                     descr: 'SM {{ $subindex1 }} Fabric Status'
                     state_name: cienaCesChassisSMFabricHealthState
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Switch Modules'
                 -
                     oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisSMHealthTable
@@ -761,11 +761,11 @@ modules:
                     descr: 'SM {{ $subindex1 }} Status'
                     state_name: cienaCesChassisSMHealthState
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Switch Modules'
                 -
                     oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisMemoryHealthTable
@@ -774,11 +774,11 @@ modules:
                     descr: 'Slot {{ $subindex1 }} Global Heap'
                     state_name: cienaCesChassisMemoryHealthStateGlobalHeap
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Memory'
                     skip_values:
                         -
@@ -792,11 +792,11 @@ modules:
                     descr: 'Slot {{ $subindex1 }} Heap1'
                     state_name: cienaCesChassisMemoryHealthStateHeap1
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Memory'
                     skip_values:
                         -
@@ -810,11 +810,11 @@ modules:
                     descr: 'Slot {{ $subindex1 }} Heap2'
                     state_name: cienaCesChassisMemoryHealthSubCategory
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Memory'
                     skip_values:
                         -
@@ -828,11 +828,11 @@ modules:
                     descr: 'Slot {{ $subindex1 }} Pool1'
                     state_name: cienaCesChassisMemoryHealthStatePool1
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Memory'
                     skip_values:
                         -
@@ -846,11 +846,11 @@ modules:
                     descr: 'Slot {{ $subindex1 }} Pool2'
                     state_name: cienaCesChassisMemoryHealthStatePool2
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Memory'
                     skip_values:
                         -
@@ -864,11 +864,11 @@ modules:
                     descr: 'Slot {{ $subindex1 }} Heap'
                     state_name: cienaCesChassisMemoryHealthStateHeap
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'Memory'
                     skip_values:
                         -
@@ -882,11 +882,11 @@ modules:
                     descr: 'Slot {{ $subindex1 }} CPU Status'
                     state_name: cienaCesChassisCPUHealthStateCPUUsage
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: normal }
-                        - { value: 3, generic: 1, graph: 0, descr: warning }
-                        - { value: 4, generic: 1, graph: 0, descr: degraded }
-                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: normal }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: degraded }
+                        - { value: 5, generic: 2, descr: faulted }
                     group: 'CPU'
                 -
                     oid: CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingTable
@@ -895,12 +895,12 @@ modules:
                     descr: 'Virtual Ring {{ CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingName }} State'
                     state_name: cienaCesRapsVirtualRingState
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: adminDisabled }
-                        - { value: 2, generic: 0, graph: 0, descr: ok }
-                        - { value: 3, generic: 2, graph: 0, descr: protecting }
-                        - { value: 4, generic: 1, graph: 0, descr: recovering }
-                        - { value: 5, generic: 1, graph: 0, descr: init }
-                        - { value: 6, generic: 3, graph: 0, descr: none }
+                        - { value: 1, generic: 3, descr: adminDisabled }
+                        - { value: 2, generic: 0, descr: ok }
+                        - { value: 3, generic: 2, descr: protecting }
+                        - { value: 4, generic: 1, descr: recovering }
+                        - { value: 5, generic: 1, descr: init }
+                        - { value: 6, generic: 3, descr: none }
                     group: 'G.8032'
                 -
                     oid: CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingTable
@@ -909,14 +909,14 @@ modules:
                     descr: 'Virtual Ring {{ CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingName }} Status'
                     state_name: cienaCesRapsVirtualRingStatus
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: clear }
-                        - { value: 2, generic: 1, graph: 0, descr: localSignalFail }
-                        - { value: 3, generic: 1, graph: 0, descr: localForceSwitch }
-                        - { value: 4, generic: 1, graph: 0, descr: remoteOrOtherPortSignalFail }
-                        - { value: 5, generic: 1, graph: 0, descr: remoteOrOtherPortForceSwitch }
-                        - { value: 6, generic: 1, graph: 0, descr: provisioningMismatch }
-                        - { value: 7, generic: 1, graph: 0, descr: noRapsPduReceived }
-                        - { value: 8, generic: 1, graph: 0, descr: noRplOwnerDetected }
+                        - { value: 1, generic: 0, descr: clear }
+                        - { value: 2, generic: 1, descr: localSignalFail }
+                        - { value: 3, generic: 1, descr: localForceSwitch }
+                        - { value: 4, generic: 1, descr: remoteOrOtherPortSignalFail }
+                        - { value: 5, generic: 1, descr: remoteOrOtherPortForceSwitch }
+                        - { value: 6, generic: 1, descr: provisioningMismatch }
+                        - { value: 7, generic: 1, descr: noRapsPduReceived }
+                        - { value: 8, generic: 1, descr: noRplOwnerDetected }
                     group: 'G.8032'
                 -
                     oid: CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingTable
@@ -925,9 +925,9 @@ modules:
                     descr: 'Virtual Ring {{ CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingName }} Port State - West'
                     state_name: cienaCesRapsVirtualRingWestPortState
                     states:
-                        - { value: 1, generic: 1, graph: 0, descr: disabled }
-                        - { value: 2, generic: 0, graph: 0, descr: forwarding }
-                        - { value: 3, generic: 0, graph: 0, descr: blocked }
+                        - { value: 1, generic: 1, descr: disabled }
+                        - { value: 2, generic: 0, descr: forwarding }
+                        - { value: 3, generic: 0, descr: blocked }
                     group: 'G.8032'
                 -
                     oid: CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingTable
@@ -936,9 +936,9 @@ modules:
                     descr: 'Virtual Ring {{ CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingName }} Port State - East'
                     state_name: cienaCesRapsVirtualRingEastPortState
                     states:
-                        - { value: 1, generic: 1, graph: 0, descr: disabled }
-                        - { value: 2, generic: 0, graph: 0, descr: forwarding }
-                        - { value: 3, generic: 0, graph: 0, descr: blocked }
+                        - { value: 1, generic: 1, descr: disabled }
+                        - { value: 2, generic: 0, descr: forwarding }
+                        - { value: 3, generic: 0, descr: blocked }
                     group: 'G.8032'
                 -
                     oid: CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingTable
@@ -947,12 +947,12 @@ modules:
                     descr: 'Virtual Ring {{ CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingName }} Port Status - West'
                     state_name: cienaCesRapsVirtualRingWestPortStatus
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: ok }
-                        - { value: 2, generic: 2, graph: 0, descr: down }
-                        - { value: 3, generic: 1, graph: 0, descr: ccmFailure }
-                        - { value: 4, generic: 0, graph: 0, descr: localForceSwitch }
-                        - { value: 5, generic: 0, graph: 0, descr: remoteForceSwitch }
-                        - { value: 6, generic: 1, graph: 0, descr: remoteSignalFailure }
+                        - { value: 1, generic: 0, descr: ok }
+                        - { value: 2, generic: 2, descr: down }
+                        - { value: 3, generic: 1, descr: ccmFailure }
+                        - { value: 4, generic: 0, descr: localForceSwitch }
+                        - { value: 5, generic: 0, descr: remoteForceSwitch }
+                        - { value: 6, generic: 1, descr: remoteSignalFailure }
                     group: 'G.8032'
                 -
                     oid: CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingTable
@@ -961,10 +961,10 @@ modules:
                     descr: 'Virtual Ring {{ CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingName }} Port Status - East'
                     state_name: cienaCesRapsVirtualRingEastPortStatus
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: ok }
-                        - { value: 2, generic: 2, graph: 0, descr: down }
-                        - { value: 3, generic: 1, graph: 0, descr: ccmFailure }
-                        - { value: 4, generic: 0, graph: 0, descr: localForceSwitch }
-                        - { value: 5, generic: 0, graph: 0, descr: remoteForceSwitch }
-                        - { value: 6, generic: 1, graph: 0, descr: remoteSignalFailure }
+                        - { value: 1, generic: 0, descr: ok }
+                        - { value: 2, generic: 2, descr: down }
+                        - { value: 3, generic: 1, descr: ccmFailure }
+                        - { value: 4, generic: 0, descr: localForceSwitch }
+                        - { value: 5, generic: 0, descr: remoteForceSwitch }
+                        - { value: 6, generic: 1, descr: remoteSignalFailure }
                     group: 'G.8032'

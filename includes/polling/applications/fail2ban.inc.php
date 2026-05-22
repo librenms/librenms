@@ -71,7 +71,7 @@ if (count($added_jails) > 0 || count($removed_jails) > 0) {
     $app->data = ['jails' => $jails]; // save jails list
     $log_message = 'Fail2ban Jail Change:';
     $log_message .= count($added_jails) > 0 ? ' Added ' . implode(',', $added_jails) : '';
-    $log_message .= count($removed_jails) > 0 ? ' Removed ' . implode(',', $added_jails) : '';
+    $log_message .= count($removed_jails) > 0 ? ' Removed ' . implode(',', $removed_jails) : '';
     Eventlog::log($log_message, $device['device_id'], 'application');
 }
 

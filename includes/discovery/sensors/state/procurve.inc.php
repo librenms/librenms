@@ -31,11 +31,11 @@ foreach (snmpwalk_cache_oid($device, 'hpicfSensorTable', [], 'HP-ICF-CHASSIS', n
     $state_index = $state_name . '.' . $index;
 
     $states = [
-        ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
-        ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'bad'],
-        ['value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'],
-        ['value' => 4, 'generic' => 0, 'graph' => 1, 'descr' => 'good'],
-        ['value' => 5, 'generic' => 3, 'graph' => 0, 'descr' => 'notPresent'],
+        ['value' => 1, 'generic' => 3, 'descr' => 'unknown'],
+        ['value' => 2, 'generic' => 2, 'descr' => 'bad'],
+        ['value' => 3, 'generic' => 1, 'descr' => 'warning'],
+        ['value' => 4, 'generic' => 0, 'descr' => 'good'],
+        ['value' => 5, 'generic' => 3, 'descr' => 'notPresent'],
     ];
     create_state_index($state_name, $states);
 

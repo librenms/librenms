@@ -52,9 +52,10 @@ The following config options can be set to enable more custom types:
     ```bash
     lnms config:set customers_descr.+ 'cust'
     lnms config:set transit_descr.+ 'transit'
-    lnms config:set peering_descr.+ 'peering'";'
+    lnms config:set peering_descr.+ 'peering'
     lnms config:set core_descr.+ 'core'
-    lnms config:set custom_descr.+ 'something_made_up'
+    lnms config:set custom_descr.+ 'ptp'
+    lnms config:set custom_descr.+ 'anything'
     ```
 
 ## Custom interface parser

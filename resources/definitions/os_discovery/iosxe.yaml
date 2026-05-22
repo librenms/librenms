@@ -64,10 +64,10 @@ modules:
                     index: 'cHsrpGrpStandbyState.{{ $index }}'
                     group: 'HSRP'
                     states:
-                        - { value:  1, generic: 2, graph: 0, descr: 'initial' }
-                        - { value:  2, generic: 2, graph: 0, descr: 'learn' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'listen' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'speak' }
-                        - { value:  5, generic: 0, graph: 0, descr: 'standby' }
-                        - { value:  6, generic: 0, graph: 0, descr: 'active' }
+                        - { value:  1, generic: 2, descr: 'initial' }
+                        - { value:  2, generic: 2, descr: 'learn' }
+                        - { value:  3, generic: 1, descr: 'listen' }
+                        - { value:  4, generic: 1, descr: 'speak' }
+                        - { value:  5, generic: 0, descr: 'standby' }
+                        - { value:  6, generic: 0, descr: 'active' }
 

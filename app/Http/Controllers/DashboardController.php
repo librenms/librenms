@@ -40,7 +40,7 @@ use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
-    /** @var \Illuminate\Support\Collection<\App\Models\Dashboard> */
+    /** @var \Illuminate\Support\Collection<int, \App\Models\Dashboard> */
     private $dashboards;
 
     public function __construct()
@@ -256,7 +256,7 @@ class DashboardController extends Controller
 
     /**
      * @param  User  $user
-     * @return \Illuminate\Support\Collection<\App\Models\Dashboard>
+     * @return \Illuminate\Support\Collection<int, \App\Models\Dashboard>
      */
     private function getAvailableDashboards(User $user): Collection
     {

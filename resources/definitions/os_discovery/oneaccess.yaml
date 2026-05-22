@@ -32,10 +32,10 @@ modules:
                     index: 'oacSysCpuUsedCoreType.{{ $index }}'
                     state_name: oacSysCpuUsedCoreType
                     states:
-                        - { descr: controlplane, graph: 1, value: 0, generic: 0 }
-                        - { descr: dataforwarding, graph: 1, value: 1, generic: 0 }
-                        - { descr: application, graph: 1, value: 2, generic: 0 }
-                        - { descr: mixed, graph: 1, value: 3, generic: 0 }
+                        - { descr: controlplane, value: 0, generic: 0 }
+                        - { descr: dataforwarding, value: 1, generic: 0 }
+                        - { descr: application, value: 2, generic: 0 }
+                        - { descr: mixed, value: 3, generic: 0 }
                 -
                     oid: ONEACCESS-CELLULAR-MIB::oacCellRadioAccessTechnology
                     value: ONEACCESS-CELLULAR-MIB::oacCellRadioAccessTechnology
@@ -45,9 +45,9 @@ modules:
                     index: 'oacCellRadioAccessTechnology.{{ $index }}'
                     state_name: oacCellRadioAccessTechnology
                     states:
-                        - { descr: GSM, graph: 1, value: 2, generic: 0 }
-                        - { descr: UMTS, graph: 1, value: 3, generic: 0 }
-                        - { descr: LTE, graph: 1, value: 4, generic: 0 }
+                        - { descr: GSM, value: 2, generic: 0 }
+                        - { descr: UMTS, value: 3, generic: 0 }
+                        - { descr: LTE, value: 4, generic: 0 }
 
         count:
             data:

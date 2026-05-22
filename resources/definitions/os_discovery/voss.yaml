@@ -41,6 +41,6 @@ modules:
                     index: 'rcVossSystemTemperatureStatus.{{ $index }}'
                     state_name: rcVossSystemTemperatureStatus
                     states:
-                        - { descr: normal, graph: 1, value: 1, generic: 0 }
-                        - { descr: highWarning, graph: 1, value: 2, generic: 1 }
-                        - { descr: highCritical, graph: 1, value: 3, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: highWarning, value: 2, generic: 1 }
+                        - { descr: highCritical, value: 3, generic: 2 }

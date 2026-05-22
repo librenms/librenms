@@ -139,9 +139,9 @@ modules:
                     index: 'xRingProInfoPort1FwdState.{{ $index }}'
                     state_name: xRingProInfoPort1FwdState
                     states:
-                        - { descr: 'FWD', graph: 1, value: 0, generic: 0 }
-                        - { descr: 'BLK', graph: 1, value: 1, generic: 0 }
-                        - { descr: 'DWN', graph: 1, value: 2, generic: 2 }
+                        - { descr: 'FWD', value: 0, generic: 0 }
+                        - { descr: 'BLK', value: 1, generic: 0 }
+                        - { descr: 'DWN', value: 2, generic: 2 }
                 -
                     oid: ADVANTECH-EKI-PRONEER-MIB::xRingProInfoTable
                     value: ADVANTECH-EKI-PRONEER-MIB::xRingProInfoPort2FwdState
@@ -150,9 +150,9 @@ modules:
                     index: 'xRingProInfoPort2FwdState.{{ $index }}'
                     state_name: xRingProInfoPort2FwdState
                     states:
-                        - { descr: 'FWD', graph: 1, value: 0, generic: 0 }
-                        - { descr: 'BLK', graph: 1, value: 1, generic: 0 }
-                        - { descr: 'DWN', graph: 1, value: 2, generic: 2 }
+                        - { descr: 'FWD', value: 0, generic: 0 }
+                        - { descr: 'BLK', value: 1, generic: 0 }
+                        - { descr: 'DWN', value: 2, generic: 2 }
                 -
                     oid: ADVANTECH-EKI-PRONEER-MIB::xRingProStatus
                     value: ADVANTECH-EKI-PRONEER-MIB::xRingProStatus
@@ -161,8 +161,8 @@ modules:
                     index: 'xRingProStatus.{{ $index }}'
                     state_name: xRingProStatus
                     states:
-                        - { descr: 'enabled',  graph: 1, value: 1, generic: 0 }
-                        - { descr: 'disabled', graph: 1, value: 2, generic: 3 }
+                        - { descr: 'enabled',  value: 1, generic: 0 }
+                        - { descr: 'disabled', value: 2, generic: 3 }
                 -
                     oid: ADVANTECH-EKI-PRONEER-MIB::xRingEliteState
                     value: ADVANTECH-EKI-PRONEER-MIB::xRingEliteState
@@ -171,8 +171,8 @@ modules:
                     index: 'xRingEliteState.{{ $index }}'
                     state_name: xRingEliteState
                     states:
-                        - { descr: 'enabled',  graph: 1, value: 1, generic: 0 }
-                        - { descr: 'disabled', graph: 1, value: 2, generic: 3 }
+                        - { descr: 'enabled',  value: 1, generic: 0 }
+                        - { descr: 'disabled', value: 2, generic: 3 }
                 -
                     oid: ADVANTECH-EKI-PRONEER-MIB::erpsState
                     value: ADVANTECH-EKI-PRONEER-MIB::erpsState
@@ -181,5 +181,5 @@ modules:
                     index: 'erpsState.{{ $index }}'
                     state_name: erpsState
                     states:
-                        - { descr: 'enabled',  graph: 1, value: 1, generic: 0 }
-                        - { descr: 'disabled', graph: 1, value: 2, generic: 3 }
+                        - { descr: 'enabled',  value: 1, generic: 0 }
+                        - { descr: 'disabled', value: 2, generic: 3 }

@@ -12,8 +12,8 @@ modules:
                     state_name: 'pwrP'
                     descr: 'Master Primary Power'
                     states:
-                        - { descr: Power OK, graph: 0, value: 1, generic: 0 }
-                        - { descr: Power off or Low, graph: 0, value: 0, generic: 2 }
+                        - { descr: Power OK, value: 1, generic: 0 }
+                        - { descr: Power off or Low, value: 0, generic: 2 }
                 -
                     oid: CTMMIBCUSTOM::pwrS
                     value: CTMMIBCUSTOM::pwrS
@@ -21,8 +21,8 @@ modules:
                     num_oid: '.1.3.6.1.4.1.25868.1.7.{{ $index }}'
                     descr: 'Master Secondary Power'
                     states:
-                        - { descr: Power OK, graph: 0, value: 1, generic: 0 }
-                        - { descr: Power off or Low, graph: 0, value: 0, generic: 2 }
+                        - { descr: Power OK, value: 1, generic: 0 }
+                        - { descr: Power off or Low, value: 0, generic: 2 }
                 -
                     oid: CTMMIBCUSTOM::pwrSP
                     value: CTMMIBCUSTOM::pwrSP
@@ -30,8 +30,8 @@ modules:
                     num_oid: '.1.3.6.1.4.1.25868.1.23.{{ $index }}'
                     descr: 'Slave Primary Power'
                     states:
-                        - { descr: Power OK, graph: 0, value: 1, generic: 0 }
-                        - { descr: Power off or Low, graph: 0, value: 0, generic: 2 }
+                        - { descr: Power OK, value: 1, generic: 0 }
+                        - { descr: Power off or Low, value: 0, generic: 2 }
                 -
                     oid: CTMMIBCUSTOM::pwrSS
                     value: CTMMIBCUSTOM::pwrSS
@@ -39,8 +39,8 @@ modules:
                     num_oid: '.1.3.6.1.4.1.25868.1.24.{{ $index }}'
                     descr: 'Slave Secondary Power'
                     states:
-                        - { descr: Power OK, graph: 0, value: 1, generic: 0 }
-                        - { descr: Power off or Low, graph: 0, value: 0, generic: 2 }
+                        - { descr: Power OK, value: 1, generic: 0 }
+                        - { descr: Power off or Low, value: 0, generic: 2 }
 
         voltage:
             options:

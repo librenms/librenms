@@ -15,8 +15,8 @@ modules:
                     descr: 'Unit {{ Stulz-WIB8000-MIB::unitsettingName:0-1 }} bus alarm'
                     state_name: busalarm
                     states:
-                        - { descr: Ok, graph: 1, value: 0, generic: 0 }
-                        - { descr: Error, graph: 1, value: 1, generic: 2 }
+                        - { descr: Ok, value: 0, generic: 0 }
+                        - { descr: Error, value: 1, generic: 2 }
                 -
                     oid: Stulz-WIB8000-MIB::basadrconflict
                     value: Stulz-WIB8000-MIB::busadrconflict
@@ -25,8 +25,8 @@ modules:
                     descr: 'Unit {{ Stulz-WIB8000-MIB::unitsettingName:0-1 }} bus conflict'
                     state_name: basadrconflict
                     states:
-                        - { descr: Ok, graph: 1, value: 0, generic: 0 }
-                        - { descr: Error, graph: 1, value: 1, generic: 2 }
+                        - { descr: Ok, value: 0, generic: 0 }
+                        - { descr: Error, value: 1, generic: 2 }
                 -
                     oid: Stulz-WIB8000-MIB::unitOnOff
                     value: Stulz-WIB8000-MIB::unitOnOff
@@ -35,8 +35,8 @@ modules:
                     descr: 'Unit {{ Stulz-WIB8000-MIB::unitsettingName:0-1 }} running state'
                     state_name: unitOnOff
                     states:
-                        - { descr: Stopped, graph: 1, value: 0, generic: 0 }
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 0, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
                 -
                     oid: Stulz-WIB8000-MIB::generalError
                     value: Stulz-WIB8000-MIB::generalError
@@ -45,8 +45,8 @@ modules:
                     descr: 'Unit {{ Stulz-WIB8000-MIB::unitsettingName:0-1 }} error state'
                     state_name: generalError
                     states:
-                        - { descr: Ok, graph: 1, value: 0, generic: 0 }
-                        - { descr: Error, graph: 1, value: 1, generic: 2 }
+                        - { descr: Ok, value: 0, generic: 0 }
+                        - { descr: Error, value: 1, generic: 2 }
                 -
                     oid: Stulz-WIB8000-MIB::compr1Running
                     value: Stulz-WIB8000-MIB::compr1Running
@@ -55,8 +55,8 @@ modules:
                     descr: 'Unit {{ Stulz-WIB8000-MIB::unitsettingName:0-1 }} compressor state'
                     state_name: compr1Running
                     states:
-                        - { descr: Stopped, graph: 1, value: 0, generic: 0 }
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 0, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
                 -
                     oid: Stulz-WIB8000-MIB::humidifier1Running
                     value: Stulz-WIB8000-MIB::humidifier1Running
@@ -65,8 +65,8 @@ modules:
                     descr: 'Unit {{ Stulz-WIB8000-MIB::unitsettingName:0-1 }} humidifier state'
                     state_name: humidifier1Running
                     states:
-                        - { descr: Stopped, graph: 1, value: 0, generic: 0 }
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 0, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
                 -
                     oid: Stulz-WIB8000-MIB::dehumidificationRunning
                     value: Stulz-WIB8000-MIB::dehumidificationRunning
@@ -75,8 +75,8 @@ modules:
                     descr: 'Unit {{ Stulz-WIB8000-MIB::unitsettingName:0-1 }} dehumidification'
                     state_name: dehumidificationRunning
                     states:
-                        - { descr: Stopped, graph: 1, value: 0, generic: 0 }
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 0, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
                 -
                     oid: Stulz-WIB8000-MIB::fan1Running
                     value: Stulz-WIB8000-MIB::fan1Running
@@ -85,8 +85,8 @@ modules:
                     descr: 'Unit {{ Stulz-WIB8000-MIB::unitsettingName:0-1 }} fan state'
                     state_name: fan1Running
                     states:
-                        - { descr: Stopped, graph: 1, value: 0, generic: 0 }
-                        - { descr: Running, graph: 1, value: 1, generic: 0 }
+                        - { descr: Stopped, value: 0, generic: 0 }
+                        - { descr: Running, value: 1, generic: 0 }
                 -
                     oid: Stulz-WIB8000-MIB::unitFreecoolingValve
                     value: Stulz-WIB8000-MIB::unitFreecoolingValve
@@ -95,8 +95,8 @@ modules:
                     descr: 'Unit {{ Stulz-WIB8000-MIB::unitsettingName:0-1 }} freecool valve'
                     state_name: unitFreecoolingValve
                     states:
-                        - { descr: Closed, graph: 1, value: 0, generic: 0 }
-                        - { descr: Open, graph: 1, value: 1, generic: 0 }
+                        - { descr: Closed, value: 0, generic: 0 }
+                        - { descr: Open, value: 1, generic: 0 }
 
         temperature:
             data:

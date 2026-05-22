@@ -12,9 +12,9 @@
  * the source code distribution for details.
  */
 
+use App\Models\AlertOperationTransportMap;
 use App\Models\AlertTransport;
 use App\Models\AlertTransportGroup;
-use App\Models\AlertTransportMap;
 use App\Models\TransportGroupTransport;
 use Illuminate\Support\Facades\Gate;
 
@@ -36,7 +36,7 @@ if (! is_numeric($vars['group_id'])) {
 } else {
     if (AlertTransportGroup::where('transport_group_id', $vars['group_id'])->delete()) {
         TransportGroupTransport::where('transport_group_id', $vars['group_id'])->delete();
-        AlertTransportMap::where('target_type', 'group')->where('transport_or_group_id', $vars['group_id'])->delete();
+        AlertOperationTransportMap::where('transport_or_group_id', $vars['group_id'])->where('target_type', 'group')->delete();
         $message = 'Alert transport group has been deleted';
     } else {
         $message = 'ERROR: Alert transport group has not been deleted';

@@ -36,6 +36,7 @@ use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\StringHelpers;
 
 class PrinterSupplies implements Module
 {
@@ -64,12 +65,12 @@ class PrinterSupplies implements Module
     {
         $device = $os->getDeviceArray();
 
-        ModuleModelObserver::observe(PrinterSupply::class, 'Printer Supplies');
+        ModuleModelObserver::observe(PrinterSupply::class, __('Printer Supplies'));
         $levels = $this->discoveryLevels($device);
         $this->syncModelsByGroup($os->getDevice(), 'printerSupplies', $levels, [['supply_type', '!=', 'input']]);
         ModuleModelObserver::done();
 
-        ModuleModelObserver::observe(PrinterSupply::class, 'Tray Paper Level');
+        ModuleModelObserver::observe(PrinterSupply::class, __('Tray Paper Level'));
         $papers = $this->discoveryPapers($device);
         $this->syncModelsByGroup($os->getDevice(), 'printerSupplies', $papers, ['supply_type' => 'input']);
         ModuleModelObserver::done();
@@ -172,13 +173,19 @@ class PrinterSupplies implements Module
         if (! empty($oids)) {
             $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesType', $oids, 'Printer-MIB');
             $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesMaxCapacity', $oids, 'Printer-MIB');
-            $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesDescription', $oids, 'Printer-MIB', null, '-OQUsa');
+            $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesDescription', $oids, 'Printer-MIB', null, '-OQUs');
         }
 
         foreach ($oids as $index => $data) {
             $last_index = substr((string) $index, strrpos((string) $index, '.') + 1);
 
             $descr = $data['prtMarkerSuppliesDescription'];
+
+            // Decode hex-encoded non-ASCII descriptions (e.g. UTF-8 CJK characters from Fujitsu/Ricoh/Kyocera printers)
+            // When using -OQUs without -a flag, net-snmp returns non-ASCII strings as hex (e.g. "E9 BB 91 E8 89 B2")
+            if (preg_match('/^([A-Fa-f\d]{2} )*[A-Fa-f\d]{2}\s*$/', (string) $descr)) {
+                $descr = (string) hex2bin(str_replace([' 00', ' '], '', (string) $descr));
+            }
             $raw_capacity = $data['prtMarkerSuppliesMaxCapacity'];
             $raw_toner = $data['prtMarkerSuppliesLevel'];
             $supply_oid = ".1.3.6.1.2.1.43.11.1.1.9.$index";
@@ -189,7 +196,7 @@ class PrinterSupplies implements Module
                 $new_descr = '';
                 foreach (explode("\n", (string) $descr) as $line) {
                     if (preg_match('/^([A-F\d]{2} )*[A-F\d]{1,2} ?$/', $line)) {
-                        $line = snmp_hexstring($line);
+                        $line = StringHelpers::hexToAscii($line, ' ');
                     }
                     $new_descr .= $line;
                 }

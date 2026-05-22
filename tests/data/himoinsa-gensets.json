@@ -678,175 +678,150 @@
                 {
                     "state_name": "HimoinsaAlarmStatus",
                     "state_descr": "No Alarm",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "HimoinsaAlarmStatus",
                     "state_descr": "Alarm",
-                    "state_draw_graph": 0,
                     "state_value": 128,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "HimoinsaCec7AlarmStatus",
                     "state_descr": "No Alarm",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "HimoinsaCec7AlarmStatus",
                     "state_descr": "Alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "HimoinsaCec7CommStatus",
                     "state_descr": "Unknown",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "HimoinsaCec7CommStatus",
                     "state_descr": "Genset",
-                    "state_draw_graph": 0,
                     "state_value": 32,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "HimoinsaCec7CommStatus",
                     "state_descr": "Mains",
-                    "state_draw_graph": 0,
                     "state_value": 64,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "HimoinsaCec7ModeStatus",
                     "state_descr": "Unknown",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "HimoinsaCec7ModeStatus",
                     "state_descr": "Auto",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "HimoinsaCec7ModeStatus",
                     "state_descr": "Manual",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "HimoinsaCec7ModeStatus",
                     "state_descr": "Test",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "HimoinsaCec7ModeStatus",
                     "state_descr": "Blocked",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "HimoinsaCommStatus",
                     "state_descr": "Unknown",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "HimoinsaCommStatus",
                     "state_descr": "Mains",
-                    "state_draw_graph": 0,
                     "state_value": 256,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "HimoinsaCommStatus",
                     "state_descr": "Genset",
-                    "state_draw_graph": 0,
                     "state_value": 512,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "HimoinsaModeStatus",
                     "state_descr": "Unknown",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "HimoinsaModeStatus",
                     "state_descr": "Auto",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "HimoinsaModeStatus",
                     "state_descr": "Manual",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "HimoinsaModeStatus",
                     "state_descr": "Test",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "HimoinsaModeStatus",
                     "state_descr": "Blocked",
-                    "state_draw_graph": 0,
                     "state_value": 32,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "HimoinsaMotorStatus",
                     "state_descr": "Unknown",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "HimoinsaMotorStatus",
                     "state_descr": "Running",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "HimoinsaMotorStatus",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "HimoinsaTransferPumpStatus",
                     "state_descr": "Off",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "HimoinsaTransferPumpStatus",
                     "state_descr": "On",
-                    "state_draw_graph": 0,
                     "state_value": 64,
                     "state_generic_value": 1
                 }

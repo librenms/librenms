@@ -26,9 +26,9 @@ modules:
                     group: "Ports DI"
                     state_name: diTable
                     states:
-                        - { descr: Connected, graph: 1, value: 0, generic: 0 }
-                        - { descr: Empty, graph: 1, value: 1, generic: 1 }
-                        - { descr: Off, graph: 1, value: 2, generic: 2 }
+                        - { descr: Connected, value: 0, generic: 0 }
+                        - { descr: Empty, value: 1, generic: 1 }
+                        - { descr: Off, value: 2, generic: 2 }
                 -
                     oid: SNR-ERD-4::doTable
                     value: SNR-ERD-4::doState
@@ -38,9 +38,9 @@ modules:
                     group: "Ports DO"
                     state_name: doTable
                     states:
-                        - { descr: Off, graph: 1, value: 0, generic: 1 }
-                        - { descr: On, graph: 1, value: 1, generic: 0 }
-                        - { descr: Reload, graph: 1, value: 2, generic: 2 }
+                        - { descr: Off, value: 0, generic: 1 }
+                        - { descr: On, value: 1, generic: 0 }
+                        - { descr: Reload, value: 2, generic: 2 }
         humidity:
             data:
                 -

@@ -33,10 +33,10 @@ modules:
                     index: 'zyStackingSlotInfoRole.{{ $index }}'
                     state_name: zyStackingSlotInfoRole
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: master }
-                        - { value: 2, generic: 0, graph: 0, descr: backup }
-                        - { value: 3, generic: 0, graph: 0, descr: linecard }
-                        - { value: 0, generic: 3, graph: 0, descr: none }
+                        - { value: 1, generic: 0, descr: master }
+                        - { value: 2, generic: 0, descr: backup }
+                        - { value: 3, generic: 0, descr: linecard }
+                        - { value: 0, generic: 3, descr: none }
                     skip_values:
                         -
                             oid: ZYXEL-STACKING-MIB::zyStackingSlotInfoStackingStatus
@@ -51,11 +51,11 @@ modules:
                     index: 'zyStackingSlotChannelInfoNeighbor.{{ $index }}'
                     state_name: zyStackingSlotChannelInfoNeighbor
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: 'Switch 1' }
-                        - { value: 2, generic: 0, graph: 0, descr: 'Switch 2' }
-                        - { value: 3, generic: 0, graph: 0, descr: 'Switch 3' }
-                        - { value: 4, generic: 0, graph: 0, descr: 'Switch 4' }
-                        - { value: 0, generic: 3, graph: 0, descr: none }
+                        - { value: 1, generic: 0, descr: 'Switch 1' }
+                        - { value: 2, generic: 0, descr: 'Switch 2' }
+                        - { value: 3, generic: 0, descr: 'Switch 3' }
+                        - { value: 4, generic: 0, descr: 'Switch 4' }
+                        - { value: 0, generic: 3, descr: none }
                 -
                     oid: ZYXEL-STACKING-MIB::zyStackingTopology
                     value: ZYXEL-STACKING-MIB::zyStackingTopology
@@ -65,9 +65,9 @@ modules:
                     index: 'zyStackingTopology.{{ $index }}'
                     state_name: zyStackingTopology
                     states:
-                        - { value: 1, generic: 1, graph: 0, descr: chain }
-                        - { value: 2, generic: 0, graph: 0, descr: ring }
-                        - { value: 0, generic: 3, graph: 0, descr: none }
+                        - { value: 1, generic: 1, descr: chain }
+                        - { value: 2, generic: 0, descr: ring }
+                        - { value: 0, generic: 3, descr: none }
         fanspeed:
             options:
                 skip_value_lt: 0

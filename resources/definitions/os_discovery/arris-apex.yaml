@@ -83,12 +83,12 @@ modules:
                     index: 'apexAlarmHardwareFault.{{ $index }}'
                     state_name: apexAlarmHardwareFault
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Ok' }
-                        - { value:  2, generic: 0, graph: 0, descr: 'Indeterminate' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Warning' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Minor' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Major' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
+                        - { value:  1, generic: 0, descr: 'Ok' }
+                        - { value:  2, generic: 0, descr: 'Indeterminate' }
+                        - { value:  3, generic: 1, descr: 'Warning' }
+                        - { value:  4, generic: 1, descr: 'Minor' }
+                        - { value:  5, generic: 2, descr: 'Major' }
+                        - { value:  6, generic: 2, descr: 'Critical' }
                 -
                     oid: APEX-MIB::apexAlarmInvalidInitData
                     value: APEX-MIB::apexAlarmInvalidInitData
@@ -97,12 +97,12 @@ modules:
                     index: 'apexAlarmInvalidInitData.{{ $index }}'
                     state_name: apexAlarmInvalidInitData
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Ok' }
-                        - { value:  2, generic: 0, graph: 0, descr: 'Indeterminate' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Warning' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Minor' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Major' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
+                        - { value:  1, generic: 0, descr: 'Ok' }
+                        - { value:  2, generic: 0, descr: 'Indeterminate' }
+                        - { value:  3, generic: 1, descr: 'Warning' }
+                        - { value:  4, generic: 1, descr: 'Minor' }
+                        - { value:  5, generic: 2, descr: 'Major' }
+                        - { value:  6, generic: 2, descr: 'Critical' }
                 -
                     oid: APEX-MIB::apexAlarmTemperatureFault
                     value: APEX-MIB::apexAlarmTemperatureFault
@@ -111,12 +111,12 @@ modules:
                     index: 'apexAlarmTemperatureFault.{{ $index }}'
                     state_name: apexAlarmTemperatureFault
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Ok' }
-                        - { value:  2, generic: 0, graph: 0, descr: 'Indeterminate' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Warning' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Minor' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Major' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
+                        - { value:  1, generic: 0, descr: 'Ok' }
+                        - { value:  2, generic: 0, descr: 'Indeterminate' }
+                        - { value:  3, generic: 1, descr: 'Warning' }
+                        - { value:  4, generic: 1, descr: 'Minor' }
+                        - { value:  5, generic: 2, descr: 'Major' }
+                        - { value:  6, generic: 2, descr: 'Critical' }
                 -
                     oid: APEX-MIB::apexAlarmFanFault
                     value: APEX-MIB::apexAlarmFanFault
@@ -125,12 +125,12 @@ modules:
                     index: 'apexAlarmFanFault.{{ $index }}'
                     state_name: apexAlarmFanFault
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Ok' }
-                        - { value:  2, generic: 0, graph: 0, descr: 'Indeterminate' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Warning' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Minor' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Major' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
+                        - { value:  1, generic: 0, descr: 'Ok' }
+                        - { value:  2, generic: 0, descr: 'Indeterminate' }
+                        - { value:  3, generic: 1, descr: 'Warning' }
+                        - { value:  4, generic: 1, descr: 'Minor' }
+                        - { value:  5, generic: 2, descr: 'Major' }
+                        - { value:  6, generic: 2, descr: 'Critical' }
                 -
                     oid: APEX-MIB::apexAlarmPowerFault
                     value: APEX-MIB::apexAlarmPowerFault
@@ -139,12 +139,12 @@ modules:
                     index: 'apexAlarmPowerFault.{{ $index }}'
                     state_name: apexAlarmPowerFault
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Ok' }
-                        - { value:  2, generic: 0, graph: 0, descr: 'Indeterminate' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Warning' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Minor' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Major' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
+                        - { value:  1, generic: 0, descr: 'Ok' }
+                        - { value:  2, generic: 0, descr: 'Indeterminate' }
+                        - { value:  3, generic: 1, descr: 'Warning' }
+                        - { value:  4, generic: 1, descr: 'Minor' }
+                        - { value:  5, generic: 2, descr: 'Major' }
+                        - { value:  6, generic: 2, descr: 'Critical' }
                 -
                     oid: APEX-MIB::apexAlarmGbeLossOfPhysicalInput
                     value: APEX-MIB::apexAlarmGbeLossOfPhysicalInput
@@ -153,12 +153,12 @@ modules:
                     index: 'apexAlarmGbeLossOfPhysicalInput.{{ $index }}'
                     state_name: apexAlarmGbeLossOfPhysicalInput
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Ok' }
-                        - { value:  2, generic: 0, graph: 0, descr: 'Indeterminate' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Warning' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Minor' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Major' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
+                        - { value:  1, generic: 0, descr: 'Ok' }
+                        - { value:  2, generic: 0, descr: 'Indeterminate' }
+                        - { value:  3, generic: 1, descr: 'Warning' }
+                        - { value:  4, generic: 1, descr: 'Minor' }
+                        - { value:  5, generic: 2, descr: 'Major' }
+                        - { value:  6, generic: 2, descr: 'Critical' }
                 -
                     oid: APEX-MIB::apexAlarmGbeBufferFullness
                     value: APEX-MIB::apexAlarmGbeBufferFullness
@@ -167,12 +167,12 @@ modules:
                     index: 'apexAlarmGbeBufferFullness.{{ $index }}'
                     state_name: apexAlarmGbeBufferFullness
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Ok' }
-                        - { value:  2, generic: 0, graph: 0, descr: 'Indeterminate' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Warning' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Minor' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Major' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
+                        - { value:  1, generic: 0, descr: 'Ok' }
+                        - { value:  2, generic: 0, descr: 'Indeterminate' }
+                        - { value:  3, generic: 1, descr: 'Warning' }
+                        - { value:  4, generic: 1, descr: 'Minor' }
+                        - { value:  5, generic: 2, descr: 'Major' }
+                        - { value:  6, generic: 2, descr: 'Critical' }
                 -
                     oid: APEX-MIB::apexAlarmServiceInError
                     value: APEX-MIB::apexAlarmServiceInError
@@ -181,12 +181,12 @@ modules:
                     index: 'apexAlarmServiceInError.{{ $index }}'
                     state_name: apexAlarmServiceInError
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Ok' }
-                        - { value:  2, generic: 0, graph: 0, descr: 'Indeterminate' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Warning' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Minor' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Major' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
+                        - { value:  1, generic: 0, descr: 'Ok' }
+                        - { value:  2, generic: 0, descr: 'Indeterminate' }
+                        - { value:  3, generic: 1, descr: 'Warning' }
+                        - { value:  4, generic: 1, descr: 'Minor' }
+                        - { value:  5, generic: 2, descr: 'Major' }
+                        - { value:  6, generic: 2, descr: 'Critical' }
                 -
                     oid: APEX-MIB::apexAlarmGbeLossOfInputStream
                     value: APEX-MIB::apexAlarmGbeLossOfInputStream
@@ -195,12 +195,12 @@ modules:
                     index: 'apexAlarmGbeLossOfInputStream.{{ $index }}'
                     state_name: apexAlarmGbeLossOfInputStream
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Ok' }
-                        - { value:  2, generic: 0, graph: 0, descr: 'Indeterminate' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Warning' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Minor' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Major' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
+                        - { value:  1, generic: 0, descr: 'Ok' }
+                        - { value:  2, generic: 0, descr: 'Indeterminate' }
+                        - { value:  3, generic: 1, descr: 'Warning' }
+                        - { value:  4, generic: 1, descr: 'Minor' }
+                        - { value:  5, generic: 2, descr: 'Major' }
+                        - { value:  6, generic: 2, descr: 'Critical' }
                 -
                     oid: APEX-MIB::apexAlarmOutputOverflow
                     value: APEX-MIB::apexAlarmOutputOverflow
@@ -209,12 +209,12 @@ modules:
                     index: 'apexAlarmOutputOverflow.{{ $index }}'
                     state_name: apexAlarmOutputOverflow
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Ok' }
-                        - { value:  2, generic: 0, graph: 0, descr: 'Indeterminate' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Warning' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Minor' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Major' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
+                        - { value:  1, generic: 0, descr: 'Ok' }
+                        - { value:  2, generic: 0, descr: 'Indeterminate' }
+                        - { value:  3, generic: 1, descr: 'Warning' }
+                        - { value:  4, generic: 1, descr: 'Minor' }
+                        - { value:  5, generic: 2, descr: 'Major' }
+                        - { value:  6, generic: 2, descr: 'Critical' }
                 -
                     oid: APEX-MIB::apexAlarmQamModuleFault
                     value: APEX-MIB::apexAlarmQamModuleFault
@@ -223,12 +223,12 @@ modules:
                     index: 'apexAlarmQamModuleFault.{{ $index }}'
                     state_name: apexAlarmQamModuleFault
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Ok' }
-                        - { value:  2, generic: 0, graph: 0, descr: 'Indeterminate' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Warning' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Minor' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Major' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
+                        - { value:  1, generic: 0, descr: 'Ok' }
+                        - { value:  2, generic: 0, descr: 'Indeterminate' }
+                        - { value:  3, generic: 1, descr: 'Warning' }
+                        - { value:  4, generic: 1, descr: 'Minor' }
+                        - { value:  5, generic: 2, descr: 'Major' }
+                        - { value:  6, generic: 2, descr: 'Critical' }
                 -
                     oid: APEX-MIB::apexAlarmQamRfPortFault
                     value: APEX-MIB::apexAlarmQamRfPortFault
@@ -237,12 +237,12 @@ modules:
                     index: 'apexAlarmQamRfPortFault.{{ $index }}'
                     state_name: apexAlarmQamRfPortFault
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Ok' }
-                        - { value:  2, generic: 0, graph: 0, descr: 'Indeterminate' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Warning' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Minor' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Major' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
+                        - { value:  1, generic: 0, descr: 'Ok' }
+                        - { value:  2, generic: 0, descr: 'Indeterminate' }
+                        - { value:  3, generic: 1, descr: 'Warning' }
+                        - { value:  4, generic: 1, descr: 'Minor' }
+                        - { value:  5, generic: 2, descr: 'Major' }
+                        - { value:  6, generic: 2, descr: 'Critical' }
                 -
                     oid: APEX-MIB::apexAlarmQamChannelFault
                     value: APEX-MIB::apexAlarmQamChannelFault
@@ -251,12 +251,12 @@ modules:
                     index: 'apexAlarmQamChannelFault.{{ $index }}'
                     state_name: apexAlarmQamChannelFault
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Ok' }
-                        - { value:  2, generic: 0, graph: 0, descr: 'Indeterminate' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Warning' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Minor' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Major' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
+                        - { value:  1, generic: 0, descr: 'Ok' }
+                        - { value:  2, generic: 0, descr: 'Indeterminate' }
+                        - { value:  3, generic: 1, descr: 'Warning' }
+                        - { value:  4, generic: 1, descr: 'Minor' }
+                        - { value:  5, generic: 2, descr: 'Major' }
+                        - { value:  6, generic: 2, descr: 'Critical' }
                 -
                     oid: APEX-MIB::apexAlarmRdsCommFault
                     value: APEX-MIB::apexAlarmRdsCommFault
@@ -265,12 +265,12 @@ modules:
                     index: 'apexAlarmRdsCommFault.{{ $index }}'
                     state_name: apexAlarmRdsCommFault
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Ok' }
-                        - { value:  2, generic: 0, graph: 0, descr: 'Indeterminate' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Warning' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Minor' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Major' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
+                        - { value:  1, generic: 0, descr: 'Ok' }
+                        - { value:  2, generic: 0, descr: 'Indeterminate' }
+                        - { value:  3, generic: 1, descr: 'Warning' }
+                        - { value:  4, generic: 1, descr: 'Minor' }
+                        - { value:  5, generic: 2, descr: 'Major' }
+                        - { value:  6, generic: 2, descr: 'Critical' }
                 -
                     oid: APEX-MIB::apexAlarmRemCommFault
                     value: APEX-MIB::apexAlarmRemCommFault
@@ -279,12 +279,12 @@ modules:
                     index: 'apexAlarmRemCommFault.{{ $index }}'
                     state_name: apexAlarmRemCommFault
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Ok' }
-                        - { value:  2, generic: 0, graph: 0, descr: 'Indeterminate' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Warning' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Minor' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Major' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
+                        - { value:  1, generic: 0, descr: 'Ok' }
+                        - { value:  2, generic: 0, descr: 'Indeterminate' }
+                        - { value:  3, generic: 1, descr: 'Warning' }
+                        - { value:  4, generic: 1, descr: 'Minor' }
+                        - { value:  5, generic: 2, descr: 'Major' }
+                        - { value:  6, generic: 2, descr: 'Critical' }
                 -
                     oid: APEX-MIB::apexAlarmRemFault
                     value: APEX-MIB::apexAlarmRemFault
@@ -293,9 +293,9 @@ modules:
                     index: 'apexAlarmRemFault.{{ $index }}'
                     state_name: apexAlarmRemFault
                     states:
-                        - { value:  1, generic: 0, graph: 0, descr: 'Ok' }
-                        - { value:  2, generic: 0, graph: 0, descr: 'Indeterminate' }
-                        - { value:  3, generic: 1, graph: 0, descr: 'Warning' }
-                        - { value:  4, generic: 1, graph: 0, descr: 'Minor' }
-                        - { value:  5, generic: 2, graph: 0, descr: 'Major' }
-                        - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
+                        - { value:  1, generic: 0, descr: 'Ok' }
+                        - { value:  2, generic: 0, descr: 'Indeterminate' }
+                        - { value:  3, generic: 1, descr: 'Warning' }
+                        - { value:  4, generic: 1, descr: 'Minor' }
+                        - { value:  5, generic: 2, descr: 'Major' }
+                        - { value:  6, generic: 2, descr: 'Critical' }

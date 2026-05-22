@@ -41,9 +41,9 @@ modules:
                     entPhysicalIndex: 'sr-{{ $index }}'
                     state_name: equipmentSubrackOperStatus
                     states:
-                        - { descr: notPresent, graph: 0, value: 1, generic: 0 }
-                        - { descr: down, graph: 0, value: 2, generic: 2 }
-                        - { descr: up, graph: 0, value: 3, generic: 0 }
+                        - { descr: notPresent, value: 1, generic: 0 }
+                        - { descr: down, value: 2, generic: 2 }
+                        - { descr: up, value: 3, generic: 0 }
 
                 -
                     oid: LUM-EQUIPMENT-MIB::equipmentSubrackTable
@@ -54,8 +54,8 @@ modules:
                     entPhysicalIndex: 'sr-{{ $index }}'
                     state_name: equipmentSubrackTempHighExceeded
                     states:
-                        - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: alarm, value: 2, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
 
                 -
                     oid: LUM-EQUIPMENT-MIB::equipmentBoardTable
@@ -66,9 +66,9 @@ modules:
                     entPhysicalIndex: 'board-{{ $index }}'
                     state_name: BoardOperStatus
                     states:
-                        - { descr: notPresent, graph: 0, value: 1, generic: 0 }
-                        - { descr: down, graph: 0, value: 2, generic: 2 }
-                        - { descr: up, graph: 0, value: 3, generic: 0 }
+                        - { descr: notPresent, value: 1, generic: 0 }
+                        - { descr: down, value: 2, generic: 2 }
+                        - { descr: up, value: 3, generic: 0 }
                     skip_values:
                         -
                             oid: LUM-EQUIPMENT-MIB::equipmentBoardAdminStatus
@@ -83,8 +83,8 @@ modules:
                     entPhysicalIndex: 'board-{{ $index }}'
                     state_name: BoardTempHighExceeded
                     states:
-                        - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: alarm, value: 2, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
 
                 -
                     oid: LUM-EQUIPMENT-MIB::equipmentPowerTable
@@ -95,8 +95,8 @@ modules:
                     entPhysicalIndex: 'psu-{{ $index }}'
                     state_name: PSUOperStatus
                     states:
-                        - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: alarm, value: 2, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
 
                 -
                     oid: LUM-EQUIPMENT-MIB::equipmentFanTable
@@ -107,8 +107,8 @@ modules:
                     entPhysicalIndex: 'fan-{{ $index }}'
                     state_name: FanOperStatus
                     states:
-                        - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: alarm, value: 2, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
 
                 -
                     oid: LUM-OA-MIB::oaIfTable
@@ -119,9 +119,9 @@ modules:
                     entPhysicalIndex: 'oa-{{ $index }}'
                     state_name: AmpOperStatus
                     states:
-                        - { descr: notPresent, graph: 0, value: 1, generic: 0 }
-                        - { descr: down, graph: 0, value: 2, generic: 2 }
-                        - { descr: up, graph: 0, value: 3, generic: 0 }
+                        - { descr: notPresent, value: 1, generic: 0 }
+                        - { descr: down, value: 2, generic: 2 }
+                        - { descr: up, value: 3, generic: 0 }
                     skip_values:
                         -
                             oid: LUM-OA-MIB::oaIfAdminStatus
@@ -137,8 +137,8 @@ modules:
                     entPhysicalIndex: 'oa-{{ $index }}'
                     state_name: AmpSaturationFault
                     states:
-                        - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: alarm, value: 2, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
                     skip_values:
                         -
                             oid: LUM-OA-MIB::oaIfAdminStatus
@@ -153,8 +153,8 @@ modules:
                     entPhysicalIndex: 'oa-{{ $index }}'
                     state_name: AmpTempExceeded
                     states:
-                        - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: alarm, value: 2, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
                     skip_values:
                         -
                             oid: LUM-OA-MIB::oaIfAdminStatus
@@ -170,8 +170,8 @@ modules:
                     entPhysicalIndex: 'oa-{{ $index }}'
                     state_name: AmpLoS
                     states:
-                        - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: alarm, value: 2, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
                     skip_values:
                         -
                             oid: LUM-OA-MIB::oaIfAdminStatus
@@ -187,9 +187,9 @@ modules:
                     entPhysicalIndex: 'oa-{{ $index }}'
                     state_name: AmplifierTxSignalStatus
                     states:
-                        - { descr: down, graph: 0, value: 1, generic: 2 }
-                        - { descr: degraded, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 3, generic: 0 }
+                        - { descr: down, value: 1, generic: 2 }
+                        - { descr: degraded, value: 2, generic: 2 }
+                        - { descr: ok, value: 3, generic: 0 }
                     skip_values:
                         -
                             oid: LUM-OA-MIB::oaIfAdminStatus
@@ -205,9 +205,9 @@ modules:
                     entPhysicalIndex: 'oa-{{ $index }}'
                     state_name: AmplifierRxSignalStatus
                     states:
-                        - { descr: down, graph: 0, value: 1, generic: 2 }
-                        - { descr: degraded, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 3, generic: 0 }
+                        - { descr: down, value: 1, generic: 2 }
+                        - { descr: degraded, value: 2, generic: 2 }
+                        - { descr: ok, value: 3, generic: 0 }
                     skip_values:
                         -
                             oid: LUM-OA-MIB::oaIfAdminStatus
@@ -223,8 +223,8 @@ modules:
                     entPhysicalIndex: 'oa-{{ $index }}'
                     state_name: AmpLoS
                     states:
-                        - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: alarm, value: 2, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
                     skip_values:
                         -
                             oid: LUM-OA-MIB::oaIfAdminStatus
@@ -239,9 +239,9 @@ modules:
                     group: oaVoa Operational States
                     state_name: OaVoaOperStatus
                     states:
-                        - { descr: notPresent, graph: 0, value: 1, generic: 0 }
-                        - { descr: down, graph: 0, value: 2, generic: 2 }
-                        - { descr: up, graph: 0, value: 3, generic: 0 }
+                        - { descr: notPresent, value: 1, generic: 0 }
+                        - { descr: down, value: 2, generic: 2 }
+                        - { descr: up, value: 3, generic: 0 }
                     skip_values:
                         -
                             oid: LUM-OA-MIB::oaVoaClientIfAdminStatus
@@ -256,9 +256,9 @@ modules:
                     group: oaVoa Operational States
                     state_name: OaVoaOperStatus
                     states:
-                        - { descr: notPresent, graph: 0, value: 1, generic: 0 }
-                        - { descr: down, graph: 0, value: 2, generic: 2 }
-                        - { descr: up, graph: 0, value: 3, generic: 0 }
+                        - { descr: notPresent, value: 1, generic: 0 }
+                        - { descr: down, value: 2, generic: 2 }
+                        - { descr: up, value: 3, generic: 0 }
                     skip_values:
                         -
                             oid: LUM-OA-MIB::oaVoaLineIfAdminStatus
@@ -274,9 +274,9 @@ modules:
                     entPhysicalIndex: 'ocm-{{ $index }}'
                     state_name: OCMOperStatus
                     states:
-                        - { descr: notPresent, graph: 0, value: 1, generic: 0 }
-                        - { descr: down, graph: 0, value: 2, generic: 2 }
-                        - { descr: up, graph: 0, value: 3, generic: 0 }
+                        - { descr: notPresent, value: 1, generic: 0 }
+                        - { descr: down, value: 2, generic: 2 }
+                        - { descr: up, value: 3, generic: 0 }
                     skip_values:
                         -
                             oid: LUM-OCM-MIB::ocmIfAdminStatus
@@ -292,8 +292,8 @@ modules:
                     entPhysicalIndex: 'ocm-{{ $index }}'
                     state_name: OCMSwitch
                     states:
-                        - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: alarm, value: 2, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
 
                 -
                     oid: LUM-OCM-MIB::ocmIfTable
@@ -304,8 +304,8 @@ modules:
                     entPhysicalIndex: 'ocm-{{ $index }}'
                     state_name: OCMModule
                     states:
-                        - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: alarm, value: 2, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
 
                 -
                     oid: LUM-IFOTN-MIB::ifOtnOtuTable
@@ -316,8 +316,8 @@ modules:
                     entPhysicalIndex: 'otn-{{ $index }}'
                     state_name: OTNLoF
                     states:
-                        - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: alarm, value: 2, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
 
                 -
                     oid: LUM-IFOTN-MIB::ifOtnOtuTable
@@ -328,8 +328,8 @@ modules:
                     entPhysicalIndex: 'otn-{{ $index }}'
                     state_name: OTNLoMF
                     states:
-                        - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: alarm, value: 2, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
 
                 -
                     oid: LUM-IFOTN-MIB::ifOtnOtuTable
@@ -340,8 +340,8 @@ modules:
                     entPhysicalIndex: 'otn-{{ $index }}'
                     state_name: OTNIndicationSignal
                     states:
-                        - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: alarm, value: 2, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
 
                 -
                     oid: LUM-IFOTNMON-MIB::ifOtnMonSmTable
@@ -352,8 +352,8 @@ modules:
                     entPhysicalIndex: 'otnmon-{{ $index }}'
                     state_name: OTNBDIState
                     states:
-                        - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: alarm, value: 2, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
 
                 -
                     oid: LUM-IFOTNMON-MIB::ifOtnMonSmTable
@@ -364,8 +364,8 @@ modules:
                     entPhysicalIndex: 'otnmon-{{ $index }}'
                     state_name: OTNIAEState
                     states:
-                        - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: alarm, value: 2, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
 
                 -
                     oid: LUM-IFOTNMON-MIB::ifOtnMonSmTable
@@ -376,8 +376,8 @@ modules:
                     entPhysicalIndex: 'otnmon-{{ $index }}'
                     state_name: OTNBIAEState
                     states:
-                        - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: alarm, value: 2, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
 
                 -
                     oid: LUM-WDM-MIB::wdmCtrlChannelTable
@@ -387,13 +387,13 @@ modules:
                     group: WDM Channel States
                     state_name: WDMChannelStatus
                     states:
-                        - { descr: initial, graph: 0, value: 1, generic: 3 }
-                        - { descr: searching, graph: 0, value: 2, generic: 1 }
-                        - { descr: regulating, graph: 0, value: 3, generic: 1 }
-                        - { descr: ok, graph: 0, value: 4, generic: 0 }
-                        - { descr: not found, graph: 0, value: 5, generic: 2 }
-                        - { descr: error, graph: 0, value: 6, generic: 2 }
-                        - { descr: waiting, graph: 0, value: 7, generic: 1 }
+                        - { descr: initial, value: 1, generic: 3 }
+                        - { descr: searching, value: 2, generic: 1 }
+                        - { descr: regulating, value: 3, generic: 1 }
+                        - { descr: ok, value: 4, generic: 0 }
+                        - { descr: not found, value: 5, generic: 2 }
+                        - { descr: error, value: 6, generic: 2 }
+                        - { descr: waiting, value: 7, generic: 1 }
                     skip_values:
                         -
                             oid: LUM-WDM-MIB::wdmCtrlChannelAdminStatus
@@ -408,8 +408,8 @@ modules:
                     group: WDM Channel States
                     state_name: WDMChannelLoSStatus
                     states:
-                        - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: alarm, value: 2, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
                     skip_values:
                         -
                             oid: LUM-WDM-MIB::wdmCtrlChannelAdminStatus
@@ -425,9 +425,9 @@ modules:
                     entPhysicalIndex: 'physport-{{ $index }}'
                     state_name: PhysPortState
                     states:
-                        - { descr: notPresent, graph: 0, value: 1, generic: 0 }
-                        - { descr: down, graph: 0, value: 2, generic: 2 }
-                        - { descr: up, graph: 0, value: 3, generic: 0 }
+                        - { descr: notPresent, value: 1, generic: 0 }
+                        - { descr: down, value: 2, generic: 2 }
+                        - { descr: up, value: 3, generic: 0 }
                     skip_values:
                         -
                             oid: LUM-IFBASIC-MIB::ifBasicAdminAdminStatus
@@ -442,9 +442,9 @@ modules:
                     group: DCN Port States
                     state_name: DCNPortState
                     states:
-                        - { descr: notPresent, graph: 0, value: 1, generic: 0 }
-                        - { descr: down, graph: 0, value: 2, generic: 2 }
-                        - { descr: up, graph: 0, value: 3, generic: 0 }
+                        - { descr: notPresent, value: 1, generic: 0 }
+                        - { descr: down, value: 2, generic: 2 }
+                        - { descr: up, value: 3, generic: 0 }
                     skip_values:
                         -
                             oid: LUM-DCN-MIB::dcnIfAdminStatus

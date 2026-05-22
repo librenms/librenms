@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Customoid;
+
 header('Content-type: application/json');
 
 if (Gate::none(['customoid.create', 'customoid.update'])) {
@@ -13,7 +15,7 @@ $status = 'error';
 $message = '';
 
 $device_id = $_POST['device_id'];
-$id = $_POST['ccustomoid_id'];
+$id = $_POST['customoid_id'];
 $action = $_POST['action'];
 $name = strip_tags((string) $_POST['name']);
 $oid = strip_tags((string) $_POST['oid']);
@@ -94,7 +96,7 @@ if ($action == 'test') {
         }
     } elseif (empty($name)) {
         $message = 'No OID name provided';
-    } elseif (dbFetchCell('SELECT 1 FROM `customoids` WHERE `customoid_descr` = ? AND `device_id`=?', [$name, $device_id])) {
+    } elseif (Customoid::where('customoid_descr', $name)->where('device_id', $device_id)->exists()) {
         $message = "OID named <i>$name</i> on this device already exists";
     } else {
         Gate::authorize('customoid.create');
