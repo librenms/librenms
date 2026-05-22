@@ -102,6 +102,8 @@ final class OSModulesTest extends DBTestCase
         // stub out Eventlog::log and Fping->ping, we don't need to store them for these tests
         $this->stubClasses();
 
+        $ob_level = ob_get_level();
+
         try {
             $helper = new ModuleTestHelper(new ModuleList($modules), $os, $variant);
             $helper->setQuiet();
@@ -111,6 +113,10 @@ final class OSModulesTest extends DBTestCase
             $results = $helper->generateTestData($this->getSnmpsimIp(), $this->getSnmpsimPort(), true);
         } catch (FileNotFoundException|InvalidModuleException $e) {
             $this->fail($e->getMessage());
+        } finally {
+            while (ob_get_level() > $ob_level) {
+                ob_end_clean();
+            }
         }
 
         if (is_null($results)) {
