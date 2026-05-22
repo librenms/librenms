@@ -85,18 +85,23 @@
             <div x-show="showAdd" x-cloak x-transition @click.stop
                  :class="filters.length > 0 ? 'tw:right-0' : 'tw:left-0'"
                  class="tw:absolute tw:top-full tw:mt-2 tw:min-w-70 tw:max-w-[90vw] tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-neutral-200 tw:dark:border-dark-gray-200 tw:rounded-lg tw:shadow-xl tw:z-50 tw:py-2">
-                <div class="tw:px-5 tw:py-2 tw:text-neutral-400 tw:dark:text-dark-white-400 tw:uppercase tw:tracking-wider">{{ __('Select Field') }}</div>
-                <template x-for="(field, index) in fields" :key="field.key">
-                    <button type="button" @click="open(field)"
-                            :class="[isActive(field.key) ? 'tw:text-blue-600! tw:dark:text-blue-400! tw:bg-blue-50/50 tw:dark:bg-blue-900/20' : 'tw:text-neutral-600! tw:dark:text-dark-white-200!', highlightedIndex === index ? 'tw:bg-neutral-100 tw:dark:bg-dark-gray-300' : '']"
-                            class="tw:flex tw:items-center tw:justify-between tw:w-full tw:px-5 tw:py-3 tw:text-left tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-300 tw:transition-colors">
-                        <span x-text="field.label"></span>
-                        <svg x-show="isActive(field.key)" class="tw:w-[1em] tw:h-[1em]" viewBox="0 0 10 10" fill="none"
-                             stroke="currentColor" stroke-width="2.5">
-                            <path d="M1.5 5l3 3 4-5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+
+                @foreach($fields as $index => $field)
+                    <button type="button" @click="open(fields[{{ $index }}])"
+                            :class="[isActive(fields[{{ $index }}].key) ? 'tw:text-blue-600! tw:dark:text-blue-400! tw:bg-blue-50/50 tw:dark:bg-blue-900/20' : 'tw:text-neutral-600! tw:dark:text-dark-white-200!', highlightedIndex === {{ $index }} ? 'tw:bg-neutral-100 tw:dark:bg-dark-gray-300' : '']"
+                            class="tw:flex tw:items-center tw:w-full tw:px-5 tw:py-2.5 tw:text-left tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-300 tw:transition-colors tw:gap-3">
+
+                        {{-- Left Side Icon and Label Section --}}
+                        <div class="tw:flex tw:items-center tw:gap-3 tw:grow">
+                            <i class="{{ $getFieldIcon($field['type'] ?? 'text') }} fa-fw tw:text-neutral-400 tw:dark:text-dark-white-400 tw:text-center"></i>
+                            <span>{{ $field['label'] }}</span>
+                        </div>
+
+                        {{-- Right Side Active Status Checkmark --}}
+                        <i x-show="isActive(fields[{{ $index }}].key)"
+                           class="fa-solid fa-check fa-fw"></i>
                     </button>
-                </template>
+                @endforeach
             </div>
         </div>
     </div>

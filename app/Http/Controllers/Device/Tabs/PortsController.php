@@ -46,7 +46,6 @@ class PortsController implements DeviceTab
 {
     private bool $detail = true;
     private array $settings = [];
-    private array $savedFilter = [];
     private array $defaults = [
         'perPage' => 32,
         'sort' => 'ifIndex',
@@ -409,7 +408,7 @@ class PortsController implements DeviceTab
         return Port::where('device_id', $device->device_id)
             ->isNotDeleted()
             ->hasAccess(Auth::user())->with($relationships)
-            ->when(array_merge($this->savedFilter, $request->array('filter')), fn (Builder $q, $filters) => $q->applyFilters($filters))
+            ->when($request->array('filter'), fn (Builder $q, $filters) => $q->applyFilters($filters))
             ->when($this->settings['sort'] == 'port', fn (Builder $q, $sort) => $q
                 ->orderByRaw('SOUNDEX(ifName) ' . $this->settings['order'])
                 ->orderByRaw('CHAR_LENGTH(ifName) ' . $this->settings['order'])
@@ -467,18 +466,22 @@ class PortsController implements DeviceTab
         return [
             [
                 'key' => 'search',
-                'label' => 'Description',
+                'label' => __('Description'),
                 'type' => 'text',
             ],
             [
                 'key' => 'state',
-                'label' => 'Oper Status',
+                'label' => __('port.oper_status'),
                 'type' => 'select',
-                'options' => ['up', 'down', 'shutdown'],
+                'options' => [
+                    'up' => __('Up'),
+                    'down' => __('Down'),
+                    'shutdown' => __('Shutdown'),
+                ],
             ],
             [
                 'key' => 'ifSpeed',
-                'label' => 'Speed',
+                'label' => __('port.speed'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.port-field'),
                 'params' => [
@@ -488,7 +491,7 @@ class PortsController implements DeviceTab
             ],
             [
                 'key' => 'ifType',
-                'label' => 'Media',
+                'label' => __('port.media'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.port-field'),
                 'params' => [
@@ -497,8 +500,18 @@ class PortsController implements DeviceTab
                 ],
             ],
             [
+                'key' => 'ifDuplex',
+                'label' => __('port.duplex'),
+                'type' => 'select',
+                'options' => [
+                    'fullDuplex' => __('port.duplex_full'),
+                    'halfDuplex' => __('port.duplex_half'),
+                    'unknown' => __('port.duplex_unknown'),
+                ],
+            ],
+            [
                 'key' => 'port_type',
-                'label' => 'Port Type',
+                'label' => __('port.port_type'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.port-field'),
                 'params' => [
@@ -507,18 +520,23 @@ class PortsController implements DeviceTab
                 ],
             ],
             [
+                'key' => 'errors',
+                'label' => __('port.errors'),
+                'type' => 'boolean',
+            ],
+            [
                 'key' => 'ignore',
-                'label' => 'Ignored',
+                'label' => __('Ignored'),
                 'type' => 'boolean',
             ],
             [
                 'key' => 'disabled',
-                'label' => 'Disabled',
+                'label' => __('Disabled'),
                 'type' => 'boolean',
             ],
             [
                 'key' => 'deleted',
-                'label' => 'Deleted',
+                'label' => __('Deleted'),
                 'type' => 'boolean',
             ],
         ];
