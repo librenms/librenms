@@ -48,7 +48,7 @@ class DevicesController extends Controller
         } else {
             $view ??= match ($legacyFormat->toString()) {
                 'list_basic' => 'basic',
-                default      => 'detail',
+                default => 'detail',
             };
             $graph ??= '';
         }
