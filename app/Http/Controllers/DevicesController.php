@@ -41,19 +41,16 @@ class DevicesController extends Controller
         $hideFilter = $request->input('searchbar') === 'hide';
         $perPage = $request->integer('per_page', 50);
 
-        $legacyFormat = (string) $request->string('format');
-        $view ??= 'detail';
-        if ($legacyFormat) {
-            if (str_starts_with($legacyFormat, 'graph_')) {
-                $view ??= 'graph';
-                $graph ??= substr($legacyFormat, 6);
-            } else {
-                $view ??= match ($legacyFormat) {
-                    'list_basic' => 'basic',
-                    default => 'detail',
-                };
-                $graph ??= '';
-            }
+        $legacyFormat = $request->string('format');
+        if ($legacyFormat->startsWith('graph_')) {
+            $view ??= 'graph';
+            $graph ??= $legacyFormat->after('graph_')->toString();
+        } else {
+            $view ??= match ($legacyFormat->toString()) {
+                'list_basic' => 'basic',
+                default      => 'detail',
+            };
+            $graph ??= '';
         }
 
         $graphTemplate = [
