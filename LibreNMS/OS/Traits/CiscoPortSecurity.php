@@ -29,11 +29,12 @@ namespace LibreNMS\OS\Traits;
 use App\Facades\PortCache;
 use App\Models\PortSecurity;
 use Illuminate\Support\Collection;
+use LibreNMS\OS;
 use SnmpQuery;
 
 trait CiscoPortSecurity
 {
-    public function pollPortSecurity($os): Collection
+    public function pollPortSecurity(OS $os): Collection
     {
         return SnmpQuery::enumStrings()->walk([
             'CISCO-PORT-SECURITY-MIB::cpsIfPortSecurityEnable',

@@ -28,14 +28,15 @@ namespace LibreNMS\Interfaces\Polling;
 
 use App\Models\PortSecurity;
 use Illuminate\Support\Collection;
+use LibreNMS\OS;
 
 interface PortSecurityPolling
 {
     /**
      * Poll the ports for port-security data
      *
-     * @param  mixed  $os
+     * @param  OS  $os
      * @return Collection<PortSecurity>
      */
-    public function pollPortSecurity($os): Collection;
+    public function pollPortSecurity(OS $os): Collection;
 }

@@ -68,8 +68,6 @@ class PortSecurity implements Module
 
     /**
      * Poll data for this module and update the DB
-     *
-     * @param  \LibreNMS\OS  $os
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
