@@ -44,6 +44,9 @@ class PermissionsCache
     /** @var array<int, Collection<int>> */
     private array $deviceGroupMap = [];
 
+    /** @var array<int, Collection<int>> */
+    private array $portGroupMap = [];
+
     /** @var Collection<object{user_id: int, port_id: int}>|null */
     private ?Collection $portPermissions = null;
 
@@ -78,11 +81,7 @@ class PermissionsCache
      */
     public function canAccessPortGroup(PortGroup $portGroup, User|int|null $user = null): bool
     {
-        $ports_allowed = $this->portsForUser($user);
-        $devices_allowed = $this->devicesForUser($user);
-
-        // Find all ports that are not allowed by port ID and not allowed by device ID, making sure that there are no matches
-        return $portGroup->ports->filter(fn ($port, $key) => ! $ports_allowed->contains($port->port_id) && ! $devices_allowed->contains($port->device_id))->count() == 0;
+        return $this->portGroupsForUser($user)->contains($portGroup->id);
     }
 
     /**
@@ -194,6 +193,27 @@ class PermissionsCache
         }
 
         return $this->devicePermissions[$user_id];
+    }
+
+    /**
+     * Get the ids of all port groups the user can access
+     *
+     * @return Collection<int>
+     */
+    public function portGroupsForUser(User|int|null $user = null): Collection
+    {
+        $user_id = $this->getUserId($user);
+
+        // if we don't have a map for this user yet, populate it.
+        if (! isset($this->portGroupMap[$user_id])) {
+            $this->portGroupMap[$user_id] = PortGroup::withCount([
+                'ports' => function ($q) use ($user): void {
+                    $q->hasAccess($user);
+                },
+            ])->having('ports_count', '>', 0)->get()->pluck('id');
+        }
+
+        return $this->portGroupMap[$user_id];
     }
 
     /**
