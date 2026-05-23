@@ -210,7 +210,7 @@ class PermissionsCache
                 'ports' => function ($q) use ($user): void {
                     $q->hasAccess($user);
                 },
-            ])->having('ports_count', '>', 0)->get()->pluck('id');
+            ])->having('ports_count', '>', 0)->pluck('id');
         }
 
         return $this->portGroupMap[$user_id];
