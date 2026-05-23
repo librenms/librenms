@@ -28,6 +28,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Gate;
+use Permissions;
 
 class PortGroup extends BaseModel
 {
@@ -40,8 +41,7 @@ class PortGroup extends BaseModel
             return $query;
         }
 
-        // maybe filtered in future
-        return $query->limit(0);
+        return $query->whereIntegerInRaw('id', Permissions::portGroupsForUser($user));
     }
 
     /**
