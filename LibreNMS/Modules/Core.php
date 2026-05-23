@@ -62,17 +62,23 @@ class Core implements Module
 
     public function discover(OS $os): void
     {
-        $snmpdata = SnmpQuery::numeric()->get(['SNMPv2-MIB::sysObjectID.0', 'SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysName.0'])
-            ->values();
+        $snmpdata = SnmpQuery::numeric()->get([
+            'SNMPv2-MIB::sysObjectID.0',
+            'SNMPv2-MIB::sysDescr.0',
+            'SNMPv2-MIB::sysName.0',
+        ])->values();
+
+        $snmp_engine = SnmpQuery::get('SNMP-FRAMEWORK-MIB::snmpEngineID.0')->value();
 
         $device = $os->getDevice();
         $device->fill([
             'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'] ?? null,
             'sysName' => $snmpdata['.1.3.6.1.2.1.1.5.0'] ?? null,
             'sysDescr' => $snmpdata['.1.3.6.1.2.1.1.1.0'] ?? null,
+            'snmpEngineID' => $snmp_engine,
         ]);
 
-        foreach (['sysObjectID', 'sysName', 'sysDescr'] as $attribute) {
+        foreach (['sysObjectID', 'sysName', 'sysDescr', 'snmpEngineID'] as $attribute) {
             if ($device->isDirty($attribute)) {
                 $message = DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute));
                 Eventlog::log($message, $device, 'system', Severity::Notice);

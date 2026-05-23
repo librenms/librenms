@@ -1,3 +1,33 @@
+## 26.5.1
+*(2026-05-20)*
+
+A big thank you to the following 4 contributors this last month:
+
+  - [laf](https://github.com/laf) (2)
+  - [murrant](https://github.com/murrant) (2)
+  - [dependabot](https://github.com/apps/dependabot) (1)
+  - [robje](https://github.com/robje) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [laf](https://github.com/laf) (3)
+  - [Jellyfrog](https://github.com/Jellyfrog) (2)
+
+#### Device
+* Correct C1 RX and D1 RX description ([#19700](https://github.com/librenms/librenms/pull/19700)) - [robje](https://github.com/robje)
+
+#### Webui
+* Fix ports show filter text ([#19698](https://github.com/librenms/librenms/pull/19698)) - [murrant](https://github.com/murrant)
+
+#### Bug
+* Fixed unknown ifOperStatus Enum values ([#19708](https://github.com/librenms/librenms/pull/19708)) - [laf](https://github.com/laf)
+* Fix Network map ([#19707](https://github.com/librenms/librenms/pull/19707)) - [laf](https://github.com/laf)
+* Fix display name on null device ([#19702](https://github.com/librenms/librenms/pull/19702)) - [murrant](https://github.com/murrant)
+
+#### Dependencies
+* Bump composer/composer from 2.9.7 to 2.9.8 ([#19705](https://github.com/librenms/librenms/pull/19705)) - [dependabot](https://github.com/apps/dependabot)
+
+
 ## 26.5.0
 *(2026-05-18)*
 

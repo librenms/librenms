@@ -74,52 +74,42 @@ trait CiscoPortSecurity
         // Assigning port_id and device_id to SNMP array for comparison
         $portsec = $device->portSecurity;
 
-        foreach ($portsec_snmp as $item) {
-            $if_index = $item['ifIndex'];
-            if (array_key_exists('ifIndex', $portsec_snmp[$if_index]) and array_key_exists($portsec_snmp[$if_index]['ifIndex'], $port_key)) {
-                $portsec_snmp[$if_index]['port_id'] = $port_key[$portsec_snmp[$if_index]['ifIndex']];
-                $portsec_snmp[$if_index]['device_id'] = $device_id;
+        foreach ($portsec_snmp as $if_index => $snmp) {
+            if (! is_array($snmp) || ! array_key_exists($if_index, $port_key)) {
+                continue;
             }
 
-            if (array_key_exists($if_index, $port_key)) {
-                $port_id = $port_key[$if_index];
-
-                // Map SNMP fields to database schema fields
-                $record = [];
-                $record['port_id'] = $portsec_snmp[$if_index]['port_id'] ?? null;
-                $record['device_id'] = $portsec_snmp[$if_index]['device_id'] ?? null;
-                $record['port_security_enable'] = $portsec_snmp[$if_index]['cpsIfPortSecurityEnable'] ?? null;
-                $record['status'] = $portsec_snmp[$if_index]['cpsIfPortSecurityStatus'] ?? null;
-                $record['max_addresses'] = $portsec_snmp[$if_index]['cpsIfMaxSecureMacAddr'] ?? null;
-                $record['address_count'] = $portsec_snmp[$if_index]['cpsIfCurrentSecureMacAddrCount'] ?? null;
-                $record['violation_action'] = $portsec_snmp[$if_index]['cpsIfViolationAction'] ?? null;
-                $record['violation_count'] = $portsec_snmp[$if_index]['cpsIfViolationCount'] ?? null;
-                $record['last_mac_address'] = $portsec_snmp[$if_index]['cpsIfSecureLastMacAddress'] ?? null;
-                $record['sticky_enable'] = $portsec_snmp[$if_index]['cpsIfStickyEnable'] ?? null;
+            if (! array_key_exists('cpsIfPortSecurityEnable', $snmp)) {
+                continue;
             }
 
-            $update = new PortSecurity;
+            $port_id = $port_key[$if_index];
+
+            $record = [
+                'port_id' => $port_id,
+                'device_id' => $device_id,
+                'port_security_enable' => ($snmp['cpsIfPortSecurityEnable'] ?? null) === 'true',
+                'status' => $snmp['cpsIfPortSecurityStatus'] ?? null,
+                'max_addresses' => $snmp['cpsIfMaxSecureMacAddr'] ?? null,
+                'address_count' => $snmp['cpsIfCurrentSecureMacAddrCount'] ?? null,
+                'violation_action' => $snmp['cpsIfViolationAction'] ?? null,
+                'violation_count' => $snmp['cpsIfViolationCount'] ?? null,
+                'last_mac_address' => $snmp['cpsIfSecureLastMacAddress'] ?? null,
+                'sticky_enable' => array_key_exists('cpsIfStickyEnable', $snmp) ? $snmp['cpsIfStickyEnable'] === 'true' : null,
+            ];
+
+            $attributes = array_filter($record, fn ($value) => $value !== null);
+
             $entry = $portsec->where('port_id', $port_id)->first();
-            // Checking if entry exists in DB already. If true, compare polled to DB.
-            // If no entry, insert new.
+
             if ($entry) {
-                $entry = $entry->toArray();
-                unset($entry['id']);
-                unset($entry['laravel_through_key']);
+                $entry->fill($attributes);
 
-                // Remove null values from record for comparison
-                $record = array_filter($record, fn ($value) => $value !== null);
-
-                // Checking that polled data exists and doesn't match. Else if polled data exists, insert a new record.
-                if (isset($record['port_security_enable']) and $record != $entry) {
-                    unset($record['port_id']);
-                    //echo "Updating\n";
-                    $update->where('port_id', $port_id)->update($record);
+                if ($entry->isDirty()) {
+                    $entry->save();
                 }
-            } elseif (isset($record['port_security_enable'])) {
-                //$update->where('port_id', $port_id)->update($record);
-                //echo "Creating\n";
-                $update->create($record);
+            } else {
+                PortSecurity::create($attributes);
             }
         }
 
