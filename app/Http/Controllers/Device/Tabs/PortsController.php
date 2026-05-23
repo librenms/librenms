@@ -27,6 +27,7 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Facades\LibrenmsConfig;
+use App\Http\Controllers\PortSecurityController;
 use App\Models\Device;
 use App\Models\Link;
 use App\Models\Port;
@@ -82,6 +83,7 @@ class PortsController implements DeviceTab
             'from' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
             'to' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
             ...Port::filterValidationRules(),
+            ...PortSecurity::filterValidationRules(),
         ]);
 
         $this->loadSettings($request);
@@ -99,7 +101,9 @@ class PortsController implements DeviceTab
         return array_merge([
             'tab' => $tab,
             'details' => $this->detail,
-            'filterFields' => $this->filterFields($device->device_id),
+            'filterFields' => $tab === 'portsecurity'
+                ? PortSecurity::filterFieldDefinitions($device->device_id)
+                : $this->filterFields($device->device_id),
             'submenu' => [
                 $this->getTabs($device),
                 __('Graphs') => $this->getGraphLinks(),
@@ -283,7 +287,12 @@ class PortsController implements DeviceTab
 
     private function portSecurityData(Device $device): array
     {
-        return [];
+        return [
+            'portSecurity' => PortSecurityController::paginateForDevice(
+                $device->device_id,
+                $this->settings['perPage']
+            ),
+        ];
     }
 
     private function getTabs(Device $device): array

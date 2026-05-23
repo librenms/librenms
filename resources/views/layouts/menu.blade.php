@@ -331,7 +331,7 @@
                             </li>
                         @endif
 
-                        <li><a href="{{ url('search/secureports') }}"><i class="fa fa-shield fa-fw fa-lg"
+                        <li><a href="{{ route('port-security.index') }}"><i class="fa fa-shield fa-fw fa-lg"
                                                                          aria-hidden="true"></i> {{ __('Port Security') }}</a>
                         </li>
 
