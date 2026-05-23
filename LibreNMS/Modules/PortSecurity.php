@@ -75,7 +75,7 @@ class PortSecurity implements Module
     {
         if ($os instanceof PortSecurityPolling) {
             $device = $os->getDevice();
-            $portsec = $os->pollPortSecurity($os, $device);
+            $portsec = $os->pollPortSecurity($os);
             ModuleModelObserver::observe(\App\Models\PortSecurity::class);
             $this->syncModels($device, 'portSecurity', $portsec);
         }

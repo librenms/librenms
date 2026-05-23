@@ -35,8 +35,7 @@ interface PortSecurityPolling
      * Poll the ports for port-security data
      *
      * @param  mixed  $os
-     * @param  mixed  $device
      * @return Collection<PortSecurity>
      */
-    public function pollPortSecurity($os, $device): Collection;
+    public function pollPortSecurity($os): Collection;
 }
