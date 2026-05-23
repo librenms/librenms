@@ -8,7 +8,7 @@
 @include('alerts.modals.notes')
 @if (!$bare)
 <div class="row collapse @if(!$hide_dashboard_editor)in @endif" id="dashboard-editor">
-    <div class="col-md-12">
+    <div class="col-md-12 tw:pl-0!">
         <div class="btn-group btn-lg">
             <button class="btn btn-default disabled" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.title') }}</span></button>
             <div class="btn-group">
@@ -512,8 +512,8 @@
 
     function widget_dom(data) {
         dom = '<div id="'+data.user_widget_id+'" class="grid-stack-item" data-type="'+data.widget+'" data-settings="0" gs-id="'+data.user_widget_id+'">'+
-              '<div class="grid-stack-item-content">'+
-              '<header class="widget_header"><span id="widget_title_'+data.user_widget_id+'">'+data.title+
+              '<div class="grid-stack-item-content tw:left-0! tw:right-0!">'+
+              '<header class="tw:bg-gray-200 tw:dark:bg-dark-gray-200 tw:text-gray-800 tw:dark:text-dark-white-100 tw:p-2 tw:rounded-t-lg"><span id="widget_title_'+data.user_widget_id+'">'+data.title+
               '</span><span id="widget_title_counter_'+data.user_widget_id+'"></span>'+
               '<span class="fade-edit pull-right">'+
 
