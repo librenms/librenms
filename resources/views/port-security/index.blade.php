@@ -10,7 +10,7 @@
         </div>
         <x-table-export
             :export-route="route('port-security.export')"
-            :filters="$filter"
+            :filter="$filter"
             :page="$portSecurity->currentPage()"
             :per-page="$perPage"
             class="tw:shrink-0"

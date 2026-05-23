@@ -1,30 +1,41 @@
 @props([
     'exportRoute',
     'params' => [],
-    'filters' => [],
+    'filter' => [],
+    'filterName' => null,
     'page' => 1,
     'perPage' => 50,
-    'perPageParam' => 'perPage',
 ])
 
-<div {{ $attributes->merge(['class' => 'btn-group pull-right']) }}
-     data-page="{{ $page }}"
-     data-per-page="{{ $perPage }}"
-     data-per-page-param="{{ $perPageParam }}"
-     data-filters="{{ json_encode($filters) }}">
-    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<div
+    {{ $attributes->merge(['class' => 'btn-group']) }}
+    x-data="tableExport({
+        exportRoute: '{{ $exportRoute }}',
+        params: {{ Js::from($params) }},
+        filter: {{ Js::from($filter) }},
+        filterName: '{{ $filterName }}',
+        page: {{ $page }},
+        perPage: {{ $perPage }},
+    })"
+    x-init="window.addEventListener('filter:apply', (e) => onFilterChanged(e.detail))"
+>
+    <button
+        type="button"
+        class="btn btn-default dropdown-toggle"
+        data-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+    >
         <i class="fa fa-download"></i> <span class="caret"></span>
     </button>
     <ul class="dropdown-menu dropdown-menu-right">
         <li>
-            <a href="#" class="table-export-link" data-export-type="visible"
-               data-export-route="{{ $exportRoute }}" data-export-params="{{ json_encode($params) }}">
+            <a href="#" x-on:click.prevent="exportData('visible')">
                 <i class="fa-solid fa-fw fa-file-csv"></i> {{ __('Export page') }}
             </a>
         </li>
         <li>
-            <a href="#" class="table-export-link" data-export-type="all"
-               data-export-route="{{ $exportRoute }}" data-export-params="{{ json_encode($params) }}">
+            <a href="#" x-on:click.prevent="exportData('all')">
                 <i class="fa-solid fa-fw fa-file-csv"></i> {{ __('Export all results') }}
             </a>
         </li>
@@ -33,66 +44,48 @@
 
 @once
     @push('scripts')
-    <script>
-        function appendFiltersToParams(params, filters) {
-            if (! filters || typeof filters !== 'object') {
-                return;
-            }
-
-            Object.entries(filters).forEach(function ([key, operators]) {
-                if (! operators || typeof operators !== 'object') {
-                    return;
-                }
-
-                Object.entries(operators).forEach(function ([operator, value]) {
-                    const paramKey = 'filter[' + key + '][' + operator + ']';
-
-                    if (Array.isArray(value)) {
-                        params.set(paramKey, value.join(','));
-                    } else if (value !== null && value !== undefined) {
-                        params.set(paramKey, value);
-                    }
-                });
-            });
-        }
-
-        $(document).on('click', '.table-export-link', function (e) {
-            e.preventDefault();
-
-            const exportType = $(this).data('export-type');
-            const exportRoute = $(this).data('export-route');
-            const extraParams = $(this).data('exportParams') || {};
-            const $group = $(this).closest('.btn-group');
-            const defaultPage = $group.data('page') || 1;
-            const defaultPerPage = $group.data('perPage') || 50;
-            const perPageParam = $group.data('perPageParam') || 'perPage';
-            const serverFilters = $group.data('filters') || {};
-            const params = new URLSearchParams(window.location.search);
-
-            appendFiltersToParams(params, serverFilters);
-
-            Object.entries(extraParams).forEach(function ([key, value]) {
-                if (value !== null && value !== '') {
-                    params.set(key, value);
-                }
-            });
-
-            if (exportType === 'visible') {
-                params.set('export', 'page');
-                params.set('page', params.get('page') || String(defaultPage));
-                params.set(
+        <script>
+            function tableExport({ exportRoute, params, filter, filterName, page, perPage, perPageParam }) {
+                return {
+                    exportRoute,
+                    params,
+                    filter,
+                    filterName,
+                    page,
+                    perPage,
                     perPageParam,
-                    params.get(perPageParam) || String(defaultPerPage)
-                );
-            } else {
-                params.set('export', 'all');
-                params.delete('page');
-                params.delete('current');
-                params.delete(perPageParam);
-            }
 
-            window.location.href = exportRoute + '?' + params.toString();
-        });
-    </script>
+                    onFilterChanged(detail) {
+                        if (this.filterName && detail?.name !== this.filterName) return;
+
+                        if (detail?.filters && typeof detail.filters === 'object') {
+                            this.filter = detail.filters;
+                        }
+                    },
+
+                    exportData(type) {
+                        const url = new URL(this.exportRoute, window.location.origin);
+
+                        LibreNMS.Url.applyNestedParamsToUrl(url, 'filter', this.filter);
+
+                        Object.entries(this.params).forEach(([key, value]) => {
+                            if (value !== null && value !== '') {
+                                url.searchParams.set(key, value);
+                            }
+                        });
+
+                        if (type === 'visible') {
+                            url.searchParams.set('export', 'page');
+                            url.searchParams.set('page', String(this.page));
+                            url.searchParams.set('perPage', String(this.perPage));
+                        } else {
+                            url.searchParams.set('export', 'all');
+                        }
+
+                        window.location.href = url.toString();
+                    }
+                };
+            }
+        </script>
     @endpush
 @endonce
