@@ -301,11 +301,13 @@
                     </ul>
                 </li>
 {{-- Ports --}}
+            @if($show_ports_menu)
                 <li class="dropdown">
                     <a href="{{ route('ports') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i
                             class="fa fa-link fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span
                             class="tw:md:hidden tw:lg:inline-block">{{ __('Ports') }}</span></a>
                     <ul class="dropdown-menu">
+                        @can('viewAny', \App\Models\Port::class)
                         <li><a href="{{ route('ports') }}"><i class="fa fa-link fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('All Ports') }}</a></li>
 
@@ -320,6 +322,7 @@
                                                                            aria-hidden="true"></i> {{ __('Ignored :port_count', ['port_count' => $port_counts['ignored']]) }}
                                 </a></li>
                         @endif
+                        @endcan
 
                         @can('viewAny', \App\Models\Vlan::class)
                         <li><a href="{{ route('vlans.index') }}"><i class="fa fa-tasks fa-fw fa-lg"
@@ -337,16 +340,17 @@
                             </li>
                         @endif
 
-                        <li><a href="{{ route('port-security.index') }}"><i class="fa fa-shield fa-fw fa-lg"
-                                                                         aria-hidden="true"></i> {{ __('Port Security') }}</a>
-                        </li>
-
-                        @if($port_nac)
-                            <li role="presentation" class="divider"></li>
-                            <li><a href="{{ url('nac') }}"><i class="fa fa-lock fa-fw fa-lg"
-                                                              aria-hidden="true"></i> NAC</a></li>
-                        @endif
                         @can('viewAny', \App\Models\Port::class)
+                            <li><a href="{{ route('port-security.index') }}"><i class="fa fa-shield fa-fw fa-lg"
+                                                                         aria-hidden="true"></i> {{ __('Port Security') }}</a>
+                            </li>
+
+                            @if($port_nac)
+                                <li role="presentation" class="divider"></li>
+                                <li><a href="{{ url('nac') }}"><i class="fa fa-lock fa-fw fa-lg"
+                                                                  aria-hidden="true"></i> NAC</a></li>
+                            @endif
+
                             @if($port_groups_exist)
                                 <li role="presentation" class="divider"></li>
                                 @config('int_customers')
@@ -385,7 +389,7 @@
                             @endif
 
                             <li role="presentation" class="divider"></li>
-                            @can('manage', \App\Models\PortGroup::class))
+                            @can('manage', \App\Models\PortGroup::class)
                             <li><a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Manage Groups') }} </a></li>
                             @endcan
                             @if($port_groups->isNotEmpty())
@@ -425,27 +429,37 @@
                         @endcan
                     </ul>
                 </li>
+            @endif
 {{-- Sensors --}}
-                @can('viewAny', \App\Models\Sensor::class)
+                @if($show_health_menu)
                 <li class="dropdown">
                     <a href="{{ url('health') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-heartbeat fa-fw fa-lg fa-nav-icons"
                                                  aria-hidden="true"></i> <span class="tw:md:hidden tw:lg:inline-block">{{ __('Health') }}</span></a>
                     <ul class="dropdown-menu">
+                        @can('viewAny', \App\Models\Sensor::class)
                         <li><a href="{{ url('health/metric=all?status=alert') }}"><i class="fas fa-bell fa-fw fa-lg"
                                                                             aria-hidden="true"></i> {{ __('Alerts') }}</a>
                         </li>
                         <li role="presentation" class="divider"></li>
+                        @endcan
+                        @can('viewAny', \App\Models\Mempool::class)
                         <li><a href="{{ url('health/metric=mempool') }}"><i class="fas fa-memory fa-fw fa-lg"
                                                                             aria-hidden="true"></i> {{ __('Memory') }}</a>
                         </li>
+                        @endcan
+                        @can('viewAny', \App\Models\Processor::class)
                         <li><a href="{{ url('health/metric=processor') }}"><i class="fa fa-microchip fa-fw fa-lg"
                                                                               aria-hidden="true"></i> {{ __('Processor') }}
                             </a></li>
+                        @endcan
+                        @can('viewAny', \App\Models\Storage::class)
                         <li><a href="{{ url('health/metric=storage') }}"><i class="fa fa-database fa-fw fa-lg"
                                                                             aria-hidden="true"></i> {{ __('Storage') }}</a>
                         </li>
+                        @endcan
 
+                        @can('viewAny', \App\Models\Sensor::class)
                         @foreach($sensor_menu as $sensor_menu_group)
                             @foreach($sensor_menu_group as $sensor_menu_entry)
                                 @if($loop->first)
@@ -454,10 +468,10 @@
                                 <li><a href="{{ url('health/metric=' . $sensor_menu_entry['class']) }}"><i class="fa fa-{{ $sensor_menu_entry['icon'] }} fa-fw fa-lg" aria-hidden="true"></i> {{ $sensor_menu_entry['descr'] }}</a></li>
                             @endforeach
                         @endforeach
-
+                        @endcan
                     </ul>
                 </li>
-                @endcan
+                @endif
 {{-- Wireless --}}
                 @can('viewAny', \App\Models\WirelessSensor::class)
                 @if($wireless_menu->isNotEmpty())
