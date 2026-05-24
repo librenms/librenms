@@ -1,0 +1,4 @@
+---
+modules:
+  os:
+    sysDescr_regex: '/version: (?<version>.*) built:/'
