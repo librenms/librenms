@@ -112,7 +112,6 @@ class Genieatm extends OS
     {
         parent::discoverOS($device); // yaml baseline
 
-
         $device->hardware = $this->getHardware();
     }
 }
