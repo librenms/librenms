@@ -225,7 +225,7 @@ if ($format == 'graph') {
     }
     if (! empty($vars['group'])) {
         $where .= ' AND device_id IN ( ';
-        $where .= Devices::hasAccess(Auth::User())->whereHas('device_groups', function ($query) use ($vars) { $q->where('id', $vars['group']); })->pluck('device_id')->implode(',');
+        $where .= DB::table('device_group_device')->where('device_group_id', $vars['group'])->whereIntegerInRaw('device_id', Permissions::devicesForUser(Auth::User()))->pluck('device_id')->implode(',');
         $where .= ' )';
 
         show_device_group($vars['group']);
