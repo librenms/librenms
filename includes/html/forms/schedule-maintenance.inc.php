@@ -30,7 +30,6 @@ if (Gate::none(['create', 'update', 'view', 'delete'], AlertSchedule::class)) {
 $sub_type = $_POST['sub_type'];
 
 if ($sub_type == 'new-maintenance') {
-    Gate::authorize('create', AlertSchedule::class);
     // Defaults
     $status = 'error';
     $update = 0;
@@ -39,6 +38,9 @@ if ($sub_type == 'new-maintenance') {
     $schedule_id = $_POST['schedule_id'] ?? 0;
     if ($schedule_id > 0) {
         $update = 1;
+        Gate::authorize('update', AlertSchedule::class);
+    } else {
+        Gate::authorize('create', AlertSchedule::class);
     }
 
     $title = $_POST['title'];
