@@ -36,7 +36,7 @@ if (is_numeric($transport_id) && $transport_id > 0) {
     }
 }
 
-if (is_array($transport)) {
+if ($transport->exists) {
     exit(json_encode([
         'name' => $transport->transport_name,
         'type' => $transport->transport_type,
@@ -44,6 +44,7 @@ if (is_array($transport)) {
         'details' => $details,
     ]));
 } else {
+    // not reachable
     exit(json_encode([
         'status' => 'error',
         'message' => 'No alert transport found',

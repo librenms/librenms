@@ -90,7 +90,8 @@ if (empty($name)) {
             }
             $status = 'error';
         } else {
-            $transport_config = (array) json_decode((string) AlertTransport::where('transport_id', $transport_id)->value('transport_config'), true);
+            $transport_config = AlertTransport::where('transport_id', $transport_id)->value('transport_config');
+            $transport_config = is_array($transport_config) ? $transport_config : (array) json_decode((string) $transport_config, true);
             foreach ($result['config'] as $tmp_config) {
                 if (isset($tmp_config['name']) && $tmp_config['type'] !== 'hidden') {
                     $transport_config[$tmp_config['name']] = $vars[$tmp_config['name']] ?? null;
