@@ -29,7 +29,7 @@ class PollerGroupPolicy
      */
     public function view(User $user, PollerGroup $pollerGroup): bool
     {
-        return false;
+        return $this->viewAny($user); // no explicit view permission?
     }
 
     /**

@@ -696,7 +696,9 @@
                         <li class="dropdown-submenu">
                             <a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> {{ __('Poller') }}</a>
                             <ul class="dropdown-menu">
+                                @can('viewAny', \App\Models\PollerCluster::class)
                                 <li><a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> {{ __('Poller') }}</a></li>
+                                @endcan
                                 @can('viewAny', \App\Models\PollerGroup::class)
                                 <li><a href="{{ route('poller.groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Groups') }}</a></li>
                                 @endcan
