@@ -15,12 +15,12 @@ class DeviceGroupController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('viewAny', DeviceGroup::class);
 
         return view('device-group.index', [
-            'device_groups' => DeviceGroup::orderBy('name')->withCount('devices')->get(),
+            'device_groups' => DeviceGroup::hasAccess($request->user())->orderBy('name')->withCount('devices')->get(),
         ]);
     }
 
