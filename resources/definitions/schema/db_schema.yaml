@@ -649,6 +649,7 @@ devices:
     - { Field: snmp_disable, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: bgpLocalAs, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: sysObjectID, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: snmpEngineID, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: sysDescr, Type: text, 'Null': true, Extra: '' }
     - { Field: sysContact, Type: text, 'Null': true, Extra: '' }
     - { Field: version, Type: text, 'Null': true, Extra: '' }
@@ -1988,14 +1989,14 @@ port_security:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
-    - { Field: port_security_enable, Type: varchar(5), 'Null': true, Extra: '' }
+    - { Field: port_security_enable, Type: tinyint, 'Null': true, Extra: '' }
     - { Field: status, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: max_addresses, Type: int, 'Null': true, Extra: '' }
     - { Field: address_count, Type: int, 'Null': true, Extra: '' }
     - { Field: violation_action, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: violation_count, Type: int, 'Null': true, Extra: '' }
     - { Field: last_mac_address, Type: varchar(20), 'Null': true, Extra: '' }
-    - { Field: sticky_enable, Type: varchar(5), 'Null': true, Extra: '' }
+    - { Field: sticky_enable, Type: tinyint, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     port_security_device_id_index: { Name: port_security_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }

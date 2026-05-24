@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Facades\LibrenmsConfig;
+use App\Facades\Permissions;
 use App\Models\PortGroup;
 use App\Models\User;
 
@@ -30,7 +31,12 @@ class PortGroupPolicy
      */
     public function view(User $user, PortGroup $portGroup): bool
     {
-        return $this->hasGlobalPermission($user, 'viewAll');
+        if ($this->hasGlobalPermission($user, 'viewAll')) {
+            return true;
+        }
+
+        return $this->hasGlobalPermission($user, 'view')
+            && Permissions::canAccessPortGroup($portGroup, $user);
     }
 
     /**

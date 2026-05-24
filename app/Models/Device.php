@@ -81,6 +81,7 @@ class Device extends BaseModel
         'sysDescr',
         'sysName',
         'sysObjectID',
+        'snmpEngineID',
         'timeout',
         'transport',
         'type',
@@ -205,7 +206,7 @@ class Device extends BaseModel
      */
     public function displayName(): string
     {
-        return $this->display ?: $this->hostname;
+        return $this->display ?: $this->hostname ?: '';
     }
 
     /**

@@ -184,23 +184,7 @@ export default function filterBarComponent({
 
         // --- Syncing & Persistence ---
         applyFiltersToUrl(url) {
-            // Clear out any old filter mutations to keep the string clean
-            [...url.searchParams.keys()]
-                .filter((k) => k.startsWith("filter[") || k === "filter")
-                .forEach((k) => url.searchParams.delete(k));
-
-            if (this.filters.length > 0) {
-                this.filters.forEach((f) => {
-                    url.searchParams.set(
-                        `filter[${f.key}][${f.op}]`,
-                        this.encodeValue(f.value)
-                    );
-                });
-            } else if (this.isCleared) {
-                url.searchParams.set("filter", "");
-            }
-
-            return url;
+            return LibreNMS.Url.applyNestedParamsToUrl(url, 'filter', this.formattedFilters, this.isCleared);
         },
 
         syncUrl() {
