@@ -10,6 +10,10 @@ class DeviceOutagePolicy
 {
     use ChecksGlobalPermissions;
 
+    public function __construct() {
+        $this->globalPrefix = 'outage';
+    }
+
     public function viewAny(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'view', true)
