@@ -46,7 +46,7 @@ class DeviceGroup extends BaseModel
         });
 
         static::saving(function (DeviceGroup $deviceGroup): void {
-            if ($deviceGroup->isDirty('rules')) {
+            if ($deviceGroup->type == 'dynamic' && $deviceGroup->isDirty('rules')) {
                 $deviceGroup->rules = $deviceGroup->getParser()->generateJoins()->toArray();
             }
         });
