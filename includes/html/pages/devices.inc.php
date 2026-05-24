@@ -14,6 +14,7 @@
 */
 
 use App\Facades\LibrenmsConfig;
+use App\Models\DeviceGroup;
 use App\Models\Location;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\StringHelpers;
@@ -30,7 +31,7 @@ function show_device_group(int|string|null $device_group_id): void
         $device_group_name = '';
     } else {
         $pre_text = __('Device Group') . ': ';
-        $device_group_name = DB::table('device_groups')->where('id', $device_group_id)->value('name') ?? __('Group not found');
+        $device_group_name = DeviceGroup::hasAccess(Auth::User())->find($device_group_id)->name ?? __('Group not found');
     }
     ?>
     <div class="panel-heading">
@@ -223,12 +224,8 @@ if ($format == 'graph') {
         $sql_param[] = $vars['poller_group'];
     }
     if (! empty($vars['group'])) {
-        $where .= ' AND ( ';
-        foreach (DB::table('device_group_device')->where('device_group_id', $vars['group'])->pluck('device_id') as $dev) {
-            $where .= 'device_id = ? OR ';
-            $sql_param[] = $dev;
-        }
-        $where = substr($where, 0, strlen($where) - 3);
+        $where .= ' AND device_id IN ( ';
+        $where .= Devices::hasAccess(Auth::User())->whereHas('device_groups', function ($query) use ($vars) { $q->where('id', $vars['group']); })->pluck('device_id')->implode(',');
         $where .= ' )';
 
         show_device_group($vars['group']);

@@ -22,6 +22,8 @@ class DeviceGroupController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAll', DeviceGroup::Class);
+
         return view('device-group.index', [
             'device_groups' => DeviceGroup::orderBy('name')->withCount('devices')->get(),
         ]);
