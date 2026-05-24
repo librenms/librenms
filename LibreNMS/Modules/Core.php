@@ -74,8 +74,7 @@ class Core implements Module
 
         foreach (['sysObjectID', 'sysName', 'sysDescr'] as $attribute) {
             if ($device->isDirty($attribute)) {
-                $message = DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute));
-                Eventlog::log($message, $device, 'system', Severity::Notice);
+                Log::debug(DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)));
                 $os->getDeviceArray()[$attribute] = $device->$attribute; // update device array
             }
         }
