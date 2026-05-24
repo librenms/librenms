@@ -29,7 +29,7 @@ class DevicesController extends Controller
                 'status',
                 'device_id',
                 'maintenance',
-                'hostname',
+                'display',
                 'hardware',
                 'os',
                 'uptime',
