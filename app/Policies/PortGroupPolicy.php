@@ -30,6 +30,14 @@ class PortGroupPolicy
     }
 
     /**
+     * Determine whether the user can view all models.
+     */
+    public function viewAll(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'viewAll');
+    }
+
+    /**
      * Determine whether the user can view the port group.
      */
     public function view(User $user, PortGroup $portGroup): bool
