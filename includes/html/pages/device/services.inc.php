@@ -21,8 +21,11 @@ use Illuminate\Support\Facades\Gate;
 
 $pagetitle[] = 'Services';
 
+Gate::authorize('view', DeviceCache::getPrimary());
+Gate::authorize('services.view');
+
 require_once 'includes/services.inc.php';
-$services = service_get($device['device_id']);
+$services = Service::where('device_id', $device['device_id'])->hasAccess(request()->user())->get();
 
 require_once 'includes/html/modal/new_service.inc.php';
 require_once 'includes/html/modal/delete_service.inc.php';
