@@ -129,6 +129,7 @@
                     </ul>
                 </li>
 {{-- Devices --}}
+            @if(! $no_devices_added || Gate::allows('create', \App\Models\Device::class))
                 <li class="dropdown">
                     <a href="{{ route('devices') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-server fa-fw fa-lg fa-nav-icons"
@@ -205,6 +206,7 @@
                         @endcan
                     </ul>
                 </li>
+            @endif
 {{-- Maps --}}
                 <li class="dropdown">
                     <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown"
