@@ -80,5 +80,3 @@ echo "
 echo "<script>
 init_select2('#add_srv_device', 'device')
 </script>";
-
-

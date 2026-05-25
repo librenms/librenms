@@ -22,7 +22,6 @@ if (Gate::allows('create', Service::class)) {
         }
     }
 
-
     if ($updated) {
         print_message('Device Settings Saved');
     }

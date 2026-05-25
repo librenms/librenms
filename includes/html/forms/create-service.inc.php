@@ -27,7 +27,6 @@
 use App\Models\Service;
 use Illuminate\Support\Facades\Gate;
 
-
 foreach (['desc', 'name'] as $varname) {
     //sanitize description and name
     if (isset($vars[$varname])) {
@@ -42,7 +41,7 @@ foreach (['ip', 'ignore', 'disabled', 'param', 'template_id'] as $varname) {
     }
 }
 foreach (['stype', 'device_id', 'service_id'] as $varname) {
-        ${$varname} = $vars[$varname] ?? '';
+    ${$varname} = $vars[$varname] ?? '';
 }
 
 if (is_numeric($service_id) && $service_id > 0) {
