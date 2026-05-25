@@ -27,9 +27,6 @@
 use App\Models\Service;
 use Illuminate\Support\Facades\Gate;
 
-if (Gate::none(['create', 'update'], Service::class)) {
-    exit('ERROR: You need to have permission');
-}
 
 foreach (['desc', 'name'] as $varname) {
     //sanitize description and name
@@ -45,15 +42,16 @@ foreach (['ip', 'ignore', 'disabled', 'param', 'template_id'] as $varname) {
     }
 }
 foreach (['stype', 'device_id', 'service_id'] as $varname) {
-    if (isset($vars[$varname])) {
-        ${$varname} = $vars[$varname];
-    }
+        ${$varname} = $vars[$varname] ?? '';
 }
 
 if (is_numeric($service_id) && $service_id > 0) {
-    Gate::authorize('service.update');
+    $service = Service::findOrFail($service_id);
+    Gate::authorize('update', $service);
+    $service->fill($update);
+
     // Need to edit.
-    if (is_numeric(edit_service($update, $service_id))) {
+    if ($service->save()) {
         $status = ['status' => 0, 'message' => 'Modified Service: <i>' . $service_id . ': ' . $stype . '</i>'];
     } else {
         $status = ['status' => 1, 'message' => 'ERROR: Failed to modify service: <i>' . $service_id . '</i>'];
