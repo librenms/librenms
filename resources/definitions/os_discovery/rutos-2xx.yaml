@@ -1,12 +1,18 @@
 modules:
     os:
-        # RutOS 7.x and 6.x reuse the same numeric OIDs under .48690.1 with different MIB names,
-        # so the v6 fallback entries below use the RUT2 names net-snmp returns for those OIDs.
+        # v6 (TELTONIKA-MIB) and v7 (TELTONIKA-RUT2-MIB) define different objects at the same
+        # numeric OIDs under .1.3.6.1.4.1.48690.1.x: RouterName.0 and rut2DeviceUptime.0 both
+        # resolve to .7.0, ModemSerial.0 and rut2HardwareRevision.0 both resolve to .5.0.
+        # net-snmp returns responses under the v7 names, so we list both the v6 name (for the
+        # RouterName/ModemSerial semantic on RutOS 6.x) and the v7 name (so the actual lookup
+        # finds the value).
         hardware:
             - TELTONIKA-RUT2-MIB::rut2DeviceName.0
+            - TELTONIKA-MIB::RouterName.0
             - TELTONIKA-RUT2-MIB::rut2DeviceUptime.0
         serial:
             - TELTONIKA-RUT2-MIB::rut2Serial.0
+            - TELTONIKA-MIB::ModemSerial.0
             - TELTONIKA-RUT2-MIB::rut2HardwareRevision.0
         version:
             - TELTONIKA-RUT2-MIB::rut2FwVersion.0
@@ -37,6 +43,64 @@ modules:
                     divisor: 10
         state:
             data:
+                -
+                    oid: TELTONIKA-MIB::SimState
+                    num_oid: ".1.3.6.1.4.1.48690.2.1.{{ $index }}"
+                    descr: SIM State
+                    group: Mobile
+                    state_name: simState
+                    states:
+                        - { descr: inserted, value: 0, generic: 0 }
+                        - { descr: not inserted, value: 1, generic: 2 }
+                        - { descr: unknown, value: 2, generic: 3 }
+                -
+                    oid: TELTONIKA-MIB::PinState
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.{{ $index }}"
+                    descr: Pin State
+                    group: Mobile
+                    state_name: rutos2xx_pinState
+                    states:
+                        - { descr: PIN REQUIRED, value: 0, generic: 2 }
+                        - { descr: NOT READY, value: 1, generic: 1 }
+                        - { descr: READY, value: 2, generic: 0 }
+                        - { descr: unknown, value: 3, generic: 3 }
+                -
+                    oid: TELTONIKA-MIB::NetState
+                    num_oid: ".1.3.6.1.4.1.48690.2.3.{{ $index }}"
+                    descr: Mobile Net State
+                    group: Mobile
+                    state_name: NetState
+                    states:
+                        - { descr: searching, value: 0, generic: 1 }
+                        - { descr: registered (home), value: 1, generic: 0 }
+                        - { descr: registered (roaming), value: 2, generic: 1 }
+                        - { descr: unknown, value: 3, generic: 3 }
+                        - { descr: unregistered, value: 4, generic: 2 }
+                -
+                    oid: TELTONIKA-MIB::ConnectionState
+                    num_oid: ".1.3.6.1.4.1.48690.2.7.{{ $index }}"
+                    descr: "Connection State ({{ TELTONIKA-MIB::Operator }})"
+                    group: Mobile
+                    index: "ConnectionState.{{ $index }}"
+                    state_name: ConnectionState
+                    states:
+                        - { descr: connected, value: 0, generic: 0 }
+                        - { descr: not connected, value: 1, generic: 2 }
+                        - { descr: disconnected, value: 2, generic: 2 }
+                -
+                    oid: TELTONIKA-MIB::ConnectionType
+                    num_oid: ".1.3.6.1.4.1.48690.2.8.{{ $index }}"
+                    descr: "Connection Type ({{ TELTONIKA-MIB::Operator }})"
+                    group: Mobile
+                    index: "ConnectionType.{{ $index }}"
+                    state_name: ConnectionType
+                    states:
+                        - { descr: LTE, value: 0, generic: 0 }
+                        - { descr: 4G, value: 1, generic: 0 }
+                        - { descr: 3G, value: 2, generic: 1 }
+                        - { descr: 2G, value: 3, generic: 1 }
+                        - { descr: WCDMA, value: 4, generic: 0 }
+                        - { descr: unknown, value: 5, generic: 3 }
                 -
                     oid: TELTONIKA-RUT2-MIB::rut2MSimState
                     num_oid: ".1.3.6.1.4.1.48690.2.2.1.9.{{ $index }}"
