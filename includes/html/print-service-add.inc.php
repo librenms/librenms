@@ -18,9 +18,7 @@ echo "
       <input type='hidden' name='addsrv' value='yes'>
       <label for='device' class='col-sm-2 control-label'>Device</label>
       <div class='col-sm-5'>
-        <select name='device' class='form-control input-sm'>
-          $devicesform
-        </select>
+        <select id='add_srv_device' name='device' class='form-control input-sm'></select>
       </div>
       <div class='col-sm-5'>
       </div>
@@ -78,3 +76,9 @@ echo "
     <center><button type='submit' name='Submit' class='btn btn-default input-sm'>Add Service</button></center>
   </div>
 </form>";
+
+echo "<script>
+init_select2('#add_srv_device', 'device')
+</script>";
+
+

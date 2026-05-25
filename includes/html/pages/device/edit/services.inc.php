@@ -22,8 +22,6 @@ if (Gate::allows('create', Service::class)) {
         }
     }
 
-    $dev = device_by_id_cache($device['device_id']);
-    $devicesform = "<option value='" . $dev['device_id'] . "'>" . $dev['hostname'] . '</option>';
 
     if ($updated) {
         print_message('Device Settings Saved');
