@@ -15,6 +15,7 @@ use App\Http\Controllers\DashboardWidgetController;
 use App\Http\Controllers\Device;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\DeviceGroupController;
+use App\Http\Controllers\DevicesController;
 use App\Http\Controllers\GraphController;
 use App\Http\Controllers\Install;
 use App\Http\Controllers\LegacyController;
@@ -90,6 +91,7 @@ Route::get('graph/{path?}', GraphController::class)
 Route::middleware(['auth'])->group(function (): void {
     // pages
     Route::post('alert/{alert}/ack', [AlertController::class, 'ack'])->name('alert.ack');
+    Route::get('devices/{view?}/{graph?}', [DevicesController::class, 'index'])->name('devices');
     Route::resource('device-groups', DeviceGroupController::class);
     Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
     Route::get('inventory/purge', [App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
