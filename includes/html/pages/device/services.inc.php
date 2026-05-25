@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Gate;
 $pagetitle[] = 'Services';
 
 Gate::authorize('view', DeviceCache::getPrimary());
-Gate::authorize('services.view');
+Gate::authorize('service.view');
 
 require_once 'includes/services.inc.php';
 $services = Service::where('device_id', $device['device_id'])->hasAccess(request()->user())->get();
