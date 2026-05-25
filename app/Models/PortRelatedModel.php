@@ -26,20 +26,21 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 abstract class PortRelatedModel extends BaseModel
 {
     // ---- Query scopes ----
 
-    public function scopeHasAccess($query, User $user)
+    public function scopeHasAccess(Builder $query, User $user): Builder
     {
         return $this->hasPortAccess($query, $user);
     }
 
     // ---- Define Relationships ----
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Port, $this>
+     * @return BelongsTo<Port, $this>
      */
     public function port(): BelongsTo
     {

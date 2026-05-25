@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -42,13 +43,16 @@ class CustomMapNode extends BaseModel
                 ->whereRelation('device', fn ($q) => $q->isDown())->exists();
     }
 
-    public function scopeHasAccess($query, User $user)
+    /**
+     * Scope a query to only include nodes that the given user has access to.
+     */
+    public function scopeHasAccess(Builder $query, User $user): Builder
     {
         return $this->hasDeviceAccess($query, $user);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\CustomMap, $this>
+     * @return BelongsTo<CustomMap, $this>
      */
     public function map(): BelongsTo
     {
@@ -56,7 +60,7 @@ class CustomMapNode extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Device, $this>
+     * @return BelongsTo<Device, $this>
      */
     public function device(): BelongsTo
     {
@@ -64,7 +68,7 @@ class CustomMapNode extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\CustomMap, $this>
+     * @return BelongsTo<CustomMap, $this>
      */
     public function linked_map(): BelongsTo
     {
@@ -72,7 +76,7 @@ class CustomMapNode extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\CustomMapNodeImage, $this>
+     * @return BelongsTo<CustomMapNodeImage, $this>
      */
     public function nodeimage(): BelongsTo
     {
@@ -80,7 +84,7 @@ class CustomMapNode extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\CustomMapEdge, $this>
+     * @return HasMany<CustomMapEdge, $this>
      */
     public function edges1(): HasMany
     {
@@ -88,7 +92,7 @@ class CustomMapNode extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\CustomMapEdge, $this>
+     * @return HasMany<CustomMapEdge, $this>
      */
     public function edges2(): HasMany
     {

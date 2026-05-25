@@ -49,30 +49,24 @@ class Alert extends Model
     // ---- Query scopes ----
 
     /**
-     * Only select active alerts
-     *
-     * @param  Builder  $query
-     * @return Builder
+     * Scope a query to only include active alerts.
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
-        return $query->where('state', '=', AlertState::ACTIVE);
+        return $query->where('state', AlertState::ACTIVE);
     }
 
     /**
-     * Only select active alerts
-     *
-     * @param  Builder  $query
-     * @return Builder
+     * Scope a query to only include acknowledged alerts.
      */
-    public function scopeAcknowledged($query)
+    public function scopeAcknowledged(Builder $query): Builder
     {
-        return $query->where('state', '=', AlertState::ACKNOWLEDGED);
+        return $query->where('state', AlertState::ACKNOWLEDGED);
     }
 
     // ---- Define Relationships ----
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Device, $this>
+     * @return BelongsTo<Device, $this>
      */
     public function device(): BelongsTo
     {
@@ -80,7 +74,7 @@ class Alert extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\AlertRule, $this>
+     * @return BelongsTo<AlertRule, $this>
      */
     public function rule(): BelongsTo
     {
@@ -88,7 +82,7 @@ class Alert extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\User, $this>
+     * @return BelongsToMany<User, $this>
      */
     public function users(): BelongsToMany
     {

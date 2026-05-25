@@ -156,11 +156,9 @@ class Location extends Model
     // ---- Query scopes ----
 
     /**
-     * @param  Builder  $query
-     * @param  User  $user
-     * @return Builder
+     * Scope a query to only include locations that the given user has access to.
      */
-    public function scopeHasAccess($query, $user)
+    public function scopeHasAccess(Builder $query, User $user): Builder
     {
         if (Gate::allows('viewAll', Location::class)) {
             return $query;
@@ -174,7 +172,10 @@ class Location extends Model
         return $query->whereIntegerInRaw('id', $ids);
     }
 
-    public function scopeInDeviceGroup($query, $deviceGroup)
+    /**
+     * Scope a query to only include locations that have devices in the given device group.
+     */
+    public function scopeInDeviceGroup(Builder $query, $deviceGroup): Builder
     {
         return $query->whereHas('devices.groups', function ($query) use ($deviceGroup): void {
             $query->where('device_groups.id', $deviceGroup);
@@ -183,7 +184,7 @@ class Location extends Model
 
     // ---- Define Relationships ----
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Device, $this>
+     * @return HasMany<Device, $this>
      */
     public function devices(): HasMany
     {

@@ -28,10 +28,9 @@ class Service extends DeviceRelatedModel
     // ---- Query Scopes ----
 
     /**
-     * @param  Builder  $query
-     * @return Builder
+     * Scope a query to only include active services (not ignored or disabled).
      */
-    public function scopeIsActive($query)
+    public function scopeIsActive(Builder $query): Builder
     {
         return $query->where([
             ['service_ignore', '=', 0],
@@ -40,10 +39,9 @@ class Service extends DeviceRelatedModel
     }
 
     /**
-     * @param  Builder  $query
-     * @return Builder
+     * Scope a query to only include services that are in an OK state.
      */
-    public function scopeIsOk($query)
+    public function scopeIsOk(Builder $query): Builder
     {
         return $query->where([
             ['service_ignore', '=', 0],
@@ -53,10 +51,9 @@ class Service extends DeviceRelatedModel
     }
 
     /**
-     * @param  Builder  $query
-     * @return Builder
+     * Scope a query to only include services that are in a critical state.
      */
-    public function scopeIsCritical($query)
+    public function scopeIsCritical(Builder $query): Builder
     {
         return $query->where([
             ['service_ignore', '=', 0],
@@ -66,10 +63,9 @@ class Service extends DeviceRelatedModel
     }
 
     /**
-     * @param  Builder  $query
-     * @return Builder
+     * Scope a query to only include services that are in a warning state.
      */
-    public function scopeIsWarning($query)
+    public function scopeIsWarning(Builder $query): Builder
     {
         return $query->where([
             ['service_ignore', '=', 0],
@@ -79,10 +75,9 @@ class Service extends DeviceRelatedModel
     }
 
     /**
-     * @param  Builder  $query
-     * @return Builder
+     * Scope a query to only include services that are ignored.
      */
-    public function scopeIsIgnored($query)
+    public function scopeIsIgnored(Builder $query): Builder
     {
         return $query->where([
             ['service_ignore', '=', 1],
@@ -91,10 +86,9 @@ class Service extends DeviceRelatedModel
     }
 
     /**
-     * @param  Builder  $query
-     * @return Builder
+     * Scope a query to only include services that are disabled.
      */
-    public function scopeIsDisabled($query)
+    public function scopeIsDisabled(Builder $query): Builder
     {
         return $query->where('service_disabled', 1);
     }

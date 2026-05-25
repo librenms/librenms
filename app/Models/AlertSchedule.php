@@ -29,10 +29,10 @@ namespace App\Models;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Date;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\AlertScheduleStatus;
 use LibreNMS\Enum\MaintenanceBehavior;
@@ -174,7 +174,10 @@ class AlertSchedule extends Model
 
     // ---- Query scopes ----
 
-    public function scopeIsActive($query)
+    /**
+     * Scope a query to only include active alert schedules.
+     */
+    public function scopeIsActive(Builder $query): Builder
     {
         return $query->where(function ($query): void {
             $now = CarbonImmutable::now('UTC');
@@ -189,12 +192,12 @@ class AlertSchedule extends Model
                             ->where(function ($query) use ($now): void {
                                 $query->where(function ($query) use ($now): void {
                                     // normal, inside one day
-                                    $query->whereTime('start', '<', DB::raw('time(`end`)'))
+                                    $query->whereRaw('time(`start`) < time(`end`)')
                                         ->whereTime('start', '<=', $now->toTimeString())
                                         ->whereTime('end', '>', $now->toTimeString());
                                 })->orWhere(function ($query) use ($now): void {
                                     // outside, spans days
-                                    $query->whereTime('start', '>', DB::raw('time(`end`)'))
+                                    $query->whereRaw('time(`start`) > time(`end`)')
                                         ->where(function ($query) use ($now): void {
                                             $query->whereTime('start', '<=', $now->toTimeString())
                                                 ->orWhereTime('end', '>', $now->toTimeString());
@@ -213,7 +216,7 @@ class AlertSchedule extends Model
 
     // ---- Define Relationships ----
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\App\Models\Device, $this>
+     * @return MorphToMany<Device, $this>
      */
     public function devices(): MorphToMany
     {
@@ -221,7 +224,7 @@ class AlertSchedule extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\App\Models\DeviceGroup, $this>
+     * @return MorphToMany<DeviceGroup, $this>
      */
     public function deviceGroups(): MorphToMany
     {
@@ -229,7 +232,7 @@ class AlertSchedule extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\App\Models\Location, $this>
+     * @return MorphToMany<Location, $this>
      */
     public function locations(): MorphToMany
     {

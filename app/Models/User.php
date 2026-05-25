@@ -70,7 +70,7 @@ class User extends Authenticatable
     }
 
     /**
-     * @return int|Collection<int, \App\Models\Notification>
+     * @return int|Collection<int, Notification>
      */
     public function getNotifications(?string $type = null): int|Collection
     {
@@ -107,11 +107,8 @@ class User extends Authenticatable
     /**
      * This restricts the query to only users that match the current auth method
      * It is not needed when using user_id, but should be used for username and auth_id
-     *
-     * @param  Builder  $query
-     * @return Builder
      */
-    public function scopeThisAuth($query)
+    public function scopeThisAuth(Builder $query): Builder
     {
         // find user including ones where we might not know the auth type
         $type = LegacyAuth::getType();
@@ -123,9 +120,14 @@ class User extends Authenticatable
         });
     }
 
-    public function scopeAdminOnly($query)
+    /**
+     * Scope a query to only include users with the admin role.
+     *
+     * @param  Builder<User>  $query
+     */
+    public function scopeAdminOnly(Builder $query): Builder
     {
-        $query->role('admin');
+        return $query->role('admin');
     }
 
     // ---- Accessors/Mutators ----
@@ -167,7 +169,7 @@ class User extends Authenticatable
 
     // ---- Define Relationships ----
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ApiToken, $this>
+     * @return HasMany<ApiToken, $this>
      */
     public function apiTokens(): HasMany
     {
@@ -175,7 +177,7 @@ class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Bill, $this>
+     * @return BelongsToMany<Bill, $this>
      */
     public function bills(): BelongsToMany
     {
@@ -189,7 +191,7 @@ class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Device, $this>
+     * @return BelongsToMany<Device, $this>
      */
     public function devicesOwned(): BelongsToMany
     {
@@ -197,7 +199,7 @@ class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\DeviceGroup, $this>
+     * @return BelongsToMany<DeviceGroup, $this>
      */
     public function deviceGroups(): BelongsToMany
     {
@@ -215,7 +217,7 @@ class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Port, $this>
+     * @return BelongsToMany<Port, $this>
      */
     public function portsOwned(): BelongsToMany
     {
@@ -223,7 +225,7 @@ class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Dashboard, $this>
+     * @return HasMany<Dashboard, $this>
      */
     public function dashboards(): HasMany
     {
@@ -231,7 +233,7 @@ class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Notification, $this>
+     * @return BelongsToMany<Notification, $this>
      */
     public function notifications(): BelongsToMany
     {
@@ -239,7 +241,7 @@ class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\NotificationAttrib, $this>
+     * @return HasMany<NotificationAttrib, $this>
      */
     public function notificationAttribs(): HasMany
     {
@@ -247,7 +249,7 @@ class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserPref, $this>
+     * @return HasMany<UserPref, $this>
      */
     public function preferences(): HasMany
     {
@@ -255,7 +257,7 @@ class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserWidget, $this>
+     * @return HasMany<UserWidget, $this>
      */
     public function widgets(): HasMany
     {

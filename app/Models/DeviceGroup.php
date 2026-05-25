@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Facades\Gate;
@@ -93,7 +94,10 @@ class DeviceGroup extends BaseModel
 
     // ---- Query Scopes ----
 
-    public function scopeHasAccess($query, User $user)
+    /**
+     * Scope a query to only include device groups that the given user has access to.
+     */
+    public function scopeHasAccess(Builder $query, User $user): Builder
     {
         if (Gate::allows('viewAll', DeviceGroup::class)) {
             return $query;
@@ -102,7 +106,10 @@ class DeviceGroup extends BaseModel
         return $query->whereIntegerInRaw('id', Permissions::deviceGroupsForUser($user));
     }
 
-    public function scopeInServiceTemplate($query, $serviceTemplate)
+    /**
+     * Scope a query to only include device groups that are associated with the given service template.
+     */
+    public function scopeInServiceTemplate(Builder $query, $serviceTemplate): Builder
     {
         return $query->whereIn(
             $query->qualifyColumn('id'), function ($query) use ($serviceTemplate): void {
@@ -113,7 +120,10 @@ class DeviceGroup extends BaseModel
         );
     }
 
-    public function scopeNotInServiceTemplate($query, $serviceTemplate)
+    /**
+     * Scope a query to only include device groups that are not associated with the given service template.
+     */
+    public function scopeNotInServiceTemplate(Builder $query, $serviceTemplate): Builder
     {
         return $query->whereNotIn(
             $query->qualifyColumn('id'), function ($query) use ($serviceTemplate): void {
@@ -126,7 +136,7 @@ class DeviceGroup extends BaseModel
 
     // ---- Define Relationships ----
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\App\Models\AlertSchedule, $this>
+     * @return MorphToMany<AlertSchedule, $this>
      */
     public function alertSchedules(): MorphToMany
     {
@@ -134,7 +144,7 @@ class DeviceGroup extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Device, $this>
+     * @return BelongsToMany<Device, $this>
      */
     public function devices(): BelongsToMany
     {
@@ -142,7 +152,7 @@ class DeviceGroup extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Service, $this>
+     * @return BelongsToMany<Service, $this>
      */
     public function services(): BelongsToMany
     {
@@ -152,7 +162,7 @@ class DeviceGroup extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\User, $this>
+     * @return BelongsToMany<User, $this>
      */
     public function users(): BelongsToMany
     {
@@ -160,7 +170,7 @@ class DeviceGroup extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\ServiceTemplate, $this>
+     * @return BelongsToMany<ServiceTemplate, $this>
      */
     public function serviceTemplates(): BelongsToMany
     {

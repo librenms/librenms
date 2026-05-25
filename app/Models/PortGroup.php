@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Gate;
 use Permissions;
@@ -35,7 +36,10 @@ class PortGroup extends BaseModel
     public $timestamps = false;
     protected $fillable = ['name', 'desc'];
 
-    public function scopeHasAccess($query, User $user)
+    /**
+     * Scope a query to only include port groups the user has access to.
+     */
+    public function scopeHasAccess(Builder $query, User $user): Builder
     {
         if (Gate::allows('viewAll', PortGroup::class)) {
             return $query;
@@ -45,7 +49,7 @@ class PortGroup extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Port, $this>
+     * @return BelongsToMany<Port, $this>
      */
     public function ports(): BelongsToMany
     {

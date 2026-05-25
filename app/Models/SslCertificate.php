@@ -4,6 +4,7 @@ namespace App\Models;
 
 use AcmePhp\Ssl\Exception\CertificateParsingException;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -93,12 +94,18 @@ class SslCertificate extends Model
         return $this->belongsTo(Device::class, 'device_id', 'device_id');
     }
 
-    public function scopeEnabled($query)
+    /**
+     * Scope to only include enabled certificates.
+     */
+    public function scopeEnabled(Builder $query): Builder
     {
         return $query->where('disabled', false);
     }
 
-    public function scopeDisabled($query)
+    /**
+     * Scope to only include disabled certificates.
+     */
+    public function scopeDisabled(Builder $query): Builder
     {
         return $query->where('disabled', true);
     }
@@ -106,7 +113,7 @@ class SslCertificate extends Model
     /**
      * Scope to certificates the user is allowed to see (linked to device they have access to, or no device).
      */
-    public function scopeHasAccess($query, $user)
+    public function scopeHasAccess(Builder $query, User $user): Builder
     {
         return $query->where(function ($q) use ($user): void {
             $q->whereNull('device_id')
@@ -160,7 +167,7 @@ class SslCertificate extends Model
 
         $daysUntilExpiry = null;
         if ($validTo !== null) {
-            $daysUntilExpiry = (int) round(\Carbon\Carbon::instance($validTo)->diffInSeconds(now(), false) / -86400);
+            $daysUntilExpiry = (int) round(Carbon::instance($validTo)->diffInSeconds(now(), false) / -86400);
         }
 
         return [

@@ -131,7 +131,7 @@ class Sensor extends SensorModel implements Keyable
 
     // ---- Define Relationships ----
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\App\Models\Eventlog, $this>
+     * @return MorphMany<Eventlog, $this>
      */
     public function events(): MorphMany
     {
@@ -139,7 +139,7 @@ class Sensor extends SensorModel implements Keyable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough<\App\Models\StateIndex, \App\Models\SensorToStateIndex, $this>
+     * @return HasOneThrough<StateIndex, SensorToStateIndex, $this>
      */
     public function stateIndex(): HasOneThrough
     {
@@ -147,7 +147,7 @@ class Sensor extends SensorModel implements Keyable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\StateTranslation, $this>
+     * @return BelongsToMany<StateTranslation, $this>
      */
     public function translations(): BelongsToMany
     {
@@ -165,11 +165,9 @@ class Sensor extends SensorModel implements Keyable
     }
 
     /**
-     * @param  Builder  $query
-     * @param  SensorState  $state
-     * @return Builder
+     * Scope a query to only include sensors in the given state.
      */
-    public function scopeStateEq($query, $state)
+    public function scopeStateEq(Builder $query, SensorState $state): Builder
     {
         return $query->whereHas('translations', function ($q) use ($state): void {
             $q->where('state_generic_value', $state)
@@ -178,10 +176,9 @@ class Sensor extends SensorModel implements Keyable
     }
 
     /**
-     * @param  Builder  $query
-     * @return Builder
+     * Scope a query to only include sensors in an unknown state (state value does not match any translation or generic state).
      */
-    public function scopeStateUnknown($query)
+    public function scopeStateUnknown(Builder $query): Builder
     {
         return $query->whereHas('translations', function ($q): void {
             $q->whereColumn('sensor_current', '=', 'state_value')
@@ -193,30 +190,27 @@ class Sensor extends SensorModel implements Keyable
     }
 
     /**
-     * @param  Builder  $query
-     * @return Builder
+     * Scope a query to only include sensors in a critical state (current value outside of critical limits).
      */
-    public function scopeIsCritical($query)
+    public function scopeIsCritical(Builder $query): Builder
     {
         return $query->whereColumn('sensor_current', '<', 'sensor_limit_low')
             ->orWhereColumn('sensor_current', '>', 'sensor_limit');
     }
 
     /**
-     * @param  Builder  $query
-     * @return Builder
+     * Scope a query to only include sensors in a warning state (current value outside of warning limits but within critical limits).
      */
-    public function scopeIsWarning($query)
+    public function scopeIsWarning(Builder $query): Builder
     {
         return $query->whereColumn('sensor_current', '<', 'sensor_limit_low_warn')
             ->orWhereColumn('sensor_current', '>', 'sensor_limit_warn');
     }
 
     /**
-     * @param  Builder  $query
-     * @return Builder
+     * Scope a query to only include sensors that are disabled (sensor_alert = 0).
      */
-    public function scopeIsDisabled($query)
+    public function scopeIsDisabled(Builder $query): Builder
     {
         return $query->where('sensor_alert', 0);
     }
