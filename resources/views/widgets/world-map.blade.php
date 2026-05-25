@@ -197,6 +197,7 @@
     align-items: center;
     gap: 6px;
     font-weight: normal;
+    font-size: 15px;
 }
 #worldmap_widget-{{ $id }} .overlap-summary::before {
     content: "▶";
@@ -404,13 +405,13 @@
             const primary = members[0];
 
             if (primary['local_device_id'] && primary['local_port_id']) {
-                html = `<div style="text-align:center;">${createLinkTitle(primary)}<br><img class="graph-image" src="${createGraphURL(null, primary['local_port_id'],"port_bits","-1d","yes")}"></div>`;
+                html = `<div style="font-size:18px;text-align:center;">${createLinkTitle(primary)}<br><img class="graph-image" src="${createGraphURL(null, primary['local_port_id'],"port_bits","-1d","yes")}"></div>`;
             }
             else if (primary['remote_device_id'] && primary['remote_port_id']) {
-                html = `<div style="text-align:center;">${createLinkTitle(primary)}<br><img class="graph-image" src="${createGraphURL(null, primary['remote_port_id'],"port_bits","-1d","yes")}"></div>`;
+                html = `<div style="font-size:18px;text-align:center;">${createLinkTitle(primary)}<br><img class="graph-image" src="${createGraphURL(null, primary['remote_port_id'],"port_bits","-1d","yes")}"></div>`;
             }
             else {
-                html = `<div style="text-align:center;">${createLinkTitle(primary)}</div>`;
+                html = `<div style="font-size:18px;text-align:center;">${createLinkTitle(primary)}</div>`;
             }
 
             if (members.length <= 1) {
@@ -443,7 +444,7 @@
             `;
         }
 
-        function createMarkerHTML(device, device_id) { 
+        function createMarkerHTML(device, device_id) {
             return `<div class="device-popup">
                 <div class="device-popup__title">
                     <span>${html_chars(device["sname"] ?? device_id)}</span>
@@ -607,7 +608,7 @@
             return '#222222';                  // <10G black
         }
 
-        function formatBps(bps) { 
+        function formatBps(bps) {
             const n = Number(bps || 0);
             let color = '';
 
@@ -704,14 +705,14 @@
                                 currentLink.bringToBack();
                             }
 
-	                        const labelColor = isUp ? link['color'] : '#e40606';
-	                        const overlapCount = Array.isArray(link.members) ? link.members.length : 1;
-	                        const sameLocation = link['local_lat'] === link['remote_lat'] && link['local_lng'] === link['remote_lng'];
-	                        if (!sameLocation) {
-	                            updateOverlapLabel(link_id, latlng, overlapCount, labelColor);
-	                        } else {
-	                            updateOverlapLabel(link_id, latlng, 1, labelColor);
-	                        }
+                                const labelColor = isUp ? link['color'] : '#e40606';
+                                const overlapCount = Array.isArray(link.members) ? link.members.length : 1;
+                                const sameLocation = link['local_lat'] === link['remote_lat'] && link['local_lng'] === link['remote_lng'];
+                                if (!sameLocation) {
+                                    updateOverlapLabel(link_id, latlng, overlapCount, labelColor);
+                                } else {
+                                    updateOverlapLabel(link_id, latlng, 1, labelColor);
+                                }
                         } else {
                             const line = new L.polyline(latlng, linkStyle).addTo(map);
                             link_markers[link_id] = line;
@@ -739,13 +740,13 @@
                             }
 
                             const labelColor = isUp ? link['color'] : '#e40606';
-	                        const overlapCount = Array.isArray(link.members) ? link.members.length : 1;
-	                        const sameLocation = link['local_lat'] === link['remote_lat'] && link['local_lng'] === link['remote_lng'];
-	                        if (!sameLocation) {
-	                            updateOverlapLabel(link_id, latlng, overlapCount, labelColor);
-	                        } else {
-	                            updateOverlapLabel(link_id, latlng, 1, labelColor);
-	                        }
+                                const overlapCount = Array.isArray(link.members) ? link.members.length : 1;
+                                const sameLocation = link['local_lat'] === link['remote_lat'] && link['local_lng'] === link['remote_lng'];
+                                if (!sameLocation) {
+                                    updateOverlapLabel(link_id, latlng, overlapCount, labelColor);
+                                } else {
+                                    updateOverlapLabel(link_id, latlng, 1, labelColor);
+                                }
                         }
                     });
                     Object.keys(link_markers).forEach((id) => {

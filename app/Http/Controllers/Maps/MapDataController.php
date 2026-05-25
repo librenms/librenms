@@ -755,8 +755,8 @@ class MapDataController extends Controller
             // --- ADDED: retrieve all links from one location to another !--
             $members = $location->map(function (Link $l) {
                 $speed = $this->effectivePortSpeed($l->port);
-                $localUp = ($l->port?->ifOperStatus ?? 'down') === 'up';
-                $remoteUp = ($l->remotePort?->ifOperStatus ?? 'down') === 'up';
+                $localUp = ($l->port?->ifOperStatus ?? IfOperStatus::Down) === IfOperStatus::Up;
+                $remoteUp = ($l->remotePort?->ifOperStatus ?? IfOperStatus::Down) === IfOperStatus::Up;
                 $linkActive = (bool) ($l->active ?? true);
                 $up = $linkActive && $localUp && $remoteUp;
 
@@ -765,11 +765,11 @@ class MapDataController extends Controller
                     'local_device_id' => $l->device?->device_id,
                     'local_name' => $l->device?->sysName,
                     'local_port_id' => $l->local_port_id,
-                    
+
                     'remote_device_id' => $l->remoteDevice?->device_id,
                     'remote_name' => $l->remoteDevice?->sysName,
                     'remote_port_id' => $l->remote_port_id,
-                    
+
                     'up' => $up,
                     'speed' => $speed,
                     'color' => $this->linkUseColourCapability($speed),
@@ -796,14 +796,14 @@ class MapDataController extends Controller
                 'local_lng' => $repLink->device->location->lng,
                 'remote_lat' => $repLink->remoteDevice->location->lat,
                 'remote_lng' => $repLink->remoteDevice->location->lng,
-                
+
                 'local_device_id' => $primary['local_device_id'],
                 'local_name' => $primary['local_name'],
                 'local_port_id' => $primary['local_port_id'],
                 'remote_device_id' => $primary['remote_device_id'],
                 'remote_name' => $primary['remote_name'],
                 'remote_port_id' => $primary['remote_port_id'],
-                
+
                 'up' => $primary['up'],
                 'color' => $primary['color'],
                 'width' => $width,
