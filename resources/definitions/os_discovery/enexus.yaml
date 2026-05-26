@@ -462,8 +462,57 @@ modules:
                             value: 4
         current:
             data:
-                # rectifiersCurrent is discovered in PHP (includes/discovery/sensors/current/enexus.inc.php)
-                # to handle version-specific divisor for SmartpackS devices
+                -   # Non-Smartpack S devices
+                    oid: SP2-MIB::rectifiersCurrent
+                    value: SP2-MIB::rectifiersCurrentValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.5.2.5.{{ $index }}'
+                    descr: Rectifier Output Current
+                    index: 'current.{{ $index }}'
+                    group: Rectifier
+                    warn_limit: SP2-MIB::rectifiersCurrentMinorAlarmLevel
+                    high_limit: SP2-MIB::rectifiersCurrentMajorAlarmLevel
+                    skip_values:
+                        -
+                            device: hardware
+                            op: 'regex'
+                            value: '/^Smart[Pp]ack S.*/'
+                -   # Smartpack S >= 2.14 (whole amps)
+                    oid: SP2-MIB::rectifiersCurrent
+                    value: SP2-MIB::rectifiersCurrentValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.5.2.5.{{ $index }}'
+                    descr: Rectifier Output Current
+                    index: 'current.{{ $index }}'
+                    group: Rectifier
+                    warn_limit: SP2-MIB::rectifiersCurrentMinorAlarmLevel
+                    high_limit: SP2-MIB::rectifiersCurrentMajorAlarmLevel
+                    skip_values:
+                        -
+                            device: hardware
+                            op: 'not_regex'
+                            value: '/^Smart[Pp]ack S.*/'
+                        -
+                            device: version
+                            op: 'regex'
+                            value: '/^(2\.([0-9]|1[0-3])(\.|$)|[01]\.)/'
+                -   # Smartpack S < 2.14 (10ths of an amp)
+                    oid: SP2-MIB::rectifiersCurrent
+                    value: SP2-MIB::rectifiersCurrentValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.5.2.5.{{ $index }}'
+                    descr: Rectifier Output Current
+                    index: 'current.{{ $index }}'
+                    group: Rectifier
+                    divisor: 10
+                    warn_limit: SP2-MIB::rectifiersCurrentMinorAlarmLevel
+                    high_limit: SP2-MIB::rectifiersCurrentMajorAlarmLevel
+                    skip_values:
+                        -
+                            device: hardware
+                            op: 'not_regex'
+                            value: '/^Smart[Pp]ack S.*/'
+                        -
+                            device: version
+                            op: 'not_regex'
+                            value: '/^(2\.([0-9]|1[0-3])(\.|$)|[01]\.)/'
                 -
                     oid: SP2-MIB::rectifierTable
                     value: SP2-MIB::rectifierOutputCurrentValue
