@@ -4,12 +4,7 @@
 </div>
 <hr class="tw:my-5 @if($hideFilter) tw:hidden @endif"/>
 
-<div x-data="{ group: @js($group) }" x-init="window.addEventListener('filter:apply', (e) => $data.group = e.detail.filters['groups.id']?.eq);">
-    <h3 x-show="group" x-cloak>
-        <span class="devices-font-bold">{{ __('Device Group') }}: </span>
-        <span x-text="group"></span>
-    </h3>
-
+<div>
     <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:lg:grid-cols-4 tw:gap-4">
         @foreach($deviceGraphs as $graph)
             <div>
