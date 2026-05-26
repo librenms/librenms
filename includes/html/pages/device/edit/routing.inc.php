@@ -50,7 +50,7 @@ if (isset($_POST['editing'])) {
         <div class="col-sm-4">
             <select id="snmp_contexts" name="snmp_contexts[]" class="form-control" multiple>
                 <?php foreach ($snmp_contexts as $context) { ?>
-                    <option value="<?php echo htmlspecialchars($context, ENT_QUOTES); ?>" selected><?php echo htmlspecialchars($context); ?></option>
+                    <option value="<?php echo htmlspecialchars((string) $context, ENT_QUOTES); ?>" selected><?php echo htmlspecialchars((string) $context); ?></option>
                 <?php } ?>
             </select>
         </div>
