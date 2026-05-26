@@ -15,27 +15,16 @@
 
 /*
  * Nokia Wavence reports IF-MIB::ifName and IF-MIB::ifAlias as the literal
- * string "NULL". This breaks device_bits because the default
- * device_traffic_descr config includes /null/.
- *
- * Normalize ifName/ifAlias to ifDescr during polling so valid ports are not
- * excluded from device traffic graphs.
+ * string "NULL". Clear those values and allow port_fill_missing_and_trim()
+ * to populate them from ifDescr.
  */
-foreach ($port_stats as $ifIndex => &$port) {
-    $ifDescr = trim((string) ($port['ifDescr'] ?? ''));
-
-    if ($ifDescr === '' || strcasecmp($ifDescr, 'NULL') === 0) {
-        $ifDescr = 'Interface ' . $ifIndex;
+foreach ($port_stats as &$port) {
+    if (($port['ifName'] ?? '') === 'NULL') {
+        $port['ifName'] = '';
     }
 
-    $ifName = trim((string) ($port['ifName'] ?? ''));
-    if ($ifName === '' || strcasecmp($ifName, 'NULL') === 0) {
-        $port['ifName'] = $ifDescr;
-    }
-
-    $ifAlias = trim((string) ($port['ifAlias'] ?? ''));
-    if ($ifAlias === '' || strcasecmp($ifAlias, 'NULL') === 0) {
-        $port['ifAlias'] = $ifDescr;
+    if (($port['ifAlias'] ?? '') === 'NULL') {
+        $port['ifAlias'] = '';
     }
 }
 
