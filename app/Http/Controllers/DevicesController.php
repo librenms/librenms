@@ -254,6 +254,7 @@ class DevicesController extends Controller
             'disable_notify' => 'disable_notify',
             'disabled' => 'disabled',
             'ignore' => 'ignore',
+            'poller_group' => 'poller_group',
         ];
 
         foreach ($columns as $key => $column) {
@@ -266,11 +267,6 @@ class DevicesController extends Controller
         if ($legacy->has('group')) {
             $v = $legacy->get('group');
             $filters['groups.id'] = $v === 'none' ? ['is_empty' => 1] : ['eq' => (int) $v];
-        }
-
-        if ($legacy->has('poller_group')) {
-            $v = $legacy->get('poller_group');
-            $filters['poller_group'] = $v === '0' ? ['is_empty' => 1] : ['eq' => (int) $v];
         }
 
         if (! empty($filters)) {
