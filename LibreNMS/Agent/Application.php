@@ -13,10 +13,14 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
 
 abstract class Application
 {
+    /**
+     * @param  array<string, string>  $agent_data  Raw unix-agent text blocks keyed by extend name.
+     */
     public function __construct(
         protected OS $os,
         protected ApplicationModel $app,
@@ -77,11 +81,17 @@ abstract class Application
     // App data persistence
     // -------------------------------------------------------------------------
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function getAppData(): array
     {
         return (array) ($this->app->data ?? []);
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     protected function saveAppData(array $data): void
     {
         $this->app->data = $data;
@@ -106,7 +116,6 @@ abstract class Application
         int|float $current = 0,
         string $poller_type = 'agent',
         ?string $group = null,
-        ?string $navigation = null,
         int|float $divisor = 1,
         int|float $multiplier = 1,
         int|float|null $lowLimit = null,
@@ -116,23 +125,22 @@ abstract class Application
         string $rrd_type = 'GAUGE',
     ): static {
         app('sensor-discovery')->discover(new Sensor([
-            'device_id'           => $this->os->getDeviceId(),
-            'poller_type'         => $poller_type,
-            'sensor_class'        => $class,
-            'sensor_type'         => $type,
-            'sensor_index'        => $index,
-            'sensor_oid'          => $oid,
-            'sensor_descr'        => $descr,
-            'sensor_current'      => $current,
-            'group'               => $group,
-            'sensor_navigation'   => $navigation,
-            'sensor_divisor'      => $divisor,
-            'sensor_multiplier'   => $multiplier,
-            'sensor_limit_low'    => $lowLimit,
+            'device_id' => $this->os->getDeviceId(),
+            'poller_type' => $poller_type,
+            'sensor_class' => $class,
+            'sensor_type' => $type,
+            'sensor_index' => $index,
+            'sensor_oid' => $oid,
+            'sensor_descr' => $descr,
+            'sensor_current' => $current,
+            'group' => $group,
+            'sensor_divisor' => $divisor,
+            'sensor_multiplier' => $multiplier,
+            'sensor_limit_low' => $lowLimit,
             'sensor_limit_low_warn' => $lowWarnLimit,
-            'sensor_limit_warn'   => $warnLimit,
-            'sensor_limit'        => $highLimit,
-            'rrd_type'            => $rrd_type,
+            'sensor_limit_warn' => $warnLimit,
+            'sensor_limit' => $highLimit,
+            'rrd_type' => $rrd_type,
         ]));
 
         return $this;
@@ -141,6 +149,8 @@ abstract class Application
     /**
      * Register state translations for the last discovered sensor.
      * Fluent — call immediately after discoverSensor().
+     *
+     * @param  list<\App\Models\StateTranslation>  $translations
      */
     protected function withStateTranslations(string $stateName, array $translations): static
     {
@@ -158,8 +168,32 @@ abstract class Application
     }
 
     /**
+     * Log sensors with $oidPrefix that are absent from $expectedOids, then return their IDs.
+     * Call this before syncSensors() so the rows still exist when we read their descriptions.
+     *
+     * @param  list<string>  $expectedOids
+     * @return list<int> sensor_ids that were logged (pass to deleteStaleAgentSensors if needed)
+     */
+    protected function logStaleSensorRemovals(string $oidPrefix, array $expectedOids): array
+    {
+        $stale = Sensor::where('device_id', $this->os->getDeviceId())
+            ->where('sensor_oid', 'like', $oidPrefix . '%')
+            ->when($expectedOids !== [], fn ($q) => $q->whereNotIn('sensor_oid', $expectedOids))
+            ->get(['sensor_id', 'sensor_descr']);
+
+        foreach ($stale as $sensor) {
+            $this->logEvent('notice', 'Removed sensor: ' . ($sensor->sensor_descr ?? $sensor->sensor_id));
+        }
+
+        return $stale->pluck('sensor_id')->all();
+    }
+
+    /**
      * Delete sensors whose OID starts with $oidPrefix but are no longer expected.
      * Removes rows where the OID is not in $expectedOids OR the type is not in $knownTypes.
+     *
+     * @param  list<string>  $knownTypes
+     * @param  list<string>  $expectedOids
      */
     protected function deleteStaleAgentSensors(
         string $oidPrefix,
@@ -173,10 +207,6 @@ abstract class Application
                   ->orWhereNotIn('sensor_type', $knownTypes);
             })
             ->delete();
-
-        if ($deleted > 0) {
-            $this->logEvent('notice', "Removed $deleted stale sensor(s)");
-        }
 
         return $deleted;
     }
@@ -195,8 +225,8 @@ abstract class Application
      * - state change events with human-readable labels
      * - sensor_prev + lastupdate persisted via Eloquent save()
      *
-     * @param  array<string, int|float>  $values      ['sensor_index' => raw_value, ...]
-     * @param  string                    $oidPrefix   Scopes the DB query (e.g. 'app:mdadm:')
+     * @param  array<string, int|float>  $values  ['sensor_index' => raw_value, ...]
+     * @param  string  $oidPrefix  Scopes the DB query (e.g. 'app:mdadm:')
      */
     protected function updateSensorValues(array $values, string $oidPrefix): void
     {
@@ -229,15 +259,17 @@ abstract class Application
 
             $prevValue = $sensor->sensor_current;
 
-            Log::info("$value $unit");
+            if (Debug::isVerbose()) {
+                Log::info("$value $unit");
+            }
 
             app('Datastore')->put($device, 'sensor', [
                 'sensor_class' => $sensor->sensor_class,
-                'sensor_type'  => $sensor->sensor_type,
+                'sensor_type' => $sensor->sensor_type,
                 'sensor_descr' => $sensor->sensor_descr,
                 'sensor_index' => $sensor->sensor_index,
-                'rrd_name'     => \get_sensor_rrd_name($device, $sensor->toArray()),
-                'rrd_def'      => RrdDefinition::make()->addDataset('sensor', $sensor->rrd_type ?? 'GAUGE'),
+                'rrd_name' => \get_sensor_rrd_name($device, $sensor->toArray()),
+                'rrd_def' => RrdDefinition::make()->addDataset('sensor', $sensor->rrd_type ?? 'GAUGE'),
             ], ['sensor' => $value]);
 
             // Threshold crossing alerts
@@ -272,7 +304,7 @@ abstract class Application
             if ($value != $prevValue) {
                 $sensor->sensor_current = $value;
                 $sensor->sensor_prev = $prevValue;
-                $sensor->lastupdate = DB::raw('NOW()');
+                $sensor->lastupdate = now()->toDateTimeString();
                 $sensor->save();
             }
         }
@@ -282,6 +314,10 @@ abstract class Application
     // RRD
     // -------------------------------------------------------------------------
 
+    /**
+     * @param  array<string, mixed>  $tags
+     * @param  array<string, mixed>  $fields
+     */
     protected function putRrd(string $type, array $tags, array $fields): void
     {
         app('Datastore')->put($this->os->getDeviceArray(), $type, $tags, $fields);
@@ -315,13 +351,13 @@ abstract class Application
         }
 
         return match (strtolower(trim($level))) {
-            'unknown'           => Severity::Unknown,
-            'ok'                => Severity::Ok,
-            'info'              => Severity::Info,
-            'notice'            => Severity::Notice,
-            'warning'           => Severity::Warning,
+            'unknown' => Severity::Unknown,
+            'ok' => Severity::Ok,
+            'info' => Severity::Info,
+            'notice' => Severity::Notice,
+            'warning' => Severity::Warning,
             'error', 'critical' => Severity::Error,
-            default             => Severity::Info,
+            default => Severity::Info,
         };
     }
 
@@ -332,6 +368,8 @@ abstract class Application
     /**
      * Fetch JSON payload from SNMP extend, falling back to unix-agent cache.
      * Returns null and calls update_application() on unrecoverable error.
+     *
+     * @return array<string, mixed>|null
      */
     protected function fetchPayload(string $extend_name, int $min_version = 1): ?array
     {

@@ -4,3 +4,6 @@
 
 mdadm:
   handler: LibreNMS\Agent\Unix\Mdadm\Common
+  description: Linux software RAID arrays managed by mdadm
+  sensor_group_prefix:
+    - "Mdadm"

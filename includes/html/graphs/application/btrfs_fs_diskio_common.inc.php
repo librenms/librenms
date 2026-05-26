@@ -33,7 +33,7 @@ foreach ($device_map as $dev_id => $dev_path) {
         $candidates[] = basename($backing);
     }
     $candidates[] = (string) $dev_path;
-    $candidates[] = ltrim((string) preg_replace('#^/dev/#', '', $dev_path), '/');
+    $candidates[] = ltrim((string) preg_replace('#^/dev/#', '', (string) $dev_path), '/');
     $candidates[] = basename((string) $dev_path);
     $candidateSets[] = array_values(array_unique($candidates));
 }

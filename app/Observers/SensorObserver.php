@@ -8,6 +8,7 @@ use App\Models\Sensor;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Util\Debug;
 
 class SensorObserver
 {
@@ -39,7 +40,9 @@ class SensorObserver
     public function created(Sensor $sensor): void
     {
         Eventlog::log('Sensor Added: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr, $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
-        Log::info("$sensor->sensor_descr: Cur $sensor->sensor_current, Low: $sensor->sensor_limit_low, Low Warn: $sensor->sensor_limit_low_warn, Warn: $sensor->sensor_limit_warn, High: $sensor->sensor_limit");
+        if (Debug::isVerbose()) {
+            Log::info("$sensor->sensor_descr: Cur $sensor->sensor_current, Low: $sensor->sensor_limit_low, Low Warn: $sensor->sensor_limit_low_warn, Warn: $sensor->sensor_limit_warn, High: $sensor->sensor_limit");
+        }
 
         if ($this->consoleOutputEnabled) {
             echo '+';

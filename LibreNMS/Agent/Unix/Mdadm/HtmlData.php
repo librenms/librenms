@@ -43,16 +43,25 @@ class HtmlData
     private const CACHE_TTL = 300; // seconds (5 min — matches default poll interval)
 
     public readonly bool $isLegacy;
-    public readonly array $arraysMeta;       // [arrayName => rawMeta array]
-    public readonly array $arraysDevices;    // [arrayName => [devKey => metaDev array]]
-    public readonly array $arrayUuidByName;  // [arrayName => uuid]
-    public readonly array $arrayData;        // [arrayName => sensor+diskio map]
-    public readonly array $appMetrics;       // flat metric key => value
+    /** @var array<string, array<string, mixed>> [arrayName => rawMeta array] */
+    public readonly array $arraysMeta;
+    /** @var array<string, array<string, array<string, mixed>>> [arrayName => [devKey => metaDev array]] */
+    public readonly array $arraysDevices;
+    /** @var array<string, string> [arrayName => uuid] */
+    public readonly array $arrayUuidByName;
+    /** @var array<string, array<string, mixed>> [arrayName => sensor+diskio map] */
+    public readonly array $arrayData;
+    /** @var array<string, mixed> flat metric key => value */
+    public readonly array $appMetrics;
+    /** @var Collection<int, Sensor> */
     public readonly Collection $allSensors;
 
     /** @var Collection<string, MdadmArray> MdadmArray rows keyed by uuid, with drives eager-loaded. */
     private Collection $dbArrays;
 
+    /**
+     * @param  array<string, mixed>  $device
+     */
     private function __construct(
         public readonly Application $app,
         public readonly array $device,
@@ -144,7 +153,11 @@ class HtmlData
         10 => 'Member is missing.',
     ];
 
-    /** Resolve human-readable label, Bootstrap class, and info string for a sensor entry. */
+    /**
+     * Resolve human-readable label, Bootstrap class, and info string for a sensor entry.
+     *
+     * @return array{label: string, class: string, info: string}
+     */
     private static function resolveEntry(string $type, int $val): array
     {
         return match ($type) {
@@ -172,11 +185,63 @@ class HtmlData
         };
     }
 
+    /** Kernel RAID-4/5/6 parity-placement layout names, indexed by the raw layout value. */
+    private const RAID456_LAYOUT_LABELS = [
+        0 => 'left-asymmetric',
+        1 => 'right-asymmetric',
+        2 => 'left-symmetric',
+        3 => 'right-symmetric',
+        4 => 'parity-first',
+        5 => 'parity-last',
+    ];
+
+    /**
+     * Decode the raw kernel layout integer into a human-readable string.
+     *
+     * RAID-4/5/6 use the parity-placement names; RAID-10 encodes the copy
+     * count and policy (near = low byte, far = next byte, offset = bit 16).
+     * Null layout (non-RAID-5/10 levels report -1 → stored null) or an
+     * unrecognised level yields null so callers can omit the row.
+     */
+    private static function layoutLabel(?int $layout, ?string $level): ?string
+    {
+        if ($layout === null) {
+            return null;
+        }
+
+        $level = strtolower(trim((string) $level));
+
+        if (in_array($level, ['raid4', 'raid5', 'raid6'], true)) {
+            return self::RAID456_LAYOUT_LABELS[$layout] ?? ('layout ' . $layout);
+        }
+
+        if ($level === 'raid10') {
+            $near = $layout & 0xFF;
+            $far = ($layout >> 8) & 0xFF;
+            $offset = ($layout & 0x10000) !== 0;
+
+            if ($offset && $far > 1) {
+                return "offset=$far";
+            }
+            if ($far > 1) {
+                return "far=$far";
+            }
+
+            return "near=$near";
+        }
+
+        return null;
+    }
+
     // -------------------------------------------------------------------------
     // Caching factory methods
     // -------------------------------------------------------------------------
 
-    /** Load data for one device+app, cached for 5 minutes. */
+    /**
+     * Load data for one device+app, cached for 5 minutes.
+     *
+     * @param  array<string, mixed>  $device
+     */
     public static function forDevice(Application $app, array $device): self
     {
         return Cache::remember(
@@ -189,6 +254,8 @@ class HtmlData
     /**
      * Scoped to one array — shares the per-device cache entry.
      * Use ->array($arrayName) on the returned object to get the filtered data.
+     *
+     * @param  array<string, mixed>  $device
      */
     public static function forArray(Application $app, array $device, string $arrayName): self
     {
@@ -198,6 +265,8 @@ class HtmlData
     /**
      * Scoped to one drive — shares the per-device cache entry.
      * Use ->drive($arrayName, $driveKey) on the returned object.
+     *
+     * @param  array<string, mixed>  $device
      */
     public static function forDrive(Application $app, array $device, string $arrayName, string $driveKey): self
     {
@@ -232,7 +301,11 @@ class HtmlData
     // Scope accessors
     // -------------------------------------------------------------------------
 
-    /** All known array names (discovery order). */
+    /**
+     * All known array names (discovery order).
+     *
+     * @return list<string>
+     */
     public function arrayNames(): array
     {
         return array_keys($this->arrayData);
@@ -243,6 +316,8 @@ class HtmlData
      * Keys: mdadm_array_health_status, mdadm_array_operation_status,
      *       mdadm_array_mismatch, diskio, devices.
      * Each sensor entry: ['val' => int, 'label' => string, 'class' => string, 'info' => string, 'sensor' => Sensor]
+     *
+     * @return array<string, mixed>
      */
     public function array(string $arrayName): array
     {
@@ -252,6 +327,8 @@ class HtmlData
     /**
      * Sensor + meta data for one drive within an array.
      * Returns ['sensors' => [...], 'meta' => [...]]
+     *
+     * @return array<string, mixed>
      */
     public function drive(string $arrayName, string $driveKey): array
     {
@@ -264,6 +341,8 @@ class HtmlData
     /**
      * Parsed sync scalars for one array.
      * Keys: action, speed_bps, done_bytes, total_bytes, completed_pct, is_syncing
+     *
+     * @return array<string, mixed>
      */
     public function syncDataForArray(string $arrayName): array
     {
@@ -281,6 +360,8 @@ class HtmlData
             'total_bytes'   => $dbRow !== null ? (int) ($dbRow->sync_total_bytes ?? 0) : 0,
             'completed_pct' => $dbRow !== null ? (float) ($dbRow->sync_completed_pct ?? 0) : 0.0,
             'last_action'   => $dbRow !== null ? (string) ($dbRow->sync_last_action ?? '') : '',
+            'min_sectors'   => $dbRow !== null ? $dbRow->sync_min_sectors : null,
+            'max_sectors'   => $dbRow !== null ? $dbRow->sync_max_sectors : null,
             'is_syncing'    => $action !== '' && $action !== 'idle',
         ];
     }
@@ -311,13 +392,13 @@ class HtmlData
 
         foreach ($this->dbArrays as $uuid => $dbRow) {
             $uuid = (string) $uuid;
-            $arrayName = (string) ($dbRow->name ?? $uuid);
+            $arrayName = (string) ($dbRow->md_id ?? $uuid);
             if ($arrayName === '') {
                 continue;
             }
 
             $arraysMeta[$arrayName] = [
-                'array_name'         => $dbRow->name,
+                'array_name'         => $dbRow->md_id,
                 'uuid'               => $dbRow->uuid,
                 'raid_level'         => $dbRow->level,
                 'state'              => $dbRow->state,
@@ -332,6 +413,24 @@ class HtmlData
                 'failed_devices'     => $dbRow->failed_devices,
                 'degraded'           => $dbRow->degraded,
                 'mismatch_cnt'       => $dbRow->mismatch_cnt,
+                'layout'             => $dbRow->layout,
+                'layout_label'       => self::layoutLabel($dbRow->layout, $dbRow->level),
+                'resync_start_sectors'     => $dbRow->resync_start_sectors,
+                'reshape_position_sectors' => $dbRow->reshape_position_sectors,
+                'bitmap_type'        => $dbRow->bitmap_type,
+                'bitmap_location'    => $dbRow->bitmap_location,
+                'bitmap_chunksize'   => $dbRow->bitmap_chunksize,
+                'bitmap_metadata'    => $dbRow->bitmap_metadata,
+                'bitmap_time_base'   => $dbRow->bitmap_time_base,
+                'is_mounted'         => $dbRow->is_mounted,
+                'mount_points'       => $dbRow->mount_points,
+                'is_swap'            => $dbRow->is_swap,
+                'bitmap_backlog'     => $dbRow->bitmap_backlog,
+                'bitmap_max_backlog' => $dbRow->bitmap_max_backlog,
+                'bitmap_can_clear'   => $dbRow->bitmap_can_clear,
+                'stripe_cache_size'   => $dbRow->stripe_cache_size,
+                'stripe_cache_active' => $dbRow->stripe_cache_active,
+                'journal_mode'       => $dbRow->journal_mode,
             ];
 
             $arrayDevs = [];
@@ -347,6 +446,13 @@ class HtmlData
                     'slot'            => $drive->slot,
                     'id_model'        => $drive->id_model,
                     'id_serial_short' => $drive->id_serial_short,
+                    'offset_sectors'        => $drive->offset_sectors,
+                    'ppl_sector'            => $drive->ppl_sector,
+                    'ppl_size_sectors'      => $drive->ppl_size_sectors,
+                    'events'                => $drive->events,
+                    'recovery_start_sectors' => $drive->recovery_start_sectors,
+                    'bad_block_count'       => $drive->bad_block_count,
+                    'unack_bad_block_count' => $drive->unack_bad_block_count,
                 ];
             }
             $arraysDevices[$arrayName] = $arrayDevs;
@@ -356,7 +462,7 @@ class HtmlData
         return [$arraysMeta, $arraysDevices, $arrayUuidByName];
     }
 
-    /** @return array{Collection, array<string,mixed>, bool} */
+    /** @return array{Collection<int, Sensor>, array<string, mixed>, bool} */
     private function buildSensors(): array
     {
         // Seed from discovery so every known array is present even before sensors exist
@@ -388,9 +494,12 @@ class HtmlData
             }
         }
 
-        // Legacy fallback: populate from RRD file names when no sensors exist
-        $isLegacy = $sensors->isEmpty();
-        if ($isLegacy && empty($arrayData)) {
+        // v2 arrays carry sensors but still use legacy RRD graphs (no v3 RRD data)
+        $isV2 = $this->dbArrays->isNotEmpty()
+            && $this->dbArrays->every(fn ($r) => str_starts_with((string) ($r->uuid ?? ''), 'v2:'));
+
+        $isLegacy = $sensors->isEmpty() || $isV2;
+        if ($sensors->isEmpty() && empty($arrayData) && $this->dbArrays->isNotEmpty()) {
             foreach (Rrd::getRrdApplicationArrays($this->device, $this->app->app_id, 'mdadm') as $name) {
                 $arrayData[$name] = [];
             }

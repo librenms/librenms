@@ -41,9 +41,12 @@ $sensorPopup = static fn (array $entry, string $badge): string =>
                                     $opEntry   = $arrayData['mdadm_array_operation_status'] ?? [];
                                     $mmEntry   = $arrayData['mdadm_array_mismatch'] ?? [];
 
-                                    $errors = 0;
+                                    $errors = null;
                                     foreach (($arrayData['devices'] ?? []) as $dev) {
-                                        $errors += $dev['mdadm_device_error']['val'] ?? $dev['mdadm_device_errors']['val'] ?? 0;
+                                        $errVal = $dev['mdadm_device_error']['val'] ?? $dev['mdadm_device_errors']['val'] ?? null;
+                                        if ($errVal !== null) {
+                                            $errors = ($errors ?? 0) + (int) $errVal;
+                                        }
                                     }
                                     $errClass = $errors >= 5 ? 'danger' : ($errors >= 1 ? 'warning' : 'default');
 
@@ -58,8 +61,10 @@ $sensorPopup = static fn (array $entry, string $badge): string =>
 
                                     $hBadge  = '<span class="label label-' . e($hEntry['class'] ?? 'default') . '" title="' . e($hEntry['info'] ?? '') . '">' . e($hEntry['label'] ?? 'Unknown') . '</span>';
                                     $opBadge = '<span class="label label-' . e($opEntry['class'] ?? 'default') . '" title="' . e($opEntry['info'] ?? '') . '">' . e($opEntry['label'] ?? 'Unknown') . '</span>';
-                                    $mmBadge = '<span class="label label-' . e($mmEntry['class'] ?? 'default') . '">' . e($mmEntry['label'] ?? '0') . '</span>';
-                                    $errBadge = '<span class="label label-' . $errClass . '">' . $errors . '</span>';
+                                    $mmBadge  = '<span class="label label-' . e($mmEntry['class'] ?? 'default') . '">' . e($mmEntry['label'] ?? '-') . '</span>';
+                                    $errBadge = $errors !== null
+                                        ? '<span class="label label-' . $errClass . '">' . $errors . '</span>'
+                                        : '<span class="label label-default">-</span>';
                                 @endphp
                                 <tr>
                                     <td><a href="{{ $arrayLink }}">{{ $arrayName }}</a></td>
@@ -131,7 +136,7 @@ $sensorPopup = static fn (array $entry, string $badge): string =>
                                             $errEntry = $dev['mdadm_device_error'] ?? $dev['mdadm_device_errors'] ?? [];
 
                                             $dhBadge  = '<span class="label label-' . e($dhEntry['class'] ?? 'default') . '" title="' . e($dhEntry['info'] ?? '') . '">' . e($dhEntry['label'] ?? 'Unknown') . '</span>';
-                                            $errBadge = '<span class="label label-' . e($errEntry['class'] ?? 'default') . '">' . e($errEntry['label'] ?? '0') . '</span>';
+                                            $errBadge = '<span class="label label-' . e($errEntry['class'] ?? 'default') . '">' . e($errEntry['label'] ?? '-') . '</span>';
                                         @endphp
                                         <tr>
                                             <td>{{ $path }}</td>

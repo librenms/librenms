@@ -2,9 +2,9 @@
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\Sensor;
-use LibreNMS\Util\Clean;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
+use Symfony\Component\Yaml\Yaml;
 
 // Sensor overview panels, rendered in this order. Each empty class is skipped below.
 $sensor_overview_order = [
@@ -43,22 +43,22 @@ $sensor_overview_order = [
 
 // App-specific overview panels render their own sensor data, so suppress
 // matching app-owned sensors from the generic overview blocks.
-$appOverviewOidPrefixes = DeviceCache::getPrimary()->applications
-    ->filter(static function ($app): bool {
-        return is_file('includes/html/pages/device/overview/apps/' . Clean::fileName($app->app_type) . '.inc.php');
-    })
-    ->map(static function ($app): string {
-        return 'app:' . $app->app_type . ':';
-    })
-    ->all();
+$agentDefs = Yaml::parseFile(base_path('resources/definitions/agent/unix.yaml')) ?? [];
+$appOverviewGroupPrefixes = [];
+foreach ($agentDefs as $def) {
+    foreach ((array) ($def['sensor_group_prefix'] ?? []) as $prefix) {
+        $appOverviewGroupPrefixes[] = (string) $prefix;
+    }
+}
 
 foreach ($sensor_overview_order as $sensor_class) {
     $sensors = DeviceCache::getPrimary()->sensors
         ->where('sensor_class', $sensor_class->value)
         ->where('group', '!=', 'transceiver')
-        ->filter(static function ($sensor) use ($appOverviewOidPrefixes): bool {
-            foreach ($appOverviewOidPrefixes as $prefix) {
-                if (str_starts_with((string) $sensor->sensor_oid, $prefix)) {
+        ->filter(static function ($sensor) use ($appOverviewGroupPrefixes): bool {
+            $group = (string) $sensor->group;
+            foreach ($appOverviewGroupPrefixes as $prefix) {
+                if (str_starts_with($group, $prefix)) {
                     return false;
                 }
             }

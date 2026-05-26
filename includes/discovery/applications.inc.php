@@ -78,23 +78,34 @@ ModuleModelObserver::observe(Application::class);
 // Enable applications
 $submodules = App\Facades\LibrenmsConfig::get('discovery_submodules.applications');
 $current_apps = [];
+$enable_app = function (string $app) use (&$current_apps, $enabled_apps, $submodules, $device): void {
+    if ($submodules && ! in_array($app, $submodules)) {
+        return;
+    }
+    $current_apps[] = $app;
+
+    if (! in_array($app, $enabled_apps)) {
+        $app_obj = Application::withTrashed()->firstOrNew(['device_id' => $device['device_id'], 'app_type' => $app]);
+        if ($app_obj->trashed()) {
+            $app_obj->restore();
+        }
+        $app_obj->discovered = 1;
+        $app_obj->save();
+        Eventlog::log("Application enabled by discovery: $app", $device['device_id'], 'application', Severity::Ok);
+    }
+};
 foreach ($results as $extend => $result) {
     if (isset($applications[$extend])) {
-        $app = $applications[$extend];
-        if ($submodules && ! in_array($app, $submodules)) {
-            continue;
-        }
-        $current_apps[] = $app;
+        $enable_app($applications[$extend]);
+    }
+}
 
-        if (! in_array($app, $enabled_apps)) {
-            $app_obj = Application::withTrashed()->firstOrNew(['device_id' => $device['device_id'], 'app_type' => $app]);
-            if ($app_obj->trashed()) {
-                $app_obj->restore();
-            }
-            $app_obj->discovered = 1;
-            $app_obj->save();
-            Eventlog::log("Application enabled by discovery: $app", $device['device_id'], 'application', Severity::Ok);
-        }
+// pass_persist-only agents (e.g. the mdadm MDADM-MIB agent) have no nsExtend
+// entry, so probe their MIB scalar directly to detect and enable the app.
+if (! in_array('mdadm', $current_apps)) {
+    $mdadm_version = SnmpQuery::mibDir('librenms')->mibs(['MDADM-MIB'])->get('MDADM-MIB::mdadmVersion.0')->value();
+    if (is_numeric($mdadm_version) && (int) $mdadm_version > 0) {
+        $enable_app('mdadm');
     }
 }
 
@@ -133,5 +144,7 @@ unset(
     $name,
     $extend,
     $app,
-    $num
+    $num,
+    $enable_app,
+    $mdadm_version
 );

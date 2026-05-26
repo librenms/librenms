@@ -38,14 +38,36 @@ $diskCountFields = [
 ];
 
 $deviceHeaders = [
-    'Path'   => 'Block device path (e.g. sda5).',
-    'Role'   => 'Role this device plays in the array: active member, spare, journal, or replacement.',
-    'Health' => 'Device state flags from the kernel.',
-    'Slot'   => 'Slot (raid_disk) this device occupies. -1 means spare.',
-    'Errors' => 'Cumulative count of read errors on this device.',
-    'Model'  => '',
-    'Serial' => '',
-    'Size'   => '',
+    'Path'      => 'Block device path (e.g. sda5).',
+    'Role'      => 'Role this device plays in the array: active member, spare, journal, or replacement.',
+    'Health'    => 'Device state flags from the kernel.',
+    'Slot'      => 'Slot (raid_disk) this device occupies. -1 means spare.',
+    'Errors'    => 'Cumulative count of read errors on this device.',
+    'Events'    => 'Superblock event counter. All healthy members of an array share the same value; a lagging counter indicates a stale device.',
+    'Bad Blocks' => 'Number of bad blocks recorded for this device in the bad-block log. A parenthesised value is the count not yet acknowledged.',
+    'Recovery'  => 'Offset at which recovery of this member is currently in progress. Blank when the device is fully in sync.',
+    'Offset'    => 'Offset into the device where the array data starts (data_offset), leaving room for the superblock and write-intent bitmap.',
+    'PPL'       => 'Partial Parity Log location and size on this member (raid5 ppl consistency policy). Blank when not in use.',
+    'Model'     => '',
+    'Serial'    => '',
+    'Size'      => '',
+];
+
+// Per-column client-side sort behaviour for the drives table (keys match $deviceHeaders).
+$deviceSortTypes = [
+    'Path'       => 'string',
+    'Role'       => 'string',
+    'Health'     => 'numeric',
+    'Slot'       => 'numeric',
+    'Errors'     => 'numeric',
+    'Events'     => 'numeric',
+    'Bad Blocks' => 'numeric',
+    'Recovery'   => 'numeric',
+    'Offset'     => 'numeric',
+    'PPL'        => 'numeric',
+    'Model'      => 'string',
+    'Serial'     => 'string',
+    'Size'       => 'numeric',
 ];
 
 // ---------------------------------------------------------------------------
@@ -77,6 +99,24 @@ $linkArray = [
     'tab'    => 'apps',
     'app'    => 'mdadm',
 ];
+
+// Render a 512-byte sector count as a human-readable size, or a muted dash when unset.
+$fmtSectors = static function ($sectors): string {
+    if ($sectors === null || $sectors === '') {
+        return '<span class="text-muted">-</span>';
+    }
+    return LibreNMS\Util\Number::formatBi((int) $sectors * 512);
+};
+
+// Render a SNMP TruthValue / boolean column as a Yes/No badge, or a muted dash when unset.
+$fmtBool = static function ($value, string $yesClass = 'default'): string {
+    if ($value === null || $value === '') {
+        return '<span class="text-muted">-</span>';
+    }
+    return (bool) $value
+        ? mdadm_badge('Yes', $yesClass)
+        : mdadm_badge('No', 'default');
+};
 @endphp
 
 {{-- Optionbar --}}
@@ -88,14 +128,14 @@ $linkArray = [
     echo generate_link($ovLabel, $linkArray);
     if (!empty($data->arrayData)) {
         echo ' | Arrays: ';
-        $names = array_keys($data->arrayData);
-        foreach ($names as $i => $name) {
-            $label = htmlspecialchars($name);
-            if ($selectedArray === $name) {
+        $arrays = array_keys($data->arrayData);
+        foreach ($arrays as $i => $MDid) {
+            $label = htmlspecialchars($MDid);
+            if ($selectedArray === $MDid) {
                 $label = "<span class=\"pagemenu-selected\">{$label}</span>";
             }
-            echo generate_link($label, $linkArray, ['array' => $name]);
-            if ($i < count($names) - 1) { echo ', '; }
+            echo generate_link($label, $linkArray, ['array' => $MDid]);
+            if ($i < count($arrays) - 1) { echo ', '; }
         }
     }
     if (Auth::user()->hasRole('admin')) {
@@ -147,7 +187,7 @@ $linkArray = [
             <thead>
             <tr>
                 <th data-column-id="array_name"     data-sortable="true">Array Name</th>
-                <th data-column-id="name"           data-sortable="true">MD Device</th>
+                <th data-column-id="md_id"          data-sortable="true">MDid</th>
                 <th data-column-id="level"          data-sortable="true">Level</th>
                 <th data-column-id="state"          data-sortable="true">State</th>
                 <th data-column-id="sync_action"    data-sortable="true">Operation</th>
@@ -185,22 +225,22 @@ $linkArray = [
                 }
             @endphp
         @else
-            @foreach($data->arrayNames() as $name)
+            @foreach($data->arrayNames() as $MDid)
                 @php
-                    $arrData = $data->array($name);
+                    $arrData = $data->array($MDid);
                     $hEntry  = $arrData['mdadm_array_health_status'] ?? [];
                     $hBadge  = mdadm_badge($hEntry['label'] ?? 'Unknown', $hEntry['class'] ?? 'default', $hEntry['info'] ?? '');
-                    $arrUrl  = LibreNMS\Util\Url::generate($linkArray + ['array' => $name]);
-                    $nameEsc = htmlspecialchars($name);
+                    $arrUrl  = LibreNMS\Util\Url::generate($linkArray + ['array' => $MDid]);
+                    $MDidEsc = htmlspecialchars($MDid);
 
-                    $panelStart("<a href=\"{$arrUrl}\">{$nameEsc}</a>", $hBadge);
+                    $panelStart("<a href=\"{$arrUrl}\">{$MDidEsc}</a>", $hBadge);
                     echo '<div class="row">';
                     foreach ($arrayGraphs as $spec) {
                         $graphArray = [
                             'height' => '80', 'width' => '180',
                             'type'   => $spec['type'],
                             'id'     => $data->app->app_id,
-                            'array'  => $name,
+                            'array'  => $MDid,
                             'from'   => App\Facades\LibrenmsConfig::get('time.day'),
                             'to'     => App\Facades\LibrenmsConfig::get('time.now'),
                             'legend' => 'no',
@@ -222,10 +262,10 @@ $linkArray = [
     {{-- Per-array view                                                      --}}
     {{-- ================================================================== --}}
     @php
-        $name     = (string) $selectedArray;
-        $arrData  = $data->array($name);
-        $meta     = $data->arraysMeta[$name] ?? [];
-        $sync     = $data->syncDataForArray($name);
+        $array     = (string) $selectedArray;
+        $arrData  = $data->array($array);
+        $meta     = $data->arraysMeta[$array] ?? [];
+        $sync     = $data->syncDataForArray($array);
         $hEntry   = $arrData['mdadm_array_health_status']    ?? [];
         $opEntry  = $arrData['mdadm_array_operation_status'] ?? [];
         $hBadge   = mdadm_badge($hEntry['label']  ?? 'Unknown', $hEntry['class']  ?? 'default', $hEntry['info']  ?? '');
@@ -240,10 +280,11 @@ $linkArray = [
                 $sizeStr     = isset($meta['size_bytes']) && $meta['size_bytes'] > 0
                     ? LibreNMS\Util\Number::formatBi($meta['size_bytes'])
                     : '-';
-                $mismatchVal = (int) ($arrData['mdadm_array_mismatch']['val'] ?? 0);
+                $mismatchRaw = $arrData['mdadm_array_mismatch']['val'] ?? '-';
+                $mismatchVal = is_numeric($mismatchRaw) ? (int) $mismatchRaw : null;
                 $chunkSize   = (int) ($meta['chunk_size'] ?? 0);
 
-                $panelStart(htmlspecialchars($name) . ' Status', $hBadge);
+                $panelStart(htmlspecialchars($meta['array_name'] ) . ' Status', $hBadge);
                 echo '<table class="table table-condensed table-hover" style="width:auto">';
                 foreach ($statusFields as $label => $spec) {
                     echo $tableRow($label, htmlspecialchars((string) ($meta[$spec['key']] ?? '-')), $spec['tooltip']);
@@ -254,9 +295,48 @@ $linkArray = [
                     'Stripe unit for raid0/4/5/6/10. Larger chunks improve sequential I/O; smaller chunks improve random I/O parallelism.');
                 echo $tableRow(
                     'Mismatches',
-                    '<span' . ($mismatchVal > 0 ? ' class="text-warning"' : '') . '>' . $mismatchVal . '</span>',
+                    $mismatchVal !== null
+                        ? '<span' . ($mismatchVal > 0 ? ' class="text-warning"' : '') . '>' . $mismatchVal . '</span>'
+                        : '-',
                     'Number of sectors found inconsistent during the last check or repair operation.'
                 );
+
+                if (($meta['layout_label'] ?? null) !== null && $meta['layout_label'] !== '') {
+                    echo $tableRow('Layout', htmlspecialchars((string) $meta['layout_label']),
+                        'Parity/copy placement policy. RAID-4/5/6 use left/right symmetric/asymmetric; RAID-10 uses near/far/offset copies.');
+                }
+
+                if (array_key_exists('is_mounted', $meta) && $meta['is_mounted'] !== null) {
+                    $mountPoints = trim((string) ($meta['mount_points'] ?? ''));
+                    $mountedVal  = $fmtBool($meta['is_mounted']);
+                    if ($mountPoints !== '') {
+                        $mountedVal .= ' <span class="text-muted">' . htmlspecialchars($mountPoints) . '</span>';
+                    }
+                    echo $tableRow('Mounted', $mountedVal,
+                        'Whether a filesystem on this array is currently mounted, and at which mount point(s).');
+                }
+
+                if (array_key_exists('is_swap', $meta) && $meta['is_swap'] !== null) {
+                    echo $tableRow('Swap', $fmtBool($meta['is_swap']),
+                        'Whether this array is currently in use as a swap device.');
+                }
+
+                if (($meta['stripe_cache_size'] ?? null) !== null) {
+                    $scSize   = (int) $meta['stripe_cache_size'];
+                    $scActive = $meta['stripe_cache_active'] ?? null;
+                    $scStr    = number_format($scSize) . ' pages';
+                    if ($scActive !== null) {
+                        $scStr .= ' <span class="text-muted">(' . number_format((int) $scActive) . ' active)</span>';
+                    }
+                    echo $tableRow('Stripe Cache', $scStr,
+                        'Size of the stripe cache in pages per device (raid5/6). Larger caches can improve write performance at the cost of memory.');
+                }
+
+                if (($meta['journal_mode'] ?? null) !== null && $meta['journal_mode'] !== '') {
+                    echo $tableRow('Journal Mode', htmlspecialchars((string) $meta['journal_mode']),
+                        'Write-journal mode for arrays with a journal device: write-through or write-back.');
+                }
+
                 echo '</table>';
                 $panelEnd();
             @endphp
@@ -292,6 +372,22 @@ $linkArray = [
                         "<div style=\"min-width:200px\"><div class=\"progress\" style=\"margin-bottom:4px\"><div class=\"progress-bar progress-bar-info\" style=\"width:{$barPct}%;color:#111\">{$barPctFmt}%</div></div><small class=\"text-muted\">{$doneStr} / {$totalStr}</small></div>",
                         'Fraction of the current sync operation completed.');
 
+                if (($meta['resync_start_sectors'] ?? null) !== null) {
+                    $syncRows .= $tableRow('Resync start', $fmtSectors($meta['resync_start_sectors']),
+                        'Offset at which the next resync will start. Set when a resync is paused; blank after a clean shutdown.');
+                }
+                if (($meta['reshape_position_sectors'] ?? null) !== null) {
+                    $syncRows .= $tableRow('Reshape position', $fmtSectors($meta['reshape_position_sectors']),
+                        'Progress point of an in-flight reshape (e.g. changing level, chunk size, or device count).');
+                }
+                $checkMin = $sync['min_sectors'] ?? null;
+                $checkMax = $sync['max_sectors'] ?? null;
+                if ($checkMin !== null || $checkMax !== null) {
+                    $syncRows .= $tableRow('Check range',
+                        $fmtSectors($checkMin) . ' / ' . $fmtSectors($checkMax),
+                        'Sector window the current check/resync is restricted to (sync_min / sync_max). Max blank means the whole array.');
+                }
+
                 $panelStart('Sync', $opBadge);
                 echo "<table class=\"table table-condensed table-hover\" style=\"width:auto\">{$syncRows}</table>";
                 $panelEnd();
@@ -317,22 +413,82 @@ $linkArray = [
             @endphp
         </div>
 
+        {{-- Bitmap panel --}}
+        @php
+            $bitmapType = trim((string) ($meta['bitmap_type'] ?? ''));
+        @endphp
+        @if($bitmapType !== '' && strtolower($bitmapType) !== 'none')
+            <div class="col-md-3" style="display:inline-block;float:none;width:auto;vertical-align:top">
+                @php
+                    $bmRows  = $tableRow('Type', htmlspecialchars($bitmapType),
+                        'Write-intent bitmap type: internal (in the array metadata), external (a separate file), or lockless.');
+                    if (($meta['bitmap_location'] ?? null) !== null && $meta['bitmap_location'] !== '') {
+                        $bmRows .= $tableRow('Location', htmlspecialchars((string) $meta['bitmap_location']),
+                            'Where the bitmap lives, e.g. an offset relative to the superblock or an external file path.');
+                    }
+                    if (($meta['bitmap_chunksize'] ?? null) !== null) {
+                        $bmRows .= $tableRow('Chunk size', $fmtSectors(((int) $meta['bitmap_chunksize']) / 512),
+                            'Amount of array space each bitmap bit covers. Larger chunks mean a smaller bitmap but coarser resync granularity.');
+                    }
+                    if (($meta['bitmap_metadata'] ?? null) !== null && $meta['bitmap_metadata'] !== '') {
+                        $bmRows .= $tableRow('Metadata', htmlspecialchars((string) $meta['bitmap_metadata']),
+                            'Bitmap metadata format / version.');
+                    }
+                    if (($meta['bitmap_time_base'] ?? null) !== null) {
+                        $bmRows .= $tableRow('Time base', number_format((int) $meta['bitmap_time_base']) . ' s',
+                            'Seconds of idle time before a bitmap region is marked clean and flushed.');
+                    }
+                    if (($meta['bitmap_backlog'] ?? null) !== null || ($meta['bitmap_max_backlog'] ?? null) !== null) {
+                        $bmBacklog    = $meta['bitmap_backlog'] ?? null;
+                        $bmMaxBacklog = $meta['bitmap_max_backlog'] ?? null;
+                        $bmRows .= $tableRow('Backlog',
+                            ($bmBacklog === null ? '-' : number_format((int) $bmBacklog))
+                                . ' / ' . ($bmMaxBacklog === null ? '-' : number_format((int) $bmMaxBacklog)),
+                            'Outstanding / maximum write-behind requests allowed for write-mostly members.');
+                    }
+                    if (array_key_exists('bitmap_can_clear', $meta) && $meta['bitmap_can_clear'] !== null) {
+                        $bmRows .= $tableRow('Can clear', $fmtBool($meta['bitmap_can_clear']),
+                            'Whether the array is currently allowed to clear bits in the write-intent bitmap.');
+                    }
+
+                    $panelStart('Bitmap');
+                    echo "<table class=\"table table-condensed table-hover\" style=\"width:auto\">{$bmRows}</table>";
+                    $panelEnd();
+                @endphp
+            </div>
+        @endif
+
     </div>{{-- /.row --}}
 
-    {{-- Devices table --}}
+    {{-- Drives table --}}
     @php
         $sensorDevices = $arrData['devices'] ?? [];
-        $metaDevices   = (array) ($data->arraysDevices[$name] ?? []);
+        $metaDevices   = (array) ($data->arraysDevices[$array] ?? []);
+
+        // Default ordering: by slot ascending, members with no slot (-1 / null) last.
+        uasort($metaDevices, static function ($a, $b) {
+            $sa = isset($a['slot']) && is_numeric($a['slot']) ? (int) $a['slot'] : PHP_INT_MAX;
+            $sb = isset($b['slot']) && is_numeric($b['slot']) ? (int) $b['slot'] : PHP_INT_MAX;
+            if ($sa < 0) { $sa = PHP_INT_MAX - 1; }
+            if ($sb < 0) { $sb = PHP_INT_MAX - 1; }
+            return $sa <=> $sb;
+        });
+
+        $slotColIndex = array_search('Slot', array_keys($deviceHeaders), true);
     @endphp
     @if(!empty($metaDevices))
         @php
-            $panelStart('Devices');
+            $panelStart('Drives');
             $ths = '';
             foreach ($deviceHeaders as $h => $tip) {
-                $tipAttr = $tip !== '' ? ' title="' . htmlspecialchars($tip) . '"' : '';
-                $ths .= "<th{$tipAttr}>" . htmlspecialchars($h) . '</th>';
+                $tipAttr  = $tip !== '' ? ' title="' . htmlspecialchars($tip) . '"' : '';
+                $sortType = $deviceSortTypes[$h] ?? 'string';
+                $ths .= "<th{$tipAttr} data-sort-type=\"{$sortType}\" style=\"cursor:pointer;white-space:nowrap\">"
+                    . htmlspecialchars($h) . '</th>';
             }
-            echo "<table class=\"table table-condensed table-hover\"><thead><tr>{$ths}</tr></thead><tbody>";
+            echo '<table id="mdadm-drives-table" class="table table-condensed table-hover mdadm-sortable"'
+                . ' data-default-sort="' . (int) $slotColIndex . '" data-default-sort-type="numeric">'
+                . "<thead><tr>{$ths}</tr></thead><tbody>";
         @endphp
 
         @foreach($metaDevices as $devKey => $metaDev)
@@ -341,24 +497,128 @@ $linkArray = [
                 $path  = (string) ($metaDev['path'] ?? $devKey);
 
                 $dhEntry  = $dev['mdadm_device_health_status'] ?? [];
-                $errVal   = (int) ($dev['mdadm_device_error']['val'] ?? $dev['mdadm_device_errors']['val'] ?? 0);
+                $errRaw   = $dev['mdadm_device_error']['val'] ?? $dev['mdadm_device_errors']['val'] ?? '-';
+                $errVal   = is_numeric($errRaw) ? (int) $errRaw : null;
                 $sizeBytes = (int) ($metaDev['size_bytes'] ?? 0);
+
+                $eventsVal = $metaDev['events'] ?? null;
+
+                $badRaw   = $metaDev['bad_block_count'] ?? null;
+                $unackRaw = $metaDev['unack_bad_block_count'] ?? null;
+                if ($badRaw === null) {
+                    $badStr = '<span class="text-muted">-</span>';
+                } else {
+                    $badCount = (int) $badRaw;
+                    $badStr   = $badCount > 0 ? '<span class="text-warning">' . $badCount . '</span>' : '0';
+                    if ($unackRaw !== null && (int) $unackRaw > 0) {
+                        $badStr .= ' <span class="text-danger">(' . (int) $unackRaw . ')</span>';
+                    }
+                }
+
+                $pplSector = $metaDev['ppl_sector'] ?? null;
+                $pplSize   = $metaDev['ppl_size_sectors'] ?? null;
+                if ($pplSector === null && $pplSize === null) {
+                    $pplStr = '<span class="text-muted">-</span>';
+                } else {
+                    $pplStr = $fmtSectors($pplSector);
+                    if ($pplSize !== null) {
+                        $pplStr .= ' <span class="text-muted">(' . $fmtSectors($pplSize) . ')</span>';
+                    }
+                }
 
                 $cells = [
                     htmlspecialchars($path),
                     htmlspecialchars((string) ($metaDev['device_role']     ?? '-')),
                     mdadm_badge($dhEntry['label'] ?? 'Unknown', $dhEntry['class'] ?? 'default', $dhEntry['info'] ?? ''),
                     htmlspecialchars((string) ($metaDev['slot']            ?? '-')),
-                    $errVal > 0 ? '<span class="text-warning">' . $errVal . '</span>' : (string) $errVal,
+                    $errVal !== null ? ($errVal > 0 ? '<span class="text-warning">' . $errVal . '</span>' : (string) $errVal) : '-',
+                    $eventsVal !== null ? number_format((int) $eventsVal) : '<span class="text-muted">-</span>',
+                    $badStr,
+                    $fmtSectors($metaDev['recovery_start_sectors'] ?? null),
+                    $fmtSectors($metaDev['offset_sectors'] ?? null),
+                    $pplStr,
                     htmlspecialchars((string) ($metaDev['id_model']        ?? '-')),
                     htmlspecialchars((string) ($metaDev['id_serial_short'] ?? '-')),
                     $sizeBytes > 0 ? LibreNMS\Util\Number::formatBi($sizeBytes) : '-',
                 ];
-                echo '<tr><td>' . implode('</td><td>', $cells) . '</td></tr>';
+
+                // Raw comparable values for client-side sorting (numeric columns parse as numbers).
+                $sortVals = [
+                    $path,
+                    (string) ($metaDev['device_role'] ?? ''),
+                    (string) ($dhEntry['val'] ?? -1),
+                    is_numeric($metaDev['slot'] ?? null) ? (string) (int) $metaDev['slot'] : '',
+                    $errVal !== null ? (string) $errVal : '',
+                    $eventsVal !== null ? (string) (int) $eventsVal : '',
+                    $badRaw !== null ? (string) (int) $badRaw : '',
+                    $metaDev['recovery_start_sectors'] ?? '',
+                    $metaDev['offset_sectors'] ?? '',
+                    $pplSector ?? '',
+                    (string) ($metaDev['id_model'] ?? ''),
+                    (string) ($metaDev['id_serial_short'] ?? ''),
+                    (string) $sizeBytes,
+                ];
+
+                $tds = '';
+                foreach ($cells as $ci => $cellHtml) {
+                    $sv = htmlspecialchars((string) ($sortVals[$ci] ?? ''));
+                    $tds .= "<td data-sort=\"{$sv}\">{$cellHtml}</td>";
+                }
+                echo "<tr>{$tds}</tr>";
             @endphp
         @endforeach
 
         @php echo '</tbody></table>'; $panelEnd(); @endphp
+
+        <style>
+            #mdadm-drives-table thead th.mdadm-sort-asc::after  { content: " \25B2"; font-size: 9px; }
+            #mdadm-drives-table thead th.mdadm-sort-desc::after { content: " \25BC"; font-size: 9px; }
+        </style>
+        <script>
+        (function () {
+            var table = document.getElementById('mdadm-drives-table');
+            if (!table || !table.tHead || !table.tBodies.length) { return; }
+            var tbody   = table.tBodies[0];
+            var headers = table.tHead.rows[0].cells;
+
+            function sortBy(idx, type, asc) {
+                var rows = Array.prototype.slice.call(tbody.rows);
+                rows.sort(function (a, b) {
+                    var av = a.cells[idx] ? (a.cells[idx].getAttribute('data-sort') || '') : '';
+                    var bv = b.cells[idx] ? (b.cells[idx].getAttribute('data-sort') || '') : '';
+                    var cmp;
+                    if (type === 'numeric') {
+                        var an = parseFloat(av), bn = parseFloat(bv);
+                        if (isNaN(an)) { an = -Infinity; }
+                        if (isNaN(bn)) { bn = -Infinity; }
+                        cmp = an - bn;
+                    } else {
+                        cmp = av.localeCompare(bv, undefined, { numeric: true, sensitivity: 'base' });
+                    }
+                    return asc ? cmp : -cmp;
+                });
+                rows.forEach(function (r) { tbody.appendChild(r); });
+                for (var i = 0; i < headers.length; i++) {
+                    headers[i].classList.remove('mdadm-sort-asc', 'mdadm-sort-desc');
+                }
+                headers[idx].classList.add(asc ? 'mdadm-sort-asc' : 'mdadm-sort-desc');
+            }
+
+            for (var i = 0; i < headers.length; i++) {
+                (function (idx) {
+                    headers[idx].addEventListener('click', function () {
+                        var asc = !headers[idx].classList.contains('mdadm-sort-asc');
+                        sortBy(idx, headers[idx].getAttribute('data-sort-type') || 'string', asc);
+                    });
+                })(i);
+            }
+
+            var def = table.getAttribute('data-default-sort');
+            if (def !== null && def !== '') {
+                sortBy(parseInt(def, 10), table.getAttribute('data-default-sort-type') || 'string', true);
+            }
+        })();
+        </script>
     @endif
 
     {{-- Array graphs --}}
@@ -371,7 +631,7 @@ $linkArray = [
                     'id'     => $data->app->app_id,
                     'type'   => 'mdadm_legacy',
                     'metric' => $metric,
-                    'array'  => $name,
+                    'array'  => $array,
                     'legend' => 'no',
                 ];
                 echo "<div class=\"panel panel-default\"><div class=\"panel-heading\"><h3 class=\"panel-title\">{$text}</h3></div><div class=\"panel-body\">";
@@ -381,15 +641,15 @@ $linkArray = [
         @endphp
     @else
         @php
-            $diskioRates = mdadm_diskio_rates($data, $name);
-            $syncData    = $data->syncDataForArray($name);
+            $diskioRates = mdadm_diskio_rates($data, $array);
+            $syncData    = $data->syncDataForArray($array);
 
             $graphHeaders = [
                 'disk_counts' => 'A:' . (int) ($meta['active_devices'] ?? 0)
                     . ' S:' . (int) ($meta['spare_devices'] ?? 0)
                     . ' F:' . (int) ($meta['failed_devices'] ?? 0)
                     . ' D:' . (int) ($meta['degraded'] ?? 0),
-                'mismatch'    => (string) ((int) ($arrData['mdadm_array_mismatch']['val'] ?? 0)),
+                'mismatch'    => isset($arrData['mdadm_array_mismatch']['val']) ? (string) (int) $arrData['mdadm_array_mismatch']['val'] : '-',
                 'sync_bps'    => $syncData['speed_bps'] > 0
                     ? LibreNMS\Util\Number::formatBi($syncData['speed_bps'], suffix: 'B/s')
                     : '-',
@@ -414,7 +674,7 @@ $linkArray = [
                     'from'   => App\Facades\LibrenmsConfig::get('time.day'),
                     'id'     => $data->app->app_id,
                     'type'   => $spec['type'],
-                    'array'  => $name,
+                    'array'  => $array,
                     'legend' => 'no',
                 ];
                 if (isset($spec['metric'])) { $graph_array['metric'] = $spec['metric']; }
