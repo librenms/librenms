@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Device;
+use App\Models\Location;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -247,26 +248,33 @@ class DevicesController extends Controller
 
         // handle legacy filters
         $filters = [];
-        $columns = [
-            'location' => 'location_id',
-            'type' => 'type',
-            'state' => 'state',
-            'disable_notify' => 'disable_notify',
-            'disabled' => 'disabled',
-            'ignore' => 'ignore',
-            'poller_group' => 'poller_group',
+        $fields = [
+            'type',
+            'state',
+            'disable_notify',
+            'disabled',
+            'ignore',
+            'poller_group',
         ];
 
-        foreach ($columns as $key => $column) {
-            if ($legacy->has($key)) {
-                $v = $legacy->get($key);
-                $filters[$column] = ['eq' => is_numeric($v) ? (int) $v : $v];
+        foreach ($fields as $field) {
+            if ($legacy->has($field)) {
+                $v = $legacy->get($field);
+                $filters[$field] = ['eq' => is_numeric($v) ? (int) $v : $v];
             }
         }
 
         if ($legacy->has('group')) {
             $v = $legacy->get('group');
             $filters['groups.id'] = $v === 'none' ? ['is_empty' => 1] : ['eq' => (int) $v];
+        }
+
+        if ($legacy->has('location')) {
+            $v = $legacy->get('location');
+            $locationId = is_numeric($v) ? (int) $v : Location::where('location', $v)->value('id');
+            if ($locationId) {
+                $filters['location_id'] = ['eq' => $locationId];
+            }
         }
 
         if (! empty($filters)) {
