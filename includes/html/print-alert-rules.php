@@ -26,9 +26,6 @@
 
 use App\Facades\DeviceCache;
 use App\Models\AlertRule;
-use App\Models\AlertTransport;
-use App\Models\AlertTransportGroup;
-use Illuminate\Support\Facades\Schema;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertState;
 
@@ -300,7 +297,7 @@ foreach ($rule_list as $rule) {
         $location_query = 'SELECT locations.location, locations.id FROM alert_location_map, locations WHERE alert_location_map.rule_id=? and alert_location_map.location_id = locations.id ORDER BY location';
         $location_maps = dbFetchRows($location_query, [$rule['id']]);
         foreach ($location_maps as $location_map) {
-            $locations .= $except_device_or_group . '<a href="' . url('devices/location=' . $location_map['id']) . '" data-container="body" data-toggle="popover" data-placement="right" data-content="View Devices for Location" target="_blank">' . htmlentities((string) $location_map['location']) . '</a><br>';
+            $locations .= $except_device_or_group . '<a href="' . route('devices', ['filter' => ['location_id' => $location_map['id']]]) . '" data-container="body" data-toggle="popover" data-placement="right" data-content="View Devices for Location" target="_blank">' . htmlentities((string) $location_map['location']) . '</a><br>';
         }
     }
 
@@ -334,7 +331,7 @@ foreach ($rule_list as $rule) {
     }
     if (! $devices && ! $groups && ! $locations) {
         // All Devices
-        echo '<a href="' . url('devices') . '" data-container="body" data-toggle="popover" data-placement="right" data-content="View All Devices" target="_blank">All Devices</a><br>';
+        echo '<a href="' . route('devices') . '" data-container="body" data-toggle="popover" data-placement="right" data-content="View All Devices" target="_blank">All Devices</a><br>';
     }
 
     echo '</td>';

@@ -17,13 +17,13 @@
         </thead>
         <tbody>
             <tr>
-                <td><a href="{{ url('devices') }}">{{ __('Devices') }}</a></td>
-                <td><a href="{{ url('devices') }}"><span> {{ $devices['total'] }}</span></a></td>
-                <td><a href="{{ url('devices/state=up/format=list_detail') }}"><span class="green"> {{ $devices['up'] }}</span></a></td>
-                <td><a href="{{ url('devices/state=down/format=list_detail') }}"><span class="red"> {{ $devices['down'] }}</span></a></td>
-                <td><a href="{{ url('devices/ignore=1/format=list_detail') }}"><span class="blue"> {{ $devices['ignored'] }}</span></a></td>
-                <td><a href="{{ url('devices/disable_notify=1/format=list_detail') }}"><span class="grey"> {{ $devices['disable_notify'] }}</span></a></td>
-                <td><a href="{{ url('devices/disabled=1/format=list_detail') }}"><span class="black"> {{ $devices['disabled'] }}</span></a></td>
+                <td><a href="{{ route('devices') }}">{{ __('Devices') }}</a></td>
+                <td><a href="{{ route('devices') }}"><span> {{ $devices['total'] }}</span></a></td>
+                <td><a href="{{ route('devices', ['detail', 'filter' => ['state' => ['eq' => 'up']]]) }}"><span class="green"> {{ $devices['up'] }}</span></a></td>
+                <td><a href="{{ route('devices', ['detail', 'filter' => ['state' => ['eq' => 'down']]]) }}"><span class="red"> {{ $devices['down'] }}</span></a></td>
+                <td><a href="{{ route('devices', ['detail', 'filter' => ['ignore' => ['eq' => 1]]]) }}"><span class="blue"> {{ $devices['ignored'] }}</span></a></td>
+                <td><a href="{{ route('devices', ['detail', 'filter' => ['disable_notify' => ['eq' => 1]]]) }}"><span class="grey"> {{ $devices['disable_notify'] }}</span></a></td>
+                <td><a href="{{ route('devices', ['detail', 'filter' => ['disabled' => ['eq' => 1]]]) }}"><span class="black"> {{ $devices['disabled'] }}</span></a></td>
                 @if($summary_errors)
                     <td>-</td>
                 @endif

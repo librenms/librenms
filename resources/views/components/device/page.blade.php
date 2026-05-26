@@ -22,7 +22,7 @@
                 @endif
             </div>
             @if($device->location)
-                <div class="tw:mt-4"><a href="{{ url('/devices/location=' . urlencode((string) $device->location)) }}"><i class="fa fa-location-dot fa-fw fa-lg"></i> {{ $device->location }}</a></div>
+                <div class="tw:mt-4"><a href="{{ route('devices', ['filter' => ['location_id' => ['eq' => $device->location_id]]]) }}">{{ $device->location }}</a></div>
             @endif
         </div>
         <div class="pull-right tw:mr-2">

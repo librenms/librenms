@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'show_fitler' => 'Show Filter',
+    'show_filter' => 'Show Filter',
     'show_header' => 'Show Header',
     'purge' => 'Purge all deleted',
     'purged' => 'Purged',
