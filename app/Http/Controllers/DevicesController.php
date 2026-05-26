@@ -53,6 +53,8 @@ class DevicesController extends Controller
             $graph ??= '';
         }
 
+        $view = in_array($view, ['basic', 'detail', 'graph']) ? $view : 'detail';
+
         $graphTemplate = [
             'height' => 110,
             'width' => session('widescreen') ? 270 : 315,
