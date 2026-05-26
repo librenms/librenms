@@ -253,24 +253,24 @@ class DevicesController extends Controller
             'state' => 'state',
             'disable_notify' => 'disable_notify',
             'disabled' => 'disabled',
-            'ignore' => 'ignore'
+            'ignore' => 'ignore',
         ];
 
         foreach ($columns as $key => $column) {
             if ($legacy->has($key)) {
                 $v = $legacy->get($key);
-                $filters[$column] = ['eq' => is_numeric($v) ? (int)$v : $v];
+                $filters[$column] = ['eq' => is_numeric($v) ? (int) $v : $v];
             }
         }
 
         if ($legacy->has('group')) {
             $v = $legacy->get('group');
-            $filters['groups.id'] = $v === 'none' ? ['is_empty' => 1] : ['eq' => (int)$v];
+            $filters['groups.id'] = $v === 'none' ? ['is_empty' => 1] : ['eq' => (int) $v];
         }
 
         if ($legacy->has('poller_group')) {
             $v = $legacy->get('poller_group');
-            $filters['poller_group'] = $v === '0' ? ['is_empty' => 1] : ['eq' => (int)$v];
+            $filters['poller_group'] = $v === '0' ? ['is_empty' => 1] : ['eq' => (int) $v];
         }
 
         if (! empty($filters)) {
