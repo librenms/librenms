@@ -178,6 +178,14 @@ trait Filterable
 
         $not = $config['not'] ?? false;
 
+        if ($config['null'] ?? false) {
+            $not
+                ? ($boolean === 'or' ? $query->orWhereHas($relation) : $query->whereHas($relation))
+                : ($boolean === 'or' ? $query->orWhereDoesntHave($relation) : $query->whereDoesntHave($relation));
+
+            return;
+        }
+
         // Callback to apply the logic inside the relationship scope
         $callback = function (Builder $q) use ($column, $value, $config): void {
             // When negating a relation (whereDoesntHave), we must use "positive" internal logic
