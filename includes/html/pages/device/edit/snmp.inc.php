@@ -23,16 +23,6 @@ if (isset($_POST['editing'])) {
             $device->retries = $_POST['retries'] ?: null;
             $device->timeout = $_POST['timeout'] ?: null;
 
-            $snmp_contexts = $_POST['snmp_contexts'] ?? [];
-            if (! is_array($snmp_contexts)) {
-                $snmp_contexts = [];
-            }
-            $snmp_contexts = array_values(array_unique(array_filter(array_map(
-                fn ($context) => trim((string) $context),
-                $snmp_contexts
-            ))));
-            $device->snmp_contexts = $snmp_contexts !== [] ? $snmp_contexts : null;
-
             if ($device->snmpver == 'v3') {
                 $device->community = ''; // if v3 works, we don't need a community
                 $device->authalgo = $_POST['authalgo'];
@@ -162,7 +152,6 @@ unset($community, $max_repeaters, $max_oid, $port, $port_assoc_mode, $retries, $
 // get up-to-date database values for use on the form
 $max_oid = $device->getAttrib('snmp_max_oid');
 $max_repeaters = $device->getAttrib('snmp_max_repeaters');
-$snmp_contexts = $device->snmp_contexts ?? [];
 
 // use PHP Flasher to print normal (success) messages, similar to Device Settings
 if (isset($update_message)) {
@@ -290,18 +279,6 @@ echo "        </select>
         <label for='max_oid' class='col-sm-2 control-label'>Max OIDs</label>
         <div class='col-sm-1'>
             <input type='number' id='max_oid' name='max_oid' class='form-control input-sm' value='" . htmlspecialchars($max_oid ?? '') . "' placeholder='max oids' />
-        </div>
-    </div>
-    <div class='form-group'>
-        <label for='snmp_contexts' class='col-sm-2 control-label'>SNMP Contexts</label>
-        <div class='col-sm-4'>
-            <select id='snmp_contexts' name='snmp_contexts[]' class='form-control' multiple>";
-foreach ($snmp_contexts as $context) {
-    echo "<option value='" . htmlspecialchars($context, ENT_QUOTES) . "' selected>" . htmlspecialchars($context) . '</option>';
-}
-echo "
-            </select>
-            <p class='help-block'>Optional SNMP contexts used in some modules. Type a context and press Enter to add.</p>
         </div>
     </div>
     <div id='snmpv1_2'>
@@ -465,24 +442,6 @@ var current_os = <?php echo json_encode(['id' => $device->os, 'text' => Librenms
 init_select2('#os', 'os', {}, current_os, 'OS (optional)');
 
 $("[name='snmp']").bootstrapSwitch('offColor','danger');
-
-init_select2('#snmp_contexts', 'snmp-contexts', {}, null, 'Type context and press Enter', {
-    tags: true,
-    multiple: true,
-    ajax: null,
-    createTag: function (params) {
-        var term = $.trim(params.term);
-
-        if (term === '') {
-            return null;
-        }
-
-        return {
-            id: term,
-            text: term
-        };
-    }
-});
 
 <?php
 if ($device->snmpver == 'v3') {

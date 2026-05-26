@@ -650,7 +650,6 @@ devices:
     - { Field: bgpLocalAs, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: sysObjectID, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: snmpEngineID, Type: varchar(128), 'Null': true, Extra: '' }
-    - { Field: snmp_contexts, Type: longtext, 'Null': true, Extra: '' }
     - { Field: sysDescr, Type: text, 'Null': true, Extra: '' }
     - { Field: sysContact, Type: text, 'Null': true, Extra: '' }
     - { Field: version, Type: text, 'Null': true, Extra: '' }
