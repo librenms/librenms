@@ -107,6 +107,7 @@ class Device extends BaseModel
         'disable_notify',
         'poller_group',
         'groups.id',
+        'serviceTemplates.id',
         'search',
         'state',
     ];

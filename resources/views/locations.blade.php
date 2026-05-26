@@ -67,7 +67,7 @@
     </style>
 @endsection
 
-@section('javascript')
+@push('scripts')
     <script src="js/leaflet.js"></script>
     <script src="js/L.Control.Locate.min.js"></script>
     <script>
@@ -85,7 +85,7 @@
                 formatters: {
                     "location": function (column, row) {
                         var a = document.createElement('a');
-                        a.href = '{{ url('/devices') }}/location=' + row.id;
+                        a.href = '{{ route('devices', ['filter' => ['location_id' => ['eq' => '_location_id']]]) }}'.replace('_location_id', row.id);
                         a.textContent = row.location;
                         return a.outerHTML;
                     },
@@ -258,4 +258,4 @@
             }
         }
     </script>
-@endsection
+@endpush

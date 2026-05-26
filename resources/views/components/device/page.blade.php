@@ -22,7 +22,7 @@
                 @endif
             </span>
             <br/>
-            <a href="{{ url('/devices/location=' . urlencode((string) $device->location)) }}">{{ $device->location }}</a>
+            <a href="{{ route('devices', ['filter' => ['location_id' => ['eq' => $device->location_id]]]) }}">{{ $device->location }}</a>
         </div>
         <div class="pull-right">
             @foreach($overviewGraphs() as $graph)
