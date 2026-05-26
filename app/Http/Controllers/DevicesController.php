@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Device;
+use App\Models\Location;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -41,18 +42,7 @@ class DevicesController extends Controller
         $hideFilter = $request->input('searchbar') === 'hide';
         $perPage = $request->integer('per_page', 50);
 
-        $legacyFormat = $request->string('format');
-        if ($legacyFormat->startsWith('graph_')) {
-            $view ??= 'graph';
-            $graph ??= $legacyFormat->after('graph_')->toString();
-        } else {
-            $view ??= match ($legacyFormat->toString()) {
-                'list_basic' => 'basic',
-                default => 'detail',
-            };
-            $graph ??= '';
-        }
-
+        [$view, $graph] = $this->parseLegacyUrls($view, $graph, $request);
         $view = in_array($view, ['basic', 'detail', 'graph']) ? $view : 'detail';
 
         $graphTemplate = [
@@ -230,5 +220,66 @@ class DevicesController extends Controller
                 'type' => 'boolean',
             ],
         ];
+    }
+
+    /**
+     * @param  string|null  $view
+     * @param  string|null  $graph
+     * @param  Request  $request
+     * @return array{string, string}
+     */
+    private function parseLegacyUrls(?string $view, ?string $graph, Request $request): array
+    {
+        $legacy = Url::parseLegacyPath($request->path());
+
+        // handle legacy format
+        $legacyFormat = $legacy->getString('format');
+        if (str_starts_with($legacyFormat, 'graph_')) {
+            $view ??= 'graph';
+            $graph ??= substr($legacyFormat, 6);
+        } else {
+            $view ??= match ($legacyFormat) {
+                'list_basic' => 'basic',
+                default => 'detail',
+            };
+            $graph ??= '';
+        }
+
+        // handle legacy filters
+        $filters = [];
+        $fields = [
+            'type',
+            'state',
+            'disable_notify',
+            'disabled',
+            'ignore',
+            'poller_group',
+        ];
+
+        foreach ($fields as $field) {
+            if ($legacy->has($field)) {
+                $v = $legacy->get($field);
+                $filters[$field] = ['eq' => is_numeric($v) ? (int) $v : $v];
+            }
+        }
+
+        if ($legacy->has('group')) {
+            $v = $legacy->get('group');
+            $filters['groups.id'] = $v === 'none' ? ['is_empty' => 1] : ['eq' => (int) $v];
+        }
+
+        if ($legacy->has('location')) {
+            $v = $legacy->get('location');
+            $locationId = is_numeric($v) ? (int) $v : Location::where('location', $v)->value('id');
+            if ($locationId) {
+                $filters['location_id'] = ['eq' => $locationId];
+            }
+        }
+
+        if (! empty($filters)) {
+            $request->merge(['filter' => array_merge($request->input('filter', []), $filters)]);
+        }
+
+        return [$view, $graph];
     }
 }
