@@ -109,7 +109,6 @@ class DevicesController extends Controller
             'hideFilter' => $hideFilter,
             'filterFields' => $this->filterFields(),
             'graphTemplate' => $graphTemplate,
-            'group' => $request->input('filter.groups\.id.eq'),
         ]);
     }
 
