@@ -14,7 +14,7 @@
                     <a type="button" class="btn btn-primary" href="{{ route('device-groups.create') }}">
                         <i class="fa fa-plus"></i> {{ __('New Device Group') }}
                     </a>
-                    <a type="button" class="btn btn-default" href="{{ url('devices/group=none')  }}">
+                    <a type="button" class="btn btn-default" href="{{ route('devices', ['filter' => ['groups.id' => ['is_empty' => 1]]]) }}">
                         <i class="fas fa-border-none"></i> {{ __('View Ungrouped Devices') }}
                     </a>
                 </div>
