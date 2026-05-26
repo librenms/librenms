@@ -1,0 +1,225 @@
+OPTICSIM-COMMONPM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        ifIndex
+            FROM IF-MIB
+        OpticsIMPmPeriodTime, OpticsIMPmFilterGranularityPeriod,
+        OpticsIMPmRetrievingTime, OpticsIMPmLastDiscontinuityTimeStamp
+            FROM OPTICSIM-COMMON-TC
+        opticsIMMgrPollingIndex
+            FROM OPTICSIM-COMMROU-MIB
+        OBJECT-GROUP
+            FROM SNMPv2-CONF
+        OBJECT-TYPE, MODULE-IDENTITY
+            FROM SNMPv2-SMI
+        RowStatus
+            FROM SNMPv2-TC
+        tsdimBasicMib, tsdimBasicMC
+            FROM TSDIM-BASICREG-MIB
+        TsdimManagerType
+            FROM TSDIM-SNMP-TC;
+
+    opticsimCommonPmMib MODULE-IDENTITY
+        LAST-UPDATED "0302140000Z"
+        ORGANIZATION
+            "Alcatel TND"
+        CONTACT-INFO
+            "Alcatel TND"
+        DESCRIPTION
+            "Changed pmMaintLastDiscontinuityTimeStamp from scalar
+             objiect to  tabular objiect."
+        REVISION "0211050000Z"
+        DESCRIPTION
+           " Initial Release. Filtering criteria has been added. "
+    ::= { tsdimBasicMib 10 }
+
+
+
+opticsimCommonPmMibObject OBJECT IDENTIFIER ::= { opticsimCommonPmMib 1 }
+
+-- opticsIMFilterHistoryDataTable
+
+opticsIMFilterHistoryDataTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF OpticsIMFilterHistoryDataEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+        " This table contains the filtering criteria for retrieving HD.
+          Entries of this table will be created on request by the managers
+          and they will be used to define the filtering criteria to be
+          matched in the GET BULK operation of PM data.
+          The GET BULK will retrieve all the history data if the objects
+          providing filtering criteria are set to the NULL value.
+
+          The objects providing filtering criteria
+          (opticsIMFilterHDStartByOS, opticsIMFilterHDBeginTimeInterval,
+        opticsIMFilterHDEndTimeInterval, opticsIMFilterHDGranularityPeriod)
+          can be set even if the row is active.
+          In case of loss of connection between the NE and one manager, the
+          corresponding entry is deleted."
+     ::= { opticsimCommonPmMibObject 1}
+
+opticsIMFilterHistoryDataEntry OBJECT-TYPE
+     SYNTAX OpticsIMFilterHistoryDataEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+         " An entry of the opticsIMFilterHistoryDataTable. "
+     INDEX   { opticsIMMgrPollingIndex }
+     ::= { opticsIMFilterHistoryDataTable 1 }
+
+OpticsIMFilterHistoryDataEntry ::= SEQUENCE {
+  opticsIMFilterHDStartByOS             TsdimManagerType,
+  opticsIMFilterHDBeginTimeInterval     OpticsIMPmPeriodTime,
+  opticsIMFilterHDEndTimeInterval       OpticsIMPmPeriodTime,
+  opticsIMFilterHDGranularityPeriod     OpticsIMPmFilterGranularityPeriod,
+  opticsIMFilterHDRowStatus             RowStatus
+  }
+
+opticsIMFilterHDStartByOS OBJECT-TYPE
+     SYNTAX TsdimManagerType
+     MAX-ACCESS read-create
+     STATUS current
+     DESCRIPTION
+          "See Textual Conventions. "
+     ::= {opticsIMFilterHistoryDataEntry  1}
+
+opticsIMFilterHDBeginTimeInterval OBJECT-TYPE
+     SYNTAX OpticsIMPmPeriodTime
+     MAX-ACCESS read-create
+     STATUS current
+     DESCRIPTION
+          "See Textual Conventions."
+     ::= {opticsIMFilterHistoryDataEntry  2}
+
+opticsIMFilterHDEndTimeInterval OBJECT-TYPE
+     SYNTAX OpticsIMPmPeriodTime
+     MAX-ACCESS read-create
+     STATUS current
+     DESCRIPTION
+          "See Textual Conventions"
+     ::= {opticsIMFilterHistoryDataEntry  3}
+
+opticsIMFilterHDGranularityPeriod OBJECT-TYPE
+     SYNTAX OpticsIMPmFilterGranularityPeriod
+     MAX-ACCESS read-create
+     STATUS current
+     DESCRIPTION
+          "See Textual Conventions."
+     ::= {opticsIMFilterHistoryDataEntry 4}
+
+opticsIMFilterHDRowStatus OBJECT-TYPE
+     SYNTAX RowStatus
+     MAX-ACCESS read-create
+     STATUS current
+     DESCRIPTION
+       "The row status of this table."
+     ::= {opticsIMFilterHistoryDataEntry  5}
+
+pmMaintRetrievingTime OBJECT-TYPE
+    SYNTAX OpticsIMPmRetrievingTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See Textual Conventions"
+    ::= { opticsimCommonPmMibObject 2 }
+
+pmMaintLastDiscontinuityTimeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmMaintLastDiscontinuityTimeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains the last discontinuity time
+         for each interface.
+        "
+    ::= { opticsimCommonPmMibObject 3 }
+
+pmMaintLastDiscontinuityTimeEntry OBJECT-TYPE
+    SYNTAX PmMaintLastDiscontinuityTimeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry of pmMaintLastDiscontinuityTimeTable"
+    INDEX { ifIndex }
+    ::= { pmMaintLastDiscontinuityTimeTable 1 }
+
+PmMaintLastDiscontinuityTimeEntry ::=
+    SEQUENCE {
+        pmMaintLastDiscontinuityTimeStamp
+            OpticsIMPmLastDiscontinuityTimeStamp
+     }
+
+pmMaintLastDiscontinuityTimeStamp OBJECT-TYPE
+    SYNTAX OpticsIMPmLastDiscontinuityTimeStamp
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "See Textual Conventions."
+    ::= { pmMaintLastDiscontinuityTimeEntry 1 }
+
+-- END
+
+-- OPTICSIM-COMMONPM-MC DEFINITIONS ::= BEGIN
+--     IMPORTS
+--     MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY FROM SNMPv2-SMI
+--     MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+--     tsdim_basicMC FROM TSDIM-BASICREG-MIB;
+
+-- opticsimCommonPmMCCompl
+
+-- opticsimCommonPmMCCompl MODULE-IDENTITY
+--    LAST-UPDATED "0211050000Z"
+--    DESCRIPTION
+--        "Initial Release OPTICS-IM Common PM MIB"
+--
+-- ::= { opticsimCommonPmMCConf 1 }
+
+opticsimCommonPmMCConf  OBJECT IDENTIFIER ::= { tsdimBasicMC 10 }
+opticsimCommonPmMCCompl OBJECT IDENTIFIER ::= { opticsimCommonPmMCConf 1 }
+opticsimCommonPmMCGroup OBJECT IDENTIFIER ::= { opticsimCommonPmMCConf 2 }
+
+opticsimCommonPmMc MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "This module compliance describes a set of objects required for
+         TSD-IM SNMP Agent implementation.
+         These objects are defined inside opticsimCommonPmMib"
+
+    MODULE -- opticsimCommonPmMib
+
+
+
+GROUP opticsIMFilterHistoryDataGroup
+    DESCRIPTION
+        "This group describes the objects needed for the History Data
+         filtering criteria management."
+
+GROUP opticsIMTimeGroup
+    DESCRIPTION
+        "This group describes the objects needed for time definitions."
+
+::= { opticsimCommonPmMCCompl 1 }
+
+-- Units of Conformance
+
+opticsIMFilterHistoryDataGroup OBJECT-GROUP
+    OBJECTS { opticsIMFilterHDStartByOS,
+              opticsIMFilterHDBeginTimeInterval,
+              opticsIMFilterHDEndTimeInterval,
+              opticsIMFilterHDGranularityPeriod,
+              opticsIMFilterHDRowStatus}
+    STATUS current
+    DESCRIPTION
+        "This group  describes the objects needed for History Data
+         filtering criteria."
+::= { opticsimCommonPmMCGroup 1 }
+
+opticsIMTimeGroup OBJECT-GROUP
+    OBJECTS { pmMaintRetrievingTime,
+              pmMaintLastDiscontinuityTimeStamp }
+    STATUS current
+    DESCRIPTION
+        "This group  describes the objects needed for time definition."
+::= { opticsimCommonPmMCGroup 2 }
+
+END
