@@ -22,7 +22,7 @@ modules:
         temperature:
             data:
                 -
-                    oid: ENVIROMUXMICRO-MIB::intSensorEntry
+                    oid: ENVIROMUXMICRO-MIB::intSensorTable
                     value: ENVIROMUXMICRO-MIB::intSensorValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.1.1.1.4.{{ $index }}'
                     descr: '{{ ENVIROMUXMICRO-MIB::intSensorDescription }}'
@@ -48,7 +48,7 @@ modules:
                            value: ['1', '24']
                 # ENVIROMUX-2D / 5D / 16D share an identical masterUnit subtree; intSensorEntry col 6 = intSensorValue, col 2 = intSensorType (temperature(1))
                 -
-                    oid: ENVIROMUX2D::intSensorEntry
+                    oid: ENVIROMUX2D::intSensorTable
                     value: ENVIROMUX2D::intSensorValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.3.1.1.6.{{ $index }}'
                     descr: '{{ ENVIROMUX2D::intSensorDescription }}'
@@ -65,7 +65,7 @@ modules:
                             op: '!='
                             value: 1
                 -
-                    oid: ENVIROMUX5D::intSensorEntry
+                    oid: ENVIROMUX5D::intSensorTable
                     value: ENVIROMUX5D::intSensorValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.3.1.1.6.{{ $index }}'
                     descr: '{{ ENVIROMUX5D::intSensorDescription }}'
@@ -82,7 +82,7 @@ modules:
                             op: '!='
                             value: 1
                 -
-                    oid: ENVIROMUX16D::intSensorEntry
+                    oid: ENVIROMUX16D::intSensorTable
                     value: ENVIROMUX16D::intSensorValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.3.1.1.6.{{ $index }}'
                     descr: '{{ ENVIROMUX16D::intSensorDescription }}'
@@ -100,7 +100,7 @@ modules:
                             value: 1
                 # 2D / 5D / 16D extSensorEntry col 7 = extSensorValue, col 2 = extSensorType (temperature(1))
                 -
-                    oid: ENVIROMUX2D::extSensorEntry
+                    oid: ENVIROMUX2D::extSensorTable
                     value: ENVIROMUX2D::extSensorValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.5.1.1.7.{{ $index }}'
                     descr: '{{ ENVIROMUX2D::extSensorDescription }}'
@@ -117,7 +117,7 @@ modules:
                             op: '!='
                             value: 1
                 -
-                    oid: ENVIROMUX5D::extSensorEntry
+                    oid: ENVIROMUX5D::extSensorTable
                     value: ENVIROMUX5D::extSensorValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.5.1.1.7.{{ $index }}'
                     descr: '{{ ENVIROMUX5D::extSensorDescription }}'
@@ -134,7 +134,7 @@ modules:
                             op: '!='
                             value: 1
                 -
-                    oid: ENVIROMUX16D::extSensorEntry
+                    oid: ENVIROMUX16D::extSensorTable
                     value: ENVIROMUX16D::extSensorValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.5.1.1.7.{{ $index }}'
                     descr: '{{ ENVIROMUX16D::extSensorDescription }}'
@@ -153,7 +153,7 @@ modules:
         humidity:
             data:
                 -
-                    oid: ENVIROMUXMICRO-MIB::intSensorEntry
+                    oid: ENVIROMUXMICRO-MIB::intSensorTable
                     value: ENVIROMUXMICRO-MIB::intSensorValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.1.1.1.4.{{ $index }}'
                     descr: '{{ ENVIROMUXMICRO-MIB::intSensorDescription }}'
@@ -179,7 +179,7 @@ modules:
                            value: ['2']
                 # 2D / 5D / 16D internal humidity sensors (intSensorType=2); humidity is reported as integer percent (no divisor) per MIB DESCRIPTION
                 -
-                    oid: ENVIROMUX2D::intSensorEntry
+                    oid: ENVIROMUX2D::intSensorTable
                     value: ENVIROMUX2D::intSensorValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.3.1.1.6.{{ $index }}'
                     descr: '{{ ENVIROMUX2D::intSensorDescription }}'
@@ -195,7 +195,7 @@ modules:
                             op: '!='
                             value: 2
                 -
-                    oid: ENVIROMUX5D::intSensorEntry
+                    oid: ENVIROMUX5D::intSensorTable
                     value: ENVIROMUX5D::intSensorValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.3.1.1.6.{{ $index }}'
                     descr: '{{ ENVIROMUX5D::intSensorDescription }}'
@@ -211,7 +211,7 @@ modules:
                             op: '!='
                             value: 2
                 -
-                    oid: ENVIROMUX16D::intSensorEntry
+                    oid: ENVIROMUX16D::intSensorTable
                     value: ENVIROMUX16D::intSensorValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.3.1.1.6.{{ $index }}'
                     descr: '{{ ENVIROMUX16D::intSensorDescription }}'
@@ -228,7 +228,7 @@ modules:
                             value: 2
                 # 2D / 5D / 16D external humidity sensors (extSensorType=2)
                 -
-                    oid: ENVIROMUX2D::extSensorEntry
+                    oid: ENVIROMUX2D::extSensorTable
                     value: ENVIROMUX2D::extSensorValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.5.1.1.7.{{ $index }}'
                     descr: '{{ ENVIROMUX2D::extSensorDescription }}'
@@ -244,7 +244,7 @@ modules:
                             op: '!='
                             value: 2
                 -
-                    oid: ENVIROMUX5D::extSensorEntry
+                    oid: ENVIROMUX5D::extSensorTable
                     value: ENVIROMUX5D::extSensorValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.5.1.1.7.{{ $index }}'
                     descr: '{{ ENVIROMUX5D::extSensorDescription }}'
@@ -260,7 +260,7 @@ modules:
                             op: '!='
                             value: 2
                 -
-                    oid: ENVIROMUX16D::extSensorEntry
+                    oid: ENVIROMUX16D::extSensorTable
                     value: ENVIROMUX16D::extSensorValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.5.1.1.7.{{ $index }}'
                     descr: '{{ ENVIROMUX16D::extSensorDescription }}'
@@ -278,7 +278,7 @@ modules:
         state:
             data:
                 -
-                    oid: ENVIROMUX-1W-MIB::digInputEntry
+                    oid: ENVIROMUX-1W-MIB::digInputTable
                     value: ENVIROMUX-1W-MIB::digInputValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.3.1.1.3.{{ $index }}'
                     descr: '{{ ENVIROMUX-1W-MIB::digInputDescription }}'
@@ -288,7 +288,7 @@ modules:
                         - { descr: closed, value: 0, generic: 0 }
                         - { descr: open, value: 1, generic: 1 }
                 -
-                    oid: ENVIROMUX-1W-MIB::alertEntry
+                    oid: ENVIROMUX-1W-MIB::alertTable
                     value: ENVIROMUX-1W-MIB::alertStatus
                     num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.5.1.1.7.{{ $index }}'
                     descr: '{{ ENVIROMUX-1W-MIB::alertSensor }}#{{ $index }}'
@@ -310,7 +310,7 @@ modules:
                             value: 0
                 # 2D / 5D / 16D digital inputs (digInputValue = closed(0)/open(1)); skip slots whose description is "Not configured"
                 -
-                    oid: ENVIROMUX2D::digInputEntry
+                    oid: ENVIROMUX2D::digInputTable
                     value: ENVIROMUX2D::digInputValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.6.1.1.7.{{ $index }}'
                     descr: '{{ ENVIROMUX2D::digInputDescription }}'
@@ -326,7 +326,7 @@ modules:
                             op: 'regex'
                             value: '/^Not configured$/'
                 -
-                    oid: ENVIROMUX5D::digInputEntry
+                    oid: ENVIROMUX5D::digInputTable
                     value: ENVIROMUX5D::digInputValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.6.1.1.7.{{ $index }}'
                     descr: '{{ ENVIROMUX5D::digInputDescription }}'
@@ -342,7 +342,7 @@ modules:
                             op: 'regex'
                             value: '/^Not configured$/'
                 -
-                    oid: ENVIROMUX16D::digInputEntry
+                    oid: ENVIROMUX16D::digInputTable
                     value: ENVIROMUX16D::digInputValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.6.1.1.7.{{ $index }}'
                     descr: '{{ ENVIROMUX16D::digInputDescription }}'
@@ -359,7 +359,7 @@ modules:
                             value: '/^Not configured$/'
                 # 2D / 5D / 16D remote inputs (remoteInputValue = closed(0)/open(1)); skip "Not configured" slots
                 -
-                    oid: ENVIROMUX2D::remoteInputEntry
+                    oid: ENVIROMUX2D::remoteInputTable
                     value: ENVIROMUX2D::remoteInputValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.12.1.1.7.{{ $index }}'
                     descr: '{{ ENVIROMUX2D::remoteInputDescription }}'
@@ -375,7 +375,7 @@ modules:
                             op: 'regex'
                             value: '/^Not configured$/'
                 -
-                    oid: ENVIROMUX5D::remoteInputEntry
+                    oid: ENVIROMUX5D::remoteInputTable
                     value: ENVIROMUX5D::remoteInputValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.12.1.1.7.{{ $index }}'
                     descr: '{{ ENVIROMUX5D::remoteInputDescription }}'
@@ -391,7 +391,7 @@ modules:
                             op: 'regex'
                             value: '/^Not configured$/'
                 -
-                    oid: ENVIROMUX16D::remoteInputEntry
+                    oid: ENVIROMUX16D::remoteInputTable
                     value: ENVIROMUX16D::remoteInputValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.12.1.1.7.{{ $index }}'
                     descr: '{{ ENVIROMUX16D::remoteInputDescription }}'
@@ -408,7 +408,7 @@ modules:
                             value: '/^Not configured$/'
                 # 2D / 5D / 16D output relays (outRelayStatus = active(0)/inactive(1))
                 -
-                    oid: ENVIROMUX2D::outRelayEntry
+                    oid: ENVIROMUX2D::outRelayTable
                     value: ENVIROMUX2D::outRelayStatus
                     num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.8.1.1.3.{{ $index }}'
                     descr: '{{ ENVIROMUX2D::outRelayDescription }}'
@@ -419,7 +419,7 @@ modules:
                         - { descr: active, value: 0, generic: 0 }
                         - { descr: inactive, value: 1, generic: 1 }
                 -
-                    oid: ENVIROMUX5D::outRelayEntry
+                    oid: ENVIROMUX5D::outRelayTable
                     value: ENVIROMUX5D::outRelayStatus
                     num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.8.1.1.3.{{ $index }}'
                     descr: '{{ ENVIROMUX5D::outRelayDescription }}'
@@ -430,7 +430,7 @@ modules:
                         - { descr: active, value: 0, generic: 0 }
                         - { descr: inactive, value: 1, generic: 1 }
                 -
-                    oid: ENVIROMUX16D::outRelayEntry
+                    oid: ENVIROMUX16D::outRelayTable
                     value: ENVIROMUX16D::outRelayStatus
                     num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.8.1.1.3.{{ $index }}'
                     descr: '{{ ENVIROMUX16D::outRelayDescription }}'
@@ -444,7 +444,7 @@ modules:
                 # Operators can silence a known-empty bay via the device's web UI which
                 # reports back as na(2); na is mapped to generic 0 so it does not alert.
                 -
-                    oid: ENVIROMUX2D::pwrSupplyEntry
+                    oid: ENVIROMUX2D::pwrSupplyTable
                     value: ENVIROMUX2D::pwrSupplyStatus
                     num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.9.1.1.2.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -456,7 +456,7 @@ modules:
                         - { descr: ok, value: 1, generic: 0 }
                         - { descr: na, value: 2, generic: 0 }
                 -
-                    oid: ENVIROMUX5D::pwrSupplyEntry
+                    oid: ENVIROMUX5D::pwrSupplyTable
                     value: ENVIROMUX5D::pwrSupplyStatus
                     num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.9.1.1.2.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -468,7 +468,7 @@ modules:
                         - { descr: ok, value: 1, generic: 0 }
                         - { descr: na, value: 2, generic: 0 }
                 -
-                    oid: ENVIROMUX16D::pwrSupplyEntry
+                    oid: ENVIROMUX16D::pwrSupplyTable
                     value: ENVIROMUX16D::pwrSupplyStatus
                     num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.9.1.1.2.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
