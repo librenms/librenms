@@ -233,7 +233,7 @@ class DevicesController extends Controller
         $legacy = Url::parseLegacyPath($request->path());
 
         // handle legacy format
-        $legacyFormat = $legacy->get('format', '');
+        $legacyFormat = $legacy->getString('format');
         if (str_starts_with($legacyFormat, 'graph_')) {
             $view ??= 'graph';
             $graph ??= substr($legacyFormat, 6);
