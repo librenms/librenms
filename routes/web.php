@@ -91,7 +91,7 @@ Route::get('graph/{path?}', GraphController::class)
 Route::middleware(['auth'])->group(function (): void {
     // pages
     Route::post('alert/{alert}/ack', [AlertController::class, 'ack'])->name('alert.ack');
-    Route::get('devices/{view?}/{graph?}', [DevicesController::class, 'index'])->name('devices');
+    Route::get('devices/{view?}/{graph?}/{vars?}', [DevicesController::class, 'index'])->where('vars', '.*')->name('devices');
     Route::resource('device-groups', DeviceGroupController::class);
     Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
     Route::get('inventory/purge', [App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
