@@ -39,7 +39,7 @@
                             <td>{{ $device_group->desc }}</td>
                             <td>{{ __(ucfirst($device_group->type)) }}</td>
                             <td>
-                                <a href="{{ url("/devices/group=$device_group->id") }}">{{ $device_group->devices_count }}</a>
+                                <a href="{{ route('devices', ['filter' => ['groups.id' => ['eq' => $device_group->id]]]) }}">{{ $device_group->devices_count }}</a>
                             </td>
                             <td>
                                 <a href="{{ route('ports', ['filter' => ['device.groups.id' => ['eq' => $device_group->id]]]) }}">View</a>
