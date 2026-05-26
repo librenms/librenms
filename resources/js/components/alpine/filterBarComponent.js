@@ -46,6 +46,8 @@ export default function filterBarComponent({
                 { v: "neq", s: "≠", l: "Is Not" },
                 { v: "in", s: "∈", l: "Is Any Of" },
                 { v: "not_in", s: "∉", l: "Is Not Any Of" },
+                { v: "is_empty", s: "∅", l: "None" },
+                { v: "is_not_empty", s: "∃", l: "Any" },
             ],
         },
 
@@ -345,8 +347,7 @@ export default function filterBarComponent({
 
             this.current = field;
             this.op = existing?.op || this.ops()[0].v;
-            this.value =
-                existing?.value ?? (this.isMulti() ? [] : "");
+            this.value = existing?.value ?? (this.isMulti() ? [] : "");
             this.display = existing?.display ?? this.value;
 
             this.snapshot = {

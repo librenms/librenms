@@ -393,6 +393,32 @@ class FilterableTest extends TestCase
         $this->assertContains('orphan-gw', $hostnames);
     }
 
+    public function test_relation_is_empty_finds_records_without_relationship(): void
+    {
+        $this->device(['hostname' => 'connected-gw'], 'London');
+        $this->device(['hostname' => 'unassigned-gw', 'location_id' => null]);
+
+        $results = FilterableDevice::applyFilters([
+            'location.location' => ['is_empty' => '1'],
+        ])->get();
+
+        $this->assertCount(1, $results);
+        $this->assertEquals('unassigned-gw', $results->first()->hostname);
+    }
+
+    public function test_relation_is_not_empty_finds_records_with_relationship(): void
+    {
+        $this->device(['hostname' => 'connected-gw'], 'Paris');
+        $this->device(['hostname' => 'unassigned-gw', 'location_id' => null]);
+
+        $results = FilterableDevice::applyFilters([
+            'location.location' => ['is_not_empty' => '1'],
+        ])->get();
+
+        $this->assertCount(1, $results);
+        $this->assertEquals('connected-gw', $results->first()->hostname);
+    }
+
     // -------------------------------------------------------------------------
     // applyFilterSearch helper
     // -------------------------------------------------------------------------
