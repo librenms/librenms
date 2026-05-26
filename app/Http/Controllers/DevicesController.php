@@ -42,8 +42,7 @@ class DevicesController extends Controller
         $hideFilter = $request->input('searchbar') === 'hide';
         $perPage = $request->integer('per_page', 50);
 
-        [$view, $graph] = $this->parseLegacyUrls($view, $graph, $request);
-        $view = in_array($view, ['basic', 'detail', 'graph']) ? $view : 'detail';
+        [$view, $graph] = $this->parseLegacyUrls((string) $view, (string) $graph, $request);
 
         $graphTemplate = [
             'height' => 110,
@@ -223,26 +222,29 @@ class DevicesController extends Controller
     }
 
     /**
-     * @param  string|null  $view
-     * @param  string|null  $graph
-     * @param  Request  $request
      * @return array{string, string}
      */
-    private function parseLegacyUrls(?string $view, ?string $graph, Request $request): array
+    private function parseLegacyUrls(string $view, string $graph, Request $request): array
     {
         $legacy = Url::parseLegacyPath($request->path());
 
         // handle legacy format
         $legacyFormat = $legacy->getString('format');
-        if (str_starts_with($legacyFormat, 'graph_')) {
-            $view ??= 'graph';
-            $graph ??= substr($legacyFormat, 6);
+        if (! in_array($view, ['detail', 'basic', 'graph'])) {
+            if (str_starts_with($legacyFormat, 'graph_')) {
+                $view = 'graph';
+                $graph = substr($legacyFormat, 6);
+            } elseif ($legacyFormat === 'list_basic') {
+                $view = 'basic';
+            } else {
+                $view = 'detail';
+            }
+        }
+
+        if ($view === 'graph') {
+            $graph = $graph ?: 'bits';
         } else {
-            $view ??= match ($legacyFormat) {
-                'list_basic' => 'basic',
-                default => 'detail',
-            };
-            $graph ??= '';
+            $graph = '';
         }
 
         // handle legacy filters
@@ -279,6 +281,13 @@ class DevicesController extends Controller
         if (! empty($filters)) {
             $request->merge(['filter' => array_merge($request->input('filter', []), $filters)]);
         }
+
+        // handle graph date time selector (but formats don't match 100%)
+        $to = $legacy->get('to');
+        $request->mergeIfMissing([
+            'from' => preg_replace('/(^-?\d+[a-z])[a-z]*/i', '$1', $legacy->getString('from')) ?: null, // try to fix bad formats
+            'to' => $to == 'now' ? null : $to,
+        ]);
 
         return [$view, $graph];
     }
