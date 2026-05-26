@@ -80,6 +80,14 @@ export default function filterBarComponent({
             return formatted;
         },
 
+        get isOpen() {
+            return this.dialog || this.showAdd || this.showOptions;
+        },
+
+        get defaultSearchField() {
+            return this.fields.find((f) => f.search);
+        },
+
         // --- Initialization ---
         async init() {
             this.$watch("op", (newOp, oldOp) => {
@@ -134,6 +142,15 @@ export default function filterBarComponent({
             window.addEventListener("popstate", () =>
                 this.restoreFromUrl(new URLSearchParams(window.location.search))
             );
+
+            this.$watch("dialog", (val) => {
+                if (!val && this.lastFocusedElement) {
+                    this.$nextTick(() => {
+                        this.lastFocusedElement?.focus();
+                        this.lastFocusedElement = null;
+                    });
+                }
+            });
         },
 
         // --- Data Restoration ---
@@ -431,12 +448,15 @@ export default function filterBarComponent({
         },
 
         close() {
+            if (!this.isOpen) {
+                return;
+            }
+
             this.revert();
             this.dialog = false;
             this.showAdd = false;
             this.showOptions = false;
             this.current = null;
-            this.$nextTick(() => this.lastFocusedElement?.focus());
         },
 
         revert() {
