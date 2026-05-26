@@ -137,7 +137,7 @@
                         @if($device_types->isNotEmpty())
                         <ul class="dropdown-menu scrollable-menu">
                         @foreach($device_types as $type => $icon)
-                            <li><a href="{{ url("devices/type=$type") }}"><i class="fa fa-{{ $icon }} fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($type) }}</a></li>
+                            <li><a href="{{ route('devices', ['filter' => ['type' => ['eq' => $type]]]) }}"><i class="fa fa-{{ $icon }} fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($type) }}</a></li>
                         @endforeach
                         </ul>
                         @endif
@@ -150,7 +150,7 @@
                                 </a>
                             <ul class="dropdown-menu scrollable-menu">
                             @foreach($device_groups as $group)
-                                <li><a href="{{ url("devices/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($group->name) }}</a></li>
+                                <li><a href="{{ route('devices', ['filter' => ['groups.id' => ['eq' => $group->id]]]) }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($group->name) }}</a></li>
                             @endforeach
                             </ul>
                         </li>
