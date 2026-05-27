@@ -35,8 +35,8 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     $ports = ObjectCache::portCounts(['total', 'up', 'down', 'disabled'], $device['device_id']);
     echo '<div class="panel-body">
     <a class="btn btn-default" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports']) . '">Total: <span class="badge">' . $ports['total'] . '</span></a>
-    <a class="btn btn-success" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports', 'filter' => ['state' => ['eq' => 'up']]]) . '">Up: <span class="badge">' . $ports['up'] . '</span></a>
-    <a class="btn btn-danger" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports', 'filter' => ['state' => ['eq' => 'down']]]) . '">Down: <span class="badge">' . $ports['down'] . '</span></a>
+    <a class="btn btn-success" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports', 'filter' => ['state' => ['eq' => 'up'], 'disabled' => ['eq' => '0'], 'ignore' => ['eq' => '0'], 'deleted' => ['eq' => '0']]]) . '">Up: <span class="badge">' . $ports['up'] . '</span></a>
+    <a class="btn btn-danger" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports', 'filter' => ['state' => ['eq' => 'down'], 'disabled' => ['eq' => '0'], 'ignore' => ['eq' => '0'], 'deleted' => ['eq' => '0']]]) . '">Down: <span class="badge">' . $ports['down'] . '</span></a>
     <a class="btn btn-primary" role="button" href="' . route('device', ['device' => $device['device_id'], 'tab' => 'ports', 'filter' => ['disabled' => ['eq' => '1']]]) . '">Disabled: <span class="badge">' . $ports['disabled'] . '</span></a>
     </div>';
 

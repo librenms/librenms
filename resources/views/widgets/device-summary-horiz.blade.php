@@ -35,7 +35,7 @@
                 <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'down']]]) }}"><span class="red"> {{ $ports['down'] }}</span></a></td>
                 <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['ignore' => ['eq' => '1']]]) }}"><span class="blue"> {{ $ports['ignored'] }}</span></a></td>
                 <td><span class="grey"> -</span></td>
-                <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'shutdown']]]) }}"><span class="black"> {{ $ports['shutdown'] }}</span></a></td>
+                <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'shutdown'], 'disabled' => ['eq' => '0'], 'ignore' => ['eq' => '0'], 'deleted' => ['eq' => '0']]]) }}"><span class="black"> {{ $ports['shutdown'] }}</span></a></td>
                 @if($summary_errors)
                     <td><a href="{{ route('ports', ['view' => 'detail', 'errors' => 1]) }}"><span class="black"> {{ $ports['errored'] }}</span></a></td>
                 @endif
