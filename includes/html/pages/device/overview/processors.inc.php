@@ -92,7 +92,7 @@ if (count($processors)) {
         $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . ' - CPU usage');
 
         echo '<tr>
-              <td colspan="4">';
+              <td colspan="12">';
         echo \LibreNMS\Util\Url::overlibLink($link, $graph, $overlib_content);
         echo '  </td>
             </tr>';

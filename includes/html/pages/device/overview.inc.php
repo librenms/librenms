@@ -5,7 +5,7 @@ use LibreNMS\Interfaces\Plugins\Hooks\DeviceOverviewHook;
 $overview = 1;
 
 echo '
-<div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4">
+<div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:w-full">
     <div class="tw:min-w-0">
 ';
 require 'includes/html/dev-overview-data.inc.php';
