@@ -92,6 +92,11 @@ if ($device['os'] == 'nokia-1830') {
     require base_path('includes/discovery/ports/nokia-1830.inc.php');
 }
 
+// Nokia Wavence - normalize literal NULL values from ifName/ifAlias
+if ($device['os'] == 'wavence') {
+    require base_path('includes/discovery/ports/wavence.inc.php');
+}
+
 // End Building SNMP Cache Array
 d_echo($port_stats);
 
