@@ -130,6 +130,7 @@ class DevicesController extends Controller
                 'key' => 'search',
                 'label' => __('Search'),
                 'type' => 'text',
+                'search' => true,
             ],
             [
                 'key' => 'state',

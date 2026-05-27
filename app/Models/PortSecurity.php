@@ -80,6 +80,7 @@ class PortSecurity extends DeviceRelatedModel implements Keyable
                 'key' => 'search',
                 'label' => __('Port name'),
                 'type' => 'text',
+                'search' => true,
             ],
             [
                 'key' => 'port_security_enable',
