@@ -56,10 +56,10 @@
     @apply tw:font-bold tw:text-blue-900 tw:visited:text-blue-900 tw:dark:text-dark-white-100 tw:dark:visited:text-dark-white-100
 }
 .device-link-down {
-    @apply tw:font-bold tw:text-red-600 tw:visited:text-red-600 tw:dark:!text-red-500 tw:dark:visited:!text-red-500
+    @apply tw:font-bold tw:text-red-600 tw:visited:text-red-600 tw:dark:text-red-500! tw:dark:visited:text-red-500!
 }
 .device-link-disabled {
-    @apply tw:font-bold tw:text-gray-400 tw:visited:text-gray-400 tw:dark:!text-gray-500 tw:dark:visited:!text-gray-500
+    @apply tw:font-bold tw:text-gray-400 tw:visited:text-gray-400 tw:dark:text-gray-500! tw:dark:visited:text-gray-500!
 }
 
 #coordinates-text  {
@@ -68,26 +68,6 @@
 
 .overview-panel {
   @apply tw:rounded-xl tw:overflow-hidden tw:border tw:border-gray-300 tw:shadow-sm tw:dark:border-dark-gray-200;
-}
-
-.device-overview-columns {
-  @apply tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4;
-}
-
-.device-panel-status-up {
-  @apply tw:border-l-4 tw:border-l-green-600!;
-}
-
-.device-panel-status-down {
-  @apply tw:border-l-4 tw:border-l-red-600!;
-}
-
-.device-panel-status-maintenance {
-  @apply tw:border-l-4 tw:border-l-blue-500!;
-}
-
-.device-panel-status-disabled {
-  @apply tw:border-l-4 tw:border-l-black!;
 }
 
 .lnms-btn {

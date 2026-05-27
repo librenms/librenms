@@ -34,12 +34,12 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\View\Component;
+use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Util\Graph;
 
 class Page extends Component
 {
     public string $alertClass;
-    public string $statusBorderClass;
     public ?int $parentDeviceId;
     public ?string $typeIcon = null;
     public string $typeText = '';
@@ -54,7 +54,6 @@ class Page extends Component
         DeviceCache::setPrimary($device->device_id); // set primary device in case it was not set by controller
         $this->pagetitle = $subtitle ? ($device->displayName() . ': ' . $subtitle) : $device->displayName();
         $this->alertClass = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
-        $this->statusBorderClass = $this->statusIndicator($device);
         $this->parentDeviceId = Vminfo::guessFromDevice($device)->value('device_id');
         $this->populateTypeFields();
     }
@@ -100,23 +99,13 @@ class Page extends Component
         }
     }
 
-    /**
-     * @return string
-     */
-    private function statusIndicator(Device $device): string
+    public function statusBorderClass(): string
     {
-        if ($device->disabled) {
-            return 'device-panel-status-disabled';
-        }
-
-        if ($device->isUnderMaintenance()) {
-            return 'device-panel-status-maintenance';
-        }
-
-        if ($device->status) {
-            return 'device-panel-status-up';
-        }
-
-        return 'device-panel-status-down';
+        return match ($this->device->getDeviceStatus()) {
+            DeviceStatus::Up, DeviceStatus::IgnoredUp => $this->device->isUnderMaintenance() ? 'tw:border-l-blue-500!' : 'tw:border-l-green-600!',
+            DeviceStatus::Down, DeviceStatus::IgnoredDown => $this->device->isUnderMaintenance() ? 'tw:border-l-blue-500!' : 'tw:border-l-red-600!',
+            DeviceStatus::Disabled => 'tw:border-l-black!',
+            DeviceStatus::NeverPolled => 'tw:border-l-gray-400!',
+        };
     }
 }

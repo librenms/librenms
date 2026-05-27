@@ -1,7 +1,7 @@
 @section('title', $pagetitle)
 
 <div class="container-fluid">
-    <x-panel class="tw:rounded-2xl! tw:border {{ $statusBorderClass }} tw:border-gray-300 tw:bg-white tw:shadow-sm tw:dark:border-dark-gray-200 tw:dark:bg-dark-gray-40 tw:mb-0!">
+    <x-panel class="tw:rounded-2xl! tw:border tw:border-l-5 {{ $statusBorderClass }} tw:border-gray-300 tw:bg-white tw:shadow-sm tw:dark:border-dark-gray-200 tw:dark:bg-dark-gray-40 tw:mb-0!">
         <x-slot:slot class="tw:pl-5 tw:pr-5 tw:pt-3! tw:pb-0!">
         <img src="{{ url($device->logo()) }}" title="{{ $device->logo() }}"
              alt="logo"
@@ -12,10 +12,10 @@
                 <a href="{{ route('device', $parentDeviceId) }}" title="{{ __('device.vm_host') }}"><i
                         class="fa fa-server fa-fw fa-lg"></i></a>
             @endif
-            @if($device->isUnderMaintenance())
-                <span title="{{ __('device.scheduled_maintenance') }}" class="fa fa-wrench fa-fw fa-lg"></span>
-            @endif
             <div style="font-size: 20px;">
+                @if($device->isUnderMaintenance())
+                    <span title="{{ __('device.scheduled_maintenance') }}" class="fa fa-wrench fa-fw"></span>
+                @endif
                 <x-device-link :device="$device"/>
                 @if($typeIcon)
                     <i class="fa-solid fa-{{ $typeIcon }}" title="{{ $typeText }}"></i>
@@ -43,7 +43,7 @@
         </div>
         </x-slot:slot>
     </x-panel>
-    
+
     <x-device.page-tabs :device="$device" :dropdown-links="$dropdownLinks"/>
 
     <div class="tab-content tw:mt-4">
