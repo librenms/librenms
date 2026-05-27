@@ -368,9 +368,10 @@ class Port extends DeviceRelatedModel
     public function filterState(Builder $query, mixed $value, array $config): void
     {
         $this->applyMappedFilter($query, $value, $config, fn (Builder $q, $state) => match ($state) {
-            'shutdown' => $q->where('ifAdminStatus', '!=', 'up'),
-            'up' => $q->where('ifAdminStatus', 'up')->where('ifOperStatus', 'up'),
-            default => $q->where('ifAdminStatus', 'up')->where('ifOperStatus', '!=', 'up'),
+            'up' => $q->where('ifOperStatus', 'up'),
+            'shutdown' => $q->where('ifAdminStatus', 'down'),
+            default => $q->where('ifOperStatus', '!=', 'up')
+                ->where(fn (Builder $sub) => $sub->where('ifAdminStatus', '!=', 'down')->orWhereNull('ifAdminStatus')),
         });
     }
 
