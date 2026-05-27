@@ -13,6 +13,11 @@ modules:
                         - Sentry4-MIB::st4PhaseLabel
                         - Sentry4-MIB::st4OcpLabel
                         - Sentry4-MIB::st4BranchLabel
+                        - Sentry4-MIB::st4HumidSensorEventConfigTable
+                        - Sentry4-MIB::st4HumidSensorConfigTable
+                        - Sentry4-MIB::st4TempSensorEventConfigTable
+                        - Sentry4-MIB::st4TempSensorConfigTable
+                        - Sentry4-MIB::st4TempSensorScale
         current:
             data:
                 -
@@ -499,3 +504,51 @@ modules:
                         - { descr: nvmFail, value: 21, generic: 2 }
                         - { descr: profileError, value: 22, generic: 2 }
                         - { descr: conflict, value: 23, generic: 2 }
+        humidity:
+            options:
+                skip_value_lt: 0
+            data:
+                -
+                    oid: Sentry4-MIB::st4HumidSensorMonitorTable
+                    value: Sentry4-MIB::st4HumidSensorValue
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.10.3.1.1.{{ $index }}'
+                    index: 'st4HumidSensorValue.{{ $index }}'
+                    descr: '{{ Sentry4-MIB::st4HumidSensorName }}'
+                    low_warn_limit: Sentry4-MIB::st4HumidSensorLowWarning
+                    low_limit: Sentry4-MIB::st4HumidSensorLowAlarm
+                    warn_limit: Sentry4-MIB::st4HumidSensorHighWarning
+                    high_limit: Sentry4-MIB::st4HumidSensorHighAlarm
+        temperature:
+            options:
+                skip_value_lt: -399
+            data:
+                -
+                    oid: Sentry4-MIB::st4TempSensorMonitorTable
+                    value: Sentry4-MIB::st4TempSensorValue
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.9.3.1.1.{{ $index }}'
+                    index: 'st4TempSensorValue{{ $index }}'
+                    descr: '{{ Sentry4-MIB::st4TempSensorName }}'
+                    skip_limits_calc: true
+                    low_warn_limit: Sentry4-MIB::st4TempSensorLowWarning
+                    low_limit: Sentry4-MIB::st4TempSensorLowAlarm
+                    warn_limit: Sentry4-MIB::st4TempSensorHighWarning
+                    high_limit: Sentry4-MIB::st4TempSensorHighAlarm
+                    divisor: 10
+                    skip_values:
+                        - { oid: Sentry4-MIB::st4TempSensorScale.0, op: '!=', value: 0 }
+                -
+                    oid: Sentry4-MIB::st4TempSensorMonitorTable
+                    value: Sentry4-MIB::st4TempSensorValue
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.9.3.1.1.{{ $index }}'
+                    index: 'st4TempSensorValue{{ $index }}'
+                    descr: '{{ Sentry4-MIB::st4TempSensorName }}'
+                    skip_limits_calc: true
+                    low_warn_limit: Sentry4-MIB::st4TempSensorLowWarning
+                    low_limit: Sentry4-MIB::st4TempSensorLowAlarm
+                    warn_limit: Sentry4-MIB::st4TempSensorHighWarning
+                    high_limit: Sentry4-MIB::st4TempSensorHighAlarm
+                    divisor: 10
+                    user_func: fahrenheit_to_celsius
+                    skip_values:
+                        - { oid: Sentry4-MIB::st4TempSensorScale.0, op: '!=', value: 1 }
+
