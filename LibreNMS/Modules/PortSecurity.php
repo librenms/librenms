@@ -68,14 +68,12 @@ class PortSecurity implements Module
 
     /**
      * Poll data for this module and update the DB
-     *
-     * @param  \LibreNMS\OS  $os
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
         if ($os instanceof PortSecurityPolling) {
             $device = $os->getDevice();
-            $portsec = $os->pollPortSecurity($os, $device);
+            $portsec = $os->pollPortSecurity($os);
             ModuleModelObserver::observe(\App\Models\PortSecurity::class);
             $this->syncModels($device, 'portSecurity', $portsec);
         }
