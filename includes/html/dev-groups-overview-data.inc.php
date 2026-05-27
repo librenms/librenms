@@ -6,7 +6,7 @@ if (count($device_groups)) {
     ?>
     <div class='row'>
         <div class='col-md-12'>
-            <div class='panel panel-default panel-condensed device-overview'>
+            <div class='panel panel-default panel-condensed device-overview overview-panel'>
                 <div class='panel-heading'>
                     <a href="<?=url('device-groups')?>">
                         <i class="fa fa-th fa-lg icon-theme" aria-hidden="true"></i>
