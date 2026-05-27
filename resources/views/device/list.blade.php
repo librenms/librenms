@@ -9,7 +9,7 @@
             <th data-column-id="device_id" data-width="5px" data-visible="{{ $detailed ? 'true' : 'false' }}">{{ __('Id') }}</th>
             <th data-column-id="maintenance" data-width="5px" data-searchable="false" data-formatter="maintenance" data-visible="{{ $detailed ? 'true' : 'false' }}">{{ $detailed ? 'M.' : __('Maintenance') }}</th>
             <th data-column-id="icon" data-width="70px" data-searchable="false" data-formatter="icon" data-visible="{{ $detailed ? 'true' : 'false' }}">{{ __('Vendor') }}</th>
-            <th data-column-id="display" data-order="asc" {!! $detailed ? 'data-formatter="device"' : '' !!}>{{ __('Device') }}</th>
+            <th data-column-id="display" data-order="asc" data-formatter="device">{{ __('Device') }}</th>
             <th data-column-id="metrics" data-width="{{ $detailed ? '100px' : '150px' }}" data-sortable="false" data-searchable="false" data-visible="{{ $detailed ? 'true' : 'false' }}">{{ __('Metrics') }}</th>
             <th data-column-id="hardware">{{ __('Platform') }}</th>
             <th data-column-id="os">{{ __('device.attributes.os') }}</th>
