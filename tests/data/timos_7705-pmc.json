@@ -8246,7 +8246,7 @@
                     "bgpLocalAs": 65000,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
-                    "ifIndices": "1"
+                    "ifIndices": null
                 },
                 {
                     "vrf_oid": "4093",
@@ -8254,7 +8254,7 @@
                     "bgpLocalAs": 0,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
-                    "ifIndices": "2,3,4,5"
+                    "ifIndices": null
                 },
                 {
                     "vrf_oid": "4094",
@@ -8299,7 +8299,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": 65000
                 },
                 {
                     "astext": "AS65000-MOCK-TEXT",
@@ -8322,7 +8322,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": 65000
                 },
                 {
                     "astext": "AS65000-MOCK-TEXT",
@@ -8345,7 +8345,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": 65000
                 },
                 {
                     "astext": "AS65000-MOCK-TEXT",
@@ -8441,7 +8441,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": 65000
                 },
                 {
                     "astext": "AS65000-MOCK-TEXT",
@@ -8464,7 +8464,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": 65000
                 },
                 {
                     "astext": "AS65000-MOCK-TEXT",
@@ -8487,7 +8487,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": 65000
                 },
                 {
                     "astext": "AS65000-MOCK-TEXT",
