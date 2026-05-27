@@ -1,13 +1,13 @@
 <div class="row">
     <div class="col-md-12">
-        <x-panel class="device-overview panel-condensed">
+        <x-panel class="device-overview panel-condensed overview-panel">
             <x-slot name="heading" class="tw:mb-6">
                 <x-icons.transceiver></x-icons.transceiver>
                 <strong><a href="{{ $transceivers_link }}">{{ __('port.tabs.transceivers') }}</a></strong>
             </x-slot>
 
             @foreach($transceivers as $transceiver)
-                <x-panel>
+                <x-panel class="overview-panel">
                     <x-slot:heading>
                         @if($transceiver->port)
                         <x-port-link :port="$transceiver->port" :vars="['view' => 'transceiver']"></x-port-link>

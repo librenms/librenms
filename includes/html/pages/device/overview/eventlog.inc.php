@@ -2,7 +2,7 @@
 
 echo '  <div class="row">
           <div class="col-md-12">
-            <div class="panel panel-default panel-condensed">
+            <div class="panel panel-default panel-condensed overview-panel">
               <div class="panel-heading">';
 echo '<a href="' . route('device.eventlog', ['device' => $device['device_id']]) . '">';
 echo '<i class="fa fa-bookmark fa-lg icon-theme" aria-hidden="true"></i> <strong>Recent Events</strong></a>';

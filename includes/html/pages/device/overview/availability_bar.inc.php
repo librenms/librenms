@@ -118,7 +118,7 @@ $total_outage = $outages->reduce(function ($carry, $outage) use ($start_ts, $now
 echo <<<'HTML'
 <div class="row">
     <div class="col-md-12">
-        <div class="panel panel-default panel-condensed">
+        <div class="panel panel-default panel-condensed overview-panel">
             <div class="panel-heading">
                 <i class="fa fa-check-circle fa-lg icon-theme" aria-hidden="true"></i>
                 <strong> Availability (90 days)</strong>
