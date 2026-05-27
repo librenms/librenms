@@ -8246,7 +8246,7 @@
                     "bgpLocalAs": 65000,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
-                    "ifIndices": null
+                    "ifIndices": "1"
                 },
                 {
                     "vrf_oid": "4093",
@@ -8254,7 +8254,7 @@
                     "bgpLocalAs": 0,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
-                    "ifIndices": null
+                    "ifIndices": "2,3,4,5"
                 },
                 {
                     "vrf_oid": "4094",
