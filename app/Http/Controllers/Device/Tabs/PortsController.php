@@ -477,6 +477,7 @@ class PortsController implements DeviceTab
                 'key' => 'search',
                 'label' => __('Description'),
                 'type' => 'text',
+                'search' => true,
             ],
             [
                 'key' => 'state',
