@@ -98,11 +98,8 @@ class PortsStackPersistenceTest extends DBTestCase
     {
         $device = Device::factory()->create(['community' => 'arubaos-cx_10.06', 'os' => 'arubaos-cx', 'status' => 1]);
         DeviceCache::setPrimary($device->device_id);
-        $attrs = $device->attributesToArray();
-        $os = OS::make($attrs);
-        $module = new PortsStack();
 
-        $module->discover($os);
+        $this->discoverWithFixture($device, 'arubaos-cx_10.06');
         $initial = $device->portsStack()->count();
         $this->assertGreaterThan(0, $initial);
 
@@ -110,7 +107,7 @@ class PortsStackPersistenceTest extends DBTestCase
         // The preservation logic is scoped to the LAG-MIB branch and should not touch this path.
         $device->portsStack()->first()->delete();
 
-        $module->discover($os);
+        $this->discoverWithFixture($device, 'arubaos-cx_10.06');
         $this->assertEquals($initial, $device->portsStack()->count());
         $this->assertEquals(0, $device->portsStack()->where('ifStackStatus', 'notInService')->count());
     }
