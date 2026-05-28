@@ -12,10 +12,13 @@ class AlertRuleFactory extends Factory
         return [
             'name' => $this->faker->unique()->words(3, true),
             'severity' => $this->faker->randomElement(['ok', 'warning', 'critical']),
-            'extra' => '{}',
+            // 'extra' and 'builder' are array-cast on the model; passing a string
+            // here would get JSON-encoded into a quoted string ("{}") in the DB,
+            // which then decodes back to the string "{}" rather than [].
+            'extra' => [],
             'disabled' => 0,
             'query' => 'SELECT * FROM devices WHERE status = 1',
-            'builder' => '{}',
+            'builder' => [],
             'proc' => null,
             'notes' => null,
             'invert_map' => 0,

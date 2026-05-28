@@ -482,11 +482,20 @@ class OpenApiGenerator
     }
 
     /**
-     * @param  array{cardinality: 'one'|'many', repository: class-string<\Binaryk\LaravelRestify\Repositories\Repository>}  $info
+     * @param  array{cardinality: 'one'|'many', repository: class-string<\Binaryk\LaravelRestify\Repositories\Repository>, target_uri_key?: string}  $info
      */
     private function relatedPathItem(string $parentUriKey, string $relationName, array $info, string $tagName, Parameter $idParameter): PathItem
     {
         $relatedResourceName = Str::studly(Str::singular($info['repository']::uriKey()));
+
+        // For HasMany / BelongsToMany, Restify's relatable.index matches the
+        // URL segment against the target repo's uriKey (plural), so the
+        // advertised path needs to use that. For BelongsTo (a single related
+        // model), JSON:API convention prefers the singular relation name (the
+        // array key), so keep that.
+        $segment = $info['cardinality'] === 'many'
+            ? ($info['target_uri_key'] ?? $relationName)
+            : $relationName;
 
         $envelopeRef = $info['cardinality'] === 'many'
             ? '#/components/schemas/JsonApiList'
@@ -502,8 +511,8 @@ class OpenApiGenerator
         );
 
         $operation = Operation::get()
-            ->operationId("{$parentUriKey}.{$relationName}")
-            ->summary("List {$relationName} of a " . Str::singular($parentUriKey))
+            ->operationId("{$parentUriKey}.{$segment}")
+            ->summary("List {$segment} of a " . Str::singular($parentUriKey))
             ->tags($tagName)
             ->parameters($idParameter)
             ->responses(
@@ -516,7 +525,7 @@ class OpenApiGenerator
                 $this->errorResponse(500, 'Server Error'),
             );
 
-        return PathItem::create()->route("/api/v1/{$parentUriKey}/{id}/{$relationName}")->operations($operation);
+        return PathItem::create()->route("/api/v1/{$parentUriKey}/{id}/{$segment}")->operations($operation);
     }
 
     private function writeRequestBody(string $resourceName, string $uriKey): RequestBody

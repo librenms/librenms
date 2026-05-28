@@ -73,7 +73,7 @@ class RestifyRelationshipsTest extends DBTestCase
         $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=location");
 
         $response->assertStatus(200)
-            ->assertJsonPath('data.relationships.location.attributes.location', $location->location);
+            ->assertJsonPath('data.relationships.location.attributes.name', $location->location);
     }
 
     public function testDeviceShowIncludesGroups(): void
@@ -84,10 +84,10 @@ class RestifyRelationshipsTest extends DBTestCase
         $device->groups()->attach($groups->pluck('id'));
         Sanctum::actingAs($user);
 
-        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=groups");
+        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=device-groups");
 
         $response->assertStatus(200)
-            ->assertJsonCount(2, 'data.relationships.groups');
+            ->assertJsonCount(2, 'data.relationships.device-groups');
     }
 
     public function testDeviceIndexIncludesRelationships(): void
@@ -102,7 +102,7 @@ class RestifyRelationshipsTest extends DBTestCase
 
         $response->assertStatus(200)
             ->assertJsonCount(2, 'data.0.relationships.ports')
-            ->assertJsonPath('data.0.relationships.location.attributes.location', $location->location);
+            ->assertJsonPath('data.0.relationships.location.attributes.name', $location->location);
     }
 
     public function testDeviceWithoutRelatedParamExcludesRelationships(): void
@@ -234,10 +234,10 @@ class RestifyRelationshipsTest extends DBTestCase
         $rule->groups()->attach($groups->pluck('id'));
         Sanctum::actingAs($user);
 
-        $response = $this->getJson("/api/v1/alert-rules/{$rule->id}?related=groups");
+        $response = $this->getJson("/api/v1/alert-rules/{$rule->id}?related=device-groups");
 
         $response->assertStatus(200)
-            ->assertJsonCount(2, 'data.relationships.groups');
+            ->assertJsonCount(2, 'data.relationships.device-groups');
     }
 
     public function testAlertRuleIncludesLocations(): void
@@ -639,12 +639,12 @@ class RestifyRelationshipsTest extends DBTestCase
         Port::factory()->count(2)->for($device)->create();
         Sanctum::actingAs($user);
 
-        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=ports,location,groups");
+        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=ports,location,device-groups");
 
         $response->assertStatus(200)
             ->assertJsonCount(2, 'data.relationships.ports')
-            ->assertJsonPath('data.relationships.location.attributes.location', $location->location)
-            ->assertJsonCount(1, 'data.relationships.groups');
+            ->assertJsonPath('data.relationships.location.attributes.name', $location->location)
+            ->assertJsonCount(1, 'data.relationships.device-groups');
     }
 
     // ── Empty relationships ─────────────────────────────────
@@ -667,10 +667,10 @@ class RestifyRelationshipsTest extends DBTestCase
         $device = Device::factory()->create();
         Sanctum::actingAs($user);
 
-        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=groups");
+        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=device-groups");
 
         $response->assertStatus(200)
-            ->assertJsonPath('data.relationships.groups', []);
+            ->assertJsonPath('data.relationships.device-groups', []);
     }
 
     // ── Relationship permission tests ───────────────────────
@@ -829,12 +829,12 @@ class RestifyRelationshipsTest extends DBTestCase
         $rule->groups()->attach($groups->pluck('id'));
         Sanctum::actingAs($user);
 
-        $response = $this->getJson("/api/v1/alert-rules/{$rule->id}?related=groups");
+        $response = $this->getJson("/api/v1/alert-rules/{$rule->id}?related=device-groups");
 
         $response->assertStatus(200);
 
         // Device groups should be filtered out since user lacks device-group.view
-        $relationships = $response->json('data.relationships.groups');
+        $relationships = $response->json('data.relationships.device-groups');
         $nonNullGroups = collect($relationships)->filter()->values();
         $this->assertEmpty($nonNullGroups, 'User without device-group.view should not see related groups');
     }

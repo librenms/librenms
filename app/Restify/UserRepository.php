@@ -25,10 +25,19 @@ class UserRepository extends Repository
     public static function related(): array
     {
         return [
-            'devices-owned' => BelongsToMany::make('devicesOwned', DeviceRepository::class)->label('devices-owned'),
-            'ports-owned' => BelongsToMany::make('portsOwned', PortRepository::class)->label('ports-owned'),
+            'devices-owned' => tap(
+                BelongsToMany::make('devices-owned', DeviceRepository::class),
+                static fn ($f) => $f->relation = 'devicesOwned',
+            ),
+            'ports-owned' => tap(
+                BelongsToMany::make('ports-owned', PortRepository::class),
+                static fn ($f) => $f->relation = 'portsOwned',
+            ),
             'bills' => BelongsToMany::make('bills', BillRepository::class),
-            'device-groups' => BelongsToMany::make('deviceGroups', DeviceGroupRepository::class)->label('device-groups'),
+            'device-groups' => tap(
+                BelongsToMany::make('device-groups', DeviceGroupRepository::class),
+                static fn ($f) => $f->relation = 'deviceGroups',
+            ),
         ];
     }
 

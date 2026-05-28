@@ -86,7 +86,7 @@ class RepositoryIntrospector
 
     /**
      * @param  class-string<RestifyRepository>  $repositoryClass
-     * @return array<string, array{cardinality: 'one'|'many', repository: class-string<RestifyRepository>, is_attachable: bool, attribute: string}>
+     * @return array<string, array{cardinality: 'one'|'many', repository: class-string<RestifyRepository>, is_attachable: bool, attribute: string, target_uri_key: string}>
      */
     public function related(string $repositoryClass): array
     {
@@ -110,6 +110,7 @@ class RepositoryIntrospector
                 'repository' => $field->repositoryClass,
                 'is_attachable' => $field instanceof BelongsToMany,
                 'attribute' => (string) $field->attribute,
+                'target_uri_key' => $field->repositoryClass::uriKey(),
             ];
         }
 
