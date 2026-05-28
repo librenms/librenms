@@ -46,7 +46,10 @@ final class SnmpQueryMockTest extends DBTestCase
         $device = Device::factory()->create(['community' => self::FIXTURE]);
         DeviceCache::setPrimary($device->device_id);
 
-        return (new SnmpQueryMock())->numeric();
+        $mock = new SnmpQueryMock();
+        $mock->numeric();
+
+        return $mock;
     }
 
     public function test_walk_does_not_match_numerically_adjacent_subtrees(): void
