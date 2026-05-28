@@ -121,9 +121,9 @@ class PortsStack implements Module
                 if (! in_array((int) $existing->low_ifIndex, $seen, true)) {
                     $portStacks->push(new PortStack([
                         'high_ifIndex' => $existing->high_ifIndex,
-                        'high_port_id' => PortCache::getIdFromIfIndex($existing->high_ifIndex, $device),
+                        'high_port_id' => PortCache::getIdFromIfIndex($existing->high_ifIndex, $device) ?? $existing->high_port_id,
                         'low_ifIndex' => $existing->low_ifIndex,
-                        'low_port_id' => PortCache::getIdFromIfIndex($existing->low_ifIndex, $device),
+                        'low_port_id' => PortCache::getIdFromIfIndex($existing->low_ifIndex, $device) ?? $existing->low_port_id,
                         'ifStackStatus' => 'notInService',
                     ]));
                 }
