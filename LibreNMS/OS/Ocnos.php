@@ -87,7 +87,6 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
 
         foreach ($transceivers as $cmmStackUnitIndex => $chassisTransceivers) {
             foreach ($chassisTransceivers as $cmmTransIndex => $transceiver) {
-
                 $ifName = $this->guessIfName($cmmTransIndex, $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransType'] ?? 'missing', $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransEEPROMEntry.60'] ?? '');
 
                 $inventory->push(new EntPhysical([
