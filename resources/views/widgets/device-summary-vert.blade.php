@@ -62,7 +62,7 @@
             <tr>
                 <th><span class="black">{{ __('Disabled') }}/{{ __('Shutdown') }}</span></th>
                 <td><a href="{{ route('devices', ['detail', 'filter' => ['disabled' => ['eq' => 1]]]) }}"><span class="black"> {{ $devices['disabled'] }}</span></a></td>
-                <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'shutdown']]]) }}"><span class="black"> {{ $ports['shutdown'] }}</span></a></td>
+                <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'shutdown'], 'disabled' => ['eq' => '0'], 'ignore' => ['eq' => '0'], 'deleted' => ['eq' => '0']]]) }}"><span class="black"> {{ $ports['shutdown'] }}</span></a></td>
                 @if($show_services)
                     <td><a href="{{ url('services/view=details/disabled=1') }}"><span class="black"> {{ $services['disabled'] }}</span></a></td>
                 @endif

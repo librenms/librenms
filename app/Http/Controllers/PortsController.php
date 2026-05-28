@@ -134,6 +134,7 @@ class PortsController extends Controller
                 'key' => 'search',
                 'label' => __('Description'),
                 'type' => 'text',
+                'search' => true,
             ],
             [
                 'key' => 'device.hostname',
