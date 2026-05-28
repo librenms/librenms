@@ -66,6 +66,11 @@ class PortsStackPersistenceTest extends DBTestCase
         $this->discoverWithFixture($device, 'nxos_lag-mib_member_dropped');
         $this->assertEquals($initial, $device->portsStack()->count());
         $this->assertEquals(1, $device->portsStack()->where('ifStackStatus', 'notInService')->count());
+
+        // The dropped fixture removes the row for member ifIndex 940683264 (aggregator 369099075).
+        // Assert that specific member is the one that flipped, not just that *some* row did.
+        $dropped = $device->portsStack()->where('ifStackStatus', 'notInService')->first();
+        $this->assertEquals(940683264, $dropped->low_ifIndex);
     }
 
     public function test_lagmib_recovered_member_flips_back_to_active(): void
