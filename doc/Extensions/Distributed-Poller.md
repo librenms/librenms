@@ -146,7 +146,7 @@ To change the default poller group:
 
 ### Distributed Billing
 
-By default, billing runs on a single poller.
+By default, [billing](Billing-Module.md) runs on a single poller.
 To allow billing across groups:
 
 !!! setting "poller/distributed"
