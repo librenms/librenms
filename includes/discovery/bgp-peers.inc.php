@@ -40,6 +40,24 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         } elseif ($device['os'] === 'cumulus') {
             $peers_data = snmp_walk($device, 'bgpPeerRemoteAs', '-Oq', 'CUMULUS-BGPUN-MIB');
             $peer2 = ! empty($peers_data);
+        } elseif ($device['os'] === 'vyos') {
+            foreach (\SnmpQuery::walk('BGP4V2-MIB::bgp4V2PeerRemoteAs')->valuesByIndex() as $index => $data) {
+                $remote_as = $data['BGP4V2-MIB::bgp4V2PeerRemoteAs'] ?? null;
+                if (! is_numeric($remote_as)) {
+                    continue;
+                }
+                $parts = explode('.', $index);
+                // Index: instance.addrType.ip_len.ip_octets
+                $ip_len = (int) ($parts[2] ?? 0);
+                $addr_parts = array_slice($parts, 3, $ip_len);
+                if (count($addr_parts) !== $ip_len || ($ip_len !== 4 && $ip_len !== 16)) {
+                    continue;
+                }
+                try {
+                    $peers_data .= IP::fromSnmpString(implode('.', $addr_parts))->uncompressed() . " $remote_as\n";
+                } catch (InvalidIpException) {
+                }
+            }
         }
 
         if (empty($peers_data)) {

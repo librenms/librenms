@@ -62,6 +62,8 @@ if (! empty($peers)) {
         $peer_data_check = snmpwalk_cache_multi_oid($device, 'hwBgpPeerEntry', [], 'HUAWEI-BGP-VPN-MIB', 'huawei');
     } elseif ($device['os_group'] == 'cisco') {
         $peer_data_check = snmpwalk_cache_oid($device, 'cbgpPeer2RemoteAs', [], 'CISCO-BGP4-MIB');
+    } elseif ($device['os'] === 'vyos') {
+        $peer_data_check = \SnmpQuery::enumStrings()->walk('BGP4V2-MIB::bgp4V2PeerRemoteAs')->valuesByIndex();
     } elseif ($device['os'] == 'cumulus') {
         $peer_data_check = snmpwalk_cache_oid($device, 'bgpPeerRemoteAs', [], 'CUMULUS-BGPUN-MIB');
         if (empty($peer_data_check)) {
@@ -411,6 +413,20 @@ if (! empty($peers)) {
                             'CISCO-BGP4-MIB::cbgpPeer2LocalAddr' => 'bgpLocalAddr',
                             'CISCO-BGP4-MIB::cbgpPeer2LastError' => 'bgpPeerLastErrorCode',
                             'CISCO-BGP4-MIB::cbgpPeer2LastErrorTxt' => 'bgpPeerLastErrorText',
+                        ];
+                    } elseif ($device['os'] === 'vyos') {
+                        $peer_identifier = '1.' . $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident;
+                        $mib = 'BGP4V2-MIB';
+                        $oid_map = [
+                            'bgp4V2PeerState' => 'bgpPeerState',
+                            'bgp4V2PeerAdminStatus' => 'bgpPeerAdminStatus',
+                            'bgp4V2PeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
+                            'bgp4V2PeerInUpdatesElapsedTime' => 'bgpPeerInUpdateElapsedTime',
+                            'bgp4V2PeerLocalAddr' => 'bgpLocalAddr',
+                            'bgp4V2PeerDescription' => 'bgpPeerDescr',
+                            'bgp4V2PeerLastErrorCodeReceived' => 'bgpPeerLastErrorCode',
+                            'bgp4V2PeerLastErrorSubCodeReceived' => 'bgpPeerLastErrorSubCode',
+                            'bgp4V2PeerLastErrorReceivedText' => 'bgpPeerLastErrorText',
                         ];
                     } elseif ($device['os'] == 'cumulus') {
                         $peer_identifier = $peer['bgpPeerIdentifier'];
