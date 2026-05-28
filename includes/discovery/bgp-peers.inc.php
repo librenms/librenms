@@ -46,7 +46,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
                 if (! is_numeric($remote_as)) {
                     continue;
                 }
-                $parts = explode('.', $index);
+                $parts = explode('.', (string) $index);
                 // Index: instance.addrType.ip_len.ip_octets
                 $ip_len = (int) ($parts[2] ?? 0);
                 $addr_parts = array_slice($parts, 3, $ip_len);
