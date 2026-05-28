@@ -3,9 +3,10 @@
 /**
  * SnmpQueryMockTest.php
  *
- * Regression tests for the OID prefix matching and output format bugs
- * in tests/Mocks/SnmpQueryMock.php. Each test asserts behavior that was
- * broken before the fix and is correct after.
+ * Regression tests for three bugs in tests/Mocks/SnmpQueryMock.php:
+ * prefix-overlap matching, dropped OID index suffix in walk output,
+ * and missing newline termination. Each test asserts behavior that
+ * was broken before the fix and is correct after.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +15,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
