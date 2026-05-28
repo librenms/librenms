@@ -20,12 +20,20 @@
     "src": "html/fonts/glyphicons-halflings-regular.woff2"
   },
   "resources/js/app.js": {
+<<<<<<< HEAD
     "file": "assets/app-BPrLHhck.js",
+=======
+    "file": "assets/app-CJ1eiB7m.js",
+>>>>>>> dd8977b6e8 (Updated dashboard UI)
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
+<<<<<<< HEAD
       "assets/app-D_mOkweP.css"
+=======
+      "assets/app-BUqRP48N.css"
+>>>>>>> dd8977b6e8 (Updated dashboard UI)
     ],
     "assets": [
       "assets/glyphicons-halflings-regular-BUJKDMgK.eot",

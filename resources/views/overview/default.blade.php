@@ -512,10 +512,10 @@
 
     function widget_dom(data) {
         dom = '<div id="'+data.user_widget_id+'" class="grid-stack-item" data-type="'+data.widget+'" data-settings="0" gs-id="'+data.user_widget_id+'">'+
-              '<div class="grid-stack-item-content tw:left-0! tw:right-0!">'+
-              '<header class="tw:bg-gray-200 tw:dark:bg-dark-gray-200 tw:text-gray-800 tw:dark:text-dark-white-100 tw:p-2 tw:rounded-t-lg"><span id="widget_title_'+data.user_widget_id+'">'+data.title+
+              '<div class="grid-stack-item-content">'+
+              '<header class="dashboard-widget-header"><span id="widget_title_'+data.user_widget_id+'" class="dashboard-widget-title">'+data.title+
               '</span><span id="widget_title_counter_'+data.user_widget_id+'"></span>'+
-              '<span class="fade-edit pull-right">'+
+              '<span class="fade-edit dashboard-widget-actions">'+
 
                 @if (
                         ($dashboard->access == 1 && Auth::id() === $dashboard->user_id) ||
@@ -523,7 +523,7 @@
                     )
                         '<i class="fa fa-pencil-square-o edit-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Settings" data-toggle="tooltip" data-placement="top" title="Settings">&nbsp;</i>&nbsp;'+
                 @endif
-              '<i class="text-danger fa fa-times close-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Close" data-toggle="tooltip" data-placement="top" title="Remove">&nbsp;</i>&nbsp;'+
+              '<i class="fa fa-times close-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Close" data-toggle="tooltip" data-placement="top" title="Remove">&nbsp;</i>&nbsp;'+
               '</span>'+
               '</header>'+
               '<div class="widget_body" id="widget_body_'+data.user_widget_id+'">'+data.widget+'</div>'+
