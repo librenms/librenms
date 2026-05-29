@@ -17,10 +17,11 @@ use App\Api\Controllers\MetricsApi\ServicesMetrics;
 use App\Api\Controllers\MetricsApi\StoragesMetrics;
 use App\Api\Controllers\MetricsApi\WirelessSensorsMetrics;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class MetricsApiController
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $html = [];
         $html[] = '<!doctype html>';
@@ -66,98 +67,98 @@ class MetricsApiController
         return response(implode("\n", $html), 200, ['Content-Type' => 'text/html; charset=utf-8']);
     }
 
-    public function accessPoints(Request $request)
+    public function accessPoints(Request $request): Response
     {
         $body = app(AccessPointsMetrics::class)->render($request);
 
         return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
     }
 
-    public function alerts(Request $request)
+    public function alerts(Request $request): Response
     {
         $body = app(AlertsMetrics::class)->render($request);
 
         return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
     }
 
-    public function applications(Request $request)
+    public function applications(Request $request): Response
     {
         $body = app(ApplicationsMetrics::class)->render($request);
 
         return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
     }
 
-    public function customoids(Request $request)
+    public function customoids(Request $request): Response
     {
         $body = app(CustomoidsMetrics::class)->render($request);
 
         return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
     }
 
-    public function devices(Request $request)
+    public function devices(Request $request): Response
     {
         $body = app(DevicesMetrics::class)->render($request);
 
         return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
     }
 
-    public function mempools(Request $request)
+    public function mempools(Request $request): Response
     {
         $body = app(MempoolsMetrics::class)->render($request);
 
         return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
     }
 
-    public function pollers(Request $request)
+    public function pollers(Request $request): Response
     {
         $body = app(PollersMetrics::class)->render($request);
 
         return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
     }
 
-    public function ports(Request $request)
+    public function ports(Request $request): Response
     {
         $body = app(PortsMetrics::class)->render($request);
 
         return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
     }
 
-    public function portsStatistics(Request $request)
+    public function portsStatistics(Request $request): Response
     {
         $body = app(PortsStatisticsMetrics::class)->render($request);
 
         return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
     }
 
-    public function processors(Request $request)
+    public function processors(Request $request): Response
     {
         $body = app(ProcessorsMetrics::class)->render($request);
 
         return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
     }
 
-    public function sensors(Request $request)
+    public function sensors(Request $request): Response
     {
         $body = app(SensorsMetrics::class)->render($request);
 
         return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
     }
 
-    public function services(Request $request)
+    public function services(Request $request): Response
     {
         $body = app(ServicesMetrics::class)->render($request);
 
         return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
     }
 
-    public function storages(Request $request)
+    public function storages(Request $request): Response
     {
         $body = app(StoragesMetrics::class)->render($request);
 
         return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
     }
 
-    public function wirelessSensors(Request $request)
+    public function wirelessSensors(Request $request): Response
     {
         $body = app(WirelessSensorsMetrics::class)->render($request);
 
