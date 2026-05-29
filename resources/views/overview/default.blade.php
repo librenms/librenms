@@ -512,7 +512,7 @@
 
     function widget_dom(data) {
         dom = '<div id="'+data.user_widget_id+'" class="grid-stack-item" data-type="'+data.widget+'" data-settings="0" gs-id="'+data.user_widget_id+'">'+
-              '<div class="grid-stack-item-content tw:ring tw:ring-gray-200 tw:dark:ring-dark-gray-200">'+
+              '<div class="grid-stack-item-content tw:ring tw:ring-gray-200 tw:dark:ring-dark-gray-200 tw:left-0! tw:bottom-0!">'+
               '<header class="tw:bg-gray-200 tw:dark:bg-dark-gray-200 tw:text-gray-800 tw:dark:text-dark-white-100 tw:p-4 tw:text-center"><span id="widget_title_'+data.user_widget_id+'" class="dashboard-widget-title">'+data.title+
               '</span><span id="widget_title_counter_'+data.user_widget_id+'"></span>'+
               '<span class="fade-edit tw:float-right">'+
@@ -521,9 +521,9 @@
                         ($dashboard->access == 1 && Auth::id() === $dashboard->user_id) ||
                         ($dashboard->access == 0 || $dashboard->access >= 2)
                     )
-                        '<i class="fa fa-pencil-square-o tw:cursor-pointer tw:me-2 tw:pl-2" data-widget-id="'+data.user_widget_id+'" aria-label="Settings" data-toggle="tooltip" data-placement="top" title="Settings">&nbsp;</i>&nbsp;'+
+                        '<i class="fa fa-pencil-square-o tw:cursor-pointer tw:me-2 tw:pl-2" data-widget-id="'+data.user_widget_id+'" data-toggle="tooltip" data-placement="top">&nbsp;</i>&nbsp;'+
                 @endif
-              '<i class="fa fa-times tw:text-[#a94442] tw:dark:text-[#ee5f5b] tw:cursor-pointer tw:me-2" data-widget-id="'+data.user_widget_id+'" aria-label="Close" data-toggle="tooltip" data-placement="top" title="Remove">&nbsp;</i>&nbsp;'+
+              '<i class="fa fa-lg fa-times tw:text-[#a94442] tw:dark:text-[#ee5f5b] tw:cursor-pointer tw:me-2" data-widget-id="'+data.user_widget_id+'" data-toggle="tooltip" data-placement="top">&nbsp;</i>&nbsp;'+
               '</span>'+
               '</header>'+
               '<div class="tw:left-1! tw:right-1! tw:p-[0.8em] tw:overflow-y-auto tw:overflow-x-hidden tw:w-full tw:h-[calc(100%-2.6em)] tw:cursor-auto" id="widget_body_'+data.user_widget_id+'">'+data.widget+'</div>'+

@@ -109,32 +109,3 @@
 .lnms-btn-primary .lnms-btn-badge {
   @apply tw:bg-white tw:text-[#337ab7];
 }
-
-.grid-stack > .grid-stack-item > .grid-stack-item-content {
-  @apply tw:left-1! tw:right-1! tw:top-1! tw:bottom-1! tw:overflow-hidden tw:bg-white tw:text-black tw:cursor-pointer tw:rounded;
-}
-
-.dashboard-widget-header {
-  @apply tw:bg-gray-200 tw:dark:bg-dark-gray-200 tw:text-gray-800 tw:dark:text-dark-white-100 tw:p-4 tw:rounded-t-lg tw:text-center;
-}
-
-.dashboard-widget-actions {
-  @apply tw:float-right;
-}
-
-.edit-widget,
-.close-widget {
-  @apply tw:cursor-pointer tw:me-2;
-}
-
-.close-widget {
-  @apply tw:text-[#a94442] tw:dark:text-[#ee5f5b];
-}
-
-.widget_body {
-  @apply tw:!left-1 tw:!right-1 tw:p-[0.8em] tw:rounded-bl tw:rounded-br tw:overflow-y-auto tw:overflow-x-hidden tw:w-full tw:h-[calc(100%-2.6em)] tw:cursor-auto tw:rounded-b-lg;
-}
-
-.widget_body:has(> .worldmap_widget) {
-  @apply tw:p-0;
-}
