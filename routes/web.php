@@ -15,6 +15,7 @@ use App\Http\Controllers\DashboardWidgetController;
 use App\Http\Controllers\Device;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\DeviceGroupController;
+use App\Http\Controllers\DevicesController;
 use App\Http\Controllers\GraphController;
 use App\Http\Controllers\Install;
 use App\Http\Controllers\LegacyController;
@@ -38,12 +39,12 @@ use App\Http\Controllers\PollerGroupController;
 use App\Http\Controllers\PollerSettingsController;
 use App\Http\Controllers\PortController;
 use App\Http\Controllers\PortGroupController;
+use App\Http\Controllers\PortSecurityController;
 use App\Http\Controllers\PortTypeController;
 use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\RealtimeDataController;
 use App\Http\Controllers\RealtimeGraphController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\Search\PortSecuritySearchController;
 use App\Http\Controllers\Select;
 use App\Http\Controllers\SensorController;
 use App\Http\Controllers\ServiceTemplateController;
@@ -90,6 +91,7 @@ Route::get('graph/{path?}', GraphController::class)
 Route::middleware(['auth'])->group(function (): void {
     // pages
     Route::post('alert/{alert}/ack', [AlertController::class, 'ack'])->name('alert.ack');
+    Route::get('devices/{view?}/{graph?}/{vars?}', [DevicesController::class, 'index'])->where('vars', '.*')->name('devices');
     Route::resource('device-groups', DeviceGroupController::class);
     Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
     Route::get('inventory/purge', [App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
@@ -97,6 +99,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::resource('port', PortController::class)->only('update');
     Route::get('port/{port}/popup', App\Http\Controllers\PortPopupController::class)->name('port.popup');
     Route::get('vlans', [App\Http\Controllers\VlansController::class, 'index'])->name('vlans.index');
+    Route::get('port-security', [PortSecurityController::class, 'index'])->name('port-security.index');
     Route::get('porttype/{type}', [PortTypeController::class, 'graph'])->name('porttype.graph');
     Route::get('portgroup/{group}', [PortGroupController::class, 'graph'])->name('portgroup.graph')->whereNumber('group');
     Route::prefix('poller')->group(function (): void {
@@ -177,6 +180,10 @@ Route::middleware(['auth'])->group(function (): void {
     });
 
     // fallback device routes
+    Route::match(['get', 'post'], 'device/{device}/{tab}/{vars}', [DeviceController::class, 'index'])
+        ->middleware('saved-filter:device.port-security')
+        ->where(['tab' => 'ports', 'vars' => 'portsecurity'])
+        ->name('device.port-security');
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', [DeviceController::class, 'index'])
         ->middleware('saved-filter:device.ports') // FIXME more specific route
         ->name('device')->where('vars', '.*');
@@ -258,9 +265,6 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('plugin/p={pluginName}', [PluginLegacyController::class, 'redirect']);
     Route::any('plugin/v1/{plugin:plugin_name}/{other?}', PluginLegacyController::class)->where('other', '(.*)')->name('plugin.legacy');
     Route::get('plugin/{plugin:plugin_name}', PluginPageController::class)->name('plugin.page');
-
-    // Search pages
-    Route::get('search/secureports', [PortSecuritySearchController::class, 'index'])->name('search.secureports');
 
     Route::get('health/{metric?}/{legacyview?}', [SensorController::class, 'index'])->name('sensor.index');
     Route::get('wireless/{metric}/{legacyview?}', [WirelessSensorController::class, 'index'])->name('wireless.index');
@@ -360,7 +364,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('outages', Table\OutagesController::class)->name('table.outages');
             Route::get('outages/export', [Table\OutagesController::class, 'export']);
             Route::post('port-nac', Table\PortNacController::class)->name('table.port-nac');
-            Route::post('port-security', Table\PortSecurityController::class)->name('table.port-security');
+            Route::get('port-security/export', [Table\PortSecurityController::class, 'export'])->name('port-security.export');
             Route::post('port-stp', Table\PortStpController::class);
             Route::post('ports', Table\PortsController::class)->name('table.ports');
             Route::get('ports/export', [Table\PortsController::class, 'export']);

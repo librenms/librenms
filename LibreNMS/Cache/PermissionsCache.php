@@ -29,6 +29,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Bill;
 use App\Models\Device;
 use App\Models\Port;
+use App\Models\PortGroup;
 use App\Models\User;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
@@ -42,6 +43,9 @@ class PermissionsCache
 
     /** @var array<int, Collection<int>> */
     private array $deviceGroupMap = [];
+
+    /** @var array<int, Collection<int>> */
+    private array $portGroupMap = [];
 
     /** @var Collection<object{user_id: int, port_id: int}>|null */
     private ?Collection $portPermissions = null;
@@ -69,6 +73,15 @@ class PermissionsCache
             ->where('user_id', $this->getUserId($user))
             ->where('port_id', $this->getPortId($port))
             ->isNotEmpty();
+    }
+
+    /**
+     * Check if a access can be accessed by user (non-global read/admin)
+     * If no user is given, use the logged in user
+     */
+    public function canAccessPortGroup(PortGroup $portGroup, User|int|null $user = null): bool
+    {
+        return $this->portGroupsForUser($user)->contains($portGroup->id);
     }
 
     /**
@@ -180,6 +193,27 @@ class PermissionsCache
         }
 
         return $this->devicePermissions[$user_id];
+    }
+
+    /**
+     * Get the ids of all port groups the user can access
+     *
+     * @return Collection<int>
+     */
+    public function portGroupsForUser(User|int|null $user = null): Collection
+    {
+        $user_id = $this->getUserId($user);
+
+        // if we don't have a map for this user yet, populate it.
+        if (! isset($this->portGroupMap[$user_id])) {
+            $this->portGroupMap[$user_id] = PortGroup::withCount([
+                'ports' => function ($q) use ($user): void {
+                    $q->hasAccess($user);
+                },
+            ])->having('ports_count', '>', 0)->pluck('id');
+        }
+
+        return $this->portGroupMap[$user_id];
     }
 
     /**

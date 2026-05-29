@@ -46,6 +46,8 @@ export default function filterBarComponent({
                 { v: "neq", s: "≠", l: "Is Not" },
                 { v: "in", s: "∈", l: "Is Any Of" },
                 { v: "not_in", s: "∉", l: "Is Not Any Of" },
+                { v: "is_empty", s: "∅", l: "None" },
+                { v: "is_not_empty", s: "∃", l: "Any" },
             ],
         },
 
@@ -76,6 +78,14 @@ export default function filterBarComponent({
                 formatted[f.key][f.op] = this.encodeValue(f.value);
             });
             return formatted;
+        },
+
+        get isOpen() {
+            return this.dialog || this.showAdd || this.showOptions;
+        },
+
+        get defaultSearchField() {
+            return this.fields.find((f) => f.search);
         },
 
         // --- Initialization ---
@@ -132,6 +142,15 @@ export default function filterBarComponent({
             window.addEventListener("popstate", () =>
                 this.restoreFromUrl(new URLSearchParams(window.location.search))
             );
+
+            this.$watch("dialog", (val) => {
+                if (!val && this.lastFocusedElement) {
+                    this.$nextTick(() => {
+                        this.lastFocusedElement?.focus();
+                        this.lastFocusedElement = null;
+                    });
+                }
+            });
         },
 
         // --- Data Restoration ---
@@ -184,23 +203,7 @@ export default function filterBarComponent({
 
         // --- Syncing & Persistence ---
         applyFiltersToUrl(url) {
-            // Clear out any old filter mutations to keep the string clean
-            [...url.searchParams.keys()]
-                .filter((k) => k.startsWith("filter[") || k === "filter")
-                .forEach((k) => url.searchParams.delete(k));
-
-            if (this.filters.length > 0) {
-                this.filters.forEach((f) => {
-                    url.searchParams.set(
-                        `filter[${f.key}][${f.op}]`,
-                        this.encodeValue(f.value)
-                    );
-                });
-            } else if (this.isCleared) {
-                url.searchParams.set("filter", "");
-            }
-
-            return url;
+            return LibreNMS.Url.applyNestedParamsToUrl(url, 'filter', this.formattedFilters, this.isCleared);
         },
 
         syncUrl() {
@@ -361,8 +364,7 @@ export default function filterBarComponent({
 
             this.current = field;
             this.op = existing?.op || this.ops()[0].v;
-            this.value =
-                existing?.value ?? (this.isMulti() ? [] : "");
+            this.value = existing?.value ?? (this.isMulti() ? [] : "");
             this.display = existing?.display ?? this.value;
 
             this.snapshot = {
@@ -446,12 +448,15 @@ export default function filterBarComponent({
         },
 
         close() {
+            if (!this.isOpen) {
+                return;
+            }
+
             this.revert();
             this.dialog = false;
             this.showAdd = false;
             this.showOptions = false;
             this.current = null;
-            this.$nextTick(() => this.lastFocusedElement?.focus());
         },
 
         revert() {

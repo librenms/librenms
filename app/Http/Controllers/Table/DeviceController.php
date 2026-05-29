@@ -53,6 +53,7 @@ class DeviceController extends TableController
     {
         return [
             'format' => 'nullable|in:list_basic,list_detail',
+            ...Device::filterValidationRules(),
             'os' => 'nullable|string',
             'version' => 'nullable|string',
             'hardware' => 'nullable|string',
@@ -85,6 +86,7 @@ class DeviceController extends TableController
             'status' => 'status',
             'icon' => 'icon',
             'hostname' => 'hostname',
+            'display' => 'display',
             'hardware' => 'hardware',
             'os' => 'os',
             'uptime' => \DB::raw('IF(`status` = 1, `uptime`, `last_polled` - NOW())'),
@@ -101,6 +103,7 @@ class DeviceController extends TableController
         /** @var Builder $query */
         $query = Device::hasAccess($request->user())
             ->with(['location', 'groups'])
+            ->applyFilters($request->array('filter'))
             ->withCount(['ports', 'sensors', 'wirelessSensors']);
 
         // if searching or sorting the location field, join the locations table

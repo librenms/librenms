@@ -1132,15 +1132,6 @@ parameters:
 			'''
 			identifier: function.deprecated
 			count: 1
-			path: LibreNMS/OS/Rutos2xx.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get_multi_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
 			path: LibreNMS/OS/Scalance.php
 
 		-

@@ -1,0 +1,35 @@
+-- "CONFIDENTIAL. All rights reserved. Alcatel. This computer program is protected under Copyright.
+-- Recipient is to retain the program in confidence, and is not permitted to copy, use, distribute, modify or
+-- translate the program without authorization. Passing on and copying,use and communication of its
+-- contents is not permitted without written authorization."
+
+TSDIM-BASICREG-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+    MODULE-IDENTITY, enterprises FROM SNMPv2-SMI;
+
+tsdimBasicReg MODULE-IDENTITY
+    LAST-UPDATED "0110190000Z"
+    ORGANIZATION "Alcatel TSD"
+    CONTACT-INFO "Alcatel TSD"
+    DESCRIPTION
+        "Created the registration tsdimBasicEMLSpcMib definition
+         to be used for EML internal purposes not technology dependent"
+    REVISION "0108170000Z"
+    DESCRIPTION
+        "Changed the registration tree definition"
+    REVISION "9906240000Z"
+    DESCRIPTION
+        "Initial Release TSD-IM BASIC REGISTRATION MODULE"
+::= { tsdimBasicMib 1 }
+
+-- Basic SNMP Registration Tree
+
+alcatel                 OBJECT IDENTIFIER ::= { enterprises 637 }
+ltt                     OBJECT IDENTIFIER ::= { alcatel 54 }
+tsdim                   OBJECT IDENTIFIER ::= { ltt 1 }
+
+tsdimBasicMib           OBJECT IDENTIFIER ::= { tsdim 1 }
+tsdimBasicMC            OBJECT IDENTIFIER ::= { tsdimBasicMib 99 }
+tsdimBasicEMLSpcMib     OBJECT IDENTIFIER ::= { tsdimBasicMib 999 }
+
+END

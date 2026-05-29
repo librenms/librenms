@@ -126,18 +126,18 @@
                 </li>
 {{-- Devices --}}
                 <li class="dropdown">
-                    <a href="{{ url('devices/') }}" class="dropdown-toggle" data-hover="dropdown"
+                    <a href="{{ route('devices') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-server fa-fw fa-lg fa-nav-icons"
                                                  aria-hidden="true"></i> <span>{{ __('Devices') }}</span></a>
                     <ul class="dropdown-menu">
                     @if($no_devices_added)
                     <li><a href="#"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ __('No Devices') }}</a>
                     @else
-                    <li @class(['dropdown-submenu' => $device_types->isNotEmpty()])><a href="{{ url('devices') }}"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Devices') }}</a>
+                    <li @class(['dropdown-submenu' => $device_types->isNotEmpty()])><a href="{{ route('devices') }}"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Devices') }}</a>
                         @if($device_types->isNotEmpty())
                         <ul class="dropdown-menu scrollable-menu">
                         @foreach($device_types as $type => $icon)
-                            <li><a href="{{ url("devices/type=$type") }}"><i class="fa fa-{{ $icon }} fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($type) }}</a></li>
+                            <li><a href="{{ route('devices', ['filter' => ['type' => ['eq' => $type]]]) }}"><i class="fa fa-{{ $icon }} fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($type) }}</a></li>
                         @endforeach
                         </ul>
                         @endif
@@ -150,7 +150,7 @@
                                 </a>
                             <ul class="dropdown-menu scrollable-menu">
                             @foreach($device_groups as $group)
-                                <li><a href="{{ url("devices/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($group->name) }}</a></li>
+                                <li><a href="{{ route('devices', ['filter' => ['groups.id' => ['eq' => $group->id]]]) }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($group->name) }}</a></li>
                             @endforeach
                             </ul>
                         </li>
@@ -162,7 +162,7 @@
                             <ul class="dropdown-menu scrollable-menu">
                                 <li><a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Locations') }}</a></li>
                             @foreach($locations as $location)
-                                    <li><a href="{{ url("devices/location=" . $location->id) }}"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> {{ $location->display() }}</a></li>
+                                    <li><a href="{{ route('devices', ['filter' => ['location_id' => ['eq' => $location->id]]]) }}"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> {{ $location->display() }}</a></li>
                             @endforeach
                             </ul>
                         </li>
@@ -331,7 +331,7 @@
                             </li>
                         @endif
 
-                        <li><a href="{{ url('search/secureports') }}"><i class="fa fa-shield fa-fw fa-lg"
+                        <li><a href="{{ route('port-security.index') }}"><i class="fa fa-shield fa-fw fa-lg"
                                                                          aria-hidden="true"></i> {{ __('Port Security') }}</a>
                         </li>
 
@@ -404,7 +404,7 @@
                             <li><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'down']]]) }}"><i class="fa fa-arrow-circle-down fa-fw fa-lg"
                                                                            aria-hidden="true"></i> {{ __('Down :port_count', ['port_count' => $port_counts['down']]) }}
                                 </a></li>
-                            <li><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'shutdown']]]) }}"><i
+                            <li><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'shutdown'], 'disabled' => ['eq' => '0'], 'ignore' => ['eq' => '0'], 'deleted' => ['eq' => '0']]]) }}"><i
                                         class="fa fa-arrow-circle-o-down fa-fw fa-lg"
                                         aria-hidden="true"></i> {{ __('Disabled :port_count', ['port_count' => $port_counts['shutdown']]) }}
                                 </a></li>

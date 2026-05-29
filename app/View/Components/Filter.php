@@ -12,7 +12,7 @@ class Filter extends Component
      * Create a new component instance.
      *
      * @param  string  $name
-     * @param  array<array{key: string, label: string, type: string, endpoint?: string, options?: string[], params?: array<string, string>}>  $fields
+     * @param  array<array{key: string, label: string, type: string, search?: bool, endpoint?: string, options?: string[]|array<string, string>, params?: array<string, string>}>  $fields
      * @param  bool  $reload
      * @param  bool  $hide
      * @param  array<string, string>  $initial

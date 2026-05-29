@@ -684,6 +684,7 @@ devices:
     - { Field: mtu_status, Type: tinyint, 'Null': false, Extra: '', Default: '1' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [device_id], Unique: true, Type: BTREE }
+    devices_display_index: { Name: devices_display_index, Columns: [display], Unique: false, Type: BTREE }
     devices_hostname_sysname_display_index: { Name: devices_hostname_sysname_display_index, Columns: [hostname, sysName, display], Unique: false, Type: BTREE }
     devices_last_poll_attempted_index: { Name: devices_last_poll_attempted_index, Columns: [last_poll_attempted], Unique: false, Type: BTREE }
     devices_last_polled_index: { Name: devices_last_polled_index, Columns: [last_polled], Unique: false, Type: BTREE }
@@ -1989,14 +1990,14 @@ port_security:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
-    - { Field: port_security_enable, Type: varchar(5), 'Null': true, Extra: '' }
+    - { Field: port_security_enable, Type: tinyint, 'Null': true, Extra: '' }
     - { Field: status, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: max_addresses, Type: int, 'Null': true, Extra: '' }
     - { Field: address_count, Type: int, 'Null': true, Extra: '' }
     - { Field: violation_action, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: violation_count, Type: int, 'Null': true, Extra: '' }
     - { Field: last_mac_address, Type: varchar(20), 'Null': true, Extra: '' }
-    - { Field: sticky_enable, Type: varchar(5), 'Null': true, Extra: '' }
+    - { Field: sticky_enable, Type: tinyint, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     port_security_device_id_index: { Name: port_security_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }

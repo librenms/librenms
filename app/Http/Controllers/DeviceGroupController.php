@@ -77,7 +77,7 @@ class DeviceGroupController extends Controller
      */
     public function show(DeviceGroup $deviceGroup)
     {
-        return redirect(url('/devices/group=' . $deviceGroup->id));
+        return redirect(route('devices', ['filter' => ['groups.id' => ['eq' => $deviceGroup->id]]]));
     }
 
     /**

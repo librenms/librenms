@@ -446,6 +446,9 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     // process the group
                     $group = trim((string) YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache)) ?: null;
 
+                    // process the skip_limits_calc flag
+                    $skipLimitsCalc = trim((string) YamlDiscovery::replaceValues('skip_limits_calc', $index, null, $data, $pre_cache)) ?: null;
+
                     // process the divisor - cannot be 0
                     if (isset($data['divisor'])) {
                         $divisor = (int) YamlDiscovery::replaceValues('divisor', $index, $count, $data, $pre_cache);
@@ -485,7 +488,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                         } else {
                             ${$limit} = trim((string) YamlDiscovery::replaceValues($limit, $index, null, $data, $pre_cache));
                             if (is_numeric(${$limit})) {
-                                ${$limit} = (${$limit} / $divisor) * $multiplier;
+                                ${$limit} = $skipLimitsCalc ? ${$limit} : (${$limit} / $divisor) * $multiplier;
                             }
                             if (is_numeric(${$limit}) && isset($user_function)) {
                                 if (is_callable($user_function)) {
