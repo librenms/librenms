@@ -189,8 +189,8 @@ if (LibrenmsConfig::get('enable_vrfs')) {
             // No Such Object on the NV-OVERLAY walk just means the
             // device is not a VTEP (e.g., a spine), which is fine.
             $transient_re = '/(Timeout|No Response|Authentication failure|Unknown user)/i';
-            $nv_transient = ! $nv_response->isValid() && preg_match($transient_re, $nv_response->getErrorMessage());
-            $bgp_transient = ! $bgp_response->isValid() && preg_match($transient_re, $bgp_response->getErrorMessage());
+            $nv_transient = ! $nv_response->isValid() && preg_match($transient_re, (string) $nv_response->getErrorMessage());
+            $bgp_transient = ! $bgp_response->isValid() && preg_match($transient_re, (string) $bgp_response->getErrorMessage());
 
             if ($nv_transient || $bgp_transient) {
                 echo "\n  [VRF discovery] NX-OS fallback: SNMP error in walk output; preserving existing vrfs rows for this device.";
