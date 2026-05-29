@@ -43,6 +43,8 @@ class ServiceTemplateController extends SelectController
 
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', ServiceTemplate::class);
+
         return ServiceTemplate::hasAccess($request->user())->select(['id', 'name']);
     }
 

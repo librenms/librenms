@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\BgpPeer;
+use App\Models\Dashboard;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\Service;
@@ -19,6 +20,8 @@ class OverviewController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Dashboard::class);
+
         $view = LibrenmsConfig::get('front_page');
 
         if (view()->exists("overview.custom.$view")) {
@@ -37,6 +40,8 @@ class OverviewController extends Controller
      */
     public function simple(Request $request)
     {
+        $this->authorize('viewAny', Dashboard::class);
+
         //TODO: All below missing D.ignore = '0' check
         $ports_down = [];
         $bgp_down = [];

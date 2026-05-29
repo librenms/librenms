@@ -75,7 +75,8 @@ class CustomersController extends TableController
     {
         $customers = collect($paginator->items())->pluck('port_descr_descr');
         // fetch all ports
-        $ports = Port::whereIn('port_descr_descr', $customers)
+        $ports = Port::hasAccess(request()->user())
+            ->whereIn('port_descr_descr', $customers)
             ->whereIn('port_descr_type', $this->getTypeStrings())
             ->with('device')
             ->get()

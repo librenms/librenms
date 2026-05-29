@@ -300,7 +300,7 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
                   });
                 device_map.addLayer(device_marker_cluster);
         ';
-    } elseif (Gate::allows('update', Location::class)) {
+    } elseif (Gate::allows('location.update')) {
         echo '
                 device_marker = L.marker(device_location).addTo(device_map);
                 device_marker.dragging.enable();

@@ -26,15 +26,16 @@
 
 use App\Models\Poller;
 
-if (Gate::denies('delete', Poller::class)) {
+$poller = Poller::findOrFail($vars['id']);
+if (Gate::denies('delete', $poller)) {
     $status = ['status' => 1, 'message' => 'ERROR: You need permission to delete poller entries'];
 } else {
     $id = $vars['id'];
     if (! is_numeric($id)) {
         $status = ['status' => 1, 'message' => 'No poller has been selected'];
     } else {
-        $poller_name = Poller::where('id', $id)->value('poller_name');
-        if (Poller::where('id', $id)->delete()) {
+        $poller_name = e($poller->poller_name);
+        if ($poller->delete()) {
             $status = ['status' => 0, 'message' => "Poller: <i>$poller_name ($id), has been deleted.</i>"];
         } else {
             $status = ['status' => 1, 'message' => "Poller: <i>$poller_name ($id), has NOT been deleted.</i>"];

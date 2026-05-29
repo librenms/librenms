@@ -60,6 +60,8 @@ class MacSearchController extends TableController
 
     protected function baseQuery(Request $request): Builder|\Illuminate\Database\Query\Builder
     {
+        $this->authorize('viewAny', Port::class);
+
         return Port::query()
             ->hasAccess($request->user())
             ->with('device')

@@ -17,6 +17,8 @@ class CustomoidController extends SelectController
      */
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Customoid::class);
+
         return Customoid::hasAccess($request->user())
             ->with(['device' => function ($query): void {
                 $query->select('device_id', 'hostname', 'sysName', 'display');

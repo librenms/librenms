@@ -26,9 +26,9 @@
 
 namespace App\Models;
 
+use App\Facades\Permissions;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Gate;
-use Permissions;
 
 class PortGroup extends BaseModel
 {

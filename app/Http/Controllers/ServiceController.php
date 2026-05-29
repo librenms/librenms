@@ -16,6 +16,8 @@ class ServiceController extends Controller
      */
     public function store(Request $request, ToastInterface $toast)
     {
+        $this->authorize('create', Service::class);
+
         $this->validate($request, [
             'service_name' => 'required|string|unique:service',
             'device_id' => 'integer',
