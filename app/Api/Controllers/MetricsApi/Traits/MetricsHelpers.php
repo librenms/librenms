@@ -25,19 +25,19 @@ trait MetricsHelpers
 
         // single or comma-separated device ids
         if ($request->filled('device_id')) {
-            $deviceIds = $deviceIds->merge(array_map(trim(...), explode(',', $request->get('device_id'))));
+            $deviceIds = $deviceIds->merge(array_map(trim(...), explode(',', $request->input('device_id'))));
         }
         if ($request->filled('device_ids')) {
-            $deviceIds = $deviceIds->merge(array_map(trim(...), explode(',', $request->get('device_ids'))));
+            $deviceIds = $deviceIds->merge(array_map(trim(...), explode(',', $request->input('device_ids'))));
         }
 
         // hostname(s)
         $hostnames = collect();
         if ($request->filled('hostname')) {
-            $hostnames = $hostnames->merge(array_map(trim(...), explode(',', $request->get('hostname'))));
+            $hostnames = $hostnames->merge(array_map(trim(...), explode(',', $request->input('hostname'))));
         }
         if ($request->filled('hostnames')) {
-            $hostnames = $hostnames->merge(array_map(trim(...), explode(',', $request->get('hostnames'))));
+            $hostnames = $hostnames->merge(array_map(trim(...), explode(',', $request->input('hostnames'))));
         }
         if ($hostnames->isNotEmpty()) {
             $fromHost = Device::whereIn('hostname', $hostnames)->orWhereIn('sysName', $hostnames)->pluck('device_id');
@@ -46,7 +46,7 @@ trait MetricsHelpers
 
         // device_group may be id (numeric) or name; expand to device ids
         if ($request->filled('device_group')) {
-            $dg = trim($request->get('device_group'));
+            $dg = trim($request->input('device_group'));
             if (ctype_digit($dg)) {
                 $groupId = (int) $dg;
                 $fromGroup = DB::table('device_group_device')->where('device_group_id', $groupId)->pluck('device_id');
@@ -64,8 +64,8 @@ trait MetricsHelpers
     /**
      * Apply a device filter (when provided) to an Eloquent/QueryBuilder instance.
      *
-     * @param mixed $query
-     * @param Collection<int, int|string>|null $deviceIds
+     * @param  mixed  $query
+     * @param  Collection<int, int|string>|null  $deviceIds
      * @return mixed
      */
     private function applyDeviceFilter(mixed $query, ?Collection $deviceIds): mixed
@@ -81,7 +81,7 @@ trait MetricsHelpers
      * Given a collection of device ids, return a keyed map of Device models by device_id.
      * If null is given, returns an empty collection.
      *
-     * @param Collection<int, int|string>|null $deviceIds
+     * @param  Collection<int, int|string>|null  $deviceIds
      * @return Collection<int, Device>
      */
     private function gatherDevicesForIds(?Collection $deviceIds): Collection
@@ -108,7 +108,7 @@ trait MetricsHelpers
      * Format a set of label key=>value pairs into a Prometheus label string.
      * Values should already be escaped using escapeLabel from MetricsHelpers.
      *
-     * @param array<string, int|float|string> $labels
+     * @param  array<string, int|float|string>  $labels
      */
     private function formatLabels(array $labels): string
     {
@@ -124,8 +124,8 @@ trait MetricsHelpers
      * Append a metric block (HELP, TYPE, and lines) into the main lines array.
      * $metricLines may be a single formatted metric line string or an array of lines.
      *
-     * @param array<int, string> $lines
-     * @param array<int, string>|string $metricLines
+     * @param  array<int, string>  $lines
+     * @param  array<int, string>|string  $metricLines
      */
     private function appendMetricBlock(array &$lines, string $metricName, string $help, string $type, array|string $metricLines): void
     {
