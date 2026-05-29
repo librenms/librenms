@@ -15,6 +15,10 @@ class ServicesMetrics
     {
         $lines = [];
 
+        // Determine scope (global vs detail) and parse filters
+        $scope = $this->parseScope($request);
+        $includeDetail = $scope === 'detail';
+
         // Parse filters
         $filters = $this->parseDeviceFilters($request);
 
@@ -24,6 +28,11 @@ class ServicesMetrics
 
         // Append global metrics
         $this->appendMetricBlock($lines, 'librenms_services_total', 'Total number of services configured', 'gauge', [$total]);
+
+        // Default to global metrics only; detailed per-access-point metrics are opt-in via ?scope=detail
+        if (! $includeDetail) {
+            return implode("\n", $lines) . "\n";
+        }
 
         // counts by status (0=OK,1=WARNING,2=CRITICAL)
         $status_lines = [];

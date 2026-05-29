@@ -10,6 +10,22 @@ use Illuminate\Support\Facades\DB;
 trait MetricsHelpers
 {
     /**
+     * Parse a metrics scope query parameter with normalization and allow-listing.
+     *
+     * @param  array<int, string>  $allowed
+     */
+    private function parseScope(Request $request, string $default = 'global', array $allowed = ['global', 'detail']): string
+    {
+        $scope = strtolower(trim((string) $request->input('scope', $default)));
+
+        if ($scope === '' || ! in_array($scope, $allowed, true)) {
+            return $default;
+        }
+
+        return $scope;
+    }
+
+    /**
      * Parse device / device group filters from the Request.
      * Supports:
      * - device_id (single), device_ids (comma-separated)

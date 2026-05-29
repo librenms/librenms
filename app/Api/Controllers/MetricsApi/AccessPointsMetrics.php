@@ -14,6 +14,10 @@ class AccessPointsMetrics
     {
         $lines = [];
 
+        // Determine scope (global vs detail) and parse filters
+        $scope = $this->parseScope($request);
+        $includeDetail = $scope === 'detail';
+
         // Parse filters
         $filters = $this->parseDeviceFilters($request);
 
@@ -23,6 +27,11 @@ class AccessPointsMetrics
 
         // Append global metrics
         $this->appendMetricBlock($lines, 'librenms_access_points_total', 'Total number of access points', 'gauge', "librenms_access_points_total {$total}");
+
+        // Default to global metrics only; detailed per-access-point metrics are opt-in via ?scope=detail
+        if (! $includeDetail) {
+            return implode("\n", $lines) . "\n";
+        }
 
         // Prepare per-access-point metrics arrays
         $deleted_lines = [];

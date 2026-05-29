@@ -14,6 +14,10 @@ class SensorsMetrics
     {
         $lines = [];
 
+        // Determine scope (global vs detail) and parse filters
+        $scope = $this->parseScope($request);
+        $includeDetail = $scope === 'detail';
+
         // Parse filters
         $filters = $this->parseDeviceFilters($request);
 
@@ -23,6 +27,11 @@ class SensorsMetrics
 
         // Append global metrics
         $this->appendMetricBlock($lines, 'librenms_sensors_total', 'Total number of sensors', 'gauge', [$total]);
+
+        // Default to global metrics only; detailed per-access-point metrics are opt-in via ?scope=detail
+        if (! $includeDetail) {
+            return implode("\n", $lines) . "\n";
+        }
 
         // Group outputs by rrd_type
         $gauge_value_lines = [];

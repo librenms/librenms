@@ -15,6 +15,10 @@ class PortsStatisticsMetrics
     {
         $lines = [];
 
+        // Determine scope (global vs detail) and parse filters
+        $scope = $this->parseScope($request);
+        $includeDetail = $scope === 'detail';
+
         // Parse filters
         $filters = $this->parseDeviceFilters($request);
 
@@ -29,6 +33,11 @@ class PortsStatisticsMetrics
 
         // Append global metrics
         $this->appendMetricBlock($lines, 'librenms_ports_statistics_total', 'Total number of ports_statistics rows', 'gauge', [(string) $total]);
+
+        // Default to global metrics only; detailed per-access-point metrics are opt-in via ?scope=detail
+        if (! $includeDetail) {
+            return implode("\n", $lines) . "\n";
+        }
 
         // Prepare per-port stats arrays
         $in_nucast_lines = [];

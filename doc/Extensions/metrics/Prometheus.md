@@ -30,6 +30,8 @@ LibreNMS provides multiple metrics endpoints for different types of data:
 - `/api/v0/metrics/services` — Service check results
 - And more...
 
+It use the Metrics API as a metrics exporter, you'll want to set the scope=detail parameter.
+
 For complete API documentation, see [Metrics API](../../API/Metrics.md).
 
 ### Authentication
@@ -51,16 +53,19 @@ All metrics endpoints except pollers support filtering to specific devices or de
 # Scrape only specific devices
 metrics_path: /api/v0/metrics/ports
 params:
+  scope: 'detail'
   device_ids: ['1,2,3']
 
 # Scrape devices by hostname
 metrics_path: /api/v0/metrics/sensors
 params:
+  scope: 'detail'
   hostnames: ['sw01,sw02,fw01']
 
 # Scrape devices in a group
 metrics_path: /api/v0/metrics/devices
 params:
+  scope: 'detail'
   device_group: ['core-switches']
 ```
 
@@ -81,6 +86,8 @@ scrape_configs:
       - targets: ['your.librenms.example:443']
     scheme: https
     metrics_path: /api/v0/metrics/devices
+    params:
+      scope: 'detail'
     headers:
       X-Auth-Token: 'YOURAPITOKENHERE'
     scrape_interval: 150s
@@ -91,6 +98,8 @@ scrape_configs:
       - targets: ['your.librenms.example:443']
     scheme: https
     metrics_path: /api/v0/metrics/ports
+    params:
+      scope: 'detail'
     headers:
       X-Auth-Token: 'YOURAPITOKENHERE'
     scrape_interval: 150s
@@ -101,6 +110,8 @@ scrape_configs:
       - targets: ['your.librenms.example:443']
     scheme: https
     metrics_path: /api/v0/metrics/sensors
+    params:
+      scope: 'detail'
     headers:
       X-Auth-Token: 'YOURAPITOKENHERE'
     scrape_interval: 150s
@@ -111,6 +122,8 @@ scrape_configs:
       - targets: ['your.librenms.example:443']
     scheme: https
     metrics_path: /api/v0/metrics/alerts
+    params:
+      scope: 'detail'
     headers:
       X-Auth-Token: 'YOURAPITOKENHERE'
     scrape_interval: 150s
@@ -127,6 +140,7 @@ scrape_configs:
     scheme: https
     metrics_path: /api/v0/metrics/devices
     params:
+      scope: 'detail'
       device_group: ['core-switches', 'core-routers']
     headers:
       X-Auth-Token: 'YOURAPITOKENHERE'
@@ -138,6 +152,8 @@ scrape_configs:
       - targets: ['your.librenms.example:443']
     scheme: https
     metrics_path: /api/v0/metrics/applications
+    params:
+      scope: 'detail'
     headers:
       X-Auth-Token: 'YOURAPITOKENHERE'
     scrape_interval: 150s
@@ -149,7 +165,7 @@ If you scrape at the exact interval that your poller is polling at, 5 minutes (3
 
 Example:
 ```
-12:00:00 - Poller write 500
+12:00:00 - Poller writes 500
 12:00:01 - Prometheus scrapes 500
 12:05:00 - Poller writes 600
 12:05:01 - Prometheus scrapes 600
@@ -257,7 +273,6 @@ If your Push Gateway uses basic authentication, configure the following:
     lnms config:set prometheus.password password
     ```
 
-<<<<<<< master
 Additional settings
 
 !!! setting "poller/prometheus"
@@ -267,9 +282,6 @@ Additional settings
 
 
 ## Prefix
-=======
-### Metric Prefix
->>>>>>> Update ServicesMetrics.php, WirelessSensorsMetrics.php, Metrics.md, and 3 more files
 
 Setting the 'prefix' option will cause all metric names to begin with the configured value.
 

@@ -44,6 +44,27 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' "https://foo.example/api/v0/metrics/sen
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' "https://foo.example/api/v0/metrics/devices?device_group=switches"
 ```
 
+## Scope Parameter
+
+Most metrics endpoints support an optional `scope` query parameter to control the level of detail in the output:
+
+- `scope=global` (default): Returns summary/global metrics only. This is the default if the parameter is omitted.  This is useful for monitoring LibreNMS itself with a Prometheus monitoring system.
+- `scope=detail`: Returns detailed, per-entity metrics in addition to the global summary metrics. This may significantly increase the number of metrics and cardinality.  This is useful using the Metrics API as a metric exporter.
+
+### Usage Examples
+
+Default (global-only):
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/metrics/devices
+```
+
+Request detailed metrics:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' "https://foo.example/api/v0/metrics/devices?scope=detail"
+```
+
+When `scope=detail` is specified, the endpoint will include additional per-device, per-port, or per-entity metrics as appropriate for the endpoint. This is useful for advanced monitoring and troubleshooting, but may increase load and data volume for large environments.
+
 ## Available Metrics Endpoints
 
 ### `metrics_access_points`
