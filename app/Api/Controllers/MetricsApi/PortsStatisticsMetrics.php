@@ -28,7 +28,7 @@ class PortsStatisticsMetrics
         }
 
         // Append global metrics
-        $this->appendMetricBlock($lines, 'librenms_ports_statistics_total', 'Total number of ports_statistics rows', 'gauge', [$total]);
+        $this->appendMetricBlock($lines, 'librenms_ports_statistics_total', 'Total number of ports_statistics rows', 'gauge', [(string) $total]);
 
         // Prepare per-port stats arrays
         $in_nucast_lines = [];
