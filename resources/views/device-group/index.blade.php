@@ -11,9 +11,11 @@
 
             <div class="row">
                 <div class="col-md-12">
+                    @can('create', App\Models\DeviceGroup::class)
                     <a type="button" class="btn btn-primary" href="{{ route('device-groups.create') }}">
                         <i class="fa fa-plus"></i> {{ __('New Device Group') }}
                     </a>
+                    @endcan
                     <a type="button" class="btn btn-default" href="{{ route('devices', ['filter' => ['groups.id' => ['is_empty' => 1]]]) }}">
                         <i class="fas fa-border-none"></i> {{ __('View Ungrouped Devices') }}
                     </a>
@@ -46,18 +48,23 @@
                             </td>
                             <td>{{ $device_group->type == 'dynamic' ? $device_group->getParser()->toSql(false) : '' }}</td>
                             <td>
+                                @can('device.update')
                                 <button type="button" title="{{ __('Rediscover all Devices of Device Group') }}" class="btn btn-warning btn-sm" aria-label="{{ __('Rediscover Group') }}"
                                         onclick="discover_dg(this, '{{ $device_group->id }}')">
                                     <i
                                         class="fa fa-retweet" aria-hidden="true"></i></button>
+                                @endcan
+                                @can('update', $device_group)
                                 <a type="button" title="{{ __('edit Device Group') }}" class="btn btn-primary btn-sm" aria-label="{{ __('Edit') }}"
                                    href="{{ route('device-groups.edit', $device_group->id) }}">
                                     <i class="fa fa-pencil" aria-hidden="true"></i></a>
+                                @endcan
+                                @can('delete', $device_group)
                                 <button type="button" class="btn btn-danger btn-sm" title="{{ __('delete Device Group') }}" aria-label="{{ __('Delete') }}"
                                         data-group-name="{{ $device_group->name }}"
                                         onclick="delete_dg(this, '{{ route('device-groups.destroy', $device_group->id) }}')">
-                                    <i
-                                        class="fa fa-trash" aria-hidden="true"></i></button>
+                                    <i class="fa fa-trash" aria-hidden="true"></i></button>
+                                @endcan
                             </td>
                         </tr>
                     @endforeach

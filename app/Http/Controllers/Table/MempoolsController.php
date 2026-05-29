@@ -65,6 +65,8 @@ class MempoolsController extends TableController
      */
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Mempool::class);
+
         if ($request->input('view') == 'graphs') {
             $query = Device::hasAccess($request->user())->has('mempools')->with('mempools');
         } else {

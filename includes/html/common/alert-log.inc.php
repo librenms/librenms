@@ -14,8 +14,6 @@
 * @author     LibreNMS Contributors
 */
 
-use App\Models\Alert;
-
 $param = [];
 
 $pagetitle[] = 'Alert Log';
@@ -39,7 +37,7 @@ $alert_severities = [
 ];
 
 $admin_verbose_details = '';
-if (Gate::allows('detail', Alert::class)) {
+if (Gate::allows('alert.detail')) {
     $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
 }
 

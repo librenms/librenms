@@ -194,8 +194,9 @@ $('#service-submit').on("click", function(e) {
                 $("#ajax_response").html('<div class="alert alert-danger">'+result.message+'</div>');
             }
         },
-        error: function(){
-            $("#ajax_response").html('<div class="alert alert-info">An error occurred creating this service.</div>');
+        error: function(result){
+            var msg = (result.responseJSON && result.responseJSON.message) ? result.responseJSON.message : 'An error occurred saving this service.';
+            $("#ajax_response").html('<div class="alert alert-danger">' + msg + '</div>');
         }
     });
 });
