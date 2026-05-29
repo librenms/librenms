@@ -175,29 +175,32 @@ if (LibrenmsConfig::get('enable_vrfs')) {
         if (empty($rds) && $device['os'] === 'nxos') {
             $vrf_names = [];
 
-            // snmp_walk() strips embedded double quotes; combined with -Oqn
-            // each line arrives as "OID VALUE", space-separated.
+            // SnmpQuery::numeric() walks by numeric OID without symbol
+            // resolution. The response object handles error normalization,
+            // quote stripping, and multi-line value joining via
+            // ->isValid() / ->values(), so the calling code stays clean.
+            $nv_response = \SnmpQuery::numeric()->walk('.1.3.6.1.4.1.9.9.820.1.1.2.1.9');
+            $bgp_response = \SnmpQuery::numeric()->walk('.1.3.6.1.4.1.9.9.187.1.2.9.1.4');
 
-            $nv_walk = snmp_walk($device, '.1.3.6.1.4.1.9.9.820.1.1.2.1.9', '-Oqn', '', null);
-            $bgp_walk = snmp_walk($device, '.1.3.6.1.4.1.9.9.187.1.2.9.1.4', '-Oqn', '', null);
+            // isValid() returns false for both transient SNMP errors
+            // (timeout, auth failure, engineID resync) and legitimate
+            // "No Such Object/Instance" responses. We must distinguish:
+            // a transient error means "preserve existing rows"; a
+            // No Such Object on the NV-OVERLAY walk just means the
+            // device is not a VTEP (e.g., a spine), which is fine.
+            $transient_re = '/(Timeout|No Response|Authentication failure|Unknown user)/i';
+            $nv_transient = ! $nv_response->isValid() && preg_match($transient_re, $nv_response->getErrorMessage());
+            $bgp_transient = ! $bgp_response->isValid() && preg_match($transient_re, $bgp_response->getErrorMessage());
 
-            // snmp_walk() only normalizes "No Such Object/Instance" to false;
-            // timeouts, auth failures, and engineID resync errors pass through
-            // as non-empty strings that would otherwise be parsed as VRF data.
-            // Detect those and preserve existing rows to avoid corruption.
-            $walk_err_re = '/(Timeout|No Response|Authentication failure|Unknown user)/i';
-            $nv_walk_failed = is_string($nv_walk) && preg_match($walk_err_re, $nv_walk);
-            $bgp_walk_failed = is_string($bgp_walk) && preg_match($walk_err_re, $bgp_walk);
-
-            if ($nv_walk_failed || $bgp_walk_failed) {
+            if ($nv_transient || $bgp_transient) {
                 echo "\n  [VRF discovery] NX-OS fallback: SNMP error in walk output; preserving existing vrfs rows for this device.";
-                foreach (dbFetchRows('SELECT vrf_id FROM vrfs WHERE device_id = ?', [$device['device_id']]) as $row) {
-                    $valid_vrf[$row['vrf_id']] = 1;
+                foreach (DeviceCache::getPrimary()->vrfs()->pluck('vrf_id') as $existing_vrf_id) {
+                    $valid_vrf[$existing_vrf_id] = 1;
                 }
             } else {
                 // Cisco VRF names are alphanumeric + underscore + hyphen,
-                // max 32 chars. Strict match drops anything that survives
-                // the walk-level error check but isn't a real VRF name.
+                // max 32 chars. Strict match drops anything that isn't
+                // a real VRF name.
                 $valid_name_re = '/^[A-Za-z0-9_-]{1,32}$/';
 
                 // Source 1: cnvoVNetIpVrfOrBridgeDomainName
@@ -205,43 +208,31 @@ if (LibrenmsConfig::get('enable_vrfs')) {
                 // Do NOT filter on the VNI number itself - L3VNI numbering
                 // is platform/site specific (e.g., 50997-50999 on one
                 // fabric, 13901-13902 on another).
-                if (! empty($nv_walk)) {
-                    foreach (explode("\n", trim((string) $nv_walk)) as $line) {
-                        $parts = preg_split('/\s+/', trim($line), 2);
-                        if (count($parts) === 2) {
-                            $name = $parts[1];
-                            if (! ctype_digit($name) && preg_match($valid_name_re, $name)) {
-                                $vrf_names[$name] = true;
-                            }
-                        }
+                foreach ($nv_response->values() as $name) {
+                    if (is_string($name) && ! ctype_digit($name) && preg_match($valid_name_re, $name)) {
+                        $vrf_names[$name] = true;
                     }
                 }
 
                 // Source 2: cbgpPeer3VrfName catches VRFs with BGP peering
                 // but no L3VNI (e.g., 'default' and non-EVPN VRFs).
                 // DISTINCT the values.
-                if (! empty($bgp_walk)) {
-                    foreach (explode("\n", trim((string) $bgp_walk)) as $line) {
-                        $parts = preg_split('/\s+/', trim($line), 2);
-                        if (count($parts) === 2) {
-                            $name = $parts[1];
-                            if (preg_match($valid_name_re, $name)) {
-                                $vrf_names[$name] = true;
-                            }
-                        }
+                foreach ($bgp_response->values() as $name) {
+                    if (is_string($name) && preg_match($valid_name_re, $name)) {
+                        $vrf_names[$name] = true;
                     }
                 }
 
                 d_echo("\n[DEBUG NX-OS VRF discovery]\nFound: " . implode(', ', array_keys($vrf_names)) . "\n[/DEBUG]\n");
 
                 if (empty($vrf_names)) {
-                    // Walks completed cleanly but yielded no parseable VRFs
-                    // (Nexus with VRFs configured but no L3VNI and no BGP
-                    // peers - rare). Preserve existing rows; don't let the
-                    // tail cleanup wipe legitimate data on a hollow walk.
+                    // Walks completed but yielded no parseable VRFs (Nexus
+                    // with VRFs configured but no L3VNI and no BGP peers).
+                    // Preserve existing rows; don't let the tail cleanup
+                    // wipe legitimate data on a hollow walk.
                     echo "\n  [VRF discovery] NX-OS fallback: no parseable VRFs via NV-OVERLAY+BGP; preserving existing vrfs rows for this device.";
-                    foreach (dbFetchRows('SELECT vrf_id FROM vrfs WHERE device_id = ?', [$device['device_id']]) as $row) {
-                        $valid_vrf[$row['vrf_id']] = 1;
+                    foreach (DeviceCache::getPrimary()->vrfs()->pluck('vrf_id') as $existing_vrf_id) {
+                        $valid_vrf[$existing_vrf_id] = 1;
                     }
                 } else {
                     foreach (array_keys($vrf_names) as $vrf_name) {
@@ -252,25 +243,26 @@ if (LibrenmsConfig::get('enable_vrfs')) {
 
                         echo "\n  [VRF $vrf_name] OID   - $vrf_oid (NX-OS via NV-OVERLAY+BGP)";
 
-                        if (dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid])) {
-                            dbUpdate(['vrf_name' => $vrf_name], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
+                        $vrf_attrs = [
+                            'vrf_oid' => $vrf_oid,
+                            'vrf_name' => $vrf_name,
+                            'mplsVpnVrfRouteDistinguisher' => null,
+                            'mplsVpnVrfDescription' => '',
+                        ];
+
+                        if (DeviceCache::getPrimary()->vrfs()->where('vrf_oid', $vrf_oid)->exists()) {
+                            DeviceCache::getPrimary()->vrfs()->where('vrf_oid', $vrf_oid)->update(['vrf_name' => $vrf_name]);
                         } else {
-                            dbInsert([
-                                'vrf_oid' => $vrf_oid,
-                                'vrf_name' => $vrf_name,
-                                'mplsVpnVrfRouteDistinguisher' => null,
-                                'mplsVpnVrfDescription' => '',
-                                'device_id' => $device['device_id'],
-                            ], 'vrfs');
+                            DeviceCache::getPrimary()->vrfs()->create($vrf_attrs);
                         }
 
-                        $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid]);
+                        $vrf_id = DeviceCache::getPrimary()->vrfs()->where('vrf_oid', $vrf_oid)->value('vrf_id');
                         $valid_vrf[$vrf_id] = 1;
                     }
                 }
             }
 
-            unset($vrf_names, $nv_walk, $bgp_walk);
+            unset($vrf_names, $nv_response, $bgp_response);
         }
     } elseif ($device['os_group'] == 'nokia') {
         unset($vrf_count);
