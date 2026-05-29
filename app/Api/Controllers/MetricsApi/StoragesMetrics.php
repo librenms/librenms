@@ -14,6 +14,10 @@ class StoragesMetrics
     {
         $lines = [];
 
+        // Determine scope (global vs detail) and parse filters
+        $scope = $this->parseScope($request);
+        $includeDetail = $scope === 'detail';
+
         // Parse filters
         $filters = $this->parseDeviceFilters($request);
 
@@ -23,6 +27,11 @@ class StoragesMetrics
 
         // Append global metrics
         $this->appendMetricBlock($lines, 'librenms_storages_total', 'Total number of storage entries', 'gauge', [$total]);
+
+        // Default to global metrics only; detailed per-access-point metrics are opt-in via ?scope=detail
+        if (! $includeDetail) {
+            return implode("\n", $lines) . "\n";
+        }
 
         // Prepare per-storage arrays
         $used_lines = [];

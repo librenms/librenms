@@ -15,6 +15,10 @@ class ApplicationsMetrics
     {
         $lines = [];
 
+        // Determine scope (global vs detail) and parse filters
+        $scope = $this->parseScope($request);
+        $includeDetail = $scope === 'detail';
+
         // Parse filters
         $filters = $this->parseDeviceFilters($request);
 
@@ -26,6 +30,11 @@ class ApplicationsMetrics
         }
         $total = $totalQ->count();
         $this->appendMetricBlock($lines, 'librenms_applications_metrics_total', 'Total number of application metrics rows', 'gauge', ["librenms_applications_metrics_total {$total}"]);
+
+        // Default to global metrics only; detailed per-access-point metrics are opt-in via ?scope=detail
+        if (! $includeDetail) {
+            return implode("\n", $lines) . "\n";
+        }
 
         $metric_lines = [];
 

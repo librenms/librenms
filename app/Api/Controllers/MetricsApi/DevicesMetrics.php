@@ -13,6 +13,10 @@ class DevicesMetrics
     {
         $lines = [];
 
+        // Determine scope (global vs detail) and parse filters
+        $scope = $this->parseScope($request);
+        $includeDetail = $scope === 'detail';
+
         // Parse filters
         $filters = $this->parseDeviceFilters($request);
 
@@ -28,6 +32,11 @@ class DevicesMetrics
         $this->appendMetricBlock($lines, 'librenms_devices_total', 'Total number of devices', 'gauge', ["librenms_devices_total {$total}"]);
         $this->appendMetricBlock($lines, 'librenms_devices_up', 'Number of devices currently up', 'gauge', ["librenms_devices_up {$up}"]);
         $this->appendMetricBlock($lines, 'librenms_devices_down', 'Number of devices currently down', 'gauge', ["librenms_devices_down {$down}"]);
+
+        // Default to global metrics only; detailed per-access-point metrics are opt-in via ?scope=detail
+        if (! $includeDetail) {
+            return implode("\n", $lines) . "\n";
+        }
 
         // Prepare per-device arrays
         $device_up_lines = [];

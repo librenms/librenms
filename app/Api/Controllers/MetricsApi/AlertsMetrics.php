@@ -15,6 +15,10 @@ class AlertsMetrics
     {
         $lines = [];
 
+        // Determine scope (global vs detail) and parse filters
+        $scope = $this->parseScope($request);
+        $includeDetail = $scope === 'detail';
+
         // Parse filters
         $filters = $this->parseDeviceFilters($request);
 
@@ -26,6 +30,11 @@ class AlertsMetrics
         $alertsQ = $this->applyDeviceFilter($alertsQ, $filters['device_ids']);
         $total_alerts = $alertsQ->count();
         $this->appendMetricBlock($lines, 'librenms_alerts_total', 'Total number of alerts rows', 'gauge', "librenms_alerts_total {$total_alerts}");
+
+        // Default to global metrics only; detailed per-access-point metrics are opt-in via ?scope=detail
+        if (! $includeDetail) {
+            return implode("\n", $lines) . "\n";
+        }
 
         // Alerts by state
         $state_lines = [];

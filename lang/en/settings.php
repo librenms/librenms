@@ -82,7 +82,7 @@ return [
             'mtu' => ['name' => 'MTU Check'],
             'opentsdb' => ['name' => 'Datastore: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
-            'prometheus' => ['name' => 'Datastore: Prometheus'],
+            'prometheus' => ['name' => 'Datastore: Prometheus (Pushgateway)'],
             'rrdtool' => ['name' => 'Datastore: RRDTool'],
             'snmp' => ['name' => 'SNMP'],
             'dispatcherservice' => ['name' => 'Dispatcher Service'],

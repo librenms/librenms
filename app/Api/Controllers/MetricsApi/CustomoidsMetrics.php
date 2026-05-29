@@ -14,6 +14,10 @@ class CustomoidsMetrics
     {
         $lines = [];
 
+        // Determine scope (global vs detail) and parse filters
+        $scope = $this->parseScope($request);
+        $includeDetail = $scope === 'detail';
+
         // Parse filters
         $filters = $this->parseDeviceFilters($request);
 
@@ -23,6 +27,11 @@ class CustomoidsMetrics
 
         // Append global metrics
         $this->appendMetricBlock($lines, 'librenms_customoids_total', 'Total number of customoids', 'gauge', ["librenms_customoids_total {$total}"]);
+
+        // Default to global metrics only; detailed per-access-point metrics are opt-in via ?scope=detail
+        if (! $includeDetail) {
+            return implode("\n", $lines) . "\n";
+        }
 
         // Prepare per-customoid metrics arrays grouped by datatype
         $gauge_value_lines = [];
