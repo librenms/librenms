@@ -66,7 +66,6 @@
   @apply tw:underline;
 }
 
-<<<<<<< HEAD
 .overview-panel {
   @apply tw:rounded-xl tw:overflow-hidden tw:border tw:border-gray-300 tw:shadow-sm tw:dark:border-dark-gray-200;
 }
@@ -109,7 +108,8 @@
 
 .lnms-btn-primary .lnms-btn-badge {
   @apply tw:bg-white tw:text-[#337ab7];
-=======
+}
+
 .grid-stack > .grid-stack-item > .grid-stack-item-content {
   @apply tw:left-1! tw:right-1! tw:top-1! tw:bottom-1! tw:overflow-hidden tw:bg-white tw:text-black tw:cursor-pointer tw:rounded;
 }
@@ -137,5 +137,4 @@
 
 .widget_body:has(> .worldmap_widget) {
   @apply tw:p-0;
->>>>>>> 7f090af303 (More dashboard updates)
 }
