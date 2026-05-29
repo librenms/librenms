@@ -27,6 +27,9 @@ class PollersMetrics
         return implode("\n", $lines) . "\n";
     }
 
+    /**
+     * @param array<int, string> $lines
+     */
     private function addPollersMetrics(array &$lines): void
     {
         // Gather global metrics
@@ -57,6 +60,9 @@ class PollersMetrics
         }
     }
 
+    /**
+     * @param array<int, string> $lines
+     */
     private function addPollerClusterMetrics(array &$lines): void
     {
         // Gather global metrics
@@ -100,6 +106,9 @@ class PollersMetrics
         }
     }
 
+    /**
+     * @param array<int, string> $lines
+     */
     private function addPollerClusterStatsMetrics(array &$lines): void
     {
         // Gather cluster stats
