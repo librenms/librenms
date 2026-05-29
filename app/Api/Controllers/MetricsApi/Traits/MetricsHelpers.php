@@ -16,8 +16,8 @@ trait MetricsHelpers
      * - hostname (single), hostnames (comma-separated)
      * - device_group (id or name) which will expand to device ids in that group
      * Returns an array with key 'device_ids' => Collection|null
-    *
-    * @return array{device_ids: Collection<int, int|string>|null}
+     *
+     * @return array{device_ids: Collection<int, int|string>|null}
      */
     private function parseDeviceFilters(Request $request): array
     {
@@ -63,12 +63,12 @@ trait MetricsHelpers
 
     /**
      * Apply a device filter (when provided) to an Eloquent/QueryBuilder instance.
-      *
-      * @param mixed $query
-      * @param Collection<int, int|string>|null $deviceIds
-      * @return mixed
+     *
+     * @param mixed $query
+     * @param Collection<int, int|string>|null $deviceIds
+     * @return mixed
      */
-     private function applyDeviceFilter(mixed $query, ?Collection $deviceIds): mixed
+    private function applyDeviceFilter(mixed $query, ?Collection $deviceIds): mixed
     {
         if ($deviceIds === null) {
             return $query;
@@ -80,9 +80,9 @@ trait MetricsHelpers
     /**
      * Given a collection of device ids, return a keyed map of Device models by device_id.
      * If null is given, returns an empty collection.
-      *
-      * @param Collection<int, int|string>|null $deviceIds
-      * @return Collection<int, Device>
+     *
+     * @param Collection<int, int|string>|null $deviceIds
+     * @return Collection<int, Device>
      */
     private function gatherDevicesForIds(?Collection $deviceIds): Collection
     {
@@ -107,8 +107,8 @@ trait MetricsHelpers
     /**
      * Format a set of label key=>value pairs into a Prometheus label string.
      * Values should already be escaped using escapeLabel from MetricsHelpers.
-      *
-      * @param array<string, int|float|string> $labels
+     *
+     * @param array<string, int|float|string> $labels
      */
     private function formatLabels(array $labels): string
     {
@@ -123,9 +123,9 @@ trait MetricsHelpers
     /**
      * Append a metric block (HELP, TYPE, and lines) into the main lines array.
      * $metricLines may be a single formatted metric line string or an array of lines.
-      *
-      * @param array<int, string> $lines
-      * @param array<int, string>|string $metricLines
+     *
+     * @param array<int, string> $lines
+     * @param array<int, string>|string $metricLines
      */
     private function appendMetricBlock(array &$lines, string $metricName, string $help, string $type, array|string $metricLines): void
     {

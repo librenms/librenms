@@ -28,15 +28,15 @@ class PollersMetrics
     }
 
     /**
-     * @param array<int, string> $lines
+     * @param  array<int, string>  $lines
      */
     private function addPollersMetrics(array &$lines): void
     {
         // Gather global metrics
         $total = Poller::count();
         $active = Poller::isActive()->count();
-        $this->appendMetricBlock($lines, 'librenms_pollers_total', 'Total number of legacy pollers', 'gauge', [$total]);
-        $this->appendMetricBlock($lines, 'librenms_pollers_active', 'Number of active legacy pollers', 'gauge', [$active]);
+        $this->appendMetricBlock($lines, 'librenms_pollers_total', 'Total number of legacy pollers', 'gauge', [(string) $total]);
+        $this->appendMetricBlock($lines, 'librenms_pollers_active', 'Number of active legacy pollers', 'gauge', [(string) $active]);
 
         // Prepare per-poller arrays
         $devices_lines = [];
@@ -61,7 +61,7 @@ class PollersMetrics
     }
 
     /**
-     * @param array<int, string> $lines
+     * @param  array<int, string>  $lines
      */
     private function addPollerClusterMetrics(array &$lines): void
     {
@@ -69,8 +69,8 @@ class PollersMetrics
         $total = PollerCluster::count();
         $active = PollerCluster::isActive()->count();
 
-        $this->appendMetricBlock($lines, 'librenms_poller_cluster_total', 'Total number of poller cluster nodes', 'gauge', [$total]);
-        $this->appendMetricBlock($lines, 'librenms_poller_cluster_active', 'Number of active poller cluster nodes', 'gauge', [$active]);
+        $this->appendMetricBlock($lines, 'librenms_poller_cluster_total', 'Total number of poller cluster nodes', 'gauge', [(string) $total]);
+        $this->appendMetricBlock($lines, 'librenms_poller_cluster_active', 'Number of active poller cluster nodes', 'gauge', [(string) $active]);
 
         // Prepare per-cluster-node arrays
         $is_master_lines = [];
@@ -107,7 +107,7 @@ class PollersMetrics
     }
 
     /**
-     * @param array<int, string> $lines
+     * @param  array<int, string>  $lines
      */
     private function addPollerClusterStatsMetrics(array &$lines): void
     {
