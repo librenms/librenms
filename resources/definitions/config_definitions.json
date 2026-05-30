@@ -6503,6 +6503,13 @@
             },
             "order": 3
         },
+        "redis.enable": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "redis",
+            "order": 0
+        },
         "reporting.error": {
             "group": "system",
             "section": "reporting",

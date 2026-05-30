@@ -88,6 +88,7 @@ class ModuleTestHelper
         LibrenmsConfig::set('graphite.enable', false);
         LibrenmsConfig::set('prometheus.enable', false);
         LibrenmsConfig::set('kafka.enable', false);
+        LibrenmsConfig::set('redis.enable', false);
     }
 
     private static function compareOid(mixed $a, mixed $b): int

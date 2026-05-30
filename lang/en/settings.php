@@ -83,6 +83,7 @@ return [
             'opentsdb' => ['name' => 'Datastore: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
             'prometheus' => ['name' => 'Datastore: Prometheus (Pushgateway)'],
+            'redis' => ['name' => 'Datastore: Redis'],
             'rrdtool' => ['name' => 'Datastore: RRDTool'],
             'snmp' => ['name' => 'SNMP'],
             'dispatcherservice' => ['name' => 'Dispatcher Service'],
@@ -1898,6 +1899,12 @@ return [
             'prefix' => [
                 'description' => 'Prefix',
                 'help' => 'Optional text to prepend to exported metric names',
+            ],
+        ],
+        'redis' => [
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports poller metrics payloads to Redis',
             ],
         ],
         'public_status' => [
