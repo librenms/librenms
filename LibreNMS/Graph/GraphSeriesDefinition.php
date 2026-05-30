@@ -26,13 +26,13 @@ namespace LibreNMS\Graph;
 
 class GraphSeriesDefinition
 {
-    /** @var array<string, MetricBinding> */
+    /** @var array<string, RrdMetricBinding> */
     private array $bindings = [];
-    /** @var MetricBinding[] */
+    /** @var RrdMetricBinding[] */
     private array $bindingList = [];
 
     /**
-     * @param MetricBinding[] $bindings
+     * @param RrdMetricBinding[] $bindings
      */
     public function __construct(
         public readonly string $name,
@@ -56,13 +56,13 @@ class GraphSeriesDefinition
         }
     }
 
-    public function binding(string $source): ?MetricBinding
+    public function binding(string $source): ?RrdMetricBinding
     {
         return $this->bindings[$source] ?? null;
     }
 
     /**
-     * @return MetricBinding[]
+     * @return RrdMetricBinding[]
      */
     public function bindings(?string $source = null): array
     {
@@ -70,6 +70,6 @@ class GraphSeriesDefinition
             return $this->bindingList;
         }
 
-        return array_values(array_filter($this->bindingList, fn (MetricBinding $binding) => $binding->source() === $source));
+        return array_values(array_filter($this->bindingList, fn (RrdMetricBinding $binding) => $binding->source() === $source));
     }
 }

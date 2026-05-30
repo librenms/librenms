@@ -24,7 +24,7 @@
 
 namespace LibreNMS\Graph;
 
-class RrdMetricBinding implements MetricBinding
+class RrdMetricBinding
 {
     public const SOURCE = 'rrd';
 

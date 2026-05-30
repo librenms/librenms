@@ -27,14 +27,13 @@ namespace App\Providers;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Data\Store\Rrd;
-use LibreNMS\Graph\GraphDataProvider;
 use LibreNMS\Graph\RrdGraphDataProvider;
 
 class GraphServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(GraphDataProvider::class, fn (Application $app) => new RrdGraphDataProvider(
+        $this->app->singleton(RrdGraphDataProvider::class, fn (Application $app) => new RrdGraphDataProvider(
             $app->make(Rrd::class),
         ));
     }

@@ -319,7 +319,7 @@ function get_device_graph_data(Request $request)
                 'device_id' => $device_id,
                 'hostname'  => $device->hostname,
             ], $from, $to, $width, $height);
-            $provider = app(\LibreNMS\Graph\GraphDataProvider::class);
+            $provider = app(\LibreNMS\Graph\RrdGraphDataProvider::class);
             $result = $provider->query($query);
 
             return graph_data_response($result, $query);

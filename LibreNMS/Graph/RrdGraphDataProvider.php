@@ -32,14 +32,13 @@ use LibreNMS\Graph\Definitions\Device\PollerPerfGraph;
 use Symfony\Component\Process\Process;
 
 /**
- * Reads time-series data for a registered {@see GraphDefinition} out of RRD files and
- * returns it as a normalized {@see GraphDataResult}. This is the only backend wired up in
- * the first graph-data PR; the definition map below is intentionally tiny and grows as
- * further graph families are added in later PRs.
+ * Reads time-series data for a registered graph definition out of RRD files and
+ * returns it as a normalized {@see GraphDataResult}. The definition map below is
+ * intentionally tiny and grows as further graph families are added in later PRs.
  */
-class RrdGraphDataProvider implements GraphDataProvider
+class RrdGraphDataProvider
 {
-    /** @var array<string, class-string<GraphDefinition>> */
+    /** @var array<string, class-string> */
     private const DEFINITIONS = [
         PollerPerfGraph::GRAPH_TYPE => PollerPerfGraph::class,
     ];
@@ -64,16 +63,16 @@ class RrdGraphDataProvider implements GraphDataProvider
             );
         }
 
-        $device  = Device::findOrFail($deviceId);
-        $def     = new $definitionClass();
-        $context = new GraphContext($device, $query);
+        $device   = Device::findOrFail($deviceId);
+        $def      = new $definitionClass();
+        $entities = array_merge(['hostname' => $device->hostname], $query->entities);
 
         $result = new GraphDataResult(
-            id:       $def->id($context),
+            id:       $query->graphType . ':' . ($entities['hostname'] ?? ''),
             type:     $query->graphType,
-            title:    $def->title($context),
-            subtitle: $def->subtitle($context),
-            unit:     $def->unit($context),
+            title:    $def->title($entities),
+            subtitle: $def->subtitle($entities),
+            unit:     $def->unit($entities),
             from:     $query->from,
             to:       $query->to,
             step:     $query->step,
@@ -83,16 +82,15 @@ class RrdGraphDataProvider implements GraphDataProvider
             $def->display()
         ));
 
-        $this->fillSeries($result, $def, $context);
+        $this->fillSeries($result, $def, $query, $entities);
 
         return $result;
     }
 
-    private function fillSeries(GraphDataResult $result, GraphDefinition $def, GraphContext $context): void
+    private function fillSeries(GraphDataResult $result, PollerPerfGraph $def, GraphQuery $query, array $entities): void
     {
-        $query  = $context->query;
         $groups = [];
-        foreach ($def->series($context) as $seriesDef) {
+        foreach ($def->series($entities) as $seriesDef) {
             $binding = $seriesDef->binding(RrdMetricBinding::SOURCE);
             if (! $binding instanceof RrdMetricBinding) {
                 $result->addWarning("Series '{$seriesDef->key}' has no RRD binding; empty series returned.");
@@ -102,7 +100,7 @@ class RrdGraphDataProvider implements GraphDataProvider
 
             $step          = $binding->step ?? $query->step;
             $consolidation = strtoupper($binding->consolidation);
-            $rrdFile       = $this->rrd->name($context['hostname'], $binding->rrdName);
+            $rrdFile       = $this->rrd->name($entities['hostname'] ?? '', $binding->rrdName);
             $key           = implode(':', [$rrdFile, $step, $consolidation]);
             $groups[$key][] = [$seriesDef, $binding, $rrdFile, $step, $consolidation];
         }

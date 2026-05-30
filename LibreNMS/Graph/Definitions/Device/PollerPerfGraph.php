@@ -24,12 +24,10 @@
 
 namespace LibreNMS\Graph\Definitions\Device;
 
-use LibreNMS\Graph\GraphContext;
-use LibreNMS\Graph\GraphDefinition;
 use LibreNMS\Graph\GraphSeriesDefinition;
 use LibreNMS\Graph\RrdMetricBinding;
 
-class PollerPerfGraph implements GraphDefinition
+class PollerPerfGraph
 {
     public const GRAPH_TYPE = 'device_poller_perf';
 
@@ -38,33 +36,29 @@ class PollerPerfGraph implements GraphDefinition
         return self::GRAPH_TYPE;
     }
 
-    public function id(GraphContext $context): string
-    {
-        return self::GRAPH_TYPE . ':' . $context['device_id'];
-    }
-
-    public function title(GraphContext $context): string
+    public function title(array $entities = []): string
     {
         return 'Poller Time';
     }
 
-    public function subtitle(GraphContext $context): string
+    public function subtitle(array $entities = []): string
     {
-        return $context['hostname'] ?? '';
+        return $entities['hostname'] ?? '';
     }
 
-    public function unit(GraphContext $context): string
+    public function unit(array $entities = []): string
     {
         return 'seconds';
     }
 
-    public function series(GraphContext $context): array
+    /** @return GraphSeriesDefinition[] */
+    public function series(array $entities = []): array
     {
         return [
             new GraphSeriesDefinition(
                 name:        'Poller time',
                 key:         'poller_time',
-                unit:        $this->unit($context),
+                unit:        $this->unit($entities),
                 color:       '008C00',
                 area:        true,
                 areaOpacity: 0.2,
@@ -75,23 +69,13 @@ class PollerPerfGraph implements GraphDefinition
         ];
     }
 
-    public function markers(GraphContext $context): array
+    public function markers(array $entities = []): array
     {
         return [];
-    }
-
-    public function entityType(): string
-    {
-        return 'device';
     }
 
     public function display(): array
     {
         return ['kind' => 'line', 'stacked' => false, 'area' => true, 'legend' => true];
-    }
-
-    public function variables(): array
-    {
-        return [];
     }
 }
