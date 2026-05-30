@@ -30,8 +30,8 @@ class DevicesMetrics
 
         // Append global metrics
         $this->appendMetricBlock($lines, 'librenms_devices_total', 'Total number of devices', 'gauge', ["librenms_devices_total {$total}"]);
-        $this->appendMetricBlock($lines, 'librenms_devices_up', 'Number of devices currently up', 'gauge', ["librenms_devices_up {$up}"]);
-        $this->appendMetricBlock($lines, 'librenms_devices_down', 'Number of devices currently down', 'gauge', ["librenms_devices_down {$down}"]);
+        $this->appendMetricBlock($lines, 'librenms_devices_total_up', 'Total number of devices currently up', 'gauge', ["librenms_devices_total_up {$up}"]);
+        $this->appendMetricBlock($lines, 'librenms_devices_total_down', 'Total number of devices currently down', 'gauge', ["librenms_devices_total_down {$down}"]);
 
         // Default to global metrics only; detailed per-access-point metrics are opt-in via ?scope=detail
         if (! $includeDetail) {
@@ -62,11 +62,17 @@ class DevicesMetrics
 
             if (! isset($snapshot[$deviceId])) {
                 $snapshot[$deviceId] = [
+                    'status' => ['ts' => -1, 'value' => 0],
                     'last_polled_timetaken' => ['ts' => -1, 'value' => 0.0],
                     'last_ping_timetaken' => ['ts' => -1, 'value' => 0.0],
                     'uptime' => ['ts' => -1, 'value' => 0],
-                    'up' => ['ts' => -1, 'value' => 0],
                 ];
+            }
+
+            if (array_key_exists('status', $payload) && $payload['status'] !== null) {
+                if ($timestamp >= $snapshot[$deviceId]['status']['ts']) {
+                    $snapshot[$deviceId]['status'] = ['ts' => $timestamp, 'value' => ((int) $payload['status'] > 0 ? 1 : 0)];
+                }
             }
 
             if ($measurement === 'poller-perf' && (($tags['module'] ?? null) === 'ALL') && isset($fields['poller']) && is_numeric($fields['poller'])) {
@@ -78,10 +84,6 @@ class DevicesMetrics
             if ($measurement === 'icmp-perf') {
                 if (isset($fields['avg']) && is_numeric($fields['avg']) && $timestamp >= $snapshot[$deviceId]['last_ping_timetaken']['ts']) {
                     $snapshot[$deviceId]['last_ping_timetaken'] = ['ts' => $timestamp, 'value' => (float) $fields['avg']];
-                }
-
-                if (isset($fields['rcv']) && is_numeric($fields['rcv']) && $timestamp >= $snapshot[$deviceId]['up']['ts']) {
-                    $snapshot[$deviceId]['up'] = ['ts' => $timestamp, 'value' => ((float) $fields['rcv'] > 0 ? 1 : 0)];
                 }
             }
 
@@ -114,7 +116,7 @@ class DevicesMetrics
                 $this->escapeLabel((string) $device->sysName),
                 $this->escapeLabel((string) $device->type));
 
-            $isUp = (int) $snapshot[$deviceId]['up']['value'];
+            $isUp = (int) $snapshot[$deviceId]['status']['value'];
             $lastPolledTimeTaken = (float) $snapshot[$deviceId]['last_polled_timetaken']['value'];
             $lastPingTimeTaken = (float) $snapshot[$deviceId]['last_ping_timetaken']['value'];
             $uptime = (int) $snapshot[$deviceId]['uptime']['value'];

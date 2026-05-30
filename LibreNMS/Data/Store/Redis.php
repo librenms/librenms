@@ -52,6 +52,8 @@ class Redis extends BaseDatastore
                 'measurement' => $measurement,
                 'device_id' => $device->device_id,
                 'hostname' => $device->hostname,
+                'status' => isset($device->status) ? (int) $device->status : null,
+                'status_reason' => isset($device->status_reason) ? (string) $device->status_reason : null,
                 'fields' => $fields,
                 'tags' => array_filter($tags, fn ($value) => $value !== '' && $value !== null),
             ];
