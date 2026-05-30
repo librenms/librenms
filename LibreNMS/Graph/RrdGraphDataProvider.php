@@ -45,7 +45,8 @@ class RrdGraphDataProvider
 
     public function __construct(
         private readonly Rrd $rrd,
-    ) {}
+    ) {
+    }
 
     public function query(GraphQuery $query): GraphDataResult
     {
@@ -63,8 +64,8 @@ class RrdGraphDataProvider
             );
         }
 
-        $device   = Device::findOrFail($deviceId);
-        $def      = new $definitionClass();
+        $device = Device::findOrFail($deviceId);
+        $def = new $definitionClass();
         $entities = array_merge(['hostname' => $device->hostname], $query->entities);
 
         $result = new GraphDataResult(
@@ -87,6 +88,7 @@ class RrdGraphDataProvider
         return $result;
     }
 
+    /** @param array<string, mixed> $entities */
     private function fillSeries(GraphDataResult $result, PollerPerfGraph $def, GraphQuery $query, array $entities): void
     {
         $groups = [];
@@ -98,10 +100,10 @@ class RrdGraphDataProvider
                 continue;
             }
 
-            $step          = $binding->step ?? $query->step;
+            $step = $binding->step ?? $query->step;
             $consolidation = strtoupper($binding->consolidation);
-            $rrdFile       = $this->rrd->name($entities['hostname'] ?? '', $binding->rrdName);
-            $key           = implode(':', [$rrdFile, $step, $consolidation]);
+            $rrdFile = $this->rrd->name($entities['hostname'] ?? '', $binding->rrdName);
+            $key = implode(':', [$rrdFile, $step, $consolidation]);
             $groups[$key][] = [$seriesDef, $binding, $rrdFile, $step, $consolidation];
         }
 
@@ -207,7 +209,7 @@ class RrdGraphDataProvider
     private function executeRrdFetch(array $command): string
     {
         $rrdtool = LibrenmsConfig::get('rrdtool', 'rrdtool');
-        $rrdDir  = LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd');
+        $rrdDir = LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd');
 
         $proc = new Process(array_merge([$rrdtool], $command), $rrdDir);
         $proc->run();
@@ -226,7 +228,7 @@ class RrdGraphDataProvider
      */
     public static function parseRrdFetchOutput(string $output): array
     {
-        $lines  = explode("\n", trim($output));
+        $lines = explode("\n", trim($output));
         $header = array_shift($lines);
         if ($header === null || trim($header) === '') {
             return [];
@@ -237,7 +239,7 @@ class RrdGraphDataProvider
         }
 
         $dsNames = preg_split('/\s+/', trim($header));
-        $result  = array_fill_keys($dsNames, []);
+        $result = array_fill_keys($dsNames, []);
 
         foreach ($lines as $line) {
             if (trim($line) === '') {
@@ -246,7 +248,7 @@ class RrdGraphDataProvider
 
             [$tsRaw, $valuesRaw] = explode(':', $line, 2);
             $values = preg_split('/\s+/', trim($valuesRaw));
-            $tsMs   = (int) trim($tsRaw) * 1000;
+            $tsMs = (int) trim($tsRaw) * 1000;
 
             foreach ($dsNames as $i => $ds) {
                 $val = $values[$i] ?? null;

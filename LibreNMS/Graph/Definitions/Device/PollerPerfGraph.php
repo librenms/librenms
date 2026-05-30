@@ -36,22 +36,28 @@ class PollerPerfGraph
         return self::GRAPH_TYPE;
     }
 
+    /** @param array<string, mixed> $entities */
     public function title(array $entities = []): string
     {
         return 'Poller Time';
     }
 
+    /** @param array<string, mixed> $entities */
     public function subtitle(array $entities = []): string
     {
         return $entities['hostname'] ?? '';
     }
 
+    /** @param array<string, mixed> $entities */
     public function unit(array $entities = []): string
     {
         return 'seconds';
     }
 
-    /** @return GraphSeriesDefinition[] */
+    /**
+     * @param array<string, mixed> $entities
+     * @return GraphSeriesDefinition[]
+     */
     public function series(array $entities = []): array
     {
         return [
@@ -69,11 +75,16 @@ class PollerPerfGraph
         ];
     }
 
+    /**
+     * @param array<string, mixed> $entities
+     * @return list<array<string, mixed>>
+     */
     public function markers(array $entities = []): array
     {
         return [];
     }
 
+    /** @return array<string, mixed> */
     public function display(): array
     {
         return ['kind' => 'line', 'stacked' => false, 'area' => true, 'legend' => true];
