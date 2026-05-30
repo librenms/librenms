@@ -78,6 +78,17 @@ if (! empty($fdbPort_table)) {
         $vlan = $vlan_fdb_dict[$vlanIndex] ?? $vlanIndex;
 
         foreach ($data[$data_oid] ?? [] as $mac => $dot1dBasePort) {
+            // Some devices (e.g. CBS220) include an InetAddress length byte in the OID index,
+            // producing [len:b1:b2:b3:b4:b5].b6 instead of [b1:b2:b3:b4:b5:b6].
+            // snmpwalk_group then nests the leftover OID component as an extra array level.
+            if (is_array($dot1dBasePort)) {
+                $extra = dechex((int) ltrim((string) array_key_first($dot1dBasePort), '.'));
+                $dot1dBasePort = reset($dot1dBasePort);
+                $mac_parts = explode(':', (string) $mac);
+                array_shift($mac_parts); // drop the non-conformant length byte
+                $mac_parts[] = $extra;
+                $mac = implode(':', $mac_parts);
+            }
             if ($dot1dBasePort == 0) {
                 Log::debug("No port known for $mac\n");
                 continue;
