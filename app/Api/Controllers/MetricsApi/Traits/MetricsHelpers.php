@@ -155,4 +155,44 @@ trait MetricsHelpers
             $lines = array_merge($lines, $metricLinesArr);
         }
     }
+
+    /**
+     * Read and decode poller metric payloads from Redis.
+     * Optionally filters to the provided device ids.
+     *
+     * @param  Collection<int, int|string>|null  $deviceIds
+     * @return array<int, array<string, mixed>>
+     */
+    private function readRedisPollerPayloads(?Collection $deviceIds = null): array
+    {
+        $connection = (string) config('database.redis.metrics.connection', 'metrics');
+        $listKey = (string) config('database.redis.metrics.poller_key', 'librenms:metrics:poller');
+
+        try {
+            $entries = app('redis')->connection($connection)->lrange($listKey, 0, -1);
+        } catch (\Throwable) {
+            return [];
+        }
+
+        $payloads = [];
+        foreach ($entries as $entry) {
+            $payload = json_decode((string) $entry, true);
+            if (! is_array($payload)) {
+                continue;
+            }
+
+            $deviceId = isset($payload['device_id']) ? (int) $payload['device_id'] : 0;
+            if ($deviceId <= 0) {
+                continue;
+            }
+
+            if ($deviceIds !== null && ! $deviceIds->contains((string) $deviceId) && ! $deviceIds->contains($deviceId)) {
+                continue;
+            }
+
+            $payloads[] = $payload;
+        }
+
+        return $payloads;
+    }
 }

@@ -45,28 +45,87 @@ class DevicesMetrics
         $ping_timetaken_lines = [];
         $uptime_lines = [];
 
-        // Gather per-device metrics
-        $deviceQuery = Device::select('device_id', 'hostname', 'sysName', 'type', 'status', 'last_polled_timetaken', 'last_discovered_timetaken', 'last_ping_timetaken', 'uptime');
-        $deviceQuery = $this->applyDeviceFilter($deviceQuery, $filters['device_ids']);
-        foreach ($deviceQuery->cursor() as $device) {
+        // Gather per-device metrics from Redis poller snapshots
+        $payloads = $this->readRedisPollerPayloads($filters['device_ids']);
+
+        $snapshot = [];
+        foreach ($payloads as $payload) {
+            $deviceId = isset($payload['device_id']) ? (int) $payload['device_id'] : 0;
+            if ($deviceId <= 0) {
+                continue;
+            }
+
+            $measurement = (string) ($payload['measurement'] ?? '');
+            $timestamp = (int) ($payload['timestamp'] ?? 0);
+            $fields = is_array($payload['fields'] ?? null) ? $payload['fields'] : [];
+            $tags = is_array($payload['tags'] ?? null) ? $payload['tags'] : [];
+
+            if (! isset($snapshot[$deviceId])) {
+                $snapshot[$deviceId] = [
+                    'last_polled_timetaken' => ['ts' => -1, 'value' => 0.0],
+                    'last_ping_timetaken' => ['ts' => -1, 'value' => 0.0],
+                    'uptime' => ['ts' => -1, 'value' => 0],
+                    'up' => ['ts' => -1, 'value' => 0],
+                ];
+            }
+
+            if ($measurement === 'poller-perf' && (($tags['module'] ?? null) === 'ALL') && isset($fields['poller']) && is_numeric($fields['poller'])) {
+                if ($timestamp >= $snapshot[$deviceId]['last_polled_timetaken']['ts']) {
+                    $snapshot[$deviceId]['last_polled_timetaken'] = ['ts' => $timestamp, 'value' => (float) $fields['poller']];
+                }
+            }
+
+            if ($measurement === 'icmp-perf') {
+                if (isset($fields['avg']) && is_numeric($fields['avg']) && $timestamp >= $snapshot[$deviceId]['last_ping_timetaken']['ts']) {
+                    $snapshot[$deviceId]['last_ping_timetaken'] = ['ts' => $timestamp, 'value' => (float) $fields['avg']];
+                }
+
+                if (isset($fields['rcv']) && is_numeric($fields['rcv']) && $timestamp >= $snapshot[$deviceId]['up']['ts']) {
+                    $snapshot[$deviceId]['up'] = ['ts' => $timestamp, 'value' => ((float) $fields['rcv'] > 0 ? 1 : 0)];
+                }
+            }
+
+            if ($measurement === 'uptime' && isset($fields['uptime']) && is_numeric($fields['uptime'])) {
+                if ($timestamp >= $snapshot[$deviceId]['uptime']['ts']) {
+                    $snapshot[$deviceId]['uptime'] = ['ts' => $timestamp, 'value' => (int) $fields['uptime']];
+                }
+            }
+        }
+
+        $deviceIds = collect(array_keys($snapshot));
+        if ($deviceIds->isEmpty()) {
+            return implode("\n", $lines) . "\n";
+        }
+
+        $devices = Device::select('device_id', 'hostname', 'sysName', 'type')
+            ->whereIn('device_id', $deviceIds)
+            ->get()
+            ->keyBy('device_id');
+
+        foreach ($deviceIds as $deviceId) {
+            $device = $devices->get($deviceId);
+            if (! $device) {
+                continue;
+            }
+
             $labels = sprintf('device_id="%s",device_hostname="%s",device_sysName="%s",device_type="%s"',
                 $device->device_id,
                 $this->escapeLabel((string) $device->hostname),
                 $this->escapeLabel((string) $device->sysName),
                 $this->escapeLabel((string) $device->type));
 
-            $device_up_lines[] = "librenms_devices_up{{$labels}} " . ($device->status ? '1' : '0');
+            $isUp = (int) $snapshot[$deviceId]['up']['value'];
+            $lastPolledTimeTaken = (float) $snapshot[$deviceId]['last_polled_timetaken']['value'];
+            $lastPingTimeTaken = (float) $snapshot[$deviceId]['last_ping_timetaken']['value'];
+            $uptime = (int) $snapshot[$deviceId]['uptime']['value'];
 
-            $lastPolledTimeTaken = $device->status ? ((int) $device->last_polled_timetaken ?: 0) : 0;
+            $device_up_lines[] = "librenms_devices_up{{$labels}} {$isUp}";
             $polled_timetaken_lines[] = "librenms_devices_last_polled_timetaken_seconds{{$labels}} {$lastPolledTimeTaken}";
 
-            $lastDiscoveredTimeTaken = $device->status ? ((int) $device->last_discovered_timetaken ?: 0) : 0;
-            $discovered_timetaken_lines[] = "librenms_devices_last_discovered_timetaken_seconds{{$labels}} {$lastDiscoveredTimeTaken}";
+            // Redis snapshots do not currently export discovery duration.
+            $discovered_timetaken_lines[] = "librenms_devices_last_discovered_timetaken_seconds{{$labels}} 0";
 
-            $lastPingTimeTaken = $device->status ? ((int) $device->last_ping_timetaken ?: 0) : 0;
             $ping_timetaken_lines[] = "librenms_devices_last_ping_timetaken_seconds{{$labels}} {$lastPingTimeTaken}";
-
-            $uptime = $device->status ? ((int) $device->uptime ?: 0) : 0;
             $uptime_lines[] = "librenms_devices_uptime_seconds{{$labels}} {$uptime}";
         }
 
