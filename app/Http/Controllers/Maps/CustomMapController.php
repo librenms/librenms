@@ -40,13 +40,10 @@ use Illuminate\Support\Facades\Storage;
 
 class CustomMapController extends Controller
 {
-    public function __construct()
-    {
-        $this->authorizeResource(CustomMap::class, 'map');
-    }
-
     public function index(): View
     {
+        $this->authorize('viewAny', CustomMap::class);
+
         return view('map.custom-manage', [
             'maps' => CustomMap::orderBy('name')->get(['custom_map_id', 'name', 'menu_group'])->groupBy('menu_group')->sortKeys(),
             'name' => 'New Map',
@@ -94,6 +91,8 @@ class CustomMapController extends Controller
 
     public function destroy(CustomMap $map): Response
     {
+        $this->authorize('delete', $map);
+
         $map->delete();
 
         return response('Success', 200)
@@ -102,6 +101,8 @@ class CustomMapController extends Controller
 
     public function show(Request $request, CustomMap $map): View
     {
+        $this->authorize('view', $map);
+
         $request->validate([
             'screenshot' => 'nullable|in:yes',
         ]);
@@ -134,6 +135,8 @@ class CustomMapController extends Controller
 
     public function edit(CustomMap $map): View
     {
+        $this->authorize('update', $map);
+
         $data = [
             'map_id' => $map->custom_map_id,
             'name' => $map->name,
@@ -168,6 +171,8 @@ class CustomMapController extends Controller
 
     public function store(CustomMapSettingsRequest $request): JsonResponse
     {
+        $this->authorize('create', CustomMap::class);
+
         // create a new map with default values
         $map = new CustomMap;
         $map->options = [
@@ -228,6 +233,8 @@ class CustomMapController extends Controller
 
     public function update(CustomMapSettingsRequest $request, CustomMap $map): JsonResponse
     {
+        $this->authorize('update', $map);
+
         $map->fill($request->validated());
         $map->options = json_decode($request->options);
         $map->save(); // save to get ID
@@ -246,6 +253,9 @@ class CustomMapController extends Controller
 
     public function clone(CustomMap $map): JsonResponse
     {
+        $this->authorize('create', CustomMap::class);
+        $this->authorize('view', $map);
+
         $newmap = $map->replicate();
         $newmap->name .= ' - Clone';
 

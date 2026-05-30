@@ -9,6 +9,8 @@ class PluginAdminController extends Controller
 {
     public function __invoke(PluginManagerInterface $manager): \Illuminate\Contracts\View\View
     {
+        $this->authorize('plugin.admin');
+
         // legacy v1 plugins
         \LibreNMS\Plugins::scanNew();
         \LibreNMS\Plugins::scanRemoved();

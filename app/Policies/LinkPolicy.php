@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Facades\Permissions;
 use App\Models\Link;
 use App\Models\User;
 
@@ -14,7 +15,8 @@ class LinkPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'viewAll');
+        return $this->hasGlobalPermission($user, 'view', true)
+            || $this->hasGlobalPermission($user, 'viewAll');
     }
 
     /**
@@ -30,6 +32,12 @@ class LinkPolicy
      */
     public function view(User $user, Link $link): bool
     {
-        return $this->hasGlobalPermission($user, 'viewAll');
+        if ($this->hasGlobalPermission($user, 'viewAll')) {
+            return true;
+        }
+
+        return $this->hasGlobalPermission($user, 'view', true)
+            && (Permissions::canAccessDevice($link->local_device_id, $user) || Permissions::canAccessPort($link->local_port_id))
+            && ($link->remote_device_id == 0 || Permissions::canAccessDevice($link->remote_device_id, $user) || Permissions::canAccessPort($link->remote_port_id));
     }
 }

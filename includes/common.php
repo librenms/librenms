@@ -164,11 +164,6 @@ function getidbyname($hostname)
     return DeviceCache::getByHostname($hostname)->device_id;
 }
 
-function set_dev_attrib($device, $attrib_type, $attrib_value)
-{
-    return DeviceCache::get((int) $device['device_id'])->setAttrib($attrib_type, $attrib_value);
-}
-
 function get_dev_attrib($device, $attrib_type)
 {
     return DeviceCache::get((int) $device['device_id'])->getAttrib($attrib_type);

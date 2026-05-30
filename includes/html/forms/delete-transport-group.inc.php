@@ -13,14 +13,13 @@
  */
 
 use App\Models\AlertOperationTransportMap;
-use App\Models\AlertTransport;
 use App\Models\AlertTransportGroup;
 use App\Models\TransportGroupTransport;
 use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
 
-if (Gate::denies('delete', AlertTransport::class)) {
+if (Gate::denies('alert-transport.delete')) {
     exit(json_encode([
         'status' => 'error',
         'message' => 'ERROR: You need permission.',

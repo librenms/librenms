@@ -66,7 +66,7 @@ class UserPreferencesController extends Controller
         $data = [
             'user' => $user,
             'can_change_password' => LegacyAuth::get()->canUpdatePasswords($user->username),
-            'dashboards' => Dashboard::allAvailable($user)->with('user')->get(),
+            'dashboards' => Dashboard::hasAccess($user)->with('user')->get(),
             'default_dashboard' => UserPref::getPref($user, 'dashboard'),
             'note_to_device' => UserPref::getPref($user, 'add_schedule_note_to_device'),
             'locale' => UserPref::getPref($user, 'locale'),
@@ -132,6 +132,20 @@ class UserPreferencesController extends Controller
         $this->updatePreference($request->pref, $request->value);
 
         return response()->json(['status' => 'success']);
+    }
+
+    public function update(Request $request, string $preference)
+    {
+        $request->validate([
+            'name' => ['required', 'string'],
+            'filters' => ['array'],
+        ]);
+
+        if ($preference == 'filters') {
+            $name = 'filters.' . $request->string('name');
+            $filters = $request->array('filters');
+            $this->updatePreference($name, $filters ? json_encode($filters) : 'default');
+        }
     }
 
     private function getValidLocales()

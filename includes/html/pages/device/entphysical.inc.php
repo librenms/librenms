@@ -38,20 +38,20 @@ function printEntPhysical($device, $ent, $level, $class)
             echo '<strong>' . e($ent['entPhysicalParentRelPos']) . '.</strong> ';
         }
 
-        $display_entPhysicalName = $ent['entPhysicalName'];
+        $display_entPhysicalName = e($ent['entPhysicalName']);
         if ($ent['ifIndex']) {
             $port = PortCache::getByIfIndex($ent['ifIndex'], $device['device_id']);
-            $display_entPhysicalName = \LibreNMS\Util\Url::portLink($port);
+            $display_entPhysicalName = \LibreNMS\Util\Url::modernPortLink($port);
         }
 
         if ($ent['entPhysicalModelName'] && $display_entPhysicalName) {
-            echo '<strong>' . e($ent['entPhysicalModelName']) . '</strong> (' . e($display_entPhysicalName) . ')';
+            echo '<strong>' . e($ent['entPhysicalModelName']) . '</strong> (' . $display_entPhysicalName . ')';
         } elseif ($ent['entPhysicalModelName']) {
             echo '<strong>' . e($ent['entPhysicalModelName']) . '</strong>';
         } elseif (is_numeric($ent['entPhysicalName']) && $ent['entPhysicalVendorType']) {
             echo '<strong>' . e($ent['entPhysicalName']) . ' ' . e($ent['entPhysicalVendorType']) . '</strong>';
         } elseif ($display_entPhysicalName) {
-            echo '<strong>' . e($display_entPhysicalName) . '</strong>';
+            echo '<strong>' . $display_entPhysicalName . '</strong>';
         } elseif ($ent['entPhysicalDescr']) {
             echo '<strong>' . e($ent['entPhysicalDescr']) . '</strong>';
         } elseif ($ent['entPhysicalClass']) {

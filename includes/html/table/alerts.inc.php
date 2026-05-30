@@ -14,6 +14,7 @@
  * @author     LibreNMS Contributors
 */
 
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Util\Time;
 
 $where = ' `devices`.`disabled` = 0';
@@ -204,7 +205,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         'severity' => $severity_ico,
         'state' => $alert['state'],
         'alert_id' => $alert['id'],
-        'ack_ico' => $ack_ico,
+        'ack_ico' => Gate::allows('alert.update') ? $ack_ico : '',
         'proc' => $has_proc,
         'notes' => "<button type='button' class='btn btn-$note_class fa fa-sticky-note-o command-alert-note' aria-label='Notes' id='alert-notes' data-alert_id='{$alert['id']}'></button>",
     ];

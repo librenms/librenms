@@ -37,6 +37,8 @@ class PageTabs extends Component
 {
     public array $tabs = [];
     public readonly string $currentTab;
+    public array $primaryDeviceLink = [];
+    public array $deviceLinks = [];
     public static array $tabsClasses = [
         'overview' => \App\Http\Controllers\Device\Tabs\OverviewController::class,
         'graphs' => \App\Http\Controllers\Device\Tabs\GraphsController::class,
@@ -86,6 +88,10 @@ class PageTabs extends Component
         foreach (self::$tabsClasses as $tab => $class) {
             $this->tabs[$tab] = app()->make($class);
         }
+
+        $pageLinks = new PageLinks($device, $this->currentTab, $this->dropdownLinks);
+        $this->primaryDeviceLink = $pageLinks->primaryDeviceLink;
+        $this->deviceLinks = $pageLinks->deviceLinks;
     }
 
     /**

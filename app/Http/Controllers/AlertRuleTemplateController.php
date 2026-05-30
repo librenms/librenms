@@ -9,6 +9,8 @@ class AlertRuleTemplateController extends Controller
 {
     public function template(int $template_id)
     {
+        $this->authorize('create', AlertRule::class);
+
         $collection = $this->templatesCollection();
 
         if (! isset($collection[$template_id])) {
@@ -33,6 +35,8 @@ class AlertRuleTemplateController extends Controller
 
     public function rule(AlertRule $alertRule)
     {
+        $this->authorize('create', AlertRule::class);
+
         $alertRule->loadMissing('alertOperation:id,default_operation_step_duration_seconds');
 
         return response()->json([
