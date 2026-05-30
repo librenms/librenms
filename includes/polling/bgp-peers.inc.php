@@ -64,6 +64,28 @@ if (! empty($peers)) {
         $peer_data_check = snmpwalk_cache_oid($device, 'cbgpPeer2RemoteAs', [], 'CISCO-BGP4-MIB');
     } elseif ($device['os'] === 'vyos') {
         $peer_data_check = \SnmpQuery::enumStrings()->walk('BGP4V2-MIB::bgp4V2PeerRemoteAs')->valuesByIndex();
+        // Walk all per-peer data columns in one pass and index by IP for the polling loop
+        $vyos_peer_table = \SnmpQuery::enumStrings()->walk([
+            'BGP4V2-MIB::bgp4V2PeerState',
+            'BGP4V2-MIB::bgp4V2PeerAdminStatus',
+            'BGP4V2-MIB::bgp4V2PeerLocalAddr',
+            'BGP4V2-MIB::bgp4V2PeerFsmEstablishedTime',
+            'BGP4V2-MIB::bgp4V2PeerDescription',
+            'BGP4V2-MIB::bgp4V2PeerLastErrorCodeReceived',
+        ])->valuesByIndex();
+        // With BGP4V2-MIB loaded, index format is: instance[.addrType]["ip"]
+        // e.g. "1.ipv4.\"192.0.2.1\"" or "1.ipv6.\"20:01:0d:b8:...\""
+        $vyos_by_ip = [];
+        foreach ($vyos_peer_table as $idx => $vals) {
+            if (! preg_match('/\.(ipv4|ipv6)\."([^"]+)"$/', (string) $idx, $m)) {
+                continue;
+            }
+            try {
+                $ip = ($m[1] === 'ipv4') ? IP::parse($m[2]) : IP::fromHexString($m[2]);
+                $vyos_by_ip[$ip->uncompressed()] = $vals;
+            } catch (InvalidIpException) {
+            }
+        }
     } elseif ($device['os'] == 'cumulus') {
         $peer_data_check = snmpwalk_cache_oid($device, 'bgpPeerRemoteAs', [], 'CUMULUS-BGPUN-MIB');
         if (empty($peer_data_check)) {
@@ -415,19 +437,22 @@ if (! empty($peers)) {
                             'CISCO-BGP4-MIB::cbgpPeer2LastErrorTxt' => 'bgpPeerLastErrorText',
                         ];
                     } elseif ($device['os'] === 'vyos') {
-                        $peer_identifier = '1.' . $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident;
-                        $mib = 'BGP4V2-MIB';
-                        $oid_map = [
-                            'bgp4V2PeerState' => 'bgpPeerState',
-                            'bgp4V2PeerAdminStatus' => 'bgpPeerAdminStatus',
-                            'bgp4V2PeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
-                            'bgp4V2PeerInUpdatesElapsedTime' => 'bgpPeerInUpdateElapsedTime',
-                            'bgp4V2PeerLocalAddr' => 'bgpLocalAddr',
-                            'bgp4V2PeerDescription' => 'bgpPeerDescr',
-                            'bgp4V2PeerLastErrorCodeReceived' => 'bgpPeerLastErrorCode',
-                            'bgp4V2PeerLastErrorSubCodeReceived' => 'bgpPeerLastErrorSubCode',
-                            'bgp4V2PeerLastErrorReceivedText' => 'bgpPeerLastErrorText',
-                        ];
+                        $vals = $vyos_by_ip[$peer_ip->uncompressed()] ?? null;
+                        if ($vals !== null) {
+                            $peer_data = [
+                                'bgpPeerState' => $vals['BGP4V2-MIB::bgp4V2PeerState'] ?? '',
+                                'bgpPeerAdminStatus' => $vals['BGP4V2-MIB::bgp4V2PeerAdminStatus'] ?? '',
+                                'bgpPeerFsmEstablishedTime' => $vals['BGP4V2-MIB::bgp4V2PeerFsmEstablishedTime'] ?? 0,
+                                'bgpPeerDescr' => $vals['BGP4V2-MIB::bgp4V2PeerDescription'] ?? '',
+                                'bgpPeerLastErrorCode' => $vals['BGP4V2-MIB::bgp4V2PeerLastErrorCodeReceived'] ?? 0,
+                                'bgpPeerInUpdateElapsedTime' => 0,
+                            ];
+                            try {
+                                $peer_data['bgpLocalAddr'] = IP::fromHexString($vals['BGP4V2-MIB::bgp4V2PeerLocalAddr'] ?? '')->uncompressed();
+                            } catch (InvalidIpException) {
+                                $peer_data['bgpLocalAddr'] = '0.0.0.0';
+                            }
+                        }
                     } elseif ($device['os'] == 'cumulus') {
                         $peer_identifier = $peer['bgpPeerIdentifier'];
                         $mib = 'CUMULUS-BGPUN-MIB';
@@ -887,4 +912,4 @@ if (! empty($peers)) {
     } //end foreach
 } //end if
 
-unset($peers, $peer_data_tmp, $j_prefixes, $bgp_cache, $cbgp_cache, $cbgpv2_cache);
+unset($peers, $peer_data_tmp, $j_prefixes, $bgp_cache, $cbgp_cache, $cbgpv2_cache, $vyos_peer_table, $vyos_by_ip);

@@ -46,15 +46,15 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
                 if (! is_numeric($remote_as)) {
                     continue;
                 }
-                $parts = explode('.', (string) $index);
-                // Index: instance.addrType.ip_len.ip_octets
-                $ip_len = (int) ($parts[2] ?? 0);
-                $addr_parts = array_slice($parts, 3, $ip_len);
-                if (count($addr_parts) !== $ip_len || ($ip_len !== 4 && $ip_len !== 16)) {
+                // With the BGP4V2-MIB loaded, SnmpQuery formats the OID index as:
+                // instance[.addrType]["ip"]  e.g. "1.ipv4.\"192.0.2.1\"" or "1.ipv6.\"20:01:0d:b8:...\""
+                if (! preg_match('/\.(ipv4|ipv6)\."([^"]+)"$/', (string) $index, $m)) {
                     continue;
                 }
                 try {
-                    $peers_data .= IP::fromSnmpString(implode('.', $addr_parts))->uncompressed() . " $remote_as\n";
+                    $ip = ($m[1] === 'ipv4') ? IP::parse($m[2]) : IP::fromHexString($m[2]);
+                    // toSnmpString() produces the colon-hex-byte format build_bgp_peers expects for IPv6
+                    $peers_data .= $ip->toSnmpString() . " $remote_as\n";
                 } catch (InvalidIpException) {
                 }
             }
