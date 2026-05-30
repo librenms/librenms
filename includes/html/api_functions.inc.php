@@ -289,6 +289,49 @@ function get_graph_by_service(Request $request)
     return check_device_permission($device_id, fn () => api_get_graph($request, $vars));
 }
 
+function graph_data_response(\LibreNMS\Graph\GraphDataResult $result, \LibreNMS\Graph\GraphQuery $query): \Illuminate\Http\JsonResponse
+{
+    $response = response()->json($result->toArray());
+    if ($query->to < time() - 60) {
+        $response->header('Cache-Control', 'private, max-age=300');
+    } else {
+        $response->header('Cache-Control', 'no-store');
+    }
+
+    return $response;
+}
+
+function get_device_graph_data(Request $request)
+{
+    $hostname   = $request->route('hostname') ?? $request->route('device_id');
+    $graph_type = $request->route('graph_type');
+    $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    return check_device_permission($device_id, function ($device_id) use ($request, $graph_type) {
+        $from   = (int) $request->input('from',  time() - 86400);
+        $to     = (int) $request->input('to',    time());
+        $width  = (int) $request->input('width', 1200);
+        $height = (int) $request->input('height', 300);
+
+        try {
+            $device   = \App\Models\Device::findOrFail($device_id);
+            $query    = \LibreNMS\Graph\GraphQuery::fromRequest('device', $graph_type, [
+                'device_id' => $device_id,
+                'hostname'  => $device->hostname,
+            ], $from, $to, $width, $height);
+            $provider = app(\LibreNMS\Graph\GraphDataProvider::class);
+            $result = $provider->query($query);
+
+            return graph_data_response($result, $query);
+        } catch (\InvalidArgumentException|\RuntimeException $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage(),
+            ], 404);
+        }
+    });
+}
+
 function list_locations()
 {
     $locations = dbFetchRows('SELECT `locations`.* FROM `locations` WHERE `locations`.`location` IS NOT NULL');

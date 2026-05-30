@@ -143,6 +143,8 @@ Route::prefix('v0')->group(function (): void {
         Route::get('{hostname}/ports/{ifname}/{type}', [App\Api\Controllers\LegacyApiController::class, 'get_graph_by_port_hostname'])->name('get_graph_by_port_hostname');
         Route::get('{hostname}/services/{id}/graphs/{datasource}', [App\Api\Controllers\LegacyApiController::class, 'get_graph_by_service'])->name('get_graph_by_service');
         Route::post('{hostname}/eventlog', [App\Api\Controllers\LegacyApiController::class, 'add_eventlog'])->name('add_eventlog');
+        // JSON graph data — additive, does not affect existing image endpoints
+        Route::get('{hostname}/graphs/{graph_type}/data', [App\Api\Controllers\LegacyApiController::class, 'get_device_graph_data'])->name('get_device_graph_data');
         Route::get('{hostname}/{type}', [App\Api\Controllers\LegacyApiController::class, 'get_graph_generic_by_hostname'])->name('get_graph_generic_by_hostname');
         Route::get('', [App\Api\Controllers\LegacyApiController::class, 'list_devices'])->name('list_devices');
     });
