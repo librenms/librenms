@@ -10,7 +10,7 @@ if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
         ->orderBy('service_type')
         ->get(['service_type', 'service_status', 'service_message', 'service_name'])
         ->map(function ($service) use ($colors) {
-            $message = htmlentities(str_replace(' ', '&nbsp;', $service->service_message));
+            $message = htmlentities(str_replace(' ', '&nbsp;', (string) $service->service_message));
             $color = $colors->get($service->service_status, 'default');
             $type = htmlentities(strtolower((string) $service->service_type));
             $name = htmlentities((string) $service->service_name);
@@ -22,7 +22,7 @@ if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
     $services = ObjectCache::serviceCounts(['total', 'ok', 'warning', 'critical'], $device['device_id']);
     echo '<div class="row">
             <div class="col-md-12">
-                <div class="panel panel-default panel-condensed">
+                <div class="panel panel-default panel-condensed overview-panel">
                     <div class="panel-heading">
                         <a href="' . Url::deviceUrl($device['device_id'], ['tab' => 'services']) . '"><i class="fa fa-cogs fa-lg icon-theme" aria-hidden="true"></i> <strong>Services</strong></a>
                     </div>

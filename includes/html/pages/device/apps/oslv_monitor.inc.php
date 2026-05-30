@@ -434,11 +434,11 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                     }
                     if (isset($ip_data['gw']) && ! is_null($ip_data['gw'])) {
                         $gw_ip = $ip_data['gw'];
-                        $gw_ip = htmlspecialchars($gw_ip);
+                        $gw_ip = htmlspecialchars((string) $gw_ip);
                     }
                     if (isset($ip_data['if']) && ! is_null($ip_data['if'])) {
                         $interface = $ip_data['if'];
-                        $interface = htmlspecialchars($interface);
+                        $interface = htmlspecialchars((string) $interface);
                         $port = Port::with('device')->firstWhere(['device_id' => $app->device_id, 'ifName' => $interface]);
                         if (isset($port)) {
                             $interface_raw = true;
@@ -459,7 +459,7 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                     }
                     if (isset($ip_data['gw_if']) && ! is_null($ip_data['gw_if'])) {
                         $gw_interface = $ip_data['gw_if'];
-                        $gw_interface = htmlspecialchars($gw_interface);
+                        $gw_interface = htmlspecialchars((string) $gw_interface);
                         $port = Port::with('device')->firstWhere(['device_id' => $app->device_id, 'ifName' => $gw_interface]);
                         if (isset($port)) {
                             $gw_interface_raw = true;

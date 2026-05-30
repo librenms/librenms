@@ -1,4 +1,3 @@
-mib: SIAE-UNIT-MIB:SIAE-POWER-SUPPLY-MIB:SIAE-SFP-MIB
 modules:
     os:
         hardware:
@@ -23,12 +22,12 @@ modules:
                     index: 'pwrSupplyRowStatus.{{ $index }}'
                     state_name: pwrSupplyRowStatus
                     states:
-                        - { descr: Active, graph: 1, value: 1, generic: 0 }
-                        - { descr: 'Not in service', graph: 1, value: 2, generic: 3 }
-                        - { descr: 'Not ready', graph: 1, value: 3, generic: 2 }
-                        - { descr: 'Create and go', graph: 1, value: 4, generic: 3 }
-                        - { descr: 'Create and wait', graph: 1, value: 5, generic: 3 }
-                        - { descr: 'Destroy', graph: 1, value: 6, generic: 3 }
+                        - { descr: Active, value: 1, generic: 0 }
+                        - { descr: 'Not in service', value: 2, generic: 3 }
+                        - { descr: 'Not ready', value: 3, generic: 2 }
+                        - { descr: 'Create and go', value: 4, generic: 3 }
+                        - { descr: 'Create and wait', value: 5, generic: 3 }
+                        - { descr: 'Destroy', value: 6, generic: 3 }
                 -
                     oid: SIAE-SFP-MIB::sfpDiagnosticTable
                     value: SIAE-SFP-MIB::sfpLOSPinOut
@@ -37,8 +36,8 @@ modules:
                     index: 'sfpLOSPinOut.{{ $index }}'
                     state_name: sfpLOSPinOut
                     states:
-                        - { descr: 'LOS Detected', graph: 1, value: 1, generic: 2 }
-                        - { descr: 'LOS OK', graph: 1, value: 2, generic: 0 }
+                        - { descr: 'LOS Detected', value: 1, generic: 2 }
+                        - { descr: 'LOS OK', value: 2, generic: 0 }
                     skip_values:
                         -
                             oid: SIAE-SFP-MIB::sfpDiagnosticValid
@@ -52,8 +51,8 @@ modules:
                     index: 'sfpTxFaultPinOut.{{ $index }}'
                     state_name: sfpTxFaultPinOut
                     states:
-                        - { descr: 'Fault', graph: 1, value: 1, generic: 2 }
-                        - { descr: 'OK', graph: 1, value: 2, generic: 0 }
+                        - { descr: 'Fault', value: 1, generic: 2 }
+                        - { descr: 'OK', value: 2, generic: 0 }
                     skip_values:
                         -
                             oid: SIAE-SFP-MIB::sfpDiagnosticValid

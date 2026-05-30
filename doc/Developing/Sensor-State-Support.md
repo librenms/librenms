@@ -72,54 +72,53 @@ generic state (0, 1, 2 or 3).
 For YAML based state discovery:
 
 ```yaml
-mib: NETBOTZV2-MIB
 modules:
     sensors:
         state:
             data:
                 -
-                    oid: dryContactSensorTable
-                    value: dryContactSensorValue
+                    oid: NETBOTZV2-MIB::dryContactSensorTable
+                    value: NETBOTZV2-MIB::dryContactSensorValue
                     num_oid: '.1.3.6.1.4.1.5528.100.4.2.1.1.2.{{ $index }}'
-                    descr: dryContactSensorLabel
+                    descr: NETBOTZV2-MIB::dryContactSensorLabel
                     group: Contact Sensors
                     index: 'dryContactSensor.{{ $index }}'
-                    state_name: dryContactSensor
+                    state_name: NETBOTZV2-MIB::dryContactSensor
                     states:
                         - { value: -1, generic: 3, graph: 0, descr: 'null' }
                         - { value:  0, generic: 0, graph: 0, descr: open }
                         - { value:  1, generic: 2, graph: 0, descr: closed }
                 -
-                    oid: doorSwitchSensorTable
-                    value: doorSwitchSensorValue
+                    oid: NETBOTZV2-MIB::doorSwitchSensorTable
+                    value: NETBOTZV2-MIB::doorSwitchSensorValue
                     num_oid: '.1.3.6.1.4.1.5528.100.4.2.2.1.2.{{ $index }}'
-                    descr: doorSwitchSensorLabel
+                    descr: NETBOTZV2-MIB::doorSwitchSensorLabel
                     group: Switch Sensors
                     index: 'doorSwitchSensor.{{ $index }}'
-                    state_name: doorSwitchSensor
+                    state_name: NETBOTZV2-MIB::doorSwitchSensor
                     states:
                         - { value: -1, generic: 3, graph: 0, descr: 'null' }
                         - { value:  0, generic: 0, graph: 0, descr: open }
                         - { value:  1, generic: 2, graph: 0, descr: closed }
                 -
-                    oid: cameraMotionSensorTable
-                    value: cameraMotionSensorValue
+                    oid: NETBOTZV2-MIB::cameraMotionSensorTable
+                    value: NETBOTZV2-MIB::cameraMotionSensorValue
                     num_oid: '.1.3.6.1.4.1.5528.100.4.2.3.1.2.{{ $index }}'
-                    descr: cameraMotionSensorLabel
+                    descr: NETBOTZV2-MIB::cameraMotionSensorLabel
                     group: Camera Motion Sensors
                     index: 'cameraMotionSensor.{{ $index }}'
-                    state_name: cameraMotionSensor
+                    state_name: NETBOTZV2-MIB::cameraMotionSensor
                     states:
                         - { value: -1, generic: 3, graph: 0, descr: 'null' }
                         - { value:  0, generic: 0, graph: 0, descr: noMotion }
                         - { value:  1, generic: 2, graph: 0, descr: motionDetected }
                 -
-                    oid: otherStateSensorTable
-                    value: otherStateSensorErrorStatus
+                    oid: NETBOTZV2-MIB::otherStateSensorTable
+                    value: NETBOTZV2-MIB::otherStateSensorErrorStatus
                     num_oid: '.1.3.6.1.4.1.5528.100.4.2.10.1.3.{{ $index }}'
-                    descr: otherStateSensorLabel
+                    descr: NETBOTZV2-MIB::otherStateSensorLabel
                     index: '{{ $index }}'
-                    state_name: otherStateSensorErrorStatus
+                    state_name: NETBOTZV2-MIB::otherStateSensorErrorStatus
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: normal }
                         - { value: 1, generic: 1, graph: 0, descr: info }
@@ -141,11 +140,11 @@ switches. The file should be located in
 ```php
 <?php
 
-$oids = snmpwalk_group($device, 'ciscoEnvMonSupplyStatusTable', 'CISCO-ENVMON-MIB');
+$oids = SnmpQuery::hideMib()->walk('CISCO-ENVMON-MIB::ciscoEnvMonSupplyStatusTable')->valuesByIndex;
 
 if (!empty($oids)) {
     //Create State Index
-    $state_name = 'ciscoEnvMonSupplyState';
+    $state_name = 'CISCO-ENVMON-MIB::ciscoEnvMonSupplyState';
     $states = [
         ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'normal'],
         ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'warning'],

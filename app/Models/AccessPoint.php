@@ -24,7 +24,7 @@ class AccessPoint extends DeviceRelatedModel implements Keyable
         'interference',
     ];
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return "{$this->name}_{$this->radio_number}";
     }

@@ -1,5 +1,5 @@
 <?php
 
-$class = 'signal_loss';
+$class = \LibreNMS\Enum\Sensor::SignalLoss;
 
 require 'sensors.inc.php';

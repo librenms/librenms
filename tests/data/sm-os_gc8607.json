@@ -2338,84 +2338,72 @@
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "BPSK",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "4QAM",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "8PSK",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "16QAM",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "32QAM",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "64QAM",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "128QAM",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "256QAM",
-                    "state_draw_graph": 1,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "512QAM",
-                    "state_draw_graph": 1,
                     "state_value": 9,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "1024QAM",
-                    "state_draw_graph": 1,
                     "state_value": 10,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "2048QAM",
-                    "state_draw_graph": 1,
                     "state_value": 11,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "4096QAM",
-                    "state_draw_graph": 1,
                     "state_value": 12,
                     "state_generic_value": 0
                 }
@@ -2528,84 +2516,72 @@
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "BPSK",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "4QAM",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "8PSK",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "16QAM",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "32QAM",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "64QAM",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "128QAM",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "256QAM",
-                    "state_draw_graph": 1,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "512QAM",
-                    "state_draw_graph": 1,
                     "state_value": 9,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "1024QAM",
-                    "state_draw_graph": 1,
                     "state_value": 10,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "2048QAM",
-                    "state_draw_graph": 1,
                     "state_value": 11,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "smosLinkAcmModulation",
                     "state_descr": "4096QAM",
-                    "state_draw_graph": 1,
                     "state_value": 12,
                     "state_generic_value": 0
                 }
@@ -2865,7 +2841,7 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "rate",
-                    "sensor_index": "1.2",
+                    "sensor_index": "1",
                     "sensor_type": "total-rx",
                     "sensor_descr": "Link 1 Total Rx",
                     "sensor_divisor": 1,
@@ -2887,7 +2863,7 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "rate",
-                    "sensor_index": "1.2",
+                    "sensor_index": "1",
                     "sensor_type": "total-tx",
                     "sensor_descr": "Link 1 Total Tx",
                     "sensor_divisor": 1,
@@ -3111,7 +3087,7 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "rate",
-                    "sensor_index": "1.2",
+                    "sensor_index": "1",
                     "sensor_type": "total-rx",
                     "sensor_descr": "Link 1 Total Rx",
                     "sensor_divisor": 1,
@@ -3133,7 +3109,7 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "rate",
-                    "sensor_index": "1.2",
+                    "sensor_index": "1",
                     "sensor_type": "total-tx",
                     "sensor_descr": "Link 1 Total Tx",
                     "sensor_divisor": 1,
@@ -3245,6 +3221,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "Aricent",
+                    "entPhysicalMfgDate": "2009-8-6,13:30:30.1",
                     "ifIndex": null
                 },
                 {
@@ -3264,6 +3241,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3283,6 +3261,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3302,6 +3281,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3321,6 +3301,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3340,6 +3321,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3359,6 +3341,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3378,6 +3361,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3397,6 +3381,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3416,6 +3401,7 @@
                     "entPhysicalContainedIn": 9,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3435,6 +3421,7 @@
                     "entPhysicalContainedIn": 9,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3454,6 +3441,7 @@
                     "entPhysicalContainedIn": 9,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3473,6 +3461,7 @@
                     "entPhysicalContainedIn": 9,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3492,6 +3481,7 @@
                     "entPhysicalContainedIn": 9,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3511,6 +3501,7 @@
                     "entPhysicalContainedIn": 9,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3530,6 +3521,7 @@
                     "entPhysicalContainedIn": 9,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3549,6 +3541,7 @@
                     "entPhysicalContainedIn": 9,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3568,6 +3561,7 @@
                     "entPhysicalContainedIn": 9,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3587,6 +3581,7 @@
                     "entPhysicalContainedIn": 9,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 }
             ]

@@ -35,6 +35,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
+/**
+ * @template TModel of Model
+ *
+ * @extends PaginatedAjaxController<TModel>
+ */
 abstract class SelectController extends PaginatedAjaxController
 {
     protected ?string $idField = null;
@@ -46,16 +51,14 @@ abstract class SelectController extends PaginatedAjaxController
             'limit' => 'int',
             'page' => 'int',
             'term' => 'nullable|string',
+            'id' => 'nullable|string',
         ];
     }
 
     /**
      * The default method called by the route handler
-     *
-     * @param  Request  $request
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): JsonResponse
     {
         $this->validate($request, $this->rules());
 
@@ -81,8 +84,9 @@ abstract class SelectController extends PaginatedAjaxController
     }
 
     /**
-     * @param  Paginator|Collection  $paginator
-     * @return \Illuminate\Http\JsonResponse
+     * @param  Paginator|Collection<int, mixed>  $paginator
+     * @param  bool  $hasMore
+     * @return JsonResponse
      */
     protected function formatResponse($paginator, bool $hasMore = false): JsonResponse
     {
@@ -105,10 +109,10 @@ abstract class SelectController extends PaginatedAjaxController
      * Default implementation uses primary key and the first value in the model
      * If only one value is in the model attributes, that is the id and text.
      *
-     * @param  Model  $model
-     * @return array
+     * @param  TModel  $model
+     * @return array{id: int|string, text: string, icon?: string}
      */
-    public function formatItem($model)
+    public function formatItem(Model $model): array
     {
         if ($this->idField && $this->textField) {
             return [
@@ -122,10 +126,13 @@ abstract class SelectController extends PaginatedAjaxController
 
         return [
             'id' => $attributes->count() == 1 ? $attributes->first() : $model->getKey(),
-            'text' => $attributes->forget($model->getKeyName())->first(),
+            'text' => $attributes->forget([$model->getKeyName()])->first(),
         ];
     }
 
+    /**
+     * @return array{id: int|string, text: string, icon?: string}|null
+     */
     protected function prependItem(): ?array
     {
         return null;

@@ -375,12 +375,6 @@ class BillingQueueManager(TimedQueueManager):
                 "Error {} in {} billing:\n{}".format(exit_code, run_type, output)
             )
 
-        if self.config.log_output:
-            with open(
-                "{}/dispatch_billing-{}.log".format(self.config.logdir, run_type), "a"
-            ) as log_file:
-                log_file.write(output)
-
 
 class PingQueueManager(TimedQueueManager):
     def __init__(self, config, lock_manager):
@@ -414,15 +408,6 @@ class PingQueueManager(TimedQueueManager):
                     else ("device:ping", "fast", "-q", "-g", group)
                 )
                 exit_code, output = LibreNMS.call_script("lnms", args)
-
-                if self.config.log_output:
-                    with open(
-                        "{}/dispatch_group_{}_ping.log".format(
-                            self.config.logdir, group
-                        ),
-                        "a",
-                    ) as log_file:
-                        log_file.write(output)
 
                 if exit_code != 0:
                     logger.warning(
@@ -461,17 +446,17 @@ class ServicesQueueManager(TimedQueueManager):
     def do_work(self, device_id, group):
         if self.lock(device_id, timeout=self.config.services.frequency):
             logger.info("Checking services on device {}".format(device_id))
-            args = ("-d", "-h", device_id) if self.config.debug else ("-h", device_id)
-            exit_code, output = LibreNMS.call_script("check-services.php", args)
 
-            if self.config.log_output:
-                with open(
-                    "{}/dispatch_device_{}_services.log".format(
-                        self.config.logdir, device_id
-                    ),
-                    "a",
-                ) as log_file:
-                    log_file.write(output)
+            output = (
+                "{}/dispatch_device_{}_services.log".format(
+                    self.config.logdir, device_id
+                )
+                if self.config.log_output == LibreNMS.LogOutput.FILE
+                else self.config.log_output
+            )
+
+            args = ("-d", "-h", device_id) if self.config.debug else ("-h", device_id)
+            exit_code, output = LibreNMS.call_script("check-services.php", args, output)
 
             if exit_code == 0:
                 self.unlock(device_id)
@@ -511,15 +496,15 @@ class AlertQueueManager(TimedQueueManager):
 
     def do_work(self, device_id, group):
         logger.info("Checking alerts")
-        args = ("-d", "-f") if self.config.debug else ("-f",)
-        exit_code, output = LibreNMS.call_script("alerts.php", args)
 
-        if self.config.log_output:
-            with open(
-                "{}/dispatch_alerts.log".format(self.config.logdir),
-                "a",
-            ) as log_file:
-                log_file.write(output)
+        output = (
+            "{}/dispatch_alerts.log".format(self.config.logdir)
+            if self.config.log_output == LibreNMS.LogOutput.FILE
+            else self.config.log_output
+        )
+
+        args = ("-d", "-f") if self.config.debug else ("-f",)
+        exit_code, output = LibreNMS.call_script("alerts.php", args, output)
 
         if exit_code != 0:
             if exit_code == 1:
@@ -544,21 +529,20 @@ class PollerQueueManager(QueueManager):
         if self.lock(device_id, timeout=self.config.poller.frequency):
             logger.info("Polling device {}".format(device_id))
 
-            args = (
-                ("device:poll", device_id, "-vv")
-                if self.config.debug
-                else ("device:poll", device_id, "-q")
+            output = (
+                "{}/dispatch_device_{}_poller.log".format(self.config.logdir, device_id)
+                if self.config.log_output == LibreNMS.LogOutput.FILE
+                else self.config.log_output
             )
-            exit_code, output = LibreNMS.call_script("lnms", args)
 
-            if self.config.log_output:
-                with open(
-                    "{}/dispatch_device_{}_poller.log".format(
-                        self.config.logdir, device_id
-                    ),
-                    "a",
-                ) as log_file:
-                    log_file.write(output)
+            args_list = ["device:poll", device_id]
+            if self.config.debug:
+                args_list.append("-vv")
+            elif self.config.log_output is LibreNMS.LogOutput.NONE:
+                args_list.append("-q")
+            args = tuple(args_list)
+
+            exit_code, output = LibreNMS.call_script("lnms", args, output)
 
             if exit_code == 0:
                 self.unlock(device_id)
@@ -613,21 +597,22 @@ class DiscoveryQueueManager(TimedQueueManager):
         ):
             logger.info("Discovering device {}".format(device_id))
 
-            args = (
-                ("device:discover", device_id, "-vv")
-                if self.config.debug
-                else ("device:discover", device_id, "-q")
+            output = (
+                "{}/dispatch_device_{}_discovery.log".format(
+                    self.config.logdir, device_id
+                )
+                if self.config.log_output == LibreNMS.LogOutput.FILE
+                else self.config.log_output
             )
-            exit_code, output = LibreNMS.call_script("lnms", args)
 
-            if self.config.log_output:
-                with open(
-                    "{}/dispatch_device_{}_discovery.log".format(
-                        self.config.logdir, device_id
-                    ),
-                    "a",
-                ) as log_file:
-                    log_file.write(output)
+            args_list = ["device:discover", device_id]
+            if self.config.debug:
+                args_list.append("-vv")
+            elif self.config.log_output is LibreNMS.LogOutput.NONE:
+                args_list.append("-q")
+            args = tuple(args_list)
+
+            exit_code, output = LibreNMS.call_script("lnms", args, output)
 
             if exit_code == 0:
                 self.unlock(device_id)

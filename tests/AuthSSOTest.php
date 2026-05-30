@@ -280,14 +280,14 @@ final class AuthSSOTest extends DBTestCase
         LibrenmsConfig::set('sso.mode', 'env');
         $this->assertNull($a->authSSOGetAttr('foobar'));
         $this->assertNull($a->authSSOGetAttr(null));
-        $this->assertNull($a->authSSOGetAttr(1));
+        $this->assertNull($a->authSSOGetAttr(''));
         $this->assertIsString($a->authSSOGetAttr('alsoVALID-ATTR'));
         $this->assertIsString($a->authSSOGetAttr('HTTP_VALID_ATTR'));
 
         LibrenmsConfig::set('sso.mode', 'header');
         $this->assertNull($a->authSSOGetAttr('foobar'));
         $this->assertNull($a->authSSOGetAttr(null));
-        $this->assertNull($a->authSSOGetAttr(1));
+        $this->assertNull($a->authSSOGetAttr(''));
         $this->assertNull($a->authSSOGetAttr('alsoVALID-ATTR'));
         $this->assertIsString($a->authSSOGetAttr('VALID-ATTR'));
     }

@@ -8,7 +8,7 @@ switch ($device['sysObjectID']) {
     case '.1.3.6.1.4.1.674.10895.3017': /* Dell Powerconnect 3548 */
     case '.1.3.6.1.4.1.674.10895.3019': /* Dell Powerconnect 3548P */
     case '.1.3.6.1.4.1.674.10895.3028': /* Dell Powerconnect 2848 */
-        $temperature = trim(snmp_get($device, '.1.3.6.1.4.1.89.53.15.1.9.1', '-Ovq'));
+        $temperature = trim((string) SnmpQuery::get('.1.3.6.1.4.1.89.53.15.1.9.1')->value());
         discover_sensor(null, 'temperature', $device, '.1.3.6.1.4.1.89.53.15.1.9.1', 0, 'powerconnect', 'Internal Temperature', '1', '1', '0', null, null, '45', $temperature);
         break;
     default:
@@ -16,7 +16,7 @@ switch ($device['sysObjectID']) {
          * Default Temperature Discovery
          * Operating Temperature: 0º C to 45º C
          */
-        $temperature = snmp_get($device, 'boxServicesTempSensorTemperature.0', '-Ovq', 'FASTPATH-BOXSERVICES-PRIVATE-MIB');
+        $temperature = SnmpQuery::get('FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorTemperature.0')->value();
         if (is_numeric($temperature)) {
             discover_sensor(null, 'temperature', $device, '.1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.8.1.4.0', 0, 'powerconnect', 'Internal Temperature', '1', '1', '0', null, null, '45', $temperature);
         }

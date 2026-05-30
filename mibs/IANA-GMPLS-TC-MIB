@@ -1,7 +1,4 @@
--- extracted from rfc4802.txt
--- at Thu Mar  1 06:08:22 2007
-
-   IANA-GMPLS-TC-MIB DEFINITIONS ::= BEGIN
+IANA-GMPLS-TC-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
        MODULE-IDENTITY, mib-2              FROM SNMPv2-SMI  -- RFC 2578
@@ -9,15 +6,15 @@
 
    ianaGmpls MODULE-IDENTITY
        LAST-UPDATED
-                  "200702270000Z" -- 27 February 2007 00:00:00 GMT
+                  "201511040000Z" -- 04 November 2015
        ORGANIZATION
                   "IANA"
        CONTACT-INFO
                   "Internet Assigned Numbers Authority
-                   Postal: 4676 Admiralty Way, Suite 330
-                           Marina del Rey, CA 90292
-                   Tel:    +1 310 823 9358
-                   E-Mail: iana@iana.org"
+                   Postal: 12025 Waterfront Drive, Suite 300
+                           Los Angeles, CA 90094
+                   Tel:    +1 310 301-5800
+                   E-Mail: iana&iana.org"
        DESCRIPTION
          "Copyright (C) The IETF Trust (2007).  The initial version
           of this MIB module was published in RFC 4802.  For full legal
@@ -25,7 +22,55 @@
           may be available on:
           http://www.ietf.org/copyrights/ianamib.html"
 
-          REVISION
+         REVISION
+           "201511040000Z" -- 04 November 2015
+         DESCRIPTION
+           "Updated description for Switching Type 151."
+         REVISION
+           "201509220000Z" -- 22 September 2015
+         DESCRIPTION
+           "Added Switching Type 151."
+         REVISION
+           "201405090000Z" -- 09 May 2014
+         DESCRIPTION
+           "Fixed typographical error that interfered with compilation."
+         REVISION
+           "201403110000Z" -- 11 March 2014
+         DESCRIPTION
+           "Added Administrative Status Information Flags 23-24."
+         REVISION
+           "201312160000Z" -- 16 December 2013
+         DESCRIPTION
+           "Added Switching Type 110."
+         REVISION
+           "201311040000Z" -- 04 November 2013
+         DESCRIPTION
+           "Added missing value 40 to IANAGmplsSwitchingTypeTC."
+         REVISION
+           "201310140000Z" -- 14 October 2013
+         DESCRIPTION
+           "Restored names,added comments for G-PIDs 47, 56; updated IANA contact info."
+         REVISION
+           "201310100000Z" -- 10 October 2013
+         DESCRIPTION
+           "Deprecated 2-4 in IANAGmplsSwitchingTypeTC, added registry reference."
+         REVISION
+           "201310090000Z" -- 09 October 2013
+         DESCRIPTION
+           "Added Generalized PIDs 59-70 and changed names for 47, 56."
+         REVISION
+           "201004130000Z" -- 13 April 2010
+         DESCRIPTION
+           "Added LSP Encoding Type tunnelLine(14), Switching Type evpl(30)."
+         REVISION
+           "201002220000Z" -- 22 February 2010
+         DESCRIPTION
+           "Added missing Administrative Status Information Flags 25, 26, and 28."
+         REVISION
+           "201002190000Z" -- 19 February 2010
+         DESCRIPTION
+           "Added dcsc(125)."
+         REVISION
            "200702270000Z" -- 27 February 2007 00:00:00 GMT
          DESCRIPTION
            "Initial version issued as part of RFC 4802."
@@ -57,7 +102,7 @@
              IANA.)
 
              Requests for new values should be made to IANA via
-             email (iana@iana.org)."
+             email (iana&iana.org)."
        REFERENCE
             "1. Generalized Multi-Protocol Label Switching (GMPLS)
                 Signaling Functional Description, RFC 3471, section
@@ -77,8 +122,10 @@
                   tunnelLspFiber(9),           -- Fiber
                   -- the value 10 is deprecated
                   tunnelLspFiberChannel(11),   -- Fiber Channel
+
                   tunnelDigitalPath(12),       -- Digital Path
-                  tunnelOpticalChannel(13)     -- Optical Channel
+                  tunnelOpticalChannel(13),    -- Optical Channel
+                  tunnelLine(14)               -- Line
                 }
 
    IANAGmplsSwitchingTypeTC ::= TEXTUAL-CONVENTION
@@ -106,22 +153,29 @@
              IANA.)
 
              Requests for new values should be made to IANA via
-             email (iana@iana.org)."
+             email (iana&iana.org)."
        REFERENCE
             "1. Routing Extensions in Support of Generalized
                 Multi-Protocol Label Switching, RFC 4202, section 2.4.
              2. Generalized Multi-Protocol Label Switching (GMPLS)
                 Signaling Functional Description, RFC 3471, section
-                3.1.1."
+                3.1.1.
+             3. Revised Definition of The GMPLS Switching Capability 
+                and Type Fields, RFC7074, section 5."
        SYNTAX  INTEGER {
                   unknown(0),   -- none of the following, or not known
                   psc1(1),      -- Packet-Switch-Capable 1
-                  psc2(2),      -- Packet-Switch-Capable 2
-                  psc3(3),      -- Packet-Switch-Capable 3
-                  psc4(4),      -- Packet-Switch-Capable 4
+                  psc2(2),      -- Deprecated [RFC7074]
+                  psc3(3),      -- Deprecated [RFC7074]
+                  psc4(4),      -- Deprecated [RFC7074]
+                  evpl(30),     -- Ethernet Virtual Private Line
+                  pbb(40),      -- Provider Backbone Bridging
                   l2sc(51),     -- Layer-2-Switch-Capable
                   tdm(100),     -- Time-Division-Multiplex
+                  otntdm(110),  -- Time-Division-Multiplex OTN-TDM capable
+                  dcsc(125),    -- Data Channel Switching Capable
                   lsc(150),     -- Lambda-Switch-Capable
+                  wsonlsc(151), -- WSON-LSC
                   fsc(200)      -- Fiber-Switch-Capable
                 }
 
@@ -150,13 +204,16 @@
              IANA.)
 
              Requests for new values should be made to IANA via
-             email (iana@iana.org)."
+             email (iana&iana.org)."
         REFERENCE
             "1. Generalized Multi-Protocol Label Switching (GMPLS)
                 Signaling Functional Description, RFC 3471, section
                 3.1.1.
              2. Generalized MPLS Signalling Extensions for G.709 Optical
-                Transport Networks Control, RFC 4328, section 3.1.3."
+                Transport Networks Control, RFC 4328, section 3.1.3.
+             3. Generalized Multi-Protocol Label Switching (GMPLS)
+                Signaling Extensions for the evolving G.709 Optical
+                Transport Networks Control,[RFC7139], sections 4 and 11." 
         SYNTAX  INTEGER {
                   unknown(0),      -- unknown or none of the following
                   -- the values 1, 2, 3 and 4 are reserved in RFC 3471
@@ -200,7 +257,7 @@
                   hdlc(44),
                   ethernetV2DixOnly(45),
                   ethernet802dot3Only(46),
-                  g709ODUj(47),
+                  g709ODUj(47), -- used for the G.709 ODU-2.5G GMPLS PID [RFC7139]
                   g709OTUk(48),
                   g709CBRorCBRa(49),
                   g709CBRb(50),
@@ -209,9 +266,21 @@
                   gfpIPorPPP(53),
                   gfpEthernetMAC(54),
                   gfpEthernetPHY(55),
-                  g709ESCON(56),
+                  g709ESCON(56), -- used for the SBCON/ESCON GMPLS PID [RFC7139]
                   g709FICON(57),
-                  g709FiberChannel(58)
+                  g709FiberChannel(58),
+                  framedGFP(59),
+                  sTM1(60),
+                  sTM4(61),
+                  infiniBand(62),
+                  sDI(63),
+                  sDI1point001(64),
+                  dVBASI(65),
+                  g709ODU125G(66),
+                  g709ODUAny(67),
+                  nullTest(68),
+                  randomTest(69),
+                  sixtyfourB66BGFPFEthernet(70)
                 }
 
    IANAGmplsAdminStatusInformationTC ::= TEXTUAL-CONVENTION
@@ -221,6 +290,7 @@
              Admin Status flags in the Admin Status object or TLV, as
              described in RFC 3471.  Setting this object to a non-zero
              value will result in the inclusion of the Admin Status
+
              object or TLV on signaling messages.
 
              This textual convention is strongly tied to the
@@ -243,7 +313,7 @@
              IANA.)
 
              Requests for new values should be made to IANA via
-             email (iana@iana.org)."
+             email (iana&iana.org)."
         REFERENCE
             "1. Generalized Multi-Protocol Label Switching (GMPLS)
                 Signaling Functional Description, RFC 3471, section 8.
@@ -269,62 +339,21 @@
                   reserved14(14), -- reserved
                   reserved15(15), -- reserved
                   reserved16(16), -- reserved
+
                   reserved17(17), -- reserved
                   reserved18(18), -- reserved
                   reserved19(19), -- reserved
                   reserved20(20), -- reserved
                   reserved21(21), -- reserved
                   reserved22(22), -- reserved
-                  reserved23(23), -- reserved
-                  reserved24(24), -- reserved
-                  reserved25(25), -- reserved
-                  reserved26(26), -- reserved
-                  reserved27(27), -- Inhibit Alarm bit (RFC 4783)
-                  reserved28(28), -- reserved
+                  oamFlowsEnabled(23), -- (RFC 7260)
+                  oamAlarmsEnabled(24), -- (RFC 7260)
+                  handover(25), -- Handover bit (RFC 5852)
+                  lockout(26), -- Lockout bit (RFC 4872)
+                  inhibitAlarmCommunication(27), -- Inhibit Alarm bit (RFC 4783)
+                  callControl(28), -- Call control bit (RFC 4974)
                   testing(29), -- Testing bit (RFC 3473)
                   administrativelyDown(30), -- Admin down (RFC 3473)
                   deleteInProgress(31) -- Delete bit (RFC 3473)
                 }
-   END
-
--- 
---    Copyright (C) The IETF Trust (2007).
--- 
---    This document is subject to the rights, licenses and restrictions
---    contained in BCP 78, and except as set forth therein, the authors
---    retain all their rights.
--- 
---    This document and the information contained herein are provided on an
---    "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
---    OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY, THE IETF TRUST AND
---    THE INTERNET ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS
---    OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF
---    THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
---    WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
--- 
--- Intellectual Property
--- 
---    The IETF takes no position regarding the validity or scope of any
---    Intellectual Property Rights or other rights that might be claimed to
---    pertain to the implementation or use of the technology described in
---    this document or the extent to which any license under such rights
---    might or might not be available; nor does it represent that it has
---    made any independent effort to identify any such rights.  Information
---    on the procedures with respect to rights in RFC documents can be
---    found in BCP 78 and BCP 79.
--- 
---    Copies of IPR disclosures made to the IETF Secretariat and any
---    assurances of licenses to be made available, or the result of an
---    attempt made to obtain a general license or permission for the use of
---    such proprietary rights by implementers or users of this
---    specification can be obtained from the IETF on-line IPR repository at
---    http://www.ietf.org/ipr.
--- 
---    The IETF invites any interested party to bring to its attention any
---    copyrights, patents or patent applications, or other proprietary
---    rights that may cover technology that may be required to implement
---    this standard.  Please address the information to the IETF at
---    ietf-ipr@ietf.org.
--- 
-
-
+END

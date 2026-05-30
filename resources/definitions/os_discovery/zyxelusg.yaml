@@ -1,4 +1,3 @@
-mib: ZYXEL-ES-COMMON
 modules:
     os:
         hardware: ZYXEL-ES-COMMON::sysProductModel.0

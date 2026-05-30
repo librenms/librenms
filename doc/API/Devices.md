@@ -419,7 +419,7 @@ Output:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health/device_wireless_ccq/1
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless/device_wireless_ccq/1
 ```
 
 Output:
@@ -452,6 +452,84 @@ Output:
             "lastupdate": "2017-12-06 21:26:29",
             "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.3.0\"]",
             "access_point_id": null
+        }
+    ],
+    "count": 1
+}
+```
+
+### `get_device_wireless_sensors`
+
+Get the wireless sensors recorded for a device. Returns rows from the
+`wireless_sensors` table, optionally filtered by sensor class and projected
+to a chosen subset of columns.
+
+Route: `/api/v0/devices/:hostname/wireless-sensors`
+
+- hostname can be either the device hostname or id
+
+Input:
+
+- class (optional): filter rows by `sensor_class`. Must be one of the
+  wireless sensor types (`clients`, `rssi`, `snr`, `mcs`, `frequency`,
+  `capacity`, `distance`, `quality`, etc.).
+- columns (optional): comma-separated list of `wireless_sensors` columns to
+  return. Defaults to all columns.
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless-sensors
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "wireless_sensors": [
+        {
+            "sensor_id": 5132,
+            "sensor_deleted": 0,
+            "sensor_class": "rssi",
+            "device_id": 42,
+            "sensor_index": "1",
+            "sensor_type": "epmp-ap-ul",
+            "sensor_descr": "Subscriber-1 (10.0.0.11) [aa:bb:cc:dd:ee:f1] UL RSSI",
+            "sensor_divisor": 1,
+            "sensor_multiplier": 1,
+            "sensor_current": -54,
+            "sensor_prev": -54,
+            "sensor_limit": null,
+            "sensor_limit_warn": null,
+            "sensor_limit_low": null,
+            "sensor_limit_low_warn": null,
+            "sensor_alert": 1,
+            "sensor_custom": "No",
+            "sensor_oids": "[\".1.3.6.1.4.1.17713.21.1.2.30.1.4.1\"]"
+        }
+    ],
+    "count": 1
+}
+```
+
+Example filtered by class and selecting a subset of columns:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless-sensors?class=rssi&columns=sensor_id,sensor_index,sensor_descr,sensor_current
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "wireless_sensors": [
+        {
+            "sensor_id": 5132,
+            "sensor_index": "1",
+            "sensor_descr": "Subscriber-1 (10.0.0.11) [aa:bb:cc:dd:ee:f1] UL RSSI",
+            "sensor_current": -54
         }
     ],
     "count": 1
@@ -588,7 +666,7 @@ Input:
   Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services/localhost/35/graphs/loss
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/services/35/graphs/loss
 ```
 
 Output:
@@ -607,6 +685,7 @@ Route: `/api/v0/devices/:hostname/ports`
 Input:
 
 - columns: Comma separated list of columns you want returned.
+- `with=vlans`. Returns VLAN associations (tagged and untagged) for each port.
 
 Example:
 
@@ -634,6 +713,54 @@ Output:
     ]
 }
 ```
+
+Example with VLANs:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/ports?with=vlans
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "ports": [
+        {
+            "port_id": 12345,
+            "ifName": "Gi1/0/1",
+            "vlans": [
+                {
+                    "port_vlan_id": 2,
+                    "device_id": 3,
+                    "port_id": 12345,
+                    "vlan": 1,
+                    "baseport": 2,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "port_vlan_id": 54,
+                    "device_id": 3,
+                    "port_id": 12345,
+                    "vlan": 250,
+                    "baseport": 2,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                }
+            ]
+        }
+    ]
+}
+```
+
+> **Note:** Using `with=vlans` on devices with many ports may increase response
+> size and memory usage. Consider using the `columns` parameter to limit
+> returned fields when fetching VLAN data for large devices.
 
 ### `get_device_fdb`
 
@@ -1074,6 +1201,7 @@ Input:
 - ifDescr: If this is set to true then we will use ifDescr to lookup
   the port instead of ifName. Pass the ifDescr value you want to
   search as you would ifName.
+- graph_type: This can be png or svg to force the output as required.
 
 Example:
 

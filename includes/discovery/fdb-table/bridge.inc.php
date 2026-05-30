@@ -77,18 +77,25 @@ if (! empty($fdbPort_table)) {
         // device VLANs table should catch anything invalid.
         $vlan = $vlan_fdb_dict[$vlanIndex] ?? $vlanIndex;
 
-        foreach ($data[$data_oid] ?? [] as $mac => $dot1dBasePort) {
-            // Some devices (e.g. CBS220) include an InetAddress length byte in the OID index,
-            // producing [len:b1:b2:b3:b4:b5].b6 instead of [b1:b2:b3:b4:b5:b6].
-            // snmpwalk_group then nests the leftover OID component as an extra array level.
+        // Some SNMP agents (arubaos-cx, comtrol) prepend a length byte to
+        // MacAddress indexes, encoding 7 bytes instead of 6.  With -OX the
+        // last octet spills out of the bracket into a nested array level:
+        //   dot1dTpFdbPort[6:0:a:f7:ec:d1].97 = 10
+        //   → key '6:0:a:f7:ec:d1', value ['97' => '10']
+        // Strip the length prefix, append the spilled octet (decimal → hex).
+        $fdb_entries = $data[$data_oid] ?? [];
+        foreach ($fdb_entries as $mac => $dot1dBasePort) {
             if (is_array($dot1dBasePort)) {
-                $extra = dechex((int) ltrim((string) array_key_first($dot1dBasePort), '.'));
-                $dot1dBasePort = reset($dot1dBasePort);
-                $mac_parts = explode(':', (string) $mac);
-                array_shift($mac_parts); // drop the non-conformant length byte
-                $mac_parts[] = $extra;
-                $mac = implode(':', $mac_parts);
+                unset($fdb_entries[$mac]);
+                $octets = explode(':', (string) $mac);
+                array_shift($octets); // drop length prefix byte
+                foreach ($dot1dBasePort as $spilled_octet => $port) {
+                    $fdb_entries[implode(':', [...$octets, dechex((int) $spilled_octet)])] = $port;
+                }
             }
+        }
+
+        foreach ($fdb_entries as $mac => $dot1dBasePort) {
             if ($dot1dBasePort == 0) {
                 Log::debug("No port known for $mac\n");
                 continue;

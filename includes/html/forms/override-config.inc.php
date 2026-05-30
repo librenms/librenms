@@ -12,30 +12,33 @@
  * the source code distribution for details.
 */
 
+use App\Facades\DeviceCache;
+use Illuminate\Support\Facades\Gate;
+
 header('Content-type: application/json');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('device.update')) {
     $response = [
         'status' => 'error',
-        'message' => 'Need to be admin',
+        'message' => 'Need permission',
     ];
     echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-$device['device_id'] = $_POST['device_id'];
+$device = DeviceCache::get((int) $_POST['device_id']);
 $attrib = $_POST['attrib'];
 $state = $_POST['state'];
 $status = 'error';
 $message = 'Error with config';
 
-if (empty($device['device_id'])) {
+if ($device->exists == false) {
     $message = 'No device passed';
 } else {
     if ($state == true) {
-        set_dev_attrib($device, $attrib, $state);
+        $device->setAttrib($attrib, $state);
     } else {
-        del_dev_attrib($device, $attrib);
+        $device->forgetAttrib($attrib);
     }
     $status = 'ok';
     $message = 'Config has been updated';

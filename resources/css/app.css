@@ -1,6 +1,8 @@
 @import './toast.css';
 
 @import "tailwindcss" prefix(tw);
+@source "../../includes/html/pages/**/*.php";
+@source "../../includes/html/**/*.inc.php";
 @import "../../html/css/bootstrap.min.css" layer(components);
 @custom-variant dark (&:where(.dark, .dark *));
 @layer base {
@@ -54,8 +56,56 @@
     @apply tw:font-bold tw:text-blue-900 tw:visited:text-blue-900 tw:dark:text-dark-white-100 tw:dark:visited:text-dark-white-100
 }
 .device-link-down {
-    @apply tw:font-bold tw:text-red-600 tw:visited:text-red-600 tw:dark:!text-red-500 tw:dark:visited:!text-red-500
+    @apply tw:font-bold tw:text-red-600 tw:visited:text-red-600 tw:dark:text-red-500! tw:dark:visited:text-red-500!
 }
 .device-link-disabled {
-    @apply tw:font-bold tw:text-gray-400 tw:visited:text-gray-400 tw:dark:!text-gray-500 tw:dark:visited:!text-gray-500
+    @apply tw:font-bold tw:text-gray-400 tw:visited:text-gray-400 tw:dark:text-gray-500! tw:dark:visited:text-gray-500!
+}
+
+#coordinates-text  {
+  @apply tw:underline;
+}
+
+.overview-panel {
+  @apply tw:rounded-xl tw:overflow-hidden tw:border tw:border-gray-300 tw:shadow-sm tw:dark:border-dark-gray-200;
+}
+
+.lnms-btn {
+  @apply tw:inline-flex tw:items-center tw:gap-2 tw:rounded-xl tw:px-4 tw:py-2 tw:font-normal tw:no-underline;
+}
+
+.lnms-btn-badge {
+  @apply tw:inline-flex tw:min-w-9 tw:items-center tw:justify-center tw:rounded-xl tw:px-2.5 tw:py-0.5 tw:text-base tw:font-bold;
+}
+
+.lnms-btn-default {
+  @apply tw:bg-[#3a3f44] tw:hover:bg-[#1e2023] tw:text-white!;
+}
+
+.lnms-btn-default .lnms-btn-badge {
+  @apply tw:bg-white tw:text-[#232628];
+}
+
+.lnms-btn-success {
+  @apply tw:bg-[#5cb85c] tw:hover:bg-[#449d44] tw:text-white!;
+}
+
+.lnms-btn-success .lnms-btn-badge {
+  @apply tw:bg-white tw:text-[#5cb85c];
+}
+
+.lnms-btn-danger {
+  @apply tw:bg-[#d9534f] tw:hover:bg-[#c9302c] tw:text-white!;
+}
+
+.lnms-btn-danger .lnms-btn-badge {
+  @apply tw:bg-white tw:text-[#d9534f];
+}
+
+.lnms-btn-primary {
+  @apply tw:bg-[#337ab7] tw:hover:bg-[#286090] tw:text-white!;
+}
+
+.lnms-btn-primary .lnms-btn-badge {
+  @apply tw:bg-white tw:text-[#337ab7];
 }

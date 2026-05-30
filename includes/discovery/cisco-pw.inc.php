@@ -63,7 +63,7 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
     // Cycle the list of pseudowires we cached earlier and make sure we saw them again.
     foreach ($pws_db as $pw_id => $pseudowire_id) {
         if (empty($device['pws'][$pw_id])) {
-            dbDelete('pseudowires', '`pseudowire_id` = ?', [$pseudowire_id]);
+            \App\Models\Pseudowire::where('pseudowire_id', $pseudowire_id)->delete();
         }
     }
 

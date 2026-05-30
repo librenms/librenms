@@ -30,8 +30,8 @@ class Stp extends DeviceRelatedModel implements Keyable
         'bridgeForwardDelay',
     ];
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
-        return $this->vlan;
+        return (string) $this->vlan;
     }
 }

@@ -14,7 +14,7 @@
                 <pre>{!! $git_log !!}</pre>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">@Lang('Close')</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('Close') }}</button>
             </div>
         </div>
     </div>
@@ -39,11 +39,11 @@
                     <td>{{ $version_webserver }}</td>
                 </tr>
                 <tr>
-                    <td><b>{{ __('PHP') }}</b></td>
+                    <td><a target="_blank" href="https://www.php.net/"><b>{{ __('PHP') }}</b></a></td>
                     <td>{{ $version_php }}</td>
                 </tr>
                 <tr>
-                    <td><b>{{ __('Python') }}</b></td>
+                    <td><a target="_blank" href="https://www.python.org/"><b>{{ __('Python') }}</b></a></td>
                     <td>{{ $version_python }}</td>
                 </tr>
                 <tr>
@@ -57,6 +57,10 @@
                 <tr>
                     <td><a target="_blank" href="https://oss.oetiker.ch/rrdtool/"><b>{{ __('RRDtool') }}</b></a></td>
                     <td>{{ $version_rrdtool }}</td>
+                </tr>
+                <tr>
+                    <td><a target="_blank" href="https://www.net-snmp.org/"><b>{{ __('Net-SNMP') }}</b></a></td>
+                    <td>{{ $version_netsnmp }}</td>
                 </tr>
             </table>
 
@@ -95,7 +99,7 @@
 
         <table class='table table-condensed'>
 
-            @admin
+            @can('reporting.update')
             <tr>
                 <td colspan='4'>
                     <div>
@@ -114,7 +118,7 @@
                     @endif
                 </td>
             </tr>
-            @endadmin
+            @endcan
 
             <tr>
                 <td><i class='fa fa-fw fa-server fa-lg icon-theme' aria-hidden='true'></i> <b>{{ __('Devices') }}</b></td>

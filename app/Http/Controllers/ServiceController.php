@@ -16,7 +16,9 @@ class ServiceController extends Controller
      */
     public function store(Request $request, ToastInterface $toast)
     {
-        $request = [
+        $this->authorize('create', Service::class);
+
+        $this->validate($request, [
             'service_name' => 'required|string|unique:service',
             'device_id' => 'integer',
             'service_type' => 'string',
@@ -26,9 +28,9 @@ class ServiceController extends Controller
             'service_changed' => 'integer',
             'service_disabled' => 'integer',
             'service_ignore' => 'integer',
-        ];
+        ]);
 
-        $service = Service::make(
+        $service = new Service(
             $request->only(
                 [
                     'service_name',

@@ -5,7 +5,7 @@ use LibreNMS\Util\Number;
 
 echo 'RFC1628 ';
 
-$battery_current = snmp_get($device, 'upsBatteryCurrent.0', '-OqvU', 'UPS-MIB');
+$battery_current = SnmpQuery::get('UPS-MIB::upsBatteryCurrent.0')->value();
 
 if (is_numeric($battery_current)) {
     $oid = '.1.3.6.1.2.1.33.1.2.6.0';

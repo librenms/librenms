@@ -145,12 +145,18 @@ class Xdsl implements Module
         $adslPorts = new Collection;
 
         foreach ($adsl as $ifIndex => $data) {
+            if (! is_array($data)) {
+                $received = is_string($data) ? 'Data: "' . $data . '"' : 'Type: ' . gettype($data);
+                Log::warning("XDSL: Skipping port (ifIndex $ifIndex) - device returned malformed SNMP response. $received");
+                continue;
+            }
+
             // Values are 1/10
             foreach ($this->adslTenthValues as $oid) {
                 if (isset($data[$oid])) {
                     if ($oid == 'adslAtucCurrOutputPwr') {
                         // workaround Cisco Bug CSCvj53634
-                        $data[$oid] = Number::constrainInteger($data[$oid], IntegerType::int32);
+                        $data[$oid] = Number::constrainInteger($data[$oid], IntegerType::Int32);
                     }
                     $data[$oid] /= 10;
                 }
@@ -195,6 +201,11 @@ class Xdsl implements Module
         $vdslPorts = new Collection;
 
         foreach ($vdsl as $ifIndex => $data) {
+            if (! is_array($data)) {
+                $received = is_string($data) ? 'Data: "' . $data . '"' : 'Type: ' . gettype($data);
+                Log::warning("XDSL: Skipping port (ifIndex $ifIndex) - device returned malformed SNMP response. $received");
+                continue;
+            }
             $portVdsl = new PortVdsl([
                 'port_id' => PortCache::getIdFromIfIndex($ifIndex, $os->getDevice()),
                 'xdsl2ChStatusActDataRateXtur' => $data['xdsl2ChStatusActDataRate']['xtur'] ?? 0,

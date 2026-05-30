@@ -43,7 +43,7 @@ foreach ($input_freq as $index => $data) {
     );
 }
 
-$output_freq = snmp_get($device, 'upsOutputFrequency.0', '-OqvU', 'UPS-MIB');
+$output_freq = SnmpQuery::get('UPS-MIB::upsOutputFrequency.0')->value();
 if (is_numeric($output_freq)) {
     $freq_oid = '.1.3.6.1.2.1.33.1.4.2.0';
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'frequency', $freq_oid);
@@ -66,7 +66,7 @@ if (is_numeric($output_freq)) {
     );
 }
 
-$bypass_freq = snmp_get($device, 'upsBypassFrequency.0', '-OqvU', 'UPS-MIB');
+$bypass_freq = SnmpQuery::get('UPS-MIB::upsBypassFrequency.0')->value();
 if (is_numeric($bypass_freq)) {
     $freq_oid = '.1.3.6.1.2.1.33.1.5.1.0';
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'frequency', $freq_oid);

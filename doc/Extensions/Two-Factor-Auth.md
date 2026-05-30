@@ -92,24 +92,8 @@ These steps imply that Two-Factor has been enabled system wide as above under Co
 - If your browser didn't reload, reload manually
 - Scan provided QR or click on 'Manual' to see the Key
 
-### Google Authenticator
+### Authenticator Apps
 
-Installation guides for Google Authenticator can be found [here](https://support.google.com/accounts/answer/1066447?hl=en).
-
-Usage:
-
-- Create a key as described above
-- Scan provided QR or click on 'Manual' and enter the Secret
-- On next login, enter the passcode that the App provides
-
-### LastPass Authenticator
-
-LastPass Authenticator is confirmed to work with Timebased One-Time Passwords (TOTP).
-
-Installation guide for LastPass Authenticator can be found [here](https://support.logmeininc.com/lastpass/help/lastpass-authenticator-lp030014).
-
-Usage:
-
-- Create a Timerbased key as described above
-- Click Add (+) and scan provided QR or click on 'NO QR CODE?' and enter naming details and the Secret
-- On next login, enter the passcode that the App provides
+- [Google Authenticator](https://support.google.com/accounts/answer/1066447?hl=en).
+- [LastPass Authenticator](https://support.logmeininc.com/lastpass/help/lastpass-authenticator-lp030014).
+- [Enpass Authenticator](https://support.enpass.io/app/item/generating_one_time_code_in_enpass.htm)).

@@ -15,6 +15,11 @@ use Log;
 
 class DeviceObserver
 {
+    public function creating(Device $device): void
+    {
+        $device->regenerateDisplayName();
+    }
+
     /**
      * Handle the device "created" event.
      *
@@ -60,6 +65,10 @@ class DeviceObserver
 
     public function updating(Device $device): void
     {
+        if ($device->isDirty(['display_template', 'hostname', 'sysName', 'ip', 'overwrite_ip'])) {
+            $device->regenerateDisplayName();
+        }
+
         // handle device renames
         if ($device->isDirty('hostname')) {
             $new_name = $device->hostname;
@@ -92,19 +101,21 @@ class DeviceObserver
      */
     public function deleted(Device $device): void
     {
-        // delete rrd files
-        $host_dir = Rrd::dirFromHost($device->hostname);
-        try {
-            $result = File::deleteDirectory($host_dir);
+        if (! empty($device->hostname)) {
+            // delete rrd files
+            $host_dir = Rrd::dirFromHost($device->hostname);
+            try {
+                $result = File::deleteDirectory($host_dir);
 
-            if (! $result) {
-                Log::debug("Could not delete RRD files for: $device->hostname");
+                if (! $result) {
+                    Log::debug("Could not delete RRD files for: $device->hostname");
+                }
+            } catch (\Exception $e) {
+                Log::error("Could not delete RRD files for: $device->hostname", [$e]);
             }
-        } catch (\Exception $e) {
-            Log::error("Could not delete RRD files for: $device->hostname", [$e]);
         }
 
-        Eventlog::log("Device $device->hostname has been removed", 0, 'system', Severity::Notice);
+        Eventlog::log('Device ' . ($device->hostname ?: $device->device_id) . ' has been removed', 0, 'system', Severity::Notice);
 
         (new Oxidized)->reloadNodes();
     }

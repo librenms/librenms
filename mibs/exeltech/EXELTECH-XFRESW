@@ -1,0 +1,465 @@
+EXELTECH-XFERSW DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises,
+    IpAddress
+FROM RFC1155-SMI;
+
+--the module description
+
+exeltechMIB MODULE-IDENTITY
+       LAST-UPDATED "199004020000Z"
+       ORGANIZATION "Exeltech, Inc."
+       CONTACT-INFO
+              "        Todd Celinski
+
+                Postal: Exeltech, Inc
+                        7317 Jack Newell Blvd. North
+                        Fort Worth, Texas 76118-7100
+                        US
+
+                   Tel: +1 817 595 4969
+                   Fax: +1 817 595 1290
+
+                E-mail: exlsup@exeltech.com"
+       DESCRIPTION
+               "The MIB module to describe exeltech's
+ 		devices."
+       ::= { enterprises 30320 }
+
+
+-- the transfer switch group
+-- these are the objects
+
+
+xferSw2      	OBJECT IDENTIFIER 	::= { exeltechMIB 1 }
+objects     	OBJECT IDENTIFIER 	::= { xferSw2     0 }
+battery     	OBJECT IDENTIFIER 	::= { objects     0 }
+
+	batV OBJECT-TYPE
+     		SYNTAX      INTEGER
+    		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present battery voltage. Displayed in deciVolts. Divide by 10 to get voltage."
+    	::= { battery 1 }
+
+	batI OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present battery current. Displayed in deciAmps. Divide by 10 to get amps."
+    	::= { battery 2 }
+
+	aBusV OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present A bus DC voltage if present. Displayed in deciVolts. Divide by 10 to get voltage."
+    	::= { battery 3 }
+
+	bBusV OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present B bus DC voltage if present. Displayed in deciVolts. Divide by 10 to get voltage."
+    	::= { battery 4 }
+
+
+
+
+
+
+source1     	OBJECT IDENTIFIER 	::= { objects 1 }
+
+	voltage1a OBJECT-TYPE
+     		SYNTAX      INTEGER
+    		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present RMS voltage of source 1a. Displayed in deciVolts. Divide by 10 to get voltage."
+    	::= { source1 1 }
+
+
+	current1a OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present RMS current of source 1a. Displayed in deciAmps. Divide by 10 to get amps."
+    	::= { source1 2 }
+
+	freq1a 	OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present frequency of source 1a. Displayed in deciHertz. Divide by 10 to get hertz."
+    	::= { source1 3 }
+
+	voltage1b OBJECT-TYPE
+     		SYNTAX      INTEGER
+    		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present RMS voltage of source 1b. Displayed in deciVolts. Divide by 10 to get voltage."
+    	::= { source1 4 }
+
+
+	current1b OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present RMS current of source 1b. Displayed in deciAmps. Divide by 10 to get amps."
+    	::= { source1 5 }
+
+	freq1b 	OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present frequency of source 1b. Displayed in deciHertz. Divide by 10 to get hertz."
+    	::= { source1 6 }
+
+	ACVOut1	OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present RMS Output Voltage of source 1. Displayed in deciVolts. Divide by 10 to get 				voltage."
+    	::= { source1 7 }
+	SCRTemp1	OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present the SCR temperature of source 1. Displayed in Degrees C."
+    	::= { source1 8 }
+
+source2     	OBJECT IDENTIFIER 	::= { objects 2 }
+
+	voltage2a OBJECT-TYPE
+     		SYNTAX      INTEGER
+    		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present RMS voltage of source 2a. Displayed in deciVolts. Divide by 10 to get voltage."
+    	::= { source2 1 }
+
+
+	current2a OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present RMS current of source 2a. Displayed in deciAmps. Divide by 10 to get amps."
+    	::= { source2 2 }
+
+	freq2a 	OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present frequency of source 2a. Displayed in deciHertz. Divide by 10 to get hertz."
+    	::= { source2 3 }
+
+	voltage2b OBJECT-TYPE
+     		SYNTAX      INTEGER
+    		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present RMS voltage of source 2b. Displayed in deciVolts. Divide by 10 to get voltage."
+    	::= { source2 4 }
+
+
+	current2b OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present RMS current of source 2b. Displayed in deciAmps. Divide by 10 to get amps."
+    	::= { source2 5 }
+
+	freq2b 	OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present frequency of source 2b. Displayed in deciHertz. Divide by 10 to get hertz."
+    	::= { source2 6 }
+
+	ACVOut2	OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present RMS Output Voltage of source 2. Displayed in deciVolts. Divide by 10 to get voltage."
+    	::= { source2 7 }
+
+	SCRTemp2	OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present the SCR temperature of source 2. Displayed in Degrees C."
+    	::= { source2 8 }
+
+source3     	OBJECT IDENTIFIER 	::= { objects 3 }
+
+	voltage3a OBJECT-TYPE
+     		SYNTAX      INTEGER
+    		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present RMS voltage of source 3a. Displayed in deciVolts. Divide by 10 to get voltage."
+    	::= { source3 1 }
+
+
+	current3a OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present RMS current of source 3a. Displayed in deciAmps. Divide by 10 to get amps."
+    	::= { source3 2 }
+
+	freq3a 	OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present frequency of source 3a. Displayed in deciHertz. Divide by 10 to get hertz."
+    	::= { source3 3 }
+
+	voltage3b OBJECT-TYPE
+     		SYNTAX      INTEGER
+    		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present RMS voltage of source 3b. Displayed in deciVolts. Divide by 10 to get voltage."
+    	::= { source3 4 }
+
+
+	current3b OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present RMS current of source 3b. Displayed in deciAmps. Divide by 10 to get amps."
+    	::= { source3 5 }
+
+	freq3b 	OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present frequency of source 3b. Displayed in deciHertz. Divide by 10 to get hertz."
+    	::= { source3 6 }
+
+	ACVOut3	 	OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present RMS Output Voltage of source 3. Displayed in deciVolts. Divide by 10 to get 			voltage."
+    	::= { source3 7 }
+
+	SCRTemp3	OBJECT-TYPE
+     		SYNTAX      INTEGER
+     		MAX-ACCESS  read-only
+     		STATUS      current
+     		DESCRIPTION
+            		"The present the SCR temperature of source 3. Displayed in Degrees C."
+    	::= { source3 8 }
+
+Alarms     	OBJECT IDENTIFIER 	::= { objects 4 }
+
+
+    	source1Alarms   	OBJECT-TYPE
+		     		SYNTAX      INTEGER
+		     		MAX-ACCESS  read-only
+		     		STATUS      current
+		     		DESCRIPTION
+		            		"Alarms Status: This is a 2 byte and each bit represents an alarm.
+
+					0x0001 - Power Module Overtemp
+					0x0002 - Power Module Fail
+					0x0004 - Control Card Fail
+					0x0008 - One Source has failed or are not phase locked
+					0x0010 - LvAlarm
+					0x0020 - Control Card Overtemp
+					0x0040 - SCRs are Warm
+					0x0080 - Low DCV
+					0x0200 - Popk alarm - System not redunant
+					0x0400 - Both sources are dead
+					0x0800 - Fan Failed or Hot Temperature"
+    	::= { Alarms 1 }
+
+    	source2Alarms   	OBJECT-TYPE
+		     		SYNTAX      INTEGER
+		     		MAX-ACCESS  read-only
+		     		STATUS      current
+		     		DESCRIPTION
+		            		"Alarms Status: This is a 2 byte and each bit represents an alarm.
+
+					0x0001 - Power Module Overtemp
+					0x0002 - Power Module Fail
+					0x0004 - Control Card Fail
+					0x0008 - One Source has failed or are not phase locked
+					0x0010 - LvAlarm
+					0x0020 - Control Card Overtemp
+					0x0040 - SCRs are Warm
+					0x0080 - Low DCV
+					0x0200 - Popk alarm - System not redunant
+					0x0400 - Both sources are dead
+					0x0800 - Fan Failed or Hot Temperature"
+    	::= { Alarms 2 }
+
+	source3Alarms   	OBJECT-TYPE
+		     		SYNTAX      INTEGER
+		     		MAX-ACCESS  read-only
+		     		STATUS      current
+		     		DESCRIPTION
+		            		"Alarms Status: This is a 2 byte and each bit represents an alarm.
+
+					0x0001 - Power Module Overtemp
+					0x0002 - Power Module Fail
+					0x0004 - Control Card Fail
+					0x0008 - One Source has failed or are not phase locked
+					0x0010 - LvAlarm
+					0x0020 - Control Card Overtemp
+					0x0040 - SCRs are Warm
+					0x0080 - Low DCV
+					0x0200 - Popk alarm - System not redunant
+					0x0400 - Both sources are dead
+					0x0800 - Fan Failed or Hot Temperature"
+    	::= { Alarms 3 }
+
+
+	MinorAlarm		OBJECT-TYPE
+			     	SYNTAX      INTEGER
+			     	MAX-ACCESS  read-only
+			     	STATUS      current
+			     	DESCRIPTION
+			  	     	"Alarms Status: 0 is no Alarm, 1 is any Minor Alarm on any phase."
+    	::= { Alarms 4 }
+
+   	MajorAlarm		OBJECT-TYPE
+			     	SYNTAX      INTEGER
+			     	MAX-ACCESS  read-only
+			     	STATUS      current
+			     	DESCRIPTION
+			  	     	"Alarms Status: 0 is no Alarm, 1 is any Major Alarm on any phase."
+    	::= { Alarms 5 }
+
+
+
+
+Settings     	OBJECT IDENTIFIER 	::= { objects     5 }
+
+
+
+	DCVLow			OBJECT-TYPE
+     				SYNTAX      INTEGER
+     				MAX-ACCESS  read-write
+     				STATUS      current
+     				DESCRIPTION
+            				"This value is the low DC Voltage limit for sending traps. The voltage
+					 needs to be set in deciVolts. Multiply the voltage by 10 and then send
+					 that value."
+    	::= { Settings     1 }
+
+	DCVHigh		OBJECT-TYPE
+     				SYNTAX      INTEGER
+     				MAX-ACCESS  read-write
+     				STATUS      current
+     				DESCRIPTION
+            				"This value is the high DC Voltage limit for sending traps. The voltage
+					 needs to be set in deciVolts. Multiply the voltage by 10 and then send
+					 that value."
+    	::= { Settings     2 }
+
+	TrapTragetIp1		OBJECT-TYPE
+     				SYNTAX  IpAddress
+     				MAX-ACCESS read-write
+     				STATUS      current
+     				DESCRIPTION
+            				"Ip address of the first target for traps. Set to zero to remove from targets."
+    	::= { Settings     3 }
+
+
+	IpAddressStatic	OBJECT-TYPE
+     				SYNTAX      IpAddress
+     				MAX-ACCESS  read-write
+     				STATUS      current
+     				DESCRIPTION
+            				"Static Ip address of the system. Set to zero to use DHCP to obtain an Ip
+					 address. Changes will be applied after network chip is reset."
+    	::= { Settings     4 }
+
+
+	SubnetMaskStatic	OBJECT-TYPE
+     				SYNTAX      IpAddress
+     				MAX-ACCESS  read-write
+     				STATUS      current
+     				DESCRIPTION
+            				"Subnet mask for the system when using a static Ip address. Changes will
+					 be applied after network chip is reset."
+    	::= { Settings     5 }
+
+
+	DefaultGatewayStatic	OBJECT-TYPE
+     				SYNTAX      IpAddress
+     				MAX-ACCESS  read-write
+     				STATUS      current
+     				DESCRIPTION
+            				"Default gateway for the system when using a static Ip address. Changes
+					 will be applied after network chip is reset."
+    	::= { Settings     6 }
+
+--
+--
+-- 	Traps Below Here
+--
+--
+
+
+
+
+	LowDC-trap		TRAP-TYPE
+				STATUS current
+				ENTERPRISE batV
+				VARIABLES { batV, DCVLow }
+				DESCRIPTION "Battery voltage low limit has been triggered."
+	::=  1
+
+	HighDC-trap		TRAP-TYPE
+				STATUS current
+				ENTERPRISE batV
+				VARIABLES { batV, DCVHigh }
+				DESCRIPTION "Battery voltage high limit has been triggered."
+	::=  2
+
+
+
+	MinorAlarm-trap		TRAP-TYPE
+				STATUS current
+				ENTERPRISE Alarms
+				VARIABLES { source1Alarms, source2Alarms, source3Alarms}
+				DESCRIPTION "A minor alarm has been triggered."
+	::=  3
+
+	MajorAlarm-trap		TRAP-TYPE
+				STATUS current
+				ENTERPRISE Alarms
+				VARIABLES { source1Alarms, source2Alarms, source3Alarms}
+				DESCRIPTION "A major alarm has been triggered."
+	::=  4
+
+
+
+END

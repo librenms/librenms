@@ -1,44 +1,44 @@
 #! /usr/bin/env python3
 """
- wrapper        A small tool which wraps services, discovery and poller php scripts
-                in order to run them as threads with Queue and workers
+wrapper        A small tool which wraps services, discovery and poller php scripts
+               in order to run them as threads with Queue and workers
 
- Authors:       Orsiris de Jong <contact@netpower.fr>
-                Neil Lathwood <neil@librenms.org>
-                Job Snijders <job.snijders@atrato.com>
+Authors:       Orsiris de Jong <contact@netpower.fr>
+               Neil Lathwood <neil@librenms.org>
+               Job Snijders <job.snijders@atrato.com>
 
-                Distributed poller code (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org>
-                All code parts that belong to Daniel are enclosed in EOC comments
+               Distributed poller code (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org>
+               All code parts that belong to Daniel are enclosed in EOC comments
 
- Date:          Sep 2021
+Date:          Sep 2021
 
- Usage:         This program accepts three command line arguments
-                - the number of threads (defaults to 1 for discovery / service, and 16 for poller)
-                - the wrapper type (service, discovery or poller)
-                - optional debug boolean
+Usage:         This program accepts three command line arguments
+               - the number of threads (defaults to 1 for discovery / service, and 16 for poller)
+               - the wrapper type (service, discovery or poller)
+               - optional debug boolean
 
 
- Ubuntu Linux:  apt-get install python-mysqldb
- FreeBSD:       cd /usr/ports/*/py-MySQLdb && make install clean
- RHEL 7:        yum install MySQL-python
- RHEL 8:        dnf install mariadb-connector-c-devel gcc && python -m pip install mysqlclient
+Ubuntu Linux:  apt-get install python-mysqldb
+FreeBSD:       cd /usr/ports/*/py-MySQLdb && make install clean
+RHEL 7:        yum install MySQL-python
+RHEL 8:        dnf install mariadb-connector-c-devel gcc && python -m pip install mysqlclient
 
- Tested on:     Python 3.6.8 / PHP 7.2.11 / CentOS 8 / AlmaLinux 8.4
+Tested on:     Python 3.6.8 / PHP 7.2.11 / CentOS 8 / AlmaLinux 8.4
 
- License:       This program is free software: you can redistribute it and/or modify it
-                under the terms of the GNU General Public License as published by the
-                Free Software Foundation, either version 3 of the License, or (at your
-                option) any later version.
+License:       This program is free software: you can redistribute it and/or modify it
+               under the terms of the GNU General Public License as published by the
+               Free Software Foundation, either version 3 of the License, or (at your
+               option) any later version.
 
-                This program is distributed in the hope that it will be useful, but
-                WITHOUT ANY WARRANTY; without even the implied warranty of
-                MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
-                Public License for more details.
+               This program is distributed in the hope that it will be useful, but
+               WITHOUT ANY WARRANTY; without even the implied warranty of
+               MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+               Public License for more details.
 
-                You should have received a copy of the GNU General Public License along
-                with this program. If not, see https://www.gnu.org/licenses/.
+               You should have received a copy of the GNU General Public License along
+               with this program. If not, see https://www.gnu.org/licenses/.
 
-                LICENSE.txt contains a copy of the full GPLv3 licensing conditions.
+               LICENSE.txt contains a copy of the full GPLv3 licensing conditions.
 """
 
 import logging

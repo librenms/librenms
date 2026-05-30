@@ -22,6 +22,7 @@ if (isset($searchPhrase) && ! empty($searchPhrase)) {
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
 }
 
 $count_sql = "SELECT COUNT(`bgpPeer_id`) $sql";

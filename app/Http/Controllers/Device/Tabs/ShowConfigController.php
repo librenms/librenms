@@ -31,6 +31,7 @@ use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use Symfony\Component\Process\Process;
 
@@ -41,7 +42,7 @@ class ShowConfigController extends Controller implements DeviceTab
 
     public function visible(Device $device): bool
     {
-        if (auth()->user()->can('show-config', $device)) {
+        if (Gate::allows('show-config', $device)) {
             return $this->oxidizedEnabled($device) || $this->getRancidConfigFile() !== false;
         }
 

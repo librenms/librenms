@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Facades\LibrenmsConfig;
+use App\Models\Traits\Filterable;
 use App\View\SimpleTemplate;
 use Carbon\Carbon;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
@@ -27,7 +29,6 @@ use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
-use Permissions;
 
 /**
  * @property-read int|null $ports_count
@@ -38,7 +39,7 @@ use Permissions;
  */
 class Device extends BaseModel
 {
-    use PivotEventTrait, HasFactory;
+    use PivotEventTrait, HasFactory, Filterable;
 
     private ?MaintenanceStatus $maintenanceStatus = null;
 
@@ -57,7 +58,7 @@ class Device extends BaseModel
         'features',
         'hardware',
         'hostname',
-        'display',
+        'display_template',
         'icon',
         'ignore',
         'ignore_status',
@@ -81,11 +82,34 @@ class Device extends BaseModel
         'sysDescr',
         'sysName',
         'sysObjectID',
+        'snmpEngineID',
         'timeout',
         'transport',
         'type',
         'version',
         'uptime',
+    ];
+
+    protected array $filterable = [
+        'device_id',
+        'hostname',
+        'sysName',
+        'display',
+        'hardware',
+        'os',
+        'location_id',
+        'version',
+        'features',
+        'type',
+        'status',
+        'disabled',
+        'ignore',
+        'disable_notify',
+        'poller_group',
+        'groups.id',
+        'serviceTemplates.id',
+        'search',
+        'state',
     ];
 
     /**
@@ -201,19 +225,11 @@ class Device extends BaseModel
     }
 
     /**
-     * Get the display name of this device based on the display format string
-     * The default is {{ $hostname }} controlled by the device_display_default setting
+     * @deprecated use display field directly
      */
     public function displayName(): string
     {
-        $hostname_is_ip = IP::isValid($this->hostname);
-
-        return SimpleTemplate::parse($this->display ?: \App\Facades\LibrenmsConfig::get('device_display_default', '{{ $hostname }}'), [
-            'hostname' => $this->hostname,
-            'sysName' => $this->sysName ?: $this->hostname,
-            'sysName_fallback' => $hostname_is_ip ? $this->sysName : $this->hostname,
-            'ip' => $this->overwrite_ip ?: ($hostname_is_ip ? $this->hostname : $this->ip),
-        ]);
+        return $this->display ?: $this->hostname ?: '';
     }
 
     /**
@@ -232,15 +248,30 @@ class Device extends BaseModel
         return '';
     }
 
+    public function regenerateDisplayName(): void
+    {
+        $hostname_is_ip = IP::isValid($this->hostname);
+
+        $display = SimpleTemplate::parse($this->display_template ?: LibrenmsConfig::get('device_display_default',
+            '{{ $hostname }}'), [
+                'hostname' => $this->hostname,
+                'sysName' => $this->sysName ?: $this->hostname,
+                'sysName_fallback' => $hostname_is_ip ? $this->sysName : $this->hostname,
+                'ip' => $this->overwrite_ip ?: ($hostname_is_ip ? $this->hostname : $this->ip),
+            ]);
+
+        $this->display = substr($display, 0, 128);
+    }
+
     public function isUnderMaintenance(): bool
     {
-        return $this->getMaintenanceStatus() !== MaintenanceStatus::NONE;
+        return $this->getMaintenanceStatus() !== MaintenanceStatus::None;
     }
 
     public function getMaintenanceStatus(): MaintenanceStatus
     {
         if (! $this->device_id) {
-            return MaintenanceStatus::NONE;
+            return MaintenanceStatus::None;
         }
 
         // use cached status
@@ -276,18 +307,18 @@ class Device extends BaseModel
     public function getDeviceStatus(): DeviceStatus
     {
         if ($this->disabled) {
-            return DeviceStatus::DISABLED;
+            return DeviceStatus::Disabled;
         }
 
         if ($this->ignore) {
-            return $this->status ? DeviceStatus::IGNORED_UP : DeviceStatus::IGNORED_DOWN;
+            return $this->status ? DeviceStatus::IgnoredUp : DeviceStatus::IgnoredDown;
         }
 
         if ($this->status) {
-            return DeviceStatus::UP;
+            return DeviceStatus::Up;
         }
 
-        return $this->last_polled ? DeviceStatus::DOWN : DeviceStatus::NEVER_POLLED;
+        return $this->last_polled ? DeviceStatus::Down : DeviceStatus::NeverPolled;
     }
 
     /**
@@ -336,29 +367,10 @@ class Device extends BaseModel
         $deviceOutage = $this->getCurrentOutage();
 
         if ($deviceOutage) {
-            return Carbon::createFromTimestamp((int) $deviceOutage->going_down, session('preferences.timezone'));
+            return Carbon::createFromTimestamp((int) $deviceOutage->going_down);
         }
 
         return $this->last_polled ?? Carbon::now();
-    }
-
-    /**
-     * Check if user can access this device.
-     *
-     * @param  User  $user
-     * @return bool
-     */
-    public function canAccess($user)
-    {
-        if (! $user) {
-            return false;
-        }
-
-        if ($user->hasGlobalRead()) {
-            return true;
-        }
-
-        return Permissions::canAccessDevice($this->device_id, $user->user_id);
     }
 
     public function formatDownUptime($short = false): string
@@ -552,6 +564,25 @@ class Device extends BaseModel
 
     // ---- Query scopes ----
 
+    public function filterState(Builder $query, mixed $value, array $config): void
+    {
+        $this->applyMappedFilter($query, $value, $config, fn (Builder $q, $state) => match ($state) {
+            'up' => $q->where('status', 1)->where('disabled', 0)->where('disable_notify', 0),
+            'down' => $q->where('status', 0)->where('disabled', 0)->where('disable_notify', 0),
+            default => $q,
+        });
+    }
+
+    public function filterSearch(Builder $query, mixed $value, array $config): void
+    {
+        $this->applyFilterSearch(
+            ['sysName', 'hostname', 'display', 'hardware', 'os', 'location.location'],
+            $query,
+            $value,
+            $config,
+        );
+    }
+
     public function scopeIsUp($query)
     {
         return $query->where([
@@ -712,7 +743,7 @@ class Device extends BaseModel
 
     // ---- Define Relationships ----
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AccessPoint, $this>
+     * @return HasMany<AccessPoint, $this>
      */
     public function accessPoints(): HasMany
     {
@@ -720,7 +751,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Alert, $this>
+     * @return HasMany<Alert, $this>
      */
     public function alerts(): HasMany
     {
@@ -728,7 +759,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AlertLog, $this>
+     * @return HasMany<AlertLog, $this>
      */
     public function alertLogs(): HasMany
     {
@@ -736,7 +767,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\App\Models\AlertSchedule, $this>
+     * @return MorphToMany<AlertSchedule, $this>
      */
     public function alertSchedules(): MorphToMany
     {
@@ -744,7 +775,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Application, $this>
+     * @return HasMany<Application, $this>
      */
     public function applications(): HasMany
     {
@@ -752,7 +783,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\DeviceAttrib, $this>
+     * @return HasMany<DeviceAttrib, $this>
      */
     public function attribs(): HasMany
     {
@@ -760,7 +791,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Availability, $this>
+     * @return HasMany<Availability, $this>
      */
     public function availability(): HasMany
     {
@@ -768,7 +799,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\BgpPeer, $this>
+     * @return HasMany<BgpPeer, $this>
      */
     public function bgppeers(): HasMany
     {
@@ -776,7 +807,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\CefSwitching, $this>
+     * @return HasMany<CefSwitching, $this>
      */
     public function cefSwitching(): HasMany
     {
@@ -784,7 +815,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Device, $this>
+     * @return BelongsToMany<Device, $this>
      */
     public function children(): BelongsToMany
     {
@@ -792,7 +823,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Component, $this>
+     * @return HasMany<Component, $this>
      */
     public function components(): HasMany
     {
@@ -800,7 +831,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\DiskIo, $this>
+     * @return HasMany<DiskIo, $this>
      */
     public function diskIo(): HasMany
     {
@@ -808,7 +839,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\HrDevice, $this>
+     * @return HasMany<HrDevice, $this>
      */
     public function hostResources(): HasMany
     {
@@ -816,7 +847,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\HrSystem, $this>
+     * @return HasOne<HrSystem, $this>
      */
     public function hostResourceValues(): HasOne
     {
@@ -824,7 +855,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\EntPhysical, $this>
+     * @return HasMany<EntPhysical, $this>
      */
     public function entityPhysical(): HasMany
     {
@@ -832,7 +863,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\EntityState, $this>
+     * @return HasMany<EntityState, $this>
      */
     public function entityState(): HasMany
     {
@@ -840,7 +871,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Eventlog, $this>
+     * @return HasMany<Eventlog, $this>
      */
     public function eventlogs(): HasMany
     {
@@ -848,7 +879,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\DeviceGraph, $this>
+     * @return HasMany<DeviceGraph, $this>
      */
     public function graphs(): HasMany
     {
@@ -856,7 +887,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\DeviceGroup, $this>
+     * @return BelongsToMany<DeviceGroup, $this>
      */
     public function groups(): BelongsToMany
     {
@@ -864,7 +895,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\IpsecTunnel, $this>
+     * @return HasMany<IpsecTunnel, $this>
      */
     public function ipsecTunnels(): HasMany
     {
@@ -872,7 +903,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\Ipv4Address, \App\Models\Port, $this>
+     * @return HasManyThrough<Ipv4Address, Port, $this>
      */
     public function ipv4(): HasManyThrough
     {
@@ -880,7 +911,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\Ipv6Address, \App\Models\Port, $this>
+     * @return HasManyThrough<Ipv6Address, Port, $this>
      */
     public function ipv6(): HasManyThrough
     {
@@ -888,7 +919,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\IsisAdjacency, $this>
+     * @return HasMany<IsisAdjacency, $this>
      */
     public function isisAdjacencies(): HasMany
     {
@@ -896,7 +927,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Link, $this>
+     * @return HasMany<Link, $this>
      */
     public function links(): HasMany
     {
@@ -904,24 +935,36 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Link, $this>
+     * @return HasMany<Link, $this>
      */
     public function remoteLinks(): HasMany
     {
         return $this->hasMany(Link::class, 'remote_device_id');
     }
 
+    /**
+     * @return \Illuminate\Support\Collection<int, \App\Models\Link>
+     */
     public function allLinks(): \Illuminate\Support\Collection
     {
         return $this->links->merge($this->remoteLinks);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Location, $this>
+     * @return BelongsTo<Location, $this>
      */
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class, 'location_id', 'id');
+    }
+
+    /**
+     * @return HasMany<Ipv4Mac, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MacAccounting, $this>
+     */
+    public function macAccounting(): HasMany
+    {
+        return $this->hasMany(MacAccounting::class, 'device_id');
     }
 
     /**
@@ -933,7 +976,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\CustomMap, \App\Models\CustomMapNode, $this>
+     * @return HasManyThrough<CustomMap, CustomMapNode, $this>
      */
     public function maps(): HasManyThrough
     {
@@ -942,7 +985,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MefInfo, $this>
+     * @return HasMany<MefInfo, $this>
      */
     public function mefInfo(): HasMany
     {
@@ -950,7 +993,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MuninPlugin, $this>
+     * @return HasMany<MuninPlugin, $this>
      */
     public function muninPlugins(): HasMany
     {
@@ -958,7 +1001,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ipv6Nd, $this>
+     * @return HasMany<Ipv6Nd, $this>
      */
     public function nd(): HasMany
     {
@@ -966,7 +1009,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\NetscalerVserver, $this>
+     * @return HasMany<NetscalerVserver, $this>
      */
     public function netscalerVservers(): HasMany
     {
@@ -974,7 +1017,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\OspfArea, $this>
+     * @return HasMany<OspfArea, $this>
      */
     public function ospfAreas(): HasMany
     {
@@ -982,7 +1025,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\OspfInstance, $this>
+     * @return HasMany<OspfInstance, $this>
      */
     public function ospfInstances(): HasMany
     {
@@ -990,7 +1033,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\OspfNbr, $this>
+     * @return HasMany<OspfNbr, $this>
      */
     public function ospfNbrs(): HasMany
     {
@@ -998,7 +1041,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\OspfPort, $this>
+     * @return HasMany<OspfPort, $this>
      */
     public function ospfPorts(): HasMany
     {
@@ -1006,7 +1049,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ospfv3Area, $this>
+     * @return HasMany<Ospfv3Area, $this>
      */
     public function ospfv3Areas(): HasMany
     {
@@ -1014,7 +1057,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ospfv3Instance, $this>
+     * @return HasMany<Ospfv3Instance, $this>
      */
     public function ospfv3Instances(): HasMany
     {
@@ -1022,7 +1065,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ospfv3Nbr, $this>
+     * @return HasMany<Ospfv3Nbr, $this>
      */
     public function ospfv3Nbrs(): HasMany
     {
@@ -1030,7 +1073,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ospfv3Port, $this>
+     * @return HasMany<Ospfv3Port, $this>
      */
     public function ospfv3Ports(): HasMany
     {
@@ -1038,7 +1081,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Package, $this>
+     * @return HasMany<Package, $this>
      */
     public function packages(): HasMany
     {
@@ -1046,7 +1089,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Device, $this>
+     * @return BelongsToMany<Device, $this>
      */
     public function parents(): BelongsToMany
     {
@@ -1054,7 +1097,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Port, $this>
+     * @return HasMany<Port, $this>
      */
     public function ports(): HasMany
     {
@@ -1062,7 +1105,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\PortAdsl, \App\Models\Port, $this>
+     * @return HasManyThrough<PortAdsl, Port, $this>
      */
     public function portsAdsl(): HasManyThrough
     {
@@ -1070,7 +1113,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortsFdb, $this>
+     * @return HasMany<PortsFdb, $this>
      */
     public function portsFdb(): HasMany
     {
@@ -1078,7 +1121,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortsNac, $this>
+     * @return HasMany<PortsNac, $this>
      */
     public function portsNac(): HasMany
     {
@@ -1086,7 +1129,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortStack, $this>
+     * @return HasMany<PortStack, $this>
      */
     public function portsStack(): HasMany
     {
@@ -1094,7 +1137,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortStp, $this>
+     * @return HasMany<PortStp, $this>
      */
     public function portsStp(): HasMany
     {
@@ -1102,7 +1145,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\PortSecurity, \App\Models\Port, $this>
+     * @return HasManyThrough<PortSecurity, Port, $this>
      */
     public function portSecurity(): HasManyThrough
     {
@@ -1110,7 +1153,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\PortVdsl, \App\Models\Port, $this>
+     * @return HasManyThrough<PortVdsl, Port, $this>
      */
     public function portsVdsl(): HasManyThrough
     {
@@ -1118,7 +1161,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortVlan, $this>
+     * @return HasMany<PortVlan, $this>
      */
     public function portsVlan(): HasMany
     {
@@ -1126,7 +1169,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Process, $this>
+     * @return HasMany<Process, $this>
      */
     public function processes(): HasMany
     {
@@ -1134,7 +1177,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Processor, $this>
+     * @return HasMany<Processor, $this>
      */
     public function processors(): HasMany
     {
@@ -1142,7 +1185,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Route, $this>
+     * @return HasMany<Route, $this>
      */
     public function routes(): HasMany
     {
@@ -1150,7 +1193,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\AlertRule, $this>
+     * @return BelongsToMany<AlertRule, $this>
      */
     public function rules(): BelongsToMany
     {
@@ -1158,7 +1201,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Sensor, $this>
+     * @return HasMany<Sensor, $this>
      */
     public function sensors(): HasMany
     {
@@ -1166,7 +1209,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\ServiceTemplate, $this>
+     * @return BelongsToMany<ServiceTemplate, $this>
      */
     public function serviceTemplates(): BelongsToMany
     {
@@ -1174,7 +1217,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Service, $this>
+     * @return HasMany<Service, $this>
      */
     public function services(): HasMany
     {
@@ -1182,7 +1225,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\DeviceStats, $this>
+     * @return HasOne<DeviceStats, $this>
      */
     public function stats(): HasOne
     {
@@ -1190,7 +1233,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Storage, $this>
+     * @return HasMany<Storage, $this>
      */
     public function storage(): HasMany
     {
@@ -1198,7 +1241,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Stp, $this>
+     * @return HasMany<Stp, $this>
      */
     public function stpInstances(): HasMany
     {
@@ -1206,7 +1249,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortStp, $this>
+     * @return HasMany<PortStp, $this>
      */
     public function stpPorts(): HasMany
     {
@@ -1214,7 +1257,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Mempool, $this>
+     * @return HasMany<Mempool, $this>
      */
     public function mempools(): HasMany
     {
@@ -1222,7 +1265,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsLsp, $this>
+     * @return HasMany<MplsLsp, $this>
      */
     public function mplsLsps(): HasMany
     {
@@ -1230,7 +1273,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsLspPath, $this>
+     * @return HasMany<MplsLspPath, $this>
      */
     public function mplsLspPaths(): HasMany
     {
@@ -1238,7 +1281,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsSdp, $this>
+     * @return HasMany<MplsSdp, $this>
      */
     public function mplsSdps(): HasMany
     {
@@ -1246,7 +1289,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsService, $this>
+     * @return HasMany<MplsService, $this>
      */
     public function mplsServices(): HasMany
     {
@@ -1254,7 +1297,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsSap, $this>
+     * @return HasMany<MplsSap, $this>
      */
     public function mplsSaps(): HasMany
     {
@@ -1262,7 +1305,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsSdpBind, $this>
+     * @return HasMany<MplsSdpBind, $this>
      */
     public function mplsSdpBinds(): HasMany
     {
@@ -1270,7 +1313,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsTunnelArHop, $this>
+     * @return HasMany<MplsTunnelArHop, $this>
      */
     public function mplsTunnelArHops(): HasMany
     {
@@ -1278,7 +1321,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsTunnelCHop, $this>
+     * @return HasMany<MplsTunnelCHop, $this>
      */
     public function mplsTunnelCHops(): HasMany
     {
@@ -1286,7 +1329,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\DeviceOutage, $this>
+     * @return HasMany<DeviceOutage, $this>
      */
     public function outages(): HasMany
     {
@@ -1294,7 +1337,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PrinterSupply, $this>
+     * @return HasMany<PrinterSupply, $this>
      */
     public function printerSupplies(): HasMany
     {
@@ -1302,7 +1345,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Pseudowire, $this>
+     * @return HasMany<Pseudowire, $this>
      */
     public function pseudowires(): HasMany
     {
@@ -1310,7 +1353,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\LoadbalancerRserver, $this>
+     * @return HasMany<LoadbalancerRserver, $this>
      */
     public function rServers(): HasMany
     {
@@ -1318,7 +1361,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Qos, $this>
+     * @return HasMany<Qos, $this>
      */
     public function qos(): HasMany
     {
@@ -1326,7 +1369,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Sla, $this>
+     * @return HasMany<Sla, $this>
      */
     public function slas(): HasMany
     {
@@ -1334,7 +1377,15 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Syslog, $this>
+     * @return HasMany<SslCertificate, $this>
+     */
+    public function sslCertificates(): HasMany
+    {
+        return $this->hasMany(SslCertificate::class, 'device_id');
+    }
+
+    /**
+     * @return HasMany<Syslog, $this>
      */
     public function syslogs(): HasMany
     {
@@ -1342,7 +1393,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\TnmsneInfo, $this>
+     * @return HasMany<TnmsneInfo, $this>
      */
     public function tnmsNeInfo(): HasMany
     {
@@ -1350,7 +1401,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Transceiver, $this>
+     * @return HasMany<Transceiver, $this>
      */
     public function transceivers(): HasMany
     {
@@ -1358,7 +1409,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\User, $this>
+     * @return BelongsToMany<User, $this>
      */
     public function users(): BelongsToMany
     {
@@ -1367,7 +1418,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Vminfo, $this>
+     * @return HasMany<Vminfo, $this>
      */
     public function vminfo(): HasMany
     {
@@ -1375,7 +1426,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Vlan, $this>
+     * @return HasMany<Vlan, $this>
      */
     public function vlans(): HasMany
     {
@@ -1383,7 +1434,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\VrfLite, $this>
+     * @return HasMany<VrfLite, $this>
      */
     public function vrfLites(): HasMany
     {
@@ -1391,7 +1442,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Vrf, $this>
+     * @return HasMany<Vrf, $this>
      */
     public function vrfs(): HasMany
     {
@@ -1399,7 +1450,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\LoadbalancerVserver, $this>
+     * @return HasMany<LoadbalancerVserver, $this>
      */
     public function vServers(): HasMany
     {
@@ -1407,7 +1458,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\WirelessSensor, $this>
+     * @return HasMany<WirelessSensor, $this>
      */
     public function wirelessSensors(): HasMany
     {

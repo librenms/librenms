@@ -6,11 +6,11 @@ if (device_permitted($entry['device_id'])) {
     // Stop shortening hostname. Issue #61
     // $entry['hostname'] = shorthost($entry['hostname'], 20);
     if ($vars['page'] != 'device') {
-        $syslog_output .= '<td>' . $entry['date'] . '</td>
+        $syslog_output .= '<td>' . e($entry['date']) . '</td>
                         <td><strong>' . generate_device_link($entry) . '</strong></td>
-                        <td><strong>' . $entry['program'] . ' : </strong> ' . htmlspecialchars((string) $entry['msg']) . '</td>';
+                        <td><strong>' . e($entry['program']) . ' : </strong> ' . e($entry['msg']) . '</td>';
     } else {
-        $syslog_output .= '<td><i>' . $entry['date'] . '</i>&nbsp;&nbsp;&nbsp;<strong>' . $entry['program'] . '</strong>&nbsp;&nbsp;&nbsp;' . htmlspecialchars((string) $entry['msg']) . '</td>';
+        $syslog_output .= '<td><i>' . e($entry['date']) . '</i>&nbsp;&nbsp;&nbsp;<strong>' . e($entry['program']) . '</strong>&nbsp;&nbsp;&nbsp;' . e($entry['msg']) . '</td>';
     }
 
     $syslog_output .= '</tr>';

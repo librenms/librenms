@@ -20,7 +20,7 @@
  *  down(3),
  *  notpresent(4)
  */
-$voss_fan = snmpwalk_cache_multi_oid($device, 'rcVossSystemFanInfoOperStatus', [], 'RAPID-CITY');
+$voss_fan = snmpwalk_cache_multi_oid($device, 'rcVossSystemFanInfoOperStatus', [], 'RAPID-CITY', null, '-OeQUs');
 $fan = snmpwalk_cache_multi_oid($device, 'rcChasFanOperStatus', [], 'RAPID-CITY');
 
 if (is_array($voss_fan)) {
@@ -34,10 +34,10 @@ if (is_array($voss_fan)) {
 
         $state_name = 'rcVossSystemFanInfoOperStatus';
         $states = [
-            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
-            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'up'],
-            ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'down'],
-            ['value' => 4, 'generic' => 3, 'graph' => 0, 'descr' => 'notPresent'],
+            ['value' => 1, 'generic' => 3, 'descr' => 'unknown'],
+            ['value' => 2, 'generic' => 0, 'descr' => 'up'],
+            ['value' => 3, 'generic' => 1, 'descr' => 'down'],
+            ['value' => 4, 'generic' => 3, 'descr' => 'notPresent'],
         ];
         create_state_index($state_name, $states);
 
@@ -53,10 +53,10 @@ if (is_array($voss_fan)) {
 
         $state_name = 'rcChasFanOperStatus';
         $states = [
-            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
-            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'up'],
-            ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'down'],
-            ['value' => 4, 'generic' => 3, 'graph' => 0, 'descr' => 'notPresent'],
+            ['value' => 1, 'generic' => 3, 'descr' => 'unknown'],
+            ['value' => 2, 'generic' => 0, 'descr' => 'up'],
+            ['value' => 3, 'generic' => 1, 'descr' => 'down'],
+            ['value' => 4, 'generic' => 3, 'descr' => 'notPresent'],
         ];
         create_state_index($state_name, $states);
 
@@ -71,7 +71,7 @@ if (is_array($voss_fan)) {
  *  down(4)
 */
 
-$power_supply = snmpwalk_cache_multi_oid($device, 'rcChasPowerSupplyOperStatus', [], 'RAPID-CITY');
+$power_supply = snmpwalk_cache_multi_oid($device, 'rcChasPowerSupplyOperStatus', [], 'RAPID-CITY', null, '-OeQUs');
 
 if (is_array($power_supply)) {
     foreach ($power_supply as $oid => $array) {
@@ -83,10 +83,10 @@ if (is_array($power_supply)) {
 
         $state_name = 'rcChasPowerSupplyOperStatus';
         $states = [
-            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
-            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'empty'],
-            ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'up'],
-            ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'down'],
+            ['value' => 1, 'generic' => 3, 'descr' => 'unknown'],
+            ['value' => 2, 'generic' => 0, 'descr' => 'empty'],
+            ['value' => 3, 'generic' => 0, 'descr' => 'up'],
+            ['value' => 4, 'generic' => 1, 'descr' => 'down'],
         ];
         create_state_index($state_name, $states);
 

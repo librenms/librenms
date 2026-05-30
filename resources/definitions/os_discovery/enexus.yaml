@@ -1,4 +1,3 @@
-mib: SP2-MIB
 modules:
     os:
         hardware:
@@ -26,26 +25,26 @@ modules:
                     state_name: powerSystemStatus
                     group: System
                     states:
-                        - { descr: error, graph: 0, value: 0, generic: 2 }
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: minorAlarm, graph: 0, value: 2, generic: 1 }
-                        - { descr: majorAlarm, graph: 0, value: 3, generic: 2 }
-                        - { descr: disabled, graph: 0, value: 4, generic: 3 }
-                        - { descr: disconnected, graph: 0, value: 5, generic: 3 }
-                        - { descr: notPresent, graph: 0, value: 6, generic: 3 }
-                        - { descr: minorAndMajor, graph: 0, value: 7, generic: 2 }
-                        - { descr: majorLow, graph: 0, value: 8, generic: 2 }
-                        - { descr: minorLow, graph: 0, value: 9, generic: 1 }
-                        - { descr: majorHigh, graph: 0, value: 10, generic: 2 }
-                        - { descr: minorHigh, graph: 0, value: 11, generic: 1 }
-                        - { descr: event, graph: 0, value: 12, generic: 1 }
-                        - { descr: valueVolt, graph: 0, value: 13, generic: 1 }
-                        - { descr: valueAmp, graph: 0, value: 14, generic: 1 }
-                        - { descr: valueTemp, graph: 0, value: 15, generic: 1 }
-                        - { descr: valueUnit, graph: 0, value: 16, generic: 1 }
-                        - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
-                        - { descr: critical, graph: 0, value: 18, generic: 2 }
-                        - { descr: warning, graph: 0, value: 19, generic: 1 }
+                        - { descr: error, value: 0, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: minorAlarm, value: 2, generic: 1 }
+                        - { descr: majorAlarm, value: 3, generic: 2 }
+                        - { descr: disabled, value: 4, generic: 3 }
+                        - { descr: disconnected, value: 5, generic: 3 }
+                        - { descr: notPresent, value: 6, generic: 3 }
+                        - { descr: minorAndMajor, value: 7, generic: 2 }
+                        - { descr: majorLow, value: 8, generic: 2 }
+                        - { descr: minorLow, value: 9, generic: 1 }
+                        - { descr: majorHigh, value: 10, generic: 2 }
+                        - { descr: minorHigh, value: 11, generic: 1 }
+                        - { descr: event, value: 12, generic: 1 }
+                        - { descr: valueVolt, value: 13, generic: 1 }
+                        - { descr: valueAmp, value: 14, generic: 1 }
+                        - { descr: valueTemp, value: 15, generic: 1 }
+                        - { descr: valueUnit, value: 16, generic: 1 }
+                        - { descr: valuePerCent, value: 17, generic: 1 }
+                        - { descr: critical, value: 18, generic: 2 }
+                        - { descr: warning, value: 19, generic: 1 }
                     skip_values: 4
                 -
                     oid: SP2-MIB::mains
@@ -56,26 +55,26 @@ modules:
                     state_name: mainsStatus
                     group: System
                     states:
-                        - { descr: error, graph: 0, value: 0, generic: 2 }
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: minorAlarm, graph: 0, value: 2, generic: 1 }
-                        - { descr: majorAlarm, graph: 0, value: 3, generic: 2 }
-                        - { descr: disabled, graph: 0, value: 4, generic: 3 }
-                        - { descr: disconnected, graph: 0, value: 5, generic: 3 }
-                        - { descr: notPresent, graph: 0, value: 6, generic: 3 }
-                        - { descr: minorAndMajor, graph: 0, value: 7, generic: 2 }
-                        - { descr: majorLow, graph: 0, value: 8, generic: 2 }
-                        - { descr: minorLow, graph: 0, value: 9, generic: 1 }
-                        - { descr: majorHigh, graph: 0, value: 10, generic: 2 }
-                        - { descr: minorHigh, graph: 0, value: 11, generic: 1 }
-                        - { descr: event, graph: 0, value: 12, generic: 1 }
-                        - { descr: valueVolt, graph: 0, value: 13, generic: 1 }
-                        - { descr: valueAmp, graph: 0, value: 14, generic: 1 }
-                        - { descr: valueTemp, graph: 0, value: 15, generic: 1 }
-                        - { descr: valueUnit, graph: 0, value: 16, generic: 1 }
-                        - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
-                        - { descr: critical, graph: 0, value: 18, generic: 2 }
-                        - { descr: warning, graph: 0, value: 19, generic: 1 }
+                        - { descr: error, value: 0, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: minorAlarm, value: 2, generic: 1 }
+                        - { descr: majorAlarm, value: 3, generic: 2 }
+                        - { descr: disabled, value: 4, generic: 3 }
+                        - { descr: disconnected, value: 5, generic: 3 }
+                        - { descr: notPresent, value: 6, generic: 3 }
+                        - { descr: minorAndMajor, value: 7, generic: 2 }
+                        - { descr: majorLow, value: 8, generic: 2 }
+                        - { descr: minorLow, value: 9, generic: 1 }
+                        - { descr: majorHigh, value: 10, generic: 2 }
+                        - { descr: minorHigh, value: 11, generic: 1 }
+                        - { descr: event, value: 12, generic: 1 }
+                        - { descr: valueVolt, value: 13, generic: 1 }
+                        - { descr: valueAmp, value: 14, generic: 1 }
+                        - { descr: valueTemp, value: 15, generic: 1 }
+                        - { descr: valueUnit, value: 16, generic: 1 }
+                        - { descr: valuePerCent, value: 17, generic: 1 }
+                        - { descr: critical, value: 18, generic: 2 }
+                        - { descr: warning, value: 19, generic: 1 }
                     skip_values: 4
 
                 -
@@ -86,26 +85,26 @@ modules:
                     state_name: mainsMainsFailureStatus
                     group: System
                     states:
-                        - { descr: error, graph: 0, value: 0, generic: 2 }
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: minorAlarm, graph: 0, value: 2, generic: 1 }
-                        - { descr: majorAlarm, graph: 0, value: 3, generic: 2 }
-                        - { descr: disabled, graph: 0, value: 4, generic: 3 }
-                        - { descr: disconnected, graph: 0, value: 5, generic: 3 }
-                        - { descr: notPresent, graph: 0, value: 6, generic: 3 }
-                        - { descr: minorAndMajor, graph: 0, value: 7, generic: 2 }
-                        - { descr: majorLow, graph: 0, value: 8, generic: 2 }
-                        - { descr: minorLow, graph: 0, value: 9, generic: 1 }
-                        - { descr: majorHigh, graph: 0, value: 10, generic: 2 }
-                        - { descr: minorHigh, graph: 0, value: 11, generic: 1 }
-                        - { descr: event, graph: 0, value: 12, generic: 1 }
-                        - { descr: valueVolt, graph: 0, value: 13, generic: 1 }
-                        - { descr: valueAmp, graph: 0, value: 14, generic: 1 }
-                        - { descr: valueTemp, graph: 0, value: 15, generic: 1 }
-                        - { descr: valueUnit, graph: 0, value: 16, generic: 1 }
-                        - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
-                        - { descr: critical, graph: 0, value: 18, generic: 2 }
-                        - { descr: warning, graph: 0, value: 19, generic: 1 }
+                        - { descr: error, value: 0, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: minorAlarm, value: 2, generic: 1 }
+                        - { descr: majorAlarm, value: 3, generic: 2 }
+                        - { descr: disabled, value: 4, generic: 3 }
+                        - { descr: disconnected, value: 5, generic: 3 }
+                        - { descr: notPresent, value: 6, generic: 3 }
+                        - { descr: minorAndMajor, value: 7, generic: 2 }
+                        - { descr: majorLow, value: 8, generic: 2 }
+                        - { descr: minorLow, value: 9, generic: 1 }
+                        - { descr: majorHigh, value: 10, generic: 2 }
+                        - { descr: minorHigh, value: 11, generic: 1 }
+                        - { descr: event, value: 12, generic: 1 }
+                        - { descr: valueVolt, value: 13, generic: 1 }
+                        - { descr: valueAmp, value: 14, generic: 1 }
+                        - { descr: valueTemp, value: 15, generic: 1 }
+                        - { descr: valueUnit, value: 16, generic: 1 }
+                        - { descr: valuePerCent, value: 17, generic: 1 }
+                        - { descr: critical, value: 18, generic: 2 }
+                        - { descr: warning, value: 19, generic: 1 }
                     skip_values: 4
                 -
                     oid: SP2-MIB::rectifierTable
@@ -117,26 +116,26 @@ modules:
                     index: 'rectifierStatus.{{ $index }}'
                     group: Rectifier
                     states:
-                        - { descr: error, graph: 0, value: 0, generic: 2 }
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: minorAlarm, graph: 0, value: 2, generic: 1 }
-                        - { descr: majorAlarm, graph: 0, value: 3, generic: 2 }
-                        - { descr: disabled, graph: 0, value: 4, generic: 3 }
-                        - { descr: disconnected, graph: 0, value: 5, generic: 3 }
-                        - { descr: notPresent, graph: 0, value: 6, generic: 3 }
-                        - { descr: minorAndMajor, graph: 0, value: 7, generic: 2 }
-                        - { descr: majorLow, graph: 0, value: 8, generic: 2 }
-                        - { descr: minorLow, graph: 0, value: 9, generic: 1 }
-                        - { descr: majorHigh, graph: 0, value: 10, generic: 2 }
-                        - { descr: minorHigh, graph: 0, value: 11, generic: 1 }
-                        - { descr: event, graph: 0, value: 12, generic: 1 }
-                        - { descr: valueVolt, graph: 0, value: 13, generic: 1 }
-                        - { descr: valueAmp, graph: 0, value: 14, generic: 1 }
-                        - { descr: valueTemp, graph: 0, value: 15, generic: 1 }
-                        - { descr: valueUnit, graph: 0, value: 16, generic: 1 }
-                        - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
-                        - { descr: critical, graph: 0, value: 18, generic: 2 }
-                        - { descr: warning, graph: 0, value: 19, generic: 1 }
+                        - { descr: error, value: 0, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: minorAlarm, value: 2, generic: 1 }
+                        - { descr: majorAlarm, value: 3, generic: 2 }
+                        - { descr: disabled, value: 4, generic: 3 }
+                        - { descr: disconnected, value: 5, generic: 3 }
+                        - { descr: notPresent, value: 6, generic: 3 }
+                        - { descr: minorAndMajor, value: 7, generic: 2 }
+                        - { descr: majorLow, value: 8, generic: 2 }
+                        - { descr: minorLow, value: 9, generic: 1 }
+                        - { descr: majorHigh, value: 10, generic: 2 }
+                        - { descr: minorHigh, value: 11, generic: 1 }
+                        - { descr: event, value: 12, generic: 1 }
+                        - { descr: valueVolt, value: 13, generic: 1 }
+                        - { descr: valueAmp, value: 14, generic: 1 }
+                        - { descr: valueTemp, value: 15, generic: 1 }
+                        - { descr: valueUnit, value: 16, generic: 1 }
+                        - { descr: valuePerCent, value: 17, generic: 1 }
+                        - { descr: critical, value: 18, generic: 2 }
+                        - { descr: warning, value: 19, generic: 1 }
                     skip_values: 4
                 -
                     oid: SP2-MIB::rectifiers
@@ -147,26 +146,26 @@ modules:
                     state_name: rectifiersStatus
                     group: Rectifier
                     states:
-                        - { descr: error, graph: 0, value: 0, generic: 2 }
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: minorAlarm, graph: 0, value: 2, generic: 1 }
-                        - { descr: majorAlarm, graph: 0, value: 3, generic: 2 }
-                        - { descr: disabled, graph: 0, value: 4, generic: 3 }
-                        - { descr: disconnected, graph: 0, value: 5, generic: 3 }
-                        - { descr: notPresent, graph: 0, value: 6, generic: 3 }
-                        - { descr: minorAndMajor, graph: 0, value: 7, generic: 2 }
-                        - { descr: majorLow, graph: 0, value: 8, generic: 2 }
-                        - { descr: minorLow, graph: 0, value: 9, generic: 1 }
-                        - { descr: majorHigh, graph: 0, value: 10, generic: 2 }
-                        - { descr: minorHigh, graph: 0, value: 11, generic: 1 }
-                        - { descr: event, graph: 0, value: 12, generic: 1 }
-                        - { descr: valueVolt, graph: 0, value: 13, generic: 1 }
-                        - { descr: valueAmp, graph: 0, value: 14, generic: 1 }
-                        - { descr: valueTemp, graph: 0, value: 15, generic: 1 }
-                        - { descr: valueUnit, graph: 0, value: 16, generic: 1 }
-                        - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
-                        - { descr: critical, graph: 0, value: 18, generic: 2 }
-                        - { descr: warning, graph: 0, value: 19, generic: 1 }
+                        - { descr: error, value: 0, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: minorAlarm, value: 2, generic: 1 }
+                        - { descr: majorAlarm, value: 3, generic: 2 }
+                        - { descr: disabled, value: 4, generic: 3 }
+                        - { descr: disconnected, value: 5, generic: 3 }
+                        - { descr: notPresent, value: 6, generic: 3 }
+                        - { descr: minorAndMajor, value: 7, generic: 2 }
+                        - { descr: majorLow, value: 8, generic: 2 }
+                        - { descr: minorLow, value: 9, generic: 1 }
+                        - { descr: majorHigh, value: 10, generic: 2 }
+                        - { descr: minorHigh, value: 11, generic: 1 }
+                        - { descr: event, value: 12, generic: 1 }
+                        - { descr: valueVolt, value: 13, generic: 1 }
+                        - { descr: valueAmp, value: 14, generic: 1 }
+                        - { descr: valueTemp, value: 15, generic: 1 }
+                        - { descr: valueUnit, value: 16, generic: 1 }
+                        - { descr: valuePerCent, value: 17, generic: 1 }
+                        - { descr: critical, value: 18, generic: 2 }
+                        - { descr: warning, value: 19, generic: 1 }
                     skip_values: 4
 
                 -
@@ -178,26 +177,26 @@ modules:
                     state_name: loadFusesStatus
                     group: Load Fuse
                     states:
-                        - { descr: error, graph: 0, value: 0, generic: 2 }
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: minorAlarm, graph: 0, value: 2, generic: 1 }
-                        - { descr: majorAlarm, graph: 0, value: 3, generic: 2 }
-                        - { descr: disabled, graph: 0, value: 4, generic: 3 }
-                        - { descr: disconnected, graph: 0, value: 5, generic: 3 }
-                        - { descr: notPresent, graph: 0, value: 6, generic: 3 }
-                        - { descr: minorAndMajor, graph: 0, value: 7, generic: 2 }
-                        - { descr: majorLow, graph: 0, value: 8, generic: 2 }
-                        - { descr: minorLow, graph: 0, value: 9, generic: 1 }
-                        - { descr: majorHigh, graph: 0, value: 10, generic: 2 }
-                        - { descr: minorHigh, graph: 0, value: 11, generic: 1 }
-                        - { descr: event, graph: 0, value: 12, generic: 1 }
-                        - { descr: valueVolt, graph: 0, value: 13, generic: 1 }
-                        - { descr: valueAmp, graph: 0, value: 14, generic: 1 }
-                        - { descr: valueTemp, graph: 0, value: 15, generic: 1 }
-                        - { descr: valueUnit, graph: 0, value: 16, generic: 1 }
-                        - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
-                        - { descr: critical, graph: 0, value: 18, generic: 2 }
-                        - { descr: warning, graph: 0, value: 19, generic: 1 }
+                        - { descr: error, value: 0, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: minorAlarm, value: 2, generic: 1 }
+                        - { descr: majorAlarm, value: 3, generic: 2 }
+                        - { descr: disabled, value: 4, generic: 3 }
+                        - { descr: disconnected, value: 5, generic: 3 }
+                        - { descr: notPresent, value: 6, generic: 3 }
+                        - { descr: minorAndMajor, value: 7, generic: 2 }
+                        - { descr: majorLow, value: 8, generic: 2 }
+                        - { descr: minorLow, value: 9, generic: 1 }
+                        - { descr: majorHigh, value: 10, generic: 2 }
+                        - { descr: minorHigh, value: 11, generic: 1 }
+                        - { descr: event, value: 12, generic: 1 }
+                        - { descr: valueVolt, value: 13, generic: 1 }
+                        - { descr: valueAmp, value: 14, generic: 1 }
+                        - { descr: valueTemp, value: 15, generic: 1 }
+                        - { descr: valueUnit, value: 16, generic: 1 }
+                        - { descr: valuePerCent, value: 17, generic: 1 }
+                        - { descr: critical, value: 18, generic: 2 }
+                        - { descr: warning, value: 19, generic: 1 }
                 -
                     oid: SP2-MIB::loadFuseTable
                     value: SP2-MIB::loadFuseStatus
@@ -207,18 +206,18 @@ modules:
                     state_name: loadFuseStatus
                     group: Load Fuse
                     states:
-                        - { descr: error, graph: 0, value: 0, generic: 2 }
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: minorAlarm, graph: 0, value: 2, generic: 1 }
-                        - { descr: majorAlarm, graph: 0, value: 3, generic: 2 }
-                        - { descr: disabled, graph: 0, value: 4, generic: 3 }
-                        - { descr: disconnected, graph: 0, value: 5, generic: 3 }
-                        - { descr: notPresent, graph: 0, value: 6, generic: 3 }
-                        - { descr: minorAndMajor, graph: 0, value: 7, generic: 2 }
-                        - { descr: majorLow, graph: 0, value: 8, generic: 2 }
-                        - { descr: minorLow, graph: 0, value: 9, generic: 1 }
-                        - { descr: majorHigh, graph: 0, value: 10, generic: 2 }
-                        - { descr: minorHigh, graph: 0, value: 11, generic: 1 }
+                        - { descr: error, value: 0, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: minorAlarm, value: 2, generic: 1 }
+                        - { descr: majorAlarm, value: 3, generic: 2 }
+                        - { descr: disabled, value: 4, generic: 3 }
+                        - { descr: disconnected, value: 5, generic: 3 }
+                        - { descr: notPresent, value: 6, generic: 3 }
+                        - { descr: minorAndMajor, value: 7, generic: 2 }
+                        - { descr: majorLow, value: 8, generic: 2 }
+                        - { descr: minorLow, value: 9, generic: 1 }
+                        - { descr: majorHigh, value: 10, generic: 2 }
+                        - { descr: minorHigh, value: 11, generic: 1 }
                     skip_values: 4
                 -
                     oid: SP2-MIB::battery
@@ -229,26 +228,26 @@ modules:
                     state_name: batteryStatus
                     group: Battery
                     states:
-                        - { descr: error, graph: 0, value: 0, generic: 2 }
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: minorAlarm, graph: 0, value: 2, generic: 1 }
-                        - { descr: majorAlarm, graph: 0, value: 3, generic: 2 }
-                        - { descr: disabled, graph: 0, value: 4, generic: 3 }
-                        - { descr: disconnected, graph: 0, value: 5, generic: 3 }
-                        - { descr: notPresent, graph: 0, value: 6, generic: 3 }
-                        - { descr: minorAndMajor, graph: 0, value: 7, generic: 2 }
-                        - { descr: majorLow, graph: 0, value: 8, generic: 2 }
-                        - { descr: minorLow, graph: 0, value: 9, generic: 1 }
-                        - { descr: majorHigh, graph: 0, value: 10, generic: 2 }
-                        - { descr: minorHigh, graph: 0, value: 11, generic: 1 }
-                        - { descr: event, graph: 0, value: 12, generic: 1 }
-                        - { descr: valueVolt, graph: 0, value: 13, generic: 1 }
-                        - { descr: valueAmp, graph: 0, value: 14, generic: 1 }
-                        - { descr: valueTemp, graph: 0, value: 15, generic: 1 }
-                        - { descr: valueUnit, graph: 0, value: 16, generic: 1 }
-                        - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
-                        - { descr: critical, graph: 0, value: 18, generic: 2 }
-                        - { descr: warning, graph: 0, value: 19, generic: 1 }
+                        - { descr: error, value: 0, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: minorAlarm, value: 2, generic: 1 }
+                        - { descr: majorAlarm, value: 3, generic: 2 }
+                        - { descr: disabled, value: 4, generic: 3 }
+                        - { descr: disconnected, value: 5, generic: 3 }
+                        - { descr: notPresent, value: 6, generic: 3 }
+                        - { descr: minorAndMajor, value: 7, generic: 2 }
+                        - { descr: majorLow, value: 8, generic: 2 }
+                        - { descr: minorLow, value: 9, generic: 1 }
+                        - { descr: majorHigh, value: 10, generic: 2 }
+                        - { descr: minorHigh, value: 11, generic: 1 }
+                        - { descr: event, value: 12, generic: 1 }
+                        - { descr: valueVolt, value: 13, generic: 1 }
+                        - { descr: valueAmp, value: 14, generic: 1 }
+                        - { descr: valueTemp, value: 15, generic: 1 }
+                        - { descr: valueUnit, value: 16, generic: 1 }
+                        - { descr: valuePerCent, value: 17, generic: 1 }
+                        - { descr: critical, value: 18, generic: 2 }
+                        - { descr: warning, value: 19, generic: 1 }
                 -
                     oid: SP2-MIB::batteryBankTable
                     value: SP2-MIB::batteryBankStatus
@@ -258,26 +257,26 @@ modules:
                     state_name: batteryBankStatus
                     group: Battery
                     states:
-                        - { descr: error, graph: 0, value: 0, generic: 2 }
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: minorAlarm, graph: 0, value: 2, generic: 1 }
-                        - { descr: majorAlarm, graph: 0, value: 3, generic: 2 }
-                        - { descr: disabled, graph: 0, value: 4, generic: 3 }
-                        - { descr: disconnected, graph: 0, value: 5, generic: 3 }
-                        - { descr: notPresent, graph: 0, value: 6, generic: 3 }
-                        - { descr: minorAndMajor, graph: 0, value: 7, generic: 2 }
-                        - { descr: majorLow, graph: 0, value: 8, generic: 2 }
-                        - { descr: minorLow, graph: 0, value: 9, generic: 1 }
-                        - { descr: majorHigh, graph: 0, value: 10, generic: 2 }
-                        - { descr: minorHigh, graph: 0, value: 11, generic: 1 }
-                        - { descr: event, graph: 0, value: 12, generic: 1 }
-                        - { descr: valueVolt, graph: 0, value: 13, generic: 1 }
-                        - { descr: valueAmp, graph: 0, value: 14, generic: 1 }
-                        - { descr: valueTemp, graph: 0, value: 15, generic: 1 }
-                        - { descr: valueUnit, graph: 0, value: 16, generic: 1 }
-                        - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
-                        - { descr: critical, graph: 0, value: 18, generic: 2 }
-                        - { descr: warning, graph: 0, value: 19, generic: 1 }
+                        - { descr: error, value: 0, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: minorAlarm, value: 2, generic: 1 }
+                        - { descr: majorAlarm, value: 3, generic: 2 }
+                        - { descr: disabled, value: 4, generic: 3 }
+                        - { descr: disconnected, value: 5, generic: 3 }
+                        - { descr: notPresent, value: 6, generic: 3 }
+                        - { descr: minorAndMajor, value: 7, generic: 2 }
+                        - { descr: majorLow, value: 8, generic: 2 }
+                        - { descr: minorLow, value: 9, generic: 1 }
+                        - { descr: majorHigh, value: 10, generic: 2 }
+                        - { descr: minorHigh, value: 11, generic: 1 }
+                        - { descr: event, value: 12, generic: 1 }
+                        - { descr: valueVolt, value: 13, generic: 1 }
+                        - { descr: valueAmp, value: 14, generic: 1 }
+                        - { descr: valueTemp, value: 15, generic: 1 }
+                        - { descr: valueUnit, value: 16, generic: 1 }
+                        - { descr: valuePerCent, value: 17, generic: 1 }
+                        - { descr: critical, value: 18, generic: 2 }
+                        - { descr: warning, value: 19, generic: 1 }
                     skip_values: 4
                 -
                     oid: SP2-MIB::batteryBankFuseTable
@@ -287,26 +286,26 @@ modules:
                     state_name: batteryFuseStatus
                     group: Battery
                     states:
-                        - { descr: error, graph: 0, value: 0, generic: 2 }
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: minorAlarm, graph: 0, value: 2, generic: 1 }
-                        - { descr: majorAlarm, graph: 0, value: 3, generic: 2 }
-                        - { descr: disabled, graph: 0, value: 4, generic: 3 }
-                        - { descr: disconnected, graph: 0, value: 5, generic: 3 }
-                        - { descr: notPresent, graph: 0, value: 6, generic: 3 }
-                        - { descr: minorAndMajor, graph: 0, value: 7, generic: 2 }
-                        - { descr: majorLow, graph: 0, value: 8, generic: 2 }
-                        - { descr: minorLow, graph: 0, value: 9, generic: 1 }
-                        - { descr: majorHigh, graph: 0, value: 10, generic: 2 }
-                        - { descr: minorHigh, graph: 0, value: 11, generic: 1 }
-                        - { descr: event, graph: 0, value: 12, generic: 1 }
-                        - { descr: valueVolt, graph: 0, value: 13, generic: 1 }
-                        - { descr: valueAmp, graph: 0, value: 14, generic: 1 }
-                        - { descr: valueTemp, graph: 0, value: 15, generic: 1 }
-                        - { descr: valueUnit, graph: 0, value: 16, generic: 1 }
-                        - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
-                        - { descr: critical, graph: 0, value: 18, generic: 2 }
-                        - { descr: warning, graph: 0, value: 19, generic: 1 }
+                        - { descr: error, value: 0, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: minorAlarm, value: 2, generic: 1 }
+                        - { descr: majorAlarm, value: 3, generic: 2 }
+                        - { descr: disabled, value: 4, generic: 3 }
+                        - { descr: disconnected, value: 5, generic: 3 }
+                        - { descr: notPresent, value: 6, generic: 3 }
+                        - { descr: minorAndMajor, value: 7, generic: 2 }
+                        - { descr: majorLow, value: 8, generic: 2 }
+                        - { descr: minorLow, value: 9, generic: 1 }
+                        - { descr: majorHigh, value: 10, generic: 2 }
+                        - { descr: minorHigh, value: 11, generic: 1 }
+                        - { descr: event, value: 12, generic: 1 }
+                        - { descr: valueVolt, value: 13, generic: 1 }
+                        - { descr: valueAmp, value: 14, generic: 1 }
+                        - { descr: valueTemp, value: 15, generic: 1 }
+                        - { descr: valueUnit, value: 16, generic: 1 }
+                        - { descr: valuePerCent, value: 17, generic: 1 }
+                        - { descr: critical, value: 18, generic: 2 }
+                        - { descr: warning, value: 19, generic: 1 }
                     skip_values: 4
                 -
                     oid: SP2-MIB::inputControlUnitInputTable
@@ -316,26 +315,26 @@ modules:
                     state_name: inputStatus
                     group: Alarm Input
                     states:
-                        - { descr: error, graph: 0, value: 0, generic: 2 }
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: minorAlarm, graph: 0, value: 2, generic: 1 }
-                        - { descr: majorAlarm, graph: 0, value: 3, generic: 2 }
-                        - { descr: disabled, graph: 0, value: 4, generic: 3 }
-                        - { descr: disconnected, graph: 0, value: 5, generic: 3 }
-                        - { descr: notPresent, graph: 0, value: 6, generic: 3 }
-                        - { descr: minorAndMajor, graph: 0, value: 7, generic: 2 }
-                        - { descr: majorLow, graph: 0, value: 8, generic: 2 }
-                        - { descr: minorLow, graph: 0, value: 9, generic: 1 }
-                        - { descr: majorHigh, graph: 0, value: 10, generic: 2 }
-                        - { descr: minorHigh, graph: 0, value: 11, generic: 1 }
-                        - { descr: event, graph: 0, value: 12, generic: 1 }
-                        - { descr: valueVolt, graph: 0, value: 13, generic: 1 }
-                        - { descr: valueAmp, graph: 0, value: 14, generic: 1 }
-                        - { descr: valueTemp, graph: 0, value: 15, generic: 1 }
-                        - { descr: valueUnit, graph: 0, value: 16, generic: 1 }
-                        - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
-                        - { descr: critical, graph: 0, value: 18, generic: 2 }
-                        - { descr: warning, graph: 0, value: 19, generic: 1 }
+                        - { descr: error, value: 0, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: minorAlarm, value: 2, generic: 1 }
+                        - { descr: majorAlarm, value: 3, generic: 2 }
+                        - { descr: disabled, value: 4, generic: 3 }
+                        - { descr: disconnected, value: 5, generic: 3 }
+                        - { descr: notPresent, value: 6, generic: 3 }
+                        - { descr: minorAndMajor, value: 7, generic: 2 }
+                        - { descr: majorLow, value: 8, generic: 2 }
+                        - { descr: minorLow, value: 9, generic: 1 }
+                        - { descr: majorHigh, value: 10, generic: 2 }
+                        - { descr: minorHigh, value: 11, generic: 1 }
+                        - { descr: event, value: 12, generic: 1 }
+                        - { descr: valueVolt, value: 13, generic: 1 }
+                        - { descr: valueAmp, value: 14, generic: 1 }
+                        - { descr: valueTemp, value: 15, generic: 1 }
+                        - { descr: valueUnit, value: 16, generic: 1 }
+                        - { descr: valuePerCent, value: 17, generic: 1 }
+                        - { descr: critical, value: 18, generic: 2 }
+                        - { descr: warning, value: 19, generic: 1 }
                     skip_values: 4
                 -
                     oid: SP2-MIB::outputControlUnitOutputTable
@@ -345,10 +344,10 @@ modules:
                     state_name: outputStatus
                     group: Alarm Output
                     states:
-                        - { descr: notenergized, graph: 0, value: 0, generic: 3 }
-                        - { descr: energized, graph: 0, value: 1, generic: 3 }
-                        - { descr: disconnected, graph: 0, value: 2, generic: 3 }
-                        - { descr: connected, graph: 0, value: 3, generic: 3 }
+                        - { descr: notenergized, value: 0, generic: 3 }
+                        - { descr: energized, value: 1, generic: 3 }
+                        - { descr: disconnected, value: 2, generic: 3 }
+                        - { descr: connected, value: 3, generic: 3 }
                     skip_values: 4
                 -
                     oid: SP2-MIB::powerSystem
@@ -358,10 +357,10 @@ modules:
                     state_name: powerSystemMode
                     group: System
                     states:
-                        - { descr: off, graph: 0, value: 0, generic: 0 }
-                        - { descr: test, graph: 0, value: 1, generic: 0 }
-                        - { descr: boost, graph: 0, value: 2, generic: 0 }
-                        - { descr: float, graph: 0, value: 3, generic: 0 }
+                        - { descr: off, value: 0, generic: 0 }
+                        - { descr: test, value: 1, generic: 0 }
+                        - { descr: boost, value: 2, generic: 0 }
+                        - { descr: float, value: 3, generic: 0 }
                 -
                     oid: SP2-MIB::inputIoUnitProgInputTable
                     value: SP2-MIB::inputIoUnitProgInputStatus
@@ -370,26 +369,26 @@ modules:
                     state_name: ioInputStatus
                     group: IO Alarm Input
                     states:
-                        - { descr: error, graph: 0, value: 0, generic: 2 }
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: minorAlarm, graph: 0, value: 2, generic: 1 }
-                        - { descr: majorAlarm, graph: 0, value: 3, generic: 2 }
-                        - { descr: disabled, graph: 0, value: 4, generic: 3 }
-                        - { descr: disconnected, graph: 0, value: 5, generic: 3 }
-                        - { descr: notPresent, graph: 0, value: 6, generic: 3 }
-                        - { descr: minorAndMajor, graph: 0, value: 7, generic: 2 }
-                        - { descr: majorLow, graph: 0, value: 8, generic: 2 }
-                        - { descr: minorLow, graph: 0, value: 9, generic: 1 }
-                        - { descr: majorHigh, graph: 0, value: 10, generic: 2 }
-                        - { descr: minorHigh, graph: 0, value: 11, generic: 1 }
-                        - { descr: event, graph: 0, value: 12, generic: 1 }
-                        - { descr: valueVolt, graph: 0, value: 13, generic: 1 }
-                        - { descr: valueAmp, graph: 0, value: 14, generic: 1 }
-                        - { descr: valueTemp, graph: 0, value: 15, generic: 1 }
-                        - { descr: valueUnit, graph: 0, value: 16, generic: 1 }
-                        - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
-                        - { descr: critical, graph: 0, value: 18, generic: 2 }
-                        - { descr: warning, graph: 0, value: 19, generic: 1 }
+                        - { descr: error, value: 0, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: minorAlarm, value: 2, generic: 1 }
+                        - { descr: majorAlarm, value: 3, generic: 2 }
+                        - { descr: disabled, value: 4, generic: 3 }
+                        - { descr: disconnected, value: 5, generic: 3 }
+                        - { descr: notPresent, value: 6, generic: 3 }
+                        - { descr: minorAndMajor, value: 7, generic: 2 }
+                        - { descr: majorLow, value: 8, generic: 2 }
+                        - { descr: minorLow, value: 9, generic: 1 }
+                        - { descr: majorHigh, value: 10, generic: 2 }
+                        - { descr: minorHigh, value: 11, generic: 1 }
+                        - { descr: event, value: 12, generic: 1 }
+                        - { descr: valueVolt, value: 13, generic: 1 }
+                        - { descr: valueAmp, value: 14, generic: 1 }
+                        - { descr: valueTemp, value: 15, generic: 1 }
+                        - { descr: valueUnit, value: 16, generic: 1 }
+                        - { descr: valuePerCent, value: 17, generic: 1 }
+                        - { descr: critical, value: 18, generic: 2 }
+                        - { descr: warning, value: 19, generic: 1 }
                     skip_values: 4
 
         voltage:
@@ -463,7 +462,7 @@ modules:
                             value: 4
         current:
             data:
-                -
+                -   # Non-Smartpack S devices
                     oid: SP2-MIB::rectifiersCurrent
                     value: SP2-MIB::rectifiersCurrentValue
                     num_oid: '.1.3.6.1.4.1.12148.10.5.2.5.{{ $index }}'
@@ -477,20 +476,43 @@ modules:
                             device: hardware
                             op: 'regex'
                             value: '/^Smart[Pp]ack S.*/'
-                -  # Smartpack S returns 10ths of an amp
+                -   # Smartpack S >= 2.14 (whole amps)
                     oid: SP2-MIB::rectifiersCurrent
                     value: SP2-MIB::rectifiersCurrentValue
                     num_oid: '.1.3.6.1.4.1.12148.10.5.2.5.{{ $index }}'
-                    descr: System Output Current
+                    descr: Rectifier Output Current
+                    index: 'current.{{ $index }}'
+                    group: Rectifier
+                    warn_limit: SP2-MIB::rectifiersCurrentMinorAlarmLevel
+                    high_limit: SP2-MIB::rectifiersCurrentMajorAlarmLevel
+                    skip_values:
+                        -
+                            device: hardware
+                            op: 'not_regex'
+                            value: '/^Smart[Pp]ack S.*/'
+                        -
+                            device: version
+                            op: 'regex'
+                            value: '/^(2\.([0-9]|1[0-3])(\.|$)|[01]\.)/'
+                -   # Smartpack S < 2.14 (10ths of an amp)
+                    oid: SP2-MIB::rectifiersCurrent
+                    value: SP2-MIB::rectifiersCurrentValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.5.2.5.{{ $index }}'
+                    descr: Rectifier Output Current
                     index: 'current.{{ $index }}'
                     group: Rectifier
                     divisor: 10
                     warn_limit: SP2-MIB::rectifiersCurrentMinorAlarmLevel
                     high_limit: SP2-MIB::rectifiersCurrentMajorAlarmLevel
                     skip_values:
-                        - device: hardware
-                          op: 'not_regex'
-                          value: '/^Smart[Pp]ack S.*/'
+                        -
+                            device: hardware
+                            op: 'not_regex'
+                            value: '/^Smart[Pp]ack S.*/'
+                        -
+                            device: version
+                            op: 'not_regex'
+                            value: '/^(2\.([0-9]|1[0-3])(\.|$)|[01]\.)/'
                 -
                     oid: SP2-MIB::rectifierTable
                     value: SP2-MIB::rectifierOutputCurrentValue
@@ -517,7 +539,7 @@ modules:
                     oid: SP2-MIB::batteryBankCurrentTable
                     value: SP2-MIB::batteryCurrentValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.18.4.1.6.{{ $index }}'
-                    descr: batteryCurrentDescription
+                    descr: 'Battery {{ $index }}'
                     index: 'batteryBankCurrent.{{ $index }}'
                     entPhysicalIndex: '3{{ $index }}'
                     group: Battery
@@ -534,7 +556,6 @@ modules:
                     entPhysicalIndex: '10'
                     index: 'load.{{ $index }}'
                     group: Load
-                    divisor: 10
                     warn_limit: SP2-MIB::loadCurrentMinorHighLevel
                     high_limit: SP2-MIB::loadCurrentMajorHighLevel
         temperature:
@@ -595,19 +616,10 @@ modules:
         load:
             data:
                 -
-                    oid: SP2-MIB::batteryRemainingCapacity
-                    value: SP2-MIB::batteryRemainingCapacityValue
-                    num_oid: '.1.3.6.1.4.1.12148.10.10.9.5.{{ $index }}'
-                    descr: SP2-MIB::batteryRemainingCapacityDescription
-                    entPhysicalIndex: '100'
-                    low_warn_limit: SP2-MIB::batteryRemainingCapacityMinorLowLevel
-                    low_limit: SP2-MIB::batteryRemainingCapacityMajorLowLevel
-                    index: 'batteryRemainingCapacity.{{ $index }}'
-                -
                     oid: SP2-MIB::rectifiersCapacity
                     value: SP2-MIB::rectifiersCapacityValue
                     num_oid: '.1.3.6.1.4.1.12148.10.5.3.5.{{ $index }}'
-                    descr: SP2-MIB::rectifiersCapacityDescription
+                    descr: 'Rectifiers Capacity'
                     warn_limit: SP2-MIB::rectifiersCapacityMinorAlarmLevel
                     high_limit: SP2-MIB::rectifiersCapacityMajorAlarmLevel
                     index: 'rectifiersCapacity.{{ $index }}'
@@ -615,22 +627,31 @@ modules:
                     oid: SP2-MIB::batteryQuality
                     value: SP2-MIB::batteryQualityValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.12.5.{{ $index }}'
-                    descr: SP2-MIB::batteryQualityDescription
+                    descr: 'Battery Quality'
                     entPhysicalIndex: '100'
                     low_warn_limit: SP2-MIB::batteryQualityMinorAlarmLevel
                     low_limit: SP2-MIB::batteryQualityMajorAlarmLevel
                     index: 'batteryQuality.{{ $index }}'
+        count:
+            data:
+                -
+                    oid: SP2-MIB::batteryRemainingCapacity
+                    value: SP2-MIB::batteryRemainingCapacityValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.9.5.{{ $index }}'
+                    descr: 'Battery Remaining Capacity (Ah)'
+                    entPhysicalIndex: '100'
+                    low_warn_limit: SP2-MIB::batteryRemainingCapacityMinorLowLevel
+                    low_limit: SP2-MIB::batteryRemainingCapacityMajorLowLevel
+                    index: 'batteryRemainingCapacity.{{ $index }}'
                 -
                     oid: SP2-MIB::batteryUsedCapacity
                     value: SP2-MIB::batteryUsedCapacityValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.10.5.{{ $index }}'
-                    descr: SP2-MIB::batteryUsedCapacityDescription
+                    descr: 'Battery Used Capacity (Ah)'
                     entPhysicalIndex: '100'
                     warn_limit: SP2-MIB::batteryUsedCapacityMinorAlarmLevel
                     high_limit: SP2-MIB::batteryUsedCapacityMajorAlarmLevel
                     index: 'batteryUsedCapacity.{{ $index }}'
-        count:
-            data:
                 -
                     oid: SP2-MIB::batteryAhCharged
                     value: SP2-MIB::batteryAhChargedValue
@@ -645,7 +666,7 @@ modules:
                     oid: SP2-MIB::batteryTotalCapacity
                     value: SP2-MIB::batteryTotalCapacityValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.11.5.{{ $index }}'
-                    descr: SP2-MIB::batteryTotalCapacityDescription
+                    descr: "Battery Total Capacity"
                     entPhysicalIndex: '100'
                     index: 'batteryTotalCapacity.{{ $index }}'
                     low_warn_limit: SP2-MIB::batteryTotalCapacityMinorLowLevel
@@ -664,7 +685,7 @@ modules:
                     oid: SP2-MIB::rectifiersNumberOfRectifiers
                     index: 'rectifiersNumberOfRectifiers.0'
                     num_oid: '.1.3.6.1.4.1.12148.10.5.5.{{ $index }}'
-                    descr: Rectifiers number of rectifiers
+                    descr: Rectifier Modules
                 -
                     oid: SP2-MIB::batteryTestNumberOfResults
                     index: 'batteryTestNumberOfResults.0'

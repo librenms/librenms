@@ -12,7 +12,7 @@ class UpdateDeviceOutage
     public function execute(Device $device, bool $available): void
     {
         if (LibrenmsConfig::get('graphing.availability_consider_maintenance')
-            && $device->getMaintenanceStatus() !== MaintenanceStatus::NONE) {
+            && $device->getMaintenanceStatus() !== MaintenanceStatus::None) {
             return;
         }
 

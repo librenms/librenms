@@ -27,7 +27,7 @@ if (isset($device['device_id']) && $device['device_id'] > 0) {
     ];
 }
 
-if (! Auth::user()->hasGlobalRead()) {
+if (Gate::denies('viewAll', \App\Models\Alert::class)) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
     $sql .= ' AND `alert_log`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
@@ -102,10 +102,10 @@ foreach ($groups as $group) {
         },
         zoomMin: 86400, //24hrs
         zoomMax: <?php
-        $first_date = reset($data);
-        $last_date = end($data);
-        $milisec_diff = abs(strtotime((string) $first_date['x']) - strtotime((string) $last_date['x'])) * 1000;
-        echo $milisec_diff;
+        $firstDate = reset($data)['x'] ?? null;
+        $lastDate = end($data)['x'] ?? null;
+        $millisecondDiff = ($firstDate && $lastDate) ? abs(strtotime((string) $firstDate) - strtotime((string) $lastDate)) * 1000 : 0;
+        echo $millisecondDiff;
         ?>,
         orientation:'top'
     };

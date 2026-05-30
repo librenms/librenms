@@ -27,14 +27,16 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use App\Models\Vminfo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class VmInfoController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        return $device->vminfo()->exists();
+        return Gate::allows('viewAny', Vminfo::class) && $device->vminfo()->exists();
     }
 
     public function slug(): string

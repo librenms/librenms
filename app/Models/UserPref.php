@@ -33,8 +33,9 @@ class UserPref extends BaseModel
     public $timestamps = false;
     public $incrementing = false;
     protected $table = 'users_prefs';
-    /** @var array */
-    protected $primaryKey = ['user_id', 'pref'];
+    protected $primaryKey = 'user_id';
+    /** @var string[] */
+    protected array $compositeKey = ['user_id', 'pref'];
     protected $fillable = ['user_id', 'pref', 'value'];
 
     // ---- Helper Functions ----
@@ -102,28 +103,10 @@ class UserPref extends BaseModel
      */
     protected function setKeysForSaveQuery($query)
     {
-        /** @var array */
-        $keys = $this->getKeyName();
-
-        foreach ($keys as $keyName) {
-            $query->where($keyName, '=', $this->getKeyForSaveQuery($keyName));
+        foreach ($this->compositeKey as $keyName) {
+            $query->where($keyName, '=', $this->original[$keyName] ?? $this->getAttribute($keyName));
         }
 
         return $query;
-    }
-
-    /**
-     * Get the primary key value for a save query. (no primary key)
-     *
-     * @param  mixed  $keyName
-     * @return mixed
-     */
-    protected function getKeyForSaveQuery($keyName = null)
-    {
-        if (is_null($keyName)) {
-            $keyName = $this->getKeyName();
-        }
-
-        return $this->original[$keyName] ?? $this->getAttribute($keyName);
     }
 }

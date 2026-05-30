@@ -16,11 +16,12 @@
 
         <div class="row">
             <div class="col-sm-6 col-sm-offset-2 tw:justify-between tw:flex tw:flex-wrap">
-                <form id="delete_host" name="delete_host" method="post" action="delhost/" role="form" class="tw:inline-block">
-                    @csrf
-                    <input type="hidden" name="id" value="{{ $device->device_id }}">
-                    <button type="submit" class="btn btn-danger" name="Submit"><i class="fa fa-trash"></i> {{ __('device.edit.delete_device') }}</button>
-                </form>
+                @can('delete', $device)
+                <a href="{{ route('device.delete.confirm', ['device' => $device->device_id]) }}"
+                   class="btn btn-danger tw:inline-block">
+                    <i class="fa fa-trash"></i> {{ __('device.edit.delete_device') }}
+                </a>
+                @endcan
 
                 @if(LibrenmsConfig::get('enable_clear_discovery') && ! $device->snmp_disable)
                     <button type="submit" id="rediscover" data-device_id="{{ $device->device_id }}"
@@ -48,7 +49,7 @@
             <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="{{ __('device.edit.display_title', ['sysName' => $device->sysName]) }}" >
                 <label for="edit-display-input" class="col-sm-2 control-label" >{{ __('device.edit.display_name') }}</label>
                 <div class="col-sm-6">
-                    <input type="text" id="edit-display-input" name="display" class="form-control" placeholder="{{ __('device.edit.system_default') }}" value="{{ old('display', $device->display) }}">
+                    <input type="text" id="edit-display-input" name="display_template" class="form-control" placeholder="{{ __('device.edit.system_default') }}" value="{{ old('display_template', $device->display_template) }}">
                 </div>
             </div>
 
@@ -136,8 +137,8 @@
                 <label for="parent_id" class="col-sm-2 control-label">{{ __('device.edit.depends_on') }}</label>
                 <div class="col-sm-6">
                     <select multiple name="parent_id[]" id="parent_id" class="form-control" style="width: 100%">
-                        @foreach ($parents as $parent_id => $parent_hostname)
-                            <option value="{{  $parent_id }}" selected>{{ $parent_hostname }}</option>
+                        @foreach ($parents as $parent_id => $parent_display)
+                            <option value="{{ $parent_id }}" selected>{{ $parent_display }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -219,9 +220,9 @@
                 @if($rrd_num)
                 {{ __('device.edit.size_on_disk') }}: <b>{{ $rrd_size }}</b> in <b>{{ $rrd_num }}</b> {{ __('device.edit.rrd_files') }} |
                 @endif
-                {{ __('device.edit.last_polled') }}: <b>{{ $device->last_polled }}</b>
+                {{ __('device.edit.last_polled') }}: <b>{{ $device->last_polled ? \LibreNMS\Util\Time::format($device->last_polled, 'byminute') : $device->last_polled }}</b>
                 @if($device->last_discovered)
-                    | {{ __('device.edit.last_discovered') }}: <b>{{ $device->last_discovered }}</b>
+                    | {{ __('device.edit.last_discovered') }}: <b>{{ $device->last_discovered ? \LibreNMS\Util\Time::format($device->last_discovered, 'byminute') : $device->last_discovered }}</b>
                 @endif
             </div>
         </div>

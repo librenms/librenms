@@ -7,7 +7,6 @@ mib_dir: wis
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_wireless_clients, text: 'Connected Clients' }
-    - { graph: device_wireless_ccq, text: 'Connection Quality' }
 discovery:
     -
         sysObjectID:

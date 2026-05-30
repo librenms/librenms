@@ -1,4 +1,3 @@
-mib: PEAKFLOW-SP-MIB:PEAKFLOW-TMS-MIB
 modules:
     mempools:
         data:

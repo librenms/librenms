@@ -25,9 +25,7 @@ $subtype = basename($graphtype['subtype']);
 $id = $vars['id'] ?? null;
 
 if (isset($vars['device'])) {
-    $device = is_numeric($vars['device'])
-        ? device_by_id_cache($vars['device'])
-        : device_by_name($vars['device']);
+    $device = DeviceCache::get($vars['device']);
 }
 
 $auth = false;
@@ -193,7 +191,7 @@ if (! $auth) {
             <i class="fa-solid fa-circle-info fa-lg icon-theme" aria-hidden="true"></i>
             </div>
             </div>';
-        echo LibrenmsConfig::get('graph_descr.' . $vars['type']);
+        echo e(LibrenmsConfig::get('graph_descr.' . $vars['type']));
         print_optionbar_end();
     }
 

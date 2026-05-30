@@ -27,12 +27,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class Ipv6Address extends PortRelatedModel implements Keyable
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $primaryKey = 'ipv6_address_id';
     protected $fillable = [

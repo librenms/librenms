@@ -14,8 +14,8 @@ modules:
                     descr: 'Port ID {{ Perseus-MIB::meterPortID }} - {{ Perseus-MIB::meterName }} - State'
                     index: 'meterEnable.{{ $index }}'
                     states:
-                        - { descr: 'disabled',      graph: 1, value: 0, generic: 3 }
-                        - { descr: 'enabled',       graph: 1, value: 1, generic: 0 }
+                        - { descr: 'disabled',      value: 0, generic: 3 }
+                        - { descr: 'enabled',       value: 1, generic: 0 }
                 -
                     oid: Perseus-MIB::meterTable
                     value: Perseus-MIB::meterState
@@ -24,13 +24,13 @@ modules:
                     state_name: meterState
                     index: 'meterState.{{ $index }}'
                     states:
-                        - { descr: 'unknown',      graph: 1, value: 0, generic: 0 }
-                        - { descr: 'ok',           graph: 1, value: 1, generic: 0 }
-                        - { descr: 'varInvalid',   graph: 1, value: 2, generic: 0 }
-                        - { descr: 'meterInvalid', graph: 1, value: 3, generic: 0 }
-                        - { descr: 'alarmLow',     graph: 1, value: 4, generic: 0 }
-                        - { descr: 'alarmHigh',    graph: 1, value: 5, generic: 0 }
-                        - { descr: 'inactive',     graph: 1, value: 6, generic: 0 }
+                        - { descr: 'unknown',      value: 0, generic: 0 }
+                        - { descr: 'ok',           value: 1, generic: 0 }
+                        - { descr: 'varInvalid',   value: 2, generic: 0 }
+                        - { descr: 'meterInvalid', value: 3, generic: 0 }
+                        - { descr: 'alarmLow',     value: 4, generic: 0 }
+                        - { descr: 'alarmHigh',    value: 5, generic: 0 }
+                        - { descr: 'inactive',     value: 6, generic: 0 }
                 -
                     oid: Perseus-MIB::meterTable
                     value: Perseus-MIB::meterType
@@ -39,18 +39,18 @@ modules:
                     index: 'meterType.{{ $index }}'
                     state_name: meterType
                     states:
-                        - { descr: 'local',        graph: 1, value: 0, generic: 3 }
-                        - { descr: 'oneWire',      graph: 1, value: 1, generic: 0 }
-                        - { descr: 'varInvalid',   graph: 1, value: 2, generic: 0 }
-                        - { descr: 'unknown',      graph: 1, value: 3, generic: 0 }
-                        - { descr: 'mbus',         graph: 1, value: 4, generic: 0 }
-                        - { descr: 'modbusRTU',    graph: 1, value: 5, generic: 0 }
-                        - { descr: 'modbusTCP',    graph: 1, value: 6, generic: 0 }
-                        - { descr: 'httpXML',      graph: 1, value: 7, generic: 0 }
-                        - { descr: 'virtual',      graph: 1, value: 8, generic: 0 }
-                        - { descr: 'mQTT',         graph: 1, value: 9, generic: 0 }
-                        - { descr: 'snmp',         graph: 1, value: 10, generic: 0 }
-                        - { descr: 'localGPS',     graph: 1, value: 11, generic: 0 }
+                        - { descr: 'local',        value: 0, generic: 3 }
+                        - { descr: 'oneWire',      value: 1, generic: 0 }
+                        - { descr: 'varInvalid',   value: 2, generic: 0 }
+                        - { descr: 'unknown',      value: 3, generic: 0 }
+                        - { descr: 'mbus',         value: 4, generic: 0 }
+                        - { descr: 'modbusRTU',    value: 5, generic: 0 }
+                        - { descr: 'modbusTCP',    value: 6, generic: 0 }
+                        - { descr: 'httpXML',      value: 7, generic: 0 }
+                        - { descr: 'virtual',      value: 8, generic: 0 }
+                        - { descr: 'mQTT',         value: 9, generic: 0 }
+                        - { descr: 'snmp',         value: 10, generic: 0 }
+                        - { descr: 'localGPS',     value: 11, generic: 0 }
                 -
                     oid: Perseus-MIB::varTable
                     value: Perseus-MIB::varState
@@ -59,13 +59,13 @@ modules:
                     index: 'varState.{{ $index }}'
                     state_name: varState
                     states:
-                        - { descr: 'unknown',      graph: 1, value: 0, generic: 3 }
-                        - { descr: 'ok',           graph: 1, value: 1, generic: 0 }
-                        - { descr: 'varInvalid',   graph: 1, value: 2, generic: 0 }
-                        - { descr: 'meterInvalid', graph: 1, value: 3, generic: 0 }
-                        - { descr: 'alarmLow',     graph: 1, value: 4, generic: 0 }
-                        - { descr: 'alarmHigh',    graph: 1, value: 5, generic: 0 }
-                        - { descr: 'inactive',     graph: 1, value: 6, generic: 0 }
+                        - { descr: 'unknown',      value: 0, generic: 3 }
+                        - { descr: 'ok',           value: 1, generic: 0 }
+                        - { descr: 'varInvalid',   value: 2, generic: 0 }
+                        - { descr: 'meterInvalid', value: 3, generic: 0 }
+                        - { descr: 'alarmLow',     value: 4, generic: 0 }
+                        - { descr: 'alarmHigh',    value: 5, generic: 0 }
+                        - { descr: 'inactive',     value: 6, generic: 0 }
                 -
                     oid: Perseus-MIB::varTable
                     value: Perseus-MIB::varEnable
@@ -74,8 +74,8 @@ modules:
                     index: 'varEnable.{{ $index }}'
                     state_name: varEnable
                     states:
-                        - { descr: 'disabled',      graph: 2, value: 0, generic: 1 }
-                        - { descr: 'enabled',       graph: 2, value: 1, generic: 0 }
+                        - { descr: 'disabled',      value: 0, generic: 1 }
+                        - { descr: 'enabled',       value: 1, generic: 0 }
         count:
             data:
                 -

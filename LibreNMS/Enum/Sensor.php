@@ -2,115 +2,110 @@
 
 namespace LibreNMS\Enum;
 
+use App\Models\UserPref;
 use LibreNMS\Traits\EnumToArray;
 
 enum Sensor: string
 {
     use EnumToArray;
 
-    case AIRFLOW = 'airflow';
-    case BER = 'ber';
-    case BITRATE = 'bitrate';
-    case CHARGE = 'charge';
-    case CHROMATIC_DISPERSION = 'chromatic_dispersion';
-    case COOLING = 'cooling';
-    case COUNT = 'count';
-    case CURRENT = 'current';
-    case DBM = 'dbm';
-    case DELAY = 'delay';
-    case EER = 'eer';
-    case FANSPEED = 'fanspeed';
-    case FREQUENCY = 'frequency';
-    case HUMIDITY = 'humidity';
-    case LOAD = 'load';
-    case LOSS = 'loss';
-    case PERCENT = 'percent';
-    case POWER = 'power';
-    case POWER_CONSUMED = 'power_consumed';
-    case POWER_FACTOR = 'power_factor';
-    case PRESSURE = 'pressure';
-    case QUALITY_FACTOR = 'quality_factor';
-    case RUNTIME = 'runtime';
-    case SIGNAL = 'signal';
-    case SNR = 'snr';
-    case STATE = 'state';
-    case TEMPERATURE = 'temperature';
-    case TV_SIGNAL = 'tv_signal';
-    case VOLTAGE = 'voltage';
-    case WATERFLOW = 'waterflow';
-    case SIGNAL_LOSS = 'signal_loss';
+    case Airflow = 'airflow';
+    case Ber = 'ber';
+    case Bitrate = 'bitrate';
+    case Charge = 'charge';
+    case ChromaticDispersion = 'chromatic_dispersion';
+    case Cooling = 'cooling';
+    case Count = 'count';
+    case Current = 'current';
+    case Dbm = 'dbm';
+    case Delay = 'delay';
+    case Eer = 'eer';
+    case Fanspeed = 'fanspeed';
+    case Frequency = 'frequency';
+    case Humidity = 'humidity';
+    case Load = 'load';
+    case Loss = 'loss';
+    case Percent = 'percent';
+    case Power = 'power';
+    case PowerConsumed = 'power_consumed';
+    case PowerFactor = 'power_factor';
+    case Pressure = 'pressure';
+    case QualityFactor = 'quality_factor';
+    case Runtime = 'runtime';
+    case Signal = 'signal';
+    case Snr = 'snr';
+    case State = 'state';
+    case Temperature = 'temperature';
+    case TvSignal = 'tv_signal';
+    case Voltage = 'voltage';
+    case Waterflow = 'waterflow';
+    case SignalLoss = 'signal_loss';
+
+    public function label(): string
+    {
+        return __("sensors.$this->value.long");
+    }
 
     public function unit(): string
     {
-        return match ($this) {
-            self::AIRFLOW => 'cfm',
-            self::BER => 'ratio',
-            self::BITRATE => 'bps',
-            self::CHARGE => '%',
-            self::CHROMATIC_DISPERSION => 'ps/nm',
-            self::COOLING => 'W',
-            self::COUNT => '#',
-            self::CURRENT => 'A',
-            self::DBM => 'dBm',
-            self::DELAY => 's',
-            self::EER => 'eer',
-            self::FANSPEED => 'rpm',
-            self::FREQUENCY => 'Hz',
-            self::HUMIDITY => '%',
-            self::LOAD => '%',
-            self::LOSS => '%',
-            self::PERCENT => '%',
-            self::POWER => 'W',
-            self::POWER_CONSUMED => 'kWh',
-            self::POWER_FACTOR => 'ratio',
-            self::PRESSURE => 'kPa',
-            self::QUALITY_FACTOR => 'dB',
-            self::RUNTIME => 'Min',
-            self::SIGNAL => 'dBm',
-            self::SNR => 'SNR', // TODO: dB?
-            self::STATE => '#',
-            self::TEMPERATURE => '°C',
-            self::TV_SIGNAL => 'dBmV',
-            self::VOLTAGE => 'V',
-            self::WATERFLOW => 'l/m',
-            self::SIGNAL_LOSS => 'dB',
-        };
+        if ($this === self::Temperature && $this->userPrefsFahrenheit()) {
+            return __('sensors.temperature.unit_f');
+        }
+
+        return __("sensors.$this->value.unit");
+    }
+
+    public function unitLong(): string
+    {
+        if ($this === self::Temperature && $this->userPrefsFahrenheit()) {
+            return __('sensors.temperature.unit_long_f');
+        }
+
+        return __("sensors.$this->value.unit_long");
+    }
+
+    private function userPrefsFahrenheit(): bool
+    {
+        /** @var ?\App\Models\User $user */
+        $user = auth()->user();
+
+        return $user && UserPref::getPref($user, 'temp_units') == 'f';
     }
 
     public function icon(): string
     {
         return match ($this) {
-            self::AIRFLOW => 'angle-double-right',
-            self::BER => 'sort-amount-desc',
-            self::BITRATE => 'bar-chart',
-            self::CHARGE => 'battery-half',
-            self::CHROMATIC_DISPERSION => 'indent',
-            self::COOLING => 'thermometer-full',
-            self::COUNT => 'hashtag',
-            self::CURRENT => 'bolt fa-flip-horizontal',
-            self::DBM => 'sun-o',
-            self::DELAY => 'clock-o',
-            self::EER => 'snowflake-o',
-            self::FANSPEED => 'refresh',
-            self::FREQUENCY => 'line-chart',
-            self::HUMIDITY => 'tint',
-            self::LOAD => 'percent',
-            self::LOSS => 'percentage',
-            self::PERCENT => 'percent',
-            self::POWER => 'power-off',
-            self::POWER_CONSUMED => 'plug',
-            self::POWER_FACTOR => 'calculator',
-            self::PRESSURE => 'thermometer-empty',
-            self::QUALITY_FACTOR => 'arrows',
-            self::RUNTIME => 'hourglass-half',
-            self::SIGNAL => 'wifi',
-            self::SNR => 'signal',
-            self::STATE => 'bullseye',
-            self::TEMPERATURE => 'thermometer-three-quarters',
-            self::TV_SIGNAL => 'signal',
-            self::VOLTAGE => 'bolt',
-            self::WATERFLOW => 'tint',
-            self::SIGNAL_LOSS => 'wave-square'
+            self::Airflow => 'angle-double-right',
+            self::Ber => 'sort-amount-desc',
+            self::Bitrate => 'bar-chart',
+            self::Charge => 'battery-half',
+            self::ChromaticDispersion => 'indent',
+            self::Cooling => 'thermometer-full',
+            self::Count => 'hashtag',
+            self::Current => 'bolt fa-flip-horizontal',
+            self::Dbm => 'sun-o',
+            self::Delay => 'clock-o',
+            self::Eer => 'snowflake-o',
+            self::Fanspeed => 'refresh',
+            self::Frequency => 'line-chart',
+            self::Humidity => 'tint',
+            self::Load => 'percent',
+            self::Loss => 'percentage',
+            self::Percent => 'percent',
+            self::Power => 'power-off',
+            self::PowerConsumed => 'plug',
+            self::PowerFactor => 'calculator',
+            self::Pressure => 'thermometer-empty',
+            self::QualityFactor => 'arrows',
+            self::Runtime => 'hourglass-half',
+            self::Signal => 'wifi',
+            self::Snr => 'signal',
+            self::State => 'bullseye',
+            self::Temperature => 'thermometer-three-quarters',
+            self::TvSignal => 'signal',
+            self::Voltage => 'bolt',
+            self::Waterflow => 'tint',
+            self::SignalLoss => 'wave-square',
         };
     }
 }

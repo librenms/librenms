@@ -18,8 +18,8 @@ class HrDevice extends DeviceRelatedModel implements Keyable
         'hrProcessorLoad',
     ];
 
-    public function getCompositeKey()
+    public function getCompositeKey(): int
     {
-        return $this->hrDeviceIndex;
+        return (int) $this->hrDeviceIndex;
     }
 }

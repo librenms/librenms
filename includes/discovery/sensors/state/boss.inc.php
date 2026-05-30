@@ -13,18 +13,18 @@ if ($device['os'] === 'boss') {
         //get states
         $state_name = 's5ChasComOperState';
         $states = [
-            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'other'],
-            ['value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'notAvail'],
-            ['value' => 3, 'generic' => 3, 'graph' => 0, 'descr' => 'removed'],
-            ['value' => 4, 'generic' => 3, 'graph' => 0, 'descr' => 'disabled'],
-            ['value' => 5, 'generic' => 0, 'graph' => 0, 'descr' => 'normal'],
-            ['value' => 6, 'generic' => 1, 'graph' => 0, 'descr' => 'resetInProg'],
-            ['value' => 7, 'generic' => 1, 'graph' => 0, 'descr' => 'testing'],
-            ['value' => 8, 'generic' => 1, 'graph' => 0, 'descr' => 'warning'],
-            ['value' => 9, 'generic' => 1, 'graph' => 0, 'descr' => 'nonFatalErr'],
-            ['value' => 10, 'generic' => 2, 'graph' => 0, 'descr' => 'fatalErr'],
-            ['value' => 11, 'generic' => 3, 'graph' => 0, 'descr' => 'notConfig'],
-            ['value' => 12, 'generic' => 3, 'graph' => 0, 'descr' => 'obsoleted'],
+            ['value' => 1, 'generic' => 3, 'descr' => 'other'],
+            ['value' => 2, 'generic' => 3, 'descr' => 'notAvail'],
+            ['value' => 3, 'generic' => 3, 'descr' => 'removed'],
+            ['value' => 4, 'generic' => 3, 'descr' => 'disabled'],
+            ['value' => 5, 'generic' => 0, 'descr' => 'normal'],
+            ['value' => 6, 'generic' => 1, 'descr' => 'resetInProg'],
+            ['value' => 7, 'generic' => 1, 'descr' => 'testing'],
+            ['value' => 8, 'generic' => 1, 'descr' => 'warning'],
+            ['value' => 9, 'generic' => 1, 'descr' => 'nonFatalErr'],
+            ['value' => 10, 'generic' => 2, 'descr' => 'fatalErr'],
+            ['value' => 11, 'generic' => 3, 'descr' => 'notConfig'],
+            ['value' => 12, 'generic' => 3, 'descr' => 'obsoleted'],
         ];
         create_state_index($state_name, $states);
 

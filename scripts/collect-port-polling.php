@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Str;
@@ -106,12 +107,12 @@ foreach ($devices as &$device) {
     // It also has to save more than 1 s, or we might enable it for devices with i.e. 100ms vs 50ms, which isn't needed.
     $device['set'] = 'none';
     if (isset($enable_sel_value) && $device['diff_perc'] < ($enable_sel_value * -1) && $device['diff_sec'] < -1) {
-        set_dev_attrib($device, 'selected_ports', 'true');
+        DeviceCache::get((int) $device['device_id'])->setAttrib('selected_ports', 'true');
         $device['set'] = 'true';
         $set_count++;
     }
     if (isset($enable_sel_value) && $device['diff_perc'] > $enable_sel_value && $device['diff_sec'] > 1) {
-        set_dev_attrib($device, 'selected_ports', 'false');
+        DeviceCache::get((int) $device['device_id'])->setAttrib('selected_ports', 'false');
         $device['set'] = 'false';
         $set_count++;
     }

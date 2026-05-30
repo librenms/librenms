@@ -244,13 +244,14 @@ class ModuleTestHelper
      *
      * @throws InvalidModuleException
      */
-    public static function findOsWithData(array $modules = [], ?string $os_filter = null): array
+    public static function findOsWithData(array $modules = [], ?string $os_filter = null, ?string $base_path = null): array
     {
         $os_list = [];
+        $base_path ??= base_path();
 
-        foreach (glob(LibrenmsConfig::get('install_dir') . '/tests/data/*.json') as $file) {
+        foreach (glob($base_path . '/tests/data/*.json') as $file) {
             $base_name = basename($file, '.json');
-            [$os, $variant] = self::extractVariant($file);
+            [$os, $variant] = self::extractVariant($file, $base_path);
 
             if ($os_filter != '' && $os_filter != $os) {
                 continue;
@@ -296,13 +297,14 @@ class ModuleTestHelper
      * @param  string  $os_file  Either a filename or the basename
      * @return array{string, string} [$os, $variant]
      */
-    public static function extractVariant(string $os_file): array
+    public static function extractVariant(string $os_file, ?string $base_path = null): array
     {
         $full_name = basename($os_file, '.json');
+        $resource_path = rtrim($base_path ? rtrim($base_path, '/') . '/resources' : resource_path(), '/');
 
         if (! str_contains($full_name, '_')) {
             return [$full_name, ''];
-        } elseif (is_file(resource_path("definitions/os_detection/$full_name.yaml"))) {
+        } elseif (is_file("$resource_path/definitions/os_detection/$full_name.yaml")) {
             return [$full_name, ''];
         } else {
             [$rvar, $ros] = explode('_', strrev($full_name), 2);
@@ -558,8 +560,9 @@ class ModuleTestHelper
         }
 
         // Remove existing device in case it didn't get removed previously, if we're not running in CI
-        if (! getenv('CI') && ($existing_device = device_by_name($snmpSimIp)) && isset($existing_device['device_id'])) {
-            delete_device($existing_device['device_id']);
+        if (! getenv('CI') && DeviceCache::get($snmpSimIp)->exists) {
+            Device::query()->where('hostname', $snmpSimIp)->get()->each->delete();
+            DeviceCache::flush();
         }
 
         // Add the test device
@@ -583,7 +586,7 @@ class ModuleTestHelper
         }
 
         // Populate the device variable
-        $device = device_by_id_cache($device_id, true);
+        $device = DeviceCache::refresh((int) $device_id);
         DeviceCache::setPrimary($device_id);
 
         $data = [];  // array to hold dumped data
@@ -596,9 +599,10 @@ class ModuleTestHelper
         if ($this->quiet) {
             Debug::setOnly();
             Debug::setVerbose();
+            Debug::enableCliDebugOutput();
         }
         ob_start();
-        Log::setDefaultDriver('console');
+        Log::setDefaultDriver('stdout');
 
         (new DiscoverDevice($device_id, $this->modules))->handle();
 
@@ -606,6 +610,7 @@ class ModuleTestHelper
         if ($this->quiet) {
             Debug::setOnly($save_debug);
             Debug::setVerbose($save_vedbug);
+            Debug::disableCliDebugOutput();
         } else {
             ob_flush();
         }
@@ -626,9 +631,10 @@ class ModuleTestHelper
         if ($this->quiet) {
             Debug::setOnly();
             Debug::setVerbose();
+            Debug::enableCliDebugOutput();
         }
         ob_start();
-        Log::setDefaultDriver('console');
+        Log::setDefaultDriver('stdout');
 
         (new PollDevice($device_id, $this->modules))->handle();
 
@@ -636,6 +642,7 @@ class ModuleTestHelper
         if ($this->quiet) {
             Debug::setOnly($save_debug);
             Debug::setVerbose($save_vedbug);
+            Debug::disableCliDebugOutput();
         } else {
             ob_flush();
         }

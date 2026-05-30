@@ -1,0 +1,729 @@
+-- =====================================================================
+-- == OG-LIGHTHOUSE5-MIB:                                             ==
+-- == Opengear Lighthouse Management Information Base                 ==
+-- ==                                                                 ==
+-- == (c) Copyright 2021- Opengear Inc.                               ==
+-- =====================================================================
+OG-LIGHTHOUSE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ogSpecific
+		FROM OG-SMI-MIB
+	MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+	Integer32, IpAddress
+		FROM SNMPv2-SMI
+	MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+		FROM SNMPv2-CONF
+	DisplayString, DateAndTime
+		FROM SNMPv2-TC;
+
+ogLighthouseMib MODULE-IDENTITY
+	LAST-UPDATED "202105200000Z"
+	ORGANIZATION "Opengear Inc."
+	CONTACT-INFO
+		"Opengear Inc.
+		 9270 South 500 West, Suite J,
+		 Sandy, UT 84070
+		 support@opengear.com"
+	DESCRIPTION
+		"Opengear Lighthouse product-specific MIB"
+	REVISION "202105200000Z"
+	DESCRIPTION
+		"Revised errors with certain mib compilers."
+	REVISION "201903200000Z"
+	DESCRIPTION
+		"Add ogLhNodeCellularHealth."
+	REVISION "201801110000Z"
+	DESCRIPTION
+		"Initial revision."
+	::= { ogSpecific 1 }
+
+NodesPortsEntry ::= SEQUENCE {
+	ogLhPortIndex		Integer32,
+	ogLhPortLabel		DisplayString,
+	ogLhPortID			DisplayString
+}
+
+ThirdPartyNodesPortsEntry ::= SEQUENCE {
+	ogLhThirdPartyPortIndex				Integer32,
+	ogLhThirdPartyPortLabel				DisplayString,
+	ogLhThirdPartyPortConnectionMethod		DisplayString,
+	ogLhThirdPartyPortMode				DisplayString,
+	ogLhThirdPartyRemotePort			Integer32,
+	ogLhThirdPartyPortLineID			DisplayString
+}
+
+NodesInterfacesEntry ::= SEQUENCE {
+	ogLhNodeInterfaceIndex		Integer32,
+	ogLhNodeInterfaceName		DisplayString,
+	ogLhNodeInterfaceAddress	DisplayString
+}
+
+NodesEntry ::= SEQUENCE {
+	ogLhNodeIndex					IpAddress,
+	ogLhNodeName					DisplayString,
+	ogLhNodeModel					DisplayString,
+	ogLhNodeProductType				DisplayString,
+	ogLhNodeVpnAddress				DisplayString,
+	ogLhNodeSerialNumber			DisplayString,
+	ogLhNodeUptime					DisplayString,
+	ogLhNodeConnStatus				INTEGER,
+	ogLhNodePortsContainer			OBJECT IDENTIFIER,
+	ogLhNodeInterfacesContainer		OBJECT IDENTIFIER,
+	ogLhNodeCellularHealth			INTEGER
+}
+
+ThirdPartyNodesEntry ::= SEQUENCE {
+	ogLhThirdPartyNodeIndex				Integer32,
+	ogLhThirdPartyNodeSSHPort			Integer32,
+	ogLhThirdPartyNodeName				DisplayString,
+	ogLhThirdPartyNodeModel				DisplayString,
+	ogLhThirdPartyNodeProductType		DisplayString,
+	ogLhThirdPartyNodeAddress			DisplayString,
+	ogLhThirdPartyNodeSerialNumber		DisplayString,
+	ogLhThirdPartyNodeUptime			DisplayString,
+	ogLhThirdPartyNodeConnStatus		INTEGER,
+	ogLhThirdPartyNodePortsContainer	OBJECT IDENTIFIER
+}
+
+LicenseFeatureEntry ::= SEQUENCE {
+	ogLhLicFeatureIndex		Integer32,
+	ogLhLicFeatureName		DisplayString
+}
+
+-- =====================================================================
+-- MIB hierarchy
+-- =====================================================================
+ogLhStatus OBJECT IDENTIFIER	::= { ogLighthouseMib 1 }
+
+ogLhVersion OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current device software version."
+	::= { ogLhStatus 1 }
+
+ogLhNodes OBJECT IDENTIFIER	::= { ogLhStatus 2 }
+
+ogLhNodesTotal OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of Nodes enrolled to Lighthouse"
+	::= { ogLhNodes 1 }
+
+ogLhNodesPending OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of Nodes currently enrolling with Lighthouse"
+	::= { ogLhNodes 2 }
+
+ogLhNodesConnected OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of Nodes currently connected to Lighthouse"
+	::= { ogLhNodes 3 }
+
+ogLhNodesDisconnected OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of Nodes currently disconnected from Lighthouse"
+	::= { ogLhNodes 4 }
+
+ogLhNodesTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF NodesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The Lighthouse enrolled nodes table."
+	::= { ogLhNodes 5 }
+
+ogLhNodesRejected OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of Nodes marked as rejected by Lighthouse"
+	::= { ogLhNodes 7 }
+
+ogLhNodeEntry OBJECT-TYPE
+	SYNTAX NodesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A nodes entry."
+	INDEX { ogLhNodeIndex }
+	::= { ogLhNodesTable 1 }
+
+ogLhNodeIndex OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Index within the nodes table."
+	::= { ogLhNodeEntry 1 }
+
+ogLhNodeName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Node name (generally the host name)."
+	::= { ogLhNodeEntry 2 }
+
+ogLhNodeModel OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..128))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Node model name."
+	::= { ogLhNodeEntry 3 }
+
+ogLhNodeProductType OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Node product type."
+	::= { ogLhNodeEntry 4 }
+
+ogLhNodeVpnAddress OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Node VPN address."
+	::= { ogLhNodeEntry 5 }
+
+ogLhNodeSerialNumber OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Node serial number."
+	::= { ogLhNodeEntry 6 }
+
+ogLhNodeUptime OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Node uptime."
+	::= { ogLhNodeEntry 7 }
+
+ogLhNodeConnStatus OBJECT-TYPE
+	SYNTAX INTEGER {
+		notAvailable(0),
+		connected(1),
+		disconnected(2),
+		unknown(3)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Node connection status."
+	::= { ogLhNodeEntry 8 }
+
+ogLhNodePortsContainer OBJECT-TYPE
+    SYNTAX OBJECT IDENTIFIER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Abstract container for Lighthouse enrolled node port table."
+    ::= { ogLhNodeEntry 9 }
+
+ogLhNodePortsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF NodesPortsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The Lighthouse enrolled node port table."
+	::= { ogLhNodePortsContainer 1 }
+
+ogLhNodePortEntry OBJECT-TYPE
+	SYNTAX NodesPortsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A node port entry."
+	INDEX { ogLhNodeIndex,
+			ogLhPortIndex }
+	::= { ogLhNodePortsTable 1 }
+
+ogLhPortIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Index within the ports table."
+	::= { ogLhNodePortEntry 1 }
+
+ogLhPortLabel OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..512))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Port label."
+	::= { ogLhNodePortEntry 2 }
+
+ogLhPortID OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..512))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Portid uses in Lighthouse internally to reference Opengear Console Server port."
+	::= { ogLhNodePortEntry 3 }
+
+ogLhNodeInterfacesContainer OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Abstract container for Lighthouse 5 node interface table."
+	::= { ogLhNodeEntry 10 }
+
+ogLhNodeInterfacesTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF NodesInterfacesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The Lighthouse 5 node interfaces."
+	::= { ogLhNodeInterfacesContainer 1 }
+
+ogLhNodeInterfaceEntry OBJECT-TYPE
+	SYNTAX NodesInterfacesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A nodes interfaces entry."
+	INDEX { ogLhNodeIndex,
+			ogLhNodeInterfaceIndex }
+	::= { ogLhNodeInterfacesTable 1 }
+
+ogLhNodeInterfaceIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Index within the node's interfaces table."
+	::= { ogLhNodeInterfaceEntry 1 }
+
+ogLhNodeInterfaceName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..128))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Interface name of the Lighthouse node's interface."
+	::= { ogLhNodeInterfaceEntry 2 }
+
+ogLhNodeInterfaceAddress OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..128))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Interface address of the Lighthouse node's interface."
+	::= { ogLhNodeInterfaceEntry 3 }
+
+ogLhNodeCellularHealth OBJECT-TYPE
+	SYNTAX INTEGER {
+		unknown(0),
+		pending(1),
+		bad(2),
+		moderate(3),
+		good(4),
+		simissues(5),
+		connectivitytestfailed(6)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Node cellular health status."
+	::= { ogLhNodeEntry 11 }
+
+ogLhLicenseStatus OBJECT IDENTIFIER	::= { ogLhStatus 3 }
+
+ogLhLicInstalled OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of licenses installed on the Lighthouse"
+	::= { ogLhLicenseStatus 1 }
+
+ogLhLicSupported OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of devices supported by the licenses."
+	::= { ogLhLicenseStatus 2 }
+
+ogLhLicExpiry OBJECT-TYPE
+	SYNTAX DateAndTime
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The expiry date of the licenses."
+	::= { ogLhLicenseStatus 3 }
+
+ogLhLicStatus OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..1024))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The status of the license."
+	::= { ogLhLicenseStatus 4 }
+
+ogLhLicFeaturesTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF LicenseFeatureEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The Lighthouse license information."
+	::= { ogLhLicenseStatus 5 }
+
+ogLhLicFeatureEntry OBJECT-TYPE
+	SYNTAX LicenseFeatureEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A license feature entry."
+	INDEX { ogLhLicFeatureIndex }
+	::= { ogLhLicFeaturesTable 1 }
+
+ogLhLicFeatureIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Index within the license features table."
+	::= { ogLhLicFeatureEntry 1 }
+
+ogLhLicFeatureName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..1024))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The description of the available feature."
+	::= { ogLhLicFeatureEntry 2 }
+
+
+ogLhConfigFields OBJECT IDENTIFIER ::= { ogLighthouseMib 101 }
+
+ogLhConfigName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of a config that is being synced."
+	::= { ogLhConfigFields 1 }
+
+ogLhConfigStatus OBJECT-TYPE
+	SYNTAX INTEGER {
+		okay(0),
+		outOfSync(1),
+		error(2),
+		unknown(3)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The status of the config server, and if it is in sync with the primary."
+	::= { ogLhConfigFields 2 }
+
+nodeTraps OBJECT IDENTIFIER ::= { ogLighthouseMib 100 }
+nodeNotifs OBJECT IDENTIFIER ::= { nodeTraps 0 }
+
+nodeStatusNotif NOTIFICATION-TYPE
+	OBJECTS { ogLhNodeName, ogLhNodeIndex, ogLhNodeConnStatus }
+	STATUS current
+	DESCRIPTION "Node status update"
+	::= { nodeNotifs 1 }
+
+thirdPartyNodeStatusNotif NOTIFICATION-TYPE
+	OBJECTS { ogLhThirdPartyNodeName, ogLhThirdPartyNodeIndex,
+			ogLhThirdPartyNodeAddress, ogLhThirdPartyNodeConnStatus }
+	STATUS current
+	DESCRIPTION "Third party node status update"
+	::= { nodeNotifs 2 }
+
+cellularHealthStatusNotif NOTIFICATION-TYPE
+	OBJECTS { ogLhNodeName, ogLhNodeIndex, ogLhNodeCellularHealth }
+	STATUS current
+	DESCRIPTION "Node cellular health status update"
+	::= { nodeNotifs 3 }
+
+secondaryReplicationStatusNotif NOTIFICATION-TYPE
+	OBJECTS { ogLhConfigName, ogLhConfigStatus }
+	STATUS current
+	DESCRIPTION "Node cellular health status update"
+	::= { nodeNotifs 4 }
+
+ogLhThirdPartyNodesTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF ThirdPartyNodesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The Lighthouse enrolled third party nodes table."
+	::= { ogLhNodes 6 }
+
+ogLhThirdPartyNodeEntry OBJECT-TYPE
+	SYNTAX ThirdPartyNodesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A third party nodes entry."
+	INDEX { ogLhThirdPartyNodeIndex }
+	::= { ogLhThirdPartyNodesTable 1 }
+
+ogLhThirdPartyNodeIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..2147483645)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Index within the third party nodes table."
+	::= { ogLhThirdPartyNodeEntry 1 }
+
+ogLhThirdPartyNodeSSHPort OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"SSH port used to connect with the node."
+	::= { ogLhThirdPartyNodeEntry 2 }
+
+ogLhThirdPartyNodeName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Third party node name (generally the host name)."
+	::= { ogLhThirdPartyNodeEntry 3 }
+
+ogLhThirdPartyNodeModel OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..128))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Third party node model name."
+	::= { ogLhThirdPartyNodeEntry 4 }
+
+ogLhThirdPartyNodeProductType OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Third party node product type."
+	::= { ogLhThirdPartyNodeEntry 5 }
+
+ogLhThirdPartyNodeAddress OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Third party node address."
+	::= { ogLhThirdPartyNodeEntry 6 }
+
+ogLhThirdPartyNodeSerialNumber OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Third party node serial number."
+	::= { ogLhThirdPartyNodeEntry 7 }
+
+ogLhThirdPartyNodeUptime OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Third party node uptime."
+	::= { ogLhThirdPartyNodeEntry 8 }
+
+ogLhThirdPartyNodeConnStatus OBJECT-TYPE
+	SYNTAX INTEGER {
+		notAvailable(0),
+		connected(1),
+		disconnected(2),
+		unknown(3)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Third party node connection status."
+	::= { ogLhThirdPartyNodeEntry 9 }
+
+ogLhThirdPartyNodePortsContainer OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Abstract container for Lighthouse third party node port table."
+	::= { ogLhThirdPartyNodeEntry 10 }
+
+ogLhThirdPartyNodePortsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF ThirdPartyNodesPortsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The Lighthouse enrolled third party node port table."
+	::= { ogLhThirdPartyNodePortsContainer 1 }
+
+ogLhThirdPartyNodePortEntry OBJECT-TYPE
+	SYNTAX ThirdPartyNodesPortsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A node port entry."
+	INDEX { ogLhThirdPartyNodeIndex,
+			ogLhPortIndex }
+	::= { ogLhThirdPartyNodePortsTable 1 }
+
+ogLhThirdPartyPortIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Index within the third party ports table."
+	::= { ogLhThirdPartyNodePortEntry 1 }
+
+ogLhThirdPartyPortLabel OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..512))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Third party node port label."
+	::= { ogLhThirdPartyNodePortEntry 2 }
+
+ogLhThirdPartyPortConnectionMethod OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..32))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Third party node port connection method (ssh, telnet or not-available)."
+	::= { ogLhThirdPartyNodePortEntry 3 }
+
+ogLhThirdPartyPortMode OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Third party node port connection mode (consoleServer, disabled or not-available)."
+	::= { ogLhThirdPartyNodePortEntry 4 }
+
+ogLhThirdPartyRemotePort OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Remote port number."
+	::= { ogLhThirdPartyNodePortEntry 5 }
+
+ogLhThirdPartyPortLineID OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..64))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Line ID in used when port is configured with SSH for cisco device."
+	::= { ogLhThirdPartyNodePortEntry 6 }
+-- End MIB definition.
+
+-- Start compliance and conformance information.
+ogLighthouseConformance OBJECT IDENTIFIER ::= { ogLighthouseMib 65535 }
+ogLighthouseCompliances OBJECT IDENTIFIER ::= { ogLighthouseConformance 1 }
+ogLighthouseGroups OBJECT IDENTIFIER ::= { ogLighthouseConformance 2 }
+
+ogLighthouseCompliance MODULE-COMPLIANCE
+	STATUS  current
+	DESCRIPTION
+	    "The compliance statement for the Lighthouse status MIB."
+	MODULE
+	MANDATORY-GROUPS {
+		ogLhStatusGroup,
+		ogLhNotificationGroup
+	}
+	::= { ogLighthouseCompliances 1 }
+
+ogLhNotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		nodeStatusNotif,
+		thirdPartyNodeStatusNotif,
+		cellularHealthStatusNotif,
+		secondaryReplicationStatusNotif
+	}
+	STATUS current
+	DESCRIPTION "A collection of notifications related to Lighthouse"
+	::= { ogLighthouseGroups 2 }
+
+ogLhStatusGroup OBJECT-GROUP
+	OBJECTS {
+		ogLhVersion,
+
+		ogLhNodesTotal,
+		ogLhNodesPending,
+		ogLhNodesRejected,
+		ogLhNodesConnected,
+		ogLhNodesDisconnected,
+
+		ogLhNodeIndex,
+		ogLhNodeName,
+		ogLhNodeModel,
+		ogLhNodeProductType,
+		ogLhNodeVpnAddress,
+		ogLhNodeSerialNumber,
+		ogLhNodeUptime,
+		ogLhNodeConnStatus,
+		ogLhNodePortsContainer,
+		ogLhNodeCellularHealth,
+
+		ogLhPortIndex,
+		ogLhPortLabel,
+		ogLhPortID,
+
+		ogLhNodeInterfacesContainer,
+		ogLhNodeInterfaceIndex,
+		ogLhNodeInterfaceName,
+		ogLhNodeInterfaceAddress,
+
+		ogLhLicFeatureName,
+		ogLhLicInstalled,
+		ogLhLicSupported,
+		ogLhLicExpiry,
+		ogLhLicStatus,
+
+		ogLhThirdPartyNodeIndex,
+		ogLhThirdPartyNodeSSHPort,
+		ogLhThirdPartyNodeName,
+		ogLhThirdPartyNodeModel,
+		ogLhThirdPartyNodeProductType,
+		ogLhThirdPartyNodeAddress,
+		ogLhThirdPartyNodeSerialNumber,
+		ogLhThirdPartyNodeUptime,
+		ogLhThirdPartyNodeConnStatus,
+		ogLhThirdPartyNodePortsContainer,
+
+		ogLhThirdPartyPortIndex,
+		ogLhThirdPartyPortLabel,
+		ogLhThirdPartyPortConnectionMethod,
+		ogLhThirdPartyPortMode,
+		ogLhThirdPartyRemotePort,
+		ogLhThirdPartyPortLineID,
+
+		ogLhConfigName,
+		ogLhConfigStatus
+	}
+	STATUS current
+	DESCRIPTION
+		"A collection of objects to access Lighthouse statistics."
+	::= { ogLighthouseGroups 1 }
+
+END

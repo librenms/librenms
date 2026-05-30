@@ -18,6 +18,8 @@ Route::prefix('v0')->group(function (): void {
 
     // global read only access required
     Route::middleware(['can:global-read'])->group(function (): void {
+        Route::get('alert_templates/{id}', [App\Api\Controllers\LegacyApiController::class, 'list_alert_templates'])->name('get_alert_template');
+        Route::get('alert_templates', [App\Api\Controllers\LegacyApiController::class, 'list_alert_templates'])->name('list_alert_templates');
         Route::get('pollers', [App\Api\Controllers\LegacyApiController::class, 'list_pollers'])->name('list_pollers');
         Route::get('pollers/log', [App\Api\Controllers\LegacyApiController::class, 'list_poller_log'])->name('list_poller_log');
         Route::get('bgp', [App\Api\Controllers\LegacyApiController::class, 'list_bgp'])->name('list_bgp');
@@ -84,6 +86,9 @@ Route::prefix('v0')->group(function (): void {
         Route::delete('bills/{bill_id}', [App\Api\Controllers\LegacyApiController::class, 'delete_bill'])->name('delete_bill');
         Route::put('alerts/{id}', [App\Api\Controllers\LegacyApiController::class, 'ack_alert'])->name('ack_alert');
         Route::put('alerts/unmute/{id}', [App\Api\Controllers\LegacyApiController::class, 'unmute_alert'])->name('unmute_alert');
+        Route::post('alert_templates', [App\Api\Controllers\LegacyApiController::class, 'add_edit_alert_template'])->name('add_alert_template');
+        Route::put('alert_templates', [App\Api\Controllers\LegacyApiController::class, 'add_edit_alert_template'])->name('edit_alert_template');
+        // Route::delete('alert_templates/{id}', [App\Api\Controllers\LegacyApiController::class, 'delete_alert_template'])->name('delete_alert_template');
         Route::post('rules', [App\Api\Controllers\LegacyApiController::class, 'add_edit_rule'])->name('add_rule');
         Route::put('rules', [App\Api\Controllers\LegacyApiController::class, 'add_edit_rule'])->name('edit_rule');
         Route::delete('rules/{id}', [App\Api\Controllers\LegacyApiController::class, 'delete_rule'])->name('delete_rule');
@@ -125,6 +130,7 @@ Route::prefix('v0')->group(function (): void {
         Route::get('{hostname}/nac', [App\Api\Controllers\LegacyApiController::class, 'get_nac'])->name('get_nac');
         Route::get('{hostname}/health/{type?}/{sensor_id?}', [App\Api\Controllers\LegacyApiController::class, 'list_available_health_graphs'])->name('list_available_health_graphs');
         Route::get('{hostname}/wireless/{type?}/{sensor_id?}', [App\Api\Controllers\LegacyApiController::class, 'list_available_wireless_graphs'])->name('list_available_wireless_graphs');
+        Route::get('{hostname}/wireless-sensors', [App\Api\Controllers\LegacyApiController::class, 'get_device_wireless_sensors'])->name('get_device_wireless_sensors');
         Route::get('{hostname}/ports', [App\Api\Controllers\LegacyApiController::class, 'get_device_ports'])->name('get_device_ports');
         Route::get('{hostname}/ip', [App\Api\Controllers\LegacyApiController::class, 'get_device_ip_addresses'])->name('get_ip_addresses');
         Route::get('{hostname}/port_stack', [App\Api\Controllers\LegacyApiController::class, 'get_port_stack'])->name('get_port_stack');

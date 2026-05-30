@@ -1,7 +1,6 @@
-mib: PROSTAR-PWM:TRISTAR
 modules:
     os:
-        hardware: 
+        hardware:
             - PROSTAR-PWM::subModel.0
             - TRISTAR::subModel.0
         serial:
@@ -183,12 +182,12 @@ modules:
                     descr: 'Charge State'
                     state_name: chargeState
                     states:
-                        - { value: 0, generic: 1, graph: 1, descr: Start }
-                        - { value: 1, generic: 0, graph: 1, descr: 'Night Check' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'Disconnect' }
-                        - { value: 3, generic: 2, graph: 1, descr: 'Night' }
-                        - { value: 4, generic: 2, graph: 1, descr: 'Fault' }
-                        - { value: 5, generic: 3, graph: 1, descr: 'Bulk' }
-                        - { value: 6, generic: 3, graph: 1, descr: 'PWM' }
-                        - { value: 7, generic: 3, graph: 1, descr: 'Float' }
-                        - { value: 8, generic: 3, graph: 1, descr: 'Equalize' }
+                        - { value: 0, generic: 1, descr: Start }
+                        - { value: 1, generic: 0, descr: 'Night Check' }
+                        - { value: 2, generic: 1, descr: 'Disconnect' }
+                        - { value: 3, generic: 2, descr: 'Night' }
+                        - { value: 4, generic: 2, descr: 'Fault' }
+                        - { value: 5, generic: 3, descr: 'Bulk' }
+                        - { value: 6, generic: 3, descr: 'PWM' }
+                        - { value: 7, generic: 3, descr: 'Float' }
+                        - { value: 8, generic: 3, descr: 'Equalize' }

@@ -26,18 +26,26 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Http\Controllers\Table\Traits\SensorTrait;
 use App\Models\WirelessSensor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use LibreNMS\Enum\WirelessSensorType;
 
-class WirelessSensorController extends SensorsController
+/**
+ * @extends TableController<WirelessSensor>
+ */
+class WirelessSensorController extends TableController
 {
+    /** @use SensorTrait<WirelessSensor> */
+    use SensorTrait;
+
     protected function rules(): array
     {
         return [
             'view' => Rule::in(['detail', 'graphs']),
-            'class' => Rule::in(array_keys(\LibreNMS\Device\WirelessSensor::getTypes())),
+            'class' => Rule::in(WirelessSensorType::values()),
         ];
     }
 
@@ -46,6 +54,8 @@ class WirelessSensorController extends SensorsController
      */
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', WirelessSensor::class);
+
         $class = $request->input('class');
 
         return WirelessSensor::query()

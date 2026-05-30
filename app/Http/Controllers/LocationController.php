@@ -11,6 +11,8 @@ class LocationController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', Location::class);
+
         $data = [
             'maps_config' => [
                 'engine' => LibrenmsConfig::get('geoloc.engine'),
@@ -48,7 +50,7 @@ class LocationController extends Controller
      */
     public function update(Request $request, Location $location)
     {
-        $this->authorize('admin', $request->user());
+        $this->authorize('update', $location);
 
         $this->validate($request, [
             'lat' => 'required|numeric|max:90|min:-90',
@@ -72,7 +74,7 @@ class LocationController extends Controller
      */
     public function destroy(Request $request, Location $location)
     {
-        $this->authorize('admin', $request->user());
+        $this->authorize('delete', $location);
 
         $location->delete();
 

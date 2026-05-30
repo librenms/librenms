@@ -12,10 +12,10 @@ for ($i = 1; $i <= $numPhase; $i++) {
         $descr .= " Phase $i";
     }
 
-    $current = snmp_get($device, $volt_oid, '-Oqv');
+    $current = SnmpQuery::get($volt_oid)->value();
     if (! $current) {
         $volt_oid .= '.0';
-        $current = snmp_get($device, $volt_oid, '-Oqv');
+        $current = SnmpQuery::get($volt_oid)->value();
     }
 
     $current /= 10;
@@ -37,10 +37,10 @@ for ($i = 1; $i <= $numPhase; $i++) {
         $descr .= " Phase $i";
     }
 
-    $current = snmp_get($device, $volt_oid, '-Oqv');
+    $current = SnmpQuery::get($volt_oid)->value();
     if (! $current) {
         $volt_oid .= '.0';
-        $current = snmp_get($device, $volt_oid, '-Oqv');
+        $current = SnmpQuery::get($volt_oid)->value();
     }
 
     $current /= 10;

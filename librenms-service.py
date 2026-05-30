@@ -25,8 +25,18 @@ if __name__ == "__main__":
     parser.add_argument(
         "-o",
         "--log-output",
-        action="store_true",
-        help="Log poller ouput to files. Warning: This could use significant disk space!",
+        nargs="?",
+        const="file",
+        default="none",
+        type=LibreNMS.LogOutput,
+        choices=list(LibreNMS.LogOutput),
+        metavar="DEST",
+        help=(
+            "Where to direct poller log messages.\n"
+            "  --log-output         = log to file (same as --log-output file)\n"
+            "  --log-output DEST    = log to none, passthrough, logger, file\n"
+            "  (not specified)      = no dedicated poller output logging (=none)"
+        ),
     )
     parser.add_argument(
         "-m",

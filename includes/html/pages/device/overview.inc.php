@@ -5,14 +5,8 @@ use LibreNMS\Interfaces\Plugins\Hooks\DeviceOverviewHook;
 $overview = 1;
 
 echo '
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-md-12">
-      &nbsp;
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-6">
+<div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4">
+    <div class="tw:min-w-0">
 ';
 require 'includes/html/dev-overview-data.inc.php';
 require 'overview/maps.inc.php';
@@ -25,6 +19,7 @@ foreach (PluginManager::call(DeviceOverviewHook::class, ['device' => DeviceCache
 }
 
 require 'overview/ports.inc.php';
+require 'overview/availability_bar.inc.php';
 require 'overview/transceivers.inc.php';
 
 if ($device['os'] == 'ping') {
@@ -33,7 +28,7 @@ if ($device['os'] == 'ping') {
 
 echo '
     </div>
-    <div class="col-md-6">
+    <div class="tw:min-w-0">
 ';
 // Right Pane
 require 'overview/processors.inc.php';
@@ -75,6 +70,6 @@ require 'overview/eventlog.inc.php';
 require 'overview/services.inc.php';
 require 'overview/syslog.inc.php';
 require 'overview/graylog.inc.php';
-echo '</div></div></div>';
+echo '</div></div>';
 
 //require 'overview/current.inc.php");

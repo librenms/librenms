@@ -1,117 +1,116 @@
-mib: SENSATRONICS-ITTM:SENSATRONICS-SMI
 modules:
     sensors:
         temperature:
             data:
                 -
-                    oid: sensor1
-                    value: sensor1DataStr
+                    oid: SENSATRONICS-ITTM::sensor1
+                    value: SENSATRONICS-ITTM::sensor1DataStr
                     num_oid: '.1.3.6.1.4.1.16174.1.1.1.3.1.2.{{ $index }}'
                     index: 'sensor1Name.{{ $index }}'
-                    descr: '{{ $sensor1Name }}'
+                    descr: '{{ SENSATRONICS-ITTM::sensor1Name }}'
                     skip_values: -99.9
                 -
-                    oid: sensor2
-                    value: sensor2DataStr
+                    oid: SENSATRONICS-ITTM::sensor2
+                    value: SENSATRONICS-ITTM::sensor2DataStr
                     num_oid: '.1.3.6.1.4.1.16174.1.1.1.3.2.2.{{ $index }}'
                     index: 'sensor2Name.{{ $index }}'
-                    descr: '{{ $sensor2Name }}'
+                    descr: '{{ SENSATRONICS-ITTM::sensor2Name }}'
                     skip_values: -99.9
                 -
-                    oid: sensor3
-                    value: sensor3DataStr
+                    oid: SENSATRONICS-ITTM::sensor3
+                    value: SENSATRONICS-ITTM::sensor3DataStr
                     num_oid: '.1.3.6.1.4.1.16174.1.1.1.3.3.2.{{ $index }}'
                     index: 'sensor3Name.{{ $index }}'
-                    descr: '{{ $sensor3Name }}'
+                    descr: '{{ SENSATRONICS-ITTM::sensor3Name }}'
                     skip_values: -99.9
                 -
-                    oid: sensor4
-                    value: sensor4DataStr
+                    oid: SENSATRONICS-ITTM::sensor4
+                    value: SENSATRONICS-ITTM::sensor4DataStr
                     num_oid: '.1.3.6.1.4.1.16174.1.1.1.3.4.2.{{ $index }}'
                     index: 'sensor4Name.{{ $index }}'
-                    descr: '{{ $sensor4Name }}'
+                    descr: '{{ SENSATRONICS-ITTM::sensor4Name }}'
                     skip_values: -99.9
                 -
-                    oid: sensor5
-                    value: sensor5DataStr
+                    oid: SENSATRONICS-ITTM::sensor5
+                    value: SENSATRONICS-ITTM::sensor5DataStr
                     num_oid: '.1.3.6.1.4.1.16174.1.1.1.3.5.2.{{ $index }}'
                     index: 'sensor5Name.{{ $index }}'
-                    descr: '{{ $sensor5Name }}'
+                    descr: '{{ SENSATRONICS-ITTM::sensor5Name }}'
                     skip_values: -99.9
                 -
-                    oid: sensor6
-                    value: sensor6DataStr
+                    oid: SENSATRONICS-ITTM::sensor6
+                    value: SENSATRONICS-ITTM::sensor6DataStr
                     num_oid: '.1.3.6.1.4.1.16174.1.1.1.3.6.2.{{ $index }}'
                     index: 'sensor6Name.{{ $index }}'
-                    descr: '{{ $sensor6Name }}'
+                    descr: '{{ SENSATRONICS-ITTM::sensor6Name }}'
                     skip_values: -99.9
                 -
-                    oid: sensor7
-                    value: sensor7DataStr
+                    oid: SENSATRONICS-ITTM::sensor7
+                    value: SENSATRONICS-ITTM::sensor7DataStr
                     num_oid: '.1.3.6.1.4.1.16174.1.1.1.3.7.2.{{ $index }}'
                     index: 'sensor7Name.{{ $index }}'
-                    descr: '{{ $sensor7Name }}'
+                    descr: '{{ SENSATRONICS-ITTM::sensor7Name }}'
                     skip_values: -99.9
                 -
-                    oid: sensor8
-                    value: sensor8DataStr
+                    oid: SENSATRONICS-ITTM::sensor8
+                    value: SENSATRONICS-ITTM::sensor8DataStr
                     num_oid: '.1.3.6.1.4.1.16174.1.1.1.3.8.2.{{ $index }}'
                     index: 'sensor8Name.{{ $index }}'
-                    descr: '{{ $sensor8Name }}'
+                    descr: '{{ SENSATRONICS-ITTM::sensor8Name }}'
                     skip_values: -99.9
                 -
-                    oid: sensor9
-                    value: sensor9DataStr
+                    oid: SENSATRONICS-ITTM::sensor9
+                    value: SENSATRONICS-ITTM::sensor9DataStr
                     num_oid: '.1.3.6.1.4.1.16174.1.1.1.3.9.2.{{ $index }}'
                     index: 'sensor9Name.{{ $index }}'
-                    descr: '{{ $sensor9Name }}'
+                    descr: '{{ SENSATRONICS-ITTM::sensor9Name }}'
                     skip_values: -99.9
                 -
-                    oid: sensor10
-                    value: sensor10DataStr
+                    oid: SENSATRONICS-ITTM::sensor10
+                    value: SENSATRONICS-ITTM::sensor10DataStr
                     num_oid: '.1.3.6.1.4.1.16174.1.1.1.3.10.2.{{ $index }}'
                     index: 'sensor10Name.{{ $index }}'
-                    descr: '{{ $sensor10Name }}'
+                    descr: '{{ SENSATRONICS-ITTM::sensor10Name }}'
                     skip_values: -99.9
                 -
-                    oid: sensor11
-                    value: sensor11DataStr
+                    oid: SENSATRONICS-ITTM::sensor11
+                    value: SENSATRONICS-ITTM::sensor11DataStr
                     num_oid: '.1.3.6.1.4.1.16174.1.1.1.3.11.2.{{ $index }}'
                     index: 'sensor11Name.{{ $index }}'
-                    descr: '{{ $sensor11Name }}'
+                    descr: '{{ SENSATRONICS-ITTM::sensor11Name }}'
                     skip_values: -99.9
                 -
-                    oid: sensor12
-                    value: sensor12DataStr
+                    oid: SENSATRONICS-ITTM::sensor12
+                    value: SENSATRONICS-ITTM::sensor12DataStr
                     num_oid: '.1.3.6.1.4.1.16174.1.1.1.3.12.2.{{ $index }}'
                     index: 'sensor12Name.{{ $index }}'
-                    descr: '{{ $sensor12Name }}'
+                    descr: '{{ SENSATRONICS-ITTM::sensor12Name }}'
                     skip_values: -99.9
                 -
-                    oid: sensor13
-                    value: sensor13DataStr
+                    oid: SENSATRONICS-ITTM::sensor13
+                    value: SENSATRONICS-ITTM::sensor13DataStr
                     num_oid: '.1.3.6.1.4.1.16174.1.1.1.3.13.2.{{ $index }}'
                     index: 'sensor13Name.{{ $index }}'
-                    descr: '{{ $sensor13Name }}'
+                    descr: '{{ SENSATRONICS-ITTM::sensor13Name }}'
                     skip_values: -99.9
                 -
-                    oid: sensor14
-                    value: sensor14DataStr
+                    oid: SENSATRONICS-ITTM::sensor14
+                    value: SENSATRONICS-ITTM::sensor14DataStr
                     num_oid: '.1.3.6.1.4.1.16174.1.1.1.3.14.2.{{ $index }}'
                     index: 'sensor14Name.{{ $index }}'
-                    descr: '{{ $sensor14Name }}'
+                    descr: '{{ SENSATRONICS-ITTM::sensor14Name }}'
                     skip_values: -99.9
                 -
-                    oid: sensor15
-                    value: sensor15DataStr
+                    oid: SENSATRONICS-ITTM::sensor15
+                    value: SENSATRONICS-ITTM::sensor15DataStr
                     num_oid: '.1.3.6.1.4.1.16174.1.1.1.3.15.2.{{ $index }}'
                     index: 'sensor15Name.{{ $index }}'
-                    descr: '{{ $sensor15Name }}'
+                    descr: '{{ SENSATRONICS-ITTM::sensor15Name }}'
                     skip_values: -99.9
                 -
-                    oid: sensor16
-                    value: sensor16DataStr
+                    oid: SENSATRONICS-ITTM::sensor16
+                    value: SENSATRONICS-ITTM::sensor16DataStr
                     num_oid: '.1.3.6.1.4.1.16174.1.1.1.3.16.2.{{ $index }}'
                     index: 'sensor16Name.{{ $index }}'
-                    descr: '{{ $sensor16Name }}'
+                    descr: '{{ SENSATRONICS-ITTM::sensor16Name }}'
                     skip_values: -99.9

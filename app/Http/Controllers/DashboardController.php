@@ -40,7 +40,7 @@ use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
-    /** @var \Illuminate\Support\Collection<\App\Models\Dashboard> */
+    /** @var \Illuminate\Support\Collection<int, \App\Models\Dashboard> */
     private $dashboards;
 
     public function __construct()
@@ -54,6 +54,8 @@ class DashboardController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Dashboard::class);
+
         $request->validate([
             'dashboard' => 'integer',
             'bare' => 'nullable|in:yes',
@@ -101,6 +103,8 @@ class DashboardController extends Controller
      */
     public function show(Request $request, Dashboard $dashboard)
     {
+        $this->authorize('view', $dashboard);
+
         $request->validate([
             'bare' => 'nullable|in:yes',
         ]);
@@ -130,7 +134,7 @@ class DashboardController extends Controller
 
         $widgets = self::listWidgets();
 
-        $user_list = $user->can('manage', User::class)
+        $user_list = $user->can('viewAny', User::class)
             ? User::where('user_id', '!=', $user->user_id)
                 ->orderBy('username')
                 ->pluck('username', 'user_id')
@@ -150,6 +154,8 @@ class DashboardController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', Dashboard::class);
+
         $this->validate($request, [
             'dashboard_name' => 'string|max:255',
         ]);
@@ -170,6 +176,8 @@ class DashboardController extends Controller
 
     public function update(Request $request, Dashboard $dashboard): JsonResponse
     {
+        $this->authorize('update', $dashboard);
+
         $validated = $this->validate($request, [
             'dashboard_name' => 'string|max:255',
             'access' => 'int|in:0,1,2,3',
@@ -186,6 +194,8 @@ class DashboardController extends Controller
 
     public function destroy(Dashboard $dashboard): JsonResponse
     {
+        $this->authorize('delete', $dashboard);
+
         $dashboard->widgets()->delete();
         $dashboard->delete();
 
@@ -197,6 +207,8 @@ class DashboardController extends Controller
 
     public function copy(Request $request, Dashboard $dashboard): JsonResponse
     {
+        $this->authorize('copy', $dashboard);
+
         $this->validate($request, [
             'target_user_id' => 'required|exists:App\Models\User,user_id',
         ]);
@@ -256,12 +268,12 @@ class DashboardController extends Controller
 
     /**
      * @param  User  $user
-     * @return \Illuminate\Support\Collection<\App\Models\Dashboard>
+     * @return \Illuminate\Support\Collection<int, \App\Models\Dashboard>
      */
     private function getAvailableDashboards(User $user): Collection
     {
         if ($this->dashboards === null) {
-            $this->dashboards = Dashboard::allAvailable($user)->with('user:user_id,username')
+            $this->dashboards = Dashboard::hasAccess($user)->with('user:user_id,username')
                 ->orderBy('dashboard_name')->get()->keyBy('dashboard_id');
         }
 

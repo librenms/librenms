@@ -22,6 +22,7 @@ discovery:
             - '/^USW[ -]/'
             - '/^UBNT US/'
             - '/^US[ -]/'
+            - '/^Ubiquiti UniFi UCG-/'
     -
         sysObjectID:
             - .1.3.6.1.4.1.8072.3.2.10

@@ -2113,105 +2113,90 @@
                 {
                     "state_name": "Access_41326588",
                     "state_descr": "Closed",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Access_41326588",
                     "state_descr": "Open",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cmcIIIUnitStatus",
                     "state_descr": "OK",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cmcIIIUnitStatus",
                     "state_descr": "Failed",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cmcIIIUnitStatus",
                     "state_descr": "Overload",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "Door Opening Automatic Input Alarm_41326588",
                     "state_descr": "OK",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Door Opening Automatic Input Alarm_41326588",
                     "state_descr": "Alarm",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Door Opening Manual Front Input Access_41326588",
                     "state_descr": "On",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Door Opening Manual Front Input Access_41326588",
                     "state_descr": "Off",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Door Opening Manual Rear Input Access_41326588",
                     "state_descr": "On",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Door Opening Manual Rear Input Access_41326588",
                     "state_descr": "Off",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Input 1_41326588",
                     "state_descr": "Off",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Input 1_41326588",
                     "state_descr": "On",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Input 2_41326588",
                     "state_descr": "Off",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Input 2_41326588",
                     "state_descr": "On",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 }
@@ -2239,6 +2224,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2258,6 +2244,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Net-SNMP",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2277,6 +2264,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": 1
                 },
                 {
@@ -2296,6 +2284,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": 2
                 },
                 {
@@ -2315,6 +2304,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": 3
                 },
                 {
@@ -2334,6 +2324,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": 4
                 },
                 {
@@ -2353,6 +2344,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": 5
                 },
                 {
@@ -2372,6 +2364,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": 6
                 },
                 {
@@ -2391,6 +2384,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2410,6 +2404,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARM",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2429,6 +2424,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Freescale",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2448,6 +2444,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": 2
                 },
                 {
@@ -2467,6 +2464,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2486,6 +2484,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2505,6 +2504,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2524,6 +2524,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2543,6 +2544,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2562,6 +2564,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2581,6 +2584,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2600,6 +2604,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2619,6 +2624,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2638,6 +2644,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2657,6 +2664,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2676,6 +2684,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2695,6 +2704,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2714,6 +2724,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2733,6 +2744,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2752,6 +2764,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2771,6 +2784,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2790,6 +2804,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2809,6 +2824,7 @@
                     "entPhysicalContainedIn": 6,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": 4
                 },
                 {
@@ -2828,6 +2844,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2847,6 +2864,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2866,6 +2884,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2885,6 +2904,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2904,6 +2924,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2923,6 +2944,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2942,6 +2964,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2961,6 +2984,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2980,6 +3004,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2999,6 +3024,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3018,6 +3044,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3037,6 +3064,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3056,6 +3084,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3075,6 +3104,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3094,6 +3124,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3113,6 +3144,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3132,6 +3164,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3151,6 +3184,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3170,6 +3204,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3189,6 +3224,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3208,6 +3244,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3227,6 +3264,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3246,6 +3284,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3265,6 +3304,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3284,6 +3324,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3303,6 +3344,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3322,6 +3364,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3341,6 +3384,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3360,6 +3404,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 29,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3379,6 +3424,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 30,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3398,6 +3444,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 31,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3417,6 +3464,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 32,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3436,6 +3484,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 33,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3455,6 +3504,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 34,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3474,6 +3524,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 35,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3493,6 +3544,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 36,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3512,6 +3564,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 37,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3531,6 +3584,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 38,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3550,6 +3604,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 39,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3569,6 +3624,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 40,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3588,6 +3644,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 41,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3607,6 +3664,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 42,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3626,6 +3684,7 @@
                     "entPhysicalContainedIn": 3000,
                     "entPhysicalParentRelPos": 43,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3645,6 +3704,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": 2
                 },
                 {
@@ -3664,6 +3724,7 @@
                     "entPhysicalContainedIn": 101000,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3683,6 +3744,7 @@
                     "entPhysicalContainedIn": 101000,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3702,6 +3764,7 @@
                     "entPhysicalContainedIn": 101000,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3721,6 +3784,7 @@
                     "entPhysicalContainedIn": 101000,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3740,6 +3804,7 @@
                     "entPhysicalContainedIn": 101000,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3759,6 +3824,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": 2
                 },
                 {
@@ -3778,6 +3844,7 @@
                     "entPhysicalContainedIn": 201000,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "RITTAL GmbH & Co. KG",
+                    "entPhysicalMfgDate": "1999-12-27,0:0:0.0",
                     "ifIndex": null
                 }
             ]

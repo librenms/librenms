@@ -252,6 +252,22 @@ return [
         'delete' => 'Cleared syslog entries older than :days days (:count rows)',
         'disabled' => 'Syslog cleanup disabled, days <= 0',
     ],
+    'maintenance:discover-ssl-certificates' => [
+        'description' => 'Discover SSL certificates on devices (HTTPS port 443)',
+        'options' => [
+            'device' => 'Device spec to discover: device_id, hostname, or all',
+        ],
+        'no_devices' => 'No devices found',
+        'summary' => 'Created: :created, Updated: :updated, Failed: :failed',
+    ],
+    'maintenance:refresh-ssl-certificates' => [
+        'description' => 'Refresh certificate data for stored SSL certificates',
+        'options' => [
+            'id' => 'Certificate ID to refresh (omit to refresh all enabled)',
+        ],
+        'none' => 'No enabled certificates to refresh',
+        'summary' => 'Refreshed: :refreshed, Failed: :failed',
+    ],
     'plugin:disable' => [
         'description' => 'Disable all plugins with the given name',
         'arguments' => [

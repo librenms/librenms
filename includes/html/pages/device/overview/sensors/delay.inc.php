@@ -1,8 +1,5 @@
 <?php
 
-$graph_type = 'sensor_delay';
-$sensor_class = 'delay';
-$sensor_unit = 's';
-$sensor_type = 'delay';
+$sensor_class = \LibreNMS\Enum\Sensor::Delay;
 
 require 'includes/html/pages/device/overview/generic/sensor.inc.php';

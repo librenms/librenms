@@ -7,6 +7,7 @@ use App\Facades\LibrenmsConfig;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Js;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Debug;
 
@@ -17,7 +18,7 @@ class LegacyController extends Controller
         Checks::postAuth();
 
         // Set variables
-        $no_refresh = false;
+        $no_refresh = false; // may be overridden by included pages
         $init_modules = ['web', 'auth'];
         require base_path('/includes/init.php');
 
@@ -72,12 +73,12 @@ class LegacyController extends Controller
 
             // create and set the title
             $title = implode(' - ', $pagetitle);
-            $html .= "<script type=\"text/javascript\">\ndocument.title = '$title';\n</script>";
+            $html .= '<script>document.title = ' . Js::from($title) . ';</script>';
         }
 
         return response()->view('layouts.legacy_page', [
             'content' => $html,
-            'refresh' => $no_refresh ? 0 : LibrenmsConfig::get('page_refresh'),
+            'refresh' => $no_refresh ? 0 : LibrenmsConfig::get('page_refresh'), // @phpstan-ignore ternary.alwaysFalse ($no_refresh may be set by included pages)
         ]);
     }
 

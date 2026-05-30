@@ -1,14 +1,14 @@
 <?php
 
 $chas_oid = '.1.3.6.1.4.1.6486.800.1.1.1.1.1.1.1.2.'; // chasEntPhysOperStatus
-$stack_left = snmp_walk($device, 'chasFreeSlots', '-OQUse', 'ALCATEL-IND1-CHASSIS-MIB', 'nokia');
-$stack_role = snmp_walk($device, 'alaStackMgrChasRole', '-OQUse', 'ALCATEL-IND1-STACK-MANAGER-MIB', 'nokia');
+$stack_left = snmp_walk($device, 'chasFreeSlots', '-OQUse', 'ALCATEL-IND1-CHASSIS-MIB', 'nokia/aos6');
+$stack_role = snmp_walk($device, 'alaStackMgrChasRole', '-OQUse', 'ALCATEL-IND1-STACK-MANAGER-MIB', 'nokia/aos6');
 $stack_alone = substr((string) $stack_role, strpos((string) $stack_role, '=') + 1);
 $stack_left = substr((string) $stack_left, strpos((string) $stack_left, '=') + 1);
 //$true_stacking = (7 - $stack_left);
 $stacking = '7';
 $stacking_non = '4';
-$aos6_fan_oids = snmpwalk_cache_multi_oid($device, 'alaChasEntPhysFanTable', [], 'ALCATEL-IND1-CHASSIS-MIB', 'aos6', '-OQUse');
+$aos6_fan_oids = snmpwalk_cache_multi_oid($device, 'alaChasEntPhysFanTable', [], 'ALCATEL-IND1-CHASSIS-MIB', 'nokia/aos6', '-OQUse');
 foreach ($aos6_fan_oids as $index => $data) {
     if (is_array($data)) {
         $oid = '.1.3.6.1.4.1.6486.800.1.1.1.3.1.1.11.1.2.' . $index;
@@ -19,9 +19,9 @@ foreach ($aos6_fan_oids as $index => $data) {
         $indexName = strrev($revindex);
         $descr = 'Chassis-' . ($chassis - 568) . " Fan $indexName";
         $states = [
-            ['value' => 0, 'generic' => 1, 'graph' => 1, 'descr' => 'noStatus'],
-            ['value' => 1, 'generic' => 1, 'graph' => 1, 'descr' => 'notRunning'],
-            ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'running'],
+            ['value' => 0, 'generic' => 1, 'descr' => 'noStatus'],
+            ['value' => 1, 'generic' => 1, 'descr' => 'notRunning'],
+            ['value' => 2, 'generic' => 0, 'descr' => 'running'],
         ];
         if (! empty($current)) {
             create_state_index($state_name, $states);
@@ -45,8 +45,8 @@ if (($stack_left < $stacking) && ($stack_alone < $stacking_non)) {
             $stack_state_namea = 'alaStackMgrLocalLinkStateA';
             $descr_stacka = 'Stack Port A Chassis-' . "$stackindexa";
             $states_stacka = [
-                ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'Connected'],
-                ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'Disconnected'],
+                ['value' => 1, 'generic' => 0, 'descr' => 'Connected'],
+                ['value' => 2, 'generic' => 2, 'descr' => 'Disconnected'],
             ];
             create_state_index($stack_state_namea, $states_stacka);
             discover_sensor(null, 'state', $device, $oid_stackport_a, $stackindexa, $stack_state_namea, $descr_stacka, 1, 1, null, null, null, null, $current_stacka);
@@ -62,8 +62,8 @@ if (($stack_left < $stacking) && ($stack_alone < $stacking_non)) {
             $stack_state_nameb = 'alaStackMgrLocalLinkStateB';
             $descr_stackb = 'Stack Port B Chassis-' . "$stackindexb";
             $states_stackb = [
-                ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'Connected'],
-                ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'Disconnected'],
+                ['value' => 1, 'generic' => 0, 'descr' => 'Connected'],
+                ['value' => 2, 'generic' => 2, 'descr' => 'Disconnected'],
             ];
             create_state_index($stack_state_nameb, $states_stackb);
             discover_sensor(null, 'state', $device, $oid_stackport_b, $stackindexb, $stack_state_nameb, $descr_stackb, 1, 1, null, null, null, null, $current_stackb);

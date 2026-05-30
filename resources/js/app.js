@@ -7,6 +7,9 @@
 import "../css/app.css";
 import "./bootstrap";
 
+// Gridstack (bundled by Vite)
+import 'gridstack/dist/gridstack.min.css';
+import {GridStack} from 'gridstack';
 import Vue from "vue";
 import {i18n} from "./plugins/i18n.js"; // translation
 import ToggleButton from "vue-js-toggle-button";
@@ -17,9 +20,21 @@ import VueTabs from "vue-nav-tabs";
 import VModal from "vue-js-modal";
 // // Alpine Components
 import Alpine from "alpinejs";
+import intersect from "@alpinejs/intersect";
 // import popup from './components/alpine/popup.js'
 import popup from "./components/alpine/oldpopup.js";
 import deviceLink from "./components/alpine/deviceLink.js";
+import portLink from "./components/alpine/portLink.js";
+import filterBarComponent from "./components/alpine/filterBarComponent.js";
+import remoteDropdown from "./components/alpine/remoteDropdown.js";
+import LibreNMSDate from "./datetime.js";
+import LibreNMSUrl from './url.js';
+
+window.GridStack = GridStack;
+
+window.LibreNMS = window.LibreNMS || {};
+window.LibreNMS.Date = LibreNMSDate;
+window.LibreNMS.Url = LibreNMSUrl;
 
 /**
  * The following block of code may be used to automatically register your
@@ -69,8 +84,12 @@ const app = new Vue({
     i18n,
 });
 
+Alpine.plugin(intersect);
 Alpine.data('popup', popup);
 Alpine.data('deviceLink', deviceLink);
+Alpine.data('portLink', portLink);
+Alpine.data("filterBarComponent", filterBarComponent);
+Alpine.data("remoteDropdown", remoteDropdown);
 
 window.Alpine = Alpine;
 Alpine.start();

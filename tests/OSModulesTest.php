@@ -39,8 +39,10 @@ use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Number;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Util\Color;
 
+#[TestDox('OS Modules')]
 final class OSModulesTest extends DBTestCase
 {
     use DatabaseTransactions;
@@ -71,6 +73,7 @@ final class OSModulesTest extends DBTestCase
      */
     #[Group('os')]
     #[DataProvider('dumpedDataProvider')]
+    #[TestDox('OS data is valid')]
     public function testDataIsValid($os, $variant, $modules): void
     {
         // special case if data provider throws exception
@@ -90,6 +93,7 @@ final class OSModulesTest extends DBTestCase
      */
     #[Group('os')]
     #[DataProvider('dumpedDataProvider')]
+    #[TestDox('OS')]
     public function testOS($os, $variant, array $modules): void
     {
         // Lock testing time
@@ -149,13 +153,14 @@ final class OSModulesTest extends DBTestCase
     public static function dumpedDataProvider(): array
     {
         $modules = [];
+        $baseDir = realpath(__DIR__ . '/..');
 
         if (getenv('TEST_MODULES')) {
             $modules = explode(',', getenv('TEST_MODULES'));
         }
 
         try {
-            return ModuleTestHelper::findOsWithData($modules);
+            return ModuleTestHelper::findOsWithData($modules, base_path: $baseDir);
         } catch (InvalidModuleException $e) {
             // special case for exception
             return [[false, false, $e->getMessage()]];

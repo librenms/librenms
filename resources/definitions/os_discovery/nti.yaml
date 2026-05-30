@@ -1,14 +1,32 @@
-mib: ENVIROMUX-1W-MIB:ENVIROMUXMICRO-MIB
 modules:
+    os:
+        # Each Enviromux MIB defines its own hostSystem.* leaf names; we list them
+        # all and YamlOSDiscovery picks the first non-empty result (findFirst).
+        # ENVIROMUX-1W-MIB has no hostSystem subtree, so 1W devices will fall through.
+        hardware:
+            - ENVIROMUX2D::deviceModel.0
+            - ENVIROMUX5D::deviceModel.0
+            - ENVIROMUX16D::deviceModel.0
+            - ENVIROMUXMICRO-MIB::deviceModel.0
+        version:
+            - ENVIROMUX2D::firmwareVersion.0
+            - ENVIROMUX5D::firmwareVersion.0
+            - ENVIROMUX16D::firmwareVersion.0
+            - ENVIROMUXMICRO-MIB::firmwareRevision.0
+        serial:
+            - ENVIROMUX2D::devSerialNum.0
+            - ENVIROMUX5D::devSerialNum.0
+            - ENVIROMUX16D::devSerialNum.0
+            - ENVIROMUXMICRO-MIB::serialNumber.0
     sensors:
         temperature:
             data:
                 -
-                    oid: ENVIROMUXMICRO-MIB::intSensorEntry
+                    oid: ENVIROMUXMICRO-MIB::intSensorTable
                     value: ENVIROMUXMICRO-MIB::intSensorValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.1.1.1.4.{{ $index }}'
-                    descr: '{{ $ENVIROMUXMICRO-MIB::intSensorDescription }}'
-                    index: 'intSensorEntry.{{ $index }}'
+                    descr: '{{ ENVIROMUXMICRO-MIB::intSensorDescription }}'
+                    index: 'intSensorValue.{{ $index }}'
                     divisor: 10
                     group: Internal
                     skip_values:
@@ -17,25 +35,129 @@ modules:
                             op: '!='
                             value: 1
                 -
-                   oid: extSensorTable
-                   value: extSensorValue
+                   oid: ENVIROMUX-1W-MIB::extSensorTable
+                   value: ENVIROMUX-1W-MIB::extSensorValue
                    num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.2.1.1.4.{{ $index }}'
                    index: 'extSensorValue.{{ $index }}'
-                   descr: "{{ $extSensorDescription }}"
+                   descr: "{{ ENVIROMUX-1W-MIB::extSensorDescription }}"
                    divisor: 10
                    skip_values:
                       -
-                           oid: extSensorType
+                           oid: ENVIROMUX-1W-MIB::extSensorType
                            op: 'not_in_array'
                            value: ['1', '24']
+                # ENVIROMUX-2D / 5D / 16D share an identical masterUnit subtree; intSensorEntry col 6 = intSensorValue, col 2 = intSensorType (temperature(1))
+                -
+                    oid: ENVIROMUX2D::intSensorTable
+                    value: ENVIROMUX2D::intSensorValue
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.3.1.1.6.{{ $index }}'
+                    descr: '{{ ENVIROMUX2D::intSensorDescription }}'
+                    index: 'intSensorValue.{{ $index }}'
+                    divisor: 10
+                    group: Internal
+                    low_limit: ENVIROMUX2D::intSensorMinThreshold
+                    low_warn_limit: ENVIROMUX2D::intSensorMinWarnThreshold
+                    warn_limit: ENVIROMUX2D::intSensorMaxWarnThreshold
+                    high_limit: ENVIROMUX2D::intSensorMaxThreshold
+                    skip_values:
+                        -
+                            oid: ENVIROMUX2D::intSensorType
+                            op: '!='
+                            value: 1
+                -
+                    oid: ENVIROMUX5D::intSensorTable
+                    value: ENVIROMUX5D::intSensorValue
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.3.1.1.6.{{ $index }}'
+                    descr: '{{ ENVIROMUX5D::intSensorDescription }}'
+                    index: 'intSensorValue.{{ $index }}'
+                    divisor: 10
+                    group: Internal
+                    low_limit: ENVIROMUX5D::intSensorMinThreshold
+                    low_warn_limit: ENVIROMUX5D::intSensorMinWarnThreshold
+                    warn_limit: ENVIROMUX5D::intSensorMaxWarnThreshold
+                    high_limit: ENVIROMUX5D::intSensorMaxThreshold
+                    skip_values:
+                        -
+                            oid: ENVIROMUX5D::intSensorType
+                            op: '!='
+                            value: 1
+                -
+                    oid: ENVIROMUX16D::intSensorTable
+                    value: ENVIROMUX16D::intSensorValue
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.3.1.1.6.{{ $index }}'
+                    descr: '{{ ENVIROMUX16D::intSensorDescription }}'
+                    index: 'intSensorValue.{{ $index }}'
+                    divisor: 10
+                    group: Internal
+                    low_limit: ENVIROMUX16D::intSensorMinThreshold
+                    low_warn_limit: ENVIROMUX16D::intSensorMinWarnThreshold
+                    warn_limit: ENVIROMUX16D::intSensorMaxWarnThreshold
+                    high_limit: ENVIROMUX16D::intSensorMaxThreshold
+                    skip_values:
+                        -
+                            oid: ENVIROMUX16D::intSensorType
+                            op: '!='
+                            value: 1
+                # 2D / 5D / 16D extSensorEntry col 7 = extSensorValue, col 2 = extSensorType (temperature(1))
+                -
+                    oid: ENVIROMUX2D::extSensorTable
+                    value: ENVIROMUX2D::extSensorValue
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.5.1.1.7.{{ $index }}'
+                    descr: '{{ ENVIROMUX2D::extSensorDescription }}'
+                    index: 'extSensorValue.{{ $index }}'
+                    divisor: 10
+                    group: External
+                    low_limit: ENVIROMUX2D::extSensorMinThreshold
+                    low_warn_limit: ENVIROMUX2D::extSensorMinWarnThreshold
+                    warn_limit: ENVIROMUX2D::extSensorMaxWarnThreshold
+                    high_limit: ENVIROMUX2D::extSensorMaxThreshold
+                    skip_values:
+                        -
+                            oid: ENVIROMUX2D::extSensorType
+                            op: '!='
+                            value: 1
+                -
+                    oid: ENVIROMUX5D::extSensorTable
+                    value: ENVIROMUX5D::extSensorValue
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.5.1.1.7.{{ $index }}'
+                    descr: '{{ ENVIROMUX5D::extSensorDescription }}'
+                    index: 'extSensorValue.{{ $index }}'
+                    divisor: 10
+                    group: External
+                    low_limit: ENVIROMUX5D::extSensorMinThreshold
+                    low_warn_limit: ENVIROMUX5D::extSensorMinWarnThreshold
+                    warn_limit: ENVIROMUX5D::extSensorMaxWarnThreshold
+                    high_limit: ENVIROMUX5D::extSensorMaxThreshold
+                    skip_values:
+                        -
+                            oid: ENVIROMUX5D::extSensorType
+                            op: '!='
+                            value: 1
+                -
+                    oid: ENVIROMUX16D::extSensorTable
+                    value: ENVIROMUX16D::extSensorValue
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.5.1.1.7.{{ $index }}'
+                    descr: '{{ ENVIROMUX16D::extSensorDescription }}'
+                    index: 'extSensorValue.{{ $index }}'
+                    divisor: 10
+                    group: External
+                    low_limit: ENVIROMUX16D::extSensorMinThreshold
+                    low_warn_limit: ENVIROMUX16D::extSensorMinWarnThreshold
+                    warn_limit: ENVIROMUX16D::extSensorMaxWarnThreshold
+                    high_limit: ENVIROMUX16D::extSensorMaxThreshold
+                    skip_values:
+                        -
+                            oid: ENVIROMUX16D::extSensorType
+                            op: '!='
+                            value: 1
         humidity:
             data:
                 -
-                    oid: ENVIROMUXMICRO-MIB::intSensorEntry
+                    oid: ENVIROMUXMICRO-MIB::intSensorTable
                     value: ENVIROMUXMICRO-MIB::intSensorValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.1.1.1.4.{{ $index }}'
-                    descr: '{{ $ENVIROMUXMICRO-MIB::intSensorDescription }}'
-                    index: 'intSensorEntry.{{ $index }}'
+                    descr: '{{ ENVIROMUXMICRO-MIB::intSensorDescription }}'
+                    index: 'intSensorValue.{{ $index }}'
                     divisor: 10
                     group: Internal
                     skip_values:
@@ -44,47 +166,316 @@ modules:
                             op: '!='
                             value: 2
                 -
-                   oid: extSensorTable
-                   value: extSensorValue
+                   oid: ENVIROMUX-1W-MIB::extSensorTable
+                   value: ENVIROMUX-1W-MIB::extSensorValue
                    num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.2.1.1.4.{{ $index }}'
                    index: 'extSensorValue.{{ $index }}'
-                   descr: "{{ $extSensorDescription }}"
+                   descr: "{{ ENVIROMUX-1W-MIB::extSensorDescription }}"
                    divisor: 10
                    skip_values:
                        -
-                           oid: extSensorType
+                           oid: ENVIROMUX-1W-MIB::extSensorType
                            op: 'not_in_array'
                            value: ['2']
+                # 2D / 5D / 16D internal humidity sensors (intSensorType=2); humidity is reported as integer percent (no divisor) per MIB DESCRIPTION
+                -
+                    oid: ENVIROMUX2D::intSensorTable
+                    value: ENVIROMUX2D::intSensorValue
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.3.1.1.6.{{ $index }}'
+                    descr: '{{ ENVIROMUX2D::intSensorDescription }}'
+                    index: 'intSensorValue.{{ $index }}'
+                    group: Internal
+                    low_limit: ENVIROMUX2D::intSensorMinThreshold
+                    low_warn_limit: ENVIROMUX2D::intSensorMinWarnThreshold
+                    warn_limit: ENVIROMUX2D::intSensorMaxWarnThreshold
+                    high_limit: ENVIROMUX2D::intSensorMaxThreshold
+                    skip_values:
+                        -
+                            oid: ENVIROMUX2D::intSensorType
+                            op: '!='
+                            value: 2
+                -
+                    oid: ENVIROMUX5D::intSensorTable
+                    value: ENVIROMUX5D::intSensorValue
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.3.1.1.6.{{ $index }}'
+                    descr: '{{ ENVIROMUX5D::intSensorDescription }}'
+                    index: 'intSensorValue.{{ $index }}'
+                    group: Internal
+                    low_limit: ENVIROMUX5D::intSensorMinThreshold
+                    low_warn_limit: ENVIROMUX5D::intSensorMinWarnThreshold
+                    warn_limit: ENVIROMUX5D::intSensorMaxWarnThreshold
+                    high_limit: ENVIROMUX5D::intSensorMaxThreshold
+                    skip_values:
+                        -
+                            oid: ENVIROMUX5D::intSensorType
+                            op: '!='
+                            value: 2
+                -
+                    oid: ENVIROMUX16D::intSensorTable
+                    value: ENVIROMUX16D::intSensorValue
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.3.1.1.6.{{ $index }}'
+                    descr: '{{ ENVIROMUX16D::intSensorDescription }}'
+                    index: 'intSensorValue.{{ $index }}'
+                    group: Internal
+                    low_limit: ENVIROMUX16D::intSensorMinThreshold
+                    low_warn_limit: ENVIROMUX16D::intSensorMinWarnThreshold
+                    warn_limit: ENVIROMUX16D::intSensorMaxWarnThreshold
+                    high_limit: ENVIROMUX16D::intSensorMaxThreshold
+                    skip_values:
+                        -
+                            oid: ENVIROMUX16D::intSensorType
+                            op: '!='
+                            value: 2
+                # 2D / 5D / 16D external humidity sensors (extSensorType=2)
+                -
+                    oid: ENVIROMUX2D::extSensorTable
+                    value: ENVIROMUX2D::extSensorValue
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.5.1.1.7.{{ $index }}'
+                    descr: '{{ ENVIROMUX2D::extSensorDescription }}'
+                    index: 'extSensorValue.{{ $index }}'
+                    group: External
+                    low_limit: ENVIROMUX2D::extSensorMinThreshold
+                    low_warn_limit: ENVIROMUX2D::extSensorMinWarnThreshold
+                    warn_limit: ENVIROMUX2D::extSensorMaxWarnThreshold
+                    high_limit: ENVIROMUX2D::extSensorMaxThreshold
+                    skip_values:
+                        -
+                            oid: ENVIROMUX2D::extSensorType
+                            op: '!='
+                            value: 2
+                -
+                    oid: ENVIROMUX5D::extSensorTable
+                    value: ENVIROMUX5D::extSensorValue
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.5.1.1.7.{{ $index }}'
+                    descr: '{{ ENVIROMUX5D::extSensorDescription }}'
+                    index: 'extSensorValue.{{ $index }}'
+                    group: External
+                    low_limit: ENVIROMUX5D::extSensorMinThreshold
+                    low_warn_limit: ENVIROMUX5D::extSensorMinWarnThreshold
+                    warn_limit: ENVIROMUX5D::extSensorMaxWarnThreshold
+                    high_limit: ENVIROMUX5D::extSensorMaxThreshold
+                    skip_values:
+                        -
+                            oid: ENVIROMUX5D::extSensorType
+                            op: '!='
+                            value: 2
+                -
+                    oid: ENVIROMUX16D::extSensorTable
+                    value: ENVIROMUX16D::extSensorValue
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.5.1.1.7.{{ $index }}'
+                    descr: '{{ ENVIROMUX16D::extSensorDescription }}'
+                    index: 'extSensorValue.{{ $index }}'
+                    group: External
+                    low_limit: ENVIROMUX16D::extSensorMinThreshold
+                    low_warn_limit: ENVIROMUX16D::extSensorMinWarnThreshold
+                    warn_limit: ENVIROMUX16D::extSensorMaxWarnThreshold
+                    high_limit: ENVIROMUX16D::extSensorMaxThreshold
+                    skip_values:
+                        -
+                            oid: ENVIROMUX16D::extSensorType
+                            op: '!='
+                            value: 2
         state:
             data:
                 -
-                    oid: digInputEntry
-                    value: digInputValue
+                    oid: ENVIROMUX-1W-MIB::digInputTable
+                    value: ENVIROMUX-1W-MIB::digInputValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.3.1.1.3.{{ $index }}'
-                    descr: '{{ $digInputDescription }}'
+                    descr: '{{ ENVIROMUX-1W-MIB::digInputDescription }}'
                     state_name: DigitalInputs
                     group: Inputs
                     states:
-                        - { descr: closed, graph: 1, value: 0, generic: 0 }
-                        - { descr: open, graph: 1, value: 1, generic: 1 }
+                        - { descr: closed, value: 0, generic: 0 }
+                        - { descr: open, value: 1, generic: 1 }
                 -
-                    oid: alertEntry
-                    value: alertStatus
+                    oid: ENVIROMUX-1W-MIB::alertTable
+                    value: ENVIROMUX-1W-MIB::alertStatus
                     num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.5.1.1.7.{{ $index }}'
-                    descr: '{{ $alertSensor }}#{{ $index }}'
+                    descr: '{{ ENVIROMUX-1W-MIB::alertSensor }}#{{ $index }}'
                     group: Alerts
                     state_name: alertStatus
                     states:
-                        - { descr: normal, graph: 1, value: 0, generic: 0 }
-                        - { descr: enterinCritical, graph: 1, value: 1, generic: 1 }
-                        - { descr: Critical, graph: 1, value: 2, generic: 2 }
-                        - { descr: exitingCritical, graph: 1, value: 3, generic: 1 }
-                        - { descr: waitingAckDismiss, graph: 1, value: 4, generic: 1 }
-                        - { descr: acknowledged, graph: 1, value: 5, generic: 1 }
-                        - { descr: dismissed, graph: 1, value: 6, generic: 1 }
-                        - { descr: disconnected, graph: 1, value: 7, generic: 3 }
+                        - { descr: normal, value: 0, generic: 0 }
+                        - { descr: enterinCritical, value: 1, generic: 1 }
+                        - { descr: Critical, value: 2, generic: 2 }
+                        - { descr: exitingCritical, value: 3, generic: 1 }
+                        - { descr: waitingAckDismiss, value: 4, generic: 1 }
+                        - { descr: acknowledged, value: 5, generic: 1 }
+                        - { descr: dismissed, value: 6, generic: 1 }
+                        - { descr: disconnected, value: 7, generic: 3 }
                     skip_values:
                         -
-                            oid: alertEnabled
+                            oid: ENVIROMUX-1W-MIB::alertEnabled
                             op: '='
                             value: 0
+                # 2D / 5D / 16D digital inputs (digInputValue = closed(0)/open(1)); skip slots whose description is "Not configured"
+                -
+                    oid: ENVIROMUX2D::digInputTable
+                    value: ENVIROMUX2D::digInputValue
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.6.1.1.7.{{ $index }}'
+                    descr: '{{ ENVIROMUX2D::digInputDescription }}'
+                    index: 'digInputValue.{{ $index }}'
+                    state_name: DigitalInputs
+                    group: Inputs
+                    states:
+                        - { descr: closed, value: 0, generic: 0 }
+                        - { descr: open, value: 1, generic: 1 }
+                    skip_values:
+                        -
+                            oid: ENVIROMUX2D::digInputDescription
+                            op: 'regex'
+                            value: '/^Not configured$/'
+                -
+                    oid: ENVIROMUX5D::digInputTable
+                    value: ENVIROMUX5D::digInputValue
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.6.1.1.7.{{ $index }}'
+                    descr: '{{ ENVIROMUX5D::digInputDescription }}'
+                    index: 'digInputValue.{{ $index }}'
+                    state_name: DigitalInputs
+                    group: Inputs
+                    states:
+                        - { descr: closed, value: 0, generic: 0 }
+                        - { descr: open, value: 1, generic: 1 }
+                    skip_values:
+                        -
+                            oid: ENVIROMUX5D::digInputDescription
+                            op: 'regex'
+                            value: '/^Not configured$/'
+                -
+                    oid: ENVIROMUX16D::digInputTable
+                    value: ENVIROMUX16D::digInputValue
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.6.1.1.7.{{ $index }}'
+                    descr: '{{ ENVIROMUX16D::digInputDescription }}'
+                    index: 'digInputValue.{{ $index }}'
+                    state_name: DigitalInputs
+                    group: Inputs
+                    states:
+                        - { descr: closed, value: 0, generic: 0 }
+                        - { descr: open, value: 1, generic: 1 }
+                    skip_values:
+                        -
+                            oid: ENVIROMUX16D::digInputDescription
+                            op: 'regex'
+                            value: '/^Not configured$/'
+                # 2D / 5D / 16D remote inputs (remoteInputValue = closed(0)/open(1)); skip "Not configured" slots
+                -
+                    oid: ENVIROMUX2D::remoteInputTable
+                    value: ENVIROMUX2D::remoteInputValue
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.12.1.1.7.{{ $index }}'
+                    descr: '{{ ENVIROMUX2D::remoteInputDescription }}'
+                    index: 'remoteInputValue.{{ $index }}'
+                    state_name: DigitalInputs
+                    group: 'Remote Inputs'
+                    states:
+                        - { descr: closed, value: 0, generic: 0 }
+                        - { descr: open, value: 1, generic: 1 }
+                    skip_values:
+                        -
+                            oid: ENVIROMUX2D::remoteInputDescription
+                            op: 'regex'
+                            value: '/^Not configured$/'
+                -
+                    oid: ENVIROMUX5D::remoteInputTable
+                    value: ENVIROMUX5D::remoteInputValue
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.12.1.1.7.{{ $index }}'
+                    descr: '{{ ENVIROMUX5D::remoteInputDescription }}'
+                    index: 'remoteInputValue.{{ $index }}'
+                    state_name: DigitalInputs
+                    group: 'Remote Inputs'
+                    states:
+                        - { descr: closed, value: 0, generic: 0 }
+                        - { descr: open, value: 1, generic: 1 }
+                    skip_values:
+                        -
+                            oid: ENVIROMUX5D::remoteInputDescription
+                            op: 'regex'
+                            value: '/^Not configured$/'
+                -
+                    oid: ENVIROMUX16D::remoteInputTable
+                    value: ENVIROMUX16D::remoteInputValue
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.12.1.1.7.{{ $index }}'
+                    descr: '{{ ENVIROMUX16D::remoteInputDescription }}'
+                    index: 'remoteInputValue.{{ $index }}'
+                    state_name: DigitalInputs
+                    group: 'Remote Inputs'
+                    states:
+                        - { descr: closed, value: 0, generic: 0 }
+                        - { descr: open, value: 1, generic: 1 }
+                    skip_values:
+                        -
+                            oid: ENVIROMUX16D::remoteInputDescription
+                            op: 'regex'
+                            value: '/^Not configured$/'
+                # 2D / 5D / 16D output relays (outRelayStatus = active(0)/inactive(1))
+                -
+                    oid: ENVIROMUX2D::outRelayTable
+                    value: ENVIROMUX2D::outRelayStatus
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.8.1.1.3.{{ $index }}'
+                    descr: '{{ ENVIROMUX2D::outRelayDescription }}'
+                    index: 'outRelayStatus.{{ $index }}'
+                    state_name: OutputRelays
+                    group: Relays
+                    states:
+                        - { descr: active, value: 0, generic: 0 }
+                        - { descr: inactive, value: 1, generic: 1 }
+                -
+                    oid: ENVIROMUX5D::outRelayTable
+                    value: ENVIROMUX5D::outRelayStatus
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.8.1.1.3.{{ $index }}'
+                    descr: '{{ ENVIROMUX5D::outRelayDescription }}'
+                    index: 'outRelayStatus.{{ $index }}'
+                    state_name: OutputRelays
+                    group: Relays
+                    states:
+                        - { descr: active, value: 0, generic: 0 }
+                        - { descr: inactive, value: 1, generic: 1 }
+                -
+                    oid: ENVIROMUX16D::outRelayTable
+                    value: ENVIROMUX16D::outRelayStatus
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.8.1.1.3.{{ $index }}'
+                    descr: '{{ ENVIROMUX16D::outRelayDescription }}'
+                    index: 'outRelayStatus.{{ $index }}'
+                    state_name: OutputRelays
+                    group: Relays
+                    states:
+                        - { descr: active, value: 0, generic: 0 }
+                        - { descr: inactive, value: 1, generic: 1 }
+                # 2D / 5D / 16D power supplies; pwrSupplyStatus = failed(0)/ok(1)/na(2).
+                # Operators can silence a known-empty bay via the device's web UI which
+                # reports back as na(2); na is mapped to generic 0 so it does not alert.
+                -
+                    oid: ENVIROMUX2D::pwrSupplyTable
+                    value: ENVIROMUX2D::pwrSupplyStatus
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.9.1.9.1.1.2.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    index: 'pwrSupplyStatus.{{ $index }}'
+                    state_name: PowerSupply
+                    group: Power
+                    states:
+                        - { descr: failed, value: 0, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
+                        - { descr: na, value: 2, generic: 0 }
+                -
+                    oid: ENVIROMUX5D::pwrSupplyTable
+                    value: ENVIROMUX5D::pwrSupplyStatus
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.10.1.9.1.1.2.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    index: 'pwrSupplyStatus.{{ $index }}'
+                    state_name: PowerSupply
+                    group: Power
+                    states:
+                        - { descr: failed, value: 0, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
+                        - { descr: na, value: 2, generic: 0 }
+                -
+                    oid: ENVIROMUX16D::pwrSupplyTable
+                    value: ENVIROMUX16D::pwrSupplyStatus
+                    num_oid: '.1.3.6.1.4.1.3699.1.1.11.1.9.1.1.2.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    index: 'pwrSupplyStatus.{{ $index }}'
+                    state_name: PowerSupply
+                    group: Power
+                    states:
+                        - { descr: failed, value: 0, generic: 2 }
+                        - { descr: ok, value: 1, generic: 0 }
+                        - { descr: na, value: 2, generic: 0 }

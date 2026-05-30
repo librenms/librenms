@@ -4,19 +4,30 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\Storage;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Url;
 
+/**
+ * @extends TableController<Storage>
+ */
 class StoragesController extends TableController
 {
-    protected $model = Storage::class;
+    protected ?string $model = Storage::class;
 
-    protected $default_sort = ['device_hostname' => 'asc', 'storage_descr' => 'asc'];
+    protected array $default_sort = ['device_hostname' => 'asc', 'storage_descr' => 'asc'];
 
-    protected function sortFields($request): array
+    protected function rules(): array
+    {
+        return [
+            'status' => 'nullable|string',
+        ];
+    }
+
+    protected function sortFields(Request $request): array
     {
         return [
             'device_hostname',
@@ -35,31 +46,39 @@ class StoragesController extends TableController
         ];
     }
 
-    protected function baseQuery(Request $request): Builder
+    protected function baseQuery(Request $request): Builder|\Illuminate\Database\Query\Builder
     {
+        $this->authorize('viewAny', Storage::class);
+
         return Storage::query()
             ->hasAccess($request->user())
             ->when($request->input('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'storage.device_id'))
-            ->withAggregate('device', 'hostname');
+            ->withAggregate('device', 'hostname')
+            ->when($request->input('status') == 'warning', function ($q): void {
+                // show only entries in warning state
+                $q->where('storage_perc', '>', 0)
+                    ->whereColumn('storage_perc', '>=', 'storage_perc_warn');
+            });
     }
 
     /**
-     * @param  Storage  $storage
+     * @param  Storage  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($storage): array
+    public function formatItem(Model $model): array
     {
-        $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $storage->device]);
-        $descr = $storage->storage_descr;
+        $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $model->device]);
+        $descr = $model->storage_descr;
         $graph_array = [
             'type' => 'storage_usage',
-            'popup_title' => htmlentities(strip_tags($storage->device?->displayName() . ': ' . $storage->storage_descr)),
-            'id' => $storage->storage_id,
+            'popup_title' => htmlentities(strip_tags($model->device?->displayName() . ': ' . $model->storage_descr)),
+            'id' => $model->storage_id,
             'from' => '-1d',
             'height' => 20,
             'width' => 80,
         ];
         $mini_graph = Url::graphPopup($graph_array);
-        $used = $this->usageBar($storage, $graph_array);
+        $used = $this->usageBar($model, $graph_array);
 
         if (\Request::input('view') == 'graphs') {
             $row = Html::graphRow(array_replace($graph_array, ['height' => 100, 'width' => 216]));
@@ -74,7 +93,7 @@ class StoragesController extends TableController
             'storage_descr' => $descr,
             'graph' => $mini_graph,
             'storage_used' => $used,
-            'storage_perc' => round($storage->storage_perc) . '%',
+            'storage_perc' => round($model->storage_perc) . '%',
         ];
     }
 
@@ -91,10 +110,8 @@ class StoragesController extends TableController
 
     /**
      * Get headers for CSV export
-     *
-     * @return array
      */
-    protected function getExportHeaders()
+    protected function getExportHeaders(): array
     {
         return [
             'Device Hostname',
@@ -108,9 +125,9 @@ class StoragesController extends TableController
      * Format a row for CSV export
      *
      * @param  Storage  $storage
-     * @return array
+     * @return array<scalar>
      */
-    protected function formatExportRow($storage)
+    protected function formatExportRow(Model $storage): array
     {
         return [
             $storage->device ? $storage->device->displayName() : '',

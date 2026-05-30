@@ -7921,168 +7921,144 @@
                 {
                     "state_name": "tmnxCellPdnConnectionState",
                     "state_descr": "Not connected",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxCellPdnConnectionState",
                     "state_descr": "Connected",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxCellPortRegistrationStatus",
                     "state_descr": "Not-registered",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxCellPortRegistrationStatus",
                     "state_descr": "Registered-home",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxCellPortRegistrationStatus",
                     "state_descr": "Searching",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxCellPortRegistrationStatus",
                     "state_descr": "Denied",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxCellPortRegistrationStatus",
                     "state_descr": "No-network",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxCellPortRegistrationStatus",
                     "state_descr": "Registered-roaming",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxCellPortRegistrationStatus",
                     "state_descr": "Sms-only-home",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxCellPortRegistrationStatus",
                     "state_descr": "Sms-only-roaming",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxCellPortRegistrationStatus",
                     "state_descr": "Emergency-only",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxCellPortRegistrationStatus",
                     "state_descr": "Csfb-not-preferred-home",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxCellPortRegistrationStatus",
                     "state_descr": "Csfb-not-preferred-roaming",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxCellPortWirelessTechnology",
                     "state_descr": "None",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxCellPortWirelessTechnology",
                     "state_descr": "Lte",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxCellPortWirelessTechnology",
                     "state_descr": "Wcdma",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxCellPortWirelessTechnology",
                     "state_descr": "Gsm",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxCellSimCardEquipped",
                     "state_descr": "Installed",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxCellSimCardEquipped",
                     "state_descr": "Not installed",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxChassisOverTempState",
                     "state_descr": "Ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "tmnxChassisOverTempState",
                     "state_descr": "OverTemp",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "tmnxHwAlarmState",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "tmnxHwAlarmState",
                     "state_descr": "alarmActive",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "tmnxHwAlarmState",
                     "state_descr": "alarmCleared",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 }
@@ -8708,6 +8684,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8727,6 +8704,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "3HE11600AAAA0112",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8746,6 +8724,7 @@
                     "entPhysicalContainedIn": 50331649,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "3HE11600AAAA0112",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8765,6 +8744,7 @@
                     "entPhysicalContainedIn": 50331649,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "3HE11600AAAA0112",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8784,6 +8764,7 @@
                     "entPhysicalContainedIn": 50331649,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8803,6 +8784,7 @@
                     "entPhysicalContainedIn": 134217729,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "3HE11600AAAA0112",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8822,6 +8804,7 @@
                     "entPhysicalContainedIn": 134217729,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "3HE11600AAAA0112",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8841,6 +8824,7 @@
                     "entPhysicalContainedIn": 134217729,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "3HE11600AAAA0112",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8860,6 +8844,7 @@
                     "entPhysicalContainedIn": 134217729,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "3HE11600AAAA0112",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8879,6 +8864,7 @@
                     "entPhysicalContainedIn": 134217729,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "3HE11600AAAA0112",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8898,6 +8884,7 @@
                     "entPhysicalContainedIn": 134217729,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "3HE11600AAAA0112",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8917,6 +8904,7 @@
                     "entPhysicalContainedIn": 150994977,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

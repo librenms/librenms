@@ -1,4 +1,3 @@
-mib: POWERSUPPLY-MIB:FAN-MIB:STATISTICS-MIB:HP-ICF-POE-MIB:HP-STACK-MIB:ENTITY-MIB:ENTITY-STATE-MIB
 modules:
     mempools:
         data:
@@ -32,7 +31,7 @@ modules:
     processors:
         data:
             -
-                oid: hpSwitchCpuStat
+                oid: STATISTICS-MIB::hpSwitchCpuStat
                 num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.{{ $index }}'
                 type: procurve-fixed
     sensors:
@@ -40,131 +39,137 @@ modules:
             data:
                 -
                     oid:
-                        - entPhysicalDescr
-                        - entPhysicalName
-                        - entPhysicalClass
+                        - ENTITY-MIB::entPhysicalDescr
+                        - ENTITY-MIB::entPhysicalName
+                        - ENTITY-MIB::entPhysicalClass
         temperature:
             data:
                 -
-                    oid: hpicfPsTable
-                    value: hpicfPsTemp
+                    oid: POWERSUPPLY-MIB::hpicfPsTable
+                    value: POWERSUPPLY-MIB::hpicfPsTemp
                     num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.55.1.1.1.4.{{ $index }}'
                     index: 'hpicfPsTemp.{{ $index }}'
                     descr: 'Power Supply #{{ $index }}'
         power:
             data:
                 -
-                    oid: hpicfPsTable
-                    value: hpicfPsWattageCur
+                    oid: POWERSUPPLY-MIB::hpicfPsTable
+                    value: POWERSUPPLY-MIB::hpicfPsWattageCur
                     num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.55.1.1.1.6.{{ $index }}'
                     index: 'hpicfPsWattageCur.{{ $index }}'
-                    high_limit: hpicfPsWattageMax
+                    high_limit: POWERSUPPLY-MIB::hpicfPsWattageMax
                     descr: 'Power Supply #{{ $index }}'
                 -
-                    oid: hpicfPseFeaturesTable
-                    value: hpicfPseUsedPower
-                    num_oid: '.1.3.6.1.4.1.11.2.14.11.1.9.1.6.1.5.{{ $index }}'
+                    oid: HP-ICF-POE-MIB::hpicfPseFeaturesTable
+                    value: HP-ICF-POE-MIB::hpicfPseAvailablePower
+                    num_oid: '.1.3.6.1.4.1.11.2.14.11.1.9.1.6.1.4.{{ $index }}'
                     index: 'hpicfPseAvailablePower.{{ $index }}'
+                    descr: 'PoE Power Total'
+                -
+                    oid: HP-ICF-POE-MIB::hpicfPseFeaturesTable
+                    value: HP-ICF-POE-MIB::hpicfPseUsedPower
+                    num_oid: '.1.3.6.1.4.1.11.2.14.11.1.9.1.6.1.5.{{ $index }}'
+                    index: 'hpicfPseUsedPower.{{ $index }}'
                     skip_values:
                         -
-                          oid: hpicfPseAvailablePower
+                          oid: HP-ICF-POE-MIB::hpicfPseAvailablePower
                           op: '=='
                           value: 0
-                    high_limit: hpicfPseAvailablePower
+                    high_limit: HP-ICF-POE-MIB::hpicfPseAvailablePower
                     descr: 'PoE Power Used'
         state:
             data:
                 -
-                    oid: hpicfFanTable
-                    value: hpicfFanState
+                    oid: FAN-MIB::hpicfFanTable
+                    value: FAN-MIB::hpicfFanState
                     num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.54.2.1.1.4.{{ $index }}'
                     descr: 'Fan #{{ $index }}'
                     index: 'hpicfFanState.{{ $index }}'
                     state_name: hpicfFanState
                     states:
-                        - { descr: removed, graph: 1, value: 1, generic: 3 }
-                        - { descr: off, graph: 1, value: 2, generic: 3 }
-                        - { descr: underspeed, graph: 1, value: 3, generic: 1 }
-                        - { descr: overspeed, graph: 1, value: 4, generic: 1 }
-                        - { descr: ok, graph: 1, value: 5, generic: 0 }
-                        - { descr: maxstate, graph: 1, value: 6, generic: 3 }
+                        - { descr: removed, value: 1, generic: 3 }
+                        - { descr: off, value: 2, generic: 3 }
+                        - { descr: underspeed, value: 3, generic: 1 }
+                        - { descr: overspeed, value: 4, generic: 1 }
+                        - { descr: ok, value: 5, generic: 0 }
+                        - { descr: maxstate, value: 6, generic: 3 }
                 -
-                    oid: hpicfPsTable
-                    value: hpicfPsState
+                    oid: POWERSUPPLY-MIB::hpicfPsTable
+                    value: POWERSUPPLY-MIB::hpicfPsState
                     num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.55.1.1.1.2.{{ $index }}'
                     descr: 'Power Supply #{{ $index }}'
                     index: 'hpicfPsState.{{ $index }}'
                     state_name: hpicfPsState
                     states:
-                        - { descr: psNotPresent, graph: 1, value: 1, generic: 3 }
-                        - { descr: psNotPlugged, graph: 1, value: 2, generic: 2 }
-                        - { descr: psPowered, graph: 1, value: 3, generic: 0 }
-                        - { descr: psFailed, graph: 1, value: 4, generic: 2 }
-                        - { descr: psPermFailure, graph: 1, value: 5, generic: 2 }
-                        - { descr: psMax, graph: 1, value: 6, generic: 3 }
+                        - { descr: psNotPresent, value: 1, generic: 3 }
+                        - { descr: psNotPlugged, value: 2, generic: 2 }
+                        - { descr: psPowered, value: 3, generic: 0 }
+                        - { descr: psFailed, value: 4, generic: 2 }
+                        - { descr: psPermFailure, value: 5, generic: 2 }
+                        - { descr: psMax, value: 6, generic: 3 }
                 -
-                    oid:  hpStackConfig
-                    value: hpStackOperStatus
+                    oid:  HP-STACK-MIB::hpStackConfig
+                    value: HP-STACK-MIB::hpStackOperStatus
                     num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.69.1.1.2.{{ $index }}'
                     descr: 'Stack State'
                     state_name: hpStackOperStatus
                     states:
-                        - { descr: disabled, graph: 1, value: 1, generic: 0 }
-                        - { descr: active, graph: 1, value: 2, generic: 0 }
-                        - { descr: fragmentInactive, graph: 1, value: 3, generic: 2 }
-                        - { descr: unAvailable, graph: 1, value: 0, generic: 0 }
-                        - { descr: fragmentActive, graph: 1, value: 4, generic: 2 }
+                        - { descr: disabled, value: 1, generic: 0 }
+                        - { descr: active, value: 2, generic: 0 }
+                        - { descr: fragmentInactive, value: 3, generic: 2 }
+                        - { descr: unAvailable, value: 0, generic: 0 }
+                        - { descr: fragmentActive, value: 4, generic: 2 }
                 -
-                    oid:  hpStackConfig
-                    value: hpStackTopology
+                    oid:  HP-STACK-MIB::hpStackConfig
+                    value: HP-STACK-MIB::hpStackTopology
                     num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.69.1.1.4.{{ $index }}'
                     descr: 'Stack Topology'
                     state_name: hpStackTopology
                     skip_values:
                         -
-                          oid: hpStackOperStatus
+                          oid: HP-STACK-MIB::hpStackOperStatus
                           op: '=='
                           value: 1
                     states:
-                        - { descr: unKnown, graph: 1, value: 0, generic: 0 }
-                        - { descr: chain, graph: 1, value: 1, generic: 0 }
-                        - { descr: ring, graph: 1, value: 2, generic: 0 }
-                        - { descr: mesh, graph: 1, value: 3, generic: 0 }
-                        - { descr: partialMesh, graph: 1, value: 4, generic: 1 }
+                        - { descr: unKnown, value: 0, generic: 0 }
+                        - { descr: chain, value: 1, generic: 0 }
+                        - { descr: ring, value: 2, generic: 0 }
+                        - { descr: mesh, value: 3, generic: 0 }
+                        - { descr: partialMesh, value: 4, generic: 1 }
                 -
-                    oid: hpStackMemberTable
-                    value: hpStackMemberState
+                    oid: HP-STACK-MIB::hpStackMemberTable
+                    value: HP-STACK-MIB::hpStackMemberState
                     num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.69.1.3.1.9.{{ $index }}'
                     descr: 'Stack Member State {{ $index }}'
                     index: 'hpStackMemberState.{{ $index }}'
                     state_name: hpStackMemberState
                     states:
-                        - { descr: unusedID, graph: 1, value: 0, generic: 0 }
-                        - { descr: missing, graph: 1, value: 1, generic: 3 }
-                        - { descr: provision, graph: 1, value: 2, generic: 0 }
-                        - { descr: commander, graph: 1, value: 3, generic: 0 }
-                        - { descr: standby, graph: 1, value: 4, generic: 0 }
-                        - { descr: member, graph: 1, value: 5, generic: 0 }
-                        - { descr: shutdown, graph: 1, value: 6, generic: 3 }
-                        - { descr: booting, graph: 1, value: 7, generic: 3 }
-                        - { descr: communicationFailure, graph: 1, value: 8, generic: 3 }
-                        - { descr: incompatibleOs , graph: 1, value: 9, generic: 3 }
-                        - { descr: unknownState , graph: 1, value: 10, generic: 3 }
-                        - { descr: standbyBooting , graph: 1, value: 11, generic: 3 }
+                        - { descr: unusedID, value: 0, generic: 0 }
+                        - { descr: missing, value: 1, generic: 3 }
+                        - { descr: provision, value: 2, generic: 0 }
+                        - { descr: commander, value: 3, generic: 0 }
+                        - { descr: standby, value: 4, generic: 0 }
+                        - { descr: member, value: 5, generic: 0 }
+                        - { descr: shutdown, value: 6, generic: 3 }
+                        - { descr: booting, value: 7, generic: 3 }
+                        - { descr: communicationFailure, value: 8, generic: 3 }
+                        - { descr: incompatibleOs , value: 9, generic: 3 }
+                        - { descr: unknownState , value: 10, generic: 3 }
+                        - { descr: standbyBooting , value: 11, generic: 3 }
                 -
-                    oid: entStateOper
-                    value: entStateOper
+                    oid: ENTITY-STATE-MIB::entStateOper
+                    value: ENTITY-STATE-MIB::entStateOper
                     num_oid: '.1.3.6.1.2.1.131.1.1.1.3.{{ $index }}'
-                    descr: '{{ $entPhysicalName }} [{{ $entPhysicalDescr }}]'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }} [{{ ENTITY-MIB::entPhysicalDescr }}]'
                     index: 'entStateOper.{{ $index }}'
                     state_name: entStateOper
                     states:
-                        - { descr: notPresent, graph: 1, value: 1, generic: 3 }
-                        - { descr: unknown, graph: 1, value: 2, generic: 1 }
-                        - { descr: ok, graph: 1, value: 3, generic: 0 }
-                        - { descr: failed, graph: 1, value: 4, generic: 2 }
+                        - { descr: notPresent, value: 1, generic: 3 }
+                        - { descr: unknown, value: 2, generic: 1 }
+                        - { descr: ok, value: 3, generic: 0 }
+                        - { descr: failed, value: 4, generic: 2 }
                     skip_values:
                         -
-                            oid: entPhysicalClass
+                            oid: ENTITY-MIB::entPhysicalClass
                             op: 'in_array'
                             value: ['', 5, 6, 7, 8, 10]

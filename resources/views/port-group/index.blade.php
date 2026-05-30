@@ -11,9 +11,11 @@
 
             <div class="row">
                 <div class="col-md-12">
+                    @can('create', \App\Models\PortGroup::class)
                     <a type="button" class="btn btn-primary" href="{{ route('port-groups.create') }}">
                         <i class="fa fa-plus"></i> {{ __('New Port Group') }}
                     </a>
+                    @endcan
                 </div>
             </div>
             <div class="table-responsive">
@@ -31,15 +33,20 @@
                         <tr id="row_{{ $port_group->id }}">
                             <td>{{ $port_group->name }}</td>
                             <td>{{ $port_group->desc }}</td>
-                            <td><a href="{{ url("/ports/group=$port_group->id") }}">{{ $port_group->ports_count }}</a></td>
+                            <td><a href="{{ route('ports', ['filter' => ['groups.id' => ['eq' => $port_group->id]]]) }}">{{ $port_group->ports_count }}</a></td>
                             <td>
+                                @can('update', $port_group)
                                 <a type="button" title="{{ __('edit Port Group') }}" class="btn btn-primary btn-sm" aria-label="{{ __('Edit') }}"
                                    href="{{ route('port-groups.edit', $port_group->id) }}">
                                     <i class="fa fa-pencil" aria-hidden="true"></i></a>
+                                @endcan
+                                @can('delete', $port_group)
                                 <button type="button" class="btn btn-danger btn-sm" title="{{ __('delete Port Group') }}" aria-label="{{ __('Delete') }}"
-                                        onclick="delete_pg(this, '{{ $port_group->name }}', '{{ route('port-groups.destroy', $port_group->id) }}')">
+                                        data-group-name="{{ $port_group->name }}"
+                                        onclick="delete_pg(this, '{{ route('port-groups.destroy', $port_group->id) }}')">
                                     <i
                                         class="fa fa-trash" aria-hidden="true"></i></button>
+                                @endcan
                             </td>
                         </tr>
                     @endforeach
@@ -52,8 +59,9 @@
 
 @section('scripts')
     <script>
-        function delete_pg(button, name, url) {
+        function delete_pg(button, url) {
             var index = button.parentNode.parentNode.rowIndex;
+            var name = button.dataset.groupName;
 
             if (confirm('{{ __('Are you sure you want to delete ') }}' + name + '?')) {
                 $.ajax({

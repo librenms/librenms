@@ -12,7 +12,9 @@
  * the source code distribution for details.
  */
 
-if (! Auth::user()->hasGlobalAdmin()) {
+use Illuminate\Support\Facades\Gate;
+
+if (Gate::denies('device.update')) {
     $status = ['status' => 1, 'message' => 'You need to be admin'];
 } else {
     if (isset($_POST['viewtype'])) {

@@ -108,7 +108,7 @@ class EditTabs extends Component
         if ($this->device->sensors()->exists()) {
             $this->tabs['health'] = [
                 'text' => __('Health'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=health/'),
+                'link' => route('device.edit.health', $this->device->device_id),
             ];
         }
 
@@ -136,7 +136,7 @@ class EditTabs extends Component
 
         $this->tabs['misc'] = [
             'text' => __('Misc'),
-            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=misc/'),
+            'link' => route('device.edit.misc', $this->device->device_id),
         ];
 
         $this->tabs['component'] = [
