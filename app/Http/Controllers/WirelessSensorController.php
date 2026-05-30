@@ -40,7 +40,7 @@ class WirelessSensorController
      */
     private function getMetrics(Request $request): array
     {
-        return WirelessSensor::distinct()->pluck('sensor_class')
+        return WirelessSensor::hasAccess($request->user())->distinct()->pluck('sensor_class')
             ->mapWithKeys(fn (WirelessSensorType $class) => [$class->value => [
                 'text' => __("wireless.{$class->value}.short"),
                 'link' => route('wireless.index', $request->all() + ['metric' => $class->value]),

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\Filterable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,17 +17,50 @@ use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
+/**
+ * @property IfOperStatus|null $ifOperStatus
+ * @property IfOperStatus|null $ifOperStatus_prev
+ * @property IfOperStatus|null $ifAdminStatus
+ * @property IfOperStatus|null $ifAdminStatus_prev
+ */
 class Port extends DeviceRelatedModel
 {
     use HasFactory;
+    use Filterable;
 
     public $timestamps = false;
     protected $primaryKey = 'port_id';
     protected $guarded = [];
+    protected array $filterable = [
+        'device_id',
+        'ifName',
+        'ifDescr',
+        'portName',
+        'ifSpeed',
+        'ifIndex',
+        'ifOperStatus',
+        'ifAdminStatus',
+        'ifDuplex',
+        'ifMtu',
+        'ifType',
+        'ifAlias',
+        'ifPhysAddress',
+        'ifLastChange',
+        'ifVlan',
+        'ifTrunk',
+        'ifVrf',
+        'ignore',
+        'disabled',
+        'deleted',
+        'state',
+        'search',
+        'errors',
+        'groups.id',
+        'device.groups.id',
+        'device.location_id',
+        'device.hostname',
+    ];
 
-    /**
-     * @return array{ifOperStatus: 'LibreNMS\Enum\IfOperStatus', ifOperStatus_prev: 'LibreNMS\Enum\IfOperStatus', ifAdminStatus: 'LibreNMS\Enum\IfOperStatus', ifAdminStatus_prev: 'LibreNMS\Enum\IfOperStatus'}
-     */
     protected function casts(): array
     {
         return [
@@ -312,6 +346,58 @@ class Port extends DeviceRelatedModel
                 ->from('port_group_port')
                 ->where('port_group_id', $portGroup);
         });
+    }
+
+    public function filterErrors(Builder $query, mixed $value, array $config): void
+    {
+        $query->where(function (Builder $query) use ($value): void {
+            $operator = $value ? '>' : '=';
+            $boolean = $value ? 'or' : 'and';
+
+            $query->where($this->qualifyColumn('ifInErrors_delta'), $operator, 0, $boolean)
+                ->where($this->qualifyColumn('ifOutErrors_delta'), $operator, 0, $boolean);
+        });
+    }
+
+    /**
+     * Handle the "State" filter.
+     * up: Admin Up + Oper Up
+     * down: Admin Up + Oper NOT Up
+     * shutdown: Admin NOT Up
+     */
+    public function filterState(Builder $query, mixed $value, array $config): void
+    {
+        $this->applyMappedFilter($query, $value, $config, fn (Builder $q, $state) => match ($state) {
+            'up' => $q->where('ifOperStatus', 'up'),
+            'shutdown' => $q->where('ifAdminStatus', 'down'),
+            default => $q->where('ifOperStatus', '!=', 'up')
+                ->where(fn (Builder $sub) => $sub->where('ifAdminStatus', '!=', 'down')->orWhereNull('ifAdminStatus')),
+        });
+    }
+
+    /**
+     * Handle a global text search across multiple port fields
+     */
+    public function filterSearch(Builder $query, mixed $value, array $config): void
+    {
+        $this->applyFilterSearch(['ifName', 'ifAlias', 'ifDescr'], $query, $value, $config);
+    }
+
+    /**
+     * Custom filter for ifDuplex to handle "unknown" as both 'unknown' and NULL.
+     */
+    public function filterIfDuplex(Builder $query, mixed $value, array $config): void
+    {
+        if ($value === 'unknown') {
+            $query->where(function ($q): void {
+                $q->whereIn('ports.ifDuplex', ['unknown', ''])
+                    ->orWhereNull('ports.ifDuplex');
+            });
+
+            return;
+        }
+
+        $this->applyQueryLogic($query, 'ports.ifDuplex', $value, $config);
     }
 
     // ---- Define Relationships ----

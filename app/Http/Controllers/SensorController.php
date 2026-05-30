@@ -77,12 +77,6 @@ class SensorController
             $status = array_key_first($status_bar);
         }
 
-        $title = 'Health :: ' . match ($metric) {
-            'dbm' => 'dBm',
-            'snr' => 'SNR',
-            default => ucfirst((string) $metric),
-        };
-
         $blade_view = match ($metric) {
             'mempool' => 'sensor.mempool',
             'processor' => 'sensor.processor',
@@ -93,7 +87,7 @@ class SensorController
         };
 
         return view($blade_view, [
-            'title' => $title,
+            'title' => __('Health') . ' :: ' . __('sensors.' . $metric . '.short'),
             'metrics' => $metrics,
             'metric' => $metric,
             'views' => $views,

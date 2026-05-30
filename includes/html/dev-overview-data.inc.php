@@ -7,9 +7,14 @@ use LibreNMS\Util\Clean;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Time;
 
+echo '<script src="js/leaflet.js"></script>';
+echo '<script src="js/L.Control.Locate.min.js"></script>';
+echo '<script src="js/leaflet.markercluster.js"></script>';
+echo '<script src="js/leaflet.awesome-markers.min.js"></script>';
+
 echo "<div class='row'>
       <div class='col-md-12'>
-          <div class='panel panel-default panel-condensed device-overview'>
+          <div class='panel panel-default panel-condensed device-overview overview-panel'>
             <div class='panel-heading'>";
 
 if (LibrenmsConfig::get('overview_show_sysDescr')) {
@@ -19,11 +24,6 @@ if (LibrenmsConfig::get('overview_show_sysDescr')) {
 }
 
 echo '</div><div class="panel-body">';
-
-echo '<script src="js/leaflet.js"></script>';
-echo '<script src="js/L.Control.Locate.min.js"></script>';
-echo '<script src="js/leaflet.markercluster.js"></script>';
-echo '<script src="js/leaflet.awesome-markers.min.js"></script>';
 
 if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
     \LibreNMS\Util\Rewrite::ciscoHardware($device, false);
@@ -300,7 +300,7 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
                   });
                 device_map.addLayer(device_marker_cluster);
         ';
-    } elseif (Gate::allows('update', Location::class)) {
+    } elseif (Gate::allows('location.update')) {
         echo '
                 device_marker = L.marker(device_location).addTo(device_map);
                 device_marker.dragging.enable();

@@ -17,7 +17,9 @@ use Illuminate\Support\Facades\Gate;
 
 header('Content-type: text/plain');
 
-if (Gate::denies('delete', AlertTemplate::class)) {
+$template = AlertTemplate::findOrFail($_POST['template_id']);
+
+if (Gate::denies('delete', $template)) {
     exit('ERROR: You need permission');
 }
 
@@ -25,7 +27,7 @@ if (! is_numeric($_POST['template_id'])) {
     echo 'ERROR: No template selected';
     exit;
 } else {
-    if (AlertTemplate::where('id', $_POST['template_id'])->delete()) {
+    if ($template->delete()) {
         \App\Models\AlertTemplateMap::where('alert_templates_id', $_POST['template_id'])->delete();
         echo 'Alert template has been deleted.';
         exit;

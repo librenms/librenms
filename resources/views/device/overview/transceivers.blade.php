@@ -1,19 +1,20 @@
 <div class="row">
     <div class="col-md-12">
-        <x-panel class="device-overview panel-condensed">
+        <x-panel class="device-overview panel-condensed overview-panel">
             <x-slot name="heading" class="tw:mb-6">
                 <x-icons.transceiver></x-icons.transceiver>
                 <strong><a href="{{ $transceivers_link }}">{{ __('port.tabs.transceivers') }}</a></strong>
             </x-slot>
 
             @foreach($transceivers as $transceiver)
-                <x-panel body-class="tw:p-0!">
-                    <x-slot name="heading">
+                <x-panel class="overview-panel">
+                    <x-slot:heading>
                         @if($transceiver->port)
                         <x-port-link :port="$transceiver->port" :vars="['view' => 'transceiver']"></x-port-link>
                         @endif
                         <x-icons.transceiver></x-icons.transceiver> {{ $transceiver->vendor }} {{ $transceiver->type }}
-                    </x-slot>
+                    </x-slot:heading>
+                    <x-slot:slot class="tw:p-0!">
                     <table class="table table-hover table-condensed table-striped tw:mb-0!">
                         @foreach($sensors as $sensor)
                             @if($sensor->entPhysicalIndex !== null && $sensor->entPhysicalIndex == $transceiver->entity_physical_index && $filterSensors($sensor))
@@ -29,6 +30,7 @@
                             @endif
                         @endforeach
                     </table>
+                    </x-slot:slot>
                 </x-panel>
             @endforeach
         </x-panel>
