@@ -24,9 +24,9 @@
 
 namespace LibreNMS\Graph;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Config as LibrenmsConfig;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Graph\Definitions\Device\PollerPerfGraph;
 use Symfony\Component\Process\Process;

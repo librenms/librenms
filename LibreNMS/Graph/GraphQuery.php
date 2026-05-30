@@ -24,7 +24,7 @@
 
 namespace LibreNMS\Graph;
 
-use LibreNMS\Config as LibrenmsConfig;
+use App\Facades\LibrenmsConfig;
 
 class GraphQuery
 {
