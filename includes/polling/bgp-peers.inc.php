@@ -73,15 +73,17 @@ if (! empty($peers)) {
             'BGP4V2-MIB::bgp4V2PeerDescription',
             'BGP4V2-MIB::bgp4V2PeerLastErrorCodeReceived',
         ])->valuesByIndex();
-        // With BGP4V2-MIB loaded, index format is: instance[.addrType]["ip"]
-        // e.g. "1.ipv4.\"192.0.2.1\"" or "1.ipv6.\"20:01:0d:b8:...\""
+        // With BGP4V2-MIB loaded, index format is:
+        // "1.ipv4..192.0.2.1"  (dot-notation, real FRR devices)
+        // "1.ipv4.\"192.0.2.1\""  (quoted, some snmpsim/implementations)
         $vyos_by_ip = [];
         foreach ($vyos_peer_table as $idx => $vals) {
-            if (! preg_match('/\.(ipv4|ipv6)\."([^"]+)"$/', (string) $idx, $m)) {
+            if (! preg_match('/\.(ipv4|ipv6)\.(?:\.([0-9.]+)|"([^"]+)")$/', (string) $idx, $m)) {
                 continue;
             }
+            $addrStr = $m[2] !== '' ? $m[2] : $m[3];
             try {
-                $ip = ($m[1] === 'ipv4') ? IP::parse($m[2]) : IP::fromHexString($m[2]);
+                $ip = str_contains($addrStr, ':') ? IP::fromHexString($addrStr) : IP::fromSnmpString($addrStr);
                 $vyos_by_ip[$ip->uncompressed()] = $vals;
             } catch (InvalidIpException) {
             }
