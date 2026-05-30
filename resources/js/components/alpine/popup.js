@@ -18,7 +18,8 @@ export default function popup(url = '', options = {}) {
         showTimeout: null,
         hideTimeout: null,
         ignoreNextShownEvent: false,
-        delay: options.delay || 300,
+        showDelay: options.showDelay || 100,
+        hideDelay: options.hideDelay || 300,
         url: url,
         content: '',
         loading: false,
@@ -59,7 +60,7 @@ export default function popup(url = '', options = {}) {
             });
 
             this.popupElement.addEventListener('mouseleave', () => {
-                this.hide(this.delay);
+                this.hide(this.hideDelay);
             });
 
             document.body.appendChild(this.popupElement);
@@ -68,11 +69,11 @@ export default function popup(url = '', options = {}) {
         setupEventListeners() {
             // Mouse events on trigger element
             this.$el.addEventListener('mouseenter', () => {
-                this.show(100);
+                this.show(this.showDelay);
             });
 
             this.$el.addEventListener('mouseleave', () => {
-                this.hide(this.delay);
+                this.hide(this.hideDelay);
             });
 
             // Click away to close

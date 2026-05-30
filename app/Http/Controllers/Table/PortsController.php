@@ -104,6 +104,8 @@ class PortsController extends TableController
 
     protected function baseQuery($request): Builder
     {
+        $this->authorize('viewAny', Port::class);
+
         $query = Port::hasAccess($request->user())
             ->with(['device', 'device.location'])
             ->leftJoin('devices', 'ports.device_id', 'devices.device_id')

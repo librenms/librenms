@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Models\Device;
 use App\Models\PrinterSupply;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -45,6 +46,8 @@ class PrinterSupplyController extends TableController
      */
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Device::class);
+
         return PrinterSupply::query()
             ->hasAccess($request->user())
             ->with('device')

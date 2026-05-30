@@ -43,6 +43,8 @@ class PortGroupController extends SelectController
 
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', PortGroup::class);
+
         return PortGroup::hasAccess($request->user())->select(['id', 'name']);
     }
 

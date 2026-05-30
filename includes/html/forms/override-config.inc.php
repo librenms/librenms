@@ -13,12 +13,11 @@
 */
 
 use App\Facades\DeviceCache;
-use App\Models\Device;
 use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
 
-if (Gate::denies('update', Device::class)) {
+if (Gate::denies('device.update')) {
     $response = [
         'status' => 'error',
         'message' => 'Need permission',

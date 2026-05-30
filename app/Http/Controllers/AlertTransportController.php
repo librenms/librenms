@@ -13,6 +13,8 @@ class AlertTransportController extends Controller
 {
     public function test(Request $request, AlertTransport $transport): \Illuminate\Http\JsonResponse
     {
+        $this->authorize('update', $transport);
+
         /** @var Device $device */
         $device = Device::with('location')->first();
         $alert_data = AlertData::testData($device);

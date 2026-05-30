@@ -30,7 +30,6 @@ use App\Facades\LibrenmsConfig;
 use App\Http\Interfaces\ToastInterface;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
-use App\Models\AuthLog;
 use App\Models\Dashboard;
 use App\Models\User;
 use App\Models\UserPref;
@@ -40,7 +39,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use LibreNMS\Authentication\LegacyAuth;
-use Spatie\Permission\Models\Role;
 use URL;
 
 class UserController extends Controller
@@ -76,7 +74,7 @@ class UserController extends Controller
         return view('user.create', [
             'user' => $tmp_user,
             'dashboard' => null,
-            'dashboards' => Dashboard::allAvailable($tmp_user)->get(),
+            'dashboards' => Dashboard::hasAccess($tmp_user)->get(),
             'timezone' => 'default',
         ]);
     }
@@ -131,7 +129,7 @@ class UserController extends Controller
         $data = [
             'user' => $user,
             'dashboard' => UserPref::getPref($user, 'dashboard'),
-            'dashboards' => Dashboard::allAvailable($user)->get(),
+            'dashboards' => Dashboard::hasAccess($user)->get(),
             'timezone' => UserPref::getPref($user, 'timezone') ?: 'default',
         ];
 
@@ -149,7 +147,7 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified resource in storage. Authorized in UpdateUserRequest.
      */
     public function update(UpdateUserRequest $request, User $user, ToastInterface $toast): RedirectResponse
     {
@@ -168,7 +166,7 @@ class UserController extends Controller
 
         $user->fill($request->validated());
 
-        if ($request->has('roles') && $request->user()->can('update', Role::class)) {
+        if ($request->has('roles') && $request->user()->can('role.update')) {
             $user->syncRoles($request->input('roles', []));
         }
 
@@ -243,14 +241,5 @@ class UserController extends Controller
         }
 
         return false;
-    }
-
-    public function authlog(): View
-    {
-        $this->authorize('view', AuthLog::class);
-
-        return view('user.authlog', [
-            'authlog' => AuthLog::orderBy('datetime', 'DESC')->get(),
-        ]);
     }
 }

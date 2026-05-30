@@ -42,6 +42,8 @@ class CustomMapMenuGroupController extends SelectController
 
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', CustomMap::class);
+
         return CustomMap::query()->hasAccess($request->user())
             ->whereNotNull('menu_group')->select('menu_group')->groupBy('menu_group');
     }

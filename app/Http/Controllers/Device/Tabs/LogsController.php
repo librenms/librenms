@@ -27,14 +27,17 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use App\Models\Eventlog;
+use App\Models\Syslog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class LogsController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        return true;
+        return Gate::allows('viewAny', Syslog::class) || Gate::allows('viewAny', Eventlog::class);
     }
 
     public function slug(): string

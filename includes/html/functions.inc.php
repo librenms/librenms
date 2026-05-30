@@ -536,6 +536,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
 
     if (isset($tmp_alerts['sensor_id'])) {
         $sensor = new Sensor($tmp_alerts);
+        $sensor->sensor_id = $tmp_alerts['sensor_id'];
         if ($sensor->sensor_class == 'state') {
             // Give more details for a state (textual form)
             $details = 'State: ' . e($sensor->state_descr ?? '') . ' (numerical ' . $sensor->sensor_current . ')<br>  ';
@@ -553,7 +554,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
           ->map(fn ($value, $key) => "$key: $value")
           ->implode(', ');
 
-        $fault_detail .= Url::sensorLink($sensor, $sensor->name) . ';&nbsp; <br>' . $details;
+        $fault_detail .= Url::sensorLink($sensor, $tmp_alerts['name']) . ';&nbsp; <br>' . $details;
         $fallback = false;
     }
 

@@ -41,6 +41,8 @@ class PollerGroupController extends SelectController
 
     protected function baseQuery($request): Builder
     {
+        $this->authorize('viewAny', PollerGroup::class);
+
         return PollerGroup::query()->select(['id', 'group_name']);
     }
 

@@ -61,18 +61,22 @@
                             <a><i class="fa fa-wrench fa-fw fa-lg"
                                                                aria-hidden="true"></i> {{ __('Tools') }}</a>
                             <ul class="dropdown-menu">
+                                @can('tools.ripe')
                                 <li><a href="{{ url('ripenccapi') }}"><i class="fa fa-star fa-fw fa-lg"
                                                                          aria-hidden="true"></i> {{ __('RIPE NCC API') }}
                                     </a></li>
+                                @endcan
                                 @config('smokeping.integration')
                                 <li><a href="{{ \App\Facades\LibrenmsConfig::get('smokeping.url') }}"><i class="fa fa-line-chart fa-fw fa-lg"
                                                                        aria-hidden="true"></i> {{ __('Smokeping') }}</a>
                                 </li>
                                 @endconfig
                                 @config('mac_oui.enabled')
-                                <li><a href="{{ route('tool.oui-lookup') }}"><i class="fa fa-magnifying-glass fa-fw fa-lg"
-                                                                                              aria-hidden="true"></i> {{ __('tools.oui.title') }}</a>
-                                </li>
+                                    @can('tools.oui')
+                                    <li><a href="{{ route('tool.oui-lookup') }}"><i class="fa fa-magnifying-glass fa-fw fa-lg"
+                                                                                                  aria-hidden="true"></i> {{ __('tools.oui.title') }}</a>
+                                    </li>
+                                    @endcan
                                 @endconfig
                                 @config('oxidized.enabled')
                                 <li><a href="{{ url('oxidized') }}"><i class="fa fa-stack-overflow fa-fw fa-lg"
@@ -125,6 +129,7 @@
                     </ul>
                 </li>
 {{-- Devices --}}
+            @if(! $no_devices_added || Gate::allows('create', \App\Models\Device::class))
                 <li class="dropdown">
                     <a href="{{ route('devices') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-server fa-fw fa-lg fa-nav-icons"
@@ -168,10 +173,11 @@
                         </li>
                     @endif
                     @endcan
+                        @can('viewAny', \App\Models\DeviceOutage::class)
                         <li role="presentation" class="divider"></li>
-                        <li><a href="{{ url('outages') }}"><i class="fa fa-exclamation-triangle fa-fw fa-lg"
+                        <li><a href="{{ route('outages') }}"><i class="fa fa-exclamation-triangle fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Outages') }}</a></li>
-
+                        @endcan
                         @if($show_device_extra_divider)
                         <li role="presentation" class="divider"></li>
                         @endif
@@ -180,26 +186,27 @@
                                                                         aria-hidden="true"></i> {{ __('Manage Groups') }}
                                 </a></li>
                         @endcan
-                        @can('update', \App\Models\Device::class)
+                        @can('device.update')
                         <li><a href="{{ url('device-dependencies') }}"><i class="fa fa-group fa-fw fa-lg"></i> {{ __('Device Dependencies') }}</a></li>
                         @endcan
                         @if($show_vmwinfo)
                             <li><a href="{{ url('vminfo') }}"><i
                                         class="fa fa-cog fa-fw fa-lg"></i> {{ __('Virtual Machines') }}</a></li>
                         @endif
-                        @canany(['create', 'delete'], \App\Models\Device::class)
+                        @canany(['device.create', 'device.delete'])
                         <li role="presentation" class="divider"></li>
                         @endcanany
-                        @can('create', \App\Models\Device::class)
+                        @can('device.create')
                         <li><a href="{{ url('addhost') }}"><i class="fa fa-plus fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Add Device') }}</a></li>
                         @endcan
-                        @can('delete', \App\Models\Device::class)
+                        @can('device.delete')
                         <li><a href="{{ route('device.delete') }}"><i class="fa fa-trash fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Delete Device') }}</a></li>
                         @endcan
                     </ul>
                 </li>
+            @endif
 {{-- Maps --}}
                 <li class="dropdown">
                     <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown"
@@ -297,11 +304,13 @@
                     </ul>
                 </li>
 {{-- Ports --}}
+            @if($show_ports_menu)
                 <li class="dropdown">
                     <a href="{{ route('ports') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i
                             class="fa fa-link fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span
                             class="tw:md:hidden tw:lg:inline-block">{{ __('Ports') }}</span></a>
                     <ul class="dropdown-menu">
+                        @can('viewAny', \App\Models\Port::class)
                         <li><a href="{{ route('ports') }}"><i class="fa fa-link fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('All Ports') }}</a></li>
 
@@ -316,9 +325,12 @@
                                                                            aria-hidden="true"></i> {{ __('Ignored :port_count', ['port_count' => $port_counts['ignored']]) }}
                                 </a></li>
                         @endif
+                        @endcan
 
+                        @can('viewAny', \App\Models\Vlan::class)
                         <li><a href="{{ route('vlans.index') }}"><i class="fa fa-tasks fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('VLANs') }}</a></li>
+                        @endcan
 
                         @can('viewAny', \App\Models\Bill::class)
                         <li><a href="{{ url('bills') }}"><i class="fa fa-money fa-fw fa-lg"
@@ -331,16 +343,17 @@
                             </li>
                         @endif
 
-                        <li><a href="{{ route('port-security.index') }}"><i class="fa fa-shield fa-fw fa-lg"
-                                                                         aria-hidden="true"></i> {{ __('Port Security') }}</a>
-                        </li>
-
-                        @if($port_nac)
-                            <li role="presentation" class="divider"></li>
-                            <li><a href="{{ url('nac') }}"><i class="fa fa-lock fa-fw fa-lg"
-                                                              aria-hidden="true"></i> NAC</a></li>
-                        @endif
                         @can('viewAny', \App\Models\Port::class)
+                            <li><a href="{{ route('port-security.index') }}"><i class="fa fa-shield fa-fw fa-lg"
+                                                                         aria-hidden="true"></i> {{ __('Port Security') }}</a>
+                            </li>
+
+                            @if($port_nac)
+                                <li role="presentation" class="divider"></li>
+                                <li><a href="{{ url('nac') }}"><i class="fa fa-lock fa-fw fa-lg"
+                                                                  aria-hidden="true"></i> NAC</a></li>
+                            @endif
+
                             @if($port_groups_exist)
                                 <li role="presentation" class="divider"></li>
                                 @config('int_customers')
@@ -379,9 +392,9 @@
                             @endif
 
                             <li role="presentation" class="divider"></li>
-                            @if(Gate::any(['create', 'update', 'delete'], \App\Models\PortGroup::class))
+                            @can('manage', \App\Models\PortGroup::class)
                             <li><a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Manage Groups') }} </a></li>
-                            @endif
+                            @endcan
                             @if($port_groups->isNotEmpty())
                                 <li class="dropdown-submenu">
                                 <a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Port Groups') }}</a>
@@ -404,12 +417,12 @@
                             <li><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'down']]]) }}"><i class="fa fa-arrow-circle-down fa-fw fa-lg"
                                                                            aria-hidden="true"></i> {{ __('Down :port_count', ['port_count' => $port_counts['down']]) }}
                                 </a></li>
-                            <li><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'shutdown']]]) }}"><i
+                            <li><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'shutdown'], 'disabled' => ['eq' => '0'], 'ignore' => ['eq' => '0'], 'deleted' => ['eq' => '0']]]) }}"><i
                                         class="fa fa-arrow-circle-o-down fa-fw fa-lg"
                                         aria-hidden="true"></i> {{ __('Disabled :port_count', ['port_count' => $port_counts['shutdown']]) }}
                                 </a></li>
 
-                            @can('delete', \App\Models\Port::class)
+                            @can('port.delete')
                             @if($port_counts['deleted'])
                                 <li><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['deleted' => ['eq' => '1']]]) }}"><i class="fa fa-minus-circle fa-fw fa-lg"
                                                                                 aria-hidden="true"></i> {{ __('Deleted :port_count', ['port_count' => $port_counts['deleted']]) }}
@@ -419,27 +432,37 @@
                         @endcan
                     </ul>
                 </li>
+            @endif
 {{-- Sensors --}}
-                @can('viewAny', \App\Models\Sensor::class)
+                @if($show_health_menu)
                 <li class="dropdown">
                     <a href="{{ url('health') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-heartbeat fa-fw fa-lg fa-nav-icons"
                                                  aria-hidden="true"></i> <span class="tw:md:hidden tw:lg:inline-block">{{ __('Health') }}</span></a>
                     <ul class="dropdown-menu">
+                        @can('viewAny', \App\Models\Sensor::class)
                         <li><a href="{{ url('health/metric=all?status=alert') }}"><i class="fas fa-bell fa-fw fa-lg"
                                                                             aria-hidden="true"></i> {{ __('Alerts') }}</a>
                         </li>
                         <li role="presentation" class="divider"></li>
+                        @endcan
+                        @can('viewAny', \App\Models\Mempool::class)
                         <li><a href="{{ url('health/metric=mempool') }}"><i class="fas fa-memory fa-fw fa-lg"
                                                                             aria-hidden="true"></i> {{ __('Memory') }}</a>
                         </li>
+                        @endcan
+                        @can('viewAny', \App\Models\Processor::class)
                         <li><a href="{{ url('health/metric=processor') }}"><i class="fa fa-microchip fa-fw fa-lg"
                                                                               aria-hidden="true"></i> {{ __('Processor') }}
                             </a></li>
+                        @endcan
+                        @can('viewAny', \App\Models\Storage::class)
                         <li><a href="{{ url('health/metric=storage') }}"><i class="fa fa-database fa-fw fa-lg"
                                                                             aria-hidden="true"></i> {{ __('Storage') }}</a>
                         </li>
+                        @endcan
 
+                        @can('viewAny', \App\Models\Sensor::class)
                         @foreach($sensor_menu as $sensor_menu_group)
                             @foreach($sensor_menu_group as $sensor_menu_entry)
                                 @if($loop->first)
@@ -448,10 +471,10 @@
                                 <li><a href="{{ url('health/metric=' . $sensor_menu_entry['class']) }}"><i class="fa fa-{{ $sensor_menu_entry['icon'] }} fa-fw fa-lg" aria-hidden="true"></i> {{ $sensor_menu_entry['descr'] }}</a></li>
                             @endforeach
                         @endforeach
-
+                        @endcan
                     </ul>
                 </li>
-                @endcan
+                @endif
 {{-- Wireless --}}
                 @can('viewAny', \App\Models\WirelessSensor::class)
                 @if($wireless_menu->isNotEmpty())
@@ -667,7 +690,7 @@
                         </li>
                         @endcan
                         @can('auth-log.view')
-                        <li><a href="{{ url('authlog') }}"><i class="fa fa-shield fa-fw fa-lg"
+                        <li><a href="{{ route('auth-log') }}"><i class="fa fa-shield fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Auth History') }}</a></li>
                         @endcan
                         @if(Gate::allows('viewAny', \App\Models\PollerCluster::class) || Gate::allows('viewAny', \App\Models\PollerGroup::class))
@@ -675,11 +698,13 @@
                         <li class="dropdown-submenu">
                             <a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> {{ __('Poller') }}</a>
                             <ul class="dropdown-menu">
+                                @can('viewAny', \App\Models\PollerCluster::class)
                                 <li><a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> {{ __('Poller') }}</a></li>
+                                @endcan
                                 @can('viewAny', \App\Models\PollerGroup::class)
                                 <li><a href="{{ route('poller.groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Groups') }}</a></li>
                                 @endcan
-                                @can('update', \App\Models\PollerCluster::class)
+                                @can('poller.update')
                                 <li><a href="{{ route('poller.settings') }}"><i class="fa fa-gears fa-fw fa-lg" aria-hidden="true"></i> {{ __('Settings') }}</a></li>
                                 @endcan
                                 @can('viewAny', \App\Models\PollerCluster::class)

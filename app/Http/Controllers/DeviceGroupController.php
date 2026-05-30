@@ -10,20 +10,17 @@ use LibreNMS\Alerting\QueryBuilderFilter;
 
 class DeviceGroupController extends Controller
 {
-    public function __construct()
-    {
-        $this->authorizeResource(DeviceGroup::class, 'device_group');
-    }
-
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
+        $this->authorize('viewAny', DeviceGroup::class);
+
         return view('device-group.index', [
-            'device_groups' => DeviceGroup::orderBy('name')->withCount('devices')->get(),
+            'device_groups' => DeviceGroup::hasAccess($request->user())->orderBy('name')->withCount('devices')->get(),
         ]);
     }
 
@@ -34,6 +31,8 @@ class DeviceGroupController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', DeviceGroup::class);
+
         return view('device-group.create', [
             'device_group' => new DeviceGroup(),
             'filters' => json_encode(new QueryBuilderFilter('group')),
@@ -48,6 +47,8 @@ class DeviceGroupController extends Controller
      */
     public function store(Request $request, ToastInterface $toast)
     {
+        $this->authorize('create', DeviceGroup::class);
+
         $this->validate($request, [
             'name' => 'required|string|unique:device_groups',
             'type' => 'required|in:dynamic,static',
@@ -77,6 +78,8 @@ class DeviceGroupController extends Controller
      */
     public function show(DeviceGroup $deviceGroup)
     {
+        $this->authorize('view', $deviceGroup);
+
         return redirect(route('devices', ['filter' => ['groups.id' => ['eq' => $deviceGroup->id]]]));
     }
 
@@ -88,6 +91,8 @@ class DeviceGroupController extends Controller
      */
     public function edit(DeviceGroup $deviceGroup)
     {
+        $this->authorize('update', $deviceGroup);
+
         return view('device-group.edit', [
             'device_group' => $deviceGroup,
             'filters' => json_encode(new QueryBuilderFilter('group')),
@@ -103,6 +108,8 @@ class DeviceGroupController extends Controller
      */
     public function update(Request $request, DeviceGroup $deviceGroup, ToastInterface $toast)
     {
+        $this->authorize('update', $deviceGroup);
+
         $this->validate($request, [
             'name' => [
                 'required',
@@ -158,6 +165,8 @@ class DeviceGroupController extends Controller
      */
     public function destroy(DeviceGroup $deviceGroup)
     {
+        $this->authorize('delete', $deviceGroup);
+
         if ($deviceGroup->serviceTemplates()->exists()) {
             $msg = __('Device Group :name still has Service Templates associated with it. Please remove or update the Service Template accordingly', ['name' => htmlentities($deviceGroup->name)]);
 
