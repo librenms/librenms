@@ -30,6 +30,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
+use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
@@ -140,9 +141,11 @@ class Rrd extends BaseDatastore
             }, ARRAY_FILTER_USE_KEY);
         }
 
+        $template = ! empty($meta['rrd_update_template']) ? array_keys($fields) : null;
+
         try {
             try {
-                $this->update($rrd, $fields);
+                $this->update($rrd, $fields, $template);
             } catch (RrdNotFoundException) {
                 if (isset($rrd_def)) {
                     $this->command('create', $rrd, ['--step', $step, ...$rrd_def->getArguments(), ...$this->rra]);
@@ -515,11 +518,12 @@ class Rrd extends BaseDatastore
      *
      * @internal
      */
-    public function update(string $filename, array $data): void
+    public function update(string $filename, array $data, ?array $template = null): void
     {
-        $data = 'N:' . implode(':', array_map(fn ($v) => is_numeric($v) ? $v : 'U', $data));
+        $values = 'N:' . implode(':', array_map(fn ($v) => is_numeric($v) ? $v : 'U', $data));
+        $options = $template === null ? [$values] : ['--template', implode(':', $template), $values];
 
-        $this->command('update', $filename, [$data]);
+        $this->command('update', $filename, $options);
     }
 
     // rrdtool_update
@@ -699,6 +703,20 @@ class Rrd extends BaseDatastore
             }
 
             return $output;
+        }
+
+        // rrdtool writes its temp file in the target directory and will not create it,
+        // failing with "Cannot create temporary file" if the directory is missing.
+        // The per-device directory is normally made by PollDevice::initRrdDirectory(),
+        // but discovery (e.g. CheckDeviceAvailability writing icmp-perf, or an app
+        // collector creating its first rrd) can run before the device is ever polled,
+        // so ensure the directory exists here before creating a new rrd.
+        // Skipped for rrdcached, which manages file creation under its own base dir.
+        if ($command === 'create' && ! $this->rrdcached) {
+            $dir = dirname($filename);
+            if (! is_dir($dir)) {
+                mkdir($dir, 0775, true);
+            }
         }
 
         $this->init();

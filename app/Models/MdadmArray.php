@@ -56,6 +56,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $sync_max_sectors
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read string|null $health_label
+ * @property-read string|null $health_generic
+ * @property-read int|null $health_sensor_id
+ * @property-read string|null $op_label
+ * @property-read string|null $op_generic
+ * @property-read int|null $op_sensor_id
  * @property-read Device $device
  * @property-read Application $application
  * @property-read \Illuminate\Database\Eloquent\Collection<int, MdadmDrive> $drives
@@ -141,5 +147,21 @@ class MdadmArray extends Model
     public function drives(): HasMany
     {
         return $this->hasMany(MdadmDrive::class, 'mdadm_array_id');
+    }
+
+    /**
+     * Human-readable label combining the array name and md_id, e.g. "data (md0)".
+     * Falls back to md_id (or uuid) when no array_name is set.
+     */
+    public function graphLabel(): string
+    {
+        $arrayName = trim((string) ($this->array_name ?? ''));
+        $mdId = trim((string) ($this->md_id ?? ''));
+
+        if ($arrayName !== '' && $mdId !== '') {
+            return "$arrayName ($mdId)";
+        }
+
+        return $arrayName !== '' ? $arrayName : ($mdId !== '' ? $mdId : (string) $this->uuid);
     }
 }

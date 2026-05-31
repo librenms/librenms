@@ -23,7 +23,7 @@
  * Return the toggle button for a collapsible debug section (no wrapper div).
  * Place this inside an optionbar or navbar using a pull-right span.
  *
- * @param  string  $id     HTML id of the collapse target
+ * @param  string  $id  HTML id of the collapse target
  * @param  string  $label  Button label text
  */
 function debug_toggle_button(string $id, string $label = 'Debug'): string
@@ -40,7 +40,7 @@ function debug_toggle_button(string $id, string $label = 'Debug'): string
  * Render the collapse wrapper div that holds the debug panels.
  * Pair with debug_toggle_button() when the button lives elsewhere (e.g. navbar).
  *
- * @param  string    $id      Must match the id passed to debug_toggle_button()
+ * @param  string  $id  Must match the id passed to debug_toggle_button()
  * @param  string  ...$panels  Rendered panel HTML strings
  */
 function debug_collapse_div(string $id, string ...$panels): void
@@ -58,8 +58,8 @@ function debug_collapse_div(string $id, string ...$panels): void
  * Use debug_toggle_button() + debug_collapse_div() separately when the
  * button needs to live in a navbar.
  *
- * @param  string    $id      HTML id for the collapse target (must be unique on page)
- * @param  string    $label   Button label text
+ * @param  string  $id  HTML id for the collapse target (must be unique on page)
+ * @param  string  $label  Button label text
  * @param  string  ...$panels  HTML strings — each already a complete panel block
  */
 function debug_collapsible(string $id, string $label, string ...$panels): void
@@ -77,8 +77,8 @@ function debug_collapsible(string $id, string $label, string ...$panels): void
 /**
  * Return one Bootstrap panel as an HTML string.
  *
- * @param  string  $title    Panel heading text (not escaped — caller must escape if needed)
- * @param  string  $body     Panel body HTML
+ * @param  string  $title  Panel heading text (not escaped — caller must escape if needed)
+ * @param  string  $body  Panel body HTML
  * @param  string  $toolbar  Optional HTML prepended inside the body (e.g. copy/export buttons)
  */
 function debug_panel(string $title, string $body, string $toolbar = ''): string
@@ -98,7 +98,7 @@ function debug_panel(string $title, string $body, string $toolbar = ''): string
 /**
  * Return a scrollable <pre> element.
  *
- * @param  string  $id       HTML id (referenced by debug_toolbar)
+ * @param  string  $id  HTML id (referenced by debug_toolbar)
  * @param  string  $content  Already HTML-escaped content
  */
 function debug_pre(string $id, string $content): string
@@ -112,7 +112,7 @@ function debug_pre(string $id, string $content): string
  * Render the debug collapse div (button is expected to already be in the page).
  * Equivalent to debug_collapse_div(); exists so callers don't need to know the internal name.
  *
- * @param  string    $id      Must match the id passed to debug_toggle_button()
+ * @param  string  $id  Must match the id passed to debug_toggle_button()
  * @param  string  ...$panels  Rendered panel HTML strings
  */
 function debug_render(string $id, string ...$panels): void
@@ -131,14 +131,14 @@ function debug_format_datastore_list(array $stores): string
         return '<span class="text-muted">none</span>';
     }
 
-    return implode(', ', array_map('htmlspecialchars', $stores));
+    return implode(', ', array_map(htmlspecialchars(...), $stores));
 }
 
 /**
  * Encode headers + rows as a CSV data URI suitable for an <a download> href.
  *
- * @param  string[]    $headers  Column header strings
- * @param  string[][]  $rows     2-D array of cell values (already cast to string by caller)
+ * @param  string[]  $headers  Column header strings
+ * @param  string[][]  $rows  2-D array of cell values (already cast to string by caller)
  */
 function debug_csv_data_uri(array $headers, array $rows): string
 {
@@ -173,9 +173,9 @@ function debug_rrd_last_point(string $rrdFile): ?\LibreNMS\Data\Store\TimeSeries
  * Column headers are derived from the keys of the first row.
  * Optionally adds an Export CSV toolbar button when $csvFilename is provided.
  *
- * @param  string         $title        Panel heading text (not HTML-escaped — caller escapes if needed)
- * @param  iterable       $rows         Array/Collection of flat associative arrays; values cast to string
- * @param  string|null    $csvFilename  When set, adds a CSV download button with this filename
+ * @param  string  $title  Panel heading text (not HTML-escaped — caller escapes if needed)
+ * @param  iterable  $rows  Array/Collection of flat associative arrays; values cast to string
+ * @param  string|null  $csvFilename  When set, adds a CSV download button with this filename
  */
 function debug_db_table_panel(string $title, iterable $rows, ?string $csvFilename = null): string
 {
@@ -236,8 +236,8 @@ function debug_db_table_panel(string $title, iterable $rows, ?string $csvFilenam
  *    'file'  => ['size_bytes' => int|null, 'modified_at' => string|null],
  *    'last_update' => ['timestamp_iso' => string, 'data' => array]|null]
  *
- * @param  array     $rrdEntries  RRD file descriptor array (as built by the app's stored-data helper)
- * @param  string[]  $stores      Active datastore names for the header line
+ * @param  array  $rrdEntries  RRD file descriptor array (as built by the app's stored-data helper)
+ * @param  string[]  $stores  Active datastore names for the header line
  */
 function debug_rrd_files_panel(array $rrdEntries, array $stores = []): string
 {
@@ -267,7 +267,7 @@ function debug_rrd_files_panel(array $rrdEntries, array $stores = []): string
             HTML;
     }
 
-    $theadHtml = implode('', array_map(static fn ($h) => '<th>' . htmlspecialchars($h) . '</th>', $fileHeaders));
+    $theadHtml = implode('', array_map(static fn ($h) => '<th>' . htmlspecialchars((string) $h) . '</th>', $fileHeaders));
     $colspan = count($fileHeaders);
 
     if ($filesRows === '') {
@@ -319,10 +319,10 @@ function debug_rrd_files_panel(array $rrdEntries, array $stores = []): string
 /**
  * Return a complete Bootstrap panel for a sensor/metric table.
  *
- * @param  string    $title        Panel heading (not HTML-escaped)
- * @param  string[]  $columns      Ordered list of column keys to display (defines headers and extraction order)
- * @param  array     $rows         Array of associative arrays keyed by $columns values
- * @param  string    $csvFilename  When non-empty, adds a CSV download button with this filename
+ * @param  string  $title  Panel heading (not HTML-escaped)
+ * @param  string[]  $columns  Ordered list of column keys to display (defines headers and extraction order)
+ * @param  array  $rows  Array of associative arrays keyed by $columns values
+ * @param  string  $csvFilename  When non-empty, adds a CSV download button with this filename
  */
 function debug_sensors_panel(string $title, array $columns, array $rows, string $csvFilename = ''): string
 {
@@ -374,7 +374,7 @@ function debug_sensors_panel(string $title, array $columns, array $rows, string 
  * Copy reads textContent from the element at click time.
  * Download builds a Blob from the same text and triggers a save-as dialog.
  *
- * @param  string  $textId    id of the <pre> or element containing the text to copy/export
+ * @param  string  $textId  id of the <pre> or element containing the text to copy/export
  * @param  string  $filename  Default filename for the download dialog
  * @param  string  $mimeType  MIME type for the download Blob (default application/json)
  */

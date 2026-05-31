@@ -59,6 +59,14 @@ $sensorPopup = static fn (array $entry, string $badge): string =>
                                         'tab'  => 'apps',   'app'    => 'mdadm', 'array' => $arrayName,
                                     ]);
 
+                                    $arrayLabel = trim((string) ($meta['array_name'] ?? ''));
+                                    $mdId = trim((string) ($meta['md_id'] ?? ''));
+                                    if ($arrayLabel !== '' && $mdId !== '') {
+                                        $arrayLabel .= ' (' . $mdId . ')';
+                                    } elseif ($arrayLabel === '') {
+                                        $arrayLabel = $arrayName;
+                                    }
+
                                     $hBadge  = '<span class="label label-' . e($hEntry['class'] ?? 'default') . '" title="' . e($hEntry['info'] ?? '') . '">' . e($hEntry['label'] ?? 'Unknown') . '</span>';
                                     $opBadge = '<span class="label label-' . e($opEntry['class'] ?? 'default') . '" title="' . e($opEntry['info'] ?? '') . '">' . e($opEntry['label'] ?? 'Unknown') . '</span>';
                                     $mmBadge  = '<span class="label label-' . e($mmEntry['class'] ?? 'default') . '">' . e($mmEntry['label'] ?? '-') . '</span>';
@@ -67,7 +75,7 @@ $sensorPopup = static fn (array $entry, string $badge): string =>
                                         : '<span class="label label-default">-</span>';
                                 @endphp
                                 <tr>
-                                    <td><a href="{{ $arrayLink }}">{{ $arrayName }}</a></td>
+                                    <td><a href="{{ $arrayLink }}">{{ $arrayLabel }}</a></td>
                                     <td><a href="{{ $arrayLink }}">{{ $meta['raid_level'] ?? '-' }}</a></td>
                                     <td>{!! $sensorPopup($hEntry, $hBadge) !!}</td>
                                     <td>{!! $sensorPopup($opEntry, $opBadge) !!}</td>
@@ -88,6 +96,7 @@ $sensorPopup = static fn (array $entry, string $badge): string =>
             @foreach($data->arrayNames() as $arrayName)
                 @php
                     $arrayData   = $data->array($arrayName);
+                    $meta        = $data->arraysMeta[$arrayName] ?? [];
                     $hEntry      = $arrayData['mdadm_array_health_status'] ?? [];
                     $metaDevices = $data->arraysDevices[$arrayName] ?? [];
 
@@ -96,12 +105,20 @@ $sensorPopup = static fn (array $entry, string $badge): string =>
                         'tab'  => 'apps',   'app'    => 'mdadm', 'array' => $arrayName,
                     ]);
 
+                    $arrayLabel = trim((string) ($meta['array_name'] ?? ''));
+                    $mdId = trim((string) ($meta['md_id'] ?? ''));
+                    if ($arrayLabel !== '' && $mdId !== '') {
+                        $arrayLabel .= ' (' . $mdId . ')';
+                    } elseif ($arrayLabel === '') {
+                        $arrayLabel = $arrayName;
+                    }
+
                     $hBadge = '<span class="label label-' . e($hEntry['class'] ?? 'default') . '" title="' . e($hEntry['info'] ?? '') . '">' . e($hEntry['label'] ?? 'Unknown') . '</span>';
                 @endphp
                 @if(!empty($metaDevices))
                     <x-panel>
                         <x-slot name="heading">
-                            <a href="{{ $arrayLink }}">{{ $arrayName }}</a> Devices
+                            <a href="{{ $arrayLink }}">{{ $arrayLabel }}</a> Devices
                             <span class="pull-right">{!! $hBadge !!}</span>
                         </x-slot>
                         <x-slot name="table">
@@ -139,10 +156,10 @@ $sensorPopup = static fn (array $entry, string $badge): string =>
                                             $errBadge = '<span class="label label-' . e($errEntry['class'] ?? 'default') . '">' . e($errEntry['label'] ?? '-') . '</span>';
                                         @endphp
                                         <tr>
-                                            <td>{{ $path }}</td>
-                                            <td>{{ $metaDev['device_role'] ?? '-' }}</td>
+                                            <td><a href="{{ $arrayLink }}">{{ $path }}</a></td>
+                                            <td><a href="{{ $arrayLink }}">{{ $metaDev['device_role'] ?? '-' }}</a></td>
                                             <td>{!! $sensorPopup($dhEntry, $dhBadge) !!}</td>
-                                            <td>{{ $metaDev['slot'] ?? '-' }}</td>
+                                            <td><a href="{{ $arrayLink }}">{{ $metaDev['slot'] ?? '-' }}</a></td>
                                             <td>{!! $sensorPopup($errEntry, $errBadge) !!}</td>
                                         </tr>
                                     @endforeach

@@ -98,20 +98,20 @@ class V2 extends Application
             $arrayRow = MdadmArray::updateOrCreate(
                 ['app_id' => $appId, 'uuid' => 'v2:' . $arrayName],
                 [
-                    'device_id'          => $deviceId,
-                    'md_id'              => $arrayName,
-                    'level'              => (string) ($data['level'] ?? ''),
-                    'size_bytes'         => (int) ($data['size'] ?? 0),
-                    'raid_disks'         => $discCount,
-                    'state'              => (string) ($data['state'] ?? ''),
-                    'active_devices'     => max(0, $discCount - $hotspare - $failedTotal),
-                    'working_devices'    => max(0, $discCount - $failedTotal),
-                    'spare_devices'      => $hotspare,
-                    'failed_devices'     => $failedTotal,
-                    'degraded'           => null,
-                    'sync_action'        => $action,
+                    'device_id' => $deviceId,
+                    'md_id' => $arrayName,
+                    'level' => (string) ($data['level'] ?? ''),
+                    'size_bytes' => (int) ($data['size'] ?? 0),
+                    'raid_disks' => $discCount,
+                    'state' => (string) ($data['state'] ?? ''),
+                    'active_devices' => max(0, $discCount - $hotspare - $failedTotal),
+                    'working_devices' => max(0, $discCount - $failedTotal),
+                    'spare_devices' => $hotspare,
+                    'failed_devices' => $failedTotal,
+                    'degraded' => null,
+                    'sync_action' => $action,
                     'sync_completed_pct' => (float) ($data['sync_completed'] ?? 0),
-                    'sync_speed_bps'     => $isSyncing ? (int) ($data['sync_speed'] ?? 0) : null,
+                    'sync_speed_bps' => $isSyncing ? (int) ($data['sync_speed'] ?? 0) : null,
                 ]
             );
 
@@ -149,7 +149,6 @@ class V2 extends Application
             // Sensors
             $uuid = 'v2:' . $arrayName;
             $group = "Mdadm $arrayName";
-            $nav = 'tab=apps/app=mdadm/array=' . rawurlencode($arrayName) . '/';
             $healthIdx = $uuid . '_health';
             $opIdx = $uuid . '_operation';
             $expectedOids[] = "app:mdadm:$healthIdx";
@@ -163,7 +162,6 @@ class V2 extends Application
                 descr: "$group Health",
                 current: self::mapHealth((string) ($data['state'] ?? ''), $missingExplicit, (int) ($data['degraded'] ?? 0)),
                 group: $group,
-                navigation: $nav,
             )->withStateTranslations('mdadm_array_health_status', self::healthTranslations());
 
             $this->discoverSensor(
@@ -174,7 +172,6 @@ class V2 extends Application
                 descr: "$group Operation",
                 current: self::mapOperation($action, (string) ($data['state'] ?? '')),
                 group: $group,
-                navigation: $nav,
             )->withStateTranslations('mdadm_array_operation_status', self::operationTranslations());
 
             // Per-device health: present → Present (0), missing → Missing (10)
@@ -197,7 +194,6 @@ class V2 extends Application
                     descr: "$group $devName Health",
                     current: 0,
                     group: $devGroup,
-                    navigation: $nav,
                 )->withStateTranslations('mdadm_device_health_status', self::deviceHealthTranslations());
             }
             foreach ((array) ($data['missing_devices_list'] ?? []) as $devName) {
@@ -218,7 +214,6 @@ class V2 extends Application
                     descr: "$group $devName Health",
                     current: 10,
                     group: $devGroup,
-                    navigation: $nav,
                 )->withStateTranslations('mdadm_device_health_status', self::deviceHealthTranslations());
             }
         }
@@ -282,19 +277,19 @@ class V2 extends Application
                 continue;
             }
             $fields = [
-                'level'          => str_replace('raid', '', (string) ($data['level'] ?? '')),
-                'size'           => (int) ($data['size'] ?? 0),
-                'disc_count'     => (int) ($data['disc_count'] ?? 0),
+                'level' => str_replace('raid', '', (string) ($data['level'] ?? '')),
+                'size' => (int) ($data['size'] ?? 0),
+                'disc_count' => (int) ($data['disc_count'] ?? 0),
                 'hotspare_count' => (int) ($data['hotspare_count'] ?? 0),
-                'degraded'       => (int) ($data['degraded'] ?? 0),
-                'sync_speed'     => (int) ($data['sync_speed'] ?? 0),
+                'degraded' => (int) ($data['degraded'] ?? 0),
+                'sync_speed' => (int) ($data['sync_speed'] ?? 0),
                 'sync_completed' => (float) ($data['sync_completed'] ?? 0),
             ];
             $metrics[$array_name] = $fields;
             $tags = [
-                'name'     => $array_name,
-                'app_id'   => $this->app->app_id,
-                'rrd_def'  => $rrd_def,
+                'name' => $array_name,
+                'app_id' => $this->app->app_id,
+                'rrd_def' => $rrd_def,
                 'rrd_name' => ['app', $name, $this->app->app_id, $array_name],
             ];
             app('Datastore')->put($this->os->getDeviceArray(), 'app', $tags, $fields);
@@ -353,15 +348,15 @@ class V2 extends Application
             [$discCount, $hotspare, $failedTotal, $missingExplicit, $action, $isSyncing] = self::parseCounters($data);
 
             $arrayRow->update([
-                'state'              => (string) ($data['state'] ?? ''),
-                'active_devices'     => max(0, $discCount - $hotspare - $failedTotal),
-                'working_devices'    => max(0, $discCount - $failedTotal),
-                'spare_devices'      => $hotspare,
-                'failed_devices'     => $failedTotal,
-                'degraded'           => (int) ($data['degraded'] ?? 0),
-                'sync_action'        => $action,
+                'state' => (string) ($data['state'] ?? ''),
+                'active_devices' => max(0, $discCount - $hotspare - $failedTotal),
+                'working_devices' => max(0, $discCount - $failedTotal),
+                'spare_devices' => $hotspare,
+                'failed_devices' => $failedTotal,
+                'degraded' => (int) ($data['degraded'] ?? 0),
+                'sync_action' => $action,
                 'sync_completed_pct' => (float) ($data['sync_completed'] ?? 0),
-                'sync_speed_bps'     => $isSyncing ? (int) ($data['sync_speed'] ?? 0) : null,
+                'sync_speed_bps' => $isSyncing ? (int) ($data['sync_speed'] ?? 0) : null,
             ]);
 
             $uuid = 'v2:' . $arrayName;
@@ -372,8 +367,8 @@ class V2 extends Application
             );
             $sensorValues[$uuid . '_operation'] = self::mapOperation($action, (string) ($data['state'] ?? ''));
 
-            $presentDevs = array_map('strval', (array) ($data['device_list'] ?? []));
-            $missingDevs = array_map('strval', (array) ($data['missing_devices_list'] ?? []));
+            $presentDevs = array_map(strval(...), (array) ($data['device_list'] ?? []));
+            $missingDevs = array_map(strval(...), (array) ($data['missing_devices_list'] ?? []));
 
             foreach (MdadmDrive::where('mdadm_array_id', $arrayRow->id)->pluck('dev_id') as $devName) {
                 $devName = (string) $devName;
@@ -411,15 +406,15 @@ class V2 extends Application
         $s = str_replace('_', '-', strtolower(trim($state)));
 
         return match (true) {
-            $s === 'clear'                              => 4,
-            $s === 'inactive'                           => 5,
-            $s === 'suspended'                          => 6,
+            $s === 'clear' => 4,
+            $s === 'inactive' => 5,
+            $s === 'suspended' => 6,
             in_array($s, ['readonly', 'read-only'], true) => 7,
-            $s === 'read-auto'                          => 8,
-            $s === 'write-pending'                      => 9,
-            $failedDevices > 0                          => 2,
-            $degraded > 0                               => 1,
-            default                                     => 0,
+            $s === 'read-auto' => 8,
+            $s === 'write-pending' => 9,
+            $failedDevices > 0 => 2,
+            $degraded > 0 => 1,
+            default => 0,
         };
     }
 
@@ -429,25 +424,21 @@ class V2 extends Application
         $s = str_replace('_', '-', strtolower(trim($state)));
 
         $map = [
-            'idle'        => 0,
-            'clean'       => 1,
-            'active'      => 2,
-            'check'       => 3,
-            'resync'      => 4,
-            'recover'     => 5,
-            'recovery'    => 5,
-            'repair'      => 6,
+            'idle' => 0,
+            'clean' => 1,
+            'active' => 2,
+            'check' => 3,
+            'resync' => 4,
+            'recover' => 5,
+            'recovery' => 5,
+            'repair' => 6,
             'active-idle' => 12,
         ];
 
-        if (isset($map[$a])) {
-            return $map[$a];
-        }
-
-        return match (true) {
-            $s === 'inactive'                             => 7,
+        return $map[$a] ?? match (true) {
+            $s === 'inactive' => 7,
             in_array($s, ['readonly', 'read-only'], true) => 8,
-            default                                       => -1,
+            default => -1,
         };
     }
 
@@ -511,8 +502,9 @@ class V2 extends Application
     // -------------------------------------------------------------------------
 
     /**
+     * @param  array<string, mixed>  $data
      * @return array{int, int, int, int, string, bool}
-     *   [discCount, hotspare, failedTotal, missingExplicit, action, isSyncing]
+     *                                                 [discCount, hotspare, failedTotal, missingExplicit, action, isSyncing]
      *
      * hotspare is inferred from actual slave count, not the agent field (which can be negative
      * when a device is physically removed and drops off sysfs before the agent runs).
@@ -522,8 +514,6 @@ class V2 extends Application
      *
      * Use missingExplicit for health mapping (degraded vs failed distinction);
      * use failedTotal for active/working device stats.
-     *
-     * @param  array<string, mixed>  $data
      */
     private static function parseCounters(array $data): array
     {

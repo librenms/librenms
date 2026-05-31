@@ -41,7 +41,6 @@ class Sensor extends SensorModel implements Keyable
         'entPhysicalIndex_measured',
         'user_func',
         'group',
-        'sensor_navigation',
         'rrd_type',
     ];
 

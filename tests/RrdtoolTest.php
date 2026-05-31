@@ -28,6 +28,10 @@ namespace LibreNMS\Tests;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Store\Rrd;
+use LibreNMS\Exceptions\RrdException;
+use LibreNMS\Exceptions\RrdNotFoundException;
+use LibreNMS\RRD\RrdProcess;
+use Psr\Log\NullLogger;
 
 final class RrdtoolTest extends TestCase
 {
@@ -66,6 +70,56 @@ final class RrdtoolTest extends TestCase
         $this->expectException(\LibreNMS\Exceptions\RrdFileExistsException::class);
         // use this file, since it is guaranteed to exist
         $this->buildCommandProxy('create', __FILE__, ['o']);
+    }
+
+    public function testRealpathOnStderrThrowsRrdNotFound(): void
+    {
+        // rrdtool reports a missing file on stderr as "realpath(...): No such file or directory"
+        $this->runWithFakeRrdtool(
+            '<?php fwrite(STDERR, "realpath(/192.168.2.8/x.rrd): No such file or directory\n");',
+            function (RrdProcess $process): void {
+                $this->expectException(RrdNotFoundException::class);
+                $process->run('last /192.168.2.8/x.rrd');
+            }
+        );
+    }
+
+    public function testOtherStderrThrowsRrdException(): void
+    {
+        $this->runWithFakeRrdtool(
+            '<?php fwrite(STDERR, "some other fatal error\n");',
+            function (RrdProcess $process): void {
+                try {
+                    $process->run('last /192.168.2.8/x.rrd');
+                    $this->fail('Expected RrdException');
+                } catch (RrdException $e) {
+                    $this->assertNotInstanceOf(RrdNotFoundException::class, $e);
+                }
+            }
+        );
+    }
+
+    private function runWithFakeRrdtool(string $script, callable $test): void
+    {
+        $rrdDir = sys_get_temp_dir() . '/librenms-rrdprocess-' . bin2hex(random_bytes(6));
+        mkdir($rrdDir);
+        $rrdtool = $rrdDir . '/rrdtool';
+        file_put_contents($rrdtool, "#!/usr/bin/env php\n" . $script);
+        chmod($rrdtool, 0755);
+
+        LibrenmsConfig::set('rrdcached', '');
+        LibrenmsConfig::set('rrd_dir', $rrdDir);
+        LibrenmsConfig::set('rrdtool', $rrdtool);
+
+        $process = new RrdProcess(new NullLogger(), 1);
+
+        try {
+            $test($process);
+        } finally {
+            $process->stop();
+            unlink($rrdtool);
+            rmdir($rrdDir);
+        }
     }
 
     private function buildCommandProxy(string $command, string $filename, array $options): array

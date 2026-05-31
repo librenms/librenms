@@ -12,12 +12,12 @@ if ($array === '') {
 }
 
 $sensor = Sensor::where('device_id', $device['device_id'])
-    ->where('sensor_type', 'mdadm_array_mismatch')
+    ->where('sensor_type', 'mdadm_array_operation_status')
     ->where('group', 'Mdadm ' . $array)
     ->first();
 
 if ($sensor === null) {
-    throw new RrdGraphException('No mismatch sensor for array: ' . $array);
+    throw new RrdGraphException('No operation sensor for array: ' . $array);
 }
 
 $rrd_filename = Rrd::name($device['hostname'], ['sensor', $sensor->sensor_class, $sensor->sensor_type, $sensor->sensor_index]);

@@ -53,6 +53,7 @@ class Common extends Application
     // same sysfs/mdadm strings the legacy JSON agent emitted, so translate the
     // numeric SNMP enums (net-snmp -Oe) back to those strings here.
     private const ARRAY_STATE_MAP = [
+        0 => 'unknown',
         1 => 'clear', 2 => 'inactive', 3 => 'suspended', 4 => 'readonly',
         5 => 'read-auto', 6 => 'clean', 7 => 'active', 8 => 'write-pending',
         9 => 'active-idle', 10 => 'degraded', 11 => 'failed',
@@ -87,9 +88,9 @@ class Common extends Application
     private Collection $dbArraysPrev;
     /** @var array<string, mixed> */
     private array $discovery = [
-        'sync'        => [],
+        'sync' => [],
         'array_count' => 0,
-        'arrays'      => [],
+        'arrays' => [],
     ];
 
     // -------------------------------------------------------------------------
@@ -171,15 +172,15 @@ class Common extends Application
             return -1;
         }
 
-        $arrayState = str_replace('_', '-', strtolower(trim((string) ($array['state'] ?? ''))));
+        $arrayState = self::ARRAY_STATE_MAP[(int) ($array['state'] ?? 0)] ?? '';
 
         $stateMap = [
-            'clear'         => 4,
-            'inactive'      => 5,
-            'suspended'     => 6,
-            'readonly'      => 7,
-            'read-only'     => 7,
-            'read-auto'     => 8,
+            'clear' => 4,
+            'inactive' => 5,
+            'suspended' => 6,
+            'readonly' => 7,
+            'read-only' => 7,
+            'read-auto' => 8,
             'write-pending' => 9,
         ];
         if (isset($stateMap[$arrayState])) {
@@ -218,14 +219,14 @@ class Common extends Application
     {
         $operation = str_replace('_', '-', strtolower(trim((string) ($array['sync']['action'] ?? ''))));
         $operationMap = [
-            'idle'        => 0,
-            'clean'       => 1,
-            'active'      => 2,
-            'check'       => 3,
-            'resync'      => 4,
-            'recover'     => 5,
-            'recovery'    => 5,
-            'repair'      => 6,
+            'idle' => 0,
+            'clean' => 1,
+            'active' => 2,
+            'check' => 3,
+            'resync' => 4,
+            'recover' => 5,
+            'recovery' => 5,
+            'repair' => 6,
             'active-idle' => 12,
         ];
 
@@ -234,7 +235,7 @@ class Common extends Application
         }
 
         // Inactive/readonly arrays have no sync action; reflect array state instead.
-        $state = str_replace('_', '-', strtolower(trim((string) ($array['state'] ?? ''))));
+        $state = self::ARRAY_STATE_MAP[(int) ($array['state'] ?? 0)] ?? '';
 
         return ['inactive' => 7, 'readonly' => 8, 'read-only' => 8][$state] ?? -1;
     }
@@ -246,7 +247,7 @@ class Common extends Application
             return 10;
         }
 
-        $flags = array_map('strtolower', $device['state_flags'] ?? []);
+        $flags = array_map(strtolower(...), $device['state_flags'] ?? []);
         $state = strtolower(trim((string) ($device['state'] ?? '')));
 
         foreach (['faulty' => 9, 'blocked' => 8, 'write_error' => 7, 'want_replacement' => 5, 'replacement' => 6] as $flag => $val) {
@@ -467,7 +468,7 @@ class Common extends Application
             return $e->getParsedJson() ?: null;
         } catch (JsonAppMissingKeysException $e) {
             return $e->getParsedJson() ?: null;
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return null;
         }
     }
@@ -494,13 +495,13 @@ class Common extends Application
         }
 
         return [
-            'version'  => (int) $meta->value('mdadmVersion'),
-            'error'    => $error,
+            'version' => (int) $meta->value('mdadmVersion'),
+            'error' => $error,
             'counters' => [
-                'arrays'          => (int) $meta->value('mdadmArrayCount'),
-                'arrays_syncing'  => (int) $meta->value('mdadmSyncingArrayCount'),
+                'arrays' => (int) $meta->value('mdadmArrayCount'),
+                'arrays_syncing' => (int) $meta->value('mdadmSyncingArrayCount'),
                 'degraded_arrays' => (int) $meta->value('mdadmDegradedArrayCount'),
-                'devices_total'   => (int) $meta->value('mdadmTotalMemberCount'),
+                'devices_total' => (int) $meta->value('mdadmTotalMemberCount'),
             ],
         ];
     }
@@ -536,40 +537,41 @@ class Common extends Application
                 $slot = (int) ($dm['mdadmMemberSlot'] ?? self::SNMP_UINT32_MAX);
 
                 $devices[$devName] = [
-                    'snmp_index'      => (int) $memberIndex,
-                    'device_name'     => $devName,
-                    'slot'            => $slot === self::SNMP_UINT32_MAX ? null : $slot,
-                    'size_bytes'      => (int) ($dm['mdadmMemberSizeBytes'] ?? 0),
-                    'id_model'        => (string) ($dm['mdadmMemberIdModel'] ?? ''),
+                    'snmp_index' => (int) $memberIndex,
+                    'device_name' => $devName,
+                    'device_uuid' => (string) ($dm['mdadmMemberDeviceUuid'] ?? ''),
+                    'slot' => $slot === self::SNMP_UINT32_MAX ? null : $slot,
+                    'size_bytes' => (int) ($dm['mdadmMemberSizeBytes'] ?? 0),
+                    'id_model' => (string) ($dm['mdadmMemberIdModel'] ?? ''),
                     'id_serial_short' => (string) ($dm['mdadmMemberIdSerial'] ?? ''),
-                    'device_role'     => self::DEVICE_ROLE_MAP[(int) ($dm['mdadmMemberRole'] ?? 0)] ?? '',
-                    'offset_sectors'  => $this->gauge64OrNull($dm['mdadmMemberOffsetBlocks'] ?? null),
-                    'ppl_sector'      => $this->gauge64OrNull($dm['mdadmMemberPplSector'] ?? null),
-                    'ppl_size'        => $this->gauge64OrNull($dm['mdadmMemberPplSize'] ?? null),
+                    'device_role' => self::DEVICE_ROLE_MAP[(int) ($dm['mdadmMemberRole'] ?? 0)] ?? '',
+                    'offset_sectors' => $this->gauge64OrNull($dm['mdadmMemberOffsetBlocks'] ?? null),
+                    'ppl_sector' => $this->gauge64OrNull($dm['mdadmMemberPplSector'] ?? null),
+                    'ppl_size' => $this->gauge64OrNull($dm['mdadmMemberPplSize'] ?? null),
                 ];
             }
 
             $arrays[$uuid] = [
                 'snmp_index' => (int) $arrayIndex,
-                'array'      => [
-                    'name'               => (string) ($m['mdadmArrayShortName'] ?? ''),
-                    'array_name'         => (string) ($m['mdadmArrayName'] ?? ''),
-                    'uuid'               => $uuid,
-                    'raid_level'         => self::RAID_LEVEL_MAP[(int) ($m['mdadmArrayRaidLevel'] ?? 0)] ?? '',
-                    'raid_disks'         => (int) ($m['mdadmArrayRaidDisks'] ?? 0),
-                    'size_bytes'         => (int) ($m['mdadmArraySizeBytes'] ?? 0),
-                    'metadata_version'   => (string) ($m['mdadmArrayMetadataVersion'] ?? ''),
+                'array' => [
+                    'name' => (string) ($m['mdadmArrayShortName'] ?? ''),
+                    'array_name' => (string) ($m['mdadmArrayName'] ?? ''),
+                    'uuid' => $uuid,
+                    'raid_level' => self::RAID_LEVEL_MAP[(int) ($m['mdadmArrayRaidLevel'] ?? 0)] ?? '',
+                    'raid_disks' => (int) ($m['mdadmArrayRaidDisks'] ?? 0),
+                    'size_bytes' => (int) ($m['mdadmArraySizeBytes'] ?? 0),
+                    'metadata_version' => (string) ($m['mdadmArrayMetadataVersion'] ?? ''),
                     'consistency_policy' => self::CONSISTENCY_POLICY_MAP[(int) ($m['mdadmArrayConsistencyPolicy'] ?? 0)] ?? '',
-                    'chunk_size'         => (int) ($m['mdadmArrayChunkSize'] ?? 0),
+                    'chunk_size' => (int) ($m['mdadmArrayChunkSize'] ?? 0),
                     // mdadmArrayLayout is signed: -1 (not applicable to this RAID level) -> null.
-                    'layout'             => isset($m['mdadmArrayLayout']) && (int) $m['mdadmArrayLayout'] >= 0 ? (int) $m['mdadmArrayLayout'] : null,
-                    'resync_start'       => $this->gauge64OrNull($m['mdadmArrayResyncStart'] ?? null),
-                    'reshape_position'   => $this->gauge64OrNull($m['mdadmArrayReshapePosition'] ?? null),
-                    'bitmap_type'        => isset($m['mdadmArrayBitmapType']) ? (self::BITMAP_TYPE_MAP[(int) $m['mdadmArrayBitmapType']] ?? '') : '',
-                    'bitmap_location'    => (string) ($m['mdadmArrayBitmapLocation'] ?? ''),
-                    'bitmap_chunksize'   => (int) ($m['mdadmArrayBitmapChunksize'] ?? 0),
-                    'bitmap_metadata'    => (string) ($m['mdadmArrayBitmapMetadata'] ?? ''),
-                    'bitmap_time_base'   => (int) ($m['mdadmArrayBitmapTimeBase'] ?? 0),
+                    'layout' => isset($m['mdadmArrayLayout']) && (int) $m['mdadmArrayLayout'] >= 0 ? (int) $m['mdadmArrayLayout'] : null,
+                    'resync_start' => $this->gauge64OrNull($m['mdadmArrayResyncStart'] ?? null),
+                    'reshape_position' => $this->gauge64OrNull($m['mdadmArrayReshapePosition'] ?? null),
+                    'bitmap_type' => isset($m['mdadmArrayBitmapType']) ? (self::BITMAP_TYPE_MAP[(int) $m['mdadmArrayBitmapType']] ?? '') : '',
+                    'bitmap_location' => (string) ($m['mdadmArrayBitmapLocation'] ?? ''),
+                    'bitmap_chunksize' => (int) ($m['mdadmArrayBitmapChunksize'] ?? 0),
+                    'bitmap_metadata' => (string) ($m['mdadmArrayBitmapMetadata'] ?? ''),
+                    'bitmap_time_base' => (int) ($m['mdadmArrayBitmapTimeBase'] ?? 0),
                 ],
                 'devices' => $devices,
             ];
@@ -589,10 +591,10 @@ class Common extends Application
     {
         return [
             'version' => $scalars['version'],
-            'error'   => $scalars['error'],
-            'data'    => [
+            'error' => $scalars['error'],
+            'data' => [
                 'counters' => $scalars['counters'],
-                'tables'   => ['arrays' => $arrays],
+                'tables' => ['arrays' => $arrays],
             ],
         ];
     }
@@ -628,46 +630,46 @@ class Common extends Application
             foreach (($devHealth[$arrayIndex] ?? []) as $memberIndex => $dh) {
                 $state = (string) ($dh['mdadmMemberState'] ?? '');
                 $devices[(int) $memberIndex] = [
-                    'state'                 => $state,
-                    'state_flags'           => $this->splitStateFlags($state),
-                    'errors'                => (int) ($dh['mdadmMemberErrors'] ?? 0),
-                    'is_missing'            => ((int) ($dh['mdadmMemberIsMissing'] ?? 2)) === 1,
-                    'events'                => (int) ($dh['mdadmMemberEvents'] ?? 0),
-                    'recovery_start'        => $this->gauge64OrNull($dh['mdadmMemberRecoveryStartBlocks'] ?? null),
-                    'bad_block_count'       => (int) ($dh['mdadmMemberBadBlockCount'] ?? 0),
+                    'state' => $state,
+                    'state_flags' => $this->splitStateFlags($state),
+                    'errors' => (int) ($dh['mdadmMemberErrors'] ?? 0),
+                    'is_missing' => ((int) ($dh['mdadmMemberIsMissing'] ?? 2)) === 1,
+                    'events' => (int) ($dh['mdadmMemberEvents'] ?? 0),
+                    'recovery_start' => $this->gauge64OrNull($dh['mdadmMemberRecoveryStartBlocks'] ?? null),
+                    'bad_block_count' => (int) ($dh['mdadmMemberBadBlockCount'] ?? 0),
                     'unack_bad_block_count' => (int) ($dh['mdadmMemberUnackBadBlockCount'] ?? 0),
                 ];
             }
 
             $arrays[(int) $arrayIndex] = [
                 'array' => [
-                    'state'               => self::ARRAY_STATE_MAP[(int) ($h['mdadmArrayState'] ?? 0)] ?? '',
-                    'degraded'            => (int) ($h['mdadmArrayDegradedCount'] ?? 0),
-                    'active_devices'      => (int) ($h['mdadmArrayActiveDevices'] ?? 0),
-                    'working_devices'     => (int) ($h['mdadmArrayWorkingDevices'] ?? 0),
-                    'spare_devices'       => (int) ($h['mdadmArraySpareDevices'] ?? 0),
-                    'failed_devices'      => (int) ($h['mdadmArrayFailedDevices'] ?? 0),
-                    'mismatch_cnt'        => (int) ($h['mdadmArrayMismatchCount'] ?? 0),
-                    'is_mounted'          => $this->truthValue($h['mdadmArrayIsMounted'] ?? null),
-                    'mount_points'        => (string) ($h['mdadmArrayMountPoints'] ?? ''),
-                    'is_swap'             => $this->truthValue($h['mdadmArrayIsSwap'] ?? null),
-                    'bitmap_backlog'      => (int) ($h['mdadmArrayBitmapBacklog'] ?? 0),
-                    'bitmap_max_backlog'  => (int) ($h['mdadmArrayBitmapMaxBacklog'] ?? 0),
-                    'bitmap_can_clear'    => $this->truthValue($h['mdadmArrayBitmapCanClear'] ?? null),
-                    'stripe_cache_size'   => (int) ($h['mdadmArrayStripeCacheSize'] ?? 0),
+                    'state' => (int) ($h['mdadmArrayState'] ?? 0),
+                    'degraded' => (int) ($h['mdadmArrayDegradedCount'] ?? 0),
+                    'active_devices' => (int) ($h['mdadmArrayActiveDevices'] ?? 0),
+                    'working_devices' => (int) ($h['mdadmArrayWorkingDevices'] ?? 0),
+                    'spare_devices' => (int) ($h['mdadmArraySpareDevices'] ?? 0),
+                    'failed_devices' => (int) ($h['mdadmArrayFailedDevices'] ?? 0),
+                    'mismatch_cnt' => (int) ($h['mdadmArrayMismatchCount'] ?? 0),
+                    'is_mounted' => $this->truthValue($h['mdadmArrayIsMounted'] ?? null),
+                    'mount_points' => (string) ($h['mdadmArrayMountPoints'] ?? ''),
+                    'is_swap' => $this->truthValue($h['mdadmArrayIsSwap'] ?? null),
+                    'bitmap_backlog' => (int) ($h['mdadmArrayBitmapBacklog'] ?? 0),
+                    'bitmap_max_backlog' => (int) ($h['mdadmArrayBitmapMaxBacklog'] ?? 0),
+                    'bitmap_can_clear' => $this->truthValue($h['mdadmArrayBitmapCanClear'] ?? null),
+                    'stripe_cache_size' => (int) ($h['mdadmArrayStripeCacheSize'] ?? 0),
                     'stripe_cache_active' => (int) ($h['mdadmArrayStripeCacheActive'] ?? 0),
-                    'journal_mode'        => isset($h['mdadmArrayJournalMode']) ? (self::JOURNAL_MODE_MAP[(int) $h['mdadmArrayJournalMode']] ?? '') : '',
-                    'sync'                => [
-                        'action'        => self::SYNC_ACTION_MAP[(int) ($s['mdadmArraySyncAction'] ?? 0)] ?? 'idle',
-                        'last_action'   => self::SYNC_ACTION_MAP[(int) ($s['mdadmArraySyncLastAction'] ?? 0)] ?? 'idle',
+                    'journal_mode' => isset($h['mdadmArrayJournalMode']) ? (self::JOURNAL_MODE_MAP[(int) $h['mdadmArrayJournalMode']] ?? '') : '',
+                    'sync' => [
+                        'action' => self::SYNC_ACTION_MAP[(int) ($s['mdadmArraySyncAction'] ?? 0)] ?? 'idle',
+                        'last_action' => self::SYNC_ACTION_MAP[(int) ($s['mdadmArraySyncLastAction'] ?? 0)] ?? 'idle',
                         'completed_pct' => ((int) ($s['mdadmArraySyncCompletedCentipct'] ?? 0)) / 100,
-                        'done_bytes'    => (int) ($s['mdadmArraySyncDoneBytes'] ?? 0),
-                        'total_bytes'   => (int) ($s['mdadmArraySyncTotalBytes'] ?? 0),
-                        'speed_bps'     => (int) ($s['mdadmArraySyncSpeedBps'] ?? 0),
+                        'done_bytes' => (int) ($s['mdadmArraySyncDoneBytes'] ?? 0),
+                        'total_bytes' => (int) ($s['mdadmArraySyncTotalBytes'] ?? 0),
+                        'speed_bps' => (int) ($s['mdadmArraySyncSpeedBps'] ?? 0),
                         'speed_min_bps' => (int) ($s['mdadmArraySyncSpeedMinBps'] ?? 0),
                         'speed_max_bps' => (int) ($s['mdadmArraySyncSpeedMaxBps'] ?? 0),
-                        'min_sectors'   => $this->gauge64OrNull($s['mdadmArraySyncMin'] ?? null),
-                        'max_sectors'   => $this->gauge64OrNull($s['mdadmArraySyncMax'] ?? null),
+                        'min_sectors' => $this->gauge64OrNull($s['mdadmArraySyncMin'] ?? null),
+                        'max_sectors' => $this->gauge64OrNull($s['mdadmArraySyncMax'] ?? null),
                     ],
                 ],
                 'devices' => $devices,
@@ -748,9 +750,9 @@ class Common extends Application
             }
 
             $array = ($entry['array'] ?? []) + [
-                'name'       => (string) $arrayRow->md_id,
+                'name' => (string) $arrayRow->md_id,
                 'array_name' => $arrayRow->array_name,
-                'uuid'       => (string) $uuid,
+                'uuid' => (string) $uuid,
             ];
 
             $devices = [];
@@ -777,7 +779,7 @@ class Common extends Application
             $arr = $this->plarray[(string) $uuid]['array'] ?? [];
             $name = (string) ($arr['name'] ?? $uuid);
             $level = (string) ($arr['raid_level'] ?? '');
-            $state = (string) ($arr['state'] ?? '');
+            $state = self::ARRAY_STATE_MAP[(int) ($arr['state'] ?? 0)] ?? '';
             $active = (int) ($arr['active_devices'] ?? 0);
             $spare = (int) ($arr['spare_devices'] ?? 0);
             $failed = (int) ($arr['failed_devices'] ?? 0);
@@ -846,7 +848,7 @@ class Common extends Application
 
             $this->discovery['arrays'][(string) $uuid] = [
                 'devices_count' => count($this->plarray[$uuid]['devices']),
-                'devices'       => [],
+                'devices' => [],
             ];
             $this->discoveryArray((string) $uuid);
         }
@@ -876,6 +878,7 @@ class Common extends Application
     private static function arrayRrdDatasets(): array
     {
         return [
+            ['state',         'GAUGE',  self::RRD_HEARTBEAT, 0, null],
             ['active',        'GAUGE',  self::RRD_HEARTBEAT, 0, null],
             ['spare',         'GAUGE',  self::RRD_HEARTBEAT, 0, null],
             ['failed',        'GAUGE',  self::RRD_HEARTBEAT, 0, null],
@@ -891,7 +894,10 @@ class Common extends Application
     private static function driveRrdDatasets(): array
     {
         return [
-            ['errors', 'DERIVE', self::RRD_HEARTBEAT, 0, null],
+            ['errors',           'DERIVE', self::RRD_HEARTBEAT, 0, null],
+            ['events',           'DERIVE', self::RRD_HEARTBEAT, 0, null],
+            ['bad_blocks',       'GAUGE',  self::RRD_HEARTBEAT, 0, null],
+            ['unack_bad_blocks', 'GAUGE',  self::RRD_HEARTBEAT, 0, null],
         ];
     }
 
@@ -914,12 +920,11 @@ class Common extends Application
 
         $arrayName = (string) ($array['name'] ?? $uuid);
         $arrayGroup = "Mdadm $arrayName";
-        $arrayNav = 'tab=apps/app=mdadm/array=' . rawurlencode($arrayName) . '/';
 
         $this->discovery['arrays'][$uuid]['name'] = $arrayName;
         $this->discovery['arrays'][$uuid]['devices']['rrdkey'] = substr($uuid, 0, 8);
         $this->discovery['arrays'][$uuid]['rrd_ds'] = [
-            'linux-mdadm-array'  => array_column(self::arrayRrdDatasets(), 0),
+            'linux-mdadm-array' => array_column(self::arrayRrdDatasets(), 0),
             'linux-mdadm-drives' => array_column(self::driveRrdDatasets(), 0),
         ];
 
@@ -933,7 +938,6 @@ class Common extends Application
                 (string) $deviceKey,
                 is_array($deviceData) ? $deviceData : [],
                 $arrayGroup,
-                $arrayNav,
                 $deviceHealth
             );
         }
@@ -950,7 +954,6 @@ class Common extends Application
             oid: "app:mdadm:$arrayMismatchIndex",
             descr: "$arrayGroup Mismatch",
             group: $arrayGroup,
-            navigation: $arrayNav,
             highLimit: 1,
         );
 
@@ -961,7 +964,6 @@ class Common extends Application
             oid: "app:mdadm:$arrayOperationIndex",
             descr: "$arrayGroup Operation",
             group: $arrayGroup,
-            navigation: $arrayNav,
         )->withStateTranslations('mdadm_array_operation_status', $this->arrayOperationTranslations());
 
         $this->discoverSensor(
@@ -971,7 +973,6 @@ class Common extends Application
             oid: "app:mdadm:$arrayHealthIndex",
             descr: "$arrayGroup Health",
             group: $arrayGroup,
-            navigation: $arrayNav,
         )->withStateTranslations('mdadm_array_health_status', $this->arrayHealthTranslations());
     }
 
@@ -981,7 +982,6 @@ class Common extends Application
         string $devId,
         array $deviceData,
         string $arrayGroup,
-        string $arrayNav,
         int $deviceHealth
     ): void {
         $deviceHealthIndex = $uuid . '_' . $devId . '_health';
@@ -994,7 +994,6 @@ class Common extends Application
             oid: "app:mdadm:$deviceHealthIndex",
             descr: "$arrayGroup $devId Health",
             group: "$arrayGroup::devices",
-            navigation: $arrayNav,
         )->withStateTranslations('mdadm_device_health_status', $this->deviceHealthTranslations());
 
         $this->discoverSensor(
@@ -1004,7 +1003,6 @@ class Common extends Application
             oid: "app:mdadm:$deviceErrorsIndex",
             descr: "$arrayGroup $devId errors",
             group: "$arrayGroup::devices",
-            navigation: $arrayNav,
         );
     }
 
@@ -1043,11 +1041,11 @@ class Common extends Application
 
         foreach ($this->dbArraysPrev as $uuid => $arrayRow) {
             $uuid = (string) $uuid;
-            $array = $this->plarray[$uuid]['array'] ?? [];
-            $arrayName = (string) ($array['name'] ?? '');
-            if ($arrayName === '') {
-                continue;
+            if (! isset($this->plarray[$uuid])) {
+                continue; // array not present in this poll
             }
+            $array = $this->plarray[$uuid]['array'] ?? [];
+            $arrayName = (string) ($array['name'] ?? $uuid);
 
             $sync = $array['sync'] ?? [];
             $syncAction = strtolower(trim((string) ($sync['action'] ?? 'idle')));
@@ -1056,30 +1054,43 @@ class Common extends Application
             $prevAction = $arrayRow->sync_action !== null ? (string) $arrayRow->sync_action : null;
             $this->logIfChanged($arrayName, 'sync action', $prevAction, $syncAction);
 
+            // RRD files are keyed by the stable array UUID (md_id can change across reassembly).
             $this->putRrd('app', [
-                'name'     => 'mdadm',
-                'app_id'   => $appId,
-                'rrd_def'  => self::buildRrdDef(self::arrayRrdDatasets()),
-                'rrd_name' => ['app', 'mdadm', $appId, $arrayName],
+                'name' => 'mdadm',
+                'app_id' => $appId,
+                'rrd_def' => self::buildRrdDef(self::arrayRrdDatasets()),
+                'rrd_name' => ['app', 'mdadm', $appId, $uuid],
+                'rrd_update_template' => true,
             ], [
-                'active'        => (int) ($array['active_devices'] ?? null),
-                'spare'         => (int) ($array['spare_devices'] ?? null),
-                'failed'        => (int) ($array['failed_devices'] ?? null),
-                'degraded'      => (int) ($array['degraded'] ?? null),
-                'mismatch'      => (int) ($array['mismatch_cnt'] ?? null),
-                'done_sectors'  => $isSyncing ? (int) ($sync['done_bytes'] ?? null) : null,
+                'active' => (int) ($array['active_devices'] ?? null),
+                'spare' => (int) ($array['spare_devices'] ?? null),
+                'failed' => (int) ($array['failed_devices'] ?? null),
+                'degraded' => (int) ($array['degraded'] ?? null),
+                'mismatch' => (int) ($array['mismatch_cnt'] ?? null),
+                'done_sectors' => $isSyncing ? (int) ($sync['done_bytes'] ?? null) : null,
                 'completed_pct' => (float) ($sync['completed_pct'] ?? null),
-                'speed_bps'     => (int) ($sync['speed_bps'] ?? null),
+                'speed_bps' => (int) ($sync['speed_bps'] ?? null),
+                'state' => (int) ($array['state'] ?? null),
             ]);
 
-            foreach ($this->plarray[$uuid]['devices'] ?? [] as $devId => $devData) {
+            // Per-drive RRD is keyed by the stable superblock device UUID, falling
+            // back to dev_id (kernel name) when the array predates a known UUID.
+            foreach ($arrayRow->drives as $drive) {
+                $devId = (string) $drive->dev_id;
+                $devData = $this->plarray[$uuid]['devices'][$devId] ?? [];
+                $driveKey = $drive->dev_uuid !== null && $drive->dev_uuid !== '' ? (string) $drive->dev_uuid : $devId;
+
                 $this->putRrd('app', [
-                    'name'     => 'mdadm',
-                    'app_id'   => $appId,
-                    'rrd_def'  => $driveDef,
-                    'rrd_name' => ['app', 'mdadm', $appId, $arrayName, (string) $devId],
+                    'name' => 'mdadm',
+                    'app_id' => $appId,
+                    'rrd_def' => $driveDef,
+                    'rrd_name' => ['app', 'mdadm', $appId, $uuid . '_' . $driveKey],
+                    'rrd_update_template' => true,
                 ], [
                     'errors' => (int) ($devData['errors'] ?? 0),
+                    'events' => (int) ($devData['events'] ?? 0),
+                    'bad_blocks' => (int) ($devData['bad_block_count'] ?? 0),
+                    'unack_bad_blocks' => (int) ($devData['unack_bad_block_count'] ?? 0),
                 ]);
             }
         }
@@ -1098,24 +1109,24 @@ class Common extends Application
             $arrayRow = MdadmArray::updateOrCreate(
                 ['app_id' => $appId, 'uuid' => (string) $uuid],
                 [
-                    'device_id'          => $deviceId,
-                    'snmp_index'         => isset($entry['snmp_index']) ? (int) $entry['snmp_index'] : null,
-                    'array_name'         => ($array['array_name'] ?? '') !== '' ? (string) $array['array_name'] : null,
-                    'md_id'              => (string) ($array['name'] ?? ''),
-                    'level'              => (string) ($array['raid_level'] ?? ''),
-                    'size_bytes'         => isset($array['size_bytes']) ? (int) $array['size_bytes'] : null,
-                    'raid_disks'         => isset($array['raid_disks']) ? (int) $array['raid_disks'] : null,
-                    'metadata_version'   => isset($array['metadata_version']) ? (string) $array['metadata_version'] : null,
+                    'device_id' => $deviceId,
+                    'snmp_index' => isset($entry['snmp_index']) ? (int) $entry['snmp_index'] : null,
+                    'array_name' => ($array['array_name'] ?? '') !== '' ? (string) $array['array_name'] : null,
+                    'md_id' => (string) ($array['name'] ?? ''),
+                    'level' => (string) ($array['raid_level'] ?? ''),
+                    'size_bytes' => isset($array['size_bytes']) ? (int) $array['size_bytes'] : null,
+                    'raid_disks' => isset($array['raid_disks']) ? (int) $array['raid_disks'] : null,
+                    'metadata_version' => isset($array['metadata_version']) ? (string) $array['metadata_version'] : null,
                     'consistency_policy' => isset($array['consistency_policy']) ? (string) $array['consistency_policy'] : null,
-                    'chunk_size'         => isset($array['chunk_size']) ? (int) $array['chunk_size'] : null,
-                    'layout'             => $array['layout'] ?? null,
-                    'resync_start_sectors'     => $array['resync_start'] ?? null,
+                    'chunk_size' => isset($array['chunk_size']) ? (int) $array['chunk_size'] : null,
+                    'layout' => $array['layout'] ?? null,
+                    'resync_start_sectors' => $array['resync_start'] ?? null,
                     'reshape_position_sectors' => $array['reshape_position'] ?? null,
-                    'bitmap_type'        => ($array['bitmap_type'] ?? '') !== '' ? (string) $array['bitmap_type'] : null,
-                    'bitmap_location'    => ($array['bitmap_location'] ?? '') !== '' ? (string) $array['bitmap_location'] : null,
-                    'bitmap_chunksize'   => isset($array['bitmap_chunksize']) ? (int) $array['bitmap_chunksize'] : null,
-                    'bitmap_metadata'    => ($array['bitmap_metadata'] ?? '') !== '' ? (string) $array['bitmap_metadata'] : null,
-                    'bitmap_time_base'   => isset($array['bitmap_time_base']) ? (int) $array['bitmap_time_base'] : null,
+                    'bitmap_type' => ($array['bitmap_type'] ?? '') !== '' ? (string) $array['bitmap_type'] : null,
+                    'bitmap_location' => ($array['bitmap_location'] ?? '') !== '' ? (string) $array['bitmap_location'] : null,
+                    'bitmap_chunksize' => isset($array['bitmap_chunksize']) ? (int) $array['bitmap_chunksize'] : null,
+                    'bitmap_metadata' => ($array['bitmap_metadata'] ?? '') !== '' ? (string) $array['bitmap_metadata'] : null,
+                    'bitmap_time_base' => isset($array['bitmap_time_base']) ? (int) $array['bitmap_time_base'] : null,
                 ]
             );
 
@@ -1130,17 +1141,18 @@ class Common extends Application
                 $driveRow = MdadmDrive::updateOrCreate(
                     ['mdadm_array_id' => $arrayRow->id, 'dev_id' => (string) $devId],
                     [
-                        'device_id'       => $deviceId,
-                        'app_id'          => $appId,
-                        'snmp_index'      => isset($devData['snmp_index']) ? (int) $devData['snmp_index'] : null,
-                        'path'            => (string) ($devData['device_name'] ?? ''),
-                        'size_bytes'      => isset($devData['size_bytes']) ? (int) $devData['size_bytes'] : (isset($devData['size_blocks']) ? (int) $devData['size_blocks'] * 1024 : null),
-                        'slot'            => isset($devData['slot']) ? (int) $devData['slot'] : null,
-                        'id_model'        => isset($devData['id_model']) ? (string) $devData['id_model'] : null,
+                        'device_id' => $deviceId,
+                        'app_id' => $appId,
+                        'snmp_index' => isset($devData['snmp_index']) ? (int) $devData['snmp_index'] : null,
+                        'dev_uuid' => ($devData['device_uuid'] ?? '') !== '' ? (string) $devData['device_uuid'] : null,
+                        'path' => (string) ($devData['device_name'] ?? ''),
+                        'size_bytes' => isset($devData['size_bytes']) ? (int) $devData['size_bytes'] : (isset($devData['size_blocks']) ? (int) $devData['size_blocks'] * 1024 : null),
+                        'slot' => isset($devData['slot']) ? (int) $devData['slot'] : null,
+                        'id_model' => isset($devData['id_model']) ? (string) $devData['id_model'] : null,
                         'id_serial_short' => isset($devData['id_serial_short']) ? (string) $devData['id_serial_short'] : null,
-                        'device_role'     => isset($devData['device_role']) ? (string) $devData['device_role'] : null,
-                        'offset_sectors'  => $devData['offset_sectors'] ?? null,
-                        'ppl_sector'      => $devData['ppl_sector'] ?? null,
+                        'device_role' => isset($devData['device_role']) ? (string) $devData['device_role'] : null,
+                        'offset_sectors' => $devData['offset_sectors'] ?? null,
+                        'ppl_sector' => $devData['ppl_sector'] ?? null,
                         'ppl_size_sectors' => $devData['ppl_size'] ?? null,
                     ]
                 );
@@ -1213,32 +1225,32 @@ class Common extends Application
             }
 
             $arrayRow->update([
-                'state'              => (string) ($array['state'] ?? ''),
-                'active_devices'     => isset($array['active_devices']) ? (int) $array['active_devices'] : null,
-                'working_devices'    => isset($array['working_devices']) ? (int) $array['working_devices'] : null,
-                'spare_devices'      => isset($array['spare_devices']) ? (int) $array['spare_devices'] : null,
-                'failed_devices'     => isset($array['failed_devices']) ? (int) $array['failed_devices'] : null,
-                'degraded'           => isset($array['degraded']) ? (int) $array['degraded'] : null,
-                'mismatch_cnt'       => isset($array['mismatch_cnt']) ? (int) $array['mismatch_cnt'] : null,
-                'sync_action'        => (string) ($sync['action'] ?? ''),
+                'state' => self::ARRAY_STATE_MAP[(int) ($array['state'] ?? 0)] ?? '',
+                'active_devices' => isset($array['active_devices']) ? (int) $array['active_devices'] : null,
+                'working_devices' => isset($array['working_devices']) ? (int) $array['working_devices'] : null,
+                'spare_devices' => isset($array['spare_devices']) ? (int) $array['spare_devices'] : null,
+                'failed_devices' => isset($array['failed_devices']) ? (int) $array['failed_devices'] : null,
+                'degraded' => isset($array['degraded']) ? (int) $array['degraded'] : null,
+                'mismatch_cnt' => isset($array['mismatch_cnt']) ? (int) $array['mismatch_cnt'] : null,
+                'sync_action' => (string) ($sync['action'] ?? ''),
                 'sync_completed_pct' => isset($sync['completed_pct']) ? (float) $sync['completed_pct'] : null,
-                'sync_speed_bps'     => isset($sync['speed_bps']) ? (int) $sync['speed_bps'] : null,
+                'sync_speed_bps' => isset($sync['speed_bps']) ? (int) $sync['speed_bps'] : null,
                 'sync_speed_min_bps' => isset($sync['speed_min_bps']) ? (int) $sync['speed_min_bps'] : null,
                 'sync_speed_max_bps' => isset($sync['speed_max_bps']) ? (int) $sync['speed_max_bps'] : null,
-                'sync_done_bytes'    => isset($sync['done_bytes']) ? (int) $sync['done_bytes'] : null,
-                'sync_total_bytes'   => isset($sync['total_bytes']) ? (int) $sync['total_bytes'] : null,
-                'sync_last_action'   => isset($sync['last_action']) ? (string) $sync['last_action'] : null,
-                'sync_min_sectors'   => $sync['min_sectors'] ?? null,
-                'sync_max_sectors'   => $sync['max_sectors'] ?? null,
-                'is_mounted'         => $array['is_mounted'] ?? null,
-                'mount_points'       => ($array['mount_points'] ?? '') !== '' ? (string) $array['mount_points'] : null,
-                'is_swap'            => $array['is_swap'] ?? null,
-                'bitmap_backlog'     => isset($array['bitmap_backlog']) ? (int) $array['bitmap_backlog'] : null,
+                'sync_done_bytes' => isset($sync['done_bytes']) ? (int) $sync['done_bytes'] : null,
+                'sync_total_bytes' => isset($sync['total_bytes']) ? (int) $sync['total_bytes'] : null,
+                'sync_last_action' => isset($sync['last_action']) ? (string) $sync['last_action'] : null,
+                'sync_min_sectors' => $sync['min_sectors'] ?? null,
+                'sync_max_sectors' => $sync['max_sectors'] ?? null,
+                'is_mounted' => $array['is_mounted'] ?? null,
+                'mount_points' => ($array['mount_points'] ?? '') !== '' ? (string) $array['mount_points'] : null,
+                'is_swap' => $array['is_swap'] ?? null,
+                'bitmap_backlog' => isset($array['bitmap_backlog']) ? (int) $array['bitmap_backlog'] : null,
                 'bitmap_max_backlog' => isset($array['bitmap_max_backlog']) ? (int) $array['bitmap_max_backlog'] : null,
-                'bitmap_can_clear'   => $array['bitmap_can_clear'] ?? null,
-                'stripe_cache_size'   => isset($array['stripe_cache_size']) ? (int) $array['stripe_cache_size'] : null,
+                'bitmap_can_clear' => $array['bitmap_can_clear'] ?? null,
+                'stripe_cache_size' => isset($array['stripe_cache_size']) ? (int) $array['stripe_cache_size'] : null,
                 'stripe_cache_active' => isset($array['stripe_cache_active']) ? (int) $array['stripe_cache_active'] : null,
-                'journal_mode'       => ($array['journal_mode'] ?? '') !== '' ? (string) $array['journal_mode'] : null,
+                'journal_mode' => ($array['journal_mode'] ?? '') !== '' ? (string) $array['journal_mode'] : null,
             ]);
 
             foreach ($devices as $devId => $devData) {
@@ -1251,13 +1263,13 @@ class Common extends Application
 
                 // device_role comes from the meta table and is written at discovery; poll updates health only.
                 $driveRow->update([
-                    'state'                 => (string) ($devData['state'] ?? ''),
-                    'state_flags'           => is_array($devData['state_flags'] ?? null) ? $devData['state_flags'] : null,
-                    'errors'                => isset($devData['errors']) ? (int) $devData['errors'] : null,
-                    'is_missing'            => (bool) ($devData['is_missing'] ?? false),
-                    'events'                => isset($devData['events']) ? (int) $devData['events'] : null,
+                    'state' => (string) ($devData['state'] ?? ''),
+                    'state_flags' => is_array($devData['state_flags'] ?? null) ? $devData['state_flags'] : null,
+                    'errors' => isset($devData['errors']) ? (int) $devData['errors'] : null,
+                    'is_missing' => (bool) ($devData['is_missing'] ?? false),
+                    'events' => isset($devData['events']) ? (int) $devData['events'] : null,
                     'recovery_start_sectors' => $devData['recovery_start'] ?? null,
-                    'bad_block_count'       => isset($devData['bad_block_count']) ? (int) $devData['bad_block_count'] : null,
+                    'bad_block_count' => isset($devData['bad_block_count']) ? (int) $devData['bad_block_count'] : null,
                     'unack_bad_block_count' => isset($devData['unack_bad_block_count']) ? (int) $devData['unack_bad_block_count'] : null,
                 ]);
             }
@@ -1269,10 +1281,10 @@ class Common extends Application
     {
         $counters = $this->payload['data']['counters'] ?? [];
         $metrics = [
-            'arrays'          => (int) ($counters['arrays'] ?? 0),
-            'arrays_syncing'  => (int) ($counters['arrays_syncing'] ?? 0),
+            'arrays' => (int) ($counters['arrays'] ?? 0),
+            'arrays_syncing' => (int) ($counters['arrays_syncing'] ?? 0),
             'degraded_arrays' => (int) ($counters['degraded_arrays'] ?? 0),
-            'devices_total'   => (int) ($counters['devices_total'] ?? 0),
+            'devices_total' => (int) ($counters['devices_total'] ?? 0),
         ];
 
         foreach ($this->plarray as $uuid => $entry) {
@@ -1283,10 +1295,10 @@ class Common extends Application
             }
             $sync = $array['sync'] ?? [];
             $metrics[$arrayName] = [
-                'active_devices'     => (int) ($array['active_devices'] ?? 0),
-                'spare_devices'      => (int) ($array['spare_devices'] ?? 0),
-                'failed_devices'     => (int) ($array['failed_devices'] ?? 0),
-                'working_devices'    => (int) ($array['working_devices'] ?? 0),
+                'active_devices' => (int) ($array['active_devices'] ?? 0),
+                'spare_devices' => (int) ($array['spare_devices'] ?? 0),
+                'failed_devices' => (int) ($array['failed_devices'] ?? 0),
+                'working_devices' => (int) ($array['working_devices'] ?? 0),
                 'sync_completed_pct' => (float) ($sync['completed_pct'] ?? 0),
             ];
         }

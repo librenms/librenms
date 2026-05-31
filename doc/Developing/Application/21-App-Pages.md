@@ -1,503 +1,430 @@
+---
+title: 2.1 App Pages
+description: How to design application pages under the Device Apps tab in LibreNMS.
+tags:
+  - developing
+  - applications
+---
+
 # 2.1 App Pages
 
-This chapter covers UI patterns for rendering application data on the device Apps tab. Choose a pattern based on how your data is structured: a flat list of graphs, tabbed sections, per-instance drill-down, or a combination.
+This chapter describes how to design application pages under the **Device > Apps** tab.
 
-## App Pages (UI)
+The purpose of an app page is to help the user answer questions quickly:
 
-LibreNMS renders app pages from template files in `includes/html/pages/device/apps/`. The filename must match your app type.
+- Is the application healthy?
+- What changed recently?
+- Which instance needs attention?
+- Where do I click for more detail?
 
-### Page Structure
+Keep the page focused on presentation and navigation. Data collection, sensor creation, RRD writing, and database updates belong in the application handler and polling path, not in the UI file.
 
-App pages can range from a single flat page to a multi-section hierarchy with tabs, format toggles, and per-instance views. Here are the common structures:
+## Where app pages fit
 
-**Single page** (all content in one file):
+App pages are device-local views for one application instance on one device.
 
 ```text
-device/device=2/tab=apps/app=myapp
+device/device={id}/tab=apps/app={app_type}
+```
+
+Use an app page when the application needs one or more of the following:
+
+- graphs
+- current status tables
+- per-instance drill-down
+- grouped sections
+- links from sensors or overview panels
+- a human-friendly summary of app-specific data
+
+Do not use an app page to perform discovery, polling, normalization, expensive parsing, or long-running calculations.
+
+## Start with the user task
+
+Before writing the page, decide what the user is trying to do.
+
+| User task | Good UI shape |
+|---|---|
+| Check overall health | Summary panel + key graphs |
+| Compare a few fixed metrics | Flat graph list |
+| Browse logical groups | Section tabs |
+| Find a broken disk/container/repository | Status table + drill-down |
+| Inspect one selected entity | Focused detail page |
+| Switch graph type for one entity | Graph selector |
+| Handle many entities | Table, search/filter, or compact navigation |
+
+Avoid designing the page around internal data structures. The payload shape is not the UI shape.
+
+## Common page patterns
+
+### Pattern 1: Summary + key graphs
+
+Use this for simple applications or as the default landing page for larger applications.
+
+```text
 +-----------------------------------------------------+
-| myapp                                              |
+| App name                                            |
 +-----------------------------------------------------+
-| [graphs and content]                                |
+| Status: OK   Instances: 4   Errors: 0               |
++-----------------------------------------------------+
+| [ Key graph 1 ]                                     |
+| [ Key graph 2 ]                                     |
 +-----------------------------------------------------+
 ```
 
-**Overview + Focused views** (main page + sub-pages via URL params):
+Use this when:
+
+- the app has a small number of important metrics
+- most users only need a quick health check
+- per-instance details are secondary
+
+Keep the first screen boring and useful. A wall of graphs is not a dashboard; it is punishment with axes.
+
+### Pattern 2: Flat graph list
+
+Use this when the app has a fixed, small set of graphs.
 
 ```text
-device/device=2/tab=apps/app=borgbackup
 +-----------------------------------------------------+
-| borgbackup                                          |
+| App name                                            |
 +-----------------------------------------------------+
-| [overview graphs and summary]                        |
+| Requests                                            |
+| [ graph ]                                           |
 +-----------------------------------------------------+
-
-device/device=2/tab=apps/app=borgbackup/borgrepo=Alfader
+| Latency                                             |
+| [ graph ]                                           |
 +-----------------------------------------------------+
-| borgbackup / Alfader                                |
-+-----------------------------------------------------+
-| [focused graphs for this specific instance]          |
+| Errors                                              |
+| [ graph ]                                           |
 +-----------------------------------------------------+
 ```
 
-**Multi-section with tabs, format toggles, and per-item views** (Ports-style):
+Use this when:
+
+- there are no meaningful instances
+- the graph list is stable
+- users normally want all graphs together
+
+Avoid this pattern if the app has many instances. Repeating the same graph set for 30 disks, repositories, or containers becomes noise fast.
+
+### Pattern 3: Section tabs
+
+Use section tabs when the app has a few clear functional areas.
 
 ```text
-device/device=2/tab=ports
 +-----------------------------------------------------+
-| Ports                                              |
+| App name                                            |
 +-----------------------------------------------------+
-| [Overview] | [ARP Table] | [IPv6 ND Table]          |  <- section tabs
-|                                                     |
-| View: [Basic] | [Detail]    Graphs: [Bits] | ...   |  <- format + graph toggle
-|                                                     |
-| +-----------------------------------------------+   |
-| | Interface 1    | Status | In    | Out          |  |
-| +-----------------------------------------------+   |
-| | eth0           | up     | 1.2G  | 800M         |  |
-    ...
+| [System] | [Queries] | [Cache] | [Replication]      |
 +-----------------------------------------------------+
-
-device/device=2/tab=ports/port=1
-+-----------------------------------------------------+
-| Ports / eth0                                        |
-+-----------------------------------------------------+
-| [Graphs] | [Real time] | [Eventlog] | [Notes]     |  <- port sub-tabs
-|                                                     |
-| [Bits] | [Packets] | [Errors]                      |  <- graph selector
-|                                                     |
-| +-----------------------------------------------+   |
-| |           [~~~~~graph~~~~~]                    |  |
-| +-----------------------------------------------+   |
+| Selected section content                            |
+| [ graphs / tables ]                                 |
 +-----------------------------------------------------+
 ```
 
-This structure combines:
+Good section names describe what the user is looking at, not where the data came from.
 
-- **Section tabs** (Overview, ARP Table) switch between different data sections
-- **Format toggle** (Basic, Detail) changes the table layout
-- **Graph selector** (Bits, Errors) switches which graph is shown
-- **Per-item sub-tabs** (Graphs, Real time, Eventlog) appear when an item is selected
+Good:
 
-Use `$vars` to read URL parameters and switch rendering accordingly.
+- `System`
+- `Queries`
+- `Cache`
+- `Replication`
+- `Errors`
 
-### App Overview
+Weak:
 
-Each file receives these variables:
+- `Data 1`
+- `General`
+- `Other`
+- `JSON`
+- `Metrics`
+
+Tabs work best when there are few sections. If you need more than about five or six tabs, the app probably needs a table or a deeper drill-down structure instead.
+
+### Pattern 4: Overview + per-instance detail
+
+Use this when the app reports multiple entities such as disks, arrays, repositories, databases, containers, peers, or jobs.
+
+```text
+Overview page
++-----------------------------------------------------+
+| App name                                            |
++-----------------------------------------------------+
+| Summary: 12 instances, 1 warning, 0 critical        |
++-----------------------------------------------------+
+| Name        Status      Key value       Last change |
+| alpha       OK          42              5 min ago   |
+| beta        Warning     3 errors        5 min ago   |
+| gamma       OK          17              5 min ago   |
++-----------------------------------------------------+
+| [ overview graphs ]                                 |
++-----------------------------------------------------+
+
+Focused page
++-----------------------------------------------------+
+| App name / beta                                     |
++-----------------------------------------------------+
+| Status summary                                      |
+| [ instance graphs ]                                 |
+| [ recent errors / details ]                         |
++-----------------------------------------------------+
+```
+
+Use the overview page to help users choose what to inspect. Use the focused page to show details for the selected entity.
+
+For low entity counts, compact links are fine:
+
+```text
+Overview | alpha | beta | gamma
+```
+
+For high entity counts, do not print a huge `Instances:` link list. Prefer a table, filter, or grouped view. A 100-item option bar is a crime scene.
+
+### Pattern 5: Table + supporting graphs
+
+Use a table when the latest values matter as much as historical graphs.
+
+```text
++-----------------------------------------------------+
+| App name                                            |
++-----------------------------------------------------+
+| Name       Status     Value      Detail             |
+| disk1      OK         34 C       [open]             |
+| disk2      Warning    51 C       [open]             |
++-----------------------------------------------------+
+| Temperature                                         |
+| [ graph ]                                           |
++-----------------------------------------------------+
+```
+
+Tables are useful for:
+
+- current state
+- inventory fields
+- per-entity status
+- last run / last error
+- capacity or usage summaries
+- links to focused views
+
+Keep table columns intentional. If every payload field becomes a column, the UI becomes a spreadsheet wearing a trench coat.
+
+### Pattern 6: Focused graph selector
+
+Use this when one selected entity has multiple graph types.
+
+```text
++-----------------------------------------------------+
+| App name / eth0                                     |
++-----------------------------------------------------+
+| [Bits] | [Packets] | [Errors] | [Discards]          |
++-----------------------------------------------------+
+| [ selected graph ]                                  |
++-----------------------------------------------------+
+```
+
+Use this pattern for deep detail pages, not as the main landing page unless the app is naturally graph-first.
+
+## Choosing navigation
+
+Use navigation that matches the amount of data.
+
+| Amount of data | Preferred navigation |
+|---|---|
+| 1-5 fixed sections | Option bar / tabs |
+| 1-10 instances | Compact instance links |
+| 10-100 instances | Table with clickable rows |
+| 100+ instances | Table with filtering, grouping, or search |
+| Nested data | Overview page + focused detail pages |
+
+URL parameters should describe the selected view clearly:
+
+| Parameter | Use for |
+|---|---|
+| `section` | selected logical section |
+| `instance` | selected instance/entity |
+| `graph` | selected graph type |
+| app-specific key, e.g. `repo`, `disk`, `array` | when the entity type is clearer than generic `instance` |
+
+Prefer stable, readable parameters. Links from sensors, app overview panels, and alert messages may depend on them.
+
+## Page hierarchy
+
+A good app page usually has this order:
+
+1. App title / context
+2. Summary status
+3. Navigation
+4. Current important values
+5. Graphs
+6. Detailed tables or secondary information
+
+Put the most operationally useful information first. Users should not have to scroll past decorative graphs to find the broken thing.
+
+## Status presentation
+
+Show status in a consistent and boring way.
+
+Good status UI:
+
+- uses the same severity language as LibreNMS where possible
+- makes warnings and errors easy to scan
+- includes enough context to understand the problem
+- links to the relevant focused view
+
+Poor status UI:
+
+- uses custom color meanings
+- hides problems inside long text blocks
+- shows raw payload strings without explanation
+- makes all rows look equally important
+
+Recommended status order:
+
+```text
+Critical / Error
+Warning
+Unknown
+OK
+```
+
+## Empty and missing data states
+
+Do not render a broken-looking page when there is no data.
+
+Handle these cases deliberately:
+
+| Case | Recommended UI behavior |
+|---|---|
+| App enabled but never polled | Show a short “No data collected yet” message |
+| App returned an error | Show app status and last error if available |
+| No instances discovered | Show empty state, not an empty table |
+| Selected instance no longer exists | Show “instance not found” and link back to overview |
+| Graph has no RRD data yet | Let the graph area be empty, but keep the page usable |
+
+Empty states should be short. Do not write a novel where a helpful sentence would do.
+
+## Graph placement
+
+Graphs are useful when they answer a trend question.
+
+Good graph titles answer “what is this?” without requiring code knowledge:
+
+- `Request rate`
+- `Query latency`
+- `Disk temperature`
+- `Repository size`
+- `Backup duration`
+
+Weak graph titles expose implementation details:
+
+- `metric1`
+- `rrd_ds_0`
+- `app_value`
+- `data_count`
+
+When possible, place summary graphs on the overview page and detailed graphs on focused pages.
+
+## Tables
+
+Use tables for current state and comparison, not for dumping raw payloads.
+
+Good columns:
+
+- Name
+- Status
+- Current value
+- Last update
+- Error count
+- Usage
+- Link/details
+
+Avoid columns that are only meaningful to the developer unless the page is explicitly diagnostic.
+
+For wide entities, split details into a focused page instead of making a 20-column table.
+
+## Raw and diagnostic data
+
+Raw payload values can be useful, but they should not dominate the normal UI.
+
+Good places for raw/diagnostic data:
+
+- collapsed “details” section
+- debug-only output
+- focused diagnostic tab
+- documentation examples
+
+Bad places:
+
+- top of the landing page
+- every table row by default
+- graph titles
+- status labels
+
+## Minimal implementation contract
+
+The UI file should be thin. It should read prepared data and render a view.
+
+App pages live in:
+
+```text
+includes/html/pages/device/apps/{app_type}.inc.php
+```
+
+The page receives these variables:
 
 | Variable | Description |
-| --- | --- |
+|---|---|
 | `$device` | Device array |
-| `$app` | Application model (has `app_id`, `app_type`, `data`, etc.) |
-| `$vars` | URL query parameters (used for instance selection) |
-| `$graph_array` | Build this to pass to `print-graphrow.inc.php` |
+| `$app` | Application model |
+| `$vars` | URL parameters |
+| `$graph_array` | Graph configuration passed to graph rendering includes |
 
-All app pages live at `includes/html/pages/device/apps/{app_name}.inc.php`.
+Keep implementation details small and local:
 
-As a developer, you should sketch how your app page will look before writing code. Here is a minimal example rendered as a user sees it:
+```php
+<?php
 
-???+ info "Pattern 1 rendered (Flat Graphs)"
-    ```text
-    +-----------------------------------------------------+
-    | [Device: router01]  Apps > appname                  |
-    +-----------------------------------------------------+
-    |                                                     |
-    | +-----------------------------------------------+   |
-    | | Metric 1                                      |   |
-    | +-----------------------------------------------+   |
-    | |                                               |   |
-    | |           [~~~~~graph~~~~~]                   |   |
-    | |                                               |   |
-    | +-----------------------------------------------+   |
-    |                                                     |
-    | +-----------------------------------------------+   |
-    | | Metric 2                                      |   |
-    | +-----------------------------------------------+   |
-    | |                                               |   |
-    | |           [~~~~~graph~~~~~]                   |   |
-    | |                                               |   |
-    | +-----------------------------------------------+   |
-    +-----------------------------------------------------+
-    ```
+// Read prepared app data.
+$data = $app->data ?? [];
 
-Each panel wraps one graph. The title comes from the `$graphs` map key.
+// Select view from URL state.
+$section = $vars['section'] ?? 'overview';
+$instance = $vars['instance'] ?? null;
 
+// Render navigation, tables, and graphs.
+// Do not poll, discover, parse heavy payloads, or perform expensive work here.
+```
 
-The option bar lists instances as clickable links. Selecting one swaps to instance graphs.
+## Safety and escaping
 
-### Pattern 1: Flat Graphs
+Treat names and values from payloads as untrusted display data.
 
-Simple apps with no per-instance breakdown just loop over a list of graphs.
+Escape values before printing them into HTML unless the value is generated by a trusted LibreNMS helper that already handles escaping.
 
-??? example "Pattern 1: Flat Graphs"
-    ```php
-    <?php
+```php
+htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8')
+```
 
-    $graphs = [
-        'appname_metric1' => 'Metric 1',
-        'appname_metric2' => 'Metric 2',
-    ];
+This especially applies to:
 
-    foreach ($graphs as $key => $text) {
-        $graph_type = $key;
-        $graph_array = [
-            'height' => '100',
-            'width' => '215',
-            'to' => \App\Facades\LibrenmsConfig::get('time.now'),
-            'id' => $app['app_id'],
-            'type' => 'application_' . $key,
-        ];
+- instance names
+- disk names
+- repository names
+- container names
+- status strings from external tools
+- error messages from agents
 
-        echo '<div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">' . $text . '</h3>
-        </div>
-        <div class="panel-body">
-        <div class="row">';
-        include 'includes/html/print-graphrow.inc.php';
-        echo '</div></div></div>';
-    }
-    ```
+## App page checklist
 
-### Pattern 2: Tabbed Sections
+Before opening a pull request, check the page against this list:
 
-Use `print_optionbar_start()/end()` to create a navigation bar between sections (e.g., system vs queries vs InnoDB).
-
-???+ info "Pattern 2 rendered (Tabbed Sections)"
-    ```text
-    +-----------------------------------------------------+
-    | [Device: router01]  Apps > mysql                    |
-    +-----------------------------------------------------+
-    | [System] | [Queries] | [InnoDB]                     |
-    +-----------------------------------------------------+
-    |                                                     |
-    | +-----------------------------------------------+   |
-    | | Query Duration                                |   |
-    | +-----------------------------------------------+   |
-    | |           [~~~~~graph~~~~~]                   |   |
-    | +-----------------------------------------------+   |
-    +-----------------------------------------------------+
-    ```
-
-Tabs switch which set of graphs is displayed. State is stored in `$vars['app_section']`.
-
-??? example "Pattern 2: Tabbed Sections"
-    ```php
-    <?php
-
-    print_optionbar_start();
-
-    $app_sections = ['system' => 'System', 'queries' => 'Queries'];
-    $sep = '';
-    foreach ($app_sections as $section => $label) {
-        echo $sep;
-        $vars['app_section'] ??= $section; // default to first
-
-        if ($vars['app_section'] == $section) {
-            echo "<span class='pagemenu-selected'>";
-        }
-        echo generate_link($label, $vars, ['app_section' => $section]);
-        if ($vars['app_section'] == $section) {
-            echo '</span>';
-        }
-        $sep = ' | ';
-    }
-
-    print_optionbar_end();
-
-    $graphs['system'] = ['app_metric1' => 'Metric 1'];
-    $graphs['queries'] = ['app_metric2' => 'Metric 2'];
-
-    foreach ($graphs[$vars['app_section']] as $key => $text) {
-        $graph_type = $key;
-        $graph_array = [
-            'height' => '100',
-            'width' => '215',
-            'to' => \App\Facades\LibrenmsConfig::get('time.now'),
-            'id' => $app['app_id'],
-            'type' => 'application_' . $key,
-        ];
-
-        echo '<div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">' . $text . '</h3>
-        </div>
-        <div class="panel-body">
-        <div class="row">';
-        include 'includes/html/print-graphrow.inc.php';
-        echo '</div></div></div>';
-    }
-    ```
-
-### Pattern 3: Per-Instance Breakdown
-
-Use an option bar to list instances (sources, disks, containers). Show aggregated overview graphs when no instance is selected, and instance-specific graphs when one is selected.
-
-When expected count of instances is high, I a network ports, disks, databases, don't use Instance in header.
-
-???+ info "Pattern 3 rendered (Per-Instance Breakdown)"
-    ```
-+---------------------------------------------------------+
-    | [Device: router01]  Apps > chronyd                  |
-    +-----------------------------------------------------+
-    | Overview | Instances: NTP, PTP, GPS                 |
-    +-----------------------------------------------------+
-    |                                                     |
-    | +-----------------------------------------------+   |
-    | | Overview 1                                    |   |
-    | +-----------------------------------------------+   |
-    | |           [~~~~~graph~~~~~]                   |   |
-    | +-----------------------------------------------+   |
-    +-----------------------------------------------------+
-    ```
-
-??? example "Pattern 3: Per-Instance Breakdown"
-    ```php
-    <?php
-
-    $link_array = [
-        'page' => 'device',
-        'device' => $device['device_id'],
-        'tab' => 'apps',
-        'app' => 'appname',
-    ];
-
-    print_optionbar_start();
-
-    echo generate_link('Overview', $link_array);
-    echo ' | Instances: ';
-
-    $instances = $app->data['instances'] ?? [];
-    sort($instances);
-    foreach ($instances as $index => $instance) {
-        $label = $vars['instance'] == $instance
-            ? '<span class="pagemenu-selected">' . $instance . '</span>'
-            : $instance;
-
-        echo generate_link($label, $link_array, ['instance' => $instance]);
-        if ($index < count($instances) - 1) {
-            echo ', ';
-        }
-    }
-
-    print_optionbar_end();
-
-    if (! isset($vars['instance'])) {
-        $graphs = [
-            'appname_overview1' => 'Overview 1',
-            'appname_overview2' => 'Overview 2',
-        ];
-    } else {
-        $graphs = [
-            'appname_instance1' => 'Instance Metric 1',
-            'appname_instance2' => 'Instance Metric 2',
-        ];
-    }
-
-    foreach ($graphs as $key => $text) {
-        $graph_type = $key;
-        $graph_array = [
-            'height' => '100',
-            'width' => '215',
-            'to' => \App\Facades\LibrenmsConfig::get('time.now'),
-            'id' => $app['app_id'],
-            'type' => 'application_' . $key,
-        ];
-
-        if (isset($vars['instance'])) {
-            $graph_array['instance'] = $vars['instance'];
-        }
-
-        echo '<div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">' . $text . '</h3>
-        </div>
-        <div class="panel-body">
-        <div class="row">';
-        include 'includes/html/print-graphrow.inc.php';
-        echo '</div></div></div>';
-    }
-    ```
-
-### Pattern 4: Mix of Text/Table + Graphs
-
-Show instance details (name, serial, status) alongside graphs. Useful when you have metadata that does not fit in a graph.
-
-???+ info "Pattern 4 rendered (Text + Graphs)"
-    ```text
-    +-----------------------------------------------------+
-    | [Device: router01]  Apps > smart                    |
-    +-----------------------------------------------------+
-    | All drives | Graphs                                 |
-    +-----------------------------------------------------+
-    |                                                     |
-    | Model: Samsung SSD 870 QVO              [selected]  |
-    | Serial: S5EWNX0N123456                              |
-    | Vendor: Samsung                                     |
-    +-----------------------------------------------------+
-    |                                                     |
-    | +-----------------------------------------------+   |
-    | | Temperature                                    |  |
-    | +-----------------------------------------------+   |
-    | |           [~~~~~graph~~~~~]                    |  |
-    | +-----------------------------------------------+   |
-    |                                                     |
-    | +-----------------------------------------------+   |
-    | | Reallocated Sectors                           |   |
-    | +-----------------------------------------------+   |
-    | |           [~~~~~graph~~~~~]                    |  |
-    | +-----------------------------------------------+   |
-    +-----------------------------------------------------+
-    ```
-
-Instance metadata is printed as text labels above the graphs. Use when you have attributes like serial numbers, model names, or health status that graphs cannot show.
-
-??? example "Pattern 4: Mix of Text/Table + Graphs"
-    ```php
-    <?php
-    // ... option bar for instance selection (see Pattern 3) ...
-
-    if (isset($vars['disk'])) {
-        $currentDisk = $app->data['disks'][$vars['disk']] ?? [];
-
-        print_optionbar_start();
-
-        $diskFields = [
-            'model' => 'Model',
-            'serial' => 'Serial',
-            'vendor' => 'Vendor',
-        ];
-
-        foreach ($diskFields as $field => $label) {
-            if (isset($currentDisk[$field])) {
-                echo "{$label}: {$currentDisk[$field]}<br>\n";
-            }
-        }
-
-        print_optionbar_end();
-
-        $graphs = [
-            'app_metric1' => 'Metric 1',
-            'app_metric2' => 'Metric 2',
-        ];
-    }
-    // ... render graphs (see Pattern 1) ...
-    ```
-
-
-### Pattern 5: Graph Selector
-
-Use an option bar to let users switch between different graph types (e.g., Bits vs Packets vs Errors). The Ports page uses this to show different traffic graphs.
-
-???+ info "Pattern 5 rendered (Graph Selector)"
-    ```text
-    +-----------------------------------------------------+
-    | [Device: router01]  Apps > myapp                   |
-    +-----------------------------------------------------+
-    | Graphs: [Bits] | [Packets] | [Errors]              |
-    +-----------------------------------------------------+
-    |                                                     |
-    | +-----------------------------------------------+  |
-    | | Bits/sec                                     |  |
-    | +-----------------------------------------------+  |
-    | |           [~~~~~graph~~~~~]                    |  |
-    | +-----------------------------------------------+  |
-    +-----------------------------------------------------+
-    ```
-
-State is stored in `$vars['graph']`. Combine with Pattern 3 (instance selection) or Pattern 6 (format toggle) as needed.
-
-??? example "Pattern 5: Graph Selector"
-    ```php
-    <?php
-
-    $vars['graph'] ??= 'bits';
-    $graphs = ['bits' => 'Bits', 'upkts' => 'Packets', 'errors' => 'Errors'];
-
-    print_optionbar_start();
-    $sep = '';
-    foreach ($graphs as $graph => $label) {
-        echo $sep;
-        if ($vars['graph'] == $graph) {
-            echo '<span class="pagemenu-selected">';
-        }
-        echo generate_link($label, $vars, ['graph' => $graph]);
-        if ($vars['graph'] == $graph) {
-            echo '</span>';
-        }
-        $sep = ' | ';
-    }
-    print_optionbar_end();
-
-    $graph_type = 'appname_' . $vars['graph'];
-    $graph_array = [
-        'height' => '100',
-        'width' => '215',
-        'to' => \App\Facades\LibrenmsConfig::get('time.now'),
-        'id' => $app['app_id'],
-        'type' => 'application_' . $graph_type,
-    ];
-
-    echo '<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">' . $graphs[$vars['graph']] . '</h3>
-    </div>
-    <div class="panel-body">
-    <div class="row">';
-    include 'includes/html/print-graphrow.inc.php';
-    echo '</div></div></div>';
-    ```
-
-### Navigation Button Pattern
-
-Use `print_optionbar_start()/end()` with pipe-separated links. Active items get `<span class="pagemenu-selected">`.
-
-??? example "Navigation button pattern"
-    ```php
-    <?php
-
-    // Build base link array for consistent URL generation
-    $baseLink = [
-        'page'   => 'device',
-        'device' => $device['device_id'],
-        'tab'    => 'apps',
-        'app'    => 'appname',
-    ];
-
-    // Parse URL format to determine current view
-    $vars['format'] ??= 'list_overview';
-    [$format, $subformat] = explode('_', basename($vars['format']), 2);
-
-    print_optionbar_start();
-
-    // Overview link - highlighted when format is 'list'
-    $overviewLabel = ($format == 'list')
-        ? '<span class="pagemenu-selected">Overview</span>'
-        : 'Overview';
-    echo '<a href="' . \LibreNMS\Util\Url::generate($baseLink, ['format' => 'list_overview']) . '">' . $overviewLabel . '</a>';
-    echo ' | ';
-
-    // Build list of view types with links
-    $viewTypes = [
-        'graph_size'    => 'Size',
-        'graph_count'   => 'Count',
-        'graph_status'  => 'Status',
-    ];
-
-    $links = [];
-    foreach ($viewTypes as $viewKey => $viewLabel) {
-        $label = ($subformat === str_replace('graph_', '', $viewKey))
-            ? '<span class="pagemenu-selected">' . $viewLabel . '</span>'
-            : $viewLabel;
-        $links[] = '<a href="' . \LibreNMS\Util\Url::generate($baseLink, ['format' => $viewKey]) . '">' . $label . '</a>';
-    }
-    echo 'View Types: ' . implode(' | ', $links);
-
-    print_optionbar_end();
-    ```
-
-Key points:
-- Use `$baseLink` array for consistent URL generation
-- Parse `$vars['format']` to determine current view (format_subformat pattern)
-- Wrap active item label in `<span class="pagemenu-selected">`
-- Use `\LibreNMS\Util\Url::generate()` or `generate_link()` for URL generation
-- Separate items with ` | ` (pipe + space)
+- The first screen answers whether the app is healthy.
+- The page has a clear overview state.
+- Large instance lists are shown as tables, not giant link bars.
+- URL parameters are stable and readable.
+- Payload-derived values are escaped.
+- Heavy work is done during polling, not rendering.
+- Empty states are handled deliberately.
+- Graph titles are user-facing, not implementation-facing.
+- The page links cleanly to focused views when relevant.
+- The UI follows existing LibreNMS visual patterns instead of inventing a new mini-framework.

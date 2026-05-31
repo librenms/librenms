@@ -117,13 +117,13 @@ class HtmlData
     ];
 
     private const OPERATION_INFOS = [
-        0  => 'No sync operation running.',
-        1  => 'Array is clean.',
-        2  => 'Array is active.',
-        3  => 'Consistency check running; reads all blocks and checks redundancy.',
-        4  => 'Resync running; recalculating redundancy after unclean shutdown or creation.',
-        5  => 'Recovery running; building a hot spare to replace a failed or missing device.',
-        6  => 'Repair running; full check and repair, write-intent bitmap not used.',
+        0 => 'No sync operation running.',
+        1 => 'Array is clean.',
+        2 => 'Array is active.',
+        3 => 'Consistency check running; reads all blocks and checks redundancy.',
+        4 => 'Resync running; recalculating redundancy after unclean shutdown or creation.',
+        5 => 'Recovery running; building a hot spare to replace a failed or missing device.',
+        6 => 'Repair running; full check and repair, write-intent bitmap not used.',
         12 => 'Active with no recent writes.',
     ];
 
@@ -140,16 +140,16 @@ class HtmlData
     ];
 
     private const DEVICE_HEALTH_INFOS = [
-        0  => 'Member is fully in sync with the array.',
-        1  => 'Member is active.',
-        2  => 'Member is write-mostly; only read if no other options.',
-        3  => 'Member is spare; working but not a full member.',
-        4  => 'Member is rebuilding/recovering.',
-        5  => 'Member wants replacement due to errors or user request.',
-        6  => 'Member is a replacement device for another active member with the same raid_disk.',
-        7  => 'Member has write errors.',
-        8  => 'Member is blocked; failed but not yet acknowledged.',
-        9  => 'Member is faulty; kicked from active use due to detected fault.',
+        0 => 'Member is fully in sync with the array.',
+        1 => 'Member is active.',
+        2 => 'Member is write-mostly; only read if no other options.',
+        3 => 'Member is spare; working but not a full member.',
+        4 => 'Member is rebuilding/recovering.',
+        5 => 'Member wants replacement due to errors or user request.',
+        6 => 'Member is a replacement device for another active member with the same raid_disk.',
+        7 => 'Member has write errors.',
+        8 => 'Member is blocked; failed but not yet acknowledged.',
+        9 => 'Member is faulty; kicked from active use due to detected fault.',
         10 => 'Member is missing.',
     ];
 
@@ -161,25 +161,25 @@ class HtmlData
     private static function resolveEntry(string $type, int $val): array
     {
         return match ($type) {
-            'mdadm_array_health_status'    => [
+            'mdadm_array_health_status' => [
                 'label' => self::ARRAY_HEALTH_LABELS[$val] ?? 'Unknown',
                 'class' => self::ARRAY_HEALTH_CLASSES[$val] ?? 'default',
-                'info'  => self::ARRAY_HEALTH_INFOS[$val] ?? 'Health state unknown.',
+                'info' => self::ARRAY_HEALTH_INFOS[$val] ?? 'Health state unknown.',
             ],
             'mdadm_array_operation_status' => [
                 'label' => self::OPERATION_LABELS[$val] ?? 'Unknown',
                 'class' => self::OPERATION_CLASSES[$val] ?? 'default',
-                'info'  => self::OPERATION_INFOS[$val] ?? 'Operation state unknown.',
+                'info' => self::OPERATION_INFOS[$val] ?? 'Operation state unknown.',
             ],
             'mdadm_array_mismatch', 'mdadm_device_error' => [
                 'label' => (string) max(0, $val),
                 'class' => $val > 0 ? 'warning' : 'default',
-                'info'  => '',
+                'info' => '',
             ],
-            'mdadm_device_health_status'   => [
+            'mdadm_device_health_status' => [
                 'label' => self::DEVICE_HEALTH_LABELS[$val] ?? 'Unknown',
                 'class' => self::DEVICE_HEALTH_CLASSES[$val] ?? 'default',
-                'info'  => self::DEVICE_HEALTH_INFOS[$val] ?? 'Device health state unknown.',
+                'info' => self::DEVICE_HEALTH_INFOS[$val] ?? 'Device health state unknown.',
             ],
             default => ['label' => (string) $val, 'class' => 'default', 'info' => ''],
         };
@@ -334,7 +334,7 @@ class HtmlData
     {
         return [
             'sensors' => $this->arrayData[$arrayName]['devices'][$driveKey] ?? [],
-            'meta'    => $this->arraysDevices[$arrayName][$driveKey] ?? [],
+            'meta' => $this->arraysDevices[$arrayName][$driveKey] ?? [],
         ];
     }
 
@@ -352,17 +352,17 @@ class HtmlData
         $action = $dbRow !== null ? strtolower(trim((string) $dbRow->sync_action)) : '';
 
         return [
-            'action'        => $action,
-            'speed_bps'     => $dbRow !== null ? (int) ($dbRow->sync_speed_bps ?? 0) : 0,
+            'action' => $action,
+            'speed_bps' => $dbRow !== null ? (int) ($dbRow->sync_speed_bps ?? 0) : 0,
             'speed_min_bps' => $dbRow !== null ? (int) ($dbRow->sync_speed_min_bps ?? 0) : 0,
             'speed_max_bps' => $dbRow !== null ? (int) ($dbRow->sync_speed_max_bps ?? 0) : 0,
-            'done_bytes'    => $dbRow !== null ? (int) ($dbRow->sync_done_bytes ?? 0) : 0,
-            'total_bytes'   => $dbRow !== null ? (int) ($dbRow->sync_total_bytes ?? 0) : 0,
+            'done_bytes' => $dbRow !== null ? (int) ($dbRow->sync_done_bytes ?? 0) : 0,
+            'total_bytes' => $dbRow !== null ? (int) ($dbRow->sync_total_bytes ?? 0) : 0,
             'completed_pct' => $dbRow !== null ? (float) ($dbRow->sync_completed_pct ?? 0) : 0.0,
-            'last_action'   => $dbRow !== null ? (string) ($dbRow->sync_last_action ?? '') : '',
-            'min_sectors'   => $dbRow !== null ? $dbRow->sync_min_sectors : null,
-            'max_sectors'   => $dbRow !== null ? $dbRow->sync_max_sectors : null,
-            'is_syncing'    => $action !== '' && $action !== 'idle',
+            'last_action' => $dbRow !== null ? (string) ($dbRow->sync_last_action ?? '') : '',
+            'min_sectors' => $dbRow !== null ? $dbRow->sync_min_sectors : null,
+            'max_sectors' => $dbRow !== null ? $dbRow->sync_max_sectors : null,
+            'is_syncing' => $action !== '' && $action !== 'idle',
         ];
     }
 
@@ -398,60 +398,61 @@ class HtmlData
             }
 
             $arraysMeta[$arrayName] = [
-                'array_name'         => $dbRow->md_id,
-                'uuid'               => $dbRow->uuid,
-                'raid_level'         => $dbRow->level,
-                'state'              => $dbRow->state,
-                'size_bytes'         => $dbRow->size_bytes,
-                'raid_disks'         => $dbRow->raid_disks,
-                'metadata_version'   => $dbRow->metadata_version,
+                'md_id' => $dbRow->md_id,
+                'array_name' => $dbRow->array_name,
+                'uuid' => $dbRow->uuid,
+                'raid_level' => $dbRow->level,
+                'state' => $dbRow->state,
+                'size_bytes' => $dbRow->size_bytes,
+                'raid_disks' => $dbRow->raid_disks,
+                'metadata_version' => $dbRow->metadata_version,
                 'consistency_policy' => $dbRow->consistency_policy,
-                'chunk_size'         => $dbRow->chunk_size,
-                'active_devices'     => $dbRow->active_devices,
-                'working_devices'    => $dbRow->working_devices,
-                'spare_devices'      => $dbRow->spare_devices,
-                'failed_devices'     => $dbRow->failed_devices,
-                'degraded'           => $dbRow->degraded,
-                'mismatch_cnt'       => $dbRow->mismatch_cnt,
-                'layout'             => $dbRow->layout,
-                'layout_label'       => self::layoutLabel($dbRow->layout, $dbRow->level),
-                'resync_start_sectors'     => $dbRow->resync_start_sectors,
+                'chunk_size' => $dbRow->chunk_size,
+                'active_devices' => $dbRow->active_devices,
+                'working_devices' => $dbRow->working_devices,
+                'spare_devices' => $dbRow->spare_devices,
+                'failed_devices' => $dbRow->failed_devices,
+                'degraded' => $dbRow->degraded,
+                'mismatch_cnt' => $dbRow->mismatch_cnt,
+                'layout' => $dbRow->layout,
+                'layout_label' => self::layoutLabel($dbRow->layout, $dbRow->level),
+                'resync_start_sectors' => $dbRow->resync_start_sectors,
                 'reshape_position_sectors' => $dbRow->reshape_position_sectors,
-                'bitmap_type'        => $dbRow->bitmap_type,
-                'bitmap_location'    => $dbRow->bitmap_location,
-                'bitmap_chunksize'   => $dbRow->bitmap_chunksize,
-                'bitmap_metadata'    => $dbRow->bitmap_metadata,
-                'bitmap_time_base'   => $dbRow->bitmap_time_base,
-                'is_mounted'         => $dbRow->is_mounted,
-                'mount_points'       => $dbRow->mount_points,
-                'is_swap'            => $dbRow->is_swap,
-                'bitmap_backlog'     => $dbRow->bitmap_backlog,
+                'bitmap_type' => $dbRow->bitmap_type,
+                'bitmap_location' => $dbRow->bitmap_location,
+                'bitmap_chunksize' => $dbRow->bitmap_chunksize,
+                'bitmap_metadata' => $dbRow->bitmap_metadata,
+                'bitmap_time_base' => $dbRow->bitmap_time_base,
+                'is_mounted' => $dbRow->is_mounted,
+                'mount_points' => $dbRow->mount_points,
+                'is_swap' => $dbRow->is_swap,
+                'bitmap_backlog' => $dbRow->bitmap_backlog,
                 'bitmap_max_backlog' => $dbRow->bitmap_max_backlog,
-                'bitmap_can_clear'   => $dbRow->bitmap_can_clear,
-                'stripe_cache_size'   => $dbRow->stripe_cache_size,
+                'bitmap_can_clear' => $dbRow->bitmap_can_clear,
+                'stripe_cache_size' => $dbRow->stripe_cache_size,
                 'stripe_cache_active' => $dbRow->stripe_cache_active,
-                'journal_mode'       => $dbRow->journal_mode,
+                'journal_mode' => $dbRow->journal_mode,
             ];
 
             $arrayDevs = [];
             foreach ($dbRow->drives as $drive) {
                 $arrayDevs[$drive->dev_id] = [
-                    'path'            => $drive->path,
-                    'state'           => $drive->state,
-                    'state_flags'     => $drive->state_flags,
-                    'errors'          => $drive->errors,
-                    'is_missing'      => $drive->is_missing,
-                    'size_bytes'      => $drive->size_bytes,
-                    'device_role'     => $drive->device_role,
-                    'slot'            => $drive->slot,
-                    'id_model'        => $drive->id_model,
+                    'path' => $drive->path,
+                    'state' => $drive->state,
+                    'state_flags' => $drive->state_flags,
+                    'errors' => $drive->errors,
+                    'is_missing' => $drive->is_missing,
+                    'size_bytes' => $drive->size_bytes,
+                    'device_role' => $drive->device_role,
+                    'slot' => $drive->slot,
+                    'id_model' => $drive->id_model,
                     'id_serial_short' => $drive->id_serial_short,
-                    'offset_sectors'        => $drive->offset_sectors,
-                    'ppl_sector'            => $drive->ppl_sector,
-                    'ppl_size_sectors'      => $drive->ppl_size_sectors,
-                    'events'                => $drive->events,
+                    'offset_sectors' => $drive->offset_sectors,
+                    'ppl_sector' => $drive->ppl_sector,
+                    'ppl_size_sectors' => $drive->ppl_size_sectors,
+                    'events' => $drive->events,
                     'recovery_start_sectors' => $drive->recovery_start_sectors,
-                    'bad_block_count'       => $drive->bad_block_count,
+                    'bad_block_count' => $drive->bad_block_count,
                     'unack_bad_block_count' => $drive->unack_bad_block_count,
                 ];
             }
@@ -475,7 +476,6 @@ class HtmlData
 
         foreach ($sensors as $sensor) {
             $group = (string) $sensor->group;
-            $sensorNav = (string) ($sensor->sensor_navigation ?? '');
             $val = (int) ($sensor->sensor_current ?? -1);
             $type = (string) $sensor->sensor_type;
             $entry = array_merge(['val' => $val, 'sensor' => $sensor], self::resolveEntry($type, $val));
@@ -486,7 +486,7 @@ class HtmlData
                 $devKey = $parts[1] ?? (string) $sensor->sensor_descr;
                 $arrayData[$arrayName]['devices'][$devKey][$type] = $entry;
             } else {
-                $arrayName = $this->arrayNameFromGroupOrNavigation($group, $sensorNav);
+                $arrayName = $this->arrayNameFromGroup($group);
                 if ($arrayName === '') {
                     continue;
                 }
@@ -517,17 +517,10 @@ class HtmlData
         return "mdadm.htmldata.{$deviceId}.{$appId}";
     }
 
-    private function arrayNameFromGroupOrNavigation(string $group, string $sensorNavigation): string
+    private function arrayNameFromGroup(string $group): string
     {
         $normalizedGroup = trim(str_replace('Mdadm ', '', $group));
-        if ($normalizedGroup !== '') {
-            return str_replace('::devices', '', $normalizedGroup);
-        }
 
-        if (preg_match('/array=([^\/]+)\//', $sensorNavigation, $matches) === 1) {
-            return rawurldecode((string) $matches[1]);
-        }
-
-        return '';
+        return $normalizedGroup !== '' ? str_replace('::devices', '', $normalizedGroup) : '';
     }
 }

@@ -1066,6 +1066,101 @@ mac_accounting:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ma_id], Unique: true, Type: BTREE }
     mac_accounting_port_id_index: { Name: mac_accounting_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+mdadm_arrays:
+  Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: app_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: snmp_index, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: uuid, Type: varchar(36), 'Null': false, Extra: '' }
+    - { Field: array_name, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: md_id, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: level, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: state, Type: varchar(64), 'Null': true, Extra: '' }
+    - { Field: active_devices, Type: 'smallint unsigned', 'Null': true, Extra: '' }
+    - { Field: working_devices, Type: 'smallint unsigned', 'Null': true, Extra: '' }
+    - { Field: spare_devices, Type: 'smallint unsigned', 'Null': true, Extra: '' }
+    - { Field: failed_devices, Type: 'smallint unsigned', 'Null': true, Extra: '' }
+    - { Field: degraded, Type: 'smallint unsigned', 'Null': true, Extra: '' }
+    - { Field: mismatch_cnt, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: size_bytes, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: raid_disks, Type: 'smallint unsigned', 'Null': true, Extra: '' }
+    - { Field: metadata_version, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: consistency_policy, Type: varchar(64), 'Null': true, Extra: '' }
+    - { Field: chunk_size, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: sync_action, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: sync_completed_pct, Type: double, 'Null': true, Extra: '' }
+    - { Field: sync_speed_bps, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: sync_speed_min_bps, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: sync_speed_max_bps, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: sync_done_bytes, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: sync_total_bytes, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: sync_last_action, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: layout, Type: int, 'Null': true, Extra: '' }
+    - { Field: resync_start_sectors, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: reshape_position_sectors, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: bitmap_type, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: bitmap_location, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: bitmap_chunksize, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: bitmap_metadata, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: bitmap_time_base, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: is_mounted, Type: tinyint, 'Null': true, Extra: '' }
+    - { Field: mount_points, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: is_swap, Type: tinyint, 'Null': true, Extra: '' }
+    - { Field: bitmap_backlog, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: bitmap_max_backlog, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: bitmap_can_clear, Type: tinyint, 'Null': true, Extra: '' }
+    - { Field: stripe_cache_size, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: stripe_cache_active, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: journal_mode, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: sync_min_sectors, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: sync_max_sectors, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    mdadm_arrays_app_id_index: { Name: mdadm_arrays_app_id_index, Columns: [app_id], Unique: false, Type: BTREE }
+    mdadm_arrays_app_id_uuid_unique: { Name: mdadm_arrays_app_id_uuid_unique, Columns: [app_id, uuid], Unique: true, Type: BTREE }
+    mdadm_arrays_device_id_index: { Name: mdadm_arrays_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints:
+    mdadm_arrays_device_id_foreign: { name: mdadm_arrays_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
+mdadm_drives:
+  Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: app_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: mdadm_array_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+    - { Field: snmp_index, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: dev_id, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: dev_uuid, Type: varchar(64), 'Null': true, Extra: '' }
+    - { Field: path, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: state, Type: varchar(64), 'Null': true, Extra: '' }
+    - { Field: state_flags, Type: longtext, 'Null': true, Extra: '' }
+    - { Field: errors, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: is_missing, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: size_bytes, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: device_role, Type: varchar(64), 'Null': true, Extra: '' }
+    - { Field: slot, Type: 'smallint unsigned', 'Null': true, Extra: '' }
+    - { Field: id_model, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: id_serial_short, Type: varchar(64), 'Null': true, Extra: '' }
+    - { Field: offset_sectors, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: ppl_sector, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: ppl_size_sectors, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: events, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: recovery_start_sectors, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: bad_block_count, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: unack_bad_block_count, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    mdadm_drives_app_id_index: { Name: mdadm_drives_app_id_index, Columns: [app_id], Unique: false, Type: BTREE }
+    mdadm_drives_device_id_index: { Name: mdadm_drives_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    mdadm_drives_mdadm_array_id_dev_id_unique: { Name: mdadm_drives_mdadm_array_id_dev_id_unique, Columns: [mdadm_array_id, dev_id], Unique: true, Type: BTREE }
+    mdadm_drives_mdadm_array_id_index: { Name: mdadm_drives_mdadm_array_id_index, Columns: [mdadm_array_id], Unique: false, Type: BTREE }
+  Constraints:
+    mdadm_drives_device_id_foreign: { name: mdadm_drives_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
+    mdadm_drives_mdadm_array_id_foreign: { name: mdadm_drives_mdadm_array_id_foreign, foreign_key: mdadm_array_id, table: mdadm_arrays, key: id, extra: 'ON DELETE CASCADE' }
 mefinfo:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

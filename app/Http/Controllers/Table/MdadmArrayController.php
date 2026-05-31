@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\MdadmArray;
+use App\Models\Sensor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use LibreNMS\Enum\SensorState;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Url;
 
@@ -68,7 +70,56 @@ class MdadmArrayController extends TableController
     {
         return MdadmArray::query()
             ->with(['application.device'])
-            ->when($request->input('app_id'), fn ($q, $id) => $q->where('app_id', $id));
+            ->when($request->input('app_id'), fn ($q, $id) => $q->where('app_id', $id))
+            ->addSelect([
+                'mdadm_arrays.*',
+                'health_label' => Sensor::select('st.state_descr')
+                    ->join('sensors_to_state_indexes as stsi', 'stsi.sensor_id', '=', 'sensors.sensor_id')
+                    ->join('state_translations as st', fn ($j) => $j
+                        ->on('st.state_index_id', '=', 'stsi.state_index_id')
+                        ->whereColumn('st.state_value', 'sensors.sensor_current'))
+                    ->whereColumn('sensors.device_id', 'mdadm_arrays.device_id')
+                    ->where('sensors.sensor_type', 'mdadm_array_health_status')
+                    ->whereRaw('sensors.`group` = CONCAT("Mdadm ", mdadm_arrays.md_id)')
+                    ->limit(1),
+                'health_generic' => Sensor::select('st.state_generic_value')
+                    ->join('sensors_to_state_indexes as stsi', 'stsi.sensor_id', '=', 'sensors.sensor_id')
+                    ->join('state_translations as st', fn ($j) => $j
+                        ->on('st.state_index_id', '=', 'stsi.state_index_id')
+                        ->whereColumn('st.state_value', 'sensors.sensor_current'))
+                    ->whereColumn('sensors.device_id', 'mdadm_arrays.device_id')
+                    ->where('sensors.sensor_type', 'mdadm_array_health_status')
+                    ->whereRaw('sensors.`group` = CONCAT("Mdadm ", mdadm_arrays.md_id)')
+                    ->limit(1),
+                'op_label' => Sensor::select('st.state_descr')
+                    ->join('sensors_to_state_indexes as stsi', 'stsi.sensor_id', '=', 'sensors.sensor_id')
+                    ->join('state_translations as st', fn ($j) => $j
+                        ->on('st.state_index_id', '=', 'stsi.state_index_id')
+                        ->whereColumn('st.state_value', 'sensors.sensor_current'))
+                    ->whereColumn('sensors.device_id', 'mdadm_arrays.device_id')
+                    ->where('sensors.sensor_type', 'mdadm_array_operation_status')
+                    ->whereRaw('sensors.`group` = CONCAT("Mdadm ", mdadm_arrays.md_id)')
+                    ->limit(1),
+                'op_generic' => Sensor::select('st.state_generic_value')
+                    ->join('sensors_to_state_indexes as stsi', 'stsi.sensor_id', '=', 'sensors.sensor_id')
+                    ->join('state_translations as st', fn ($j) => $j
+                        ->on('st.state_index_id', '=', 'stsi.state_index_id')
+                        ->whereColumn('st.state_value', 'sensors.sensor_current'))
+                    ->whereColumn('sensors.device_id', 'mdadm_arrays.device_id')
+                    ->where('sensors.sensor_type', 'mdadm_array_operation_status')
+                    ->whereRaw('sensors.`group` = CONCAT("Mdadm ", mdadm_arrays.md_id)')
+                    ->limit(1),
+                'health_sensor_id' => Sensor::select('sensors.sensor_id')
+                    ->whereColumn('sensors.device_id', 'mdadm_arrays.device_id')
+                    ->where('sensors.sensor_type', 'mdadm_array_health_status')
+                    ->whereRaw('sensors.`group` = CONCAT("Mdadm ", mdadm_arrays.md_id)')
+                    ->limit(1),
+                'op_sensor_id' => Sensor::select('sensors.sensor_id')
+                    ->whereColumn('sensors.device_id', 'mdadm_arrays.device_id')
+                    ->where('sensors.sensor_type', 'mdadm_array_operation_status')
+                    ->whereRaw('sensors.`group` = CONCAT("Mdadm ", mdadm_arrays.md_id)')
+                    ->limit(1),
+            ]);
     }
 
     /**
@@ -76,46 +127,63 @@ class MdadmArrayController extends TableController
      */
     public function formatItem(Model $model): array
     {
-        $dev    = $model->application->device ?? null;
+        $dev = $model->application->device ?? null;
         $arrUrl = $dev ? Url::generate([
-            'page'   => 'device',
+            'page' => 'device',
             'device' => $dev->device_id,
-            'tab'    => 'apps',
-            'app'    => 'mdadm',
-            'array'  => $model->md_id ?? $model->uuid,
+            'tab' => 'apps',
+            'app' => 'mdadm',
+            'array' => $model->md_id ?? $model->uuid,
         ]) : '#';
 
-        $stateClass = match (strtolower((string) ($model->state ?? ''))) {
-            'clean', 'active'                             => 'default',
-            'degraded'                                    => 'danger',
-            'recovering', 'resyncing', 'checking', 'sync' => 'warning',
-            default                                       => 'default',
-        };
-
-        $failedCnt  = (int) ($model->failed_devices ?? 0);
+        $failedCnt = (int) ($model->failed_devices ?? 0);
         $mismatchCnt = (int) ($model->mismatch_cnt ?? 0);
+
+        $sensorClass = static fn (?string $generic): string => $generic !== null ? match ((int) $generic) {
+            SensorState::Ok->value => 'default',
+            SensorState::Warning->value => 'warning',
+            SensorState::Error->value => 'danger',
+            default => 'default',
+        } : 'default';
+
+        $healthLabel = $model->health_label;
+        $healthClass = $sensorClass($model->health_generic);
+        $healthSensorId = $model->health_sensor_id;
+        $opLabel = $model->op_label;
+        $opClass = $sensorClass($model->op_generic);
+        $opSensorId = $model->op_sensor_id;
+
+        $sensorBadge = static fn (?string $label, string $class, ?int $sensorId): string => $label !== null
+            ? ($sensorId !== null
+                ? Url::graphPopup(['type' => 'sensor_state', 'id' => $sensorId],
+                    '<span class="label label-' . $class . '">' . htmlspecialchars($label) . '</span>')
+                : '<span class="label label-' . $class . '">' . htmlspecialchars($label) . '</span>')
+            : '<span class="text-muted">&mdash;</span>';
 
         $linkText = $model->array_name ?? $model->uuid;
 
         return [
-            'device'         => $dev ? Url::modernDeviceLink($dev) : '?',
-            'array_name'     => '<a href="' . htmlspecialchars($arrUrl) . '">' . htmlspecialchars($linkText) . '</a>',
-            'md_id'          => $model->md_id !== null
-                ? htmlspecialchars($model->md_id)
+            'device' => $dev ? Url::modernDeviceLink($dev) : '?',
+            'array_name' => '<a href="' . htmlspecialchars((string) $arrUrl) . '">' . htmlspecialchars($linkText) . '</a>',
+            'md_id' => $model->md_id !== null
+                ? '<a href="' . htmlspecialchars((string) $arrUrl) . '">' . htmlspecialchars($model->md_id) . '</a>'
                 : '<span class="text-muted">&mdash;</span>',
-            'level'          => htmlspecialchars((string) ($model->level ?? '')),
-            'state'          => '<span class="label label-' . $stateClass . '">'
+            'level' => $model->level !== null
+                ? '<a href="' . htmlspecialchars((string) $arrUrl) . '">' . htmlspecialchars((string) $model->level) . '</a>'
+                : '',
+            'state' => '<span class="label label-' . $healthClass . '">'
                 . htmlspecialchars((string) ($model->state ?? '')) . '</span>',
-            'sync_action'    => htmlspecialchars((string) ($model->sync_action ?? 'idle')),
-            'raid_disks'     => $model->raid_disks,
+            'health' => $sensorBadge($healthLabel, $healthClass, $healthSensorId !== null ? (int) $healthSensorId : null),
+            'sync_action' => $sensorBadge($opLabel, $opClass, $opSensorId !== null ? (int) $opSensorId : null),
+            'raid_disks' => $model->raid_disks,
             'active_devices' => $model->active_devices,
-            'spare_devices'  => $model->spare_devices,
+            'spare_devices' => $model->spare_devices,
             'failed_devices' => '<span class="label label-' . ($failedCnt > 0 ? 'danger' : 'default') . '">'
                 . $failedCnt . '</span>',
-            'size'           => ($model->size_bytes ?? 0) > 0
+            'size' => ($model->size_bytes ?? 0) > 0
                 ? Number::formatBi((int) $model->size_bytes)
                 : '&mdash;',
-            'mismatch_cnt'   => '<span class="label label-' . ($mismatchCnt > 0 ? 'warning' : 'default') . '">'
+            'mismatch_cnt' => '<span class="label label-' . ($mismatchCnt > 0 ? 'warning' : 'default') . '">'
                 . $mismatchCnt . '</span>',
         ];
     }
@@ -131,6 +199,7 @@ class MdadmArrayController extends TableController
             'MDid',
             'Level',
             'State',
+            'Health',
             'Operation',
             'Disks',
             'Active',
@@ -154,7 +223,8 @@ class MdadmArrayController extends TableController
             $model->md_id ?? '',
             $model->level ?? '',
             $model->state ?? '',
-            $model->sync_action ?? 'idle',
+            (string) ($model->health_label ?? ''),
+            (string) ($model->op_label ?? $model->sync_action ?? 'idle'),
             $model->raid_disks,
             $model->active_devices,
             $model->spare_devices,

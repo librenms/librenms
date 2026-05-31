@@ -1,4 +1,10 @@
 @php
+// Wrap $badge in a sensor graph popup+nav, or return $badge unchanged when no sensor is set.
+$sensorPopup = static fn (array $entry, string $badge): string =>
+    ($s = $entry['sensor'] ?? null) instanceof \App\Models\Sensor
+        ? \LibreNMS\Util\Url::sensorLink($s, $badge)
+        : $badge;
+
 // ---------------------------------------------------------------------------
 // Graph / table definitions
 // ---------------------------------------------------------------------------
@@ -13,12 +19,18 @@ $legacyGraphs = [
 ];
 
 $arrayGraphs = [
-    'disk_counts' => ['type' => 'mdadm_app',        'metric' => 'disk_counts', 'title' => 'Disk Counts (disks)'],
-    'mismatch'    => ['type' => 'mdadm_mismatch',                               'title' => 'Mismatch'],
-    'sync_bps'    => ['type' => 'mdadm_app',        'metric' => 'sync_bps',    'title' => 'Sync Speed (B/s)'],
-    'sync_pct'    => ['type' => 'mdadm_app',        'metric' => 'sync_pct',    'title' => 'Sync Progress (%)'],
-    'diskio_ops'  => ['type' => 'mdadm_diskio_ops',                             'title' => 'Disk I/O Ops'],
-    'diskio_bits' => ['type' => 'mdadm_diskio_bits',                            'title' => 'Disk I/O Bytes'],
+    'health'           => ['type' => 'mdadm_health',            'title' => 'Array Health',       'overview' => true],
+    'state'            => ['type' => 'mdadm_state',             'title' => 'Array State',         'overview' => true],
+    'all_device_health'=> ['type' => 'mdadm_all_device_health', 'title' => 'Drive Health',        'overview' => true],
+    'mismatch'         => ['type' => 'mdadm_mismatch',          'title' => 'Mismatch',            'overview' => true],
+    'drive_errors'     => ['type' => 'mdadm_drive_errors',      'title' => 'Drive Errors',        'overview' => true],
+    'drive_bad'   => ['type' => 'mdadm_drive_bad_blocks', 'title' => 'Drive Bad Blocks'],
+    'disk_counts' => ['type' => 'mdadm_disk_counts',      'title' => 'Disk Counts (disks)'],
+    'drive_events'=> ['type' => 'mdadm_drive_events',     'title' => 'Drive Events'],
+    'sync_pct'    => ['type' => 'mdadm_sync_pct',         'title' => 'Sync Progress (%)'],
+    'sync_bps'    => ['type' => 'mdadm_sync_bps',         'title' => 'Sync Speed (B/s)'],
+    'diskio_ops'  => ['type' => 'mdadm_diskio_ops',       'title' => 'Disk I/O Ops'],
+    'diskio_bits' => ['type' => 'mdadm_diskio_bits',      'title' => 'Disk I/O Bytes'],
 ];
 
 $statusFields = [
@@ -84,9 +96,10 @@ $tableRow = static function (string $label, string $value, string $tooltip = '')
     return "<tr><td style=\"text-align:right;padding-right:15px;white-space:nowrap\"><strong>{$labelHtml}</strong></td><td>{$value}</td></tr>\n";
 };
 
-$panelStart = static function (string $title, string $badge = ''): void {
+$panelStart = static function (string $title, string $badge = '', string $icon = ''): void {
     $badgeHtml = $badge !== '' ? "<span class=\"pull-right\">{$badge}</span>" : '';
-    echo "<div class=\"panel panel-default\"><div class=\"panel-heading\"><h3 class=\"panel-title\">{$title}{$badgeHtml}</h3></div><div class=\"panel-body\">";
+    $iconHtml  = $icon  !== '' ? "<i class=\"fa fa-{$icon} fa-fw\" aria-hidden=\"true\"></i> " : '';
+    echo "<div class=\"panel panel-default\"><div class=\"panel-heading\"><h3 class=\"panel-title\">{$iconHtml}{$title}{$badgeHtml}</h3></div><div class=\"panel-body\">";
 };
 
 $panelEnd = static function (): void {
@@ -159,24 +172,6 @@ $fmtBool = static function ($value, string $yesClass = 'default'): string {
     {{-- Overview                                                            --}}
     {{-- ================================================================== --}}
     @php
-        $totalArrays    = (int) ($data->appMetrics['arrays']          ?? count($data->arrayData));
-        $totalDevices   = (int) ($data->appMetrics['devices_total']   ?? 0);
-        $degradedArrays = (int) ($data->appMetrics['degraded_arrays'] ?? 0);
-        $syncingArrays  = (int) ($data->appMetrics['arrays_syncing']  ?? 0);
-
-        $panelStart('Summary');
-        echo '<div class="row text-center">';
-        foreach ([
-            ['value' => $totalArrays,    'label' => 'Arrays',   'class' => ''],
-            ['value' => $totalDevices,   'label' => 'Devices',  'class' => ''],
-            ['value' => $degradedArrays, 'label' => 'Degraded', 'class' => $degradedArrays > 0 ? 'text-danger' : ''],
-            ['value' => $syncingArrays,  'label' => 'Syncing',  'class' => $syncingArrays  > 0 ? 'text-info' : 'text-muted'],
-        ] as $item) {
-            $cls = $item['class'] !== '' ? ' ' . $item['class'] : '';
-            echo "<div class=\"col-sm-3{$cls}\"><h4>{$item['value']}</h4><small>{$item['label']}</small></div>";
-        }
-        echo '</div>';
-        $panelEnd();
     @endphp
 
     @if(!empty($data->arrayData))
@@ -187,10 +182,11 @@ $fmtBool = static function ($value, string $yesClass = 'default'): string {
             <thead>
             <tr>
                 <th data-column-id="array_name"     data-sortable="true">Array Name</th>
-                <th data-column-id="md_id"          data-sortable="true">MDid</th>
-                <th data-column-id="level"          data-sortable="true">Level</th>
-                <th data-column-id="state"          data-sortable="true">State</th>
+                <th data-column-id="md_id"          data-sortable="true">MD device</th>
+                <th data-column-id="health"         data-sortable="false">Health</th>
                 <th data-column-id="sync_action"    data-sortable="true">Operation</th>
+                <th data-column-id="state"          data-sortable="true">State</th>
+                <th data-column-id="level"          data-sortable="true">Level</th>
                 <th data-column-id="raid_disks"     data-sortable="true" data-type="numeric">Disks</th>
                 <th data-column-id="active_devices" data-sortable="true" data-type="numeric">Active</th>
                 <th data-column-id="spare_devices"  data-sortable="true" data-type="numeric">Spare</th>
@@ -229,13 +225,17 @@ $fmtBool = static function ($value, string $yesClass = 'default'): string {
                 @php
                     $arrData = $data->array($MDid);
                     $hEntry  = $arrData['mdadm_array_health_status'] ?? [];
-                    $hBadge  = mdadm_badge($hEntry['label'] ?? 'Unknown', $hEntry['class'] ?? 'default', $hEntry['info'] ?? '');
+                    $hBadge  = $sensorPopup($hEntry, mdadm_badge($hEntry['label'] ?? 'Unknown', $hEntry['class'] ?? 'default', $hEntry['info'] ?? ''));
                     $arrUrl  = LibreNMS\Util\Url::generate($linkArray + ['array' => $MDid]);
                     $MDidEsc = htmlspecialchars($MDid);
 
-                    $panelStart("<a href=\"{$arrUrl}\">{$MDidEsc}</a>", $hBadge);
+                    $arrMeta  = $data->arraysMeta[$MDid] ?? [];
+                    $arrName  = trim((string) ($arrMeta['array_name'] ?? ''));
+                    $arrLabel = $arrName !== '' ? "$arrName ($MDid)" : $MDid;
+
+                    $panelStart("<a href=\"{$arrUrl}\">" . htmlspecialchars($arrLabel) . '</a>', $hBadge);
                     echo '<div class="row">';
-                    foreach ($arrayGraphs as $spec) {
+                    foreach (array_filter($arrayGraphs, fn($s) => !empty($s['overview'])) as $spec) {
                         $graphArray = [
                             'height' => '80', 'width' => '180',
                             'type'   => $spec['type'],
@@ -248,7 +248,14 @@ $fmtBool = static function ($value, string $yesClass = 'default'): string {
                         if (isset($spec['metric'])) { $graphArray['metric'] = $spec['metric']; }
                         $titleEsc = htmlspecialchars($spec['title']);
                         $graphTag = LibreNMS\Util\Url::lazyGraphTag($graphArray);
-                        echo "<div class=\"pull-left\" style=\"margin-right:8px;margin-bottom:8px\"><div class=\"text-muted\" style=\"font-size:11px;margin-bottom:4px\">{$titleEsc}</div><a href=\"{$arrUrl}\">{$graphTag}</a></div>";
+                        $graphUrl = LibreNMS\Util\Url::generate([
+                            'page'  => 'graphs',
+                            'device' => $data->device['device_id'],
+                            'type'  => $spec['type'],
+                            'id'    => $data->app->app_id,
+                            'array' => $MDid,
+                        ]);
+                        echo "<div class=\"pull-left\" style=\"margin-right:8px;margin-bottom:8px\"><div class=\"text-muted\" style=\"font-size:11px;margin-bottom:4px\">{$titleEsc}</div><a href=\"{$graphUrl}\">{$graphTag}</a></div>";
                     }
                     echo '</div>';
                     $panelEnd();
@@ -268,8 +275,8 @@ $fmtBool = static function ($value, string $yesClass = 'default'): string {
         $sync     = $data->syncDataForArray($array);
         $hEntry   = $arrData['mdadm_array_health_status']    ?? [];
         $opEntry  = $arrData['mdadm_array_operation_status'] ?? [];
-        $hBadge   = mdadm_badge($hEntry['label']  ?? 'Unknown', $hEntry['class']  ?? 'default', $hEntry['info']  ?? '');
-        $opBadge  = mdadm_badge($opEntry['label'] ?? 'Unknown', $opEntry['class'] ?? 'default', $opEntry['info'] ?? '');
+        $hBadge  = $sensorPopup($hEntry,  mdadm_badge($hEntry['label']  ?? 'Unknown', $hEntry['class']  ?? 'default', $hEntry['info']  ?? ''));
+        $opBadge = $sensorPopup($opEntry, mdadm_badge($opEntry['label'] ?? 'Unknown', $opEntry['class'] ?? 'default', $opEntry['info'] ?? ''));
     @endphp
 
     <div class="row">
@@ -284,7 +291,10 @@ $fmtBool = static function ($value, string $yesClass = 'default'): string {
                 $mismatchVal = is_numeric($mismatchRaw) ? (int) $mismatchRaw : null;
                 $chunkSize   = (int) ($meta['chunk_size'] ?? 0);
 
-                $panelStart(htmlspecialchars($meta['array_name'] ) . ' Status', $hBadge);
+                $mdId       = (string) ($meta['md_id'] ?? $array);
+                $arrNameTop = trim((string) ($meta['array_name'] ?? ''));
+                $panelLabel = $arrNameTop !== '' ? "$arrNameTop ($mdId)" : $mdId;
+                $panelStart(htmlspecialchars($panelLabel) . ' Status', $hBadge, 'server');
                 echo '<table class="table table-condensed table-hover" style="width:auto">';
                 foreach ($statusFields as $label => $spec) {
                     echo $tableRow($label, htmlspecialchars((string) ($meta[$spec['key']] ?? '-')), $spec['tooltip']);
@@ -388,7 +398,7 @@ $fmtBool = static function ($value, string $yesClass = 'default'): string {
                         'Sector window the current check/resync is restricted to (sync_min / sync_max). Max blank means the whole array.');
                 }
 
-                $panelStart('Sync', $opBadge);
+                $panelStart('Sync', $opBadge, 'sync-alt');
                 echo "<table class=\"table table-condensed table-hover\" style=\"width:auto\">{$syncRows}</table>";
                 $panelEnd();
             @endphp
@@ -401,13 +411,7 @@ $fmtBool = static function ($value, string $yesClass = 'default'): string {
                 foreach ($diskCountFields as $label => $spec) {
                     $diskRows .= $tableRow($label, (string) (int) ($meta[$spec['key']] ?? 0), $spec['tooltip']);
                 }
-                $degradedVal = $meta['degraded'] ?? null;
-                if ($degradedVal !== null) {
-                    $dgClass  = (int) $degradedVal > 0 ? ' class="text-danger"' : '';
-                    $diskRows .= $tableRow('Degraded', "<span{$dgClass}>" . (int) $degradedVal . '</span>',
-                        'Count of missing active members. Data is still accessible but fault tolerance is reduced.');
-                }
-                $panelStart('Disk Counts');
+                $panelStart('Disk Counts', '', 'hdd');
                 echo "<table class=\"table table-condensed table-hover\" style=\"width:auto\">{$diskRows}</table>";
                 $panelEnd();
             @endphp
@@ -451,7 +455,7 @@ $fmtBool = static function ($value, string $yesClass = 'default'): string {
                             'Whether the array is currently allowed to clear bits in the write-intent bitmap.');
                     }
 
-                    $panelStart('Bitmap');
+                    $panelStart('Bitmap', '', 'map');
                     echo "<table class=\"table table-condensed table-hover\" style=\"width:auto\">{$bmRows}</table>";
                     $panelEnd();
                 @endphp
@@ -478,7 +482,7 @@ $fmtBool = static function ($value, string $yesClass = 'default'): string {
     @endphp
     @if(!empty($metaDevices))
         @php
-            $panelStart('Drives');
+            $panelStart('Drives', '', 'list');
             $ths = '';
             foreach ($deviceHeaders as $h => $tip) {
                 $tipAttr  = $tip !== '' ? ' title="' . htmlspecialchars($tip) . '"' : '';
@@ -529,7 +533,13 @@ $fmtBool = static function ($value, string $yesClass = 'default'): string {
                 $cells = [
                     htmlspecialchars($path),
                     htmlspecialchars((string) ($metaDev['device_role']     ?? '-')),
-                    mdadm_badge($dhEntry['label'] ?? 'Unknown', $dhEntry['class'] ?? 'default', $dhEntry['info'] ?? ''),
+                    (($dSensor = ($dhEntry['sensor'] ?? null)) !== null
+                        ? LibreNMS\Util\Url::graphPopup(
+                            ['type' => 'mdadm_device_health', 'id' => $data->app->app_id, 'sensor_id' => $dSensor->sensor_id, 'popup_title' => 'Device Health'],
+                            mdadm_badge($dhEntry['label'] ?? 'Unknown', $dhEntry['class'] ?? 'default', $dhEntry['info'] ?? ''),
+                            LibreNMS\Util\Url::generate(['page' => 'graphs', 'type' => 'mdadm_device_health', 'id' => $data->app->app_id, 'sensor_id' => $dSensor->sensor_id])
+                          )
+                        : mdadm_badge($dhEntry['label'] ?? 'Unknown', $dhEntry['class'] ?? 'default', $dhEntry['info'] ?? '')),
                     htmlspecialchars((string) ($metaDev['slot']            ?? '-')),
                     $errVal !== null ? ($errVal > 0 ? '<span class="text-warning">' . $errVal . '</span>' : (string) $errVal) : '-',
                     $eventsVal !== null ? number_format((int) $eventsVal) : '<span class="text-muted">-</span>',
@@ -645,10 +655,10 @@ $fmtBool = static function ($value, string $yesClass = 'default'): string {
             $syncData    = $data->syncDataForArray($array);
 
             $graphHeaders = [
+                'state'       => htmlspecialchars((string) ($meta['state'] ?? '-')),
                 'disk_counts' => 'A:' . (int) ($meta['active_devices'] ?? 0)
                     . ' S:' . (int) ($meta['spare_devices'] ?? 0)
-                    . ' F:' . (int) ($meta['failed_devices'] ?? 0)
-                    . ' D:' . (int) ($meta['degraded'] ?? 0),
+                    . ' F:' . (int) ($meta['failed_devices'] ?? 0),
                 'mismatch'    => isset($arrData['mdadm_array_mismatch']['val']) ? (string) (int) $arrData['mdadm_array_mismatch']['val'] : '-',
                 'sync_bps'    => $syncData['speed_bps'] > 0
                     ? LibreNMS\Util\Number::formatBi($syncData['speed_bps'], suffix: 'B/s')
@@ -656,7 +666,33 @@ $fmtBool = static function ($value, string $yesClass = 'default'): string {
                 'sync_pct'    => number_format((float) $syncData['completed_pct'], 1) . '%',
                 'diskio_ops'  => '-',
                 'diskio_bits' => '-',
+                'drive_events'=> '-',
+                'drive_errors'=> '-',
+                'drive_bad'   => '0',
             ];
+
+            // Drive-level summaries: per-drive event counters, error counts, and bad-block counts.
+            $driveEventParts = [];
+            $driveErrorParts = [];
+            $driveBadParts   = [];
+            foreach ($metaDevices as $devKey => $md) {
+                if (isset($md['events']) && is_numeric($md['events'])) {
+                    $driveEventParts[] = number_format((int) $md['events']);
+                }
+                $devSens = is_array($sensorDevices[$devKey] ?? null) ? $sensorDevices[$devKey] : [];
+                $errRaw  = $devSens['mdadm_device_error']['val'] ?? $devSens['mdadm_device_errors']['val'] ?? null;
+                if ($errRaw !== null && is_numeric($errRaw)) {
+                    $driveErrorParts[] = number_format((int) $errRaw);
+                }
+                if (isset($md['bad_block_count']) && is_numeric($md['bad_block_count'])) {
+                    $bc = (int) $md['bad_block_count'];
+                    $ub = isset($md['unack_bad_block_count']) ? (int) $md['unack_bad_block_count'] : 0;
+                    $driveBadParts[] = $bc . ($ub > 0 ? " ({$ub})" : '');
+                }
+            }
+            $graphHeaders['drive_events'] = !empty($driveEventParts) ? implode(' / ', $driveEventParts) : '-';
+            $graphHeaders['drive_errors'] = !empty($driveErrorParts) ? implode(' / ', $driveErrorParts) : '-';
+            $graphHeaders['drive_bad']    = !empty($driveBadParts)   ? implode(' / ', $driveBadParts)   : '0';
 
             if (isset($diskioRates['reads'], $diskioRates['writes'])) {
                 $graphHeaders['diskio_ops'] = 'In: ' . LibreNMS\Util\Number::formatSi($diskioRates['reads'],  2, 0, 'ops/s')

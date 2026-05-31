@@ -5,26 +5,25 @@
  *
  * Shared by any application whose member devices are tracked via ucd_diskio.
  *
- * @param  array              $device
- * @param  list<list<string>> $deviceCandidateSets  Ordered candidate diskio_descr
+ * @param  array  $device
+ * @param  list<list<string>>  $deviceCandidateSets  Ordered candidate diskio_descr
  *                                                   strings per device. The first
  *                                                   candidate that matches a known
  *                                                   ucd_diskio entry is used.
  *                                                   Callers should pre-compute
  *                                                   /dev/-stripped and basename
  *                                                   variants.
- * @param  string             $context              Included in exception messages.
+ * @param  string  $context  Included in exception messages.
  * @return list<array{filename: string, descr: string}>
  */
 function app_diskio_build_rrd_list(array $device, array $deviceCandidateSets, string $context = ''): array
 {
-    $rows = dbFetchRows(
-        'SELECT diskio_descr FROM ucd_diskio WHERE device_id = ? ORDER BY diskio_descr',
-        [$device['device_id']]
-    );
+    $descrs = \App\Models\UcdDiskio::where('device_id', $device['device_id'])
+        ->orderBy('diskio_descr')
+        ->pluck('diskio_descr');
     $known = [];
-    foreach ($rows as $row) {
-        $d = trim((string) ($row['diskio_descr'] ?? ''));
+    foreach ($descrs as $descr) {
+        $d = trim((string) $descr);
         if ($d !== '') {
             $known[$d] = true;
         }

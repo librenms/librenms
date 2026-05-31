@@ -1,127 +1,151 @@
+---
+title: 2.3 Device Overview App Panels
+description: How to add compact application status panels to the LibreNMS Device Overview page.
+tags:
+  - developing
+  - applications
+---
+
 # 2.3 Device Overview App Panels
 
-Application panels appear in the left column of the **Device Overview** page, below ports and transceivers. Each application that wants a panel ships two files: a PHP glue file that guards and passes data, and a Blade template that renders the HTML.
+Application panels appear in the left column of the Device Overview page, below ports and transceivers.
+
+Use an overview panel for compact app status. Do not do heavy work here; the overview page should be fast.
 
 ## File locations
 
 | File | Purpose |
-|------|---------|
-| `includes/html/pages/device/overview/app-overview-renderer.php` | Dispatch loop - scans active apps and includes per-app PHP files |
-| `includes/html/pages/device/overview/apps/{app_type}.inc.php` | Per-app glue: guard, data prep, `echo view(...)` |
-| `resources/views/device/overview/apps/{app_type}.blade.php` | Per-app Blade template |
+| --- | --- |
+| `includes/html/pages/device/overview/app-overview-renderer.php` | Dispatcher that includes active app panels |
+| `includes/html/pages/device/overview/apps/{app_type}.inc.php` | Per-app PHP glue file |
+| `resources/views/device/overview/apps/{view_name}.blade.php` | Per-app Blade template |
 
-`app-overview-renderer.php` is already included by `overview.inc.php`. You only need to add your two files.
+The dispatcher is already included by the Device Overview page. An app normally adds only the PHP glue file and Blade template.
 
----
+## Naming
 
-## Contract for the PHP glue file
+App types often use kebab-case. Blade view names use underscores.
 
-The dispatcher sets `$app` (`App\Models\Application`) and `$device` (array) in scope before including your file. Your file must:
+| App type | PHP file | Blade view |
+| --- | --- | --- |
+| `my-app` | `my-app.inc.php` | `device.overview.apps.my_app` |
+| `btrfs` | `btrfs.inc.php` | `device.overview.apps.btrfs` |
 
-1. Guard against missing variables and wrong types.
-2. Guard against empty data - render nothing if the app has no data to show.
-3. Call `echo view('device.overview.apps.{app_type}', [...])` to render.
-4. Unset any temporary variables it introduced to avoid polluting the outer scope.
+## PHP glue contract
+
+The dispatcher sets `$app` and `$device` before including the per-app file.
+
+The glue file must:
+
+1. Guard against missing or wrong variable types.
+2. Load only lightweight/precomputed data.
+3. Render nothing when there is no useful data.
+4. Call `echo view(...)`.
+5. Unset temporary variables to avoid leaking scope.
 
 ```php
 <?php
 
 use App\Models\Application;
+use LibreNMS\Util\Url;
 
 if (! isset($app, $device) || ! $app instanceof Application || ! is_array($device)) {
     return;
 }
 
-// load and guard
-$_myData = MyApp\Data::forDevice($app, $device);
-if ($_myData->isEmpty()) {
+$_myData = $app->data['latest']['overview'] ?? [];
+if ($_myData === []) {
     return;
 }
 
 echo view('device.overview.apps.my_app', [
-    'app'     => $app,
-    'data'    => $_myData,
-    'appLink' => \LibreNMS\Util\Url::generate([
-        'page' => 'device', 'device' => $app->device_id,
-        'tab'  => 'apps',   'app'    => 'my_app',
+    'app' => $app,
+    'data' => $_myData,
+    'appLink' => Url::generate([
+        'page' => 'device',
+        'device' => $app->device_id,
+        'tab' => 'apps',
+        'app' => 'my-app',
     ]),
 ]);
 
 unset($_myData);
 ```
 
----
+## Blade template
 
-## Blade template structure
-
-Use the `<x-panel>` component for the outer wrapper and any inner panels. The outer panel gets `class="device-overview panel-condensed"` to match the style of other overview sections (ports, transceivers).
+Use `<x-panel>` for the outer wrapper and apply `device-overview panel-condensed`.
 
 ```blade
 <div class="row">
     <div class="col-md-12">
         <x-panel class="device-overview panel-condensed">
             <x-slot name="heading">
-                <i class="fa fa-YOUR-ICON fa-lg icon-theme" aria-hidden="true"></i>
+                <i class="fa fa-cube fa-lg icon-theme" aria-hidden="true"></i>
                 <strong><a href="{{ $appLink }}">My App</a></strong>
             </x-slot>
 
-            {{-- content goes here --}}
-
+            <dl class="tw:mb-0!">
+                <dt>Status</dt>
+                <dd>{{ $data['status'] ?? 'unknown' }}</dd>
+            </dl>
         </x-panel>
     </div>
 </div>
 ```
 
-### Full-width tables
+## Full-width tables
 
-Use `<x-slot name="table">` to place a table outside the `panel-body` div, so it stretches edge-to-edge like Bootstrap's `.table` inside a panel:
+Use the panel `table` slot to make a table stretch edge-to-edge like other Bootstrap panel tables.
 
 ```blade
-<x-panel>
+<x-panel class="device-overview panel-condensed">
+    <x-slot name="heading">
+        <strong><a href="{{ $appLink }}">My App</a></strong>
+    </x-slot>
+
     <x-slot name="table">
         <table class="table table-condensed table-hover tw:mb-0!">
-            ...
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($data['items'] ?? [] as $item)
+                    <tr>
+                        <td>{{ $item['name'] }}</td>
+                        <td>{{ $item['status'] }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
         </table>
     </x-slot>
 </x-panel>
 ```
 
-### Inner panels (sub-sections)
+## Data source guidance
 
-Nest `<x-panel>` inside the outer panel body for sub-sections such as per-array or per-device breakdowns:
+Prefer data already prepared by polling:
 
-```blade
-@foreach($items as $item)
-    <x-panel>
-        <x-slot name="heading">{{ $item->name }}</x-slot>
-        <x-slot name="table">
-            <table class="table table-condensed table-hover tw:mb-0!">
-                ...
-            </table>
-        </x-slot>
-    </x-panel>
-@endforeach
-```
+- `$app->data['latest']`
+- `application_metrics`
+- latest sensor values
+- small model queries scoped by `app_id` or `device_id`
 
-### Status badges
+Avoid:
 
-The `<x-label>` component maps a `Severity` enum to Bootstrap label classes. When your data layer resolves to Bootstrap class strings (`'default'`, `'warning'`, `'danger'`) directly, use inline spans instead:
+- SNMP calls
+- shell commands
+- expensive RRD reads
+- broad unscoped database queries
+- parsing large payloads on page load
 
-```blade
-<span class="label label-{{ $entry['class'] }}" title="{{ $entry['info'] }}">
-    {{ $entry['label'] }}
-</span>
-```
+## Rules
 
----
-
-!!! note
-    Keep panel rendering defensive: if required data is missing, return early and render nothing.
-
-## mdadm reference implementation
-
-- PHP glue: `includes/html/pages/device/overview/apps/mdadm.inc.php`
-- Blade template: `resources/views/device/overview/apps/mdadm.blade.php`
-- Data layer: `LibreNMS\Agent\Unix\Mdadm\HtmlData`
-
-The mdadm panel renders an arrays summary table (health/operation badges, disk counts, size, errors) followed by per-array inner panels listing each member device.
+- Render nothing for empty data.
+- Keep the panel compact.
+- Link the heading to the full app page.
+- Escape output through Blade `{{ }}` unless HTML is deliberate.
+- Use app pages for detail; use overview panels for summary.

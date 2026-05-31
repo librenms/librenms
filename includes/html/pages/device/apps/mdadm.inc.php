@@ -20,7 +20,7 @@ function mdadm_badge(string $label, string $class, ?string $title = null): strin
 /**
  * Sum diskio rates across all devices in an array from ucd-diskio RRDs.
  *
- * @return array<string, float>  Keys: 'read', 'written', 'reads', 'writes'
+ * @return array<string, float> Keys: 'read', 'written', 'reads', 'writes'
  */
 function mdadm_diskio_rates(HtmlData $data, string $arrayName): array
 {
@@ -92,16 +92,16 @@ function mdadm_debug_stored_data(int $appId, string $appName, string $hostname):
         }
 
         $entry = [
-            'array'             => $arrayName,
-            'rrd_file'          => $rrdFile,
-            'exists'            => App\Facades\Rrd::checkRrdExists($rrdFile),
+            'array' => $arrayName,
+            'rrd_file' => $rrdFile,
+            'exists' => App\Facades\Rrd::checkRrdExists($rrdFile),
             'expected_datasets' => ['active', 'spare', 'failed', 'degraded', 'mismatch', 'done_sectors', 'completed_pct', 'speed_bps'],
         ];
 
         if ($entry['exists']) {
             clearstatcache(true, $rrdFile);
             $entry['file'] = [
-                'size_bytes'  => is_file($rrdFile) ? filesize($rrdFile) : null,
+                'size_bytes' => is_file($rrdFile) ? filesize($rrdFile) : null,
                 'modified_at' => is_file($rrdFile) ? date('c', (int) filemtime($rrdFile)) : null,
                 'age_seconds' => is_file($rrdFile) ? max(0, time() - (int) filemtime($rrdFile)) : null,
             ];
@@ -110,10 +110,10 @@ function mdadm_debug_stored_data(int $appId, string $appName, string $hostname):
             $entry['last_update_ok'] = $point !== null;
             if ($point !== null) {
                 $entry['last_update'] = [
-                    'timestamp'     => $point->timestamp,
+                    'timestamp' => $point->timestamp,
                     'timestamp_iso' => date('c', $point->timestamp),
-                    'age_seconds'   => max(0, time() - $point->timestamp),
-                    'data'          => $point->data,
+                    'age_seconds' => max(0, time() - $point->timestamp),
+                    'data' => $point->data,
                 ];
             } else {
                 $entry['last_update'] = null;
@@ -161,15 +161,14 @@ function mdadm_debug_render(int $appId, object $allSensors, string $appName, str
     );
 
     // 3. Sensors — what to list
-    $sensorColumns = ['sensor_oid', 'sensor_type', 'group', 'sensor_navigation', 'sensor_index', 'sensor_descr', 'current'];
+    $sensorColumns = ['sensor_oid', 'sensor_type', 'group', 'sensor_index', 'sensor_descr', 'current'];
     $sensorRows = $allSensors->map(fn ($s) => [
-        'sensor_oid'        => $s->sensor_oid,
-        'sensor_type'       => $s->sensor_type,
-        'group'             => $s->group,
-        'sensor_navigation' => $s->sensor_navigation,
-        'sensor_index'      => $s->sensor_index,
-        'sensor_descr'      => $s->sensor_descr,
-        'current'           => $s->sensor_current,
+        'sensor_oid' => $s->sensor_oid,
+        'sensor_type' => $s->sensor_type,
+        'group' => $s->group,
+        'sensor_index' => $s->sensor_index,
+        'sensor_descr' => $s->sensor_descr,
+        'current' => $s->sensor_current,
     ])->toArray();
 
     debug_render('mdadm-debug-panels',
@@ -199,8 +198,8 @@ if (! isset($app, $device, $vars)
 $htmlData = HtmlData::forDevice($app, $device);
 
 echo view('device.apps.mdadm', [
-    'data'          => $htmlData,
-    'app'           => $app,
-    'device'        => $device,
+    'data' => $htmlData,
+    'app' => $app,
+    'device' => $device,
     'selectedArray' => $vars['array'] ?? null,
 ])->render();

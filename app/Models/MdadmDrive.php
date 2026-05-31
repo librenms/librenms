@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $mdadm_array_id
  * @property int|null $snmp_index
  * @property string $dev_id
+ * @property string|null $dev_uuid
  * @property string|null $path
  * @property string|null $state
  * @property list<string>|null $state_flags
@@ -44,6 +45,7 @@ class MdadmDrive extends Model
         'mdadm_array_id',
         'snmp_index',
         'dev_id',
+        'dev_uuid',
         'path',
         'state',
         'state_flags',
@@ -65,7 +67,7 @@ class MdadmDrive extends Model
 
     protected $casts = [
         'state_flags' => 'array',
-        'is_missing'  => 'boolean',
+        'is_missing' => 'boolean',
     ];
 
     /**

@@ -13,13 +13,13 @@ if (empty($_mdadmData->arrayNames())) {
 }
 
 echo view('device.overview.apps.mdadm', [
-    'app'     => $app,
-    'data'    => $_mdadmData,
+    'app' => $app,
+    'data' => $_mdadmData,
     'appLink' => LibreNMS\Util\Url::generate([
-        'page'   => 'device',
+        'page' => 'device',
         'device' => $app->device_id,
-        'tab'    => 'apps',
-        'app'    => 'mdadm',
+        'tab' => 'apps',
+        'app' => 'mdadm',
     ]),
 ]);
 
