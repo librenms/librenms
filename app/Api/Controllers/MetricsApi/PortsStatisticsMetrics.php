@@ -32,7 +32,7 @@ class PortsStatisticsMetrics
         }
 
         // Append global metrics
-        $this->appendMetricBlock($lines, 'librenms_ports_statistics_total', 'Total number of ports_statistics rows', 'gauge', [(string) $total]);
+        $this->appendMetricBlock($lines, 'librenms_ports_statistics_total', 'Total number of ports_statistics rows', 'gauge', ["librenms_ports_statistics_total {$total}"]);
 
         // Default to global metrics only; detailed per-access-point metrics are opt-in via ?scope=detail
         if (! $includeDetail) {

@@ -108,8 +108,13 @@ class PortsMetrics
                 $this->escapeLabel((string) $p->ifAlias)
             );
 
-            $admin_lines[] = "librenms_ports_admin_up{{$labels}} " . ($p->ifAdminStatus === 'up' ? '1' : '0');
-            $oper_lines[] = "librenms_ports_oper_up{{$labels}} " . ($p->ifOperStatus === 'up' ? '1' : '0');
+            $adminStatus = strtolower((string) $p->ifAdminStatus);
+            $operStatus = strtolower((string) $p->ifOperStatus);
+            $isAdminUp = $adminStatus === 'up' || str_starts_with($adminStatus, 'up(') || $adminStatus === '1';
+            $isOperUp = $operStatus === 'up' || str_starts_with($operStatus, 'up(') || $operStatus === '1';
+
+            $admin_lines[] = "librenms_ports_admin_up{{$labels}} " . ($isAdminUp ? '1' : '0');
+            $oper_lines[] = "librenms_ports_oper_up{{$labels}} " . ($isOperUp ? '1' : '0');
             $speed_lines[] = "librenms_ports_speed_bits_per_second{{$labels}} " . ((int) $p->ifSpeed ?: 0);
             $in_octets_lines[] = "librenms_ports_ifInOctets{{$labels}} " . ((int) ($fields['INOCTETS'] ?? $fields['ifInOctets'] ?? 0));
             $out_octets_lines[] = "librenms_ports_ifOutOctets{{$labels}} " . ((int) ($fields['OUTOCTETS'] ?? $fields['ifOutOctets'] ?? 0));
