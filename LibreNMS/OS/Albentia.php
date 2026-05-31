@@ -4,8 +4,8 @@
 // LibreNMS\OS\Albentia
 //
 // Wireless-class sensors for Albentia BS, so the values land in the
-// Wireless > Frequency / Clients / Distance / Power / RSSI dashboards
-// instead of the regular Sensors page.
+// Wireless > Frequency / Clients / Distance / Power dashboards instead
+// of the regular Sensors page.
 //
 // Per-sector frequency creates one Wireless::Frequency sensor per radio
 // (8 sectors on AXS-BS-850-N, 4 on AXS-BS-452-N).
@@ -22,6 +22,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Albentia extends OS implements
     WirelessClientsDiscovery,
@@ -38,14 +39,9 @@ class Albentia extends OS implements
     private function getRadioInfo(): array
     {
         if ($this->radioInfoCache === null) {
-            $this->radioInfoCache = (array) snmpwalk_cache_oid(
-                $this->getDeviceArray(),
-                'radioInfoTable',
-                [],
-                'ALBENTIA-AS-MIB',
-                'albentia',
-                '-OteQUsb'
-            );
+            $this->radioInfoCache = SnmpQuery::cache()
+                ->walk('ALBENTIA-AS-MIB::radioInfoTable')
+                ->table(1);
         }
 
         return $this->radioInfoCache;
@@ -69,21 +65,38 @@ class Albentia extends OS implements
     }
 
     /**
+     * Encode a DisplayString index back to SNMP numeric form (<len>.<asc>...).
+     *
+     * SnmpQuery::table(1) keys rows by the decoded INDEX value (e.g. "blue").
+     * To rebuild a leaf numeric OID we need the original encoded form
+     * (e.g. "4.98.108.117.101").
+     */
+    private function encodeStringIndex(string $idx): string
+    {
+        $out = (string) strlen($idx);
+        foreach (str_split($idx) as $ch) {
+            $out .= '.' . ord($ch);
+        }
+
+        return $out;
+    }
+
+    /**
      * @return array<int, WirelessSensor>
      */
     public function discoverWirelessFrequency()
     {
         $sensors = [];
-        foreach ($this->getRadioInfo() as $idx_enc => $row) {
-            $color = (string) ($row['radioInfoSectorColor'] ?? $idx_enc);
-            $freq = $row['radioInfoFreq'] ?? null;
+        foreach ($this->getRadioInfo() as $idx => $row) {
+            $freq = $row['ALBENTIA-AS-MIB::radioInfoFreq'] ?? null;
             if ($freq === null) {
                 continue;
             }
+            $color = (string) $idx;
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Frequency,
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.28087.12.10.10.5.1.13.' . $idx_enc,
+                '.1.3.6.1.4.1.28087.12.10.10.5.1.13.' . $this->encodeStringIndex($color),
                 'albentia',
                 $color,
                 'Sector ' . $color,
@@ -99,8 +112,8 @@ class Albentia extends OS implements
      */
     public function discoverWirelessDistance()
     {
-        foreach ($this->getRadioInfo() as $idx_enc => $row) {
-            $dist = $row['radioInfoDistance'] ?? null;
+        foreach ($this->getRadioInfo() as $idx => $row) {
+            $dist = $row['ALBENTIA-AS-MIB::radioInfoDistance'] ?? null;
             if ($dist === null) {
                 continue;
             }
@@ -109,7 +122,7 @@ class Albentia extends OS implements
                 new WirelessSensor(
                     WirelessSensorType::Distance,
                     $this->getDeviceId(),
-                    '.1.3.6.1.4.1.28087.12.10.10.5.1.12.' . $idx_enc,
+                    '.1.3.6.1.4.1.28087.12.10.10.5.1.12.' . $this->encodeStringIndex((string) $idx),
                     'albentia',
                     0,
                     'Distance',
@@ -128,8 +141,8 @@ class Albentia extends OS implements
      */
     public function discoverWirelessPower()
     {
-        foreach ($this->getRadioInfo() as $idx_enc => $row) {
-            $tx = $row['radioInfoTxPow'] ?? null;
+        foreach ($this->getRadioInfo() as $idx => $row) {
+            $tx = $row['ALBENTIA-AS-MIB::radioInfoTxPow'] ?? null;
             if ($tx === null) {
                 continue;
             }
@@ -138,7 +151,7 @@ class Albentia extends OS implements
                 new WirelessSensor(
                     WirelessSensorType::Power,
                     $this->getDeviceId(),
-                    '.1.3.6.1.4.1.28087.12.10.10.5.1.6.' . $idx_enc,
+                    '.1.3.6.1.4.1.28087.12.10.10.5.1.6.' . $this->encodeStringIndex((string) $idx),
                     'albentia',
                     0,
                     'TxPow',

@@ -9,14 +9,21 @@
  * @var array<string, mixed> $device  Provided by the discovery loop in
  *                                    includes/discovery/functions.inc.php
  */
-$radio = (array) snmpwalk_cache_oid(
-    $device, 'radioInfoTable', [], 'ALBENTIA-AS-MIB', 'albentia', '-OteQUsb'
-);
+$radio = SnmpQuery::cache()
+    ->walk('ALBENTIA-AS-MIB::radioInfoTable')
+    ->table(1);
 
-foreach ($radio as $idx_enc => $row) {
-    $rssi = $row['radioInfoTargetRSSI'] ?? null;
+foreach ($radio as $idx => $row) {
+    $rssi = $row['ALBENTIA-AS-MIB::radioInfoTargetRSSI'] ?? null;
     if ($rssi === null || $rssi === '') {
         continue;
+    }
+
+    // Re-encode the string sectorColor index into SNMP numeric form so the
+    // sensor_oid is pollable: "blue" -> "4.98.108.117.101"
+    $idx_enc = (string) strlen((string) $idx);
+    foreach (str_split((string) $idx) as $ch) {
+        $idx_enc .= '.' . ord($ch);
     }
 
     discover_sensor(
@@ -31,4 +38,4 @@ foreach ($radio as $idx_enc => $row) {
     break;
 }
 
-unset($radio, $idx_enc, $row, $rssi);
+unset($radio, $idx, $idx_enc, $ch, $row, $rssi);
