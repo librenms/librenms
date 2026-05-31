@@ -204,4 +204,53 @@ trait MetricsHelpers
 
         return $payloads;
     }
+
+    /**
+     * Read latest Redis poller payload snapshot for each port interface key.
+     * Snapshot key preference is device_id + ifIndex, falling back to device_id + ifName.
+     *
+     * @param  Collection<int, int|string>|null  $deviceIds
+     * @return array<int, array{device_id: int, timestamp: int, tags: array<string, mixed>, fields: array<string, mixed>}>
+     */
+    private function readRedisPortPayloadSnapshots(?Collection $deviceIds = null): array
+    {
+        $payloads = $this->readRedisPollerPayloads($deviceIds);
+        $snapshot = [];
+
+        foreach ($payloads as $payload) {
+            if (($payload['measurement'] ?? null) !== 'ports') {
+                continue;
+            }
+
+            $deviceId = isset($payload['device_id']) ? (int) $payload['device_id'] : 0;
+            if ($deviceId <= 0) {
+                continue;
+            }
+
+            $timestamp = isset($payload['timestamp']) ? (int) $payload['timestamp'] : 0;
+            $tags = is_array($payload['tags'] ?? null) ? $payload['tags'] : [];
+            $fields = is_array($payload['fields'] ?? null) ? $payload['fields'] : [];
+
+            $ifIndex = isset($tags['ifIndex']) ? (string) $tags['ifIndex'] : '';
+            $ifName = isset($tags['ifName']) ? (string) $tags['ifName'] : '';
+            if ($ifIndex === '' && $ifName === '') {
+                continue;
+            }
+
+            $snapshotKey = $ifIndex !== ''
+                ? $deviceId . ':' . $ifIndex
+                : $deviceId . ':' . $ifName;
+
+            if (! isset($snapshot[$snapshotKey]) || $timestamp >= $snapshot[$snapshotKey]['timestamp']) {
+                $snapshot[$snapshotKey] = [
+                    'device_id' => $deviceId,
+                    'timestamp' => $timestamp,
+                    'tags' => $tags,
+                    'fields' => $fields,
+                ];
+            }
+        }
+
+        return array_values($snapshot);
+    }
 }

@@ -44,16 +44,52 @@ class PortsMetrics
         $in_errors_lines = [];
         $out_errors_lines = [];
 
-        // Gather device info mapping only for referenced devices
-        $deviceIdsQuery = Port::select('device_id')->distinct();
-        $deviceIdsQuery = $this->applyDeviceFilter($deviceIdsQuery, $filters['device_ids']);
-        $deviceIds = $deviceIdsQuery->pluck('device_id');
+        // Gather per-port counters from Redis poller snapshots
+        $snapshots = $this->readRedisPortPayloadSnapshots($filters['device_ids']);
+        if (empty($snapshots)) {
+            return implode("\n", $lines) . "\n";
+        }
+
+        $deviceIds = collect(array_values(array_unique(array_map(fn (array $snapshot) => (int) $snapshot['device_id'], $snapshots))));
         $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
-        // Gather per-port metrics
-        $portQuery = Port::select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifIndex', 'ifType', 'ifAlias', 'ifAdminStatus', 'ifOperStatus', 'ifSpeed', 'ifInOctets', 'ifOutOctets', 'ifInUcastPkts', 'ifOutUcastPkts', 'ifInErrors', 'ifOutErrors', 'poll_time');
-        $portQuery = $this->applyDeviceFilter($portQuery, $filters['device_ids']);
-        foreach ($portQuery->cursor() as $p) {
+        $ports = Port::select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifIndex', 'ifType', 'ifAlias', 'ifAdminStatus', 'ifOperStatus', 'ifSpeed')
+            ->whereIn('device_id', $deviceIds)
+            ->get();
+
+        $portsByDeviceIfIndex = [];
+        $portsByDeviceIfName = [];
+        foreach ($ports as $port) {
+            $portDeviceId = (int) $port->device_id;
+            $portIfIndex = (string) $port->ifIndex;
+            $portIfName = (string) $port->ifName;
+            if ($portIfIndex !== '') {
+                $portsByDeviceIfIndex[$portDeviceId . ':' . $portIfIndex] = $port;
+            }
+            if ($portIfName !== '') {
+                $portsByDeviceIfName[$portDeviceId . ':' . $portIfName] = $port;
+            }
+        }
+
+        foreach ($snapshots as $snapshot) {
+            $snapshotDeviceId = (int) $snapshot['device_id'];
+            $tags = is_array($snapshot['tags'] ?? null) ? $snapshot['tags'] : [];
+            $fields = is_array($snapshot['fields'] ?? null) ? $snapshot['fields'] : [];
+            $snapshotIfIndex = isset($tags['ifIndex']) ? (string) $tags['ifIndex'] : '';
+            $snapshotIfName = isset($tags['ifName']) ? (string) $tags['ifName'] : '';
+
+            $port = null;
+            if ($snapshotIfIndex !== '') {
+                $port = $portsByDeviceIfIndex[$snapshotDeviceId . ':' . $snapshotIfIndex] ?? null;
+            }
+            if (! $port && $snapshotIfName !== '') {
+                $port = $portsByDeviceIfName[$snapshotDeviceId . ':' . $snapshotIfName] ?? null;
+            }
+            if (! $port) {
+                continue;
+            }
+
+            $p = $port;
             $dev = $devices->get($p->device_id);
             $device_hostname = $dev ? $this->escapeLabel((string) $dev->hostname) : '';
             $device_sysName = $dev ? $this->escapeLabel((string) $dev->sysName) : '';
@@ -75,12 +111,12 @@ class PortsMetrics
             $admin_lines[] = "librenms_ports_admin_up{{$labels}} " . ($p->ifAdminStatus === 'up' ? '1' : '0');
             $oper_lines[] = "librenms_ports_oper_up{{$labels}} " . ($p->ifOperStatus === 'up' ? '1' : '0');
             $speed_lines[] = "librenms_ports_speed_bits_per_second{{$labels}} " . ((int) $p->ifSpeed ?: 0);
-            $in_octets_lines[] = "librenms_ports_ifInOctets{{$labels}} " . ((int) $p->ifInOctets ?: 0);
-            $out_octets_lines[] = "librenms_ports_ifOutOctets{{$labels}} " . ((int) $p->ifOutOctets ?: 0);
-            $in_ucast_pkt_lines[] = "librenms_ports_ifInUcastPkts{{$labels}} " . ((int) $p->ifInUcastPkts ?: 0);
-            $out_ucast_pkt_lines[] = "librenms_ports_ifOutUcastPkts{{$labels}} " . ((int) $p->ifOutUcastPkts ?: 0);
-            $in_errors_lines[] = "librenms_ports_ifInErrors{{$labels}} " . ((int) $p->ifInErrors ?: 0);
-            $out_errors_lines[] = "librenms_ports_ifOutErrors{{$labels}} " . ((int) $p->ifOutErrors ?: 0);
+            $in_octets_lines[] = "librenms_ports_ifInOctets{{$labels}} " . ((int) ($fields['INOCTETS'] ?? $fields['ifInOctets'] ?? 0));
+            $out_octets_lines[] = "librenms_ports_ifOutOctets{{$labels}} " . ((int) ($fields['OUTOCTETS'] ?? $fields['ifOutOctets'] ?? 0));
+            $in_ucast_pkt_lines[] = "librenms_ports_ifInUcastPkts{{$labels}} " . ((int) ($fields['INUCASTPKTS'] ?? $fields['ifInUcastPkts'] ?? 0));
+            $out_ucast_pkt_lines[] = "librenms_ports_ifOutUcastPkts{{$labels}} " . ((int) ($fields['OUTUCASTPKTS'] ?? $fields['ifOutUcastPkts'] ?? 0));
+            $in_errors_lines[] = "librenms_ports_ifInErrors{{$labels}} " . ((int) ($fields['INERRORS'] ?? $fields['ifInErrors'] ?? 0));
+            $out_errors_lines[] = "librenms_ports_ifOutErrors{{$labels}} " . ((int) ($fields['OUTERRORS'] ?? $fields['ifOutErrors'] ?? 0));
         }
 
         // Append per-port metrics

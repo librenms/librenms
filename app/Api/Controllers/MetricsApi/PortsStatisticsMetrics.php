@@ -50,50 +50,77 @@ class PortsStatisticsMetrics
         $in_multicast_lines = [];
         $out_multicast_lines = [];
 
-        // Preload device/port labels mapping
-        if ($filters['device_ids']) {
-            $portIds = Port::whereIn('device_id', $filters['device_ids']->all())->pluck('port_id');
-        } else {
-            $portIds = PortStatistic::select('port_id')->distinct()->pluck('port_id');
+        // Gather per-port counters from Redis poller snapshots
+        $snapshots = $this->readRedisPortPayloadSnapshots($filters['device_ids']);
+        if (empty($snapshots)) {
+            return implode("\n", $lines) . "\n";
         }
-        $ports = Port::select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifIndex', 'ifType', 'ifAlias')->whereIn('port_id', $portIds)->get()->keyBy('port_id');
-        $deviceIds = $ports->pluck('device_id')->unique();
+
+        $deviceIds = collect(array_values(array_unique(array_map(fn (array $snapshot) => (int) $snapshot['device_id'], $snapshots))));
+        $ports = Port::select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifIndex', 'ifType', 'ifAlias')
+            ->whereIn('device_id', $deviceIds)
+            ->get();
         $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
-        if ($filters['device_ids']) {
-            $psQuery = PortStatistic::whereIn('port_id', $portIds);
-        } else {
-            $psQuery = PortStatistic::query();
+        $portsByDeviceIfIndex = [];
+        $portsByDeviceIfName = [];
+        foreach ($ports as $port) {
+            $portDeviceId = (int) $port->device_id;
+            $portIfIndex = (string) $port->ifIndex;
+            $portIfName = (string) $port->ifName;
+            if ($portIfIndex !== '') {
+                $portsByDeviceIfIndex[$portDeviceId . ':' . $portIfIndex] = $port;
+            }
+            if ($portIfName !== '') {
+                $portsByDeviceIfName[$portDeviceId . ':' . $portIfName] = $port;
+            }
         }
-        foreach ($psQuery->cursor() as $ps) {
-            $p = $ports->get($ps->port_id);
-            $dev = $p ? $devices->get($p->device_id) : null;
+
+        foreach ($snapshots as $snapshot) {
+            $snapshotDeviceId = (int) $snapshot['device_id'];
+            $tags = is_array($snapshot['tags'] ?? null) ? $snapshot['tags'] : [];
+            $fields = is_array($snapshot['fields'] ?? null) ? $snapshot['fields'] : [];
+            $snapshotIfIndex = isset($tags['ifIndex']) ? (string) $tags['ifIndex'] : '';
+            $snapshotIfName = isset($tags['ifName']) ? (string) $tags['ifName'] : '';
+
+            $p = null;
+            if ($snapshotIfIndex !== '') {
+                $p = $portsByDeviceIfIndex[$snapshotDeviceId . ':' . $snapshotIfIndex] ?? null;
+            }
+            if (! $p && $snapshotIfName !== '') {
+                $p = $portsByDeviceIfName[$snapshotDeviceId . ':' . $snapshotIfName] ?? null;
+            }
+            if (! $p) {
+                continue;
+            }
+
+            $dev = $devices->get($p->device_id);
             $device_hostname = $dev ? $this->escapeLabel((string) $dev->hostname) : '';
             $device_sysName = $dev ? $this->escapeLabel((string) $dev->sysName) : '';
             $device_type = $dev ? $this->escapeLabel((string) $dev->type) : '';
 
             $labels = sprintf('port_id="%s",device_id="%s",device_hostname="%s",device_sysName="%s",device_type="%s",ifName="%s",ifDescr="%s",ifIndex="%s",ifType="%s",ifAlias="%s"',
-                $ps->port_id,
-                $p ? $p->device_id : '',
+                $p->port_id,
+                $p->device_id,
                 $device_hostname,
                 $device_sysName,
                 $device_type,
-                $this->escapeLabel((string) ($p->ifName ?? '')),
-                $this->escapeLabel((string) ($p->ifDescr ?? '')),
-                $this->escapeLabel((string) ($p->ifIndex ?? '')),
-                $this->escapeLabel((string) ($p->ifType ?? '')),
-                $this->escapeLabel((string) ($p->ifAlias ?? ''))
+                $this->escapeLabel((string) $p->ifName),
+                $this->escapeLabel((string) $p->ifDescr),
+                $this->escapeLabel((string) $p->ifIndex),
+                $this->escapeLabel((string) $p->ifType),
+                $this->escapeLabel((string) $p->ifAlias)
             );
 
-            $in_nucast_lines[] = "librenms_ports_statistics_ifInNUcastPkts{{$labels}} " . ((int) $ps->ifInNUcastPkts ?: 0);
-            $out_nucast_lines[] = "librenms_ports_statistics_ifOutNUcastPkts{{$labels}} " . ((int) $ps->ifOutNUcastPkts ?: 0);
-            $in_discards_lines[] = "librenms_ports_statistics_ifInDiscards{{$labels}} " . ((int) $ps->ifInDiscards ?: 0);
-            $out_discards_lines[] = "librenms_ports_statistics_ifOutDiscards{{$labels}} " . ((int) $ps->ifOutDiscards ?: 0);
-            $in_unknown_proto_lines[] = "librenms_ports_statistics_ifInUnknownProtos{{$labels}} " . ((int) $ps->ifInUnknownProtos ?: 0);
-            $in_broadcast_lines[] = "librenms_ports_statistics_ifInBroadcastPkts{{$labels}} " . ((int) $ps->ifInBroadcastPkts ?: 0);
-            $out_broadcast_lines[] = "librenms_ports_statistics_ifOutBroadcastPkts{{$labels}} " . ((int) $ps->ifOutBroadcastPkts ?: 0);
-            $in_multicast_lines[] = "librenms_ports_statistics_ifInMulticastPkts{{$labels}} " . ((int) $ps->ifInMulticastPkts ?: 0);
-            $out_multicast_lines[] = "librenms_ports_statistics_ifOutMulticastPkts{{$labels}} " . ((int) $ps->ifOutMulticastPkts ?: 0);
+            $in_nucast_lines[] = "librenms_ports_statistics_ifInNUcastPkts{{$labels}} " . ((int) ($fields['INNUCASTPKTS'] ?? $fields['ifInNUcastPkts'] ?? 0));
+            $out_nucast_lines[] = "librenms_ports_statistics_ifOutNUcastPkts{{$labels}} " . ((int) ($fields['OUTNUCASTPKTS'] ?? $fields['ifOutNUcastPkts'] ?? 0));
+            $in_discards_lines[] = "librenms_ports_statistics_ifInDiscards{{$labels}} " . ((int) ($fields['INDISCARDS'] ?? $fields['ifInDiscards'] ?? 0));
+            $out_discards_lines[] = "librenms_ports_statistics_ifOutDiscards{{$labels}} " . ((int) ($fields['OUTDISCARDS'] ?? $fields['ifOutDiscards'] ?? 0));
+            $in_unknown_proto_lines[] = "librenms_ports_statistics_ifInUnknownProtos{{$labels}} " . ((int) ($fields['INUNKNOWNPROTOS'] ?? $fields['ifInUnknownProtos'] ?? 0));
+            $in_broadcast_lines[] = "librenms_ports_statistics_ifInBroadcastPkts{{$labels}} " . ((int) ($fields['INBROADCASTPKTS'] ?? $fields['ifInBroadcastPkts'] ?? 0));
+            $out_broadcast_lines[] = "librenms_ports_statistics_ifOutBroadcastPkts{{$labels}} " . ((int) ($fields['OUTBROADCASTPKTS'] ?? $fields['ifOutBroadcastPkts'] ?? 0));
+            $in_multicast_lines[] = "librenms_ports_statistics_ifInMulticastPkts{{$labels}} " . ((int) ($fields['INMULTICASTPKTS'] ?? $fields['ifInMulticastPkts'] ?? 0));
+            $out_multicast_lines[] = "librenms_ports_statistics_ifOutMulticastPkts{{$labels}} " . ((int) ($fields['OUTMULTICASTPKTS'] ?? $fields['ifOutMulticastPkts'] ?? 0));
         }
 
         // Append per-port metrics
