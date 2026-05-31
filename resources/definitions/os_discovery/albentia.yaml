@@ -60,17 +60,11 @@ modules:
                     index: 'sectorTemp.{{ $index }}'
                     divisor: 100
                     group: 'Sector temperature'
+                    warn_limit: 70
+                    high_limit: 80
 
         percent:
             data:
-                # zoneStFramDivPerc: TDD downlink share of the radio frame.
-                # The MIB declares AlbFloatValue (d-2) but the Komarac firmware
-                # (verified on 22.9.7481 / 22.9.7643 / 22.9.7712) reports DL
-                # frame slots out of 12800 — raw 1023700 = 79.98% which
-                # matches the typical 80% DL configuration of these BS.
-                # The 12800 divisor was determined empirically against a
-                # fleet of 18 BS configured to known DL/UL ratios. Rounded
-                # to integer with user_func so the dashboard shows e.g. 80%.
                 -
                     oid: ALBENTIA-AS-MIB::zoneStatsTable
                     value: ALBENTIA-AS-MIB::zoneStFramDivPerc
