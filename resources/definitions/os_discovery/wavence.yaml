@@ -1,8 +1,6 @@
 modules:
     os:
         sysDescr_regex: '/(?<version>.*)/'
-        hardware: TSDIM-SNMPNE-MIB::tsdimNeInstallationType.0
-        features: TSDIM-SNMPNE-MIB::tsdimSdhNeLabel.0
 
     sensors:
         dbm:
@@ -35,3 +33,31 @@ modules:
                     divisor: 10
                     descr: 'UBT Radio Remote Rx Main Power'
                     index: 'analogueMeasuresRemoteRxMainPower.{{ $index }}'
+
+        state:
+            data:
+                -
+                    oid: OPTICSIM-RADIO-TRS-PDH-MIB::opticsIMAdaptiveModulationTable
+                    value: OPTICSIM-RADIO-TRS-PDH-MIB::adaptiveModulationCurrentModulation
+                    num_oid: '.1.3.6.1.4.1.637.54.1.10.3.1.8.1.9.{{ $index }}'
+                    descr: 'Radio {{ $index }} Current Modulation'
+                    index: 'adaptiveModulationCurrentModulation.{{ $index }}'
+                    state_name: wavence-adaptive-modulation
+                    states:
+                        - { value: 1, generic: 0, descr: '4QAM' }
+                        - { value: 2, generic: 0, descr: '16QAM' }
+                        - { value: 3, generic: 0, descr: '32TCM' }
+                        - { value: 4, generic: 0, descr: '64QAM' }
+                        - { value: 5, generic: 0, descr: '128TCM' }
+                        - { value: 6, generic: 0, descr: '256QAM' }
+                        - { value: 7, generic: 0, descr: '32QAM' }
+                        - { value: 8, generic: 0, descr: '128QAM' }
+                        - { value: 9, generic: 0, descr: '8PSK' }
+                        - { value: 10, generic: 0, descr: '512QAM' }
+                        - { value: 11, generic: 0, descr: '1024QAM' }
+                        - { value: 12, generic: 0, descr: '2048QAM' }
+                        - { value: 13, generic: 0, descr: '4096QAM' }
+                        - { value: 14, generic: 0, descr: 'BPSK 1/4' }
+                        - { value: 15, generic: 0, descr: 'BPSK 1/2' }
+                        - { value: 16, generic: 0, descr: 'BPSK' }
+                        - { value: 17, generic: 0, descr: '4QAM Strong' }

@@ -31,8 +31,8 @@ foreach ($port_stats as &$port) {
 unset($port);
 
 /*
- * Some Nokia Wavence releases/models return unusable standard IF-MIB octet
- * counters:
+ * Nokia Wavence provides interface metadata, status, and speed through IF-MIB,
+ * but some releases/models return unusable standard IF-MIB octet counters:
  *
  *   ifInOctets / ifOutOctets      = 0
  *   ifHCInOctets / ifHCOutOctets  = NULL
@@ -70,7 +70,7 @@ if (! empty($wavence_pm)) {
     foreach ($port_stats as $ifIndex => &$port) {
         /*
          * Only apply Wavence Ethernet PM counters to Ethernet ports.
-         * Do not apply them to the UBT-S Radio Channel interface.
+         * Do not apply them to radio channel or aggregated radio interfaces.
          */
         if (($port['ifType'] ?? '') !== 'ethernetCsmacd') {
             continue;

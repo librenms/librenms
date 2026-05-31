@@ -5,6 +5,14 @@ icon: nokia
 mib_dir: nokia/wavence
 bad_ifXEntry:
     - Wavence-SA
+    - NE UBT-SA
+    - UBT-S
+    - UBT-T
+    - UBT-C
+    - UBT-I
+    - UBT-T XP
+    - UBT-I2
+    - UBT-S2
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_dbm, text: 'Radio Levels' }
@@ -12,3 +20,7 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.637.54.1.10.90.13
+            - .1.3.6.1.4.1.637.54.1.10.90.14
+            - .1.3.6.1.4.1.637.54.1.10.90.15
+            - .1.3.6.1.4.1.637.54.1.10.90.16
+            - .1.3.6.1.4.1.637.54.1.10.90.17

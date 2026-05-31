@@ -1,0 +1,3966 @@
+OPTICSIM-EQPT-MIB DEFINITIONS ::= BEGIN
+  IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+     Integer32, Unsigned32, IpAddress                   FROM SNMPv2-SMI
+   RowStatus, DisplayString, InstancePointer, DateAndTime, TruthValue,
+     TEXTUAL-CONVENTION                                 FROM SNMPv2-TC
+   MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP  FROM SNMPv2-CONF
+   tsdimEventObjectClassIdentifier, tsdimEventObjectInstanceIdentifier,
+     tsdimEventNotificationId, tsdimEventTime, tsdimAlarmSeverity,
+     tsdimAlarmSpecProblem, opticsIMAdditionalText, opticsIMAlarmType
+                                                        FROM TSDIM-SUPPORT-MIB
+   tsdimBasicMib, tsdimBasicMC                          FROM TSDIM-BASICREG-MIB
+   TsdimOperationalState, OpticsIMUserLabel             FROM TSDIM-SNMP-TC
+   OpticsIMProtectionGroupType, OpticsIMRevertive, OpticsIMProtectionUnitType,
+   OpticsIMProtectionSwitchCommand, OpticsIMProtectionSwitchStatus,
+   OpticsIMEquipmentProtectionSwitchCriteria, OpticsIMRadioChannelNumber,
+     OpticsIMProtectionPriority                         FROM OPTICSIM-COMMON-TC
+   InterfaceIndexOrZero                                 FROM IF-MIB;
+
+opticsIMEqptMib MODULE-IDENTITY
+  LAST-UPDATED "202204290000Z"
+  ORGANIZATION "Alcatel TND"
+  CONTACT-INFO "Alcatel TND"
+DESCRIPTION
+        " Equipment MIB.     "
+
+     REVISION "202204290000Z"
+      DESCRIPTION
+        " Enhanced equipmentLabel object from 20 to 32 characters.
+        "
+
+     REVISION "201702280000Z"
+      DESCRIPTION
+        "- SNMPIDL-534, added new alarms:
+            opticsIMAlarmDCAndPFoEbothPresentRaise/Clear, opticsIMAlarmAIMreadFailRaise/Clear,
+            opticsIMAlarmInterRadioUnitCommunicationProblemRaise/Clear
+        "
+
+      REVISION "201511130000Z"
+      DESCRIPTION
+        "- SNMPIDL-507, update LAST-UPDATED and REVISION date format adding the 2 digits missing (20) for yers after 1999.
+Added a REVISION block corresponding to the LAST-UPDATED timestamp.
+           - SNMPIDL-508, added a space between opening and closing braces and the enclosed content.
+        "
+
+REVISION "201509040000Z"
+DESCRIPTION
+        "- SNMPIDL-499, added :
+     equipmentInputVoltage, equipmentInputCurrent,             equipmentPowerConsumption to opticsIMEquipmentExtenTable;
+    - SNMPIDL-500, added
+    opticsIMAlarmLowInputVoltageRaise/Clear new probable cause
+     and equipmentInputVoltageThreshold to opticsIMEquipmentExtenTable;
+    "
+
+  REVISION "201407310000Z"
+  DESCRIPTION
+    "OPTnm26867 - D.Spreafico
+     - added opticsIMAlarmRateMismatchRaise/Clear notification-type.
+    "
+
+  REVISION "201401060000Z"
+  DESCRIPTION
+    "OPTnm25390 - D.Spreafico
+     - added opticsIMAlarmReplacementProcedureOnGoingRaise/Clear notification-type.
+    "
+
+  REVISION "201307060000Z"
+  DESCRIPTION
+    "OPTnm21881 - D.Spreafico
+     - Added equipmentCombinerImplemented and equipmentCombinerFunction on opticsIMEquipmentExtenTable
+     - Added opticsIMAlarmRxDivMissingRaise/Clear and opticsIMAlarmCombinerLossOfAlignmentRaise/Clear notification-type.
+    "
+
+  REVISION "201301100000Z"
+  DESCRIPTION
+    "OPTnm16306 - D.Spreafico
+     - Added opticsIMFanHandlerTable
+     - Added equipmentTrsObjectConnected  to opticsIMEquipmentExtenTable
+     - added opticsIMAlarmFanCommunicationProblemRaise/Clear notification-type.
+    "
+
+  REVISION "201209300000Z"
+  DESCRIPTION
+    "TSDnm90353 - D.Spreafico
+     Added opticsIMAlarmRFSwitchFailRaise/Clear alarm."
+
+  REVISION "201101270000Z"
+  DESCRIPTION
+    "TSDnm90353 - L.P.Lewis
+     Added opticsIMAlarmFanFailRaise/Clear alarm."
+
+  REVISION "201008040000Z"
+  DESCRIPTION
+    "P.Tresoldi - TSDnm83899:
+     Added opticsIMEnhUnderConstructionTable."
+
+  REVISION "201004010000Z"
+  DESCRIPTION
+    "Added opticsIMAlarmInternalCableFailureRaise/Clear alarm."
+
+  REVISION "200912170000Z"
+  DESCRIPTION
+    "Added opticsIMPowerSourceTable"
+
+  REVISION "200911120000Z"
+  DESCRIPTION
+    "Added opticsIMAlarmNewMediaConverterRaise/Clear,
+           opticsIMAlarmMediaConverterLossOfAssociationRaise/Clear,
+           opticsIMAlarmSystemTimeOfDayUnreliableRaise/Clear,
+           opticsIMAlarmReplaceableUnitInitializingRaise/Clear"
+
+  REVISION "200902190000Z"
+  DESCRIPTION
+    "Addition of the following objects:
+     - opticsIMEquipmentProtectionGroupExtTable with
+       opticsIMEquipmentProtectionGroupLosSwitchCriteria columnar object"
+
+  REVISION "200808070000Z"
+  DESCRIPTION
+    "Addition of the following branch:
+     - opticsIMEqpTrsCapability
+       containing the following supporting objects describing limitations
+       applicable on board basis:
+       table:
+         - opticsIMEqpTrsCEquipmentTable
+       scalar objects:
+         - opticsIMEqpTrsCImaLinkMaxNumber
+         - opticsIMEqpTrsCImaGroupMaxNumber
+         - opticsIMEqpTrsCPwMaxNumber
+         - opticsIMEqpTrsCAtmXPointMaxNumber"
+
+  REVISION "200805290000Z"
+  DESCRIPTION
+    "Addition of following table:
+     - opticsIMEquipmentExtentedTable
+     Addition of following object on opticsIMEquipmentTable
+     - equipmentBoardReset
+     Addition of following alarms:
+     - opticsIMAlarmPowerSupplyFailureRaise/Clear "
+
+  REVISION     "200711290000Z"
+  DESCRIPTION
+    "Addition of following table:
+     - opticsIMExternalPointTable
+     Addition of following TC:
+     - opticsIMExternalPointType"
+  REVISION     "200710110000Z"
+  DESCRIPTION
+    "Addition of following alarms:
+     - SecondaryBatteryFail.
+     - FlashCardRealignmentInProgress
+     - FlashCardFailure
+     Addition of following scalar object:
+     - opticsIMBatteryProtected"
+
+  REVISION "200702280000Z"
+  DESCRIPTION
+    "Addition of following columnar objects:
+    - opticsIMEquipmentProtectionGroupExtraTraffic to
+      opticsIMEquipmentProtectionGroupEntry
+    - opticsIMEquipmentProtectionUnitPriority to
+      opticsIMEquipmentProtectionUnitEntry"
+
+  REVISION "200512050000Z"
+  DESCRIPTION
+    "Addition alarms to opticsIMEqtAlarms and opticsIMEqptAlarmGroup:
+     - opticsIMAlarmDatabaseAbnormalRaise
+     - opticsIMAlarmDatabaseAbnormalClear"
+
+  REVISION "200504070000Z"
+  DESCRIPTION
+    "Addition of enhanced equipment tables:
+     - opticsIMEnhEquipmentTable
+     - opticsIMEnhAllowedEquipmentTypesTable
+     - opticsIMEnhAffectedObjectsListTable
+     - opticsIMEnhRemoteInventoryTable
+       indexed by object enhEquipmentPosition with variable length;
+     Addition of groups:
+     - opticsIMEnhEquipmentGroup
+     - opticsIMEnhRemoteInventoryGroup
+     - opticsIMEnhAffectedObjectsListGroup
+     Addition alarms to opticsIMEqtAlarms and opticsIMEqptAlarmGroup
+     - opticsIMAlarmFuseBrokenRaise
+     - opticsIMAlarmFuseBrokenClear
+     - opticsIMAlarmExcessiveEnvironmentalTemperatureRaise
+     - opticsIMAlarmExcessiveEnvironmentalTemperatureClear
+     For each alarm notification (raise and clear) the following objects have been added:
+     - opticsIMAdditionalText
+     - opticsIMAlarmType"
+
+  REVISION "200406150000Z"
+  DESCRIPTION
+    "Addition of the following tables:
+     opticsIMExternalInputPointRemotizationTable and
+     opticsIMRemoteExternalInputPointTable. The enum remoteInputPoint has been
+     added to the outputPointCriteria object (opticsIMExternalOutputPointTable).
+     The behaviour for '-1' value on outputPointAutomaticEventID has been added"
+
+  REVISION "200310100000Z"
+  DESCRIPTION
+    "Addition of the following alarm notifications:
+     opticsIMAlarmRemoteInventoryFailure, opticsIMAlarmRepeaterCableProblem,
+     opticsIMAlarmProvisioningMismatch."
+
+  REVISION "200307250000Z"
+  DESCRIPTION
+    "Added the outputPointAutomaticEventId object to the
+     opticsIMExternalOutputPointTable, the table
+     opticsIMOutputPointAllowedEventsTable and the alarm
+     opticsIMAlarmStandByVersionMismatchRaise/Clear. "
+
+  REVISION "200211050000Z"
+  DESCRIPTION
+    "It has been pointed out in the description of
+     opticsIMAllowedEquipmentTypesEntry that the allowedEquipmentTypeId value
+     corresponding to 'EMPTY' equipment is 0. Changed the syntax of the
+     equipment administrative state (a new TC has been added)."
+
+  REVISION "200211050000Z"
+  DESCRIPTION
+    "The value to be used for not significant equipment positions has been
+     changed from 255 to 0."
+
+  REVISION "200207240000Z"
+  DESCRIPTION
+    "Updated the syntax of affectedObjectInstanceId object, removed the
+     affectedObjectClassId object. "
+
+  REVISION "200205100000Z"
+  DESCRIPTION
+    "Updated the tables already existing. Added the object
+     opticsIMTribPortsImpedance."
+
+  REVISION "200201250000Z"
+  DESCRIPTION
+    "Initial Release of Equipment MIB."
+::= { tsdimBasicMib 8 }
+
+opticsIMEqptMibObject OBJECT IDENTIFIER ::= { opticsIMEqptMib 1 }
+
+OpticsIMExternalState ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "This object describes the state of the external point."
+  SYNTAX INTEGER {
+    off   (1),
+    on   (2)
+  }
+
+OpticsIMPolarity  ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "This object describes the sensing polarity of an input or output point."
+  SYNTAX INTEGER {
+    activeLow (1),
+    activeHigh (2)
+  }
+
+OpticsIMEqptAdministrativeState  ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "This object describes the administrative state of an equipment object."
+  SYNTAX INTEGER {
+    outOfService (0),
+    inService (1)
+  }
+
+OpticsIMExternalPointType ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "This object describes the type of an external point."
+  SYNTAX INTEGER {
+    input (0),
+    output (1)
+  }
+
+opticsIMEquipmentTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMEquipmentEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "This table contains the information related to the resources that
+     represent the physical components of a managed element, including
+     replaceable components. "
+::= { opticsIMEqptMibObject 1 }
+
+opticsIMEquipmentEntry OBJECT-TYPE
+  SYNTAX     OpticsIMEquipmentEntry
+  MAX-ACCESS not-accessible
+  STATUS     current
+  DESCRIPTION
+    "An entry of the equipment table. Each entry (row) corresponds to a
+     physical component of a managed element (racks, subracks, slots/boards,
+     sub-slots/daughter boards).
+     During the commissioning phase the whole set of instances is created by
+     the network element itself.
+
+     Each entry may be instantiated or exist without the presence of the
+     physical resources. In this case the operationalState will be disabled.
+     When the resource is physically removed, the corresponding equipment
+     object is not automatically deleted.
+
+     When a resource is physically installed and no corresponding equipment
+     object has been created, no self instantiation is performed.
+
+     The equipmentActual attribute represents the type of equipment which is
+     physically present  This attribute assume the 'EMPTY' value when either
+     the resource is not physically present or the NE is unable to identify
+     the equipment type.
+
+     The equipmentExpected attribute contains the type of equipment that the
+     managing system expects to be present. It is set by the agent as a side
+     effect of setting the equipmentExpectedTypeId associated to.
+
+     The equipmentExpectedTypeId attribute value of each instance may be set
+     according to a planned or default configuration known by the NE and
+     represents the identifier of the type of equipment expected to be present.
+
+     If no configuration is wanted then the equipmentExpectedTypeId shall be
+     set to 0 corresponding to the 'EMPTY' value.
+
+     If the equipmentExpected attribute value is set to a non 'EMPTY' value,
+     and if the equipment is not physically present an alarm notification is
+     sent with the probableCause of replaceableUnitMissing'.
+
+     When there is a mismatch in the contents of the equipmentActual and the
+     equipmentExpected attribute, an alarm notification with probableCause
+     'replaceableUnitTypeMismatch' will be raised.
+
+     The equipmentExpected value of 'EMPTY' (no type) does not match any other
+     value for equipmentActual except 'EMPTY'.
+
+     In case equipmentExpected is 'EMPTY' and equipmentActual is different from
+     'EMPTY' an alarm notification with probableCause
+`     'unconfiguredEquipmentPresent' will be raised (exception to mismatch case).
+
+     If the equipmentExpected attribute value is set to 'EMPTY' and the NE is
+     not able to identify the resource which is physically present
+     (equipmentActual = 'EMPTY'), an alarm notification is raised with
+     probableCause 'replaceableUnitProblem'.
+
+     Based on the value of the equipmentExpected attribute, the functional
+     objects implemented by the physical instance are automatically created
+     inside the NE and are included in the list of the affectedObject pointed
+     by the related instance.
+
+     In case equipmentExpected is set to 'EMPTY', no object will be included
+     in the affectedObject list.
+     When, for reconfiguration purposes, the equipmentExpected attribute is
+     changed by the managing system the whole set of functional objects (TPs)
+     present in the related list of affectedObjects and associated to the
+     previous value of the equipmentExpected are deleted and the new set,
+     associated to the new value of equipmentExpected, are created.
+     Change of the equipmentExpected of an instance is only permitted when that
+     instance is in locked administrativeState and if corresponding functional
+     objects can be deleted (e.g. the deletion  should fail if one of these is
+     used as a timing reference).
+     When a resource is physically removed and replaced by another resource of
+     a different type for reconfiguration purposes the new resource can be
+     brought into service only after the managing system has changed the
+     equipmentExpected value of the corresponding instance matching the new
+     equipmentActual value.
+
+     The equipmentAdministrativeState attribute may have the following values:
+     locked, and unlocked.
+     This attribute reflects  the management authorization for the resource to
+     perform its function.
+     When an instance enters  the locked administrativeState then all affected
+     functional objects enter the disabled operationalState.
+
+     The operationalState attribute may assume two values: enabled and disabled,
+     according to the intrinsic capability of the resource to perform its
+     function.
+
+     On detection of equipment failures (e.g. replaceableUnitMissing,
+     replaceableTypeMismatch, replaceableUnitProblem), the whole set of TPs
+     included on the affectedObject list, should change their operationalState
+     attribute to 'disabled'. In case of equipment involved in a Equipment
+     Protection Switching, the TPs included on the affectedObject list should
+     change their operationalState attribute to 'disabled' only for the active
+     equipment (not for the stand-by one).
+     When an entry of this table enters in disabled operationalState then all
+     affected objects enter the disabled operationalState."
+  INDEX  { equipmentPosition }
+::= { opticsIMEquipmentTable 1 }
+
+OpticsIMEquipmentEntry ::= SEQUENCE {
+  equipmentPosition            OCTET STRING,
+  equipmentExpectedTypeId      Integer32,
+  equipmentExpected            DisplayString,
+  equipmentActual              DisplayString,
+  equipmentAdministrativeState OpticsIMEqptAdministrativeState,
+  equipmentOperationalState    TsdimOperationalState,
+  equipmentAsapIndex           Integer32,
+  equipmentLabel               DisplayString,
+  equipmentBoardReset          Integer32
+}
+
+equipmentPosition OBJECT-TYPE
+  SYNTAX        OCTET STRING (SIZE(4))
+  MAX-ACCESS    not-accessible
+  STATUS        current
+  DESCRIPTION
+    "This object identifies an entry in the equipment table. It identifies the
+     position of the equipment (rack, subrack, slot/board and sub-slot/daughter
+     board) inside the NE.
+     The first octet identifies the rack position, the second the subrack
+     contained in the rack, the third the slot/board contained in the subrack
+     and the fourth the sub-slot/daughter board contained in the board.
+     Octets not significant will be indicated by the value 0 (i.e. the
+     position of the second subrack inside the third rack will be identified
+     by (3, 2, 0, 0)."
+::= { opticsIMEquipmentEntry 1 }
+
+equipmentExpectedTypeId OBJECT-TYPE
+  SYNTAX        Integer32
+  MAX-ACCESS    read-write
+  STATUS        current
+  DESCRIPTION
+    "This object contains the identifier of the equipment type requested by the
+     managing systems. The identifier must be included in one of the entries of
+     the opticsIMAllowedEquipmentTypesTable associated to that equipment
+     position. As a side effect of setting this object, the agent must set
+     the equipmentExpected object with the string associated to this identifier
+     (see opticsIMAllowedEquipmentTypesTable)."
+::= { opticsIMEquipmentEntry 2 }
+
+equipmentExpected OBJECT-TYPE
+  SYNTAX        DisplayString
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the equipment type expected by the managing systems.
+     It is updated by the agent when the equipmentExpectedTypeId object is set
+     by the managing systems."
+::= { opticsIMEquipmentEntry 3 }
+
+equipmentActual OBJECT-TYPE
+  SYNTAX        DisplayString
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the equipment type of the equipment actually present"
+::= { opticsIMEquipmentEntry 4 }
+
+equipmentAdministrativeState OBJECT-TYPE
+  SYNTAX          OpticsIMEqptAdministrativeState
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "See Textual Conventions."
+  DEFVAL { inService }
+::= { opticsIMEquipmentEntry 5 }
+
+equipmentOperationalState OBJECT-TYPE
+  SYNTAX          TsdimOperationalState
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "See Textual Conventions."
+  DEFVAL { enabled }
+::= { opticsIMEquipmentEntry 6 }
+
+equipmentAsapIndex OBJECT-TYPE
+  SYNTAX          Integer32
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "This object defines the ASAP object associated to the equipment position."
+::= { opticsIMEquipmentEntry 7 }
+
+equipmentLabel OBJECT-TYPE
+  SYNTAX          DisplayString (SIZE (0..32))
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "This object defines the label associated to the equipment position."
+::= { opticsIMEquipmentEntry 8 }
+
+equipmentBoardReset  OBJECT-TYPE
+  SYNTAX        Integer32
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "This object defines the board reset command associated to the equipment
+     position. The attribute value meaning is product dependant and specified
+     within the product specification."
+::= { opticsIMEquipmentEntry 9 }
+
+--
+-- opticsIMEquipmentExtenTable
+--
+
+opticsIMEquipmentExtenTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMEquipmentExtenEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "This table contains the information related to the resources that
+     represent the physical components of a managed element, including
+     replaceable components."
+::= { opticsIMEqptMibObject 20 }
+
+opticsIMEquipmentExtenEntry OBJECT-TYPE
+  SYNTAX             OpticsIMEquipmentExtenEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "An entry of the equipment extention table. Each entry (row), corresponding
+     to a physical component of a managed element, includes additional fields
+     not included in the associated opticsIMEquipmentEntry."
+  INDEX    { equipmentPosition }
+::= { opticsIMEquipmentExtenTable 1 }
+
+OpticsIMEquipmentExtenEntry ::= SEQUENCE {
+  equipmentTemperature          Integer32,
+  equipmentTrsObjectConnected      Integer32,
+  equipmentCombinerImplemented  TruthValue,
+  equipmentCombinerFunction    INTEGER,
+-- begin SNMPIDL-499
+   equipmentInputVoltage         Integer32,
+   equipmentInputCurrent         Integer32,
+   equipmentPowerConsumption    Integer32,
+-- end SNMPIDL-499
+-- begin SNMPIDL-500
+   equipmentInputVoltageThreshold Integer32
+-- end SNMPIDL-500
+}
+
+equipmentTemperature  OBJECT-TYPE
+  SYNTAX              Integer32
+  MAX-ACCESS          read-only
+  STATUS              current
+  DESCRIPTION
+    "This object reports the temperature of the equipment expressed in Celsius
+     degrees "
+::= { opticsIMEquipmentExtenEntry 1 }
+
+equipmentTrsObjectConnected      OBJECT-TYPE
+  SYNTAX              Integer32
+  MAX-ACCESS          read-write
+  STATUS              current
+  DESCRIPTION
+    "This object contains the information related to the transmission resource (in term of slot and port
+     where the equipment is connected to) referenced for this equipment resource (equipmentPosition)."
+::= { opticsIMEquipmentExtenEntry 2 }
+
+equipmentCombinerImplemented  OBJECT-TYPE
+     SYNTAX                   TruthValue
+     MAX-ACCESS               read-only
+     STATUS                   current
+     DESCRIPTION
+          " This object specifies whether the Combiner capability is present or not on this radio equipment.
+            The true value indicates that  the Combiner capability is present and the false value that the
+            capability is not present. "
+::= { opticsIMEquipmentExtenEntry 3 }
+
+equipmentCombinerFunction    OBJECT-TYPE
+     SYNTAX INTEGER { disabled    (1),
+                      enabled     (2)  }
+     MAX-ACCESS     read-write
+     STATUS            current
+     DESCRIPTION
+         " This object specifies whether the Combiner function is currently allowed to work or no on this radio equipment."
+::= { opticsIMEquipmentExtenEntry 4 }
+
+-- begin SNMPIDL-499
+equipmentInputVoltage OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS     read-only
+     STATUS            current
+     DESCRIPTION
+         " This object reports the value of instantaneous voltage applied to the equipment. The unit of measure is NE dependent and will be defined on own external specification."
+::= { opticsIMEquipmentExtenEntry 5 }
+
+equipmentInputCurrent OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS     read-only
+     STATUS            current
+     DESCRIPTION
+         " This object reports the value of the instantaneous electric current flowing through the equipment. The unit of measure is NE dependent and will be defined on own external specification."
+::= { opticsIMEquipmentExtenEntry 6 }
+
+equipmentPowerConsumption OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS     read-only
+     STATUS            current
+     DESCRIPTION
+         " This object reports the value of the instantaneous power consumed by the equipment. The unit of measure is NE dependent and will be defined on own external specification"
+::= { opticsIMEquipmentExtenEntry 7 }
+-- end SNMPIDL-499
+
+-- begin SNMPIDL-500
+equipmentInputVoltageThreshold OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS     read-write
+     STATUS            current
+     DESCRIPTION
+         " This object defines the value of the threshold for the instantaneous voltage used to raise the lowInputVoltage alarm. The unit of measure is NE dependent and will be defined on own external specification
+In case of '0' value the lowInputVoltage alarm is never raised (feature implicitly disabled)."
+::= { opticsIMEquipmentExtenEntry 8 }
+-- end SNMPIDL-500
+
+--
+-- opticsIMFanHAndlerTable
+--
+
+opticsIMFanHandlerTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMFanHandlerEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "This table contains the information related to the management of the fan component."
+::= { opticsIMEqptMibObject 25 }
+
+opticsIMFanHandlerEntry OBJECT-TYPE
+  SYNTAX             OpticsIMFanHandlerEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "An entry of the Fan handler table. Each entry (row), corresponding
+     to a physical fan managed element, includes specific information for the fan management
+     not included on the associated opticsIMEquipmentEntry."
+  INDEX    { equipmentPosition }
+::= { opticsIMFanHandlerTable 1 }
+
+OpticsIMFanHandlerEntry ::= SEQUENCE {
+  firstSelectedHandler          OCTET STRING,
+  secondSelectedHandler         OCTET STRING
+}
+
+firstSelectedHandler OBJECT-TYPE
+  SYNTAX              OCTET STRING (SIZE(4))
+  MAX-ACCESS          read-write
+  STATUS              current
+  DESCRIPTION
+    "This object contains the first allowed manager of the fan equipment indexed by this entry (equipmentPosition).
+     It is expressed as the index on the equipmentTable corresponding to a physical equipment connected to the fan.
+    "
+::= { opticsIMFanHandlerEntry 1 }
+
+secondSelectedHandler         OBJECT-TYPE
+  SYNTAX             OCTET STRING (SIZE(4))
+  MAX-ACCESS          read-write
+  STATUS              current
+  DESCRIPTION
+    "This object contains the second allowed manager of the fan equipment indexed by this entry (equipmentPosition).
+     It is expressed as the index on the equipmentTable corresponding to a physical equipment connected to the fan.
+    "
+::= { opticsIMFanHandlerEntry 2 }
+
+--
+-- opticsIMAllowedEquipmentTypesTable
+--
+
+opticsIMAllowedEquipmentTypesTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMAllowedEquipmentTypesEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "This table contains, for each equipment position composing the NE, the
+     allowed equipment types."
+::= { opticsIMEqptMibObject 2 }
+
+opticsIMAllowedEquipmentTypesEntry OBJECT-TYPE
+  SYNTAX             OpticsIMAllowedEquipmentTypesEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "An entry of the allowed equipment type table. Each entry (row) corresponds
+     to an equipment type allowed for the equipment position identified by the
+     equipmentPosition object.
+     An empty equipment position shall be identified by the value 0 in the
+     allowedEquipmentTypeId object and by the string 'EMPTY' in the
+     allowedEquipmentType one."
+  INDEX { equipmentPosition, allowedEquipmentTypeId }
+::= { opticsIMAllowedEquipmentTypesTable 1 }
+
+OpticsIMAllowedEquipmentTypesEntry ::= SEQUENCE {
+  allowedEquipmentTypeId  Integer32,
+  allowedEquipmentType    DisplayString
+}
+
+allowedEquipmentTypeId OBJECT-TYPE
+  SYNTAX                      Integer32
+  MAX-ACCESS            not-accessible
+  STATUS                      current
+  DESCRIPTION
+    "This object contains the identifier of an equipment type allowed for the
+     associated equipment position."
+::= { opticsIMAllowedEquipmentTypesEntry 1 }
+
+allowedEquipmentType OBJECT-TYPE
+  SYNTAX                     DisplayString
+  MAX-ACCESS            read-only
+  STATUS                      current
+  DESCRIPTION
+    "This object identifies the equipment type (string) associated to the
+     allowedEquipmentTypeId."
+::= { opticsIMAllowedEquipmentTypesEntry 2 }
+
+opticsIMAffectedObjectsListTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMAffectedObjectsListEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "This table contains, for each equipment composing the NE, the list, if
+     any, of the objects affected by any change in state or type of such
+     equipment."
+::= { opticsIMEqptMibObject 3 }
+
+opticsIMAffectedObjectsListEntry OBJECT-TYPE
+  SYNTAX       OpticsIMAffectedObjectsListEntry
+  MAX-ACCESS   not-accessible
+  STATUS       current
+  DESCRIPTION
+    "An entry of the affected object list table. Each entry (row) corresponds
+     to an affected object for the equipment position identified by the
+     equipmentPosition object.
+     Each affected object is identified by the instance identifier."
+  INDEX    { equipmentPosition, affectedObjectsListIndex }
+::= { opticsIMAffectedObjectsListTable 1 }
+
+OpticsIMAffectedObjectsListEntry ::= SEQUENCE {
+  affectedObjectsListIndex     Integer32,
+   affectedObjectInstanceId    InstancePointer
+}
+
+affectedObjectsListIndex OBJECT-TYPE
+  SYNTAX      Integer32
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "This object identifies the index for each equipment position."
+::= { opticsIMAffectedObjectsListEntry 1 }
+
+affectedObjectInstanceId OBJECT-TYPE
+  SYNTAX      InstancePointer
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "See Textual Conventions."
+::= { opticsIMAffectedObjectsListEntry 3 }
+
+opticsIMRemoteInventoryTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMRemoteInventoryEntry
+  MAX-ACCESS                    not-accessible
+  STATUS                              current
+  DESCRIPTION
+    "This table contains the remote inventory of the different units
+     (replaceable units) composing the NE "
+::= { opticsIMEqptMibObject 4 }
+
+opticsIMRemoteInventoryEntry OBJECT-TYPE
+  SYNTAX                   OpticsIMRemoteInventoryEntry
+  MAX-ACCESS          not-accessible
+  STATUS                    current
+  DESCRIPTION
+    "An entry of the remote inventory table. Each entry (row) corresponds to
+     the remote inventory data of a replaceable unit identified by the
+     equipmentPosition object.
+     An entry of this table is created at creation time of the associated
+     opticsIMEquipmentTable entry identified by the same equipment position."
+  INDEX    { equipmentPosition }
+::= { opticsIMRemoteInventoryTable 1 }
+
+OpticsIMRemoteInventoryEntry ::= SEQUENCE {
+  remoteInventoryStatus             INTEGER,
+  remoteInventoryCompanyIdentifier  DisplayString,
+  remoteInventoryMnemonic           DisplayString,
+  remoteInventoryCLEICode           DisplayString,
+  remoteInventoryPartNumber         DisplayString,
+  remoteInventorySoftwarePartNumber DisplayString,
+  remoteInventoryFactoryIdentifier  DisplayString,
+  remoteInventorySerialNumber       DisplayString,
+  remoteInventoryDateIdentifier     DisplayString,
+  remoteInventoryDate               DisplayString,
+  remoteInventoryCustomerField      DisplayString
+}
+
+remoteInventoryStatus OBJECT-TYPE
+  SYNTAX INTEGER {
+    available   (1),
+    unavailable (2)
+  }
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the status of the remote inventory data: available
+     or not. "
+::= { opticsIMRemoteInventoryEntry 1 }
+
+remoteInventoryCompanyIdentifier OBJECT-TYPE
+  SYNTAX        DisplayString  (SIZE(4))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the identifier of the manufacturer of the
+     replaceable unit."
+::= { opticsIMRemoteInventoryEntry 2 }
+
+remoteInventoryMnemonic OBJECT-TYPE
+  SYNTAX        DisplayString  (SIZE(8))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the mnemonic describing the replaceable unit."
+::= { opticsIMRemoteInventoryEntry 3 }
+
+remoteInventoryCLEICode OBJECT-TYPE
+  SYNTAX        DisplayString  (SIZE(10))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the CLEI code of the replaceable unit."
+::= { opticsIMRemoteInventoryEntry 4 }
+
+remoteInventoryPartNumber OBJECT-TYPE
+  SYNTAX        DisplayString (SIZE(14))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the part number of the replaceable unit."
+::= { opticsIMRemoteInventoryEntry 5 }
+
+remoteInventorySoftwarePartNumber OBJECT-TYPE
+  SYNTAX        DisplayString  (SIZE(14))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the software part number of the replaceable unit. "
+::= { opticsIMRemoteInventoryEntry 6 }
+
+remoteInventoryFactoryIdentifier OBJECT-TYPE
+  SYNTAX        DisplayString  (SIZE(4))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the identifier of the factory where the replaceable
+     unit was made."
+::= { opticsIMRemoteInventoryEntry 7 }
+
+remoteInventorySerialNumber OBJECT-TYPE
+  SYNTAX        DisplayString  (SIZE(16))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the serial number of the replaceable unit. "
+::= { opticsIMRemoteInventoryEntry 8 }
+
+remoteInventoryDateIdentifier OBJECT-TYPE
+  SYNTAX        DisplayString  (SIZE(2))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the date identifier of the replaceable unit. It
+     specifies the meaning of the Date field."
+::= { opticsIMRemoteInventoryEntry 9 }
+
+remoteInventoryDate OBJECT-TYPE
+  SYNTAX        DisplayString  (SIZE(6))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the manufacturing date of the replaceable unit. The
+     format is YYMMDD."
+::= { opticsIMRemoteInventoryEntry 10 }
+
+remoteInventoryCustomerField OBJECT-TYPE
+  SYNTAX        DisplayString (SIZE (46))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object represents a string of 46 characters and is reserved for
+     customer inventory information (loaded during the manufacturing process
+     only)."
+::= { opticsIMRemoteInventoryEntry 11 }
+
+opticsIMExternalInputPointTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMExternalInputPointEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "This table contains the information related to the monitor of the input
+     points."
+::= { opticsIMEqptMibObject 5 }
+
+opticsIMExternalInputPointEntry OBJECT-TYPE
+  SYNTAX             OpticsIMExternalInputPointEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "An entry of the externalInputPoint table. Each entry (row) corresponds to
+     an input point."
+       INDEX      { inputPointIndex }
+::= { opticsIMExternalInputPointTable 1 }
+
+OpticsIMExternalInputPointEntry ::= SEQUENCE {
+  inputPointIndex            Integer32,
+  inputPointUserLabel        OpticsIMUserLabel,
+  inputPointExternalState    OpticsIMExternalState,
+  inputPointPolarity         OpticsIMPolarity,
+  inputPointAsapIndex        Integer32,
+  inputPointOperationalState TsdimOperationalState
+}
+
+inputPointIndex OBJECT-TYPE
+  SYNTAX        Integer32
+  MAX-ACCESS    not-accessible
+  STATUS        current
+  DESCRIPTION
+    "This object identifies an entry in the externalInputPoint table."
+::= { opticsIMExternalInputPointEntry 1 }
+
+inputPointUserLabel OBJECT-TYPE
+  SYNTAX        OpticsIMUserLabel
+  MAX-ACCESS    read-write
+  STATUS        current
+  DESCRIPTION
+    "See Textual Conventions.
+     This object is used to associate a user-friendly label with the input
+     point."
+::= { opticsIMExternalInputPointEntry 2 }
+
+inputPointExternalState OBJECT-TYPE
+  SYNTAX        OpticsIMExternalState
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object describes the state of the external input point. See Textual
+     Conventions."
+::= { opticsIMExternalInputPointEntry 3 }
+
+inputPointPolarity OBJECT-TYPE
+  SYNTAX        OpticsIMPolarity
+  MAX-ACCESS    read-write
+  STATUS        current
+  DESCRIPTION
+    "See Textual Conventions."
+::= { opticsIMExternalInputPointEntry 4 }
+
+inputPointAsapIndex OBJECT-TYPE
+  SYNTAX          Integer32
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "This object defines the ASAP object associated to this external input
+     point."
+::= { opticsIMExternalInputPointEntry 5 }
+
+inputPointOperationalState OBJECT-TYPE
+  SYNTAX          TsdimOperationalState
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "See Textual Conventions."
+  DEFVAL { enabled }
+::= { opticsIMExternalInputPointEntry 6 }
+
+opticsIMExternalOutputPointTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMExternalOutputPointEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "This table contains the information related to the control of the output
+     points."
+::= { opticsIMEqptMibObject 6 }
+
+opticsIMExternalOutputPointEntry OBJECT-TYPE
+  SYNTAX            OpticsIMExternalOutputPointEntry
+  MAX-ACCESS        not-accessible
+  STATUS            current
+  DESCRIPTION
+    "An entry of the externalOutputPoint table. Each entry (row) corresponds
+     to an output point."
+       INDEX   { outputPointIndex }
+::= { opticsIMExternalOutputPointTable 1 }
+
+OpticsIMExternalOutputPointEntry ::= SEQUENCE {
+  outputPointIndex            Integer32,
+  outputPointUserLabel        OpticsIMUserLabel,
+  outputPointExternalState    OpticsIMExternalState,
+  outputPointPolarity         OpticsIMPolarity,
+  outputPointCriteria         INTEGER,
+  outputPointOperationalState TsdimOperationalState,
+  outputPointAutomaticEventId Integer32,
+  outputPointAutomaticEvent   DisplayString
+}
+
+outputPointIndex OBJECT-TYPE
+  SYNTAX        Integer32
+  MAX-ACCESS    not-accessible
+  STATUS        current
+  DESCRIPTION
+    "This object identifies an entry in the externalOutputPoint table."
+::= { opticsIMExternalOutputPointEntry 1 }
+
+outputPointUserLabel OBJECT-TYPE
+  SYNTAX        OpticsIMUserLabel
+  MAX-ACCESS    read-write
+  STATUS        current
+  DESCRIPTION
+    "See Textual Conventions.
+     This object is used to associate a user-friendly label with the output
+     point."
+::= { opticsIMExternalOutputPointEntry 2 }
+
+outputPointExternalState OBJECT-TYPE
+  SYNTAX        OpticsIMExternalState
+  MAX-ACCESS    read-write
+  STATUS        current
+  DESCRIPTION
+    "This object describes the state of the external output point. See Textual
+     Conventions."
+::= { opticsIMExternalOutputPointEntry 3 }
+
+outputPointPolarity OBJECT-TYPE
+  SYNTAX    OpticsIMPolarity
+  MAX-ACCESS    read-write
+  STATUS    current
+  DESCRIPTION
+    "See Textual Conventions."
+::= { opticsIMExternalOutputPointEntry 4 }
+
+outputPointCriteria OBJECT-TYPE
+  SYNTAX        INTEGER {
+    manual           (1),
+    automatic        (2),
+    remoteInputPoint (3)
+  }
+  MAX-ACCESS    read-write
+  STATUS        current
+  DESCRIPTION
+    "This object defines the criteria used to manage the output point. If it is
+     set to manual the output state can be controlled by the operator using the
+     external state. If it is set to automatic, the output is automatically
+     controlled by the event indicated by the outputPointAutomaticEventId
+     object and set operations on external state must be rejected.
+     If it is set to remoteInputPoint, the output point is automatically
+     managed by the agent with the values assumed by the objects of the
+     associated remote input point (defined in
+     opticsIMRemoteExternalInputPointTable). Set operations on external state,
+     polarity and user label must be rejected."
+::= { opticsIMExternalOutputPointEntry 5 }
+
+outputPointOperationalState OBJECT-TYPE
+  SYNTAX        TsdimOperationalState
+  MAX-ACCESS      read-only
+  STATUS        current
+  DESCRIPTION
+    "See Textual Conventions."
+  DEFVAL { enabled }
+::= { opticsIMExternalOutputPointEntry 6 }
+
+outputPointAutomaticEventId OBJECT-TYPE
+  SYNTAX      Integer32
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+    "This object contains the identifier of the event type associated to the
+     output point when the outputPointCriteria object is set to automatic. The
+     identifier must be included in one of the entries of the
+     opticsIMOutputPointAllowedEventsTable. As a side effect of setting of this
+     object, the agent must set the outputPointAutomaticEvent object with the
+     string associated to this identifier (see
+     opticsIMOutputPointAllowedEventsTable).
+     If the event type associated to the output point (when the
+     outputPointCriteria object is set to automatic) is not configurable by the
+     manager (fixed event) by convention this object contains the '-1' value."
+::= { opticsIMExternalOutputPointEntry 7 }
+
+outputPointAutomaticEvent OBJECT-TYPE
+  SYNTAX       DisplayString
+  MAX-ACCESS   read-only
+  STATUS       current
+  DESCRIPTION
+    "This object contains the event type associated to the output point when
+     the outputPointCriteria object is set to automatic. It is updated by the
+     agent with the string corresponding to the value of the
+     outputPointAutomaticEventId object set by the managing system."
+::= { opticsIMExternalOutputPointEntry 8 }
+
+opticsIMExternalPointTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMExternalPointEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "This table allows to configure the external points type."
+::= { opticsIMEqptMibObject 19 }
+
+opticsIMExternalPointEntry OBJECT-TYPE
+  SYNTAX      OpticsIMExternalPointEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry of the opticsIMExternalPointTable. Each entry (row) corresponds to
+     an external point. "
+  INDEX      { externalPointIndex }
+::= { opticsIMExternalPointTable 1 }
+
+OpticsIMExternalPointEntry ::= SEQUENCE {
+  externalPointIndex      Integer32,
+  externalPointType       OpticsIMExternalPointType
+}
+
+externalPointIndex OBJECT-TYPE
+  SYNTAX       Integer32
+  MAX-ACCESS   not-accessible
+  STATUS       current
+  DESCRIPTION
+    "This object identifies an entry in the opticsIMExternalPointTable."
+::= { opticsIMExternalPointEntry 1 }
+
+externalPointType OBJECT-TYPE
+  SYNTAX    OpticsIMExternalPointType
+  MAX-ACCESS    read-write
+  STATUS    current
+  DESCRIPTION
+    "See Textual Conventions.
+     This object is used to define the type of the external point (input or
+     output)."
+::= { opticsIMExternalPointEntry 2 }
+
+opticsIMEquipmentProtectionGroupTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMEquipmentProtectionGroupEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "This table is used to manage all the protection schemes related to the
+     Equipment Protection Switch (EPS) function."
+::= { opticsIMEqptMibObject 7 }
+
+opticsIMEquipmentProtectionGroupEntry OBJECT-TYPE
+  SYNTAX         OpticsIMEquipmentProtectionGroupEntry
+  MAX-ACCESS     not-accessible
+  STATUS         current
+  DESCRIPTION
+   "An entry of the opticsIMEquipmentProtectionGroup table. Each entry
+    corresponds to an Equipment Protection Switch protection scheme and allows
+    to define all the related common management functions.
+    Each entry can be created as consequence of the equipment provisioning or
+    directly by the managing systems."
+  INDEX   { opticsIMEquipmentProtectionGroupIndex }
+::= { opticsIMEquipmentProtectionGroupTable 1 }
+
+OpticsIMEquipmentProtectionGroupEntry ::= SEQUENCE {
+  opticsIMEquipmentProtectionGroupIndex             Unsigned32,
+  opticsIMEquipmentProtectionGroupType              OpticsIMProtectionGroupType,
+  opticsIMEquipmentProtectionGroupRevertive         OpticsIMRevertive,
+  opticsIMEquipmentProtectionGroupOperationalState  TsdimOperationalState,
+  opticsIMEquipmentProtectionGroupRowStatus         RowStatus,
+  opticsIMEquipmentProtectionGroupExtraTraffic      INTEGER
+}
+
+opticsIMEquipmentProtectionGroupIndex OBJECT-TYPE
+  SYNTAX      Unsigned32
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "This object is the identifier of the opticsIMEquipmentProtectionGroupTable"
+::= { opticsIMEquipmentProtectionGroupEntry 1 }
+
+opticsIMEquipmentProtectionGroupType OBJECT-TYPE
+  SYNTAX       OpticsIMProtectionGroupType
+  MAX-ACCESS   read-only
+  STATUS       current
+  DESCRIPTION
+    "See Textual Conventions."
+::= { opticsIMEquipmentProtectionGroupEntry 2 }
+
+opticsIMEquipmentProtectionGroupRevertive OBJECT-TYPE
+  SYNTAX      OpticsIMRevertive
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "See Textual Conventions."
+::= { opticsIMEquipmentProtectionGroupEntry 3 }
+
+opticsIMEquipmentProtectionGroupOperationalState OBJECT-TYPE
+  SYNTAX       TsdimOperationalState
+  MAX-ACCESS   read-only
+  STATUS       current
+  DESCRIPTION
+    "See Textual Conventions."
+::= { opticsIMEquipmentProtectionGroupEntry 4 }
+
+opticsIMEquipmentProtectionGroupRowStatus OBJECT-TYPE
+  SYNTAX        RowStatus
+  MAX-ACCESS    read-create
+  STATUS        current
+  DESCRIPTION
+    "See Textual Conventions.
+     When an entry of this table is deleted the corresponding entries of
+     equipmentProtectionUnit table are deleted."
+::= { opticsIMEquipmentProtectionGroupEntry 5 }
+
+opticsIMEquipmentProtectionGroupExtraTraffic OBJECT-TYPE
+  SYNTAX      INTEGER {
+    enabled   (0),
+    disabled  (1)
+  }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "This object specifies if the extra traffic is enabled or disabled on the
+     protecting channel.It can be used only whether the protection scheme is
+     1:N."
+::= { opticsIMEquipmentProtectionGroupEntry 6 }
+
+
+opticsIMEquipmentProtectionUnitTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF   OpticsIMEquipmentProtectionUnitEntry
+  MAX-ACCESS                     not-accessible
+  STATUS                               current
+  DESCRIPTION
+  " This table contains the Equipment Protection Unit associated to each Equipment Protection
+    Group."
+::= { opticsIMEqptMibObject 8 }
+
+opticsIMEquipmentProtectionUnitEntry OBJECT-TYPE
+  SYNTAX       OpticsIMEquipmentProtectionUnitEntry
+  MAX-ACCESS   not-accessible
+  STATUS       current
+  DESCRIPTION
+    "An entry in the opticsIMEquipmentProtectionUnit table. Entries of this
+     table are created when the associated Equipment Protection Group is
+     created and, when the related group is already created, as consequence of
+     the equipment provisioning."
+  INDEX { opticsIMEquipmentProtectionGroupIndex,
+          opticsIMEquipmentProtectionUnitIndex }
+::= { opticsIMEquipmentProtectionUnitTable 1 }
+
+OpticsIMEquipmentProtectionUnitEntry ::= SEQUENCE {
+  opticsIMEquipmentProtectionUnitIndex          Integer32,
+  opticsIMEquipmentProtectionUnitChannelNumber  OpticsIMRadioChannelNumber,
+  opticsIMEquipmentProtectionUnitType           OpticsIMProtectionUnitType,
+  opticsIMEquipmentProtectionUnitSwitchCommand  OpticsIMProtectionSwitchCommand,
+  opticsIMEquipmentProtectionUnitSwitchCriteria
+                                    OpticsIMEquipmentProtectionSwitchCriteria,
+  opticsIMEquipmentProtectionUnitSwitchRequestSource
+                                    INTEGER,
+  opticsIMEquipmentProtectionUnitSwitchStatus   OpticsIMProtectionSwitchStatus,
+  opticsIMEquipmentProtectionUnitPriority       OpticsIMProtectionPriority
+}
+
+opticsIMEquipmentProtectionUnitIndex OBJECT-TYPE
+  SYNTAX       Integer32
+  MAX-ACCESS   not-accessible
+  STATUS       current
+  DESCRIPTION
+    "This object identifies the index of the protection unit for each equipment
+     protection group."
+::= { opticsIMEquipmentProtectionUnitEntry 1 }
+
+opticsIMEquipmentProtectionUnitChannelNumber OBJECT-TYPE
+  SYNTAX          OpticsIMRadioChannelNumber
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "See Textual Conventions."
+::= { opticsIMEquipmentProtectionUnitEntry 2 }
+
+opticsIMEquipmentProtectionUnitType OBJECT-TYPE
+  SYNTAX          OpticsIMProtectionUnitType
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "See Textual Conventions."
+::= { opticsIMEquipmentProtectionUnitEntry 3 }
+
+opticsIMEquipmentProtectionUnitSwitchCommand  OBJECT-TYPE
+  SYNTAX          OpticsIMProtectionSwitchCommand
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "See Textual Conventions."
+::= { opticsIMEquipmentProtectionUnitEntry 4 }
+
+opticsIMEquipmentProtectionUnitSwitchCriteria  OBJECT-TYPE
+  SYNTAX          OpticsIMEquipmentProtectionSwitchCriteria
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "This object contains the highest priority automatic switch request
+     currently active on the channel. "
+::= { opticsIMEquipmentProtectionUnitEntry 5 }
+
+opticsIMEquipmentProtectionUnitSwitchRequestSource OBJECT-TYPE
+  SYNTAX     INTEGER {
+    local    (1),
+    remote   (2),
+    noOne    (3)
+  }
+  MAX-ACCESS read-only
+  STATUS     current
+  DESCRIPTION
+    "This object is used, only in dual ended mode, to indicate the source of
+     the switching request (local, remote or none when no switching request is
+     present)."
+::= { opticsIMEquipmentProtectionUnitEntry 6 }
+
+opticsIMEquipmentProtectionUnitSwitchStatus  OBJECT-TYPE
+  SYNTAX        OpticsIMProtectionSwitchStatus
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "See Textual Conventions."
+::= { opticsIMEquipmentProtectionUnitEntry 7 }
+
+opticsIMEquipmentProtectionUnitPriority OBJECT-TYPE
+  SYNTAX          OpticsIMProtectionPriority
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+" See Textual Conventions. "
+::= { opticsIMEquipmentProtectionUnitEntry 8 }
+
+opticsIMEquipmentProtectionGroupExtTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMEquipmentProtectionGroupExtEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "This table is used to manage all the protection schemes related to the
+     Equipment Protection Switch (EPS) function."
+::= { opticsIMEqptMibObject 22 }
+
+opticsIMEquipmentProtectionGroupExtEntry OBJECT-TYPE
+  SYNTAX             OpticsIMEquipmentProtectionGroupExtEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "An entry of the opticsIMEquipmentProtectionGroupExt table. Each entry
+     corresponds to an Equipment Protection Switch protection scheme and
+     allows to define all the related common management functions.
+     Each entry can be created as consequence of the equipment provisioning or
+     directly by the managing systems."
+  INDEX { opticsIMEquipmentProtectionGroupIndex }
+::= { opticsIMEquipmentProtectionGroupExtTable 1 }
+
+OpticsIMEquipmentProtectionGroupExtEntry ::= SEQUENCE {
+  opticsIMEquipmentProtectionGroupLosSwitchCriteria INTEGER
+}
+
+opticsIMEquipmentProtectionGroupLosSwitchCriteria  OBJECT-TYPE
+  SYNTAX      INTEGER {
+    enabled   (0),
+    disabled  (1)
+  }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "This object specifies if the LOS on the Protection units involved on this
+     group is used as switch criteria."
+::= { opticsIMEquipmentProtectionGroupExtEntry 1 }
+
+opticsIMEqptAlarms OBJECT IDENTIFIER ::= { opticsIMEqptMibObject 9 }
+
+-- housekeeping  alarm
+opticsIMHousekeepingAlarmRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the HousekeepingAlarm defect raise."
+::= { opticsIMEqptAlarms 1 }
+
+opticsIMHousekeepingAlarmClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the HousekeepingAlarm defect clear."
+::= { opticsIMEqptAlarms 2 }
+
+-- replaceable unit problem (card fail) alarm
+opticsIMAlarmReplaceableUnitProblemRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType}
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Replaceable Unit Problem (RUP) defect raise"
+::= { opticsIMEqptAlarms 3 }
+
+opticsIMAlarmReplaceableUnitProblemClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Replaceable Unit Problem (RUP) defect clear"
+::= { opticsIMEqptAlarms 4 }
+
+-- replaceable unit missing (card missing) alarm
+opticsIMAlarmReplaceableUnitMissingRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Replaceable Unit Missing (RUM) defect raise"
+::= { opticsIMEqptAlarms 5 }
+
+opticsIMAlarmReplaceableUnitMissingClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Replaceable Unit Missing (RUM) defect clear"
+::= { opticsIMEqptAlarms 6 }
+
+-- replaceable unit type mismatch (card mismatch) alarm
+opticsIMAlarmReplaceableUnitTypeMismatchRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Replaceable Unit Type Mismatch (RUTM)
+     defect raise"
+::= { opticsIMEqptAlarms 7 }
+
+opticsIMAlarmReplaceableUnitTypeMismatchClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Replaceable Unit Type Mismatch (RUTM)
+     defect clear"
+::= { opticsIMEqptAlarms 8 }
+
+-- unconfigured equipment present alarm
+opticsIMAlarmUnconfiguredEquipmentPresentRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Unconfigured Equipment Present (UEP)
+     defect raise"
+::= { opticsIMEqptAlarms 9 }
+
+opticsIMAlarmUnconfiguredEquipmentPresentClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType}
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Unconfigured Equipment Present (UEP)
+     defect clear"
+::= { opticsIMEqptAlarms 10 }
+
+-- firmware download on going alarm
+opticsIMAlarmFirmwareDownloadOnGoingRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Software Environment Problem (SEP)
+     defect raise"
+::= { opticsIMEqptAlarms 11 }
+
+opticsIMAlarmFirmwareDownloadOnGoingClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Firmware Download On Going defect clear"
+::= { opticsIMEqptAlarms 12 }
+
+-- version mismatch alarm
+opticsIMAlarmVersionMismatchRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Version Mismatch (VM) defect raise"
+::= { opticsIMEqptAlarms 13 }
+
+opticsIMAlarmVersionMismatchClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Version Mismatch (VM) defect clear"
+::= { opticsIMEqptAlarms 14 }
+
+-- internal communication problem (RC unreachable) alarm
+opticsIMAlarmInternalCommunicationProblemRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Internal Communication Problem (ICP)
+     defect raise."
+::= { opticsIMEqptAlarms 15 }
+
+opticsIMAlarmInternalCommunicationProblemClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Internal Communication Problem (ICP) defect
+     clear."
+::= { opticsIMEqptAlarms 16 }
+
+-- lan failure alarm
+opticsIMAlarmLanFailureRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Lan Failure (LAN) defect raise"
+::= { opticsIMEqptAlarms 17 }
+
+opticsIMAlarmLanFailureClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Lan Failure (LAN) defect clear"
+::= { opticsIMEqptAlarms 18 }
+
+-- battery fail/missing alarm
+opticsIMAlarmBatteryFailRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Battery Failure (BF) defect raise"
+::= { opticsIMEqptAlarms 19 }
+
+opticsIMAlarmBatteryFailClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType}
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Battery Failure (BF) defect clear"
+::= { opticsIMEqptAlarms 20 }
+
+-- secondary battery fail/missing alarm
+opticsIMAlarmSecondaryBatteryFailRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Battery Failure (BF) defect raise for a
+     secondary battery."
+::= { opticsIMEqptAlarms 43 }
+
+opticsIMAlarmSecondaryBatteryFailClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Battery Failure (BF) defect clear for a
+     secondary battery."
+::= { opticsIMEqptAlarms 44 }
+
+-- powerAndOr (andBatteryFailure) alarm
+opticsIMAlarmAndBatteryFailureRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the And Battery Failure (ABF) defect raise."
+::= { opticsIMEqptAlarms 21 }
+
+opticsIMAlarmAndBatteryFailureClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the And Battery Failure (ABF) defect clear."
+::= { opticsIMEqptAlarms 22 }
+
+-- backplane failure alarm
+opticsIMAlarmBackplaneFailureRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Backplane Failure (BKF) defect raise."
+::= { opticsIMEqptAlarms 23 }
+
+opticsIMAlarmBackplaneFailureClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Backplane Failure (BKF) defect clear."
+::= { opticsIMEqptAlarms 24 }
+
+-- receiver failure alarm
+opticsIMAlarmReceiverFailureRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Receiver Failure defect raise: it can model
+     a link failure alarm appearance."
+::= { opticsIMEqptAlarms 25 }
+
+opticsIMAlarmReceiverFailureClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType}
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Receiver Failure defect clear: it can model
+     a link failure alarm disappearance."
+::= { opticsIMEqptAlarms 26 }
+
+-- low power alarm
+opticsIMAlarmLowPowerRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Low Power defect raise."
+::= { opticsIMEqptAlarms 27 }
+
+opticsIMAlarmLowPowerClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Low Power defect clear."
+::= { opticsIMEqptAlarms 28 }
+
+-- stand-by version mismatch alarm
+opticsIMAlarmStandByVersionMismatchRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the stand-by version mismatch  defect raise"
+::= { opticsIMEqptAlarms 29 }
+
+opticsIMAlarmStandByVersionMismatchClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the stand-by version mismatch defect clear."
+::= { opticsIMEqptAlarms 30 }
+
+-- remote inventory failure alarm
+opticsIMAlarmRemoteInventoryFailureRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the remote inventory failure defect raise."
+::= { opticsIMEqptAlarms 31 }
+
+opticsIMAlarmRemoteInventoryFailureClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the remote inventory failure defect clear."
+::= { opticsIMEqptAlarms 32 }
+
+-- repeater cable problem alarm
+opticsIMAlarmRepeaterCableProblemRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the repeater cable problem defect raise."
+::= { opticsIMEqptAlarms 33 }
+
+opticsIMAlarmRepeaterCableProblemClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the repeater cable problem defect clear"
+::= { opticsIMEqptAlarms 34 }
+
+-- provisioning mismatch alarm
+
+opticsIMAlarmProvisioningMismatchRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType}
+  STATUS current
+  DESCRIPTION
+    "This notification reports the provisioning mismatch alarm raise."
+::= { opticsIMEqptAlarms 35 }
+
+opticsIMAlarmProvisioningMismatchClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the provisioning mismatch alarm clear."
+::= { opticsIMEqptAlarms 36 }
+
+-- Fuse Broken Defect
+opticsIMAlarmFuseBrokenRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the fuse broken defect raise."
+::= { opticsIMEqptAlarms 37 }
+
+
+opticsIMAlarmFuseBrokenClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the fuse broken defect clear."
+::= { opticsIMEqptAlarms 38 }
+
+-- Excessive Environmental Temperature Defect
+opticsIMAlarmExcessiveEnvironmentalTemperatureRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the excessive environmental alarm raise."
+::= { opticsIMEqptAlarms 39 }
+
+opticsIMAlarmExcessiveEnvironmentalTemperatureClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the excessive environmental alarm clear."
+::= { opticsIMEqptAlarms 40 }
+
+-- Excessive Environmental Temperature Defect
+opticsIMAlarmDatabaseAbnormalRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the database is in abnormal state."
+::= { opticsIMEqptAlarms 41 }
+
+opticsIMAlarmDatabaseAbnormalClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the database is out of abnormal state."
+::= { opticsIMEqptAlarms 42 }
+
+-- Flash card realignment in progress indication
+opticsIMAlarmFlashCardRealignmentInProgressRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Flash card realignment in progress defect
+     raise."
+::= { opticsIMEqptAlarms 45 }
+
+opticsIMAlarmFlashCardRealignmentInProgressClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Flash card realignment in progress defect
+     clear."
+::= { opticsIMEqptAlarms 46 }
+
+-- Flash card failure defect
+opticsIMAlarmFlashCardFailureRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Flash card failure defect raise."
+::= { opticsIMEqptAlarms 47 }
+
+opticsIMAlarmFlashCardFailureClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Flash card failure defect clear."
+::= { opticsIMEqptAlarms 48 }
+
+-- Power Supply Failure
+opticsIMAlarmPowerSupplyFailureRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the power supply failure raise."
+::= { opticsIMEqptAlarms 49 }
+
+opticsIMAlarmPowerSupplyFailureClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the power supply failure clear."
+::= { opticsIMEqptAlarms 50 }
+
+opticsIMAlarmNewMediaConverterRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "Reports the raise of a New Media Converter Discovered alarm."
+::= { opticsIMEqptAlarms 51 }
+
+opticsIMAlarmNewMediaConverterClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "Reports the clear of a New Media Converter Discovered alarm."
+::= { opticsIMEqptAlarms 52 }
+
+opticsIMAlarmMediaConverterLossOfAssociationRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "Reports the raise of a Media Converter Loss Of Association alarm."
+::= { opticsIMEqptAlarms 53 }
+
+opticsIMAlarmMediaConverterLossOfAssociationClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "Reports the clear of a Media Converter Loss Of Association alarm."
+::= { opticsIMEqptAlarms 54 }
+
+
+opticsIMAlarmSystemTimeOfDayUnreliableRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "Reports the raise of the System Time-Of-Day Unreliable alarm."
+::= { opticsIMEqptAlarms 55 }
+
+opticsIMAlarmSystemTimeOfDayUnreliableClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "Reports the clear of the System Time-Of-Day Unreliable alarm."
+::= { opticsIMEqptAlarms 56 }
+
+opticsIMAlarmReplaceableUnitInitializingRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "Reports the raise of a Replaceable Unit Initializing alarm."
+::= { opticsIMEqptAlarms 57 }
+
+opticsIMAlarmReplaceableUnitInitializingClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "Reports the clear of a Replaceable Unit Initializing alarm."
+::= { opticsIMEqptAlarms 58 }
+
+opticsIMAlarmInternalCableFailureRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "Reports the raise of a failure of an internal (on NE) cable."
+::= { opticsIMEqptAlarms 59 }
+
+opticsIMAlarmInternalCableFailureClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "Reports the clear of a failure of an internal (on NE) cable."
+::= { opticsIMEqptAlarms 60 }
+
+opticsIMAlarmFanFailRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Fan Failure defect raise."
+::= { opticsIMEqptAlarms 61 }
+
+opticsIMAlarmFanFailClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Fan Failure defect clear."
+::= { opticsIMEqptAlarms 62 }
+
+opticsIMAlarmRFSwitchFailRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the RF Switch module Failure defect raise."
+::= { opticsIMEqptAlarms 63 }
+
+opticsIMAlarmRFSwitchFailClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the RF Switch module Failure defect clear."
+::= { opticsIMEqptAlarms 64 }
+
+opticsIMAlarmFanCommunicationProblemRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the FAN Communication Problem defect raise."
+::= { opticsIMEqptAlarms 65 }
+
+opticsIMAlarmFanCommunicationProblemClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the FAN Communication Problem defect clear."
+::= { opticsIMEqptAlarms 66 }
+
+-- Missing of a RxDiv module
+
+opticsIMAlarmRxDivMissingRaise NOTIFICATION-TYPE
+  OBJECTS {     tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the RxDiv missing defect raise."
+::= { opticsIMEqptAlarms 67 }
+
+opticsIMAlarmRxDivMissingClear NOTIFICATION-TYPE
+  OBJECTS {     tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the RxDiv missing defect  clear."
+::= { opticsIMEqptAlarms 68 }
+
+-- Loss of alignment between Rx Main and Rx Div modules for the Combiner
+
+opticsIMAlarmCombinerLossOfAlignmentRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Loss of Alignment for the Combiner function defect raise."
+::= { opticsIMEqptAlarms  69 }
+
+opticsIMAlarmCombinerLossOfAlignmentClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Loss of Alignment for the Combiner function defect clear."
+::= { opticsIMEqptAlarms  70 }
+
+-- A procedure to replace an equipment is in progress
+
+opticsIMAlarmReplacementProcedureOnGoingRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Replacement Procedure On Going raise."
+::= { opticsIMEqptAlarms  71 }
+
+opticsIMAlarmReplacementProcedureOnGoingClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Replacement Procedure On Going clear."
+::= { opticsIMEqptAlarms  72 }
+
+
+-- A mismach between the rate and the equipment provisioned
+
+opticsIMAlarmRateMismatchRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the Provisioned Rate Mismatch raise."
+::= { opticsIMEqptAlarms  73 }
+
+opticsIMAlarmRateMismatchClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports theProvisioned Rate Mismatch clear."
+::= { opticsIMEqptAlarms  74 }
+
+
+-- Low Input Voltage
+
+opticsIMAlarmLowInputVoltageRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports a Low Input Voltage alarm raise."
+::= { opticsIMEqptAlarms  75 }
+
+opticsIMAlarmLowInputVoltageClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports a Low Input Voltage alarm clear."
+::= { opticsIMEqptAlarms  76 }
+
+
+-- DC and PFoE both Present
+
+opticsIMAlarmDCAndPFoEbothPresentRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the presence of input power both from PoE and DC cable alarm raise."
+::= { opticsIMEqptAlarms  77 }
+
+opticsIMAlarmDCAndPFoEbothPresentClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports the presence of input power both from PoE and DC cable alarm clear."
+::= { opticsIMEqptAlarms  78 }
+
+
+-- AIM read Fail
+
+opticsIMAlarmAIMreadFailRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports a problem to read AIM unit alarm raise."
+::= { opticsIMEqptAlarms  79 }
+
+opticsIMAlarmAIMreadFailClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports a problem to read AIM unit alarm clear."
+::= { opticsIMEqptAlarms  80 }
+
+-- Inter Radio unit Communication problem alarm
+
+ opticsIMAlarmInterRadioUnitCommunicationProblemRaise NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports a communication problem between radio units alarm raise."
+::= { opticsIMEqptAlarms  81 }
+
+ opticsIMAlarmInterRadioUnitCommunicationProblemClear NOTIFICATION-TYPE
+  OBJECTS {
+    tsdimEventObjectClassIdentifier,
+    tsdimEventObjectInstanceIdentifier,
+    tsdimEventNotificationId,
+    tsdimEventTime,
+    tsdimAlarmSeverity,
+    tsdimAlarmSpecProblem,
+    opticsIMAdditionalText,
+    opticsIMAlarmType
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification reports a communication problem between radio units clear."
+::= { opticsIMEqptAlarms  82 }
+
+
+----
+opticsIMTribPortsImpedance  OBJECT-TYPE
+  SYNTAX INTEGER {
+    balanced120Ohm  (1),
+    unbalanced75Ohm (2)
+  }
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+  "This object specifies the impedance used by E1 tributary ports: balanced 120
+   ohm, unbalanced 75 ohm."
+::= { opticsIMEqptMibObject 10 }
+
+opticsIMOutputPointAllowedEventsTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMOutputPointAllowedEventsEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "This table contains the list of events that can be associated to the
+     external output points when an automatic management of an output point
+     is active."
+::= { opticsIMEqptMibObject 11 }
+
+opticsIMOutputPointAllowedEventsEntry OBJECT-TYPE
+  SYNTAX          OpticsIMOutputPointAllowedEventsEntry
+  MAX-ACCESS      not-accessible
+  STATUS          current
+  DESCRIPTION
+    "An entry of the outputPointAllowedEventsTable. Each entry (row)
+     corresponds to an event type that can be associated to an output point."
+  INDEX { outputPointAllowedEventId }
+::= { opticsIMOutputPointAllowedEventsTable 1 }
+
+OpticsIMOutputPointAllowedEventsEntry ::= SEQUENCE {
+  outputPointAllowedEventId Integer32,
+  outputPointAllowedEvent   DisplayString
+}
+
+outputPointAllowedEventId OBJECT-TYPE
+  SYNTAX          Integer32
+  MAX-ACCESS      not-accessible
+  STATUS          current
+  DESCRIPTION
+    "This object contains the identifier of an event that can be associated to
+     an output point."
+::= { opticsIMOutputPointAllowedEventsEntry 1 }
+
+outputPointAllowedEvent OBJECT-TYPE
+  SYNTAX          DisplayString
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "This object identifies the event, in a format string, associated to the
+     outputPointAllowedEventId object."
+::= { opticsIMOutputPointAllowedEventsEntry 2 }
+
+opticsIMExternalInputPointRemotizationTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMExternalInputPointRemotizationEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "This table allows to define the external input points which
+     characteristics (ExternalState, Polarity and UserLabel) have to be
+     remotize on external output points of other NEs identified by their IP
+     address.
+     The updating is performed automatically by the local agent each time the
+     objects above change their value or the related time-out expires. The
+     updating can be also required by the manager by means of the
+     inputPointManualRemotization object."
+::= { opticsIMEqptMibObject 12 }
+
+opticsIMExternalInputPointRemotizationEntry OBJECT-TYPE
+  SYNTAX            OpticsIMExternalInputPointRemotizationEntry
+  MAX-ACCESS        not-accessible
+  STATUS            current
+  DESCRIPTION
+    "An entry of the ExternalInputPointRemotization table. Each entry (row)
+     corresponds to an input point."
+       INDEX      { inputPointIndex }
+::= { opticsIMExternalInputPointRemotizationTable 1 }
+
+OpticsIMExternalInputPointRemotizationEntry ::= SEQUENCE {
+   inputPointRemotizationDestination        IpAddress,
+   inputPointRemotizationStatus             INTEGER,
+   inputPointRemotizationLastUpdate         DateAndTime,
+   inputPointManualRemotization             INTEGER,
+   inputPointRemotizationRowStatus          RowStatus
+}
+
+inputPointRemotizationDestination OBJECT-TYPE
+  SYNTAX          IpAddress
+  MAX-ACCESS      read-create
+  STATUS          current
+  DESCRIPTION
+    "This object is used to identify the IP address of the agent on which the
+     characteristics of the input point have to be remotized as output point"
+::= { opticsIMExternalInputPointRemotizationEntry 1 }
+
+inputPointRemotizationStatus OBJECT-TYPE
+  SYNTAX          INTEGER {
+    success                (1),
+    destinationUnreachable (2),
+    configurationMismatch  (3)
+  }
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "This object defines the status of the last remotization of the input point
+     information on the agent identified by the
+     inputPointRemotizationDestination object.
+     The value success (1) is returned if the status of the local input point
+     has been remotized successfully on the destination.
+     The value destinationUnreachable (2) is returned if the destination
+     (defined by the inputPointRemotizationDestination object).is unreachable;
+     The value configurationMismatch (3) is returned if the destination is
+     reachable, but no entry related to the current input point is present in
+     the opticsIMRemoteExternalInputPointTable of the destination."
+::= { opticsIMExternalInputPointRemotizationEntry 2 }
+
+inputPointRemotizationLastUpdate OBJECT-TYPE
+  SYNTAX                DateAndTime
+  MAX-ACCESS      read-only
+  STATUS                current
+  DESCRIPTION
+    "This object defines the time of the last remotization tried by the local
+     agent.This object is updated each time the local agent tries to update
+     the destination output point."
+::= { opticsIMExternalInputPointRemotizationEntry 3 }
+
+inputPointManualRemotization OBJECT-TYPE
+  SYNTAX INTEGER {
+    updating     (1),
+    notUpdating  (2)
+  }
+  MAX-ACCESS      read-create
+  STATUS          current
+  DESCRIPTION
+    "This object is used to trigger a manual updating of the destination
+     output point.
+     When the procedure has been completed, the agent has to change the value
+     back to notUpdating."
+::= { opticsIMExternalInputPointRemotizationEntry 4 }
+
+inputPointRemotizationRowStatus OBJECT-TYPE
+  SYNTAX          RowStatus
+  MAX-ACCESS      read-create
+  STATUS          current
+  DESCRIPTION
+    "See Textual Conventions.
+     When an entry of this table is created the local agent has to notify each
+     change of the related input point (ExternalState, Polarity and UserLabel)
+     to the destination identified by the associated
+     inputPointRemotizationDestination object."
+::= { opticsIMExternalInputPointRemotizationEntry 5 }
+
+opticsIMRemoteExternalInputPointTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMRemoteExternalInputPointEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "This table allows to identify the remote external input points which
+     characteristics have to be provided on local external output points."
+::= { opticsIMEqptMibObject 13 }
+
+opticsIMRemoteExternalInputPointEntry OBJECT-TYPE
+  SYNTAX                 OpticsIMRemoteExternalInputPointEntry
+  MAX-ACCESS        not-accessible
+  STATUS                  current
+  DESCRIPTION
+    "An entry of the opticsIMRemoteExternalInputPoint table. Each entry (row)
+     corresponds to an output point."
+  INDEX      { outputPointIndex }
+::= { opticsIMRemoteExternalInputPointTable 1 }
+
+OpticsIMRemoteExternalInputPointEntry ::= SEQUENCE {
+  remoteInputPointAgent        IpAddress,
+  remoteInputPointIndex        Integer32,
+  remoteInputPointLastUpdate   DateAndTime,
+  remoteInputPointRowStatus    RowStatus
+}
+
+remoteInputPointAgent OBJECT-TYPE
+  SYNTAX          IpAddress
+  MAX-ACCESS      read-create
+  STATUS          current
+  DESCRIPTION
+    "This object identifies the IP address of the agent where the remote input
+     point is physically present. "
+::= { opticsIMRemoteExternalInputPointEntry 1 }
+
+remoteInputPointIndex OBJECT-TYPE
+  SYNTAX         Integer32
+  MAX-ACCESS     read-create
+  STATUS         current
+  DESCRIPTION
+    "This object identifies the remote input point on the agent defined by the
+     remoteInputPointAgent object. The same index value used to identify the
+     input point in the opticsIMExternalInputPointTable object must be used."
+::= { opticsIMRemoteExternalInputPointEntry 2 }
+
+remoteInputPointLastUpdate OBJECT-TYPE
+  SYNTAX          DateAndTime
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "This object defines the time of the last update received from the remote
+     agent concerning the status of the remote input point."
+::= { opticsIMRemoteExternalInputPointEntry 3 }
+
+remoteInputPointRowStatus OBJECT-TYPE
+  SYNTAX          RowStatus
+  MAX-ACCESS      read-create
+  STATUS          current
+  DESCRIPTION
+    "See Textual Conventions.
+     When an entry of this table is created, the local agent updates the output
+     point parameters each time receives a message from the remote agent that
+     the parameters of the associated input point are changed."
+::= { opticsIMRemoteExternalInputPointEntry 4 }
+
+-- Begin Enhanced Equipment Tables and its related enhanced tables
+opticsIMEnhEquipmentTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMEnhEquipmentEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "This table is and enhancement of opticsIMEquipmentTable and it contains
+     the information related to the resources that represent the physical
+     components of a managed element, including replaceable components."
+::= { opticsIMEqptMibObject 14 }
+
+opticsIMEnhEquipmentEntry OBJECT-TYPE
+  SYNTAX              OpticsIMEnhEquipmentEntry
+  MAX-ACCESS          not-accessible
+  STATUS              current
+  DESCRIPTION
+    "An entry of the enhanced equipment table. Each entry (row) corresponds to
+     a physical component of a managed element (racks, subracks, slots/boards,
+     sub-slots/daughter boards/drawers, optical/electrical modules).
+     During the commissioning phase the whole set of instances is created by
+     the network element itself.
+     Each entry may be instantiated or exist without the presence of the
+     physical resources. In this case the operationalState will be disabled.
+     When the resource is physically removed, the corresponding equipment
+     object is not automatically deleted. When a resource is physically
+     installed and no corresponding equipment object has been created, no self
+     instantiation is performed.
+     The opticsEquipmentActual attribute represents the type of equipment which
+     is physically present. This attribute assume the 'EMPTY' value when either
+     the resource is not physically present or the NE is unable to identify the
+     equipment type.
+     The opticsEquipmentExpected attribute contains the type of equipment that
+     the managing system expects to be present.It is set by the agent as a side
+     effect of setting the opticsEquipmentExpectedTypeId associated to.
+     The opticsEquipmentExpectedTypeId attribute value of each instance may be
+     set according to a planned or default configuration known by the NE and
+     represents the identifier of the type of equipment expected to be present.
+     If no configuration is wanted then the opticsEquipmentExpectedTypeId shall
+     be set to 0 corresponding to the 'EMPTY' value.
+     If the opticsEquipmentExpected attribute value is set to a non 'EMPTY'
+     value, and if the equipment is not physically present an alarm
+     notification is sent with the probableCause of 'replaceableUnitMissing'.
+     When there is a mismatch in the contents of the opticsEquipmentActual and
+     the equipmentExpected attribute, an alarm notification with probableCause
+     'replaceableUnitTypeMismatch' will be raised.
+     The opticsEquipmentExpected value of 'EMPTY' (no type) does not match any
+     other value for opticsEquipmentActual except 'EMPTY'.
+     In case opticsEquipmentExpected is 'EMPTY' and opticsEquipmentActual is
+     different from 'EMPTY' an alarm notification with probableCause
+     'unconfiguredEquipmentPresent' will be raised (exception to mismatch case).
+     If the opticsEquipmentExpected attribute value is set to 'EMPTY' and the
+     NE is not able to identify the resource which is physically present
+     (opticsEquipmentActual = 'EMPTY'), an alarm notification is raised with
+     probableCause 'replaceableUnitProblem'.
+     Based on the value of the opticsEquipmentExpected attribute, the
+     functional objects implemented by the physical instance are automatically
+     created inside the NE and are included in the list of the affected object
+     pointed by the related instance.
+     In case opticsEquipmentExpected is set to 'EMPTY', no object will be
+     included in the affectedObject list.
+     When, for reconfiguration purposes, the opticsEquipmentExpected attribute
+     is changed by the managing system the whole set of functional objects (TPs)
+     present in the related list of affectedObjects and associated to the
+     previous value of the opticsEquipmentExpected are deleted and the new set,
+     associated to the new value of equipmentExpected, are created.
+     Change of the opticsEquipmentExpected of an instance is only permitted
+     when that instance is in locked administrativeState and if corresponding
+     functional objects can be deleted (e.g. the deletion  should fail if one
+     of these is used as a timing reference).
+     When a resource is physically removed and replaced by another resource of
+     a different type for reconfiguration purposes the new resource can be
+     brought into service only after the managing system has changed the
+     opticsEquipmentExpected value of the corresponding instance matching the
+     new opticsEquipmentActual value.
+     The opticsEquipmentAdministrativeState attribute may have the following
+     values: locked, and unlocked.
+     This attribute reflects  the management authorization for the resource to
+     perform its function.
+     When an instance enters  the locked administrativeState then all affected
+     functional objects enter the disabled operationalState.
+     The opticsEquipmentOperationalState attribute may assume two values:
+     enabled and disabled, according to the intrinsic capability of the
+     resource to perform its function.
+     On detection of equipment failures  (e.g. replaceableUnitMissing,
+     replaceableTypeMismatch, replaceableUnitProblem), the whole set of TPs
+     included on the affectedObject list, should change their operationalState
+     attribute to 'disabled'. In case of equipment involved in a Equipment
+     Protection Switching, the TPs included on the affectedObject list should
+     change their operationalState attribute to 'disabled' only for the active
+     equipment (not for the stand-by one).
+     When an entry of this table enters in disabled operationalState then all
+     affected objects enter the disabled operationalState.
+     The  opticsEquipmentBoardReset  attribute allows the remote board reset.
+     The opticsEquipmentRxLinkStatus and opticsEquipmentTxLinkStatus attributes
+     are related to the management of link failure alarm (for instance modelled
+     by  the opticsIMAlarmReceiverFailure alarm).
+     When a link failure alarm raises,  the link alarm localization is done by
+     these attributes, analysing the links and the string characters. This
+     association rule must be described  within product specification."
+  INDEX    { opticsEquipmentPosition }
+::= { opticsIMEnhEquipmentTable 1 }
+
+OpticsIMEnhEquipmentEntry ::= SEQUENCE {
+  opticsEquipmentPosition              OCTET STRING,
+  opticsEquipmentExpectedTypeId        Integer32,
+  opticsEquipmentExpected              DisplayString,
+  opticsEquipmentActual                DisplayString,
+  opticsEquipmentAdministrativeState   OpticsIMEqptAdministrativeState,
+  opticsEquipmentOperationalState      TsdimOperationalState,
+  opticsEquipmentAsapIndex             Integer32,
+  opticsEquipmentLabel                 DisplayString,
+  opticsEquipmentBoardReset            Integer32,
+  opticsEquipmentRxLinkStatus          DisplayString,
+  opticsEquipmentTxLinkStatus          DisplayString
+  }
+
+opticsEquipmentPosition OBJECT-TYPE
+  SYNTAX        OCTET STRING
+  MAX-ACCESS    not-accessible
+  STATUS        current
+  DESCRIPTION
+    "This object identifies an entry in the enhanced equipment table. It
+     identifies the position of the equipment (rack, subrack, slot/board and
+     sub-slot/daughter board/drawers, optical/electrical components) inside
+     the NE.
+     The first octet identifies the rack position, the second the subrack
+     contained in the rack, the third the slot/board contained in the subrack,
+     the fourth the sub-slot/daughter board/drawer contained in the board, the
+     fifth the optical/electrical module (XFP,SFP..), associated to the board.
+     Octets not significant will be indicated by the value 0.
+     The length of this object is product dependant."
+::= { opticsIMEnhEquipmentEntry 1 }
+
+opticsEquipmentExpectedTypeId OBJECT-TYPE
+  SYNTAX        Integer32
+  MAX-ACCESS    read-write
+  STATUS        current
+  DESCRIPTION
+    "This object contains the identifier of the equipment type requested by the
+     managing systems. The identifier must be included in one of the entries of
+     the opticsIMEnhAllowedEquipmentTypesTable associated to that equipment
+     position. As a side effect of setting this object, the agent must set the
+     opticsEquipmentExpected object with the string associated to this
+     identifier (see opticsIMEnhAllowedEquipmentTypesTable). "
+::= { opticsIMEnhEquipmentEntry 2 }
+
+opticsEquipmentExpected OBJECT-TYPE
+  SYNTAX        DisplayString
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the equipment type expected by the managing systems.
+     It is updated by the agent when the opticsEquipmentExpectedTypeId object
+     is set by the managing systems."
+::= { opticsIMEnhEquipmentEntry 3 }
+
+opticsEquipmentActual OBJECT-TYPE
+  SYNTAX        DisplayString
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the equipment type of the equipment actually present"
+::= { opticsIMEnhEquipmentEntry 4 }
+
+opticsEquipmentAdministrativeState OBJECT-TYPE
+  SYNTAX        OpticsIMEqptAdministrativeState
+  MAX-ACCESS    read-write
+  STATUS        current
+  DESCRIPTION
+    "See Textual Conventions."
+  DEFVAL { inService }
+::= { opticsIMEnhEquipmentEntry 5 }
+
+opticsEquipmentOperationalState OBJECT-TYPE
+  SYNTAX          TsdimOperationalState
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "See Textual Conventions."
+  DEFVAL { enabled }
+::= { opticsIMEnhEquipmentEntry 6 }
+
+opticsEquipmentAsapIndex OBJECT-TYPE
+  SYNTAX          Integer32
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "This object defines the ASAP object associated to the equipment position."
+::= { opticsIMEnhEquipmentEntry 7 }
+
+opticsEquipmentLabel OBJECT-TYPE
+  SYNTAX          DisplayString (SIZE (0..20))
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "This object defines the label associated to the equipment position."
+::= { opticsIMEnhEquipmentEntry 8 }
+
+
+opticsEquipmentBoardReset  OBJECT-TYPE
+  SYNTAX        Integer32
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "This object defines the board reset command associated to the equipment
+     position. The attribute value meaning is product dependant and specified
+     within the product specification."
+::= { opticsIMEnhEquipmentEntry 9 }
+
+opticsEquipmentRxLinkStatus  OBJECT-TYPE
+  SYNTAX        DisplayString
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object  refers to the links from matrix (or from a generic central
+     unit) located in its slot  to a set of ports located in their slots. This
+     object is interpreted with a rule, described within product specification,
+     and will typically have header chars (for equipment identification) plus
+     data chars referred to the link status. Each data char 'X' is related to
+     a link status associated to a specific slot (X=0 for link down, X= 1 for
+     link up)"
+::= { opticsIMEnhEquipmentEntry 10 }
+
+opticsEquipmentTxLinkStatus  OBJECT-TYPE
+  SYNTAX        DisplayString
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object refers to the links from a set of ports located in their slots
+     to matrix (or to a generic central unit) located in its slot. This object
+     is interpreted with a rule, described within product specification, and
+     will typically have header chars (for equipment identification) plus data
+     chars referred to the link status. Each data char 'X' is related to a link
+     status associated to a specific slot (X =0 for link down, X = 1 for link
+     up)"
+::= { opticsIMEnhEquipmentEntry 11 }
+
+opticsIMEnhAllowedEquipmentTypesTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMEnhAllowedEquipmentTypesEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "This table contains, for each equipment position composing the NE, the
+     allowed equipment types. "
+::= { opticsIMEqptMibObject 15 }
+
+opticsIMEnhAllowedEquipmentTypesEntry OBJECT-TYPE
+  SYNTAX          OpticsIMEnhAllowedEquipmentTypesEntry
+  MAX-ACCESS      not-accessible
+  STATUS          current
+  DESCRIPTION
+    "An entry of the enhanced allowed equipment type table. Each entry (row)
+     corresponds to an equipment type allowed for the equipment position
+     identified by the opticsEquipmentPosition object.
+     An empty equipment position shall be identified by the value 0 in the
+     opticsopticsAllowedEquipmentTypeId object and by the string 'EMPTY' in
+     the opticsAllowedEquipmentType one."
+  INDEX   { opticsEquipmentPosition, opticsAllowedEquipmentTypeId }
+::= { opticsIMEnhAllowedEquipmentTypesTable 1 }
+
+OpticsIMEnhAllowedEquipmentTypesEntry ::= SEQUENCE {
+  opticsAllowedEquipmentTypeId  Integer32,
+  opticsAllowedEquipmentType    DisplayString
+  }
+
+opticsAllowedEquipmentTypeId OBJECT-TYPE
+  SYNTAX        Integer32
+  MAX-ACCESS    not-accessible
+  STATUS        current
+  DESCRIPTION
+    "This object contains the identifier of an equipment type allowed for the
+     associated equipment position."
+::= { opticsIMEnhAllowedEquipmentTypesEntry 1 }
+
+opticsAllowedEquipmentType OBJECT-TYPE
+  SYNTAX         DisplayString
+  MAX-ACCESS     read-only
+  STATUS         current
+  DESCRIPTION
+    "This object identifies the equipment type (string) associated to the
+     opticsopticsAllowedEquipmentTypeId."
+::= { opticsIMEnhAllowedEquipmentTypesEntry 2 }
+
+opticsIMEnhAffectedObjectsListTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMEnhAffectedObjectsListEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "This enhanced table contains, for each equipment composing the NE, the
+     list, if any, of the objects affected by any change in state or type of
+     such equipment."
+::= { opticsIMEqptMibObject 16 }
+
+opticsIMEnhAffectedObjectsListEntry OBJECT-TYPE
+  SYNTAX              OpticsIMEnhAffectedObjectsListEntry
+  MAX-ACCESS          not-accessible
+  STATUS              current
+  DESCRIPTION
+    "An entry of the enhanced affected object list table. Each entry (row)
+     corresponds to an affected object for the equipment position identified
+     by the opticsEquipmentPosition object.
+     Each affected object is identified by the instance identifier."
+  INDEX    { opticsEquipmentPosition, opticsAffectedObjectsListIndex }
+::= { opticsIMEnhAffectedObjectsListTable 1 }
+
+OpticsIMEnhAffectedObjectsListEntry ::= SEQUENCE {
+  opticsAffectedObjectsListIndex    Integer32,
+  opticsAffectedObjectInstanceId    InstancePointer
+  }
+
+opticsAffectedObjectsListIndex OBJECT-TYPE
+  SYNTAX                Integer32
+  MAX-ACCESS            not-accessible
+  STATUS                current
+  DESCRIPTION
+    "This object identifies the index for each equipment position."
+::= { opticsIMEnhAffectedObjectsListEntry 1 }
+
+opticsAffectedObjectInstanceId OBJECT-TYPE
+  SYNTAX          InstancePointer
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "See Textual Conventions."
+::= { opticsIMEnhAffectedObjectsListEntry 3 }
+
+opticsIMEnhRemoteInventoryTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMEnhRemoteInventoryEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "This table contains the enhanced remote inventory of the different units
+     (replaceable units) composing the NE"
+::= { opticsIMEqptMibObject 17 }
+
+opticsIMEnhRemoteInventoryEntry OBJECT-TYPE
+  SYNTAX         OpticsIMEnhRemoteInventoryEntry
+  MAX-ACCESS     not-accessible
+  STATUS         current
+  DESCRIPTION
+    "An entry of the enhanced remote inventory table. Each entry (row)
+     corresponds to the remote inventory data of a replaceable unit identified
+     by the opticsEquipmentPosition object.
+     An entry of this table is created at creation time of the associated
+     opticsIMEnhEquipmentTable entry identified by the same equipment position."
+  INDEX    { opticsEquipmentPosition }
+::= { opticsIMEnhRemoteInventoryTable 1 }
+
+OpticsIMEnhRemoteInventoryEntry ::= SEQUENCE {
+  opticsRemoteInventoryStatus               INTEGER,
+  opticsRemoteInventoryCompanyIdentifier    DisplayString,
+  opticsRemoteInventoryMnemonic             DisplayString,
+  opticsRemoteInventoryCLEICode             DisplayString,
+  opticsRemoteInventoryPartNumber           DisplayString,
+  opticsRemoteInventorySoftwarePartNumber   DisplayString,
+  opticsRemoteInventoryFactoryIdentifier    DisplayString,
+  opticsRemoteInventorySerialNumber         DisplayString,
+  opticsRemoteInventoryDateIdentifier       DisplayString,
+  opticsRemoteInventoryDate                 DisplayString,
+  opticsRemoteInventoryCustomerField        DisplayString
+  }
+
+opticsRemoteInventoryStatus OBJECT-TYPE
+  SYNTAX INTEGER {
+    available   (1),
+    unavailable (2)
+  }
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the status of the enhanced remote inventory data:
+     available or not. "
+::= { opticsIMEnhRemoteInventoryEntry 1 }
+
+opticsRemoteInventoryCompanyIdentifier OBJECT-TYPE
+  SYNTAX        DisplayString  (SIZE(4))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the identifier of the manufacturer of the replaceable
+     unit."
+::= { opticsIMEnhRemoteInventoryEntry 2 }
+
+opticsRemoteInventoryMnemonic OBJECT-TYPE
+  SYNTAX        DisplayString  (SIZE(8))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the mnemonic describing the replaceable unit."
+::= { opticsIMEnhRemoteInventoryEntry 3 }
+
+opticsRemoteInventoryCLEICode OBJECT-TYPE
+  SYNTAX        DisplayString  (SIZE(10))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the CLEI code of the replaceable unit."
+::= { opticsIMEnhRemoteInventoryEntry 4 }
+
+opticsRemoteInventoryPartNumber OBJECT-TYPE
+  SYNTAX        DisplayString  (SIZE(14))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the part number of the replaceable unit."
+::= { opticsIMEnhRemoteInventoryEntry 5 }
+
+opticsRemoteInventorySoftwarePartNumber OBJECT-TYPE
+  SYNTAX        DisplayString  (SIZE(14))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the software part number of the replaceable unit."
+::= { opticsIMEnhRemoteInventoryEntry 6 }
+
+opticsRemoteInventoryFactoryIdentifier OBJECT-TYPE
+  SYNTAX        DisplayString  (SIZE(4))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the identifier of the factory where the replaceable
+     unit was made."
+::= { opticsIMEnhRemoteInventoryEntry 7 }
+
+opticsRemoteInventorySerialNumber OBJECT-TYPE
+  SYNTAX        DisplayString  (SIZE(16))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the serial number of the replaceable unit."
+::= { opticsIMEnhRemoteInventoryEntry 8 }
+
+opticsRemoteInventoryDateIdentifier OBJECT-TYPE
+  SYNTAX        DisplayString  (SIZE(2))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the date identifier of the replaceable unit. It
+     specifies the meaning of the Date field."
+::= { opticsIMEnhRemoteInventoryEntry 9 }
+
+opticsRemoteInventoryDate OBJECT-TYPE
+  SYNTAX        DisplayString  (SIZE(6))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object contains the manufacturing date of the replaceable unit. The
+     format is YYMMDD."
+::= { opticsIMEnhRemoteInventoryEntry 10 }
+
+opticsRemoteInventoryCustomerField OBJECT-TYPE
+  SYNTAX        DisplayString (SIZE (46))
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "This object represents a string of 46 characters and is reserved for
+     customer inventory information (loaded during the manufacturing process
+     only)."
+::= { opticsIMEnhRemoteInventoryEntry 11 }
+
+-- End Enhanced Equipment Tables and its related enhanced tables
+
+-- battery protection
+opticsIMBatteryProtected  OBJECT-TYPE
+  SYNTAX          TruthValue
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "This object specifies if the battery protection is required on the system.
+     The 'true' value indicates that the battery protection is required."
+::= { opticsIMEqptMibObject 18 }
+
+-- Equipment Transmission Capability branch
+opticsIMEqpTrsCapability  OBJECT IDENTIFIER ::= { opticsIMEqptMibObject 21 }
+
+opticsIMEqpTrsCEquipmentTable  OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMEqpTrsCEquipmentEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "Extension of the Equipment table to support management of specific
+     transmission properties at board level"
+::= { opticsIMEqpTrsCapability 1 }
+
+opticsIMEqpTrsCEquipmentEntry OBJECT-TYPE
+  SYNTAX        OpticsIMEqpTrsCEquipmentEntry
+  MAX-ACCESS    not-accessible
+  STATUS        current
+  DESCRIPTION
+    ""
+  INDEX { equipmentPosition }
+::= { opticsIMEqpTrsCEquipmentTable 1 }
+
+OpticsIMEqpTrsCEquipmentEntry ::= SEQUENCE {
+  eqpTrsCImaGroupNumber       Integer32,
+  eqpTrsCImaGroupNextIndex    Integer32
+}
+
+eqpTrsCImaGroupNumber  OBJECT-TYPE
+  SYNTAX              Integer32
+  MAX-ACCESS          read-only
+  STATUS              current
+  DESCRIPTION
+    "Actual number of IMA Group configurated on the board.
+     This value is incremented/decremented as a side effect of the
+     creation/deletion of an IMA Group.
+     It must never be greater then the opticsImEqpTrsCImaGroupMaxNumber."
+::= { opticsIMEqpTrsCEquipmentEntry 1 }
+
+eqpTrsCImaGroupNextIndex  OBJECT-TYPE
+  SYNTAX              Integer32
+  MAX-ACCESS          read-only
+  STATUS              current
+  DESCRIPTION
+    "This index must be initialised by the system on the basis of the naming
+     rules.
+     The index will span in the following range, where 'ss' is the slot
+     position:
+                  6s 01 30000 - 6s XX 30000
+     where XX is the value of opticsIMEqpTrsCImaGroupMaxNumber"
+  ::= { opticsIMEqpTrsCEquipmentEntry 2 }
+
+opticsIMEqpTrsCImaLinkMaxNumber  OBJECT-TYPE
+  SYNTAX              Integer32
+  MAX-ACCESS          read-only
+  STATUS              current
+  DESCRIPTION
+    "Maximum Number of configurable IMA Link over a IMA Group.
+     This value is hardcoded and it is not configurable."
+::= { opticsIMEqpTrsCapability 2 }
+
+opticsIMEqpTrsCImaGroupMaxNumber  OBJECT-TYPE
+  SYNTAX              Integer32
+  MAX-ACCESS          read-only
+  STATUS              current
+  DESCRIPTION
+    "Maximum Number of configurable IMA Group on the board.
+     This value is hardcoded and it is not configurable."
+  ::= { opticsIMEqpTrsCapability 3 }
+
+opticsIMEqpTrsCPwMaxNumber  OBJECT-TYPE
+  SYNTAX              Integer32
+  MAX-ACCESS          read-only
+  STATUS              current
+  DESCRIPTION
+    "Maximum Number of configurable PseudoWire services per board.
+     This value is hardcoded and it is not configurable."
+  ::= { opticsIMEqpTrsCapability 4 }
+
+opticsIMEqpTrsCAtmXPointMaxNumber  OBJECT-TYPE
+  SYNTAX              Integer32
+  MAX-ACCESS          read-only
+  STATUS              current
+  DESCRIPTION
+    "Maximum Number of configurable VP/VC connection points on each ATM
+     interface.
+     This value is hardcoded and it is not configurable."
+  ::= { opticsIMEqpTrsCapability 5 }
+
+-- End of Equipment Transmission Capability branch
+
+
+-- PowerSourceTable
+
+
+opticsIMPowerSourceTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMPowerSourceEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "This table contains the information related to the managed power sources of a physical component."
+::= { opticsIMEqptMibObject 23 }
+
+opticsIMPowerSourceEntry OBJECT-TYPE
+  SYNTAX             OpticsIMPowerSourceEntry
+  MAX-ACCESS         not-accessible
+  STATUS             current
+  DESCRIPTION
+    "An entry of the power source table. Each entry (row), corresponding
+     to a power source for a physical component of a managed element."
+  INDEX    { powerSourceIndex }
+::= { opticsIMPowerSourceTable 1 }
+
+OpticsIMPowerSourceEntry ::= SEQUENCE {
+
+  powerSourceIndex          Integer32,
+  powerSourceType           INTEGER,
+  powerSourcePortIndex      InterfaceIndexOrZero,
+  powerSourceInterfaceIndex InterfaceIndexOrZero,
+  powerSourceAsapIndex        Integer32
+
+}
+
+powerSourceIndex OBJECT-TYPE
+  SYNTAX              Integer32
+  MAX-ACCESS          not-accessible
+  STATUS              current
+  DESCRIPTION
+    "This object identifies an entry in the power source table.
+      "
+::= { opticsIMPowerSourceEntry 1 }
+
+powerSourceType OBJECT-TYPE
+    SYNTAX INTEGER {
+        qMA (1),
+        poE (2),
+        disabled (3)
+  }
+  MAX-ACCESS          read-write
+  STATUS              current
+  DESCRIPTION
+    "This object identifies the type of power for this source.
+      "
+::= { opticsIMPowerSourceEntry 2 }
+
+powerSourcePortIndex OBJECT-TYPE
+  SYNTAX              InterfaceIndexOrZero
+  MAX-ACCESS          read-only
+  STATUS              current
+  DESCRIPTION
+    "Meaningful only in case of poE (power over ethernet) on powerSourceType object. Default at creation is zero.
+     This object will report the ifIndex of the associated Electrical GbEth Interface used to power.
+      "
+::= { opticsIMPowerSourceEntry 3 }
+
+powerSourceInterfaceIndex OBJECT-TYPE
+  SYNTAX              InterfaceIndexOrZero
+  MAX-ACCESS          read-only
+  STATUS              current
+  DESCRIPTION
+    "Meaningful only in case of equipment configured on a Ethernet Interface and powered by the PowerSource on the
+     powerSourcePortIndex (Electrical GbEth Interface).
+     Agent as side effect of equipment configuration on a Etherent Interface will report in this object the ifIndex of this
+     Ethernet Interface;  that allows a generic Manager to know to which equipment the Power Source is supplied to.
+     Default at creation is Zero.
+      "
+::= { opticsIMPowerSourceEntry 4 }
+
+powerSourceAsapIndex OBJECT-TYPE
+  SYNTAX          Integer32
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "This object defines the ASAP object associated to the power Source."
+
+::= { opticsIMPowerSourceEntry 5 }
+
+-- end PowerSourceTable
+
+
+--
+-- TSDnm83899 Start
+--
+
+opticsIMEnhUnderConstructionTable OBJECT-TYPE
+  SYNTAX     SEQUENCE OF  OpticsIMEnhUnderConstructionEntry
+  MAX-ACCESS not-accessible
+  STATUS     current
+  DESCRIPTION
+   "This table contains the flag to switch on/off the UnderConstruction
+    for equipment resources composing the NE "
+::= { opticsIMEqptMibObject 24 }
+
+opticsIMEnhUnderConstructionEntry OBJECT-TYPE
+  SYNTAX     OpticsIMEnhUnderConstructionEntry
+  MAX-ACCESS not-accessible
+  STATUS     current
+  DESCRIPTION
+    "An entry of the enhanced under construction table. Each entry (row)
+     corresponds to the Under construction flag of an equipment resource
+     identified by the opticsEquipmentPosition object.
+     An entry of this table is created at creation time of the associated
+     opticsIMEnhEquipmentTable entry identified by the same equipment
+     position."
+  INDEX { opticsEquipmentPosition }
+::= { opticsIMEnhUnderConstructionTable 1 }
+
+OpticsIMEnhUnderConstructionEntry ::= SEQUENCE {
+  opticsIMUnderConstructionFlag   TruthValue
+}
+
+opticsIMUnderConstructionFlag  OBJECT-TYPE
+  SYNTAX     TruthValue
+  MAX-ACCESS read-write
+  STATUS     current
+  DESCRIPTION
+    "This object contains the flag of the underConstruction:
+     enable or disable. "
+::= { opticsIMEnhUnderConstructionEntry 1 }
+
+--
+-- TSDnm83899 End
+--
+
+
+-- OPTICSIM-EQPT-MC DEFINITIONS ::= BEGIN
+--   IMPORTS
+--     MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY    FROM SNMPv2-SMI
+--     MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP FROM SNMPv2-CONF
+--     tsdimBasicMC                                     FROM TSDIM-BASICREG-MIB;
+--
+-- opticsIMEqptMCCompl MODULE-IDENTITY
+--   LAST-UPDATED "20020724000000Z"
+--   ORGANIZATION "Alcatel TND"
+--   CONTACT-INFO "Alcatel TND"
+--   DESCRIPTION
+--     "Removed the affectedObjectClassId object from opticsIMEquipmentGroup."
+--
+--   REVISION "20020510000000Z"
+--   DESCRIPTION
+--     "Updated the groups already existing. Added the object
+--      opticsIMTribPortsImpedance."
+--
+--   REVISION "20020125000000Z"
+--   DESCRIPTION
+--     "Initial Release of Equipment Module Compliance."
+-- ::= { opticsIMEqptMCConf 1 }
+
+opticsIMEqptMCConf       OBJECT IDENTIFIER ::= { tsdimBasicMC 5 }
+opticsIMEqptMCCompl      OBJECT IDENTIFIER ::= { opticsIMEqptMCConf 1 }
+opticsIMEqptMCGroup      OBJECT IDENTIFIER ::= { opticsIMEqptMCConf 2 }
+
+opticsIMEqptMc MODULE-COMPLIANCE
+  STATUS current
+  DESCRIPTION
+    "This module compliance describes a set of objects required for Optics-IM
+     Agent implementation. These objects are defined inside opticsIMEqptMib."
+
+  MODULE -- opticsIMEqptMib
+
+  MANDATORY-GROUPS {
+    opticsIMEquipmentGroup,
+    opticsIMExternalPointsGroup,
+    opticsIMRemoteInventoryGroup,
+    opticsIMEquipmentProtectionGroup,
+    opticsIMEqptAlarmGroup,
+    opticsIMEnhEquipmentGroup,
+    opticsIMEnhRemoteInventoryGroup
+  }
+
+  GROUP opticsIMAffectedObjectsListGroup
+    DESCRIPTION
+      "This group describes the objects needed for the definition of the
+       objects list affected by an equipment type. "
+
+  GROUP opticsIMOptExternalPointsGroup
+    DESCRIPTION
+      "This group describes the External Points optional objects."
+
+  GROUP opticsIMOptEquipmentProtectionGroup
+    DESCRIPTION
+      "This group describes the Equipment Protection optional objects."
+
+  GROUP opticsIMOptTribPortsGroup
+    DESCRIPTION
+      "This group describes the Tributary Ports optional objects."
+
+  GROUP opticsIMOptExternalPointsRemotizationGroup
+    DESCRIPTION
+      "This group describes the objects used to manage the remotization of
+       external input points on external output ones."
+
+  GROUP opticsIMEnhAffectedObjectsListGroup
+    DESCRIPTION
+      "This group describes the objects needed for the definition of the
+       enhanced objects list affected by an equipment type."
+::= { opticsIMEqptMCCompl 1 }
+
+opticsIMEquipmentGroup OBJECT-GROUP
+  OBJECTS {
+    equipmentExpectedTypeId,
+    equipmentExpected,
+    equipmentActual,
+    equipmentAdministrativeState,
+    equipmentOperationalState,
+    equipmentAsapIndex,
+    equipmentLabel,
+    allowedEquipmentType
+  }
+  STATUS current
+  DESCRIPTION
+    "This group describes the mandatory objects needed for the Equipment
+     configuration."
+::= { opticsIMEqptMCGroup 1 }
+
+opticsIMAffectedObjectsListGroup OBJECT-GROUP
+  OBJECTS { affectedObjectInstanceId }
+  STATUS current
+  DESCRIPTION
+    "This group describes the objects needed for the definition of the objects
+     list affected by an equipment type."
+::= { opticsIMEqptMCGroup 2 }
+
+opticsIMRemoteInventoryGroup OBJECT-GROUP
+  OBJECTS {
+    remoteInventoryStatus,
+    remoteInventoryCompanyIdentifier,
+    remoteInventoryMnemonic,
+    remoteInventoryCLEICode,
+    remoteInventoryPartNumber,
+    remoteInventorySoftwarePartNumber,
+    remoteInventoryFactoryIdentifier,
+    remoteInventorySerialNumber,
+    remoteInventoryDateIdentifier,
+    remoteInventoryDate,
+    remoteInventoryCustomerField
+  }
+  STATUS current
+  DESCRIPTION
+    "This group describes the mandatory objects needed for the Remote
+     Inventory."
+::= { opticsIMEqptMCGroup 3 }
+
+opticsIMExternalPointsGroup OBJECT-GROUP
+  OBJECTS {
+    inputPointUserLabel,
+    inputPointExternalState,
+    inputPointAsapIndex,
+    inputPointOperationalState,
+    outputPointUserLabel,
+    outputPointExternalState,
+    outputPointOperationalState
+  }
+  STATUS current
+  DESCRIPTION
+    "This group describes the objects needed for the external points
+     management."
+::= { opticsIMEqptMCGroup 4 }
+
+opticsIMOptExternalPointsGroup OBJECT-GROUP
+  OBJECTS {
+    inputPointPolarity,
+    outputPointPolarity,
+    outputPointCriteria,
+    outputPointAutomaticEventId,
+    outputPointAutomaticEvent,
+    outputPointAllowedEvent,
+    externalPointType
+  }
+  STATUS current
+  DESCRIPTION
+    "This group describes the External Points optional objects."
+::= { opticsIMEqptMCGroup 5 }
+
+opticsIMEquipmentProtectionGroup OBJECT-GROUP
+  OBJECTS {
+    opticsIMEquipmentProtectionGroupType,
+    opticsIMEquipmentProtectionGroupRevertive,
+    opticsIMEquipmentProtectionGroupOperationalState,
+    opticsIMEquipmentProtectionGroupRowStatus,
+    opticsIMEquipmentProtectionGroupExtraTraffic,
+    opticsIMEquipmentProtectionUnitChannelNumber,
+    opticsIMEquipmentProtectionUnitType,
+    opticsIMEquipmentProtectionUnitSwitchCommand,
+    opticsIMEquipmentProtectionUnitSwitchCriteria,
+    opticsIMEquipmentProtectionUnitSwitchStatus,
+    opticsIMEquipmentProtectionUnitPriority
+  }
+  STATUS current
+  DESCRIPTION
+    "This group describes the Equipment Protection mandatory objects."
+::= { opticsIMEqptMCGroup 6 }
+
+opticsIMOptEquipmentProtectionGroup OBJECT-GROUP
+  OBJECTS {
+    opticsIMEquipmentProtectionUnitSwitchRequestSource,
+    opticsIMBatteryProtected
+  }
+  STATUS current
+  DESCRIPTION
+    "This group describes the Equipment Protection optional objects."
+::= { opticsIMEqptMCGroup 7 }
+
+
+opticsIMEqptAlarmGroup NOTIFICATION-GROUP
+  NOTIFICATIONS {
+    opticsIMHousekeepingAlarmRaise,
+    opticsIMHousekeepingAlarmClear,
+    opticsIMAlarmReplaceableUnitProblemRaise,
+    opticsIMAlarmReplaceableUnitProblemClear,
+    opticsIMAlarmReplaceableUnitMissingRaise,
+    opticsIMAlarmReplaceableUnitMissingClear,
+    opticsIMAlarmReplaceableUnitTypeMismatchRaise,
+    opticsIMAlarmReplaceableUnitTypeMismatchClear,
+    opticsIMAlarmUnconfiguredEquipmentPresentRaise,
+    opticsIMAlarmUnconfiguredEquipmentPresentClear,
+    opticsIMAlarmFirmwareDownloadOnGoingRaise,
+    opticsIMAlarmFirmwareDownloadOnGoingClear,
+    opticsIMAlarmVersionMismatchRaise,
+    opticsIMAlarmVersionMismatchClear,
+    opticsIMAlarmInternalCommunicationProblemRaise,
+    opticsIMAlarmInternalCommunicationProblemClear,
+    opticsIMAlarmLanFailureRaise,
+    opticsIMAlarmLanFailureClear,
+    opticsIMAlarmBatteryFailRaise,
+    opticsIMAlarmBatteryFailClear,
+    opticsIMAlarmSecondaryBatteryFailRaise,
+    opticsIMAlarmSecondaryBatteryFailClear,
+    opticsIMAlarmAndBatteryFailureRaise,
+    opticsIMAlarmAndBatteryFailureClear,
+    opticsIMAlarmBackplaneFailureRaise,
+    opticsIMAlarmBackplaneFailureClear,
+    opticsIMAlarmReceiverFailureRaise,
+    opticsIMAlarmReceiverFailureClear,
+    opticsIMAlarmLowPowerRaise,
+    opticsIMAlarmLowPowerClear,
+    opticsIMAlarmStandByVersionMismatchRaise,
+    opticsIMAlarmStandByVersionMismatchClear,
+    opticsIMAlarmRemoteInventoryFailureRaise,
+    opticsIMAlarmRemoteInventoryFailureClear,
+    opticsIMAlarmRepeaterCableProblemRaise,
+    opticsIMAlarmRepeaterCableProblemClear,
+    opticsIMAlarmProvisioningMismatchRaise,
+    opticsIMAlarmProvisioningMismatchClear,
+    opticsIMAlarmFuseBrokenRaise,
+    opticsIMAlarmFuseBrokenClear,
+    opticsIMAlarmExcessiveEnvironmentalTemperatureRaise,
+    opticsIMAlarmExcessiveEnvironmentalTemperatureClear,
+    opticsIMAlarmDatabaseAbnormalRaise,
+    opticsIMAlarmDatabaseAbnormalClear,
+    opticsIMAlarmNewMediaConverterRaise,
+    opticsIMAlarmNewMediaConverterClear,
+    opticsIMAlarmMediaConverterLossOfAssociationRaise,
+    opticsIMAlarmMediaConverterLossOfAssociationClear,
+    opticsIMAlarmSystemTimeOfDayUnreliableRaise,
+    opticsIMAlarmSystemTimeOfDayUnreliableClear,
+    opticsIMAlarmReplaceableUnitInitializingRaise,
+    opticsIMAlarmReplaceableUnitInitializingClear
+  }
+  STATUS current
+  DESCRIPTION
+    "This group describes the Equipment alarm notifications."
+::= { opticsIMEqptMCGroup 8 }
+
+opticsIMOptTribPortsGroup OBJECT-GROUP
+  OBJECTS { opticsIMTribPortsImpedance }
+  STATUS current
+  DESCRIPTION
+    "This group describes the tributary ports optional objects."
+::= { opticsIMEqptMCGroup 9 }
+
+opticsIMOptExternalPointsRemotizationGroup OBJECT-GROUP
+  OBJECTS {
+    inputPointRemotizationDestination,
+    inputPointRemotizationStatus,
+    inputPointRemotizationLastUpdate,
+    inputPointManualRemotization,
+    inputPointRemotizationRowStatus,
+    remoteInputPointAgent,
+    remoteInputPointIndex,
+    remoteInputPointLastUpdate,
+    remoteInputPointRowStatus
+  }
+  STATUS current
+  DESCRIPTION
+    "This group describes the objects used to manage the remotization of
+     external input points on external output ones."
+::= { opticsIMEqptMCGroup 10 }
+
+-- Begin Groups related to Enhanced Equipment Table
+opticsIMEnhEquipmentGroup OBJECT-GROUP
+  OBJECTS {
+    opticsEquipmentExpectedTypeId,
+    opticsEquipmentExpected,
+    opticsEquipmentActual,
+    opticsEquipmentAdministrativeState,
+    opticsEquipmentOperationalState,
+    opticsEquipmentAsapIndex,
+    opticsEquipmentLabel,
+    opticsAllowedEquipmentType,
+    opticsEquipmentBoardReset,
+    opticsEquipmentRxLinkStatus,
+    opticsEquipmentTxLinkStatus
+  }
+  STATUS current
+  DESCRIPTION
+    "This group describes the mandatory objects needed for the Equipment
+     configuration."
+::= { opticsIMEqptMCGroup 11 }
+
+opticsIMEnhAffectedObjectsListGroup OBJECT-GROUP
+  OBJECTS { opticsAffectedObjectInstanceId }
+  STATUS current
+  DESCRIPTION
+    "This group describes the objects needed for the definition of the
+     enhanced objects list affected by an equipment type."
+::= { opticsIMEqptMCGroup 12 }
+
+opticsIMEnhRemoteInventoryGroup OBJECT-GROUP
+  OBJECTS {
+    opticsRemoteInventoryStatus,
+    opticsRemoteInventoryCompanyIdentifier,
+    opticsRemoteInventoryMnemonic,
+    opticsRemoteInventoryCLEICode,
+    opticsRemoteInventoryPartNumber,
+    opticsRemoteInventorySoftwarePartNumber,
+    opticsRemoteInventoryFactoryIdentifier,
+    opticsRemoteInventorySerialNumber,
+    opticsRemoteInventoryDateIdentifier,
+    opticsRemoteInventoryDate,
+    opticsRemoteInventoryCustomerField
+  }
+  STATUS current
+  DESCRIPTION
+    "This group describes the mandatory objects needed for the Enhanced Remote
+     Inventory."
+::= { opticsIMEqptMCGroup 13 }
+
+opticsIMEqpTrsCGroup  OBJECT-GROUP
+  OBJECTS {
+    opticsIMEqpTrsCImaLinkMaxNumber,
+    opticsIMEqpTrsCImaGroupMaxNumber,
+    opticsIMEqpTrsCPwMaxNumber,
+    opticsIMEqpTrsCAtmXPointMaxNumber
+  }
+  STATUS     current
+  DESCRIPTION
+    "This group describes the mandatory objects needed for the A16E1DS1
+     equipment support."
+::= { opticsIMEqptMCGroup 14 }
+
+-- End Groups related to Enhanced Equipment Table
+
+END
