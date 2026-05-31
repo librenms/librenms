@@ -4,11 +4,21 @@ namespace App\Api\Controllers\MetricsApi;
 
 use App\Models\Device;
 use App\Models\Port;
+use BackedEnum;
 use Illuminate\Http\Request;
 
 class PortsMetrics
 {
     use Traits\MetricsHelpers;
+
+    private function normalizePortStatus(mixed $status): string
+    {
+        if ($status instanceof BackedEnum) {
+            return strtolower((string) $status->value);
+        }
+
+        return strtolower((string) $status);
+    }
 
     public function render(Request $request): string
     {
@@ -108,8 +118,8 @@ class PortsMetrics
                 $this->escapeLabel((string) $p->ifAlias)
             );
 
-            $adminStatus = strtolower((string) $p->ifAdminStatus);
-            $operStatus = strtolower((string) $p->ifOperStatus);
+            $adminStatus = $this->normalizePortStatus($p->ifAdminStatus);
+            $operStatus = $this->normalizePortStatus($p->ifOperStatus);
             $isAdminUp = $adminStatus === 'up' || str_starts_with($adminStatus, 'up(') || $adminStatus === '1';
             $isOperUp = $operStatus === 'up' || str_starts_with($operStatus, 'up(') || $operStatus === '1';
 
