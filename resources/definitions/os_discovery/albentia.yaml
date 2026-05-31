@@ -60,6 +60,8 @@ modules:
                     index: 'sectorTemp.{{ $index }}'
                     divisor: 100
                     group: 'Sector temperature'
+                    low_limit: 0
+                    low_warn_limit: 5
                     warn_limit: 70
                     high_limit: 80
 
