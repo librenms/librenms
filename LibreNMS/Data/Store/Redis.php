@@ -8,15 +8,15 @@ use Illuminate\Support\Facades\Log;
 
 class Redis extends BaseDatastore
 {
-    private bool $enabled;
-    private string $connection;
-    private string $defaultListKey;
-    private string $servicesListKey;
-    private string $discoveryListKey;
-    private int $maxLength;
-    private int $defaultTtl;
-    private int $servicesTtl;
-    private int $discoveryTtl;
+    private readonly bool $enabled;
+    private readonly string $connection;
+    private readonly string $defaultListKey;
+    private readonly string $servicesListKey;
+    private readonly string $discoveryListKey;
+    private readonly int $maxLength;
+    private readonly int $defaultTtl;
+    private readonly int $servicesTtl;
+    private readonly int $discoveryTtl;
 
     public function __construct()
     {
@@ -62,7 +62,7 @@ class Redis extends BaseDatastore
                 'measurement' => $measurement,
                 'device_id' => $device->device_id,
                 'hostname' => $device->hostname,
-                'status' => isset($device->status) ? (int) $device->status : null,
+                'status' => isset($device->status) ? ((int) $device->status > 0 ? 1 : 0) : null,
                 'status_reason' => isset($device->status_reason) ? (string) $device->status_reason : null,
                 'fields' => $fields,
                 'tags' => array_filter($tags, fn ($value) => $value !== '' && $value !== null),
@@ -82,7 +82,7 @@ class Redis extends BaseDatastore
             $ttl = $this->resolveTtlForMeasurement($measurement);
 
             $redis = app('redis')->connection($this->connection);
-            $redis->rpush($listKey, $encoded);
+            $redis->rPush($listKey, $encoded);
 
             if ($this->maxLength > 0) {
                 $redis->ltrim($listKey, -$this->maxLength, -1);
