@@ -65,7 +65,7 @@ class Redis extends BaseDatastore
                 'status' => isset($device->status) ? ((int) $device->status > 0 ? 1 : 0) : null,
                 'status_reason' => isset($device->status_reason) ? (string) $device->status_reason : null,
                 'fields' => $fields,
-                'tags' => array_filter($tags, fn ($value) => $value !== '' && $value !== null),
+                'tags' => array_filter($tags, fn ($value) => $value !== ''),
             ];
 
             $encoded = json_encode($payload, JSON_UNESCAPED_SLASHES);
