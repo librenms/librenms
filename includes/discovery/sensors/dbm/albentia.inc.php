@@ -1,10 +1,14 @@
 <?php
-//
-// Albentia: Target RSSI (config setpoint, single global value per BS).
-// All sectors return the same value, so publish only the first row.
-// Not exposed in Wireless > RSSI on purpose — that dashboard is for measured
-// signal, not configuration targets.
-
+/**
+ * Albentia: Target RSSI (config setpoint, single global value per BS).
+ *
+ * All sectors return the same value, so publish only the first row.
+ * Not exposed in Wireless > RSSI on purpose — that dashboard is for measured
+ * signal, not configuration targets.
+ *
+ * @var array<string, mixed> $device  Provided by the discovery loop in
+ *                                    includes/discovery/functions.inc.php
+ */
 $radio = (array) snmpwalk_cache_oid(
     $device, 'radioInfoTable', [], 'ALBENTIA-AS-MIB', 'albentia', '-OteQUsb'
 );

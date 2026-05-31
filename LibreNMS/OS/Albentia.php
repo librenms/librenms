@@ -29,8 +29,12 @@ class Albentia extends OS implements
     WirelessFrequencyDiscovery,
     WirelessPowerDiscovery
 {
+    /** @var array<string, array<string, string|int>>|null */
     private ?array $radioInfoCache = null;
 
+    /**
+     * @return array<string, array<string, string|int>>
+     */
     private function getRadioInfo(): array
     {
         if ($this->radioInfoCache === null) {
@@ -47,6 +51,9 @@ class Albentia extends OS implements
         return $this->radioInfoCache;
     }
 
+    /**
+     * @return array<int, WirelessSensor>
+     */
     public function discoverWirelessClients()
     {
         return [
@@ -61,6 +68,9 @@ class Albentia extends OS implements
         ];
     }
 
+    /**
+     * @return array<int, WirelessSensor>
+     */
     public function discoverWirelessFrequency()
     {
         $sensors = [];
@@ -84,6 +94,9 @@ class Albentia extends OS implements
         return $sensors;
     }
 
+    /**
+     * @return array<int, WirelessSensor>
+     */
     public function discoverWirelessDistance()
     {
         foreach ($this->getRadioInfo() as $idx_enc => $row) {
@@ -110,6 +123,9 @@ class Albentia extends OS implements
         return [];
     }
 
+    /**
+     * @return array<int, WirelessSensor>
+     */
     public function discoverWirelessPower()
     {
         foreach ($this->getRadioInfo() as $idx_enc => $row) {
