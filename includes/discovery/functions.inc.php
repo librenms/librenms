@@ -291,6 +291,19 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
                 return 1;
             }
         }
+    } elseif ($device['os'] == 'deltaups') {
+        // Delta UPS602R2RT* with Mini-SNMP firmware reports input/output/bypass
+        // voltages in tenths of volts (e.g. 2302 = 230.2 V) instead of the RFC
+        // 1628 whole volts. Verified on UPS602R2RT2N035 (FW 0F0011BR00.02.03).
+        // The older GES602R212035 with the "UPS SNMP Agent" reports correctly
+        // so we narrow the override to the affected hardware string. The
+        // upsBatteryVoltage OID always uses the RFC 1628 d-1 scale so it is
+        // intentionally excluded here.
+        if ($sensor_type == 'voltage'
+            && ! Str::startsWith($oid, '.1.3.6.1.2.1.33.1.2.5.')
+            && Str::startsWith($device['hardware'] ?? '', 'Delta UPS602R2RT')) {
+            return 10;
+        }
     } elseif ($device['os'] == 'huaweiups') {
         if ($sensor_type == 'frequency') {
             if (Str::startsWith($device['hardware'], 'UPS2000')) {
