@@ -26,7 +26,7 @@ class AccessPointsMetrics
         $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         // Append global metrics
-        $this->appendMetricBlock($lines, 'librenms_access_points_total', 'Total number of access points', 'gauge', "librenms_access_points_total {$total}");
+        $this->appendMetricBlock($lines, 'librenms_access_points_total', 'Total number of access points', 'gauge', ["librenms_access_points_total {$total}"]);
 
         // Default to global metrics only; detailed per-access-point metrics are opt-in via ?scope=detail
         if (! $includeDetail) {

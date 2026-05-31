@@ -10,8 +10,13 @@ class Redis extends BaseDatastore
 {
     private bool $enabled;
     private string $connection;
-    private string $listKey;
+    private string $defaultListKey;
+    private string $servicesListKey;
+    private string $discoveryListKey;
     private int $maxLength;
+    private int $defaultTtl;
+    private int $servicesTtl;
+    private int $discoveryTtl;
 
     public function __construct()
     {
@@ -19,8 +24,13 @@ class Redis extends BaseDatastore
 
         $this->enabled = self::isEnabled();
         $this->connection = (string) config('database.redis.metrics.connection', 'metrics');
-        $this->listKey = (string) config('database.redis.metrics.poller_key', 'librenms:metrics:poller');
+        $this->defaultListKey = (string) config('database.redis.metrics.poller_key', 'librenms:metrics:poller');
+        $this->servicesListKey = (string) config('database.redis.metrics.services_key', $this->defaultListKey . ':services');
+        $this->discoveryListKey = (string) config('database.redis.metrics.discovery_key', $this->defaultListKey . ':discovery');
         $this->maxLength = max((int) config('database.redis.metrics.poller_max_length', 50000), 0);
+        $this->defaultTtl = $this->computeTtlSeconds('service_poller_frequency', 300);
+        $this->servicesTtl = $this->computeTtlSeconds('service_services_frequency', 300);
+        $this->discoveryTtl = $this->computeTtlSeconds('service_discovery_frequency', 21600);
     }
 
     public function getName(): string
@@ -68,11 +78,18 @@ class Redis extends BaseDatastore
                 return;
             }
 
+            $listKey = $this->resolveListKeyForMeasurement($measurement);
+            $ttl = $this->resolveTtlForMeasurement($measurement);
+
             $redis = app('redis')->connection($this->connection);
-            $redis->rpush($this->listKey, $encoded);
+            $redis->rpush($listKey, $encoded);
 
             if ($this->maxLength > 0) {
-                $redis->ltrim($this->listKey, -$this->maxLength, -1);
+                $redis->ltrim($listKey, -$this->maxLength, -1);
+            }
+
+            if ($ttl > 0) {
+                $redis->expire($listKey, $ttl);
             }
 
             $this->recordStatistic($stat->end());
@@ -80,9 +97,42 @@ class Redis extends BaseDatastore
             Log::error('Redis datastore write failed.', [
                 'measurement' => $measurement,
                 'connection' => $this->connection,
-                'key' => $this->listKey,
+                'key' => $this->resolveListKeyForMeasurement($measurement),
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    private function computeTtlSeconds(string $configKey, int $defaultFrequency): int
+    {
+        $frequency = max((int) LibrenmsConfig::get($configKey, $defaultFrequency), 1);
+
+        return max((int) ceil($frequency * 1.5), 1);
+    }
+
+    private function resolveListKeyForMeasurement(string $measurement): string
+    {
+        if ($measurement === 'services') {
+            return $this->servicesListKey;
+        }
+
+        if (in_array($measurement, ['discover', 'discover-perf', 'discovery', 'discovery-perf', 'last-discovered-perf'], true)) {
+            return $this->discoveryListKey;
+        }
+
+        return $this->defaultListKey;
+    }
+
+    private function resolveTtlForMeasurement(string $measurement): int
+    {
+        if ($measurement === 'services') {
+            return $this->servicesTtl;
+        }
+
+        if (in_array($measurement, ['discover', 'discover-perf', 'discovery', 'discovery-perf', 'last-discovered-perf'], true)) {
+            return $this->discoveryTtl;
+        }
+
+        return $this->defaultTtl;
     }
 }

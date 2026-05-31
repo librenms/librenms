@@ -166,10 +166,19 @@ trait MetricsHelpers
     private function readRedisPollerPayloads(?Collection $deviceIds = null): array
     {
         $connection = (string) config('database.redis.metrics.connection', 'metrics');
-        $listKey = (string) config('database.redis.metrics.poller_key', 'librenms:metrics:poller');
+        $defaultKey = (string) config('database.redis.metrics.poller_key', 'librenms:metrics:poller');
+        $listKeys = array_values(array_unique([
+            $defaultKey,
+            (string) config('database.redis.metrics.services_key', $defaultKey . ':services'),
+            (string) config('database.redis.metrics.discovery_key', $defaultKey . ':discovery'),
+        ]));
 
         try {
-            $entries = app('redis')->connection($connection)->lrange($listKey, 0, -1);
+            $redis = app('redis')->connection($connection);
+            $entries = [];
+            foreach ($listKeys as $listKey) {
+                $entries = array_merge($entries, $redis->lrange($listKey, 0, -1));
+            }
         } catch (\Throwable) {
             return [];
         }
