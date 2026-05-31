@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Albentia: Target RSSI (config setpoint, single global value per BS).
  *
@@ -7,7 +8,7 @@
  * signal, not configuration targets.
  *
  * @var array<string, mixed> $device  Provided by the discovery loop in
- *                                    includes/discovery/functions.inc.php
+ *                           includes/discovery/functions.inc.php
  */
 $radio = SnmpQuery::cache()
     ->walk('ALBENTIA-AS-MIB::radioInfoTable')
