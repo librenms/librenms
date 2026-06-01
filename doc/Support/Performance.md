@@ -242,3 +242,12 @@ If you are having caching issues, you can clear the file based opcache with `rm 
 
 Debian 12 users, be aware php 8.2 current stable version (8.2.7) creates segmentation faults when opcache uses file cache. Issue should be this one https://github.com/php/php-src/issues/10914 
 Using sury packages or disabling file cache solves the issue
+
+## PHP-rrd
+
+Some rrdtool functionality will use the RRD PHP module if it is installed. There are speedups both for web servers and pollers. These are enabled by installing the appropriate package as follows:
+
+=== "Ubuntu/Debian"
+        ```bash
+        sudo apt install php-rrd
+        ```
