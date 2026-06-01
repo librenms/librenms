@@ -22,7 +22,7 @@ if (Rrd::checkRrdExists(Rrd::name(DeviceCache::getPrimary()->hostname, 'icmp-per
         'popup_title' => DeviceCache::getPrimary()->hostname . ' - Ping Response',
     ]);
 
-    echo \LibreNMS\Util\Url::graphPopup($graph, \LibreNMS\Util\Url::lazyGraphTag($graph), $perf_url);
+    echo \LibreNMS\Util\Url::graphPopup($graph, \LibreNMS\Util\Url::lazyGraphTag($graph, 'tw:w-full tw:h-auto'), $perf_url);
     echo '  </td>
             </tr>
         </table>
