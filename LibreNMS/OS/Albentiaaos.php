@@ -1,16 +1,5 @@
 <?php
 
-/**
- * Wireless-class sensors for Albentia AOS base stations, so the values land in
- * the Wireless > Frequency / Clients / Distance / Power dashboards instead of
- * the regular Sensors page.
- *
- * Per-sector frequency creates one Wireless::Frequency sensor per radio
- * (8 sectors on AXS-BS-850-N, 4 on AXS-BS-452-N). Distance / TxPow / TargetRSSI
- * are configured globally on the BS (all sectors return the same value) so we
- * publish a single sensor each, indexed 0.
- */
-
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
@@ -45,14 +34,6 @@ class Albentiaaos extends OS implements
         ];
     }
 
-    /**
-     * Encode a DisplayString index back to SNMP numeric form (<len>.<asc>...).
-     *
-     * SnmpQuery::table(1) keys rows by the decoded INDEX value (e.g. "blue").
-     * To rebuild a leaf numeric OID we need the original encoded form
-     * (e.g. "4.98.108.117.101"). Public so the dbm sensor discovery
-     * (includes/discovery/sensors/dbm/albentiaaos.inc.php) can reuse it.
-     */
     public function encodeStringIndex(string $idx): string
     {
         $out = (string) strlen($idx);
@@ -109,8 +90,8 @@ class Albentiaaos extends OS implements
                     0,
                     'Distance',
                     (int) $dist,
-                    1,    // multiplier
-                    1000  // divisor: MIB is metres, Wireless > Distance expects km
+                    1,
+                    1000
                 ),
             ];
         }
