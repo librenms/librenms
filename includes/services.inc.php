@@ -87,11 +87,11 @@ function poll_service($service)
         $DS = [];
         if (isset($check_ds)) {
             foreach (json_decode($check_ds) as $k => $v) {
-                $DS[$k] = $v;
+                $DS[$k] = ['uom' => $v, 'full_name' => $k];
             }
         } else {
             foreach ($perf as $k => $v) {
-                $DS[$k] = $v['uom'];
+                $DS[$k] = ['uom' => $v['uom'], 'full_name' => $v['full_name']];
             }
         }
         d_echo('Service DS: ' . json_encode($DS, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n");
@@ -102,7 +102,7 @@ function poll_service($service)
         // rrd definition
         $rrd_def = new RrdDefinition();
         foreach ($DS as $k => $v) {
-            if (($v == 'c') && ! preg_match('/[Uu]ptime/', $k)) {
+            if (($v == 'c') && ! preg_match('/[Uu]ptime/', (string) $k)) {
                 // This is a counter, create the DS as such
                 $rrd_def->addDataset($k, 'COUNTER', 0);
             } else {
