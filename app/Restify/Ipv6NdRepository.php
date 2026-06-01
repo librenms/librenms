@@ -3,14 +3,14 @@
 namespace App\Restify;
 
 use App\Models\Ipv6Nd;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Binaryk\LaravelRestify\Filters\MatchFilter;
-use Binaryk\LaravelRestify\Filters\SearchableFilter;
-use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class Ipv6NdRepository extends Repository
 {
@@ -19,9 +19,6 @@ class Ipv6NdRepository extends Repository
     public static string $uriKey = 'ipv6-neighbor-discovery';
 
     public static string $title = 'ipv6_address';
-
-
-
 
     public static function searchables(): array
     {

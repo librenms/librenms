@@ -20,9 +20,6 @@ class AccessPointRepository extends Repository
 
     public static string $title = 'name';
 
-
-
-
     public static function related(): array
     {
         return [

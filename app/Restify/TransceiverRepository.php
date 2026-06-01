@@ -3,11 +3,11 @@
 namespace App\Restify;
 
 use App\Models\Transceiver;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Http\Request;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Http\Request;
 
 class TransceiverRepository extends Repository
 {
@@ -16,9 +16,6 @@ class TransceiverRepository extends Repository
     public static string $model = Transceiver::class;
 
     public static string $title = 'model';
-
-
-
 
     public static function searchables(): array
     {

@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\V1\OpenApiController;
+use App\Http\Controllers\Api\V1\SystemController;
 use App\Restify\AccessPointRepository;
-use App\Restify\ApplicationRepository;
-use App\Restify\BgpPeerRepository;
-use App\Restify\BillRepository;
 use App\Restify\AlertLogRepository;
 use App\Restify\AlertOperationRepository;
 use App\Restify\AlertOperationSegmentRepository;
@@ -15,15 +15,18 @@ use App\Restify\AlertScheduleRepository;
 use App\Restify\AlertTemplateRepository;
 use App\Restify\AlertTransportGroupRepository;
 use App\Restify\AlertTransportRepository;
+use App\Restify\ApplicationRepository;
+use App\Restify\AuthLogRepository;
+use App\Restify\AvailabilityRepository;
+use App\Restify\BgpPeerRepository;
+use App\Restify\BillRepository;
 use App\Restify\CefSwitchingRepository;
 use App\Restify\ComponentRepository;
-use App\Restify\AuthLogRepository;
 use App\Restify\DeviceGroupRepository;
 use App\Restify\DeviceOutageRepository;
 use App\Restify\DeviceRepository;
 use App\Restify\DiskIoRepository;
 use App\Restify\EventlogRepository;
-use App\Restify\AvailabilityRepository;
 use App\Restify\InventoryRepository;
 use App\Restify\IpsecTunnelRepository;
 use App\Restify\Ipv4AddressRepository;
@@ -55,8 +58,8 @@ use App\Restify\Ospfv3PortRepository;
 use App\Restify\PollerClusterRepository;
 use App\Restify\PollerClusterStatRepository;
 use App\Restify\PollerGroupRepository;
-use App\Restify\PortGroupRepository;
 use App\Restify\PortAdslRepository;
+use App\Restify\PortGroupRepository;
 use App\Restify\PortRepository;
 use App\Restify\PortSecurityRepository;
 use App\Restify\PortsFdbRepository;
@@ -71,20 +74,17 @@ use App\Restify\PseudowireRepository;
 use App\Restify\RouteRepository;
 use App\Restify\SensorRepository;
 use App\Restify\ServiceRepository;
-use App\Restify\SlaRepository;
 use App\Restify\ServiceTemplateRepository;
-use App\Restify\StpRepository;
+use App\Restify\SlaRepository;
 use App\Restify\StorageRepository;
+use App\Restify\StpRepository;
 use App\Restify\SyslogRepository;
 use App\Restify\TransceiverRepository;
 use App\Restify\UserRepository;
-use App\Restify\WirelessSensorRepository;
 use App\Restify\VlanRepository;
 use App\Restify\VrfLiteRepository;
 use App\Restify\VrfRepository;
-use App\Http\Controllers\Api\V1\HealthController;
-use App\Http\Controllers\Api\V1\OpenApiController;
-use App\Http\Controllers\Api\V1\SystemController;
+use App\Restify\WirelessSensorRepository;
 use Binaryk\LaravelRestify\Bootstrap\RoutesBoot;
 use Binaryk\LaravelRestify\Http\Requests\RepositoryAttachRequest;
 use Binaryk\LaravelRestify\Http\Requests\RepositoryDetachRequest;
@@ -98,7 +98,7 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
 {
     protected function gate(): void
     {
-        Gate::define("viewRestify", function ($user = null) {
+        Gate::define('viewRestify', function ($user = null) {
             return true;
         });
     }

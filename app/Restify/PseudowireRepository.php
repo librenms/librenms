@@ -3,11 +3,11 @@
 namespace App\Restify;
 
 use App\Models\Pseudowire;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Http\Request;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Http\Request;
 
 class PseudowireRepository extends Repository
 {
@@ -18,9 +18,6 @@ class PseudowireRepository extends Repository
     public static string $id = 'pseudowire_id';
 
     public static string $title = 'pw_descr';
-
-
-
 
     public static function searchables(): array
     {

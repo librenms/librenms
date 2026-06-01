@@ -3,21 +3,18 @@
 namespace App\Restify;
 
 use App\Models\AlertTransport;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class AlertTransportRepository extends Repository
 {
     public static string $model = AlertTransport::class;
 
     public static string $title = 'transport_name';
-
-
-
 
     public static function searchables(): array
     {

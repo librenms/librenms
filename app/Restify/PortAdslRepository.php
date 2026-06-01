@@ -3,11 +3,10 @@
 namespace App\Restify;
 
 use App\Models\PortAdsl;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
-use Binaryk\LaravelRestify\Filters\MatchFilter;
-use Binaryk\LaravelRestify\Filters\SearchableFilter;
-use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class PortAdslRepository extends Repository
 {
@@ -20,8 +19,6 @@ class PortAdslRepository extends Repository
     public static string $id = 'port_id';
 
     public static string $title = 'adslLineCoding';
-
-
 
     public static function searchables(): array
     {

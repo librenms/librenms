@@ -3,11 +3,11 @@
 namespace App\Restify;
 
 use App\Models\PortsNac;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Http\Request;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Http\Request;
 
 class PortsNacRepository extends Repository
 {
@@ -20,9 +20,6 @@ class PortsNacRepository extends Repository
     public static string $id = 'ports_nac_id';
 
     public static string $title = 'username';
-
-
-
 
     public static function searchables(): array
     {

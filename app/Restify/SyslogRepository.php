@@ -4,11 +4,11 @@ namespace App\Restify;
 
 use App\Models\Syslog;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Http\Request;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Http\Request;
 
 class SyslogRepository extends Repository
 {
@@ -19,9 +19,6 @@ class SyslogRepository extends Repository
     public static string $id = 'seq';
 
     public static string $title = 'msg';
-
-
-
 
     public static function related(): array
     {

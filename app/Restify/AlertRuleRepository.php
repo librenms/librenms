@@ -5,10 +5,10 @@ namespace App\Restify;
 use App\Models\AlertRule;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Fields\BelongsToMany;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 
 class AlertRuleRepository extends Repository
 {
@@ -19,9 +19,6 @@ class AlertRuleRepository extends Repository
     public static string $model = AlertRule::class;
 
     public static string $title = 'name';
-
-
-
 
     public static function related(): array
     {

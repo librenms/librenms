@@ -4,52 +4,52 @@ use Binaryk\LaravelRestify\Http\Middleware\AuthorizeRestify;
 use Binaryk\LaravelRestify\Http\Middleware\DispatchRestifyStartingEvent;
 
 return [
-    "auth" => [
-        "table" => "users",
-        "provider" => "sanctum",
-        "user_model" => "\\App\\Models\\User",
-        "token_ttl" => env("RESTIFY_TOKEN_TTL", null),
+    'auth' => [
+        'table' => 'users',
+        'provider' => 'sanctum',
+        'user_model' => '\\App\\Models\\User',
+        'token_ttl' => env('RESTIFY_TOKEN_TTL', null),
     ],
 
-    "base" => "/api/v1",
+    'base' => '/api/v1',
 
-    "middleware" => [
+    'middleware' => [
         \App\Http\Middleware\EnforceJsonApi::class,
-        "auth:sanctum",
+        'auth:sanctum',
         \App\Http\Middleware\EnsureRelatedParentExists::class,
         \App\Http\Middleware\RestifyAttachRelationResolver::class,
         DispatchRestifyStartingEvent::class,
         AuthorizeRestify::class,
     ],
 
-    "logs" => [
-        "repository" => null,
-        "enable" => false,
-        "all" => false,
+    'logs' => [
+        'repository' => null,
+        'enable' => false,
+        'all' => false,
     ],
 
-    "search" => [
-        "case_sensitive" => false,
-        "use_joins_for_belongs_to" => false,
+    'search' => [
+        'case_sensitive' => false,
+        'use_joins_for_belongs_to' => false,
     ],
 
-    "repositories" => [
-        "serialize_index_meta" => false,
-        "serialize_show_meta" => false,
-        "cache" => [
-            "enabled" => false,
-            "ttl" => 300,
-            "store" => null,
-            "skip_authenticated" => false,
-            "enable_in_tests" => false,
-            "tags" => ["restify", "repositories"],
+    'repositories' => [
+        'serialize_index_meta' => false,
+        'serialize_show_meta' => false,
+        'cache' => [
+            'enabled' => false,
+            'ttl' => 300,
+            'store' => null,
+            'skip_authenticated' => false,
+            'enable_in_tests' => false,
+            'tags' => ['restify', 'repositories'],
         ],
     ],
 
-    "cache" => [
-        "policies" => [
-            "enabled" => false,
-            "ttl" => 300,
+    'cache' => [
+        'policies' => [
+            'enabled' => false,
+            'ttl' => 300,
         ],
     ],
 ];

@@ -4,11 +4,10 @@ namespace App\Restify;
 
 use App\Models\MplsTunnelCHop;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
-use Binaryk\LaravelRestify\Filters\MatchFilter;
-use Binaryk\LaravelRestify\Filters\SearchableFilter;
-use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class MplsTunnelCHopRepository extends Repository
 {
@@ -21,9 +20,6 @@ class MplsTunnelCHopRepository extends Repository
     public static string $id = 'c_hop_id';
 
     public static string $title = 'mplsTunnelCHopIpv4Addr';
-
-
-
 
     public static function related(): array
     {

@@ -4,11 +4,11 @@ namespace App\Restify;
 
 use App\Models\MplsSap;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Http\Request;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Http\Request;
 
 class MplsSapRepository extends Repository
 {
@@ -21,9 +21,6 @@ class MplsSapRepository extends Repository
     public static string $id = 'sap_id';
 
     public static string $title = 'sapDescription';
-
-
-
 
     public static function related(): array
     {

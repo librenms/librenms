@@ -4,11 +4,11 @@ namespace App\Restify;
 
 use App\Models\Vlan;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Http\Request;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Http\Request;
 
 class VlanRepository extends Repository
 {
@@ -19,9 +19,6 @@ class VlanRepository extends Repository
     public static string $id = 'vlan_id';
 
     public static string $title = 'vlan_name';
-
-
-
 
     public static function related(): array
     {

@@ -4,11 +4,11 @@ namespace App\Restify;
 
 use App\Models\WirelessSensor;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Http\Request;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Http\Request;
 
 class WirelessSensorRepository extends Repository
 {
@@ -19,9 +19,6 @@ class WirelessSensorRepository extends Repository
     public static string $id = 'sensor_id';
 
     public static string $title = 'sensor_descr';
-
-
-
 
     public static function related(): array
     {

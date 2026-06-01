@@ -4,11 +4,10 @@ namespace App\Restify;
 
 use App\Models\DeviceOutage;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
-use Binaryk\LaravelRestify\Filters\MatchFilter;
-use Binaryk\LaravelRestify\Filters\SearchableFilter;
-use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class DeviceOutageRepository extends Repository
 {
@@ -17,8 +16,6 @@ class DeviceOutageRepository extends Repository
     public static string $model = DeviceOutage::class;
 
     public static string $title = 'going_down';
-
-
 
     public static function related(): array
     {

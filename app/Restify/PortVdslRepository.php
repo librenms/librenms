@@ -3,11 +3,10 @@
 namespace App\Restify;
 
 use App\Models\PortVdsl;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
-use Binaryk\LaravelRestify\Filters\MatchFilter;
-use Binaryk\LaravelRestify\Filters\SearchableFilter;
-use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class PortVdslRepository extends Repository
 {
@@ -20,8 +19,6 @@ class PortVdslRepository extends Repository
     public static string $id = 'port_id';
 
     public static string $title = 'port_id';
-
-
 
     public static function searchables(): array
     {

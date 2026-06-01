@@ -3,14 +3,13 @@
 namespace App\Restify;
 
 use App\Models\Availability;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Binaryk\LaravelRestify\Filters\MatchFilter;
-use Binaryk\LaravelRestify\Filters\SearchableFilter;
-use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class AvailabilityRepository extends Repository
 {
@@ -19,8 +18,6 @@ class AvailabilityRepository extends Repository
     public static string $id = 'availability_id';
 
     public static string $title = 'duration';
-
-
 
     public static function searchables(): array
     {

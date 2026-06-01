@@ -4,11 +4,10 @@ namespace App\Restify;
 
 use App\Models\MplsLspPath;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
-use Binaryk\LaravelRestify\Filters\MatchFilter;
-use Binaryk\LaravelRestify\Filters\SearchableFilter;
-use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class MplsLspPathRepository extends Repository
 {
@@ -21,9 +20,6 @@ class MplsLspPathRepository extends Repository
     public static string $id = 'lsp_path_id';
 
     public static string $title = 'mplsLspPathType';
-
-
-
 
     public static function related(): array
     {

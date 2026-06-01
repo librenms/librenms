@@ -4,11 +4,11 @@ namespace App\Restify;
 
 use App\Models\Processor;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Http\Request;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Http\Request;
 
 class ProcessorRepository extends Repository
 {
@@ -19,9 +19,6 @@ class ProcessorRepository extends Repository
     public static string $id = 'processor_id';
 
     public static string $title = 'processor_descr';
-
-
-
 
     public static function related(): array
     {

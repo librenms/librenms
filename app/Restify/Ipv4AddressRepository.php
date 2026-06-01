@@ -3,11 +3,11 @@
 namespace App\Restify;
 
 use App\Models\Ipv4Address;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Http\Request;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Http\Request;
 
 class Ipv4AddressRepository extends Repository
 {
@@ -18,9 +18,6 @@ class Ipv4AddressRepository extends Repository
     public static string $id = 'ipv4_address_id';
 
     public static string $title = 'ipv4_address';
-
-
-
 
     public static function searchables(): array
     {

@@ -5,7 +5,6 @@ namespace App\Policies;
 use App\Facades\Permissions;
 use App\Models\Device;
 use App\Models\DeviceGroup;
-use App\Models\ServiceTemplate;
 use App\Models\User;
 use Illuminate\Support\Collection;
 

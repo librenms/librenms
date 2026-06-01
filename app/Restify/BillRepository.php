@@ -4,10 +4,10 @@ namespace App\Restify;
 
 use App\Models\Bill;
 use Binaryk\LaravelRestify\Fields\BelongsToMany;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 
 class BillRepository extends Repository
 {
@@ -18,9 +18,6 @@ class BillRepository extends Repository
     public static string $id = 'bill_id';
 
     public static string $title = 'bill_name';
-
-
-
 
     public static function related(): array
     {

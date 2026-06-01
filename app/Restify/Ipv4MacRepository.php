@@ -3,11 +3,11 @@
 namespace App\Restify;
 
 use App\Models\Ipv4Mac;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Http\Request;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Http\Request;
 
 class Ipv4MacRepository extends Repository
 {
@@ -18,9 +18,6 @@ class Ipv4MacRepository extends Repository
     public static string $uriKey = 'ipv4-mac-addresses';
 
     public static string $title = 'ipv4_address';
-
-
-
 
     public static function searchables(): array
     {

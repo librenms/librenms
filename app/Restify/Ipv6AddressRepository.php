@@ -3,11 +3,11 @@
 namespace App\Restify;
 
 use App\Models\Ipv6Address;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Http\Request;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Http\Request;
 
 class Ipv6AddressRepository extends Repository
 {
@@ -18,9 +18,6 @@ class Ipv6AddressRepository extends Repository
     public static string $id = 'ipv6_address_id';
 
     public static string $title = 'ipv6_compressed';
-
-
-
 
     public static function searchables(): array
     {

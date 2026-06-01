@@ -3,14 +3,14 @@
 namespace App\Restify;
 
 use App\Models\IpsecTunnel;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Binaryk\LaravelRestify\Filters\MatchFilter;
-use Binaryk\LaravelRestify\Filters\SearchableFilter;
-use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class IpsecTunnelRepository extends Repository
 {
@@ -19,9 +19,6 @@ class IpsecTunnelRepository extends Repository
     public static string $id = 'tunnel_id';
 
     public static string $title = 'tunnel_name';
-
-
-
 
     public static function searchables(): array
     {

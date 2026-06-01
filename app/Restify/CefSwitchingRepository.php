@@ -4,11 +4,11 @@ namespace App\Restify;
 
 use App\Models\CefSwitching;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Http\Request;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Http\Request;
 
 class CefSwitchingRepository extends Repository
 {
@@ -21,9 +21,6 @@ class CefSwitchingRepository extends Repository
     public static string $id = 'cef_switching_id';
 
     public static string $title = 'cef_path';
-
-
-
 
     public static function related(): array
     {

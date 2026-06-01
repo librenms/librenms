@@ -3,11 +3,10 @@
 namespace App\Restify;
 
 use App\Models\PortStp;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
-use Binaryk\LaravelRestify\Filters\MatchFilter;
-use Binaryk\LaravelRestify\Filters\SearchableFilter;
-use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class PortStpRepository extends Repository
 {
@@ -20,9 +19,6 @@ class PortStpRepository extends Repository
     public static string $id = 'port_stp_id';
 
     public static string $title = 'state';
-
-
-
 
     public static function searchables(): array
     {

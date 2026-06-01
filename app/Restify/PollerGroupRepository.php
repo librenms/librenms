@@ -3,21 +3,18 @@
 namespace App\Restify;
 
 use App\Models\PollerGroup;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class PollerGroupRepository extends Repository
 {
     public static string $model = PollerGroup::class;
 
     public static string $title = 'group_name';
-
-
-
 
     public static function searchables(): array
     {

@@ -4,10 +4,10 @@ namespace App\Restify;
 
 use App\Models\ServiceTemplate;
 use Binaryk\LaravelRestify\Fields\BelongsToMany;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 
 class ServiceTemplateRepository extends Repository
 {
@@ -16,9 +16,6 @@ class ServiceTemplateRepository extends Repository
     public static string $model = ServiceTemplate::class;
 
     public static string $title = 'name';
-
-
-
 
     public static function related(): array
     {

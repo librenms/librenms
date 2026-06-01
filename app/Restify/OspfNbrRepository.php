@@ -4,11 +4,11 @@ namespace App\Restify;
 
 use App\Models\OspfNbr;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Http\Request;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Http\Request;
 
 class OspfNbrRepository extends Repository
 {
@@ -19,9 +19,6 @@ class OspfNbrRepository extends Repository
     public static string $uriKey = 'ospf-neighbors';
 
     public static string $title = 'ospfNbrIpAddr';
-
-
-
 
     public static function related(): array
     {

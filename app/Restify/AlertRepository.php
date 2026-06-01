@@ -6,12 +6,11 @@ use App\Models\Alert;
 use App\Restify\Actions\AcknowledgeAlertAction;
 use App\Restify\Actions\UnmuteAlertAction;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
-use Binaryk\LaravelRestify\Filters\MatchFilter;
-use Binaryk\LaravelRestify\Filters\SearchableFilter;
-use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class AlertRepository extends Repository
 {
@@ -22,9 +21,6 @@ class AlertRepository extends Repository
     public static string $title = 'id';
 
     protected static array $disabledActions = ['update'];
-
-
-
 
     public static function related(): array
     {

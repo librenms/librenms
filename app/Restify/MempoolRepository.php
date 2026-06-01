@@ -4,11 +4,11 @@ namespace App\Restify;
 
 use App\Models\Mempool;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Http\Request;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Http\Request;
 
 class MempoolRepository extends Repository
 {
@@ -21,9 +21,6 @@ class MempoolRepository extends Repository
     public static string $id = 'mempool_id';
 
     public static string $title = 'mempool_descr';
-
-
-
 
     public static function related(): array
     {

@@ -4,11 +4,10 @@ namespace App\Restify;
 
 use App\Models\MplsSdpBind;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
-use Binaryk\LaravelRestify\Filters\MatchFilter;
-use Binaryk\LaravelRestify\Filters\SearchableFilter;
-use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class MplsSdpBindRepository extends Repository
 {
@@ -21,8 +20,6 @@ class MplsSdpBindRepository extends Repository
     public static string $id = 'bind_id';
 
     public static string $title = 'bind_id';
-
-
 
     public static function related(): array
     {

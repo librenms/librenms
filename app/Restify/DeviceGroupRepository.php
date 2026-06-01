@@ -4,10 +4,10 @@ namespace App\Restify;
 
 use App\Models\DeviceGroup;
 use Binaryk\LaravelRestify\Fields\BelongsToMany;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -18,9 +18,6 @@ class DeviceGroupRepository extends Repository
     public static string $model = DeviceGroup::class;
 
     public static string $title = 'name';
-
-
-
 
     public static function related(): array
     {

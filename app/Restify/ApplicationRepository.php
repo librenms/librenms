@@ -4,11 +4,10 @@ namespace App\Restify;
 
 use App\Models\Application;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
-use Binaryk\LaravelRestify\Filters\MatchFilter;
-use Binaryk\LaravelRestify\Filters\SearchableFilter;
-use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class ApplicationRepository extends Repository
 {
@@ -19,9 +18,6 @@ class ApplicationRepository extends Repository
     public static string $id = 'app_id';
 
     public static string $title = 'app_type';
-
-
-
 
     public static function related(): array
     {

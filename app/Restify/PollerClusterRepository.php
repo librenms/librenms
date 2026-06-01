@@ -4,22 +4,19 @@ namespace App\Restify;
 
 use App\Models\PollerCluster;
 use Binaryk\LaravelRestify\Fields\HasMany;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
-use Binaryk\LaravelRestify\Filters\MatchFilter;
-use Binaryk\LaravelRestify\Filters\SearchableFilter;
-use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class PollerClusterRepository extends Repository
 {
     public static string $model = PollerCluster::class;
 
     public static string $title = 'poller_name';
-
-
-
 
     public static function related(): array
     {

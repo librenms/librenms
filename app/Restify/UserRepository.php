@@ -4,12 +4,12 @@ namespace App\Restify;
 
 use App\Models\User;
 use Binaryk\LaravelRestify\Fields\BelongsToMany;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class UserRepository extends Repository
 {
@@ -18,9 +18,6 @@ class UserRepository extends Repository
     public static string $id = 'user_id';
 
     public static string $title = 'username';
-
-
-
 
     public static function related(): array
     {

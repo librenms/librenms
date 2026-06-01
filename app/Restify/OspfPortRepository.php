@@ -4,11 +4,11 @@ namespace App\Restify;
 
 use App\Models\OspfPort;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Http\Request;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Http\Request;
 
 class OspfPortRepository extends Repository
 {
@@ -17,9 +17,6 @@ class OspfPortRepository extends Repository
     public static string $model = OspfPort::class;
 
     public static string $title = 'ospfIfIpAddress';
-
-
-
 
     public static function related(): array
     {

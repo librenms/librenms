@@ -6,10 +6,10 @@ use App\Models\Device;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Fields\BelongsToMany;
 use Binaryk\LaravelRestify\Fields\HasMany;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 
 class DeviceRepository extends Repository
 {
@@ -20,9 +20,6 @@ class DeviceRepository extends Repository
     public static string $id = 'device_id';
 
     public static string $title = 'hostname';
-
-
-
 
     public static function related(): array
     {

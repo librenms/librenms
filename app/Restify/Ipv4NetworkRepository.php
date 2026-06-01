@@ -3,13 +3,13 @@
 namespace App\Restify;
 
 use App\Models\Ipv4Network;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SearchableFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
-use Binaryk\LaravelRestify\Filters\MatchFilter;
-use Binaryk\LaravelRestify\Filters\SearchableFilter;
-use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class Ipv4NetworkRepository extends Repository
 {
@@ -18,9 +18,6 @@ class Ipv4NetworkRepository extends Repository
     public static string $id = 'ipv4_network_id';
 
     public static string $title = 'ipv4_network';
-
-
-
 
     public static function searchables(): array
     {

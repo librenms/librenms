@@ -4,11 +4,11 @@ namespace App\Restify;
 
 use App\Models\Ospfv3Area;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Http\Request;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Http\Request;
 
 class Ospfv3AreaRepository extends Repository
 {
@@ -17,9 +17,6 @@ class Ospfv3AreaRepository extends Repository
     public static string $model = Ospfv3Area::class;
 
     public static string $title = 'ospfv3AreaId';
-
-
-
 
     public static function related(): array
     {

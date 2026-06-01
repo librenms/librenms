@@ -4,11 +4,11 @@ namespace App\Restify;
 
 use App\Models\Vrf;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Http\Request;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Http\Request;
 
 class VrfRepository extends Repository
 {
@@ -24,9 +24,6 @@ class VrfRepository extends Repository
     public static string $id = 'vrf_id';
 
     public static string $title = 'vrf_name';
-
-
-
 
     public static function related(): array
     {

@@ -4,11 +4,10 @@ namespace App\Restify;
 
 use App\Models\PortStack;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
-use Binaryk\LaravelRestify\Filters\MatchFilter;
-use Binaryk\LaravelRestify\Filters\SearchableFilter;
-use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class PortStackRepository extends Repository
 {
@@ -17,8 +16,6 @@ class PortStackRepository extends Repository
     public static string $model = PortStack::class;
 
     public static string $title = 'ifStackStatus';
-
-
 
     public static function related(): array
     {

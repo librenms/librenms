@@ -8,9 +8,9 @@ use App\Restify\Repository as LibrenmsRepository;
 use Binaryk\LaravelRestify\Restify;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\AllOf;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Components;
-use GoldSpecDigital\ObjectOrientedOAS\Objects\OneOf;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Info;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\MediaType;
+use GoldSpecDigital\ObjectOrientedOAS\Objects\OneOf;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Operation;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\Parameter;
 use GoldSpecDigital\ObjectOrientedOAS\Objects\PathItem;
@@ -343,7 +343,7 @@ class OpenApiGenerator
 
         $opIdSuffix = $scope === 'collection' ? 'collection' : 'item';
 
-        $description = "Performs one of the registered actions. Pass `?action=<uriKey>` to choose. Available: " .
+        $description = 'Performs one of the registered actions. Pass `?action=<uriKey>` to choose. Available: ' .
             implode(', ', array_map(
                 static fn ($a) => sprintf('`%s` (%s)', $a['uriKey'], $a['name']),
                 $actions,

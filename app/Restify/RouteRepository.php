@@ -4,11 +4,11 @@ namespace App\Restify;
 
 use App\Models\Route;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Http\Request;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Http\Request;
 
 class RouteRepository extends Repository
 {
@@ -19,9 +19,6 @@ class RouteRepository extends Repository
     public static string $id = 'route_id';
 
     public static string $title = 'inetCidrRouteDest';
-
-
-
 
     public static function related(): array
     {

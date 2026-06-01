@@ -3,11 +3,10 @@
 namespace App\Restify;
 
 use App\Models\PortVlan;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
+use Binaryk\LaravelRestify\Filters\SortableFilter;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
-use Binaryk\LaravelRestify\Filters\MatchFilter;
-use Binaryk\LaravelRestify\Filters\SearchableFilter;
-use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class PortVlanRepository extends Repository
 {
@@ -18,9 +17,6 @@ class PortVlanRepository extends Repository
     public static string $id = 'port_vlan_id';
 
     public static string $title = 'vlan';
-
-
-
 
     public static function searchables(): array
     {

@@ -4,11 +4,11 @@ namespace App\Restify;
 
 use App\Models\PortSecurity;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Http\Request;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Http\Request;
 
 class PortSecurityRepository extends Repository
 {
@@ -17,9 +17,6 @@ class PortSecurityRepository extends Repository
     public static string $model = PortSecurity::class;
 
     public static string $title = 'last_mac_address';
-
-
-
 
     public static function related(): array
     {

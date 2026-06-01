@@ -4,10 +4,10 @@ namespace App\Restify;
 
 use App\Models\Location;
 use Binaryk\LaravelRestify\Fields\HasMany;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 
 class LocationRepository extends Repository
 {
@@ -16,9 +16,6 @@ class LocationRepository extends Repository
     public static string $model = Location::class;
 
     public static string $title = 'location';
-
-
-
 
     public static function related(): array
     {

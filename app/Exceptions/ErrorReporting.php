@@ -43,8 +43,6 @@ use Illuminate\Validation\ValidationException;
 use LibreNMS\Util\Git;
 use Spatie\LaravelIgnition\Facades\Flare;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class ErrorReporting

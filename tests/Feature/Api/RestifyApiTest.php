@@ -3,6 +3,7 @@
 namespace LibreNMS\Tests\Feature\Api;
 
 use App\Http\Middleware\EnforceJsonApi;
+use App\Models\AccessPoint;
 use App\Models\Alert;
 use App\Models\AlertLog;
 use App\Models\AlertOperation;
@@ -12,13 +13,28 @@ use App\Models\AlertTemplate;
 use App\Models\AlertTransport;
 use App\Models\Application;
 use App\Models\AuthLog;
+use App\Models\Availability;
 use App\Models\BgpPeer;
 use App\Models\Bill;
+use App\Models\CefSwitching;
 use App\Models\Component;
 use App\Models\Device;
+use App\Models\DeviceGroup;
+use App\Models\DeviceOutage;
+use App\Models\DiskIo;
 use App\Models\EntPhysical;
 use App\Models\Eventlog;
+use App\Models\IpsecTunnel;
+use App\Models\Ipv4Address;
+use App\Models\Ipv4Mac;
+use App\Models\Ipv4Network;
+use App\Models\Ipv6Address;
+use App\Models\Ipv6Nd;
+use App\Models\Ipv6Network;
 use App\Models\IsisAdjacency;
+use App\Models\Link;
+use App\Models\Location;
+use App\Models\Mempool;
 use App\Models\MplsLsp;
 use App\Models\MplsLspPath;
 use App\Models\MplsSap;
@@ -26,35 +42,7 @@ use App\Models\MplsSdp;
 use App\Models\MplsSdpBind;
 use App\Models\MplsService;
 use App\Models\MplsTunnelArHop;
-use App\Models\Ipv4Address;
-use App\Models\AccessPoint;
-use App\Models\Availability;
-use App\Models\CefSwitching;
-use App\Models\DeviceOutage;
-use App\Models\DiskIo;
-use App\Models\Ipv4Mac;
-use App\Models\IpsecTunnel;
-use App\Models\Ipv6Nd;
-use App\Models\PortVlan;
-use App\Models\Ipv4Network;
-use App\Models\Ipv6Address;
-use App\Models\Ipv6Network;
-use App\Models\Link;
-use App\Models\PortAdsl;
-use App\Models\PortSecurity;
-use App\Models\PortsFdb;
-use App\Models\PortsNac;
-use App\Models\PortStack;
-use App\Models\PortStatistic;
-use App\Models\PortVdsl;
-use App\Models\PortStp;
 use App\Models\MplsTunnelCHop;
-use App\Models\Pseudowire;
-use App\Models\Sla;
-use App\Models\Stp;
-use App\Models\Transceiver;
-use App\Models\Vlan;
-use App\Models\WirelessSensor;
 use App\Models\OspfArea;
 use App\Models\OspfInstance;
 use App\Models\OspfNbr;
@@ -63,24 +51,35 @@ use App\Models\Ospfv3Area;
 use App\Models\Ospfv3Instance;
 use App\Models\Ospfv3Nbr;
 use App\Models\Ospfv3Port;
-use App\Models\Route;
-use App\Models\Syslog;
-use App\Models\Vrf;
-use App\Models\VrfLite;
-use App\Models\DeviceGroup;
-use App\Models\Location;
-use App\Models\Mempool;
 use App\Models\PollerCluster;
-use App\Models\PollerClusterStat;
 use App\Models\PollerGroup;
 use App\Models\Port;
+use App\Models\PortAdsl;
 use App\Models\PortGroup;
+use App\Models\PortSecurity;
+use App\Models\PortsFdb;
+use App\Models\PortsNac;
+use App\Models\PortStack;
+use App\Models\PortStatistic;
+use App\Models\PortStp;
+use App\Models\PortVdsl;
+use App\Models\PortVlan;
 use App\Models\Processor;
+use App\Models\Pseudowire;
+use App\Models\Route;
 use App\Models\Sensor;
 use App\Models\Service;
 use App\Models\ServiceTemplate;
+use App\Models\Sla;
 use App\Models\Storage;
+use App\Models\Stp;
+use App\Models\Syslog;
+use App\Models\Transceiver;
 use App\Models\User;
+use App\Models\Vlan;
+use App\Models\Vrf;
+use App\Models\VrfLite;
+use App\Models\WirelessSensor;
 use Database\Seeders\RolesSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Testing\TestResponse;
@@ -1449,7 +1448,7 @@ class RestifyApiTest extends DBTestCase
             ->assertStatus(200)
             ->assertJsonPath('data.attributes.state', 1)
             ->assertJsonPath('data.attributes.note', 'Test note')
-            ->assertJsonStructure(['data' => ['attributes' => [ 'state', 'note', 'createdAt']]]);
+            ->assertJsonStructure(['data' => ['attributes' => ['state', 'note', 'createdAt']]]);
     }
 
     public function testAdminCanAcknowledgeAlert(): void
@@ -1572,7 +1571,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/sensors')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'class', 'description', 'current',
+            ->assertJsonStructure(['data' => [['attributes' => ['class', 'description', 'current',
                 'limit', 'warningLimit', 'lowLimit', 'lowWarningLimit',
             ]]]]);
     }
@@ -1621,7 +1620,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/processors')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'category', 'description', 'usage',
+            ->assertJsonStructure(['data' => [['attributes' => ['category', 'description', 'usage',
             ]]]]);
     }
 
@@ -1669,7 +1668,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/memory-pools')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'category', 'description', 'percentage',
+            ->assertJsonStructure(['data' => [['attributes' => ['category', 'description', 'percentage',
                 'used', 'free', 'total',
             ]]]]);
     }
@@ -1718,7 +1717,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/storage')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'category', 'description', 'size',
+            ->assertJsonStructure(['data' => [['attributes' => ['category', 'description', 'size',
                 'used', 'free', 'percentage',
             ]]]]);
     }
@@ -1767,7 +1766,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/services')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'category', 'name', 'description',
+            ->assertJsonStructure(['data' => [['attributes' => ['category', 'name', 'description',
                 'status', 'isIgnored', 'isEnabled',
             ]]]]);
     }
@@ -1847,7 +1846,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/components')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'category', 'label', 'status', 'isEnabled', 'isIgnored', 'error',
+            ->assertJsonStructure(['data' => [['attributes' => ['category', 'label', 'status', 'isEnabled', 'isIgnored', 'error',
             ]]]]);
     }
 
@@ -1895,7 +1894,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/applications')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'category', 'instance', 'status', 'state',
+            ->assertJsonStructure(['data' => [['attributes' => ['category', 'instance', 'status', 'state',
             ]]]]);
     }
 
@@ -1943,7 +1942,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/bgp-peers')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'identifier', 'remoteAs',
+            ->assertJsonStructure(['data' => [['attributes' => ['identifier', 'remoteAs',
                 'state', 'adminStatus', 'localAddress', 'remoteAddress',
             ]]]]);
     }
@@ -1992,7 +1991,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/eventlogs')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'createdAt', 'message', 'category', 'severity',
+            ->assertJsonStructure(['data' => [['attributes' => ['createdAt', 'message', 'category', 'severity',
             ]]]]);
     }
 
@@ -2040,7 +2039,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/syslogs')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'facility', 'priority', 'level', 'tag', 'program', 'message',
+            ->assertJsonStructure(['data' => [['attributes' => ['facility', 'priority', 'level', 'tag', 'program', 'message',
             ]]]]);
     }
 
@@ -2090,7 +2089,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/alert-logs')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'state', 'createdAt',
+            ->assertJsonStructure(['data' => [['attributes' => ['state', 'createdAt',
             ]]]]);
     }
 
@@ -2305,7 +2304,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/inventory')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'index', 'description', 'class',
+            ->assertJsonStructure(['data' => [['attributes' => ['index', 'description', 'class',
                 'name', 'serialNumber', 'modelName',
             ]]]]);
     }
@@ -2366,7 +2365,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ospf-instances')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'routerId', 'adminStatus', 'versionNumber',
+            ->assertJsonStructure(['data' => [['attributes' => ['routerId', 'adminStatus', 'versionNumber',
             ]]]]);
     }
 
@@ -2426,7 +2425,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ospf-areas')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'areaId', 'spfRuns', 'status',
+            ->assertJsonStructure(['data' => [['attributes' => ['areaId', 'spfRuns', 'status',
             ]]]]);
     }
 
@@ -2474,7 +2473,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ospf-neighbors')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'ipAddress', 'routerId', 'state',
+            ->assertJsonStructure(['data' => [['attributes' => ['ipAddress', 'routerId', 'state',
             ]]]]);
     }
 
@@ -2525,7 +2524,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ospf-ports')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'interfaceIpAddress', 'areaId',
+            ->assertJsonStructure(['data' => [['attributes' => ['interfaceIpAddress', 'areaId',
             ]]]]);
     }
 
@@ -2585,7 +2584,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ospfv3-instances')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'routerId', 'adminStatus', 'versionNumber',
+            ->assertJsonStructure(['data' => [['attributes' => ['routerId', 'adminStatus', 'versionNumber',
             ]]]]);
     }
 
@@ -2645,7 +2644,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ospfv3-areas')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'areaId', 'spfRuns', 'summary',
+            ->assertJsonStructure(['data' => [['attributes' => ['areaId', 'spfRuns', 'summary',
             ]]]]);
     }
 
@@ -2696,7 +2695,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ospfv3-neighbors')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'routerId', 'address', 'state',
+            ->assertJsonStructure(['data' => [['attributes' => ['routerId', 'address', 'state',
             ]]]]);
     }
 
@@ -2747,7 +2746,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ospfv3-ports')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'areaId', 'state',
+            ->assertJsonStructure(['data' => [['attributes' => ['areaId', 'state',
             ]]]]);
     }
 
@@ -2811,7 +2810,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/isis-adjacencies')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'state', 'neighborSystemId', 'ipAddress',
+            ->assertJsonStructure(['data' => [['attributes' => ['state', 'neighborSystemId', 'ipAddress',
             ]]]]);
     }
 
@@ -2871,7 +2870,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/vrfs')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'oid', 'name',
+            ->assertJsonStructure(['data' => [['attributes' => ['oid', 'name',
             ]]]]);
     }
 
@@ -2919,7 +2918,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/vrf-lite')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'contextName', 'name',
+            ->assertJsonStructure(['data' => [['attributes' => ['contextName', 'name',
             ]]]]);
     }
 
@@ -2983,7 +2982,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/routes')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'destination', 'nextHop',
+            ->assertJsonStructure(['data' => [['attributes' => ['destination', 'nextHop',
                 'protocol', 'category',
             ]]]]);
     }
@@ -3032,7 +3031,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/mpls-label-switched-paths')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'name', 'adminState', 'operationalState',
+            ->assertJsonStructure(['data' => [['attributes' => ['name', 'adminState', 'operationalState',
                 'fromAddress', 'toAddress',
             ]]]]);
     }
@@ -3081,7 +3080,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/mpls-label-switched-path-routes')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'category', 'adminState', 'operationalState',
+            ->assertJsonStructure(['data' => [['attributes' => ['category', 'adminState', 'operationalState',
             ]]]]);
     }
 
@@ -3129,7 +3128,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/mpls-service-distribution-points')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'description', 'adminStatus', 'operationalStatus',
+            ->assertJsonStructure(['data' => [['attributes' => ['description', 'adminStatus', 'operationalStatus',
             ]]]]);
     }
 
@@ -3177,7 +3176,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/mpls-service-distribution-point-bindings')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'adminStatus', 'operationalStatus',
+            ->assertJsonStructure(['data' => [['attributes' => ['adminStatus', 'operationalStatus',
             ]]]]);
     }
 
@@ -3225,7 +3224,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/mpls-services')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'description', 'category', 'adminStatus', 'operationalStatus',
+            ->assertJsonStructure(['data' => [['attributes' => ['description', 'category', 'adminStatus', 'operationalStatus',
             ]]]]);
     }
 
@@ -3273,7 +3272,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/mpls-service-access-points')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'description', 'adminStatus', 'operationalStatus',
+            ->assertJsonStructure(['data' => [['attributes' => ['description', 'adminStatus', 'operationalStatus',
             ]]]]);
     }
 
@@ -3321,7 +3320,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/mpls-tunnel-actual-route-hops')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'ipv4Address', 'addressCategory',
+            ->assertJsonStructure(['data' => [['attributes' => ['ipv4Address', 'addressCategory',
             ]]]]);
     }
 
@@ -3369,7 +3368,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/mpls-tunnel-computed-hops')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'ipv4Address', 'addressCategory',
+            ->assertJsonStructure(['data' => [['attributes' => ['ipv4Address', 'addressCategory',
             ]]]]);
     }
 
@@ -3521,7 +3520,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/vlans')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'vid', 'name', 'category',
+            ->assertJsonStructure(['data' => [['attributes' => ['vid', 'name', 'category',
             ]]]]);
     }
 
@@ -3569,7 +3568,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/links')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'remoteHostname', 'remotePortName', 'protocol', 'isActive',
+            ->assertJsonStructure(['data' => [['attributes' => ['remoteHostname', 'remotePortName', 'protocol', 'isActive',
             ]]]]);
     }
 
@@ -3712,7 +3711,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ipv4-mac-addresses')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'macAddress', 'ipv4Address',
+            ->assertJsonStructure(['data' => [['attributes' => ['macAddress', 'ipv4Address',
             ]]]]);
     }
 
@@ -3763,7 +3762,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/port-forwarding-database-entries')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'macAddress',
+            ->assertJsonStructure(['data' => [['attributes' => ['macAddress',
             ]]]]);
     }
 
@@ -3814,7 +3813,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ipv6-neighbor-discovery')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'macAddress', 'ipv6Address',
+            ->assertJsonStructure(['data' => [['attributes' => ['macAddress', 'ipv6Address',
             ]]]]);
     }
 
@@ -3865,7 +3864,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/port-vlans')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'vlan', 'state',
+            ->assertJsonStructure(['data' => [['attributes' => ['vlan', 'state',
             ]]]]);
     }
 
@@ -3913,7 +3912,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/access-points')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'name', 'macAddress', 'channel', 'associatedClients',
+            ->assertJsonStructure(['data' => [['attributes' => ['name', 'macAddress', 'channel', 'associatedClients',
             ]]]]);
     }
 
@@ -3961,7 +3960,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/wireless-sensors')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'class', 'description', 'category',
+            ->assertJsonStructure(['data' => [['attributes' => ['class', 'description', 'category',
             ]]]]);
     }
 
@@ -4012,7 +4011,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/transceivers')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'vendor', 'model', 'serial',
+            ->assertJsonStructure(['data' => [['attributes' => ['vendor', 'model', 'serial',
             ]]]]);
     }
 
@@ -4060,7 +4059,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/disk-io')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'index', 'description',
+            ->assertJsonStructure(['data' => [['attributes' => ['index', 'description',
             ]]]]);
     }
 
@@ -4108,7 +4107,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/service-level-agreements')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'owner', 'tag', 'rttCategory', 'status',
+            ->assertJsonStructure(['data' => [['attributes' => ['owner', 'tag', 'rttCategory', 'status',
             ]]]]);
     }
 
@@ -4156,7 +4155,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/device-outages')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'outageStartAt',
+            ->assertJsonStructure(['data' => [['attributes' => ['outageStartAt',
             ]]]]);
     }
 
@@ -4204,7 +4203,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/availabilities')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'duration', 'percentage',
+            ->assertJsonStructure(['data' => [['attributes' => ['duration', 'percentage',
             ]]]]);
     }
 
@@ -4252,7 +4251,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/ipsec-tunnels')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'name', 'peerAddress', 'localAddress', 'status',
+            ->assertJsonStructure(['data' => [['attributes' => ['name', 'peerAddress', 'localAddress', 'status',
             ]]]]);
     }
 
@@ -4303,7 +4302,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/pseudowires')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'category', 'description',
+            ->assertJsonStructure(['data' => [['attributes' => ['category', 'description',
             ]]]]);
     }
 
@@ -4351,7 +4350,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/port-stacks')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'highInterfaceIndex', 'lowInterfaceIndex', 'stackStatus',
+            ->assertJsonStructure(['data' => [['attributes' => ['highInterfaceIndex', 'lowInterfaceIndex', 'stackStatus',
             ]]]]);
     }
 
@@ -4402,7 +4401,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/port-spanning-trees')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'vlan', 'state', 'designatedRoot',
+            ->assertJsonStructure(['data' => [['attributes' => ['vlan', 'state', 'designatedRoot',
             ]]]]);
     }
 
@@ -4450,7 +4449,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/spanning-trees')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'bridgeAddress', 'designatedRoot', 'priority',
+            ->assertJsonStructure(['data' => [['attributes' => ['bridgeAddress', 'designatedRoot', 'priority',
             ]]]]);
     }
 
@@ -4501,7 +4500,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/port-adsl')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'atucCurrentSnrMargin', 'atucChannelCurrentTransmitRate',
+            ->assertJsonStructure(['data' => [['attributes' => ['atucCurrentSnrMargin', 'atucChannelCurrentTransmitRate',
             ]]]]);
     }
 
@@ -4552,7 +4551,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/port-vdsl')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'attainableRateDownstream', 'actualDataRateReceive',
+            ->assertJsonStructure(['data' => [['attributes' => ['attainableRateDownstream', 'actualDataRateReceive',
             ]]]]);
     }
 
@@ -4603,7 +4602,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/port-network-access-controls')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'username', 'macAddress', 'authorizationStatus',
+            ->assertJsonStructure(['data' => [['attributes' => ['username', 'macAddress', 'authorizationStatus',
             ]]]]);
     }
 
@@ -4651,7 +4650,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/port-securities')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'status', 'maxAddresses',
+            ->assertJsonStructure(['data' => [['attributes' => ['status', 'maxAddresses',
             ]]]]);
     }
 
@@ -4750,7 +4749,7 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/cef-switching')
             ->assertStatus(200)
-            ->assertJsonStructure(['data' => [['attributes' => [ 'afi', 'path', 'drops', 'punts',
+            ->assertJsonStructure(['data' => [['attributes' => ['afi', 'path', 'drops', 'punts',
             ]]]]);
     }
 

@@ -3,21 +3,18 @@
 namespace App\Restify;
 
 use App\Models\AlertSchedule;
-use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Filters\SearchableFilter;
 use Binaryk\LaravelRestify\Filters\SortableFilter;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class AlertScheduleRepository extends Repository
 {
     public static string $model = AlertSchedule::class;
 
     public static string $title = 'title';
-
-
-
 
     public static function searchables(): array
     {
