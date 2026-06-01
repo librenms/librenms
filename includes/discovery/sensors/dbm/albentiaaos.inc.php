@@ -7,7 +7,7 @@
  * Not exposed in Wireless > RSSI on purpose — that dashboard is for measured
  * signal, not configuration targets.
  *
- * @var \LibreNMS\OS\Albentiaaos $os  Provided by sensors() in
+ * @var LibreNMS\OS\Albentiaaos $os  Provided by sensors() in
  *                              includes/discovery/functions.inc.php
  * @var array<string, mixed> $device  Provided by the discovery loop in
  *                           includes/discovery/functions.inc.php
