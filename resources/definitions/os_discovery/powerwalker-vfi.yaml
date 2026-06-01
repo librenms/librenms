@@ -1,25 +1,25 @@
 modules:
   os:
-          version: UPS-MIB::psIdentUPSSoftwareVersion.0
+          version: UPS-MIB::upsIdentUPSSoftwareVersion.0
           version_regex: '/^(?<version>.*\w)|\.+$/'
-          hardware: UPS-MIB::psIdentModel.0
+          hardware: UPS-MIB::upsIdentModel.0
           hardware_regex: '/^(?<hardware>.*\w)|\.+$/'
           serial: SNMPv2-SMI::enterprises.3808.1.1.1.1.2.3.0
   sensors:
     runtime:
        data:
          -
-           oid: UPS-MIB::psEstimatedMinutesRemaining
+           oid: UPS-MIB::upsEstimatedMinutesRemaining
            num_oid: '.1.3.6.1.2.1.33.1.2.3.{{ $index }}'
-           index: 'UPS-MIB::psEstimatedMinutesRemaining.{{ $index }}'
+           index: 'UPS-MIB::upsEstimatedMinutesRemaining.{{ $index }}'
            descr: Estimated time on battery
            low_limit: 5
            warn_limit_low: 10
            graph: 1
          -
-           oid: UPS-MIB::psSecondsOnBattery
+           oid: UPS-MIB::upsSecondsOnBattery
            num_oid: '.1.3.6.1.2.1.33.1.2.2.{{ $index }}'
-           index: 'UPS-MIB::psSecondsOnBattery.{{ $index }}'
+           index: 'UPS-MIB::upsSecondsOnBattery.{{ $index }}'
            descr: Current time on battery
            divisor: 60
            warn_limit: 90
@@ -28,17 +28,17 @@ modules:
     charge:
        data:
          -
-           oid: UPS-MIB::psEstimatedChargeRemaining
+           oid: UPS-MIB::upsEstimatedChargeRemaining
            num_oid: '.1.3.6.1.2.1.33.1.2.4.{{ $index }}'
-           index: 'UPS-MIB::psEstimatedChargeRemaining.{{ $index }}'
+           index: 'UPS-MIB::upsEstimatedChargeRemaining.{{ $index }}'
            descr: Battery charge remaining
            graph: 1
     temperature:
        data:
          -
-           oid: UPS-MIB::psBatteryTemperature
+           oid: UPS-MIB::upsBatteryTemperature
            num_oid: '.1.3.6.1.2.1.33.1.2.7.{{ $index }}'
-           index: 'UPS-MIB::psBatteryTemperature.{{ $index }}'
+           index: 'UPS-MIB::upsBatteryTemperature.{{ $index }}'
            descr: Battery Temperature
            low_limit: 15
            warn_limit_low: 20
@@ -48,9 +48,9 @@ modules:
     voltage:
        data:
          -
-           oid: UPS-MIB::psInputVoltage
+           oid: UPS-MIB::upsInputVoltage
            num_oid: '.1.3.6.1.2.1.33.1.3.3.1.3.{{ $index }}'
-           index: 'UPS-MIB::psInputVoltage.{{ $index }}'
+           index: 'UPS-MIB::upsInputVoltage.{{ $index }}'
            descr: 'Input Phase {{ $subindex0 }}'
            low_limit: 210
            warn_limit_low: 216
@@ -58,9 +58,9 @@ modules:
            high_limit: 260
            graph: 1
          -
-           oid: UPS-MIB::psOutputVoltage
+           oid: UPS-MIB::upsOutputVoltage
            num_oid: '.1.3.6.1.2.1.33.1.4.4.1.2.{{ $index }}'
-           index: 'UPS-MIB::psOutputVoltage.{{ $index }}'
+           index: 'UPS-MIB::upsOutputVoltage.{{ $index }}'
            descr: 'Output Phase {{ $subindex0 }}'
            low_limit: 210
            warn_limit_low: 216
@@ -68,9 +68,9 @@ modules:
            high_limit: 260
            graph: 1
          -
-           oid: UPS-MIB::psBypassVoltage
+           oid: UPS-MIB::upsBypassVoltage
            num_oid: '.1.3.6.1.2.1.33.1.5.3.1.2.{{ $index }}'
-           index: 'UPS-MIB::psBypassVoltage.{{ $index }}'
+           index: 'UPS-MIB::upsBypassVoltage.{{ $index }}'
            descr: 'Bypass Phase {{ $subindex0 }}'
            low_limit: 210
            warn_limit_low: 216
@@ -78,9 +78,9 @@ modules:
            high_limit: 260
            graph: 1
          -
-           oid: UPS-MIB::psBatteryVoltage
+           oid: UPS-MIB::upsBatteryVoltage
            num_oid: '.1.3.6.1.2.1.33.1.2.5.{{ $index }}'
-           index: 'UPS-MIB::psBatteryVoltage.{{ $index }}'
+           index: 'UPS-MIB::upsBatteryVoltage.{{ $index }}'
            descr: Battery Voltage
            divisor: 10
            low_limit: 10
