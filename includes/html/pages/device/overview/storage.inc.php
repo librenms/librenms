@@ -16,7 +16,7 @@ if (count($drives)) {
     echo '<a href="device/device=' . $device['device_id'] . '/tab=health/metric=storage/">';
     echo '<i class="fa fa-database fa-lg icon-theme" aria-hidden="true"></i> <strong>Storage</strong></a>';
     echo '    </div>
-            <table class="table table-hover table-condensed table-striped">';
+            <table class="table">';
 
     foreach ($drives as $drive) {
         $skipdrive = 0;

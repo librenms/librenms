@@ -14,12 +14,12 @@ if (LibrenmsConfig::get('graylog.server')) {
                             <strong>Recent Graylog</strong>
                         </a>
                     </div>
-                    <table class="table table-hover table-condensed table-striped">';
+                    <table class="table">';
 
     $filter_device = $device['device_id'];
     $tmp_output = '
         <div class="table-responsive">
-        <table id="graylog" class="table table-hover table-condensed table-striped">
+        <table id="graylog" class="table table-hover table-striped">
             <thead>
                 <tr>
                 <th data-column-id="severity"></th>

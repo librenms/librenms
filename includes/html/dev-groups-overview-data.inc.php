@@ -6,24 +6,24 @@ if (count($device_groups)) {
     ?>
     <div class='row'>
         <div class='col-md-12'>
-            <div class='panel panel-default panel-condensed device-overview overview-panel'>
+            <div class='panel panel-default device-overview overview-panel'>
                 <div class='panel-heading'>
                     <a href="<?=url('device-groups')?>">
                         <i class="fa fa-th fa-lg icon-theme" aria-hidden="true"></i>
                         <strong>Device Group Membership</strong>
                     </a>
                 </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-sm-12">
+                <table class="table">
+                    <tr>
+                        <td class="col-sm-12">
                         <?php foreach ($device_groups as $group) { ?>
                             <span style="margin: 8px;">
                                 <a href="<?=route('devices', ['filter' => ['groups.id' => ['eq' => $group['id']]]])?>" target="_blank"><?=htmlspecialchars((string) $group['name'])?></a>
                             </span>
                         <?php } ?>
-                        </div>
-                    </div>
-                </div>
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>

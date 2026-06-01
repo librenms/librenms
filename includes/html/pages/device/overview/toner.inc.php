@@ -17,7 +17,7 @@ foreach ($supplies as $type => $supply) {
         $title = StringHelpers::camelToTitle($type == 'opc' ? 'organicPhotoConductor' : $type);
         echo '<i class="fa fa-print fa-lg icon-theme" aria-hidden="true"></i> <strong>' . $title . '</strong></a>';
         echo '</div>
-        <table class="table table-hover table-condensed table-striped">';
+        <table class="table">';
 
         foreach ($supply as $toner) {
             $percent = round($toner['supply_current']);

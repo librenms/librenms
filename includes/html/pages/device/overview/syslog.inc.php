@@ -9,7 +9,7 @@ if (\App\Facades\LibrenmsConfig::get('enable_syslog')) {
               <div class="panel-heading">';
         echo '<a href="' . route('device.syslog', ['device' => $device['device_id']]) . '"><i class="fa fa-clone fa-lg icon-theme" aria-hidden="true"></i> <strong>Recent Syslog</strong></a>';
         echo '        </div>
-              <table class="table table-hover table-condensed table-striped">';
+              <table class="table">';
         foreach ($syslog as $entry) {
             $syslog_output = '';
             include 'includes/html/print-syslog.inc.php';

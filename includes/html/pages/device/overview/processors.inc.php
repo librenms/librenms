@@ -12,7 +12,7 @@ if (count($processors)) {
     echo '<a href="device/device=' . $device['device_id'] . '/tab=health/metric=processor/">';
     echo '<i class="fa fa-microchip fa-lg icon-theme" aria-hidden="true"></i> <strong>Processors</strong></a>';
     echo '</div>
-        <table class="table table-hover table-condensed table-striped">';
+        <table class="table">';
 
     $graph_array = [];
     $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');

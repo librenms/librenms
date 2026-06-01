@@ -22,7 +22,7 @@ if ($mempools->isNotEmpty()) {
     echo '<i class="fas fa-memory fa-lg icon-theme" aria-hidden="true"></i> <strong>Memory</strong></a>';
     echo '
         </div>
-        <table class="table table-hover table-condensed table-striped">
+        <table class="table">
         ';
 
     echo '<tr>

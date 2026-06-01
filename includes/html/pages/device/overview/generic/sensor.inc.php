@@ -17,7 +17,7 @@ if ($sensors->isNotEmpty()) {
         <div class="panel-heading">';
     echo '<a href="device/device=' . $device['device_id'] . '/tab=health/metric=' . $sensor_class->value . '/"><i class="fa ' . $sensor_fa_icon . ' fa-lg icon-theme" aria-hidden="true"></i><strong> ' . $sensor_class->label() . '</strong></a>';
     echo '      </div>
-        <table class="table table-hover table-condensed table-striped">';
+        <table class="table">';
     $group = '';
     foreach ($sensors as $sensor) {
         if ($group != $sensor->group) {

@@ -23,7 +23,7 @@ if (LibrenmsConfig::get('overview_show_sysDescr')) {
     echo '</strong>';
 }
 
-echo '</div><div class="panel-body">';
+echo '</div><table class="table">';
 
 if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
     \LibreNMS\Util\Rewrite::ciscoHardware($device, false);
@@ -35,20 +35,20 @@ if ($device['features']) {
 
 $device['os_text'] = LibrenmsConfig::getOsSetting($device['os'], 'text');
 
-echo '<div class="row">
-        <div class="col-sm-4">System Name</div>
-        <div class="col-sm-8">' . Clean::html($device['sysName'], []) . ' </div>
-      </div>';
+echo '<tr>
+        <td class="col-sm-4">System Name</td>
+        <td class="col-sm-8">' . Clean::html($device['sysName'], []) . ' </td>
+      </tr>';
 
 if (! empty($device['overwrite_ip'])) {
-    echo "<div class='row'><div class='col-sm-4'>Assigned IP</div><div class='col-sm-8'>" . htmlentities((string) $device['overwrite_ip']) . '</div></div>';
+    echo "<tr><td class='col-sm-4'>Assigned IP</td><td class='col-sm-8'>" . htmlentities((string) $device['overwrite_ip']) . '</td></tr>';
 } elseif (! empty($device['ip'])) {
-    echo "<div class='row'><div class='col-sm-4'>Resolved IP</div><div class='col-sm-8'>" . htmlentities((string) $device['ip']) . '</div></div>';
+    echo "<tr><td class='col-sm-4'>Resolved IP</td><td class='col-sm-8'>" . htmlentities((string) $device['ip']) . '</td></tr>';
 } else {
     try {
         $ip = (string) IP::parse($device['hostname']);
         if ($ip !== format_hostname($device)) {
-            echo "<div class='row'><div class='col-sm-4'>IP Address</div><div class='col-sm-8'>" . htmlentities($ip) . '</div></div>';
+            echo "<tr><td class='col-sm-4'>IP Address</td><td class='col-sm-8'>" . htmlentities($ip) . '</td></tr>';
         }
     } catch (InvalidIpException) {
         // don't add an ip line
@@ -56,41 +56,41 @@ if (! empty($device['overwrite_ip'])) {
 }
 
 if ($device['purpose']) {
-    echo '<div class="row">
-        <div class="col-sm-4">Description</div>
-        <div class="col-sm-8">' . Clean::html($device['purpose'], []) . '</div>
-      </div>';
+    echo '<tr>
+        <td class="col-sm-4">Description</td>
+        <td class="col-sm-8">' . Clean::html($device['purpose'], []) . '</td>
+      </tr>';
 }
 
 if ($device['hardware']) {
-    echo '<div class="row">
-        <div class="col-sm-4">Hardware</div>
-        <div class="col-sm-8">' . Clean::html($device['hardware'], []) . '</div>
-      </div>';
+    echo '<tr>
+        <td class="col-sm-4">Hardware</td>
+        <td class="col-sm-8">' . Clean::html($device['hardware'], []) . '</td>
+      </tr>';
 }
 
-echo '<div class="row">
-        <div class="col-sm-4 text-nowrap">Operating System</div>
-        <div class="col-sm-8">' . Clean::html($device['os_text'] . ' ' . $device['version'] . ' ' . $device['features'], []) . ' </div>
-      </div>';
+echo '<tr>
+        <td class="col-sm-4 text-nowrap">Operating System</td>
+        <td class="col-sm-8">' . Clean::html($device['os_text'] . ' ' . $device['version'] . ' ' . $device['features'], []) . ' </td>
+      </tr>';
 
 if ($device['serial']) {
-    echo '<div class="row">
-        <div class="col-sm-4">Serial</div>
-        <div class="col-sm-8">' . Clean::html($device['serial'], []) . '</div>
-      </div>';
+    echo '<tr>
+        <td class="col-sm-4">Serial</td>
+        <td class="col-sm-8">' . Clean::html($device['serial'], []) . '</td>
+      </tr>';
 }
 
 if ($device['sysObjectID']) {
-    echo '<div class="row">
-        <div class="col-sm-4">Object ID</div>
-        <div class="col-sm-8">' . Clean::html($device['sysObjectID'], []) . '</div>
-      </div>';
+    echo '<tr>
+        <td class="col-sm-4">Object ID</td>
+        <td class="col-sm-8">' . Clean::html($device['sysObjectID'], []) . '</td>
+      </tr>';
 }
 
 if ($device['sysContact']) {
-    echo '<div class="row">
-        <div class="col-sm-4">Contact</div>';
+    echo '<tr>
+        <td class="col-sm-4">Contact</td>';
 
     $contactText = get_dev_attrib($device, 'override_sysContact_bool')
         ? get_dev_attrib($device, 'override_sysContact_string')
@@ -115,28 +115,28 @@ if ($device['sysContact']) {
     $displayText ??= Clean::html($contactText);
 
     if (get_dev_attrib($device, 'override_sysContact_bool')) {
-        echo '<div class="col-sm-8">' . $displayText . '</div>
-            </div>
-            <div class="row">
-                <div class="col-sm-4">SNMP Contact</div>
-                <div class="col-sm-8">' . Clean::html($device['sysContact']) . '</div>
-            </div>';
+        echo '<td class="col-sm-8">' . $displayText . '</td>
+            </tr>
+            <tr>
+                <td class="col-sm-4">SNMP Contact</td>
+                <td class="col-sm-8">' . Clean::html($device['sysContact']) . '</td>
+            </tr>';
     } else {
-        echo '<div class="col-sm-8">' . $displayText . '</div>
-            </div>';
+        echo '<td class="col-sm-8">' . $displayText . '</td>
+            </tr>';
     }
 }
 
 if (! empty($device['inserted']) && preg_match('/^0/', (string) $device['inserted']) == 0) {
     $inserted_text = 'Device Added';
     $inserted = (Time::formatInterval(-(time() - strtotime((string) $device['inserted']))));
-    echo "<div class='row'><div class='col-sm-4'>$inserted_text</div><div class='col-sm-8' title='$inserted_text on " . $device['inserted'] . "'>$inserted</div></div>";
+    echo "<tr><td class='col-sm-4'>$inserted_text</td><td class='col-sm-8' title='$inserted_text on " . $device['inserted'] . "'>$inserted</td></tr>";
 }
 
 if (! empty($device['last_discovered'])) {
     $last_discovered_text = 'Last Discovered';
     $last_discovered = (empty($device['last_discovered']) ? 'Never' : Time::formatInterval(-(time() - strtotime((string) $device['last_discovered']))));
-    echo "<div class='row'><div class='col-sm-4'>$last_discovered_text</div><div class='col-sm-8' title='$last_discovered_text at " . $device['last_discovered'] . "'>$last_discovered</div></div>";
+    echo "<tr><td class='col-sm-4'>$last_discovered_text</td><td class='col-sm-8' title='$last_discovered_text at " . $device['last_discovered'] . "'>$last_discovered</td></tr>";
 }
 
 
@@ -152,7 +152,7 @@ if (! $device['status'] && ! $device['last_polled']) {
 }
 
 if ($uptime) {
-    echo "<div class='row'><div class='col-sm-4'>$uptime_text</div><div class='col-sm-8'>$uptime</div></div>";
+    echo "<tr><td class='col-sm-4'>$uptime_text</td><td class='col-sm-8'>$uptime</td></tr>";
 }
 
 if ($device['location_id'] && $location = Location::find($device['location_id'])) {
@@ -162,13 +162,13 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
     $location_coords = $location_valid ? $location->lat . ', ' . $location->lng : 'N/A';
 
     echo '
-    <div class="row">
-        <div class="col-sm-4">Location</div>
-        <div class="col-sm-8">' . Clean::html($location->display(), []) . '</div>
-    </div>
-    <div class="row" id="coordinates-row" data-toggle="collapse" data-target="#toggle-map">
-        <div class="col-sm-4">Lat / Lng</div>
-        <div class="col-sm-8"><span id="coordinates-text">' . $location_coords . '</span><div class="pull-right">';
+    <tr>
+        <td class="col-sm-4">Location</td>
+        <td class="col-sm-8">' . Clean::html($location->display(), []) . '</td>
+    </tr>
+    <tr id="coordinates-row" data-toggle="collapse" data-target="#toggle-map">
+        <td class="col-sm-4">Lat / Lng</td>
+        <td class="col-sm-8"><span id="coordinates-text">' . $location_coords . '</span><div class="pull-right">';
 
     echo '<div class="btn-group" role="group" aria-label="Map actions">';
     echo '<button type="button" id="toggle-map-button" class="btn btn-primary btn-xs" data-toggle="collapse" data-target="#toggle-map"><i class="fa fa-map" style="color:white" aria-hidden="true"></i> <span>View</span></button>';
@@ -176,11 +176,10 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
         echo ' <a id="map-it-button" href="https://maps.google.com/?q=' . $location->lat . ',' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</a>';
     }
     echo '      </div>
-            </div>
-        </div>
-    </div>
-    <div id="toggle-map" class="row collapse"><div id="location-map"></div></div>
-    <script>
+            </td>
+    </tr>
+    <tr id="toggle-map" class="collapse"><td colspan="2"><div id="location-map"></div></td></tr>';
+    echo '<script>
         var device_map, device_marker_cluster;
 
         L.Control.Fullscreen = L.Control.extend({
@@ -331,7 +330,7 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
     ';
 }
 ?>
-      </div>
+      </table>
     </div>
   </div>
 </div>
