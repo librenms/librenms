@@ -283,17 +283,44 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
                     var currentUrl = $(this).attr('href');
                     var urlParams = [];
 
+                    function addExportParam(name, value) {
+                        if (name === '_token' || value === null || value === undefined || value === '') {
+                            return;
+                        }
+
+                        if (Array.isArray(value)) {
+                            value.forEach(function(item) {
+                                addExportParam(/\[\]$/.test(name) ? name : name + '[]', item);
+                            });
+
+                            return;
+                        }
+
+                        urlParams.push(encodeURIComponent(name) + '=' + encodeURIComponent(value));
+                    }
+
                     var searchPhrase = $('.search-field').val();
                     if (searchPhrase) {
-                        urlParams.push('searchPhrase=' + encodeURIComponent(searchPhrase));
+                        addExportParam('searchPhrase', searchPhrase);
                     }
 
                     // Only include pagination for visible records export
                     if (exportType === 'visible') {
                         var currentPage = grid.bootgrid('getCurrentPage');
                         var rowCount = grid.bootgrid('getRowCount');
-                        urlParams.push('current=' + currentPage);
-                        urlParams.push('rowCount=' + rowCount);
+                        addExportParam('current', currentPage);
+                        addExportParam('rowCount', rowCount);
+                    }
+
+                    var bootgrid = grid.data('.rs.jquery.bootgrid');
+                    if (bootgrid && bootgrid.options && bootgrid.options.post) {
+                        var postParams = $.isFunction(bootgrid.options.post) ? bootgrid.options.post() : bootgrid.options.post;
+
+                        if (postParams && typeof postParams === 'object') {
+                            $.each(postParams, function(name, value) {
+                                addExportParam(name, value);
+                            });
+                        }
                     }
 
                     // get all filters from the header
@@ -308,7 +335,7 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
                             }
 
                             if (value !== null && value !== '' && value !== '1') {
-                                urlParams.push(name + '=' + encodeURIComponent(value));
+                                addExportParam(name, value);
                             }
                         });
 
@@ -317,7 +344,7 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
                             var name = select.attr('name');
                             var selectedOption = select.find(':selected');
                             if (selectedOption.length) {
-                                urlParams.push(name + '=' + encodeURIComponent(selectedOption.val()));
+                                addExportParam(name, selectedOption.val());
                             }
                         });
                     }
@@ -326,7 +353,7 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
                     if (sorting && Object.keys(sorting).length > 0) {
                         for (var sortKey in sorting) {
                             if (sorting.hasOwnProperty(sortKey)) {
-                                urlParams.push('sort[' + sortKey + ']=' + sorting[sortKey]);
+                                addExportParam('sort[' + sortKey + ']', sorting[sortKey]);
                             }
                         }
                     }
