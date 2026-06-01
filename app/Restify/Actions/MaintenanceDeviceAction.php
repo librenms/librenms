@@ -29,7 +29,7 @@ class MaintenanceDeviceAction extends Action
         $schedule = $this->createMaintenanceSchedule(
             $device,
             'devices',
-            $device->displayName(),
+            $device->display ?: $device->hostname ?: '',
             $this->validateMaintenancePayload($request),
         );
 

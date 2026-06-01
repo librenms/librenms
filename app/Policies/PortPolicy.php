@@ -67,16 +67,16 @@ class PortPolicy
 
     public function attachGroups(User $user, Port $port, PortGroup $group): bool
     {
-        return $this->update($user);
+        return $this->update($user, $port);
     }
 
     public function syncGroups(User $user, Port $port, Collection $groups): bool
     {
-        return $this->update($user);
+        return $this->update($user, $port);
     }
 
     public function detachGroups(User $user, Port $port, PortGroup $group): bool
     {
-        return $this->update($user);
+        return $this->update($user, $port);
     }
 }

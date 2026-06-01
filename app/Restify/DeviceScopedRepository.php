@@ -20,7 +20,7 @@ trait DeviceScopedRepository
     public static function indexQuery(RestifyRequest $request, Builder|Relation $query)
     {
         if ($user = $request->user()) {
-            return $query->hasAccess($user);
+            return $query->hasAccess($user); // @phpstan-ignore method.notFound (scopeHasAccess defined on the wrapped model)
         }
 
         return $query->whereRaw('1 = 0');
