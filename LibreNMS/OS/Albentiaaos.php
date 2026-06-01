@@ -50,9 +50,10 @@ class Albentiaaos extends OS implements
      *
      * SnmpQuery::table(1) keys rows by the decoded INDEX value (e.g. "blue").
      * To rebuild a leaf numeric OID we need the original encoded form
-     * (e.g. "4.98.108.117.101").
+     * (e.g. "4.98.108.117.101"). Public so the dbm sensor discovery
+     * (includes/discovery/sensors/dbm/albentiaaos.inc.php) can reuse it.
      */
-    private function encodeStringIndex(string $idx): string
+    public function encodeStringIndex(string $idx): string
     {
         $out = (string) strlen($idx);
         foreach (str_split($idx) as $ch) {
