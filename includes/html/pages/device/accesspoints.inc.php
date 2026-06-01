@@ -72,7 +72,7 @@ if (isset($_POST['page_number']) && $_POST['page_number'] > 0 && $_POST['page_nu
 $start = (($page_number - 1) * $results);
 
 
-echo "<div style='margin: 0px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
+echo "<div><table class='table table-striped'>";
 $index = 0;
 foreach ($aps as $ap) {
     $index++;
