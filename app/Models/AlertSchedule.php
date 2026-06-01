@@ -84,6 +84,10 @@ class AlertSchedule extends Model
 
     public function getStartAttribute()
     {
+        if (! isset($this->attributes['start'])) {
+            return null;
+        }
+
         return Date::parse($this->attributes['start'], 'UTC')->tz($this->timezone);
     }
 
@@ -94,6 +98,10 @@ class AlertSchedule extends Model
 
     public function getEndAttribute()
     {
+        if (! isset($this->attributes['end'])) {
+            return null;
+        }
+
         return Date::parse($this->attributes['end'], 'UTC')->tz($this->timezone);
     }
 

@@ -123,7 +123,9 @@ class RestifyNestedRoutesTest extends DBTestCase
         $device = Device::factory()->create();
         Sanctum::actingAs($user);
 
+        // An unknown relationship segment resolves to no registered repository,
+        // which Restify reports as 404 (not found), not a 500.
         $this->getJson("/api/v1/devices/{$device->device_id}/nonexistent")
-            ->assertStatus(500);
+            ->assertStatus(404);
     }
 }

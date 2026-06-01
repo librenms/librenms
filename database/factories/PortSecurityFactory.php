@@ -12,7 +12,7 @@ class PortSecurityFactory extends Factory
         return [
             'port_id' => $this->faker->unique()->numberBetween(1, 10000),
             'device_id' => $this->faker->numberBetween(1, 100),
-            'port_security_enable' => 'true',
+            'port_security_enable' => true,
             'status' => 'secureup',
             'max_addresses' => 1,
             'address_count' => 1,

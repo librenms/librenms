@@ -12,7 +12,9 @@ use Binaryk\LaravelRestify\Filters\SortableFilter;
 
 class AlertRuleRepository extends Repository
 {
-    use DeviceScopedRepository;
+    // Not device-scoped: alert-rules are visible per alert-rule permission, regardless
+    // of device access. Device access is enforced only on the *related* devices/groups,
+    // which resolve through their own device-scoped repositories.
 
     public static string $model = AlertRule::class;
 

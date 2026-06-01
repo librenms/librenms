@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Facades\Permissions;
 use App\Models\AlertRule;
 use App\Models\AlertTemplate;
 use App\Models\Device;
@@ -40,36 +39,11 @@ class AlertRulePolicy
      */
     public function view(User $user, AlertRule $alertRule): bool
     {
-        if ($this->hasGlobalPermission($user, 'viewAll')) {
-            return true;
-        }
-
-        if (! $this->hasGlobalPermission($user, 'view', true)) {
-            return false;
-        }
-
-        // FIXME probably a less brain-dead way to do this
-        foreach ($alertRule->devices as $device) {
-            if (Permissions::canAccessDevice($device, $user)) {
-                return true;
-            }
-        }
-
-        foreach ($alertRule->groups as $group) {
-            if (Permissions::canAccessDeviceGroup($group, $user)) {
-                return true;
-            }
-        }
-
-        foreach ($alertRule->locations as $location) {
-            foreach ($location->devices as $device) {
-                if (Permissions::canAccessDevice($device, $user)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        // Alert-rule visibility is governed by alert-rule permission alone, regardless of
+        // device access. Device access is enforced only on the rule's related
+        // devices/groups (which resolve through their own device-scoped repositories).
+        return $this->hasGlobalPermission($user, 'viewAll')
+            || $this->hasGlobalPermission($user, 'view', true);
     }
 
     /**
