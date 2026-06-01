@@ -4,17 +4,17 @@
             "devices": [
                 {
                     "sysName": null,
-                    "sysObjectID": null,
+                    "sysObjectID": ".1.3.6.1.4.1.21296",
                     "sysDescr": null,
                     "sysContact": null,
                     "version": null,
                     "hardware": null,
                     "features": null,
                     "location": null,
-                    "os": "generic",
-                    "type": "server",
+                    "os": "iqnos",
+                    "type": "network",
                     "serial": null,
-                    "icon": "generic.svg"
+                    "icon": "infinera.svg"
                 }
             ]
         },
