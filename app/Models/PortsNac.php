@@ -26,11 +26,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PortsNac extends PortRelatedModel
 {
-    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+    use HasFactory;
     protected $table = 'ports_nac';
     protected $primaryKey = 'ports_nac_id';
     public $timestamps = true;

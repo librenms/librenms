@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class MplsSap extends DeviceRelatedModel implements Keyable
 {
-    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+    use HasFactory;
     protected $primaryKey = 'sap_id';
     public $timestamps = false;
     protected $fillable = [

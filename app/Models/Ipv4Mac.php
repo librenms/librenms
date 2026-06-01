@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class Ipv4Mac extends PortRelatedModel implements Keyable
 {
-    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+    use HasFactory;
     protected $table = 'ipv4_mac';
     public $timestamps = false;
     protected $fillable = [

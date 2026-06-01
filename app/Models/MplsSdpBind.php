@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class MplsSdpBind extends DeviceRelatedModel implements Keyable
 {
-    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+    use HasFactory;
     protected $primaryKey = 'bind_id';
     public $timestamps = false;
     protected $fillable = [

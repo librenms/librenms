@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class DiskIo extends DeviceRelatedModel implements Keyable
 {
-    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+    use HasFactory;
     public $timestamps = false;
     protected $table = 'ucd_diskio';
     protected $primaryKey = 'diskio_id';

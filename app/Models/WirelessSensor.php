@@ -28,6 +28,7 @@ namespace App\Models;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Traits\HasThresholds;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Arr;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Models\Keyable;
@@ -35,7 +36,7 @@ use LibreNMS\Util\Number;
 
 class WirelessSensor extends DeviceRelatedModel implements Keyable
 {
-    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+    use HasFactory;
     use HasThresholds;
 
     const CREATED_AT = null;
