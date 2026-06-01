@@ -78,7 +78,7 @@ if (count($processors)) {
         //Generate average cpu graph
         $graph_array['device'] = $device['device_id'];
         $graph_array['type'] = 'device_processor';
-        $graph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
+        $graph = \LibreNMS\Util\Url::lazyGraphTag($graph_array, 'tw:w-full tw:h-auto');
 
         //Generate link to graphs
         $link_array = $graph_array;
