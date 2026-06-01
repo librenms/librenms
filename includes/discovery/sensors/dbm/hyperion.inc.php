@@ -2,11 +2,6 @@
 
 echo 'Hyperion DDMI dBm: ';
 
-/*
- * ==========================
- * DDMI TABLES
- * ==========================
- */
 $ddmi = snmpwalk_cache_oid(
     $device,
     'ddmiStatusInterfaceTable',
@@ -34,14 +29,8 @@ $ifdescr = snmpwalk_cache_oid(
     '-OQUs'
 );
 
-/*
- * ==========================
- * LOOP: ONLY SFP PORTS
- * ==========================
- */
 foreach ($ddmi as $index => $entry) {
 
-    // ✅ TYLKO porty z wykrytym SFP
     if (($entry['ddmiStatusInterfaceA0SfpDetected'] ?? 'false') != 'true') {
         continue;
     }
@@ -51,16 +40,10 @@ foreach ($ddmi as $index => $entry) {
         continue;
     }
 
-    // ✅ mapowanie DDMI -> IF-MIB
     $real_ifIndex = $ddmi_if + 1000000;
 
     $portDescr = $ifdescr[$real_ifIndex]['ifDescr'] ?? "Port $ddmi_if";
 
-    /*
-     * ==========================
-     * TX POWER
-     * ==========================
-     */
     if (!empty($entry['ddmiStatusInterfaceA2CurrentTxPower'])) {
 
         $value = str_replace(',', '.', trim($entry['ddmiStatusInterfaceA2CurrentTxPower']));
@@ -90,11 +73,6 @@ foreach ($ddmi as $index => $entry) {
         }
     }
 
-    /*
-     * ==========================
-     * RX POWER
-     * ==========================
-     */
     if (!empty($entry['ddmiStatusInterfaceA2CurrentRxPower'])) {
 
         $value = str_replace(',', '.', trim($entry['ddmiStatusInterfaceA2CurrentRxPower']));

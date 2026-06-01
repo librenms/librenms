@@ -2,7 +2,6 @@
 
 echo 'Hyperion DDMI current: ';
 
-// DDMI tables
 $ddmi = snmpwalk_cache_oid(
     $device,
     'ddmiStatusInterfaceTable',
@@ -12,7 +11,6 @@ $ddmi = snmpwalk_cache_oid(
     '-OQUs'
 );
 
-// IF-MIB ifDescr
 $ifdescr = snmpwalk_cache_oid(
     $device,
     'ifDescr',
@@ -24,7 +22,6 @@ $ifdescr = snmpwalk_cache_oid(
 
 foreach ($ddmi as $index => $entry) {
 
-    // tylko porty z SFP
     if (($entry['ddmiStatusInterfaceA0SfpDetected'] ?? 'false') != 'true') {
         continue;
     }
@@ -33,7 +30,6 @@ foreach ($ddmi as $index => $entry) {
         continue;
     }
 
-    // STRING -> float
     $raw = trim($entry['ddmiStatusInterfaceA2CurrentTxBias']);
     $raw = str_replace(',', '.', $raw);
 
@@ -43,7 +39,6 @@ foreach ($ddmi as $index => $entry) {
 
     $value = (float)$raw;
 
-    // mapowanie DDMI -> ifIndex
     $ddmi_if = (int)$entry['ddmiStatusInterfaceIfIndex'];
     $real_ifIndex = $ddmi_if + 1000000;
 

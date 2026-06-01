@@ -6,6 +6,7 @@ modules:
         version: ENTITY-MIB::entPhysicalSoftwareRev.1
     processors:
         data:
+#
 #            -
 #                oid: MIB-SYSUTIL::sysutilStatusCpuLoadAverage100msec
 #                value: MIB-SYSUTIL::sysutilStatusCpuLoadAverage100msec
