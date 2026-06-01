@@ -212,10 +212,12 @@ class OpenApiSpecTest extends TestCase
 
         $paths = array_keys($response->json('paths'));
 
-        // UserRepository has 'devices-owned' => BelongsToMany::make('devicesOwned', ...)
-        // Restify routes match the URL segment to the field attribute, not the array key.
-        $this->assertContains('/api/v1/users/{id}/attach/devicesOwned', $paths);
-        $this->assertNotContains('/api/v1/users/{id}/attach/devices-owned', $paths);
+        // UserRepository's relations now use kebab-case URLs end-to-end. The
+        // RestifyAttachRelationResolver middleware bridges the URL slug to the
+        // model's camelCase relation method (e.g. devicesOwned()).
+        $this->assertContains('/api/v1/users/{id}/attach/devices-owned', $paths);
+        $this->assertContains('/api/v1/users/{id}/attach/ports-owned', $paths);
+        $this->assertNotContains('/api/v1/users/{id}/attach/devicesOwned', $paths);
     }
 
     public function testNewlyAddedAttachableRelationsAreInSpec(): void
@@ -229,7 +231,7 @@ class OpenApiSpecTest extends TestCase
             '/api/v1/devices/{id}/attach/parents',
             '/api/v1/device-groups/{id}/attach/users',
             '/api/v1/users/{id}/attach/bills',
-            '/api/v1/users/{id}/attach/deviceGroups',
+            '/api/v1/users/{id}/attach/device-groups',
             '/api/v1/alert-transport-groups/{id}/attach/transports',
             '/api/v1/alert-transport-groups',
         ] as $expected) {

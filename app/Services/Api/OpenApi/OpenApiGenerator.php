@@ -488,26 +488,21 @@ class OpenApiGenerator
     {
         $relatedResourceName = Str::studly(Str::singular($info['repository']::uriKey()));
 
-        // For HasMany / BelongsToMany, Restify's relatable.index matches the
-        // URL segment against the target repo's uriKey (plural), so the
-        // advertised path needs to use that. For BelongsTo (a single related
-        // model), JSON:API convention prefers the singular relation name (the
-        // array key), so keep that.
-        $segment = $info['cardinality'] === 'many'
-            ? ($info['target_uri_key'] ?? $relationName)
-            : $relationName;
+        // Restify's relatable.index resolves /{parent}/{id}/{segment} by matching
+        // {segment} both against a registered repository uriKey (Restify::repository)
+        // and against the parent eager field's getAttribute(). App\Restify\Repository
+        // aligns getAttribute() to the related repository's uriKey, so the advertised
+        // segment is always that uriKey — for BelongsTo as well as HasMany/BelongsToMany.
+        $segment = $info['target_uri_key'] ?? $relationName;
 
-        $envelopeRef = $info['cardinality'] === 'many'
-            ? '#/components/schemas/JsonApiList'
-            : '#/components/schemas/JsonApiSingle';
-
-        $dataSchema = $info['cardinality'] === 'many'
-            ? Schema::array('data')->items(Schema::ref("#/components/schemas/{$relatedResourceName}Resource"))
-            : Schema::ref("#/components/schemas/{$relatedResourceName}Resource", 'data');
-
+        // All relations are served by Restify's relatable.index controller, which returns
+        // a paginated list envelope (meta/links/data[]) even for BelongsTo (a to-one
+        // relation comes back as a one-element list), so document every relation as a list.
         $responseSchema = AllOf::create()->schemas(
-            Schema::ref($envelopeRef),
-            Schema::object()->properties($dataSchema),
+            Schema::ref('#/components/schemas/JsonApiList'),
+            Schema::object()->properties(
+                Schema::array('data')->items(Schema::ref("#/components/schemas/{$relatedResourceName}Resource")),
+            ),
         );
 
         $operation = Operation::get()

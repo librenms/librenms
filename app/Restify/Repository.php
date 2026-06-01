@@ -2,6 +2,8 @@
 
 namespace App\Restify;
 
+use Binaryk\LaravelRestify\Eager\RelatedCollection;
+use Binaryk\LaravelRestify\Fields\EagerField;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Binaryk\LaravelRestify\Repositories\Repository as RestifyRepository;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -13,6 +15,33 @@ use ReflectionMethod;
 
 abstract class Repository extends RestifyRepository
 {
+    /**
+     * Drive every relation's public name from the *owning* repository's uriKey.
+     *
+     * Restify resolves a nested route `/{parent}/{id}/{segment}` by matching {segment}
+     * against each eager field's getAttribute() (label ?? attribute). By default that is
+     * the Eloquent relation method name (e.g. `outages`), which need not equal the related
+     * repository's uriKey (e.g. `device-outages`) — when they differ the endpoint 403s.
+     *
+     * Setting the label to the related repository's uriKey here means each model's
+     * repository is the single source of truth for its public name: rename it once
+     * (via uriKey) and every reference to it picks up the new segment automatically.
+     * Explicit per-field ->label() calls still win (we only fill the gap).
+     */
+    public static function collectRelated(): RelatedCollection
+    {
+        return parent::collectRelated()->each(function ($field): void {
+            // getAttribute() (label ?? attribute) is what Restify matches the nested-route
+            // segment against, and the segment must also be a registered repository uriKey.
+            // Pin it to the related repository's uriKey so the owning repository is the
+            // single source of truth for the relation's public name. (No parent declares
+            // two relations to the same repository, so this never collides.)
+            if ($field instanceof EagerField) {
+                $field->label = $field->repositoryClass::uriKey();
+            }
+        });
+    }
+
     /**
      * Actions to suppress from the OpenAPI document and (by convention) from custom routes().
      * Subclasses may override with any of: 'store', 'update', 'destroy'.
