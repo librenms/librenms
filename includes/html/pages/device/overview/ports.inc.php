@@ -17,7 +17,7 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     $graph_array['type'] = 'device_bits';
     $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
     $graph_array['legend'] = 'no';
-    $graph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
+    $graph = \LibreNMS\Util\Url::lazyGraphTag($graph_array, 'tw:w-full tw:h-auto');
 
     //Generate tooltip
     $graph_array['width'] = 210;
