@@ -19,6 +19,9 @@
                             <ul class="dropdown-menu dropdown-menu-right">
                                 <li><a href="{{ $hideFilterLink }}"><i class="fa fa-regular @if($hideFilter) fa-square @else fa-square-check @endif fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ __('device.show_filter') }}</a></li>
                                 <li><a href="{{ $bareLink }}"><i class="fa fa-regular @if($bare) fa-square @else fa-square-check @endif fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ __('device.show_header') }}</a></li>
+                                @if($view === 'graph')
+                                    <li><a href="{{ $showGraphErrorsLink }}"><i class="fa fa-regular @if($showGraphErrors) fa-square-check @else fa-square @endif fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ __('device.show_graph_errors') }}</a></li>
+                                @endif
                             </ul>
                         </div>
                     </div>

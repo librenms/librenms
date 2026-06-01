@@ -4,16 +4,20 @@
 </div>
 <hr class="tw:my-5 @if($hideFilter) tw:hidden @endif"/>
 
-<div>
-    <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:lg:grid-cols-4 tw:gap-4">
-        @foreach($deviceGraphs as $graph)
-            <div>
-                <a href="{{ $graph['link'] }}" x-data="deviceLink(@js($graph['deviceLinkOptions']))">
-                    {!! $graph['graphTag'] !!}
-                </a>
-            </div>
-        @endforeach
-    </div>
+<div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:lg:grid-cols-4 tw:gap-4">
+    @foreach($deviceGraphs as $graph)
+        <div>
+            <a href="{{ $graph['link'] }}" x-data="deviceLink(@js($graph['deviceLinkOptions']))">
+                <img
+                    class="graph-image tw:w-full tw:h-auto"
+                    style="display:none"
+                    src="{{ route('graph', $graph['params']) }}"
+                    onerror="this.closest('div').style.display='none'"
+                    onload="this.style.display=''"
+                />
+            </a>
+        </div>
+    @endforeach
 </div>
 
 <x-slot name="footer">
@@ -30,8 +34,32 @@
     </div>
 </x-slot>
 
+@push('styles')
+    <style>
+        .graph-tile {
+            overflow: hidden;
+        }
+
+        .graph-tile img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .graph-loading {
+            visibility: hidden;
+        }
+    </style>
+@endpush
+
 @push('scripts')
 <script>
+    document.addEventListener('load', e => {
+        if (e.target.matches('.graph-image')) {
+            e.target.classList.remove('graph-loading');
+        }
+    }, true);
+
     window.addEventListener('date-range-changed', (event) => {
         const { relativeStartSeconds, relativeEndSeconds, start, end } = event.detail;
         const url = new URL(window.location.href);

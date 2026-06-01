@@ -8,8 +8,11 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use LibreNMS\Util\Url;
 
 class PortsController extends Controller
 {
@@ -19,6 +22,7 @@ class PortsController extends Controller
             'view' => 'in:list_basic,list_detail,graph_bits,graph_upkts,graph_nupkts,graph_errors', // legacy
             'bare' => ['nullable', 'in:yes'],
             'searchbar' => ['nullable', 'in:hide'],
+            'show_graph_errors' => ['nullable', 'in:yes'],
             'per_page' => ['nullable', 'integer'],
             'page' => ['nullable', 'integer'],
             'to' => ['nullable', 'date_or_relative'],
@@ -44,6 +48,7 @@ class PortsController extends Controller
         $view ??= $request->input('view', 'basic');
         $bare = $request->input('bare') === 'yes';
         $hideFilter = $request->input('searchbar') === 'hide';
+        $showGraphErrors = $request->boolean('show_graph_errors');
         $perPage = $request->integer('per_page', 48);
         $sort = $request->string('sort', $errors ? 'errors' : 'device');
 
@@ -62,17 +67,29 @@ class PortsController extends Controller
             'from' => $request->input('from', '-1d'),
             'legend' => 'no',
             'title' => 'yes',
+            'return_errors' => $showGraphErrors ? 0 : 1,
         ];
         if ($request->input('to')) {
             $graphTemplate['to'] = $request->input('to');
         }
+
+        $ports = $this->getPorts($view, $perPage, $sort);
 
         return view('port.index', [
             'view' => $view,
             'graph' => $graph,
             'show_detail' => $view === 'detail' ? 'true' : 'false',
             'show_errors' => $view === 'detail' || $request->boolean('filter.errors.eq') ? 'true' : 'false',
-            'ports' => $this->getPorts($view, $perPage, $sort),
+            'ports' => $ports,
+            'portGraphs' => $ports->map(function (Port $port) use ($graphTemplate) {
+                $graph = array_merge($graphTemplate, ['id' => $port->port_id]);
+
+                return [
+                    'link' => Url::graphPageUrl($graph['type'], Arr::except($graph, ['height', 'width', 'legend', 'title'])),
+                    'params' => $graph,
+                    'portLinkOptions' => ['port_id' => $port->port_id, 'params' => ['type' => $graph['type']]],
+                ];
+            }),
             'group' => $request->array('filter')['groups.id']['eq'] ?? 0,
             'perPage' => $perPage,
             'paginationOptions' => [12, 24, 48, 128, 568, 4096],
@@ -91,8 +108,9 @@ class PortsController extends Controller
             'filter' => $request->array('filter'),
             'hideFilterLink' => $hideFilter ? $request->fullUrlWithoutQuery('searchbar') : $request->fullUrlWithQuery(['searchbar' => 'hide']),
             'hideFilter' => $hideFilter,
+            'showGraphErrors' => $showGraphErrors,
+            'showGraphErrorsLink' => $showGraphErrors ? $request->fullUrlWithoutQuery('show_graph_errors') : $request->fullUrlWithQuery(['show_graph_errors' => 'yes']),
             'filterFields' => $this->filterFields(),
-            'graphTemplate' => $graphTemplate,
         ]);
     }
 
@@ -238,12 +256,12 @@ class PortsController extends Controller
      * @param  string  $view
      * @param  int  $perPage
      * @param  string  $sort
-     * @return LengthAwarePaginator<int, Port>|null
+     * @return LengthAwarePaginator<int, Port>|Collection<int, Port>
      */
-    private function getPorts(string $view, int $perPage, string $sort): ?LengthAwarePaginator
+    private function getPorts(string $view, int $perPage, string $sort): LengthAwarePaginator|Collection
     {
         if ($view !== 'graph') {
-            return null;
+            return new Collection;
         }
 
         $portsQuery = Port::hasAccess(request()->user())

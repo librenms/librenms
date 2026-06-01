@@ -9,6 +9,11 @@ use LibreNMS\Util\Url;
 
 if (is_numeric($vars['id']) && ($auth || port_permitted($vars['id']))) {
     $port = PortCache::get($vars['id']);
+
+    if ($port === null) {
+        throw new RrdGraphException('Port not found', 'No Port');
+    }
+
     $device = DeviceCache::get((int) $port['device_id']);
 
     if ($device === null) {

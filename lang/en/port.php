@@ -3,6 +3,7 @@
 return [
     'show_filter' => 'Show Filter',
     'show_header' => 'Show Header',
+    'show_graph_errors' => 'Show Graph Errors',
     'purge' => 'Purge all deleted',
     'purged' => 'Purged',
     'purged_message' => 'All deleted ports have been purged.',

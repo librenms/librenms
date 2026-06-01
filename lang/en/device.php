@@ -31,6 +31,7 @@ return [
     'device_group' => 'Device Group',
     'show_filter' => 'Show Filter',
     'show_header' => 'Show Header',
+    'show_graph_errors' => 'Show Graph Errors',
     'os' => 'OS',
     'status' => 'Status',
     'status_up' => 'Up',

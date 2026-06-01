@@ -8,7 +8,6 @@ use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Graph;
-use LibreNMS\Util\Url;
 
 class GraphController extends Controller
 {
@@ -17,7 +16,7 @@ class GraphController extends Controller
      */
     public function __invoke(Request $request, string $path = ''): Response
     {
-        $vars = array_merge(Url::parseLegacyPathVars($request->path()), $request->except(['username', 'password']));
+        $vars = $request->except(['username', 'password']);
 
         if (\Auth::check()) {
             // only allow debug for logged in users
@@ -43,6 +42,10 @@ class GraphController extends Controller
         } catch (RrdGraphException $e) {
             if (Debug::isEnabled()) {
                 throw $e;
+            }
+
+            if ($request->boolean('return_errors')) {
+                return response('', 500);
             }
 
             return response($e->generateErrorImage(), 500, ['Content-type' => ImageFormat::forGraph($vars['graph_type'] ?? null)->contentType()]);

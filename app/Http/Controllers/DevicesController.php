@@ -19,8 +19,10 @@ class DevicesController extends Controller
     {
         $request->validate([
             'format' => 'in:list_basic,list_detail,graph_bits,graph_processor,graph_ucd_load,graph_mempool,graph_uptime,graph_storage,graph_diskio,graph_poller_perf,graph_icmp_perf,graph_temperature', // legacy
-            'bare' => ['nullable', 'in:yes'],
-            'searchbar' => ['nullable', 'in:hide'],
+            'bare' => ['nullable', 'in:yes,no'],
+            'searchbar' => ['nullable', 'in:hide,show'],
+            'show_graph_errors' => ['nullable', 'in:yes,no'],
+            'show_errors' => ['nullable', 'in:yes'],
             'per_page' => ['nullable', 'integer'],
             'page' => ['nullable', 'integer'],
             'to' => ['nullable', 'date_or_relative'],
@@ -44,6 +46,7 @@ class DevicesController extends Controller
 
         [$view, $graph] = $this->parseLegacyUrls((string) $view, (string) $graph, $request);
 
+        $showGraphErrors = $request->boolean('show_graph_errors');
         $graphTemplate = [
             'height' => 110,
             'width' => session('widescreen') ? 270 : 315,
@@ -52,6 +55,7 @@ class DevicesController extends Controller
             'from' => $request->input('from', '-1d'),
             'legend' => 'no',
             'title' => 'yes',
+            'return_errors' => $showGraphErrors ? 0 : 1,
         ];
         if ($request->input('to')) {
             $graphTemplate['to'] = $request->input('to');
@@ -69,7 +73,7 @@ class DevicesController extends Controller
 
                 return [
                     'link' => Url::graphPageUrl($graph['type'], Arr::except($graph, ['height', 'width', 'legend', 'title'])),
-                    'graphTag' => Url::lazyGraphTag($graph, 'tw:w-full tw:h-auto'),
+                    'params' => $graph,
                     'deviceLinkOptions' => ['device_id' => $device->device_id, 'params' => ['type' => $graph['type']]],
                 ];
             }),
@@ -96,8 +100,9 @@ class DevicesController extends Controller
             'filter' => $request->array('filter'),
             'hideFilterLink' => $hideFilter ? $request->fullUrlWithoutQuery('searchbar') : $request->fullUrlWithQuery(['searchbar' => 'hide']),
             'hideFilter' => $hideFilter,
+            'showGraphErrors' => $showGraphErrors,
+            'showGraphErrorsLink' => $showGraphErrors ? $request->fullUrlWithoutQuery('show_graph_errors') : $request->fullUrlWithQuery(['show_graph_errors' => 'yes']),
             'filterFields' => $this->filterFields(),
-            'graphTemplate' => $graphTemplate,
         ]);
     }
 
