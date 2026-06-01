@@ -62,12 +62,17 @@
     @apply tw:font-bold tw:text-gray-400 tw:visited:text-gray-400 tw:dark:text-gray-500! tw:dark:visited:text-gray-500!
 }
 
+/* Large overview graphs: fill the panel/column and resize with the layout */
+.graph-image-fluid {
+  @apply tw:block tw:h-auto tw:w-full;
+}
+
 #coordinates-text  {
   @apply tw:underline;
 }
 
 .overview-panel {
-  @apply tw:rounded-xl tw:overflow-hidden tw:border tw:border-gray-300 tw:shadow-sm tw:dark:border-dark-gray-200;
+  @apply tw:rounded-xl tw:overflow-hidden tw:border tw:border-gray-300 tw:shadow-sm tw:dark:border-dark-gray-200 tw:ml-auto tw:mr-auto;
 }
 
 .lnms-btn {

@@ -69,7 +69,7 @@ class DevicesController extends Controller
 
                 return [
                     'link' => Url::graphPageUrl($graph['type'], Arr::except($graph, ['height', 'width', 'legend', 'title'])),
-                    'graphTag' => Url::lazyGraphTag($graph, 'tw:w-full tw:h-auto'),
+                    'graphTag' => Url::lazyGraphTag($graph, 'graph-image-fluid'),
                     'deviceLinkOptions' => ['device_id' => $device->device_id, 'params' => ['type' => $graph['type']]],
                 ];
             }),

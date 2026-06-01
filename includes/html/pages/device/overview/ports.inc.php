@@ -17,7 +17,7 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     $graph_array['type'] = 'device_bits';
     $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
     $graph_array['legend'] = 'no';
-    $graph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
+    $graph = \LibreNMS\Util\Url::lazyGraphTag($graph_array, 'graph-image-fluid');
 
     //Generate tooltip
     $graph_array['width'] = 210;
@@ -30,7 +30,7 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     $graph_array['width'] = '210';
     $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . ' - Device Traffic');
 
-    echo \LibreNMS\Util\Url::overlibLink($link, $graph, $overlib_content);
+    echo '<div class="tw:block tw:w-full">' . \LibreNMS\Util\Url::overlibLink($link, $graph, $overlib_content) . '</div>';
 
     $ports = ObjectCache::portCounts(['total', 'up', 'down', 'disabled'], $device['device_id']);
     echo '<div class="panel-body tw:flex tw:flex-wrap tw:gap-3">
