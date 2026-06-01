@@ -17,27 +17,27 @@
         </thead>
         <tbody>
             <tr>
-                <td><a href="{{ url('devices') }}">{{ __('Devices') }}</a></td>
-                <td><a href="{{ url('devices') }}"><span> {{ $devices['total'] }}</span></a></td>
-                <td><a href="{{ url('devices/state=up/format=list_detail') }}"><span class="green"> {{ $devices['up'] }}</span></a></td>
-                <td><a href="{{ url('devices/state=down/format=list_detail') }}"><span class="red"> {{ $devices['down'] }}</span></a></td>
-                <td><a href="{{ url('devices/ignore=1/format=list_detail') }}"><span class="blue"> {{ $devices['ignored'] }}</span></a></td>
-                <td><a href="{{ url('devices/disable_notify=1/format=list_detail') }}"><span class="grey"> {{ $devices['disable_notify'] }}</span></a></td>
-                <td><a href="{{ url('devices/disabled=1/format=list_detail') }}"><span class="black"> {{ $devices['disabled'] }}</span></a></td>
+                <td><a href="{{ route('devices') }}">{{ __('Devices') }}</a></td>
+                <td><a href="{{ route('devices') }}"><span> {{ $devices['total'] }}</span></a></td>
+                <td><a href="{{ route('devices', ['detail', 'filter' => ['state' => ['eq' => 'up']]]) }}"><span class="green"> {{ $devices['up'] }}</span></a></td>
+                <td><a href="{{ route('devices', ['detail', 'filter' => ['state' => ['eq' => 'down']]]) }}"><span class="red"> {{ $devices['down'] }}</span></a></td>
+                <td><a href="{{ route('devices', ['detail', 'filter' => ['ignore' => ['eq' => 1]]]) }}"><span class="blue"> {{ $devices['ignored'] }}</span></a></td>
+                <td><a href="{{ route('devices', ['detail', 'filter' => ['disable_notify' => ['eq' => 1]]]) }}"><span class="grey"> {{ $devices['disable_notify'] }}</span></a></td>
+                <td><a href="{{ route('devices', ['detail', 'filter' => ['disabled' => ['eq' => 1]]]) }}"><span class="black"> {{ $devices['disabled'] }}</span></a></td>
                 @if($summary_errors)
                     <td>-</td>
                 @endif
             </tr>
             <tr>
-                <td><a href="{{ url('ports') }}">{{ __('Ports') }}</a></td>
-                <td><a href="{{ url('ports') }}"><span>{{ $ports['total'] }}</span></a></td>
-                <td><a href="{{ url('ports/format=list_detail/state=up') }}"><span class="green"> {{ $ports['up'] }}</span></a></td>
-                <td><a href="{{ url('ports/format=list_detail/state=down') }}"><span class="red"> {{ $ports['down'] }}</span></a></td>
-                <td><a href="{{ url('ports/format=list_detail/ignore=1') }}"><span class="blue"> {{ $ports['ignored'] }}</span></a></td>
+                <td><a href="{{ route('ports') }}">{{ __('Ports') }}</a></td>
+                <td><a href="{{ route('ports') }}"><span>{{ $ports['total'] }}</span></a></td>
+                <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'up']]]) }}"><span class="green"> {{ $ports['up'] }}</span></a></td>
+                <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'down']]]) }}"><span class="red"> {{ $ports['down'] }}</span></a></td>
+                <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['ignore' => ['eq' => '1']]]) }}"><span class="blue"> {{ $ports['ignored'] }}</span></a></td>
                 <td><span class="grey"> -</span></td>
-                <td><a href="{{ url('ports/format=list_detail/state=admindown') }}"><span class="black"> {{ $ports['shutdown'] }}</span></a></td>
+                <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'shutdown'], 'disabled' => ['eq' => '0'], 'ignore' => ['eq' => '0'], 'deleted' => ['eq' => '0']]]) }}"><span class="black"> {{ $ports['shutdown'] }}</span></a></td>
                 @if($summary_errors)
-                    <td><a href="{{ url('ports/format=list_detail/errors=1') }}"><span class="black"> {{ $ports['errored'] }}</span></a></td>
+                    <td><a href="{{ route('ports', ['view' => 'detail', 'errors' => 1]) }}"><span class="black"> {{ $ports['errored'] }}</span></a></td>
                 @endif
             </tr>
             @if($show_services)

@@ -2,6 +2,8 @@
 
 namespace App\Policies;
 
+use App\Facades\Permissions;
+use App\Models\DeviceOutage;
 use App\Models\User;
 
 class DeviceOutagePolicy
@@ -10,20 +12,22 @@ class DeviceOutagePolicy
 
     public function __construct()
     {
-        $this->globalPrefix = 'device';
+        $this->globalPrefix = 'outage';
     }
 
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
-            || $this->hasGlobalPermission($user, 'viewAll')
-            || $this->hasGlobalPermission($user, 'create')
-            || $this->hasGlobalPermission($user, 'update')
-            || $this->hasGlobalPermission($user, 'delete');
+        return $this->hasGlobalPermission($user, 'view', true)
+            || $this->hasGlobalPermission($user, 'viewAll');
     }
 
-    public function view(User $user): bool
+    public function view(User $user, DeviceOutage $deviceOutage): bool
     {
-        return $this->hasGlobalPermission($user, 'view');
+        if ($this->hasGlobalPermission($user, 'viewAll')) {
+            return true;
+        }
+
+        return $this->hasGlobalPermission($user, 'view', true)
+            && Permissions::canAccessDevice($deviceOutage->device_id, $user);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Policies;
 
+use App\Facades\Permissions;
+use App\Models\EntPhysical;
 use App\Models\User;
 
 class EntPhysicalPolicy
@@ -10,20 +12,29 @@ class EntPhysicalPolicy
 
     public function __construct()
     {
-        $this->globalPrefix = 'device';
+        $this->globalPrefix = 'inventory';
     }
 
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
+        return $this->hasGlobalPermission($user, 'view', true)
             || $this->hasGlobalPermission($user, 'viewAll')
-            || $this->hasGlobalPermission($user, 'create')
             || $this->hasGlobalPermission($user, 'update')
             || $this->hasGlobalPermission($user, 'delete');
     }
 
-    public function view(User $user): bool
+    public function view(User $user, EntPhysical $entPhysical): bool
     {
-        return $this->hasGlobalPermission($user, 'view');
+        if ($this->hasGlobalPermission($user, 'viewAll')) {
+            return true;
+        }
+
+        return $this->hasGlobalPermission($user, 'view', true)
+            && Permissions::canAccessDevice($entPhysical->device_id, $user);
+    }
+
+    public function purge(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'purge');
     }
 }

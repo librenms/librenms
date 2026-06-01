@@ -101,7 +101,7 @@ class OpenApiSpecTest extends TestCase
 
         $paths = array_keys($response->json('paths'));
 
-        foreach (['/api/v1/devices/{id}/ports', '/api/v1/devices/{id}/location', '/api/v1/devices/{id}/device-groups'] as $expected) {
+        foreach (['/api/v1/devices/{id}/ports', '/api/v1/devices/{id}/locations', '/api/v1/devices/{id}/device-groups'] as $expected) {
             $this->assertContains($expected, $paths);
         }
     }

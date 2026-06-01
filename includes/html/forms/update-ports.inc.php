@@ -4,7 +4,7 @@ use App\Models\Port;
 
 header('Content-type: application/json');
 
-if (Gate::denies('update', Port::class)) {
+if (Gate::denies('port.update')) {
     $response = [
         'status' => 'error',
         'message' => 'You need permission',

@@ -20,7 +20,10 @@ DB_SOCKET=
 
 A comma separated list of trusted reverse proxy IPs or CIDR.
 
-For legacy reasons the default is `'*'`, which means any proxy is allowed.
+The default value is '127.0.0.1', which only allows reverse proxies on the localhost.
+
+These options should be avoided for security reasons.
+`'*'` means trust any proxie
 `'**'` means trust any proxy up the chain.
 
 ```dotenv

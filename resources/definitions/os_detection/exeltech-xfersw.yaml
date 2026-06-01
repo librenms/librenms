@@ -9,3 +9,4 @@ discovery:
             value: ''
 icon: exeltech
 mib_dir: exeltech
+snmp_max_oid: 5

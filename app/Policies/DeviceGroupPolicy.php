@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Facades\Permissions;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\ServiceTemplate;
@@ -17,7 +18,7 @@ class DeviceGroupPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
+        return $this->hasGlobalPermission($user, 'view', true)
             || $this->hasGlobalPermission($user, 'viewAll')
             || $this->hasGlobalPermission($user, 'create')
             || $this->hasGlobalPermission($user, 'update')
@@ -41,7 +42,8 @@ class DeviceGroupPolicy
             return true;
         }
 
-        return $this->hasGlobalPermission($user, 'view');
+        return $this->hasGlobalPermission($user, 'view', true)
+            && Permissions::canAccessDeviceGroup($deviceGroup, $user);
     }
 
     /**
@@ -55,17 +57,19 @@ class DeviceGroupPolicy
     /**
      * Determine whether the user can update the device group.
      */
-    public function update(User $user): bool
+    public function update(User $user, DeviceGroup $deviceGroup): bool
     {
-        return $this->hasGlobalPermission($user, 'update');
+        return $this->hasGlobalPermission($user, 'update')
+            && Permissions::canAccessDeviceGroup($deviceGroup, $user);
     }
 
     /**
      * Determine whether the user can delete the device group.
      */
-    public function delete(User $user): bool
+    public function delete(User $user, DeviceGroup $deviceGroup): bool
     {
-        return $this->hasGlobalPermission($user, 'delete');
+        return $this->hasGlobalPermission($user, 'delete')
+            && Permissions::canAccessDeviceGroup($deviceGroup, $user);
     }
 
     /**
@@ -73,7 +77,7 @@ class DeviceGroupPolicy
      */
     public function attachDevices(User $user, DeviceGroup $deviceGroup, Device $device): bool
     {
-        return $this->update($user);
+        return $this->update($user, $deviceGroup);
     }
 
     /**
@@ -81,7 +85,7 @@ class DeviceGroupPolicy
      */
     public function syncDevices(User $user, DeviceGroup $deviceGroup, Collection $devices): bool
     {
-        return $this->update($user);
+        return $this->update($user, $deviceGroup);
     }
 
     /**
@@ -89,21 +93,21 @@ class DeviceGroupPolicy
      */
     public function detachDevices(User $user, DeviceGroup $deviceGroup, Device $device): bool
     {
-        return $this->update($user);
+        return $this->update($user, $deviceGroup);
     }
 
     public function attachUsers(User $user, DeviceGroup $deviceGroup, User $target): bool
     {
-        return $this->update($user);
+        return $this->update($user, $deviceGroup);
     }
 
     public function syncUsers(User $user, DeviceGroup $deviceGroup, Collection $users): bool
     {
-        return $this->update($user);
+        return $this->update($user, $deviceGroup);
     }
 
     public function detachUsers(User $user, DeviceGroup $deviceGroup, User $target): bool
     {
-        return $this->update($user);
+        return $this->update($user, $deviceGroup);
     }
 }

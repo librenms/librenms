@@ -48,11 +48,8 @@ class ServiceTemplatePolicy
 
     /**
      * Determine whether the user can update the service template.
-     *
-     * @param  User  $user
-     * @param  ServiceTemplate  $template
      */
-    public function update(User $user, ServiceTemplate $template): bool
+    public function update(User $user, ?ServiceTemplate $template = null): bool
     {
         return $this->hasGlobalPermission($user, 'update');
     }

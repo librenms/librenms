@@ -101,7 +101,7 @@ class Unifi extends OS implements
 
         $radios = [];
         foreach ($client_oids as $index => $entry) {
-            $radio_name = $vap_radios[$index];
+            $radio_name = $vap_radios[$index] ?? $index;
             $radios[$radio_name]['oids'][] = '.1.3.6.1.4.1.41112.1.6.1.2.1.8.' . $index;
             if (isset($radios[$radio_name]['count'])) {
                 $radios[$radio_name]['count'] += $entry['unifiVapNumStations'];
@@ -135,7 +135,7 @@ class Unifi extends OS implements
         // discover client counts by SSID
         $ssids = [];
         foreach ($client_oids as $index => $entry) {
-            $ssid = $ssid_ids[$index];
+            $ssid = $ssid_ids[$index] ?? $index;
             if (! empty($ssid)) {
                 if (isset($ssids[$ssid])) {
                     $ssids[$ssid]['oids'][] = '.1.3.6.1.4.1.41112.1.6.1.2.1.8.' . $index;

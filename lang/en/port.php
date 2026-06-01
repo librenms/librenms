@@ -1,15 +1,30 @@
 <?php
 
 return [
+    'show_filter' => 'Show Filter',
+    'show_header' => 'Show Header',
+    'purge' => 'Purge all deleted',
+    'purged' => 'Purged',
+    'purged_message' => 'All deleted ports have been purged.',
+    'purge_failed' => 'Purge Failed',
+    'server_error' => 'The server encountered an error.',
+    'network_error' => 'Could not connect to the server.',
+    'processing' => 'Processing...',
+    'oper_status' => 'Oper Status',
+    'speed' => 'Speed',
+    'media' => 'Media',
+    'duplex' => 'Duplex',
+    'duplex_full' => 'Full',
+    'duplex_half' => 'Half',
+    'duplex_unknown' => 'Unknown',
+    'port_group' => 'Port Group',
+    'port_type' => 'Port Type',
+    'errors' => 'Errors',
     'groups' => [
         'updated' => ':port: groups updated',
         'none' => ':port no update requested',
-    ],
-    'filters' => [
-        'status_up' => 'Only Show Up',
-        'admin_down' => 'Show Admin Down',
-        'disabled' => 'Show Disabled',
-        'ignored' => 'Show Ignored',
+        'combined' => 'Combined',
+        'graph' => 'Port Group Graph',
     ],
     'graphs' => [
         'bits' => 'Bits',

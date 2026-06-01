@@ -10,21 +10,14 @@ class SensorPolicy
 {
     use ChecksGlobalPermissions;
 
-    public function __construct()
-    {
-        $this->globalPrefix = 'device';
-    }
-
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
+        return $this->hasGlobalPermission($user, 'view', true)
             || $this->hasGlobalPermission($user, 'viewAll')
-            || $this->hasGlobalPermission($user, 'create')
-            || $this->hasGlobalPermission($user, 'update')
-            || $this->hasGlobalPermission($user, 'delete');
+            || $this->hasGlobalPermission($user, 'update');
     }
 
     /**
@@ -36,15 +29,16 @@ class SensorPolicy
             return true;
         }
 
-        return $this->hasGlobalPermission($user, 'view')
+        return $this->hasGlobalPermission($user, 'view', true)
             && Permissions::canAccessDevice($sensor->device_id, $user);
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user): bool
+    public function update(User $user, Sensor $sensor): bool
     {
-        return $this->hasGlobalPermission($user, 'update');
+        return $this->hasGlobalPermission($user, 'update')
+            && Permissions::canAccessDevice($sensor->device_id, $user);
     }
 }
