@@ -22,7 +22,7 @@
         <tr id="0">
             <td>0</td>
             <td>General @if($default_group_id == 0) ({{ __('default') }}) @endif</td>
-            <td><a href="{{ url('devices/poller_group=0') }}">{{ $ungrouped_count }}</a></td>
+            <td><a href="{{ route('devices', ['filter' => ['poller_group' => ['eq' => $default_group_id]]]) }}">{{ $ungrouped_count }}</a></td>
             <td></td>
             <td>
         </tr>
@@ -30,7 +30,7 @@
         <tr id="{{ $group->id }}">
             <td>{{ $group->id }}</td>
             <td>{{ $group->group_name }}@if($group->id == $default_group_id) ({{ __('default') }}) @endif</td>
-            <td><a href="{{ url('devices/poller_group=' . $group->id) }}">{{ $group->devices_count }}</a></td>
+            <td><a href="{{ route('devices', ['filter' => ['poller_group' => ['eq' => $group->id]]]) }}">{{ $group->devices_count }}</a></td>
             <td>{{ $group->descr }}</td>
             <td>
                 @can('update', $group)

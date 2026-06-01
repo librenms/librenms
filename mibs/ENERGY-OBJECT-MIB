@@ -1,0 +1,1076 @@
+ENERGY-OBJECT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    mib-2,
+    Integer32, Counter32, Unsigned32, TimeTicks
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, TimeInterval,
+    TimeStamp, TruthValue, StorageType
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    OwnerString
+      FROM RMON-MIB
+    entPhysicalIndex
+       FROM ENTITY-MIB
+    PowerStateSet
+       FROM IANAPowerStateSet-MIB;
+
+energyObjectMib MODULE-IDENTITY
+    LAST-UPDATED    "201502090000Z"    -- 9 February 2015
+    ORGANIZATION    "IETF EMAN Working Group"
+    CONTACT-INFO
+            "WG charter:
+             http://datatracker.ietf.org/wg/eman/charter/
+
+             Mailing Lists:
+             General Discussion: eman@ietf.org
+
+             To Subscribe:
+             https://www.ietf.org/mailman/listinfo/eman
+
+             Archive:
+             http://www.ietf.org/mail-archive/web/eman
+
+          Editors:
+             Mouli Chandramouli
+             Cisco Systems, Inc.
+             Sarjapur Outer Ring Road
+             Bangalore 560103
+             India
+             Phone: +91 80 4429 2409
+             Email: moulchan@cisco.com
+
+             Brad Schoening
+             44 Rivers Edge Drive
+             Little Silver, NJ 07739
+             United States
+             Email: brad.schoening@verizon.net
+
+             Juergen Quittek
+             NEC Europe, Ltd.
+             NEC Laboratories Europe
+             Network Research Division
+             Kurfuersten-Anlage 36
+             Heidelberg  69115
+             Germany
+             Phone: +49 6221 4342-115
+             Email: quittek@neclab.eu
+
+             Thomas Dietz
+             NEC Europe, Ltd.
+             NEC Laboratories Europe
+             Network Research Division
+             Kurfuersten-Anlage 36
+             69115 Heidelberg
+             Germany
+             Phone: +49 6221 4342-128
+             Email: Thomas.Dietz@nw.neclab.eu
+
+             Benoit Claise
+             Cisco Systems, Inc.
+             De Kleetlaan 6a b1
+             Degem 1831
+             Belgium
+             Phone:  +32 2 704 5622
+             Email: bclaise@cisco.com"
+    DESCRIPTION
+       "Copyright (c) 2015 IETF Trust and the persons identified as
+        authors of the code.  All rights reserved.
+
+        Redistribution and use in source and binary forms, with or
+        without modification, is permitted pursuant to, and subject
+        to the license terms contained in, the Simplified BSD License
+        set forth in Section 4.c of the IETF Trust's Legal Provisions
+        Relating to IETF Documents
+        (http://trustee.ietf.org/license-info).
+
+        This MIB is used to monitor power and energy in
+        devices.
+
+        The tables eoMeterCapabilitiesTable and eoPowerTable
+        are a sparse extension of the eoTable from the
+        ENERGY-OBJECT-CONTEXT-MIB.  As a requirement,
+        [RFC7461] SHOULD be implemented.
+
+        Module Compliance of ENTITY-MIB v4 with respect to
+        entity4CRCompliance MUST be supported which requires
+        implementation of 4 MIB objects: entPhysicalIndex,
+        entPhysicalClass, entPhysicalName and entPhysicalUUID."
+    REVISION "201502090000Z"     -- 9 February 2015
+    DESCRIPTION
+       "Initial version, published as RFC 7460."
+   ::= { mib-2 229 }
+
+energyObjectMibNotifs OBJECT IDENTIFIER
+    ::= { energyObjectMib 0 }
+
+energyObjectMibObjects OBJECT IDENTIFIER
+    ::= { energyObjectMib 1 }
+
+energyObjectMibConform  OBJECT IDENTIFIER
+    ::= { energyObjectMib 2 }
+
+-- Textual Conventions
+
+UnitMultiplier ::= TEXTUAL-CONVENTION
+    STATUS           current
+    DESCRIPTION
+       "The Unit Multiplier is an integer value that represents
+       the IEEE 61850 Annex A units multiplier associated with
+       the integer units used to measure the power or energy.
+
+       For example, when used with eoPowerUnitMultiplier, -3
+       represents 10^-3 or milliwatts."
+    REFERENCE
+       "The International System of Units (SI), National
+       Institute of Standards and Technology, Spec. Publ. 330,
+       August 1991."
+    SYNTAX INTEGER {
+        yocto(-24),   -- 10^-24
+        zepto(-21),   -- 10^-21
+        atto(-18),    -- 10^-18
+        femto(-15),   -- 10^-15
+        pico(-12),    -- 10^-12
+        nano(-9),     -- 10^-9
+        micro(-6),    -- 10^-6
+        milli(-3),    -- 10^-3
+        units(0),     -- 10^0
+        kilo(3),      -- 10^3
+        mega(6),      -- 10^6
+        giga(9),      -- 10^9
+        tera(12),     -- 10^12
+        peta(15),     -- 10^15
+        exa(18),      -- 10^18
+        zetta(21),    -- 10^21
+        yotta(24)     -- 10^24
+    }
+
+-- Objects
+
+eoMeterCapabilitiesTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EoMeterCapabilitiesEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "This table is useful for helping applications determine
+       the monitoring capabilities supported by the local
+       management agents.  It is possible for applications to
+       know which tables are usable without going through a
+       trial-and-error process."
+    ::= { energyObjectMibObjects 1 }
+
+eoMeterCapabilitiesEntry OBJECT-TYPE
+    SYNTAX          EoMeterCapabilitiesEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "An entry describes the metering capability of an Energy
+       Object."
+    INDEX { entPhysicalIndex }
+    ::= { eoMeterCapabilitiesTable  1 }
+
+EoMeterCapabilitiesEntry ::= SEQUENCE {
+          eoMeterCapability          BITS
+               }
+
+eoMeterCapability OBJECT-TYPE
+    SYNTAX   BITS {
+       none(0),
+       powermetering(1),        -- power measurement
+       energymetering(2),       -- energy measurement
+       powerattributes(3)       -- power attributes
+                   }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "An indication of the energy-monitoring capabilities
+       supported by this agent.  This object use a BITS syntax
+       and indicates the MIB groups supported by the probe.  By
+       reading the value of this object, it is possible to
+       determine the MIB tables supported."
+    ::= { eoMeterCapabilitiesEntry 1  }
+
+eoPowerTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EoPowerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "This table lists Energy Objects."
+    ::= { energyObjectMibObjects 2  }
+
+eoPowerEntry OBJECT-TYPE
+    SYNTAX          EoPowerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "An entry describes the power usage of an Energy Object."
+    INDEX { entPhysicalIndex }
+    ::= { eoPowerTable  1 }
+
+EoPowerEntry ::= SEQUENCE {
+    eoPower                         Integer32,
+    eoPowerNameplate                Unsigned32,
+    eoPowerUnitMultiplier           UnitMultiplier,
+    eoPowerAccuracy                 Integer32,
+    eoPowerMeasurementCaliber       INTEGER,
+    eoPowerCurrentType             INTEGER,
+    eoPowerMeasurementLocal         TruthValue,
+    eoPowerAdminState               PowerStateSet,
+    eoPowerOperState                PowerStateSet,
+    eoPowerStateEnterReason         OwnerString
+  }
+
+eoPower OBJECT-TYPE
+    SYNTAX          Integer32
+    UNITS          "watts"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object indicates the power measured for the Energy
+       Object.  For alternating current, this value is obtained
+       as an average over fixed number of AC cycles.  This value
+       is specified in SI units of watts with the magnitude of
+       watts (milliwatts, kilowatts, etc.) indicated separately
+       in eoPowerUnitMultiplier.  The accuracy of the measurement
+       is specified in eoPowerAccuracy.  The direction of power
+       flow is indicated by the sign on eoPower.  If the Energy
+       Object is consuming power, the eoPower value will be
+       positive.  If the Energy Object is producing power, the
+       eoPower value will be negative.
+
+       The eoPower MUST be less than or equal to the maximum
+       power that can be consumed at the Power State specified
+       by eoPowerState.
+
+       The eoPowerMeasurementCaliber object specifies how the
+       usage value reported by eoPower was obtained.  The eoPower
+       value must report 0 if the eoPowerMeasurementCaliber is
+       'unavailable'.  For devices that cannot measure or
+       report power, this option can be used."
+    ::= { eoPowerEntry 1 }
+
+eoPowerNameplate OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS          "watts"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object indicates the rated maximum consumption for
+       the fully populated Energy Object.  The nameplate power
+       requirements are the maximum power numbers given in SI
+       watts and, in almost all cases, are well above the
+       expected operational consumption.  Nameplate power is
+       widely used for power provisioning.  This value is
+       specified in either units of watts or voltage and
+       current.  The units are therefore SI watts or equivalent
+
+       Volt-Amperes with the magnitude (milliwatts, kilowatts,
+       etc.) indicated separately in eoPowerUnitMultiplier."
+    ::= { eoPowerEntry 2 }
+
+eoPowerUnitMultiplier OBJECT-TYPE
+    SYNTAX          UnitMultiplier
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The magnitude of watts for the usage value in eoPower
+       and eoPowerNameplate."
+    ::= { eoPowerEntry 3 }
+
+eoPowerAccuracy OBJECT-TYPE
+    SYNTAX          Integer32 (0..10000)
+    UNITS           "hundredths of percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object indicates a percentage value, in hundredths of a
+       percent, representing the assumed accuracy of the usage
+       reported by eoPower.  For example, the value 1010 means
+       the reported usage is accurate to +/- 10.1 percent.  This
+       value is zero if the accuracy is unknown or not
+       applicable based upon the measurement method.
+
+       ANSI and IEC define the following accuracy classes for
+       power measurement:
+            IEC 62053-22 60044-1 class 0.1, 0.2, 0.5, 1  3.
+            ANSI C12.20 class 0.2, 0.5"
+    ::= { eoPowerEntry 4 }
+
+eoPowerMeasurementCaliber   OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unavailable(1) ,
+                        unknown(2),
+                        actual(3) ,
+                        estimated(4),
+                        static(5)                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object specifies how the usage value reported by
+       eoPower was obtained:
+
+       - unavailable(1): Indicates that the usage is not
+       available.  In such a case, the eoPower value must be 0
+       for devices that cannot measure or report power this
+
+       option can be used.
+
+       - unknown(2): Indicates that the way the usage was
+       determined is unknown.  In some cases, entities report
+       aggregate power on behalf of another device.  In such
+       cases it is not known whether the usage reported is
+       actual, estimated, or static.
+
+       - actual(3):  Indicates that the reported usage was
+       measured by the entity through some hardware or direct
+       physical means.  The usage data reported is not estimated
+       or static but is the measured consumption rate.
+
+       - estimated(4): Indicates that the usage was not
+       determined by physical measurement.  The value is a
+       derivation based upon the device type, state, and/or
+       current utilization using some algorithm or heuristic.  It
+       is presumed that the entity's state and current
+       configuration were used to compute the value.
+
+       - static(5): Indicates that the usage was not determined
+       by physical measurement, algorithm, or derivation.  The
+       usage was reported based upon external tables,
+       specifications, and/or model information.  For example, a
+       PC Model X draws 200W, while a PC Model Y draws 210W."
+    ::= { eoPowerEntry 5 }
+
+eoPowerCurrentType OBJECT-TYPE
+    SYNTAX      INTEGER  {
+                       ac(1),
+                       dc(2),
+                       unknown(3)
+                   }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates whether the eoPower for the
+       Energy Object reports alternating current 'ac', direct
+       current 'dc', or that the current type is unknown."
+    ::= { eoPowerEntry 6 }
+
+eoPowerMeasurementLocal  OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object indicates the source of power measurement
+       and can be useful when modeling the power usage of
+
+       attached devices.  The power measurement can be performed
+       by the entity itself or the power measurement of the
+       entity can be reported by another trusted entity using a
+       protocol extension.  A value of true indicates the
+       measurement is performed by the entity, whereas false
+       indicates that the measurement was performed by another
+       entity."
+    ::= { eoPowerEntry 7 }
+
+eoPowerAdminState OBJECT-TYPE
+    SYNTAX          PowerStateSet
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "This object specifies the desired Power State and the
+       Power State Set for the Energy Object.  Note that other(0)
+       is not a Power State Set and unknown(255) is not a Power
+       State as such, but simply an indication that the Power
+       State of the Energy Object is unknown.
+       Possible values of eoPowerAdminState within the Power
+       State Set are registered at IANA.
+       A current list of assignments can be found at
+       <http://www.iana.org/assignments/power-state-sets>"
+    ::= { eoPowerEntry 8 }
+
+eoPowerOperState OBJECT-TYPE
+    SYNTAX          PowerStateSet
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object specifies the current operational Power
+       State and the Power State Set for the Energy Object.
+       other(0) is not a Power State Set and unknown(255) is not
+       a Power State as such, but simply an indication that the
+       Power State of the Energy Object is unknown.
+
+       Possible values of eoPowerOperState within the Power
+       State Set are registered at IANA.  A current list of
+       assignments can be found at
+       <http://www.iana.org/assignments/power-state-sets>"
+    ::= { eoPowerEntry 9 }
+
+eoPowerStateEnterReason OBJECT-TYPE
+     SYNTAX         OwnerString
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+       "This string object describes the reason for the
+
+       eoPowerAdminState transition.  Alternatively, this string
+       may contain with the entity that configured this Energy
+       Object to this Power State."
+     DEFVAL { "" }
+     ::= { eoPowerEntry 10 }
+
+eoPowerStateTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EoPowerStateEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "This table enumerates the maximum power usage, in watts,
+       for every single supported Power State of each Energy
+       Object.
+
+       This table has cross-reference with the eoPowerTable,
+       containing rows describing each Power State for the
+       corresponding Energy Object.  For every Energy Object in
+       the eoPowerTable, there is a corresponding entry in this
+       table."
+    ::= { energyObjectMibObjects 3  }
+
+eoPowerStateEntry OBJECT-TYPE
+    SYNTAX          EoPowerStateEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "A eoPowerStateEntry extends a corresponding
+       eoPowerEntry.  This entry displays max usage values at
+       every single possible Power State supported by the Energy
+       Object.
+       For example, given the values of a Energy Object
+       corresponding to a maximum usage of 0 W at the
+       state emanmechoff, 8 W at state 6 (ready), 11 W at state
+       emanmediumMinus, and 11 W at state emanhigh:
+
+               State      MaxUsage Units
+            emanmechoff       0       W
+            emansoftoff       0       W
+            emanhibernate     0       W
+            emansleep         0       W
+            emanstandby       0       W
+            emanready         8       W
+            emanlowMinus      8       W
+            emanlow          11       W
+            emanmediumMinus  11       W
+            emanmedium       11       W
+            emanhighMinus    11       W
+
+            emnanhigh        11       W
+
+       Furthermore, this table also includes the total time in
+       each Power State, along with the number of times a
+       particular Power State was entered."
+    INDEX { entPhysicalIndex, eoPowerStateIndex }
+    ::= { eoPowerStateTable 1 }
+
+EoPowerStateEntry ::= SEQUENCE {
+    eoPowerStateIndex              PowerStateSet,
+    eoPowerStateMaxPower           Integer32,
+    eoPowerStatePowerUnitMultiplier  UnitMultiplier,
+    eoPowerStateTotalTime            TimeTicks,
+    eoPowerStateEnterCount            Counter32
+}
+
+eoPowerStateIndex OBJECT-TYPE
+    SYNTAX          PowerStateSet
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "This object specifies the index of the Power State of
+       the Energy Object within a Power State Set.  The semantics
+       of the specific Power State can be obtained from the
+       Power State Set definition."
+    ::= { eoPowerStateEntry 1 }
+
+eoPowerStateMaxPower OBJECT-TYPE
+    SYNTAX          Integer32
+    UNITS          "watts"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object indicates the maximum power for the Energy
+       Object at the particular Power State.  This value is
+       specified in SI units of watts with the magnitude of the
+       units (milliwatts, kilowatts, etc.) indicated separately
+       in eoPowerStatePowerUnitMultiplier.  If the maximum power
+       is not known for a certain Power State, then the value is
+       encoded as 0xFFFFFFFF.
+
+       For Power States not enumerated, the value of
+       eoPowerStateMaxPower might be interpolated by using the
+       next highest supported Power State."
+    ::= { eoPowerStateEntry 2  }
+
+eoPowerStatePowerUnitMultiplier OBJECT-TYPE
+    SYNTAX          UnitMultiplier
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The magnitude of watts for the usage value in
+       eoPowerStateMaxPower."
+    ::= { eoPowerStateEntry 3  }
+
+eoPowerStateTotalTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the total time in hundredths
+       of a second that the Energy Object has been in this power
+       state since the last reset, as specified in the
+       sysUpTime."
+    ::= { eoPowerStateEntry 4  }
+
+eoPowerStateEnterCount OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+       "This object indicates how often the Energy Object has
+       entered this power state, since the last reset of the
+       device as specified in the sysUpTime."
+    ::= { eoPowerStateEntry 5   }
+
+eoEnergyParametersTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EoEnergyParametersEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "This table is used to configure the parameters for
+       energy measurement collection in the table eoEnergyTable.
+       This table allows the configuration of different
+       measurement settings on the same Energy Object.
+       Implementation of this table only makes sense for Energy
+       Objects that an eoPowerMeasurementCaliber of actual."
+    ::= { energyObjectMibObjects 4   }
+
+eoEnergyParametersEntry OBJECT-TYPE
+    SYNTAX          EoEnergyParametersEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "An entry controls an energy measurement in
+       eoEnergyTable."
+    INDEX { entPhysicalIndex, eoEnergyParametersIndex }
+    ::= { eoEnergyParametersTable 1 }
+
+EoEnergyParametersEntry ::= SEQUENCE {
+    eoEnergyParametersIndex            Integer32,
+    eoEnergyParametersIntervalLength   TimeInterval,
+    eoEnergyParametersIntervalNumber   Unsigned32,
+    eoEnergyParametersIntervalMode     INTEGER,
+    eoEnergyParametersIntervalWindow   TimeInterval,
+    eoEnergyParametersSampleRate       Unsigned32,
+    eoEnergyParametersStorageType      StorageType,
+    eoEnergyParametersStatus           RowStatus
+                             }
+
+eoEnergyParametersIndex OBJECT-TYPE
+    SYNTAX           Integer32 (1..2147483647)
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+       "This object specifies the index of the Energy Parameters
+       setting for collection of energy measurements for an
+       Energy Object.  An Energy Object can have multiple
+       eoEnergyParametersIndex, depending on the capabilities of
+       the Energy Object"
+    ::= { eoEnergyParametersEntry 2 }
+
+eoEnergyParametersIntervalLength OBJECT-TYPE
+    SYNTAX          TimeInterval
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+       "This object indicates the length of time in hundredths
+       of a second over which to compute the average
+       eoEnergyConsumed measurement in the eoEnergyTable table.
+       The computation is based on the Energy Object's internal
+       sampling rate of power consumed or produced by the Energy
+       Object.  The sampling rate is the rate at which the Energy
+       Object can read the power usage and may differ based on
+       device capabilities.  The average energy consumption is
+       then computed over the length of the interval.  The
+       default value of 15 minutes is a common interval used in
+       industry."
+    DEFVAL { 90000 }
+    ::= { eoEnergyParametersEntry 3 }
+
+eoEnergyParametersIntervalNumber OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+       "The number of intervals maintained in the eoEnergyTable.
+       Each interval is characterized by a specific
+       eoEnergyCollectionStartTime, used as an index to the
+       table eoEnergyTable.  Whenever the maximum number of
+       entries is reached, the measurement over the new interval
+       replaces the oldest measurement.  There is one exception
+       to this rule: when the eoEnergyMaxConsumed and/or
+       eoEnergyMaxProduced are in (one of) the two oldest
+       measurement(s), they are left untouched and the next
+       oldest measurement is replaced."
+       DEFVAL { 10 }
+    ::= { eoEnergyParametersEntry 4 }
+
+eoEnergyParametersIntervalMode OBJECT-TYPE
+  SYNTAX          INTEGER  {
+                      period(1),
+                      sliding(2),
+                      total(3)
+                  }
+  MAX-ACCESS      read-create
+  STATUS          current
+  DESCRIPTION
+       "A control object to define the mode of interval
+       calculation for the computation of the average
+       eoEnergyConsumed or eoEnergyProvided measurement in the
+       eoEnergyTable table.
+
+       A mode of period(1) specifies non-overlapping periodic
+       measurements.
+
+       A mode of sliding(2) specifies overlapping sliding
+       windows where the interval between the start of one
+       interval and the next is defined in
+       eoEnergyParametersIntervalWindow.
+
+       A mode of total(3) specifies non-periodic measurement.
+       In this mode only one interval is used as this is a
+       continuous measurement since the last reset.  The value of
+       eoEnergyParametersIntervalNumber should be (1) one and
+       eoEnergyParametersIntervalLength is ignored."
+   ::= { eoEnergyParametersEntry 5 }
+
+eoEnergyParametersIntervalWindow OBJECT-TYPE
+    SYNTAX          TimeInterval
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+       "The length of the duration window between the starting
+       time of one sliding window and the next starting time in
+       hundredths of seconds, used to compute the average of
+       eoEnergyConsumed, eoEnergyProvided measurements in the
+       eoEnergyTable table.  This is valid only when the
+       eoEnergyParametersIntervalMode is sliding(2).  The
+       eoEnergyParametersIntervalWindow value should be a
+       multiple of eoEnergyParametersSampleRate."
+    ::= { eoEnergyParametersEntry 6 }
+
+eoEnergyParametersSampleRate OBJECT-TYPE
+    SYNTAX          Unsigned32
+   UNITS           "Milliseconds"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+       "The sampling rate, in milliseconds, at which the Energy
+       Object should poll power usage in order to compute the
+       average eoEnergyConsumed, eoEnergyProvided measurements
+       in the table eoEnergyTable.  The Energy Object should
+       initially set this sampling rate to a reasonable value,
+       i.e., a compromise between intervals that will provide
+       good accuracy by not being too long, but not so short
+       that they affect the Energy Object performance by
+       requesting continuous polling.  If the sampling rate is
+       unknown, the value 0 is reported.  The sampling rate
+       should be selected so that
+       eoEnergyParametersIntervalWindow is a multiple of
+       eoEnergyParametersSampleRate.  The default value is one
+       second."
+    DEFVAL { 1000 }
+    ::= { eoEnergyParametersEntry 7 }
+
+eoEnergyParametersStorageType OBJECT-TYPE
+    SYNTAX          StorageType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This variable indicates the storage type for this row."
+    DEFVAL { nonVolatile }
+    ::= {eoEnergyParametersEntry 8 }
+
+eoEnergyParametersStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+       "The status of this row.  The eoEnergyParametersStatus is
+       used to start or stop energy usage logging.  An entry
+       status may not be active(1) unless all objects in the
+       entry have an appropriate value.  If this object is not
+       equal to active, all associated usage-data logged into
+       the eoEnergyTable will be deleted.  The data can be
+       destroyed by setting up the eoEnergyParametersStatus to
+       destroy."
+    ::= {eoEnergyParametersEntry 9 }
+
+eoEnergyTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EoEnergyEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "This table lists Energy Object energy measurements.
+       Entries in this table are only created if the
+       corresponding value of object eoPowerMeasurementCaliber
+       is active(3), i.e., if the power is actually metered."
+    ::= { energyObjectMibObjects 5   }
+
+eoEnergyEntry OBJECT-TYPE
+    SYNTAX          EoEnergyEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry describing energy measurements."
+    INDEX { eoEnergyParametersIndex,
+            eoEnergyCollectionStartTime }
+    ::= { eoEnergyTable 1 }
+
+EoEnergyEntry ::= SEQUENCE {
+    eoEnergyCollectionStartTime       TimeTicks,
+     eoEnergyConsumed                  Unsigned32,
+     eoEnergyProvided                  Unsigned32,
+     eoEnergyStored                    Unsigned32,
+     eoEnergyUnitMultiplier            UnitMultiplier,
+     eoEnergyAccuracy                  Integer32,
+     eoEnergyMaxConsumed               Unsigned32,
+     eoEnergyMaxProduced               Unsigned32,
+     eoEnergyDiscontinuityTime         TimeStamp
+     }
+
+eoEnergyCollectionStartTime OBJECT-TYPE
+    SYNTAX          TimeTicks
+    UNITS          "hundredths of a second"
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "The time (in hundredths of a second) since the
+       network management portion of the system was last
+       re-initialized, as specified in the sysUpTime RFC 3418.
+       This object specifies the start time of the energy
+       measurement sample."
+    REFERENCE
+      "RFC 3418: Management Information Base (MIB) for the
+       Simple Network Management Protocol (SNMP)"
+    ::= { eoEnergyEntry 1 }
+
+eoEnergyConsumed OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Watt-hours"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object indicates the energy consumed in units of
+       watt-hours for the Energy Object over the defined
+       interval.  This value is specified in the common billing
+       units of watt-hours with the magnitude of watt-hours
+       kWh, MWh, etc.) indicated separately in
+       eoEnergyUnitMultiplier."
+    ::= { eoEnergyEntry 2 }
+
+eoEnergyProvided OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Watt-hours"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object indicates the energy produced in units of
+       watt-hours for the Energy Object over the defined
+       interval.
+
+       This value is specified in the common billing units of
+       watt-hours with the magnitude of watt-hours (kWh, MWh,
+       etc.) indicated separately in
+       eoEnergyUnitMultiplier."
+    ::= { eoEnergyEntry 3 }
+
+eoEnergyStored OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Watt-hours"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object indicates the difference of the energy
+       consumed and energy produced for an Energy Object in
+       units of watt-hours for the Energy Object over the
+       defined interval.  This value is specified in the common
+       billing units of watt-hours with the magnitude of
+       watt-hours (kWh, MWh, etc.) indicated separately in
+       eoEnergyUnitMultiplier."
+    ::= { eoEnergyEntry 4 }
+
+eoEnergyUnitMultiplier OBJECT-TYPE
+    SYNTAX          UnitMultiplier
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object is the magnitude of watt-hours for the
+       energy field in eoEnergyConsumed, eoEnergyProvided,
+       eoEnergyStored, eoEnergyMaxConsumed, and
+       eoEnergyMaxProduced."
+    ::= { eoEnergyEntry 5  }
+
+eoEnergyAccuracy OBJECT-TYPE
+    SYNTAX          Integer32 (0..10000)
+    UNITS           "hundredths of percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object indicates a percentage accuracy, in hundredths
+       of a percent, of Energy usage reporting.  eoEnergyAccuracy
+       is applicable to all Energy measurements in the
+       eoEnergyTable.
+
+       For example, 1010 means the reported usage is accurate to
+       +/- 10.1 percent.
+
+       This value is zero if the accuracy is unknown."
+    ::= { eoEnergyEntry 6 }
+
+eoEnergyMaxConsumed OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS          "Watt-hours"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object is the maximum energy observed in
+       eoEnergyConsumed since the monitoring started or was
+       reinitialized.  This value is specified in the common
+       billing units of watt-hours with the magnitude of
+       watt-hours (kWh, MWh, etc.) indicated separately in
+       eoEnergyUnitMultiplier."
+    ::= { eoEnergyEntry 7  }
+
+eoEnergyMaxProduced OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS          "Watt-hours"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object is the maximum energy ever observed in
+       eoEnergyEnergyProduced since the monitoring started.  This
+       value is specified in the units of watt-hours with the
+       magnitude of watt-hours (kWh, MWh, etc.) indicated
+       separately in eoEnergyEnergyUnitMultiplier."
+    ::= { eoEnergyEntry 8 }
+
+ eoEnergyDiscontinuityTime OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The value of sysUpTime RFC 3418 on the most recent
+       occasion at which any one or more of this entity's energy
+       counters in this table suffered a discontinuity:
+       eoEnergyConsumed, eoEnergyProvided or eoEnergyStored.  If
+       no such discontinuities have occurred since the last
+       re-initialization of the local management subsystem, then
+       this object contains a zero value."
+    REFERENCE
+       "RFC 3418: Management Information Base (MIB) for the
+        Simple Network Management Protocol (SNMP)"
+    ::= { eoEnergyEntry 9 }
+
+-- Notifications
+
+eoPowerEnableStatusNotification
+OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "This object controls whether the system produces
+       notifications for eoPowerStateChange.  A false value will
+       prevent these notifications from being generated."
+    DEFVAL { false }
+    ::= { energyObjectMibNotifs 1 }
+
+eoPowerStateChange NOTIFICATION-TYPE
+    OBJECTS       {eoPowerAdminState, eoPowerOperState,
+eoPowerStateEnterReason}
+    STATUS        current
+    DESCRIPTION
+       "The SNMP entity generates the eoPowerStateChange when
+       the values of eoPowerAdminState or eoPowerOperState,
+       in the context of the Power State Set, have changed for
+       the Energy Object represented by the entPhysicalIndex."
+    ::= { energyObjectMibNotifs 2 }
+
+-- Conformance
+
+energyObjectMibCompliances  OBJECT IDENTIFIER
+    ::= { energyObjectMibConform 1 }
+
+energyObjectMibGroups  OBJECT IDENTIFIER
+    ::= { energyObjectMibConform 2 }
+energyObjectMibFullCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+       "When this MIB is implemented with support for
+       read-create, then such an implementation can
+       claim full compliance.  Such devices can then
+       be both monitored and configured with this MIB.
+
+       Module Compliance of RFC 6933
+       with respect to entity4CRCompliance MUST
+       be supported, which requires implementation
+       of four MIB objects: entPhysicalIndex, entPhysicalClass,
+       entPhysicalName and entPhysicalUUID."
+    REFERENCE
+       "RFC 6933: Entity MIB (Version 4)"
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                energyObjectMibTableGroup,
+                energyObjectMibStateTableGroup,
+                eoPowerEnableStatusNotificationGroup,
+                energyObjectMibNotifGroup
+                    }
+
+    GROUP     energyObjectMibEnergyTableGroup
+       DESCRIPTION
+          "A compliant implementation does not
+           have to implement."
+
+    GROUP    energyObjectMibEnergyParametersTableGroup
+       DESCRIPTION
+           "A compliant implementation does not
+            have to implement."
+
+    GROUP     energyObjectMibMeterCapabilitiesTableGroup
+       DESCRIPTION
+           "A compliant implementation does not
+            have to implement."
+    ::= { energyObjectMibCompliances 1 }
+
+energyObjectMibReadOnlyCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+       "When this MIB is implemented without support for
+       read-create (i.e., in read-only mode), then such an
+       implementation can claim read-only compliance.  Such a
+       device can then be monitored but cannot be
+       configured with this MIB.
+
+       Module Compliance of [RFC6933] with respect to
+       entity4CRCompliance MUST be supported which requires
+       implementation of 4 MIB objects: entPhysicalIndex,
+       entPhysicalClass, entPhysicalName and entPhysicalUUID."
+    REFERENCE
+       "RFC 6933: Entity MIB (Version 4)"
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        energyObjectMibTableGroup,
+                        energyObjectMibStateTableGroup,
+                        energyObjectMibNotifGroup
+                      }
+    ::= { energyObjectMibCompliances 2 }
+
+-- Units of Conformance
+
+energyObjectMibTableGroup OBJECT-GROUP
+   OBJECTS         {
+                        eoPower,
+                        eoPowerNameplate,
+                        eoPowerUnitMultiplier,
+                        eoPowerAccuracy,
+                        eoPowerMeasurementCaliber,
+                        eoPowerCurrentType,
+                        eoPowerMeasurementLocal,
+                        eoPowerAdminState,
+                        eoPowerOperState,
+                        eoPowerStateEnterReason
+                    }
+   STATUS          current
+   DESCRIPTION
+       "This group contains the collection of all the objects
+       related to the Energy Object."
+   ::= { energyObjectMibGroups 1 }
+
+energyObjectMibStateTableGroup OBJECT-GROUP
+    OBJECTS      {
+                         eoPowerStateMaxPower,
+                         eoPowerStatePowerUnitMultiplier,
+                         eoPowerStateTotalTime,
+                         eoPowerStateEnterCount
+                    }
+    STATUS          current
+    DESCRIPTION
+       "This group contains the collection of all the objects
+       related to the Power State."
+    ::= { energyObjectMibGroups 2 }
+
+energyObjectMibEnergyParametersTableGroup OBJECT-GROUP
+    OBJECTS         {
+                        eoEnergyParametersIntervalLength,
+                        eoEnergyParametersIntervalNumber,
+                        eoEnergyParametersIntervalMode,
+                        eoEnergyParametersIntervalWindow,
+                        eoEnergyParametersSampleRate,
+                        eoEnergyParametersStorageType,
+                        eoEnergyParametersStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains the collection of all the objects
+        related to the configuration of the Energy Table."
+    ::= { energyObjectMibGroups 3 }
+
+energyObjectMibEnergyTableGroup OBJECT-GROUP
+    OBJECTS         {
+                     -- Note that object
+                   -- eoEnergyCollectionStartTime is not
+                        -- included since it is not-accessible
+
+                        eoEnergyConsumed,
+                        eoEnergyProvided,
+                        eoEnergyStored,
+                        eoEnergyUnitMultiplier,
+                        eoEnergyAccuracy,
+                        eoEnergyMaxConsumed,
+                        eoEnergyMaxProduced,
+                        eoEnergyDiscontinuityTime
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains the collection of all the objects
+        related to the Energy Table."
+    ::= { energyObjectMibGroups 4 }
+
+energyObjectMibMeterCapabilitiesTableGroup OBJECT-GROUP
+    OBJECTS         {
+                         eoMeterCapability
+                    }
+    STATUS          current
+    DESCRIPTION
+       "This group contains the object indicating the capability
+       of the Energy Object"
+    ::= { energyObjectMibGroups 5 }
+
+eoPowerEnableStatusNotificationGroup OBJECT-GROUP
+    OBJECTS         { eoPowerEnableStatusNotification  }
+    STATUS          current
+    DESCRIPTION
+       "The collection of objects that are used to enable
+       notification."
+    ::= { energyObjectMibGroups 6 }
+
+energyObjectMibNotifGroup NOTIFICATION-GROUP
+    NOTIFICATIONS    {
+                        eoPowerStateChange
+                    }
+    STATUS          current
+    DESCRIPTION
+       "This group contains the notifications for
+       the Monitoring and Control MIB for Power and Energy."
+    ::= { energyObjectMibGroups 7 }
+
+END

@@ -17,6 +17,12 @@ use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
+/**
+ * @property IfOperStatus|null $ifOperStatus
+ * @property IfOperStatus|null $ifOperStatus_prev
+ * @property IfOperStatus|null $ifAdminStatus
+ * @property IfOperStatus|null $ifAdminStatus_prev
+ */
 class Port extends DeviceRelatedModel
 {
     use HasFactory;
@@ -48,15 +54,13 @@ class Port extends DeviceRelatedModel
         'deleted',
         'state',
         'search',
+        'errors',
         'groups.id',
         'device.groups.id',
         'device.location_id',
         'device.hostname',
     ];
 
-    /**
-     * @return array{ifOperStatus: 'LibreNMS\Enum\IfOperStatus', ifOperStatus_prev: 'LibreNMS\Enum\IfOperStatus', ifAdminStatus: 'LibreNMS\Enum\IfOperStatus', ifAdminStatus_prev: 'LibreNMS\Enum\IfOperStatus'}
-     */
     protected function casts(): array
     {
         return [
@@ -344,6 +348,17 @@ class Port extends DeviceRelatedModel
         });
     }
 
+    public function filterErrors(Builder $query, mixed $value, array $config): void
+    {
+        $query->where(function (Builder $query) use ($value): void {
+            $operator = $value ? '>' : '=';
+            $boolean = $value ? 'or' : 'and';
+
+            $query->where($this->qualifyColumn('ifInErrors_delta'), $operator, 0, $boolean)
+                ->where($this->qualifyColumn('ifOutErrors_delta'), $operator, 0, $boolean);
+        });
+    }
+
     /**
      * Handle the "State" filter.
      * up: Admin Up + Oper Up
@@ -353,9 +368,10 @@ class Port extends DeviceRelatedModel
     public function filterState(Builder $query, mixed $value, array $config): void
     {
         $this->applyMappedFilter($query, $value, $config, fn (Builder $q, $state) => match ($state) {
-            'shutdown' => $q->where('ifAdminStatus', '!=', 'up'),
-            'up' => $q->where('ifAdminStatus', 'up')->where('ifOperStatus', 'up'),
-            default => $q->where('ifAdminStatus', 'up')->where('ifOperStatus', '!=', 'up'),
+            'up' => $q->where('ifOperStatus', 'up'),
+            'shutdown' => $q->where('ifAdminStatus', 'down'),
+            default => $q->where('ifOperStatus', '!=', 'up')
+                ->where(fn (Builder $sub) => $sub->where('ifAdminStatus', '!=', 'down')->orWhereNull('ifAdminStatus')),
         });
     }
 

@@ -48,6 +48,7 @@ use App\Models\ServiceTemplate;
 use App\Models\UserPref;
 use App\Models\Vlan;
 use App\Models\Vrf;
+use App\Models\WirelessSensor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -1159,6 +1160,64 @@ function get_device_ports(Illuminate\Http\Request $request): JsonResponse
     return api_success($ports, 'ports');
 }
 
+function get_device_wireless_sensors(Illuminate\Http\Request $request): JsonResponse
+{
+    $device = DeviceCache::get($request->route('hostname'));
+    $class = $request->input('class');
+
+    if ($class && ! in_array($class, \LibreNMS\Enum\WirelessSensorType::values(), true)) {
+        return api_error(400, "Invalid wireless sensor class '$class'");
+    }
+
+    $columns = validate_column_list($request->input('columns'), 'wireless_sensors', [
+        'sensor_id',
+        'sensor_deleted',
+        'sensor_class',
+        'device_id',
+        'sensor_index',
+        'sensor_type',
+        'sensor_descr',
+        'sensor_divisor',
+        'sensor_multiplier',
+        'sensor_aggregator',
+        'sensor_current',
+        'sensor_prev',
+        'sensor_limit',
+        'sensor_limit_warn',
+        'sensor_limit_low',
+        'sensor_limit_low_warn',
+        'sensor_alert',
+        'sensor_custom',
+        'entPhysicalIndex',
+        'entPhysicalIndex_measured',
+        'lastupdate',
+        'sensor_oids',
+        'access_point_id',
+        'rrd_type',
+    ]);
+
+    $wireless_sensors = WirelessSensor::query()
+        ->hasAccess(Auth::user())
+        ->where('sensor_deleted', 0)
+        ->where('device_id', $device->device_id)
+        ->when($class, fn ($q) => $q->where('sensor_class', $class))
+        ->select($columns)
+        ->orderBy('sensor_class')
+        ->orderBy('sensor_index')
+        ->orderBy('sensor_descr')
+        ->get();
+
+    if ($wireless_sensors->isEmpty()) {
+        $message = $class
+            ? "No wireless sensors found for class '$class'"
+            : 'No wireless sensors found';
+
+        return api_error(404, $message);
+    }
+
+    return api_success($wireless_sensors, 'wireless_sensors', count: $wireless_sensors->count());
+}
+
 function get_device_ip_addresses(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
@@ -1749,7 +1808,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
 
     if (isset($data['builder'])) {
         // accept inline json or json as a string
-        $builder = is_array($data['builder']) ? json_encode($data['builder']) : $data['builder'];
+        $builder = is_array($data['builder']) ? $data['builder'] : json_decode((string) $data['builder'], true);
     } else {
         $builder = $data['rule'] ?? null;
     }
@@ -1791,7 +1850,6 @@ function add_edit_rule(Illuminate\Http\Request $request)
     if (array_key_exists('acknowledgement', $data)) {
         $extra['acknowledgement'] = filter_var($data['acknowledgement'], FILTER_VALIDATE_BOOLEAN);
     }
-    $extra_json = json_encode($extra);
 
     if ($override_query === 'on' || $override_query === true) {
         $query = $adv_query;
@@ -1869,7 +1927,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
         'query' => $query,
         'severity' => $severity,
         'disabled' => $disabled,
-        'extra' => $extra_json,
+        'extra' => $extra,
         'notes' => $notes,
     ];
 

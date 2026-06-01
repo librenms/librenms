@@ -153,7 +153,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     ]);
     $actions = '';
 
-    if (! $prev && Gate::allows('update', \App\Models\Bill::class)) {
+    if (! $prev && Gate::allows('bill.update')) {
         $actions .= "<a href='" . \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $bill['bill_id'], 'view' => 'edit']) .
             "'><i class='fa fa-pencil fa-lg icon-theme' title='Edit' aria-hidden='true'></i> Edit</a> ";
     }

@@ -4,13 +4,14 @@
         name: @js($name),
         fields: @js($fields),
         reload: @js($reload),
-        initial: @js($initial)
+        initial: @js($initial),
+        hide: @js($hide)
     })"
     @click.outside="close()"
     @keydown.escape.window="close()">
 
     {{-- Main Bar --}}
-<div class="tw:group/bar tw:flex tw:flex-col tw:sm:flex-row tw:flex-nowrap" style="font-size: 16px">
+<div class="tw:group/bar tw:flex tw:flex-col tw:sm:flex-row tw:flex-nowrap" style="font-size: 16px" x-show="!hide">
     <div class="tw:flex tw:items-stretch tw:flex-col tw:sm:flex-row tw:h-auto tw:sm:h-[2.125em] tw:rounded-lg tw:border tw:border-neutral-300 tw:dark:border-dark-gray-300 tw:bg-white tw:dark:bg-dark-gray-500 tw:font-mono tw:shadow-xs tw:max-w-full">
 
         {{-- LEFT SECTION: Options Dropdown --}}
@@ -20,7 +21,7 @@
                     @click.stop="toggleOptions()"
                     class="tw:shrink-0 tw:flex tw:items-center tw:gap-2 tw:py-2 tw:sm:py-0 tw:px-4 tw:h-full tw:max-sm:w-full tw:max-sm:left-0 tw:transition-colors tw:border-b tw:sm:border-b-0 tw:sm:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:rounded-tl-lg tw:rounded-tr-lg tw:sm:rounded-tr-none tw:sm:rounded-l-lg tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400">
                 <div class="tw:relative tw:flex tw:items-center">
-                    <i class="fas fa-filter tw:text-[1.12em]"></i>
+                    <i class="fa-solid fa-filter tw:text-[1.12em]"></i>
                     <span x-show="filters.length"
                           class="tw:absolute tw:top-[-0.2em] tw:right-[-0.3em] tw:w-[0.5em] tw:h-[0.5em] tw:bg-neutral-600 tw:dark:bg-dark-white-300 tw:rounded-full tw:ring-1 tw:ring-white tw:dark:ring-dark-gray-500"></span>
                 </div>
@@ -36,13 +37,13 @@
 
                 <button type="button" @click="clearAll()"
                         class="tw:flex tw:items-center tw:gap-3 tw:w-full tw:px-5 tw:py-3 tw:text-left tw:text-nowrap tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-300 tw:transition-colors tw:text-red-600! tw:dark:text-red-400! tw:font-bold">
-                    <i class="fas fa-trash-alt"></i>
+                    <i class="fa-solid fa-trash-alt"></i>
                     <span>{{ __('Clear All') }}</span>
                 </button>
 
                 <button type="button" @click="savePreferences()"
                         class="tw:flex tw:items-center tw:gap-3 tw:w-full tw:px-5 tw:py-3 tw:text-left tw:text-nowrap tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-300 tw:transition-colors tw:text-neutral-600! tw:dark:text-dark-white-200! tw:font-bold">
-                    <i class="fas fa-save"></i>
+                    <i class="fa-solid fa-save"></i>
                     <span>{{ __('Save Preferences') }}</span>
                 </button>
             </div>
@@ -65,37 +66,52 @@
                     </button>
                     <button type="button" title="{{ __('Remove filter') }}" @click.stop="remove(f.key)"
                             class="tw:h-full tw:w-0 tw:py-2 tw:sm:py-0 tw:group-hover:w-[2.125em] tw:flex tw:items-center tw:justify-center tw:bg-neutral-100 tw:dark:bg-dark-gray-400 tw:text-neutral-500! tw:dark:text-dark-white-400! tw:transition-all tw:duration-200 tw:ease-in-out tw:overflow-hidden tw:text-[1.2em] tw:hover:text-red-600! tw:dark:hover:text-red-400!">
-                        &times;
+                        <i class="fa-solid fa-xmark"></i>
                     </button>
                 </div>
             </template>
         </div>
 
         {{-- RIGHT SECTION: Plus Button & Dropdown --}}
-        <div class="tw:shrink-0 tw:max-sm:left-0 tw:flex tw:items-stretch">
+        <div class="tw:shrink-0 tw:max-sm:left-0 tw:flex tw:flex-col tw:sm:flex-row tw:items-stretch">
+            {{-- Search Shortcut --}}
+            <button type="button"
+                    x-cloak
+                    x-show="defaultSearchField && !isActive(defaultSearchField.key)"
+                    @click="open(defaultSearchField)"
+                    :title="defaultSearchField.label"
+                    class="tw:w-[2.125em] tw:py-2 tw:sm:py-0 tw:h-full tw:relative tw:max-sm:w-full tw:flex tw:items-center tw:justify-center tw:text-neutral-400! tw:dark:text-dark-white-400! tw:hover:text-neutral-900! tw:dark:hover:text-dark-white-100! tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400 tw:transition-colors tw:border-b tw:sm:border-b-0 tw:sm:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300">
+                <i class="fa-solid fa-search"></i>
+            </button>
+
             <button type="button" title="{{ __('Add new filter') }}" @click.stop="toggleAdd()"
                     @keydown.arrow-down.prevent="navDropdown('next')"
                     @keydown.arrow-up.prevent="navDropdown('prev')"
-                    class="tw:w-[2.125em] tw:py-2 tw:sm:py-0 tw:h-full tw:relative tw:max-sm:w-full tw:flex tw:items-center tw:justify-center tw:text-[1.4em] tw:text-neutral-400! tw:dark:text-dark-white-400! tw:hover:text-neutral-900! tw:dark:hover:text-dark-white-100! tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400 tw:transition-colors tw:rounded-bl-lg tw:rounded-br-lg tw:sm:rounded-bl-none tw:sm:rounded-r-lg">
-                +
+                    class="tw:w-[2.125em] tw:py-2 tw:sm:py-0 tw:h-full tw:relative tw:max-sm:w-full tw:flex tw:items-center tw:justify-center tw:text-neutral-400! tw:dark:text-dark-white-400! tw:hover:text-neutral-900! tw:dark:hover:text-dark-white-100! tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400 tw:transition-colors tw:rounded-bl-lg tw:rounded-br-lg tw:sm:rounded-bl-none tw:sm:rounded-r-lg">
+                <i class="fa-solid fa-plus"></i>
             </button>
 
             {{-- Fields Selector --}}
             <div x-show="showAdd" x-cloak x-transition @click.stop
                  :class="filters.length > 0 ? 'tw:right-0' : 'tw:left-0'"
                  class="tw:absolute tw:top-full tw:mt-2 tw:min-w-70 tw:max-w-[90vw] tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-neutral-200 tw:dark:border-dark-gray-200 tw:rounded-lg tw:shadow-xl tw:z-50 tw:py-2">
-                <div class="tw:px-5 tw:py-2 tw:text-neutral-400 tw:dark:text-dark-white-400 tw:uppercase tw:tracking-wider">{{ __('Select Field') }}</div>
-                <template x-for="(field, index) in fields" :key="field.key">
-                    <button type="button" @click="open(field)"
-                            :class="[isActive(field.key) ? 'tw:text-blue-600! tw:dark:text-blue-400! tw:bg-blue-50/50 tw:dark:bg-blue-900/20' : 'tw:text-neutral-600! tw:dark:text-dark-white-200!', highlightedIndex === index ? 'tw:bg-neutral-100 tw:dark:bg-dark-gray-300' : '']"
-                            class="tw:flex tw:items-center tw:justify-between tw:w-full tw:px-5 tw:py-3 tw:text-left tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-300 tw:transition-colors">
-                        <span x-text="field.label"></span>
-                        <svg x-show="isActive(field.key)" class="tw:w-[1em] tw:h-[1em]" viewBox="0 0 10 10" fill="none"
-                             stroke="currentColor" stroke-width="2.5">
-                            <path d="M1.5 5l3 3 4-5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+
+                @foreach($fields as $index => $field)
+                    <button type="button" @click="open(fields[{{ $index }}])"
+                            :class="[isActive(fields[{{ $index }}].key) ? 'tw:text-blue-600! tw:dark:text-blue-400! tw:bg-blue-50/50 tw:dark:bg-blue-900/20' : 'tw:text-neutral-600! tw:dark:text-dark-white-200!', highlightedIndex === {{ $index }} ? 'tw:bg-neutral-100 tw:dark:bg-dark-gray-300' : '']"
+                            class="tw:flex tw:items-center tw:w-full tw:px-5 tw:py-2.5 tw:text-left tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-300 tw:transition-colors tw:gap-3">
+
+                        {{-- Left Side Icon and Label Section --}}
+                        <div class="tw:flex tw:items-center tw:gap-3 tw:grow">
+                            <i class="{{ $getFieldIcon($field['type'] ?? 'text') }} fa-fw tw:text-neutral-400 tw:dark:text-dark-white-400 tw:text-center"></i>
+                            <span>{{ $field['label'] }}</span>
+                        </div>
+
+                        {{-- Right Side Active Status Checkmark --}}
+                        <i x-show="isActive(fields[{{ $index }}].key)"
+                           class="fa-solid fa-check fa-fw"></i>
                     </button>
-                </template>
+                @endforeach
             </div>
         </div>
     </div>
@@ -124,7 +140,7 @@
                     </div>
                     <button type="button" title="{{ __('Close dialog') }}" @click="close()"
                             class="tw:text-neutral-400! tw:dark:text-dark-white-400! tw:transition-colors tw:hover:text-red-500! tw:dark:hover:text-red-500! tw:text-[1.5em]">
-                        &times;
+                        <i class="fa-solid fa-xmark"></i>
                     </button>
                 </div>
 

@@ -5,7 +5,7 @@ if (Rrd::checkRrdExists(Rrd::name(DeviceCache::getPrimary()->hostname, 'icmp-per
     echo '
         <div class="row">
         <div class="col-md-12">
-        <div class="panel panel-default panel-condensed">
+        <div class="panel panel-default panel-condensed overview-panel">
         <div class="panel-heading">
         <a href="' . $perf_url . '">
         <i class="fas fa-area-chart fa-lg icon-theme" aria-hidden="true"></i><strong>Ping Response</strong></a>

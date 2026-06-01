@@ -1,0 +1,14 @@
+os: wavence
+text: 'Nokia Wavence'
+type: wireless
+icon: nokia
+mib_dir: nokia/wavence
+bad_ifXEntry:
+    - Wavence-SA
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_dbm, text: 'Radio Levels' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.637.54.1.10.90.13

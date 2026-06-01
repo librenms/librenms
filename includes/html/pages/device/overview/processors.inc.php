@@ -6,7 +6,7 @@ if (count($processors)) {
     echo '
       <div class="row">
         <div class="col-md-12 ">
-          <div class="panel panel-default panel-condensed">
+          <div class="panel panel-default panel-condensed overview-panel">
             <div class="panel-heading">
 ';
     echo '<a href="device/device=' . $device['device_id'] . '/tab=health/metric=processor/">';
@@ -92,7 +92,7 @@ if (count($processors)) {
         $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . ' - CPU usage');
 
         echo '<tr>
-              <td colspan="4">';
+              <td colspan="12">';
         echo \LibreNMS\Util\Url::overlibLink($link, $graph, $overlib_content);
         echo '  </td>
             </tr>';

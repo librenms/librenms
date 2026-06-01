@@ -46,8 +46,9 @@ class DashboardController extends SelectController
      */
     protected function baseQuery(Request $request): Builder
     {
-        return Dashboard::query()
-            ->where('access', '>', 0)
+        $this->authorize('viewAny', Dashboard::class);
+
+        return Dashboard::hasAccess($request->user())
             ->leftJoin('users', 'dashboards.user_id', 'users.user_id') // left join so we can search username
             ->orderBy('dashboards.user_id')
             ->orderBy('dashboard_name')

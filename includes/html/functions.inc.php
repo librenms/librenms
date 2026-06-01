@@ -508,17 +508,17 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     $fault_detail .= $type_info ? $type_info . '&nbsp;' : '';
     $fault_detail .= '#' . ($alert_idx + 1) . ':&nbsp;';
     if (isset($tmp_alerts['bill_id'])) {
-        $fault_detail .= '<a href="' . Url::generate(['page' => 'bill', 'bill_id' => $tmp_alerts['bill_id']], []) . '">' . $tmp_alerts['bill_name'] . '</a>;&nbsp;';
+        $fault_detail .= '<a href="' . Url::generate(['page' => 'bill', 'bill_id' => $tmp_alerts['bill_id']], []) . '">' . e($tmp_alerts['bill_name']) . '</a>;&nbsp;';
         $fallback = false;
     }
 
     if (isset($tmp_alerts['port_id'])) {
+        $tmp_alerts = cleanPort($tmp_alerts);
         if (! empty($tmp_alerts['isisISAdjState'])) {
-            $fault_detail .= 'Adjacent ' . $tmp_alerts['isisISAdjIPAddrAddress'];
+            $fault_detail .= 'Adjacent ' . e($tmp_alerts['isisISAdjIPAddrAddress']);
             $port = Port::find($tmp_alerts['port_id']);
             $fault_detail .= ', Interface ' . Url::portLink($port);
         } else {
-            $tmp_alerts = cleanPort($tmp_alerts);
             $fault_detail .= generate_port_link($tmp_alerts) . ';&nbsp;';
         }
         if ((isset($tmp_alerts['ifDescr'])) && (isset($tmp_alerts['ifAlias'])) && ($tmp_alerts['ifDescr'] != $tmp_alerts['ifAlias'])) {
@@ -536,9 +536,10 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
 
     if (isset($tmp_alerts['sensor_id'])) {
         $sensor = new Sensor($tmp_alerts);
+        $sensor->sensor_id = $tmp_alerts['sensor_id'];
         if ($sensor->sensor_class == 'state') {
             // Give more details for a state (textual form)
-            $details = 'State: ' . ($sensor->state_descr ?? '') . ' (numerical ' . $sensor->sensor_current . ')<br>  ';
+            $details = 'State: ' . e($sensor->state_descr ?? '') . ' (numerical ' . $sensor->sensor_current . ')<br>  ';
         } else {
             // Other sensors
             $details = 'Value: ' . $sensor->sensor_current . ' (' . $sensor->sensor_class . ')<br>  ';
@@ -553,7 +554,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
           ->map(fn ($value, $key) => "$key: $value")
           ->implode(', ');
 
-        $fault_detail .= Url::sensorLink($sensor, $sensor->name) . ';&nbsp; <br>' . $details;
+        $fault_detail .= Url::sensorLink($sensor, $tmp_alerts['name']) . ';&nbsp; <br>' . $details;
         $fallback = false;
     }
 
@@ -565,11 +566,11 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
                 'tab' => 'services',
                 'view' => 'detail',
             ]) .
-            "'>" . ($tmp_alerts['service_name'] ?? '') . ' (' . $tmp_alerts['service_type'] . ')' . '</a>';
-        $fault_detail .= 'Service Host: ' . ($tmp_alerts['service_ip'] != '' ? $tmp_alerts['service_ip'] : format_hostname(DeviceCache::get($tmp_alerts['device_id']))) . ',<br>';
-        $fault_detail .= ($tmp_alerts['service_desc'] != '') ? ('Description: ' . $tmp_alerts['service_desc'] . ',<br>') : '';
-        $fault_detail .= ($tmp_alerts['service_param'] != '') ? ('Param: ' . $tmp_alerts['service_param'] . ',<br>') : '';
-        $fault_detail .= 'Msg: ' . $tmp_alerts['service_message'];
+            "'>" . e($tmp_alerts['service_name'] ?? '') . ' (' . e($tmp_alerts['service_type']) . ')' . '</a>';
+        $fault_detail .= 'Service Host: ' . ($tmp_alerts['service_ip'] != '' ? e($tmp_alerts['service_ip']) : DeviceCache::get($tmp_alerts['device_id'])->displayName()) . ',<br>';
+        $fault_detail .= ($tmp_alerts['service_desc'] != '') ? ('Description: ' . e($tmp_alerts['service_desc']) . ',<br>') : '';
+        $fault_detail .= ($tmp_alerts['service_param'] != '') ? ('Param: ' . e($tmp_alerts['service_param']) . ',<br>') : '';
+        $fault_detail .= 'Msg: ' . e($tmp_alerts['service_message']);
         $fallback = false;
     }
 
@@ -582,10 +583,10 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
                 'tab' => 'routing',
                 'proto' => 'bgp',
             ]) .
-            "'>" . $tmp_alerts['bgpPeerIdentifier'] . '</a>';
-        $fault_detail .= ', Desc ' . $tmp_alerts['bgpPeerDescr'] ?? '';
-        $fault_detail .= ', AS' . $tmp_alerts['bgpPeerRemoteAs'];
-        $fault_detail .= ', State ' . $tmp_alerts['bgpPeerState'];
+            "'>" . e($tmp_alerts['bgpPeerIdentifier']) . '</a>';
+        $fault_detail .= ', Desc ' . e($tmp_alerts['bgpPeerDescr'] ?? '');
+        $fault_detail .= ', AS' . e($tmp_alerts['bgpPeerRemoteAs']);
+        $fault_detail .= ', State ' . e($tmp_alerts['bgpPeerState']);
         $fallback = false;
     }
 
@@ -597,15 +598,15 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
                 'id' => $tmp_alerts['mempool_id'],
                 'type' => 'mempool_usage',
             ]) .
-            "'>" . ($tmp_alerts['mempool_descr'] ?? 'link') . '</a>';
+            "'>" . e($tmp_alerts['mempool_descr'] ?? 'link') . '</a>';
         $fault_detail .= '<br> &nbsp; &nbsp; &nbsp; Usage ' . $tmp_alerts['mempool_perc'] . '%, &nbsp; Free ' . Number::formatSi($tmp_alerts['mempool_free']) . ',&nbsp; Size ' . Number::formatSi($tmp_alerts['mempool_total']);
         $fallback = false;
     }
 
     if ($tmp_alerts['type'] && isset($tmp_alerts['label'])) {
-        $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'];
+        $fault_detail .= ' ' . e($tmp_alerts['type']) . ' - ' . e($tmp_alerts['label']);
         if (! empty($tmp_alerts['error'])) {
-            $fault_detail .= ' - ' . $tmp_alerts['error'];
+            $fault_detail .= ' - ' . e($tmp_alerts['error']);
         }
         $fault_detail .= ';&nbsp;';
 
@@ -620,14 +621,14 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
                 'tab' => 'apps',
                 'app' => $tmp_alerts['app_type'],
             ]) . "'>";
-        $fault_detail .= $tmp_alerts['app_type'];
+        $fault_detail .= e($tmp_alerts['app_type']);
         $fault_detail .= '</a>';
 
         if ($tmp_alerts['app_status']) {
-            $fault_detail .= ' => ' . $tmp_alerts['app_status'];
+            $fault_detail .= ' => ' . e($tmp_alerts['app_status']);
         }
         if (isset($tmp_alerts['metric']) && $tmp_alerts['metric'] && isset($tmp_alerts['value']) && $tmp_alerts['value']) {
-            $fault_detail .= ' : ' . $tmp_alerts['metric'] . ' => ' . $tmp_alerts['value'];
+            $fault_detail .= ' : ' . e($tmp_alerts['metric']) . ' => ' . e($tmp_alerts['value']);
         }
         $fallback = false;
     }

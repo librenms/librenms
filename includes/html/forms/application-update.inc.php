@@ -24,14 +24,13 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use App\Models\Application;
 use App\Models\Device;
 use App\Models\Eventlog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\Severity;
 
-if (Gate::denies('update', Application::class)) {
+if (Gate::denies('application.update')) {
     $status = ['status' => 1, 'message' => 'You need permission'];
 } else {
     $device = Device::find($_POST['device_id']);

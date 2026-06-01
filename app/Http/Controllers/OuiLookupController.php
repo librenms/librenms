@@ -13,6 +13,8 @@ class OuiLookupController extends Controller
      */
     public function __invoke(Request $request): \Illuminate\Contracts\View\View
     {
+        $this->authorize('tools.oui');
+
         $results = [];
         $query = $request->input('query');
 

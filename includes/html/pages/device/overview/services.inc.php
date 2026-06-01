@@ -22,7 +22,7 @@ if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
     $services = ObjectCache::serviceCounts(['total', 'ok', 'warning', 'critical'], $device['device_id']);
     echo '<div class="row">
             <div class="col-md-12">
-                <div class="panel panel-default panel-condensed">
+                <div class="panel panel-default panel-condensed overview-panel">
                     <div class="panel-heading">
                         <a href="' . Url::deviceUrl($device['device_id'], ['tab' => 'services']) . '"><i class="fa fa-cogs fa-lg icon-theme" aria-hidden="true"></i> <strong>Services</strong></a>
                     </div>
