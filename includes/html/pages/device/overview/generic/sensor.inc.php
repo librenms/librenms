@@ -12,15 +12,15 @@ if ($sensors->isNotEmpty()) {
 
     echo '
         <div class="overview-panel tw:mb-5">
-        <div class="overview-panel-heading">';
+        <div class="tw:px-4 tw:py-2.5 tw:bg-[#f5f5f5] tw:border-b tw:border-[#ddd] tw:text-[#333] tw:dark:bg-dark-gray-200 tw:dark:border-[#1c1e22] tw:dark:text-dark-white-200">';
     echo '<a href="device/device=' . $device['device_id'] . '/tab=health/metric=' . $sensor_class->value . '/"><i class="fa ' . $sensor_fa_icon . ' fa-lg icon-theme" aria-hidden="true"></i><strong> ' . $sensor_class->label() . '</strong></a>';
     echo '      </div>
-        <div class="overview-panel-body">';
+        <div class="tw:flex tw:flex-col tw:bg-white tw:divide-y tw:divide-[#ddd] tw:dark:bg-dark-gray-400 tw:dark:divide-[#1c1e22]">';
     $group = '';
     foreach ($sensors as $sensor) {
         if ($group != $sensor->group) {
             $group = $sensor->group;
-            echo '<div class="overview-row-heading"><strong>' . $group . '</strong></div>';
+            echo '<div class="tw:px-2 tw:py-2 tw:font-bold"><strong>' . $group . '</strong></div>';
         }
 
         // FIXME - make this "four graphs in popup" a function/include and "small graph" a function.
@@ -63,7 +63,7 @@ if ($sensors->isNotEmpty()) {
 
         $sensor_current = Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue());
 
-        echo '<div class="overview-row tw:grid-cols-[3fr_1fr_1fr]">
+        echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-[#f5f5f5] tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[3fr_1fr_1fr]">
             <div>' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Rewrite::shortenIfName($sensor->sensor_descr), $overlib_content, $sensor_class->value) . '</div>
             <div>' . \LibreNMS\Util\Url::overlibLink($link, $sensor_minigraph, $overlib_content, $sensor_class->value) . '</div>
             <div>' . \LibreNMS\Util\Url::overlibLink($link, $sensor_current, $overlib_content, $sensor_class->value) . '</div>

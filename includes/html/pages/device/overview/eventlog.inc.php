@@ -4,18 +4,18 @@ use App\Models\Port;
 use LibreNMS\Util\Time;
 
 echo '  <div class="overview-panel tw:mb-5">
-              <div class="overview-panel-heading">';
+              <div class="tw:px-4 tw:py-2.5 tw:bg-[#f5f5f5] tw:border-b tw:border-[#ddd] tw:text-[#333] tw:dark:bg-dark-gray-200 tw:dark:border-[#1c1e22] tw:dark:text-dark-white-200">';
 echo '<a href="' . route('device.eventlog', ['device' => $device['device_id']]) . '">';
 echo '<i class="fa fa-bookmark fa-lg icon-theme" aria-hidden="true"></i> <strong>Recent Events</strong></a>';
 echo '        </div>
-              <div class="overview-panel-body">';
+              <div class="tw:flex tw:flex-col tw:bg-white tw:divide-y tw:divide-[#ddd] tw:dark:bg-dark-gray-400 tw:dark:divide-[#1c1e22]">';
 
 $eventlog = dbFetchRows('SELECT * FROM `eventlog` WHERE `device_id` = ? ORDER BY `datetime` DESC LIMIT 0,10', [$device['device_id']]);
 foreach ($eventlog as $entry) {
     $severity_colour = eventlog_severity($entry['severity']);
     $icon = '<span class="alert-status ' . $severity_colour . '"></span>';
 
-    echo '<div class="overview-row tw:grid-cols-[auto_auto_100px_1fr]">';
+    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-[#f5f5f5] tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[auto_auto_100px_1fr]">';
     echo '<div>' . $icon . '</div>';
     echo '<div class="tw:whitespace-nowrap">' . Time::format($entry['datetime'], 'compact') . '</div>';
     echo '<div class="tw:truncate">';

@@ -5,14 +5,14 @@ use App\Facades\LibrenmsConfig;
 if (LibrenmsConfig::get('graylog.server')) {
     echo '
         <div class="overview-panel tw:mb-5" id="graylog-card">
-                    <div class="overview-panel-heading">
+                    <div class="tw:px-4 tw:py-2.5 tw:bg-[#f5f5f5] tw:border-b tw:border-[#ddd] tw:text-[#333] tw:dark:bg-dark-gray-200 tw:dark:border-[#1c1e22] tw:dark:text-dark-white-200">
                         <a href="' . route('device.graylog', ['device' => $device['device_id']]) . '">
                             <i class="fa fa-clone fa-lg icon-theme"
                             aria-hidden="true"></i>
                             <strong>Recent Graylog</strong>
                         </a>
                     </div>
-                    <div class="overview-panel-body">';
+                    <div class="tw:flex tw:flex-col tw:bg-white tw:divide-y tw:divide-[#ddd] tw:dark:bg-dark-gray-400 tw:dark:divide-[#1c1e22]">';
 
     $filter_device = $device['device_id'];
     $tmp_output = '
