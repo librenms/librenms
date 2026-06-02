@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\OS;
+use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;
@@ -69,6 +70,13 @@ class DiscoverDevice implements ShouldQueue
         $this->device->last_discovered = Carbon::now();
         $this->device->last_discovered_timetaken = $measurement->getDuration();
         $this->device->save();
+
+            app('Datastore')->put($this->deviceArray, 'last-discovered-perf', [
+                'rrd_def' => RrdDefinition::make()->addDataset('discover', 'GAUGE', 0),
+                'module' => 'ALL',
+            ], [
+                'discover' => $this->device->last_discovered_timetaken,
+            ]);
 
         DeviceDiscovered::dispatch($this->device);
     }

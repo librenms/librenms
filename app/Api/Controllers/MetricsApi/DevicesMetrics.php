@@ -64,6 +64,7 @@ class DevicesMetrics
                 $snapshot[$deviceId] = [
                     'status' => ['ts' => -1, 'value' => 0],
                     'last_polled_timetaken' => ['ts' => -1, 'value' => 0.0],
+                    'last_discovered_timetaken' => ['ts' => -1, 'value' => 0.0],
                     'last_ping_timetaken' => ['ts' => -1, 'value' => 0.0],
                     'uptime' => ['ts' => -1, 'value' => 0],
                 ];
@@ -78,6 +79,20 @@ class DevicesMetrics
             if ($measurement === 'poller-perf' && (($tags['module'] ?? null) === 'ALL') && isset($fields['poller']) && is_numeric($fields['poller'])) {
                 if ($timestamp >= $snapshot[$deviceId]['last_polled_timetaken']['ts']) {
                     $snapshot[$deviceId]['last_polled_timetaken'] = ['ts' => $timestamp, 'value' => (float) $fields['poller']];
+                }
+            }
+
+            if (in_array($measurement, ['discover', 'discover-perf', 'discovery', 'discovery-perf', 'last-discovered-perf'], true)) {
+                $discoverDuration = null;
+                foreach (['discover', 'discovery', 'poller', 'last_discovered_timetaken'] as $fieldName) {
+                    if (isset($fields[$fieldName]) && is_numeric($fields[$fieldName])) {
+                        $discoverDuration = (float) $fields[$fieldName];
+                        break;
+                    }
+                }
+
+                if ($discoverDuration !== null && $timestamp >= $snapshot[$deviceId]['last_discovered_timetaken']['ts']) {
+                    $snapshot[$deviceId]['last_discovered_timetaken'] = ['ts' => $timestamp, 'value' => $discoverDuration];
                 }
             }
 
@@ -99,7 +114,7 @@ class DevicesMetrics
             return implode("\n", $lines) . "\n";
         }
 
-        $devices = Device::select('device_id', 'hostname', 'sysName', 'type')
+        $devices = Device::select('device_id', 'hostname', 'sysName', 'type', 'last_discovered_timetaken')
             ->whereIn('device_id', $deviceIds)
             ->get()
             ->keyBy('device_id');
@@ -118,14 +133,17 @@ class DevicesMetrics
 
             $isUp = (int) $snapshot[$deviceId]['status']['value'];
             $lastPolledTimeTaken = (float) $snapshot[$deviceId]['last_polled_timetaken']['value'];
+            $lastDiscoveredTimeTaken = (float) $snapshot[$deviceId]['last_discovered_timetaken']['value'];
             $lastPingTimeTaken = (float) $snapshot[$deviceId]['last_ping_timetaken']['value'];
             $uptime = (int) $snapshot[$deviceId]['uptime']['value'];
 
+            if ($lastDiscoveredTimeTaken <= 0 && is_numeric($device->last_discovered_timetaken)) {
+                $lastDiscoveredTimeTaken = (float) $device->last_discovered_timetaken;
+            }
+
             $device_up_lines[] = "librenms_devices_up{{$labels}} {$isUp}";
             $polled_timetaken_lines[] = "librenms_devices_last_polled_timetaken_seconds{{$labels}} {$lastPolledTimeTaken}";
-
-            // Redis snapshots do not currently export discovery duration.
-            $discovered_timetaken_lines[] = "librenms_devices_last_discovered_timetaken_seconds{{$labels}} 0";
+            $discovered_timetaken_lines[] = "librenms_devices_last_discovered_timetaken_seconds{{$labels}} {$lastDiscoveredTimeTaken}";
 
             $ping_timetaken_lines[] = "librenms_devices_last_ping_timetaken_seconds{{$labels}} {$lastPingTimeTaken}";
             $uptime_lines[] = "librenms_devices_uptime_seconds{{$labels}} {$uptime}";
