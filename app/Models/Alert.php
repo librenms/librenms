@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Enum\AlertState;
 
 class Alert extends Model
@@ -98,6 +99,15 @@ class Alert extends Model
     public function rule(): BelongsTo
     {
         return $this->belongsTo(AlertRule::class, 'rule_id', 'id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AlertProblem, $this>
+     */
+    public function problems(): HasMany
+    {
+        return $this->hasMany(AlertProblem::class, 'rule_id', 'rule_id')
+            ->where('alert_problems.device_id', $this->device_id);
     }
 
     /**

@@ -17,7 +17,7 @@
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Util\Time;
 
-$where = ' `devices`.`disabled` = 0';
+$where = ' `devices`.`disabled` = 0 AND `alert_rules`.`disabled` = 0 AND `alerts`.`open` = 1';
 $param = [];
 $alert_states = [
     // divined from librenms/alerts.php
@@ -88,7 +88,9 @@ if (! empty($searchPhrase)) {
     $param[] = "%$searchPhrase%";
 }
 
-$sql = ' FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`';
+$where .= ' AND (`alert_rules`.`notify_per_entity` = 1 OR `alerts`.`id` = (SELECT MIN(`p2`.`id`) FROM `alert_problems` `p2` WHERE `p2`.`device_id` = `alerts`.`device_id` AND `p2`.`rule_id` = `alerts`.`rule_id` AND `p2`.`open` = 1 AND `p2`.`state` != ' . $alert_states['recovered'] . '))';
+
+$sql = ' FROM `alert_problems` AS `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`';
 
 if (Gate::denies('viewAll', \App\Models\Alert::class)) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
@@ -123,12 +125,27 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT `alerts`.*, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`name`, `alert_rules`.`severity`, `alert_rules`.`builder` $sql";
+$sql = "SELECT `alerts`.*, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`name`, `alert_rules`.`severity`, `alert_rules`.`builder`, `alert_rules`.`notify_per_entity` $sql";
 
 $rulei = 0;
 foreach (dbFetchRows($sql, $param) as $alert) {
-    $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alert['rule_id'], $alert['device_id']]);
-    $alert_log_id = dbFetchCell('SELECT id FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alert['rule_id'], $alert['device_id']]);
+    $log = $alert['details']; // problems carry their current fault detail directly
+
+    $entity_count = 1;
+    if (empty($alert['notify_per_entity'])) {
+        $grouped_rows = [];
+        $grouped_problems = dbFetchRows('SELECT `details` FROM `alert_problems` WHERE `device_id` = ? AND `rule_id` = ? AND `open` = 1 AND `state` != ?', [$alert['device_id'], $alert['rule_id'], $alert_states['recovered']]);
+        $entity_count = count($grouped_problems);
+        foreach ($grouped_problems as $grouped_problem) {
+            $grouped_detail = json_decode(@gzuncompress($grouped_problem['details']), true) ?: [];
+            foreach (($grouped_detail['rule'] ?? []) as $grouped_fault) {
+                $grouped_rows[] = $grouped_fault;
+            }
+        }
+        $log = gzcompress(json_encode(['rule' => $grouped_rows]), 9);
+    }
+
+    $alert_log_id = dbFetchCell('SELECT id FROM alert_log WHERE problem_id = ? ORDER BY id DESC LIMIT 1', [$alert['id']]);
     [$fault_detail, $max_row_length] = alert_details($log);
     $info = json_decode((string) $alert['info'], true);
 
@@ -177,7 +194,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         $severity_ico = '<span class="alert-status label-primary">&nbsp;</span>';
     }
 
-    $proc = dbFetchCell('SELECT proc FROM alerts,alert_rules WHERE alert_rules.id = alerts.rule_id AND alerts.id = ?', [$alert['id']]);
+    $proc = dbFetchCell('SELECT proc FROM alert_problems,alert_rules WHERE alert_rules.id = alert_problems.rule_id AND alert_problems.id = ?', [$alert['id']]);
     if (($proc == '') || ($proc == 'NULL')) {
         $has_proc = '';
     } else {
@@ -196,7 +213,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
 
     $response[] = [
         'id' => $rulei++,
-        'rule' => '<i title="' . htmlentities((string) $alert['builder']) . '"><a href="' . \LibreNMS\Util\Url::generate(['page' => 'alert-rules']) . '">' . htmlentities((string) $alert['name']) . '</a></i>',
+        'rule' => '<i title="' . htmlentities((string) $alert['builder']) . '"><a href="' . \LibreNMS\Util\Url::generate(['page' => 'alert-rules']) . '">' . htmlentities((string) $alert['name']) . '</a></i>' . ($entity_count > 1 ? ' <span class="label label-default" title="' . $entity_count . ' matching entities grouped into this alert">' . $entity_count . '&times;</span>' : ''),
         'details' => '<a class="fa-solid fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $alert['id'] . '" data-parent="#alerts"></a>',
         'verbose_details' => "<button type='button' class='btn btn-alert-details command-alert-details' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'><i class='fa-solid fa-circle-info'></i></button>",
         'hostname' => $hostname,
