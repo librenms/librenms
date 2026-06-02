@@ -99,7 +99,8 @@ Route::get('graph/{path?}', GraphController::class)
 // WebUI
 Route::middleware(['auth'])->group(function (): void {
     // pages
-    Route::post('alert/{alert}/ack', [AlertController::class, 'ack'])->name('alert.ack');
+    Route::post('alert/{problem}/ack', [AlertController::class, 'ack'])->name('alert.ack');
+    Route::post('problem/{problem}/ack', [AlertController::class, 'ack'])->name('problem.ack');
     Route::get('devices/{view?}/{graph?}/{vars?}', [DevicesController::class, 'index'])->where('vars', '.*')
         ->middleware(['saved-filter:devices'])
         ->name('devices');
