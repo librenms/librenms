@@ -31,7 +31,7 @@ class GraphsPageControllerTest extends TestCase
         $device = Device::factory()->create(['hostname' => 'graph-device.example.com']);
 
         $response = $this->actingAs($this->adminUser())
-            ->get("/graphs/device={$device->device_id}/type=device_poller_perf/");
+            ->get("/graphs?device={$device->device_id}&type=device_poller_perf");
 
         $response->assertOk();
         $response->assertSee('Poller Time');
@@ -44,7 +44,7 @@ class GraphsPageControllerTest extends TestCase
         $device = Device::factory()->create();
 
         $response = $this->actingAs($this->adminUser())
-            ->get("/graphs/device={$device->device_id}/type=device_poller_perf/from=1700000000/to=1700003600/");
+            ->get("/graphs?device={$device->device_id}&type=device_poller_perf&from=1700000000&to=1700003600");
 
         $response->assertOk();
         $response->assertSee('id="customrange"', false);
@@ -64,7 +64,7 @@ class GraphsPageControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->adminUser())
-            ->get("/graphs/id={$port->port_id}/type=port_bits/showcommand=yes/");
+            ->get("/graphs?id={$port->port_id}&type=port_bits&showcommand=yes");
 
         $response->assertOk();
         $response->assertSee('RRDTool Command');
@@ -82,7 +82,7 @@ class GraphsPageControllerTest extends TestCase
         Auth::forgetGuards();
         $this->flushSession();
 
-        $this->get("/graphs/device={$device->device_id}/type=device_poller_perf/")
+        $this->get("/graphs?device={$device->device_id}&type=device_poller_perf")
             ->assertRedirect('/login');
     }
 

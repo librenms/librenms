@@ -444,8 +444,7 @@ Route::prefix('install')->group(function (): void {
     Route::any('{path?}', [Install\InstallationController::class, 'invalid'])->where('path', '.*'); // 404
 });
 
-Route::get('graphs/{path?}', GraphsPageController::class)
-    ->where('path', '.*')
+Route::get('graphs', GraphsPageController::class)
     ->middleware('auth')
     ->name('graphs');
 
