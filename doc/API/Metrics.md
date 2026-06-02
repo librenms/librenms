@@ -65,6 +65,18 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' "https://foo.example/api/v0/metrics/dev
 
 When `scope=detail` is specified, the endpoint will include additional per-device, per-port, or per-entity metrics as appropriate for the endpoint. This is useful for advanced monitoring and troubleshooting, but may increase load and data volume for large environments.
 
+## Redis Datastore Requirement
+
+Several `scope=detail` metrics are sourced from datastore snapshots written during polling and discovery. To populate these Redis-backed detail values, the Redis datastore must be enabled.
+
+Prerequisites:
+- `redis.enable` must be set to `true`
+- A metrics Redis connection/key configuration must be present in `config/database.php`
+
+If Redis datastore is disabled, global metrics still work, but Redis-backed detail samples may be empty, missing, or fall back to SQL-derived values where implemented.
+
+The sizing of the Redis instance should also be considered before enabling this feature.
+
 ## Available Metrics Endpoints
 
 ### `metrics_access_points`
@@ -191,12 +203,12 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/metrics/devi
 Output:
 Prometheus metrics for devices including:
 - `librenms_devices_total` — Total number of devices
-- `librenms_devices_up` — Number of devices currently up
-- `librenms_devices_down` — Number of devices currently down
+- `librenms_devices_total_up` — Number of devices currently up
+- `librenms_devices_total_down` — Number of devices currently down
 - `librenms_devices_up` — Per-device status (1=up, 0=down)
-- `librenms_devices_polled_timetaken_seconds` — Time taken for last poll
-- `librenms_devices_discovered_timetaken_seconds` — Time taken for last discovery
-- `librenms_devices_ping_timetaken_seconds` — Time taken for last ping
+- `librenms_devices_last_polled_timetaken_seconds` — Time taken for last poll
+- `librenms_devices_last_discovered_timetaken_seconds` — Time taken for last discovery
+- `librenms_devices_last_ping_timetaken_seconds` — Time taken for last ping
 - `librenms_devices_uptime_seconds` — Device uptime in seconds
 
 Example metrics:
@@ -205,13 +217,13 @@ Example metrics:
 # TYPE librenms_devices_total gauge
 librenms_devices_total 47
 
-# HELP librenms_devices_up Number of devices currently up
-# TYPE librenms_devices_up gauge
-librenms_devices_up 45
+# HELP librenms_devices_total_up Number of devices currently up
+# TYPE librenms_devices_total_up gauge
+librenms_devices_total_up 45
 
-# HELP librenms_devices_down Number of devices currently down
-# TYPE librenms_devices_down gauge
-librenms_devices_down 2
+# HELP librenms_devices_total_down Number of devices currently down
+# TYPE librenms_devices_total_down gauge
+librenms_devices_total_down 2
 
 # HELP librenms_devices_up Device status (1=up, 0=down)
 # TYPE librenms_devices_up gauge
