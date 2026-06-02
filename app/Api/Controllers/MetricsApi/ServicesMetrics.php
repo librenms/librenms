@@ -47,12 +47,12 @@ class ServicesMetrics
         // Ignored Service count
         $ignoredQ = Service::where('service_ignore', 1);
         $ignored = $this->applyDeviceFilter($ignoredQ, $filters['device_ids'])->count();
-        $this->appendMetricBlock($lines, 'librenms_services_ignored', 'Number of ignored services', 'gauge', [$ignored]);
+        $this->appendMetricBlock($lines, 'librenms_services_ignored', 'Number of ignored services', 'gauge', ["librenms_services_ignored {$ignored}"]);
 
         // Disabled Service count
         $disabledQ = Service::where('service_disabled', 1);
         $disabled = $this->applyDeviceFilter($disabledQ, $filters['device_ids'])->count();
-        $this->appendMetricBlock($lines, 'librenms_services_disabled', 'Number of disabled services', 'gauge', [$disabled]);
+        $this->appendMetricBlock($lines, 'librenms_services_disabled', 'Number of disabled services', 'gauge', ["librenms_services_disabled {$disabled}"]);
 
         // Per-service values sourced from Redis service poller snapshots
         $service_metric_lines = [];
