@@ -109,11 +109,20 @@ class Alert extends DeviceRelatedModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\AlertLog, $this>
+     * @return BelongsTo<AlertLog, $this>
      */
     public function latestLog(): BelongsTo
     {
         return $this->belongsTo(AlertLog::class, 'latest_alert_log_id', 'id');
+    }
+
+    /**
+     * @return HasMany<AlertProblem, $this>
+     */
+    public function problems(): HasMany
+    {
+        return $this->hasMany(AlertProblem::class, 'rule_id', 'rule_id')
+            ->where('alert_problems.device_id', $this->device_id);
     }
 
     /**

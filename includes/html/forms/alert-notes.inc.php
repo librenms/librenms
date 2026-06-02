@@ -24,6 +24,7 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 use App\Models\Alert;
+use App\Models\AlertProblem;
 use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
@@ -32,7 +33,7 @@ $alert_id = $vars['alert_id'] ?? null;
 $sub_type = $vars['sub_type'] ?? '';
 $note = isset($vars['note']) ? strip_tags($vars['note']) : '';
 
-if (! is_numeric($alert_id) || ! ($alert = Alert::find($alert_id))) {
+if (! is_numeric($alert_id) || ! ($problem = AlertProblem::find($alert_id))) {
     abort(response()->json([
         'status' => 'error',
         'message' => 'Invalid alert id',
@@ -40,8 +41,9 @@ if (! is_numeric($alert_id) || ! ($alert = Alert::find($alert_id))) {
     ]));
 }
 
+$alert = Alert::query()->where('rule_id', $problem->rule_id)->where('device_id', $problem->device_id)->first();
 $ability = $sub_type === 'get_note' ? 'view' : 'update';
-if (Gate::denies($ability, $alert)) {
+if (! $alert || Gate::denies($ability, $alert)) {
     abort(response()->json([
         'status' => 'error',
         'message' => 'You are not authorised to access this alert',
@@ -52,10 +54,13 @@ if (Gate::denies($ability, $alert)) {
 if ($sub_type === 'get_note') {
     $status = 'ok';
     $message = 'Alert note retrieved';
-    $note = (string) $alert->note;
+    $note = (string) $problem->note;
 } else {
-    $alert->note = $note;
-    if ($alert->save()) {
+    $query = $problem->rule?->notify_per_entity
+        ? AlertProblem::whereKey($problem->id)
+        : AlertProblem::where('rule_id', $problem->rule_id)->where('device_id', $problem->device_id)->where('open', 1);
+
+    if ($query->update(['note' => $note])) {
         $status = 'ok';
         $message = 'Note updated';
     } else {

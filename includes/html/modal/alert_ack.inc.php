@@ -58,7 +58,7 @@ use App\Facades\LibrenmsConfig;
         var ack_until_clear = $("#ack_until_clear").bootstrapSwitch('state');
         $.ajax({
             type: "POST",
-            url: route('alert.ack', {alert: ack_alert_id}),
+            url: route('alert.ack', {problem: ack_alert_id}),
             dataType: "json",
             data: { state: ack_alert_state, ack_msg: ack_alert_note, ack_until_clear: ack_until_clear },
             success: function (data) {
