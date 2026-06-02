@@ -23,7 +23,6 @@
  * @copyright  2026 Rob J. Epping
  * @author     RobJE <librenms@renf.us>
  */
-
 $divisor = 100;
 $mulitplier = 1;
 
@@ -56,7 +55,7 @@ for ($card = 1; $card <= 4; $card++) {
                             null,
                             null,
                             null,
-                            (($current / $divisor) * $multiplier),
+                            ($current / $divisor) * $multiplier,
                             'snmp'
                         );
                     }

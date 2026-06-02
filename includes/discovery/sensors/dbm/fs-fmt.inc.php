@@ -22,9 +22,7 @@
  *
  * @copyright  2026 Rob J. Epping
  * @author     RobJE <librenms@renf.us>
-
  */
-
 $divisor = 100;
 $multiplier = 1;
 
@@ -57,7 +55,7 @@ for ($card = 1; $card <= 4; $card++) {
                             null,
                             null,
                             null,
-                            (($current_tx / $divisor) * $multiplier),
+                            ($current_tx / $divisor) * $multiplier,
                             'snmp'
                         );
                     }
@@ -78,11 +76,11 @@ for ($card = 1; $card <= 4; $card++) {
                             $descr_rx,
                             $divisor,
                             $multiplier,
-                            (($current_rx_threshold / $divisor) * $multiplier),
+                            ($current_rx_threshold / $divisor) * $multiplier,
                             null,
                             null,
                             null,
-                            (($current_rx / $divisor) * $multiplier),
+                            ($current_rx / $divisor) * $multiplier,
                             'snmp'
                         );
                     }

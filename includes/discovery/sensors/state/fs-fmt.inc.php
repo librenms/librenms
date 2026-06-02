@@ -23,7 +23,6 @@
  * @copyright  2026 Rob J. Epping
  * @author     RobJE <librenms@renf.us>
  */
-
 $alarm_states_name = 'fsfmtalarmstate';
 $alarm_states = [
     ['value' => 0, 'generic' => 2, 'descr' => 'alarm'],
@@ -68,7 +67,7 @@ if (is_numeric($current_power1)) {
         null,
         null,
         null,
-        (($current_power1 / $divisor) * $multiplier),
+        ($current_power1 / $divisor) * $multiplier,
         'snmp'
     );
 }
@@ -92,7 +91,7 @@ if (is_numeric($current_power2)) {
         null,
         null,
         null,
-        (($current_power2 / $divisor) * $multiplier),
+        ($current_power2 / $divisor) * $multiplier,
         'snmp'
     );
 }
@@ -116,7 +115,7 @@ if (is_numeric($current_fan)) {
         null,
         null,
         null,
-        (($current_fan / $divisor) * $multiplier),
+        ($current_fan / $divisor) * $multiplier,
         'snmp'
     );
 }
@@ -140,7 +139,7 @@ if (is_numeric($current_buzzer)) {
         null,
         null,
         null,
-        (($current_buzzer / $divisor) * $multiplier),
+        ($current_buzzer / $divisor) * $multiplier,
         'snmp'
     );
 }
@@ -174,7 +173,7 @@ for ($card = 1; $card <= 4; $card++) {
                             null,
                             null,
                             null,
-                            (($current_tx / $divisor) * $multiplier),
+                            ($current_tx / $divisor) * $multiplier,
                             'snmp'
                         );
                     }
@@ -197,7 +196,7 @@ for ($card = 1; $card <= 4; $card++) {
                             null,
                             null,
                             null,
-                            (($current_rx / $divisor) * $multiplier),
+                            ($current_rx / $divisor) * $multiplier,
                             'snmp'
                         );
                     }
@@ -220,7 +219,7 @@ for ($card = 1; $card <= 4; $card++) {
                             null,
                             null,
                             null,
-                            (($current_temp / $divisor) * $multiplier),
+                            ($current_temp / $divisor) * $multiplier,
                             'snmp'
                         );
                     }
