@@ -4,15 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Alert;
+use App\Models\AlertProblem;
 use App\Models\Eventlog;
 use Illuminate\Http\Request;
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\Severity;
 
 class AlertController extends Controller
 {
-    public function ack(Request $request, Alert $alert): \Illuminate\Http\JsonResponse
+    public function ack(Request $request, AlertProblem $problem): \Illuminate\Http\JsonResponse
     {
-        $this->authorize('update', $alert);
+        $alert = Alert::query()->where('rule_id', $problem->rule_id)->where('device_id', $problem->device_id)->first();
+        if ($alert) {
+            $this->authorize('update', $alert);
+        }
 
         $this->validate($request, [
             'state' => 'required|int',
@@ -22,38 +27,56 @@ class AlertController extends Controller
 
         $state = $request->input('state');
         $state_description = '';
-        if ($state == 2) {
-            $alert->state = 1;
+        $newState = null;
+        if ($state == AlertState::ACKNOWLEDGED) {
+            $newState = AlertState::ACTIVE;
             $state_description = 'UnAck';
-            $alert->open = 1;
-        } elseif ($state >= 1) {
-            $alert->state = 2;
+        } elseif ($state >= AlertState::ACTIVE) {
+            $newState = AlertState::ACKNOWLEDGED;
             $state_description = 'Ack';
-            $alert->open = 1;
         }
 
-        $info = $alert->info;
-        $info['until_clear'] = filter_var($request->input('ack_until_clear'), FILTER_VALIDATE_BOOLEAN);
-        $alert->info = $info;
+        if ($newState === null) {
+            return response()->json([
+                'message' => 'Problem has not been acknowledged.',
+                'status' => 'error',
+            ]);
+        }
 
+        $untilClear = filter_var($request->input('ack_until_clear'), FILTER_VALIDATE_BOOLEAN);
         $timestamp = date(LibrenmsConfig::get('dateformat.long'));
         $username = $request->user()->username;
         $ack_msg = $request->input('ack_msg');
-        $alert->note = trim($alert->note . PHP_EOL . "$timestamp - $state_description ($username) " . $ack_msg);
+        $note_suffix = "$timestamp - $state_description ($username) " . $ack_msg;
 
-        if ($alert->save()) {
-            $rule_name = $alert->rule->name;
+        $targets = $problem->rule?->notify_per_entity
+            ? collect([$problem])
+            : AlertProblem::query()->where('rule_id', $problem->rule_id)->where('device_id', $problem->device_id)->where('open', 1)->get();
+
+        $saved = false;
+        foreach ($targets as $target) {
+            $target->state = $newState;
+            $target->open = 1;
+            $info = $target->info ?: [];
+            $info['until_clear'] = $untilClear;
+            $target->info = $info;
+            $target->note = trim($target->note . PHP_EOL . $note_suffix);
+            $saved = $target->save() || $saved;
+        }
+
+        if ($saved) {
+            $rule_name = $problem->rule?->name;
             $act = strtolower($state_description) . 'nowledged';
-            Eventlog::log("$username {$act} alert $rule_name note: $ack_msg", $alert->device_id, 'alert', Severity::Info, $alert->id);
+            Eventlog::log("$username {$act} alert $rule_name note: $ack_msg", $problem->device_id, 'alert', Severity::Info, $problem->id);
 
             return response()->json([
-                'message' => "Alert {$state_description}nowledged.",
+                'message' => "Problem {$state_description}nowledged.",
                 'status' => 'ok',
             ]);
         }
 
         return response()->json([
-            'message' => 'Alert has not been acknowledged.',
+            'message' => 'Problem has not been acknowledged.',
             'status' => 'error',
         ]);
     }
