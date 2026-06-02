@@ -9,15 +9,13 @@ $supplies = \App\Models\PrinterSupply::query()->where('device_id', $device['devi
 foreach ($supplies as $type => $supply) {
     if (! empty($supply)) {
         echo '
-          <div class="row">
-          <div class="col-md-12">
-            <div class="panel panel-default panel-condensed overview-panel">
-              <div class="panel-heading">';
+            <div class="overview-panel tw:mb-5">
+              <div class="overview-panel-heading">';
         echo '<a href="device/device=' . $device['device_id'] . '/tab=printer/">';
         $title = StringHelpers::camelToTitle($type == 'opc' ? 'organicPhotoConductor' : $type);
         echo '<i class="fa fa-print fa-lg icon-theme" aria-hidden="true"></i> <strong>' . $title . '</strong></a>';
         echo '</div>
-        <table class="table">';
+        <div class="overview-panel-body">';
 
         foreach ($supply as $toner) {
             $percent = round($toner['supply_current']);
@@ -46,21 +44,19 @@ foreach ($supplies as $type => $supply) {
             // the 00 at the end makes the area transparent.
             $minigraph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
 
-            echo '<tr>
-            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $toner['supply_descr'], $overlib_content) . '</td>
-            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</td>
-            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Html::percentageBar(200, 10, $percent, null, $percent . '%', null, null, [
+            echo '<div class="overview-row tw:grid-cols-3">
+            <div>' . \LibreNMS\Util\Url::overlibLink($link, $toner['supply_descr'], $overlib_content) . '</div>
+            <div>' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</div>
+            <div>' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Html::percentageBar(200, 10, $percent, null, $percent . '%', null, null, [
                 'left' => $background['left'],
                 'left_text' => null,
                 'right' => $background['right'],
                 'right_text' => null,
             ]), $overlib_content) . '
-           </a></td>
-         </tr>';
+           </div>
+         </div>';
         }//end foreach
 
-        echo '</table>';
-        echo '</div>';
         echo '</div>';
         echo '</div>';
     }//end if

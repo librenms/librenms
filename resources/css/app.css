@@ -70,6 +70,28 @@
   @apply tw:rounded-xl tw:overflow-hidden tw:border tw:border-gray-300 tw:shadow-sm tw:dark:border-dark-gray-200;
 }
 
+/* Reusable overview panel building blocks (Tailwind grid/flex replacement for Bootstrap panel/table) */
+.overview-panel-heading {
+  @apply tw:px-4 tw:py-2.5 tw:bg-[#f5f5f5] tw:border-b tw:border-[#ddd] tw:text-[#333] tw:dark:bg-dark-gray-200 tw:dark:border-[#1c1e22] tw:dark:text-dark-white-200;
+}
+
+.overview-panel-body {
+  @apply tw:flex tw:flex-col tw:bg-white tw:divide-y tw:divide-[#ddd] tw:dark:bg-dark-gray-400 tw:dark:divide-[#1c1e22];
+}
+
+/* Set the column template inline per panel, e.g. tw:grid-cols-[3fr_1fr_1fr] */
+.overview-row {
+  @apply tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-[#f5f5f5] tw:dark:hover:bg-dark-gray-300;
+}
+
+.overview-row-heading {
+  @apply tw:px-2 tw:py-2 tw:font-bold;
+}
+
+.overview-panel-footer {
+  @apply tw:px-4 tw:py-2.5 tw:bg-[#f5f5f5] tw:border-t tw:border-[#ddd] tw:dark:bg-dark-gray-200 tw:dark:border-[#1c1e22];
+}
+
 .lnms-btn {
   @apply tw:inline-flex tw:items-center tw:gap-2 tw:rounded-xl tw:px-4 tw:py-2 tw:font-normal tw:no-underline;
 }
@@ -108,4 +130,12 @@
 
 .lnms-btn-primary .lnms-btn-badge {
   @apply tw:bg-white tw:text-[#337ab7];
+}
+
+.lnms-btn-warning {
+  @apply tw:bg-[#f0ad4e] tw:hover:bg-[#ec971f] tw:text-white!;
+}
+
+.lnms-btn-warning .lnms-btn-badge {
+  @apply tw:bg-white tw:text-[#f0ad4e];
 }

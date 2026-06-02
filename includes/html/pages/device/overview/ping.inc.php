@@ -3,16 +3,14 @@
 if (Rrd::checkRrdExists(Rrd::name(DeviceCache::getPrimary()->hostname, 'icmp-perf'))) {
     $perf_url = url('device') . '/device=' . DeviceCache::getPrimary()->device_id . '/tab=graphs/group=poller/';
     echo '
-        <div class="row">
-        <div class="col-md-12">
-        <div class="panel panel-default panel-condensed overview-panel">
-        <div class="panel-heading">
+        <div class="overview-panel tw:mb-5">
+        <div class="overview-panel-heading">
         <a href="' . $perf_url . '">
         <i class="fas fa-area-chart fa-lg icon-theme" aria-hidden="true"></i><strong>Ping Response</strong></a>
         </div>
-        <table class="table">
-            <tr>
-            <td colspan="4">';
+        <div class="overview-panel-body">
+            <div class="overview-row">
+            <div>';
 
     $graph = \App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth([
         'device' => DeviceCache::getPrimary()->device_id,
@@ -23,10 +21,8 @@ if (Rrd::checkRrdExists(Rrd::name(DeviceCache::getPrimary()->hostname, 'icmp-per
     ]);
 
     echo \LibreNMS\Util\Url::graphPopup($graph, \LibreNMS\Util\Url::lazyGraphTag($graph, 'tw:w-full tw:h-auto'), $perf_url);
-    echo '  </td>
-            </tr>
-        </table>
-        </div>
+    echo '  </div>
+            </div>
         </div>
         </div>';
 }//end if

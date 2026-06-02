@@ -20,20 +20,16 @@ if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
         })->implode(' ');
 
     $services = ObjectCache::serviceCounts(['total', 'ok', 'warning', 'critical'], $device['device_id']);
-    echo '<div class="row">
-            <div class="col-md-12">
-                <div class="panel">
-                    <div class="panel-heading">
+    echo '<div class="overview-panel tw:mb-5">
+                    <div class="overview-panel-heading">
                         <a href="' . Url::deviceUrl($device['device_id'], ['tab' => 'services']) . '"><i class="fa fa-cogs fa-lg icon-theme" aria-hidden="true"></i> <strong>Services</strong></a>
                     </div>
-                    <div class="panel-body">
-                        <a class="btn btn-default" role="button" href="' . Url::deviceUrl($device['device_id'], ['tab' => 'services']) . '">Total: <span class="badge">' . $services['total'] . '</span></a>
-                        <a class="btn btn-success" role="button" href="' . Url::deviceUrl($device['device_id'], ['tab' => 'services']) . '">Ok: <span class="badge">' . $services['ok'] . '</span></a>
-                        <a class="btn btn-warning" role="button" href="' . Url::deviceUrl($device['device_id'], ['tab' => 'services']) . '">Warning: <span class="badge">' . $services['warning'] . '</span></a>
-                        <a class="btn btn-danger" role="button" href="' . Url::deviceUrl($device['device_id'], ['tab' => 'services']) . '">Critical: <span class="badge">' . $services['critical'] . '</span></a>
+                    <div class="tw:flex tw:flex-wrap tw:gap-3 tw:p-3">
+                        <a class="lnms-btn lnms-btn-default" role="button" href="' . Url::deviceUrl($device['device_id'], ['tab' => 'services']) . '">Total: <span class="lnms-btn-badge">' . $services['total'] . '</span></a>
+                        <a class="lnms-btn lnms-btn-success" role="button" href="' . Url::deviceUrl($device['device_id'], ['tab' => 'services']) . '">Ok: <span class="lnms-btn-badge">' . $services['ok'] . '</span></a>
+                        <a class="lnms-btn lnms-btn-warning" role="button" href="' . Url::deviceUrl($device['device_id'], ['tab' => 'services']) . '">Warning: <span class="lnms-btn-badge">' . $services['warning'] . '</span></a>
+                        <a class="lnms-btn lnms-btn-danger" role="button" href="' . Url::deviceUrl($device['device_id'], ['tab' => 'services']) . '">Critical: <span class="lnms-btn-badge">' . $services['critical'] . '</span></a>
                     </div>
-                    <div class="panel-footer">' . $output . '</div>
-                </div>
-            </div>
-        </div>';
+                    <div class="overview-panel-footer">' . $output . '</div>
+                </div>';
 }

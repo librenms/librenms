@@ -4,17 +4,15 @@ use App\Facades\LibrenmsConfig;
 
 if (LibrenmsConfig::get('graylog.server')) {
     echo '
-        <div class="row" id="graylog-card">
-            <div class="col-md-12">
-                <div class="panel panel-default panel-condensed overview-panel">
-                    <div class="panel-heading">
+        <div class="overview-panel tw:mb-5" id="graylog-card">
+                    <div class="overview-panel-heading">
                         <a href="' . route('device.graylog', ['device' => $device['device_id']]) . '">
                             <i class="fa fa-clone fa-lg icon-theme"
                             aria-hidden="true"></i>
                             <strong>Recent Graylog</strong>
                         </a>
                     </div>
-                    <table class="table">';
+                    <div class="overview-panel-body">';
 
     $filter_device = $device['device_id'];
     $tmp_output = '
@@ -65,8 +63,6 @@ if (LibrenmsConfig::get('graylog.server')) {
     $common_output[] = $tmp_output;
     echo implode('', $common_output);
     echo '
-                    </table>
-                </div>
-            </div>
-        </div>';
+                    </div>
+                </div>';
 }

@@ -11,18 +11,16 @@ if ($sensors->isNotEmpty()) {
     $sensor_fa_icon = 'fa-' . $sensor_class->icon();
 
     echo '
-        <div class="row">
-        <div class="col-md-12">
-        <div class="panel panel-default panel-condensed overview-panel">
-        <div class="panel-heading">';
+        <div class="overview-panel tw:mb-5">
+        <div class="overview-panel-heading">';
     echo '<a href="device/device=' . $device['device_id'] . '/tab=health/metric=' . $sensor_class->value . '/"><i class="fa ' . $sensor_fa_icon . ' fa-lg icon-theme" aria-hidden="true"></i><strong> ' . $sensor_class->label() . '</strong></a>';
     echo '      </div>
-        <table class="table">';
+        <div class="overview-panel-body">';
     $group = '';
     foreach ($sensors as $sensor) {
         if ($group != $sensor->group) {
             $group = $sensor->group;
-            echo "<tr><td colspan='3'><strong>$group</strong></td></tr>";
+            echo '<div class="overview-row-heading"><strong>' . $group . '</strong></div>';
         }
 
         // FIXME - make this "four graphs in popup" a function/include and "small graph" a function.
@@ -65,15 +63,13 @@ if ($sensors->isNotEmpty()) {
 
         $sensor_current = Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue());
 
-        echo '<tr><td><div style="display: grid; grid-gap: 10px; grid-template-columns: 3fr 1fr 1fr;">
+        echo '<div class="overview-row tw:grid-cols-[3fr_1fr_1fr]">
             <div>' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Rewrite::shortenIfName($sensor->sensor_descr), $overlib_content, $sensor_class->value) . '</div>
             <div>' . \LibreNMS\Util\Url::overlibLink($link, $sensor_minigraph, $overlib_content, $sensor_class->value) . '</div>
             <div>' . \LibreNMS\Util\Url::overlibLink($link, $sensor_current, $overlib_content, $sensor_class->value) . '</div>
-            </div></td></tr>';
+            </div>';
     }//end foreach
 
-    echo '</table>';
-    echo '</div>';
     echo '</div>';
     echo '</div>';
 }//end if

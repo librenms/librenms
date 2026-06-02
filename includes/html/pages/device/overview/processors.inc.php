@@ -4,15 +4,13 @@ $processors = dbFetchRows('SELECT * FROM `processors` WHERE device_id = ?', [$de
 
 if (count($processors)) {
     echo '
-      <div class="row">
-        <div class="col-md-12 ">
-          <div class="panel panel-default panel-condensed overview-panel">
-            <div class="panel-heading">
+          <div class="overview-panel tw:mb-5">
+            <div class="overview-panel-heading">
 ';
     echo '<a href="device/device=' . $device['device_id'] . '/tab=health/metric=processor/">';
     echo '<i class="fa fa-microchip fa-lg icon-theme" aria-hidden="true"></i> <strong>Processors</strong></a>';
     echo '</div>
-        <table class="table">';
+        <div class="overview-panel-body">';
 
     $graph_array = [];
     $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
@@ -46,17 +44,17 @@ if (count($processors)) {
             $graph_array['bg'] = 'ffffff00'; // the 00 at the end makes the area transparent.
             $minigraph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
 
-            echo '<tr>
-                <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $text_descr, $overlib_content) . '</td>
-                <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</td>
-                <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Html::percentageBar(200, 10, $percent, null, $percent . '%', null, null, [
+            echo '<div class="overview-row tw:grid-cols-3">
+                <div>' . \LibreNMS\Util\Url::overlibLink($link, $text_descr, $overlib_content) . '</div>
+                <div>' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</div>
+                <div>' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Html::percentageBar(200, 10, $percent, null, $percent . '%', null, null, [
                 'left' => $background['left'],
                 'left_text' => null,
                 'right' => $background['right'],
                 'right_text' => null,
             ]), $overlib_content) . '
-                </a></td>
-              </tr>';
+                </div>
+              </div>';
         } else {
             if (! isset($total_percent[$proc['processor_type']])) {
                 $total_percent[$proc['processor_type']] = [
@@ -91,11 +89,11 @@ if (count($processors)) {
         $graph_array['height'] = 100;
         $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . ' - CPU usage');
 
-        echo '<tr>
-              <td colspan="12">';
+        echo '<div class="overview-row">
+              <div>';
         echo \LibreNMS\Util\Url::overlibLink($link, $graph, $overlib_content);
-        echo '  </td>
-            </tr>';
+        echo '  </div>
+            </div>';
         foreach ($total_percent as $values) {
             //Add a row with CPU desc, count and percent graph
             $percent_usage = ceil($values['usage'] / $values['count']);
@@ -103,20 +101,18 @@ if (count($processors)) {
             $background = \LibreNMS\Util\Color::percentage($percent_usage, $percent_warn);
 
             echo '
-              <tr>
-                <td class="col-md-8">' . \LibreNMS\Util\Url::overlibLink($link, 'x' . $values['count'] . ' ' . $values['descr'], $overlib_content) . '</td>
-                <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Html::percentageBar(400, 10, $percent_usage, null, $percent_usage . '%', null, null, [
+              <div class="overview-row tw:grid-cols-[2fr_1fr]">
+                <div>' . \LibreNMS\Util\Url::overlibLink($link, 'x' . $values['count'] . ' ' . $values['descr'], $overlib_content) . '</div>
+                <div>' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Html::percentageBar(400, 10, $percent_usage, null, $percent_usage . '%', null, null, [
                 'left' => $background['left'],
                 'left_text' => null,
                 'right' => $background['right'],
                 'right_text' => null,
-            ]), $overlib_content) . '</td>
-              </tr>';
+            ]), $overlib_content) . '</div>
+              </div>';
         }
     }
 
-    echo '</table>
-        </div>
-        </div>
+    echo '</div>
         </div>';
 }//end if
