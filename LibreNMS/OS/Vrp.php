@@ -398,9 +398,6 @@ class Vrp extends OS implements
                         'interference' => $interference,
                     ];
 
-                    $tags = ['name' => $name, 'radionum' => $radionum, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
-                    $datastore->put($this->getDeviceArray(), 'arubaap', $tags, $fields);
-
                     $aps->push(new AccessPoint([
                         'device_id' => $this->getDeviceId(),
                         'name' => $name,
@@ -420,7 +417,39 @@ class Vrp extends OS implements
             }
 
             ModuleModelObserver::observe(AccessPoint::class);
-            $this->syncModels($this->getDevice(), 'accessPoints', $aps);
+            $syncedAps = $this->syncModels($this->getDevice(), 'accessPoints', $aps);
+
+            foreach ($syncedAps as $ap) {
+                $rrd_name = ['arubaap', $ap->name . $ap->radio_number];
+                $rrd_def = RrdDefinition::make()
+                    ->addDataset('channel', 'GAUGE', 0, 200)
+                    ->addDataset('txpow', 'GAUGE', 0, 200)
+                    ->addDataset('radioutil', 'GAUGE', 0, 100)
+                    ->addDataset('nummonclients', 'GAUGE', 0, 500)
+                    ->addDataset('nummonbssid', 'GAUGE', 0, 200)
+                    ->addDataset('numasoclients', 'GAUGE', 0, 500)
+                    ->addDataset('interference', 'GAUGE', 0, 2000);
+
+                $tags = [
+                    'accesspoint_id' => $ap->accesspoint_id,
+                    'name' => $ap->name,
+                    'radionum' => $ap->radio_number,
+                    'rrd_name' => $rrd_name,
+                    'rrd_def' => $rrd_def,
+                ];
+
+                $fields = $ap->only([
+                    'channel',
+                    'txpow',
+                    'radioutil',
+                    'nummonclients',
+                    'nummonbssid',
+                    'numasoclients',
+                    'interference',
+                ]);
+
+                $datastore->put($this->getDeviceArray(), 'arubaap', $tags, $fields);
+            }
         }
     }
 
