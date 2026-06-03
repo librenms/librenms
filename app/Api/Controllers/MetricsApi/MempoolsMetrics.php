@@ -76,7 +76,8 @@ class MempoolsMetrics
             return implode("\n", $lines) . "\n";
         }
 
-        $deviceIds = collect(array_values(array_unique(array_map(fn (string $key) => (int) explode(':', $key)[0], array_keys($snapshot)))));
+        $deviceIds = collect(array_values(array_unique(array_map(fn (string $key) => (int) explode(':', $key)[0], array_keys($snapshot)))))
+            ->map(static fn (int $id): string => (string) $id);
         $devices = $this->gatherDevicesForIds($deviceIds);
 
         $mpQuery = Mempool::select('mempool_id', 'device_id', 'mempool_descr', 'mempool_class', 'mempool_type', 'mempool_index');
