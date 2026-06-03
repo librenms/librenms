@@ -560,7 +560,7 @@
             "type": "select",
             "default": "none",
             "options" : {
-                "none" : "No Access",
+                "none" : "No Permissions",
                 "normal" : "Normal Access",
                 "global-read" : "Global Viewing Access",
                 "admin" : "Global Administrative Access"
