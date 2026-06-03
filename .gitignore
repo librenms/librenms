@@ -49,7 +49,15 @@ pyvenv.cfg
 /.phpunit.cache/storage/pail
 /.nova
 
-# Local project files — never commit credentials or deployment scripts
+# Local project files
+# .afi-ops/ holds AFI-specific scripts, reports, and docs.
+# It's already covered by the `.*` rule on line 3, listed here for visibility.
+# .afi-ops/
+#
+# CLAUDE.md sits at the project root and is read by Claude for context.
+# Keep it ignored so it doesn't end up in upstream PRs.
 CLAUDE.md
-AUDIT.md
-Deploy-SNMP.ps1
+
+# AGENTS.md mirrors CLAUDE.md (project context for other agentic tools)
+# and contains live credentials. Must not be committed to a public repo.
+AGENTS.md
