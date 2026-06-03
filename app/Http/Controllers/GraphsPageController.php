@@ -250,9 +250,26 @@ class GraphsPageController extends Controller
         $vars = $graphVars;
         $auth = false;
         $command_only = 1;
-        ob_start();
-        require base_path('includes/html/graphs/graph.inc.php');
 
-        return (string) ob_get_clean();
+        // Legacy graph templates use relative requires, so they must run from the install root
+        // (mirrors LibreNMS\Util\Graph::get()). Restore the cwd/buffer afterwards so a failing
+        // include can't leak state into the rest of the request.
+        $previousCwd = getcwd();
+        $bufferLevel = ob_get_level();
+        chdir(base_path());
+        ob_start();
+
+        try {
+            require base_path('includes/html/graphs/graph.inc.php');
+
+            return (string) ob_get_clean();
+        } finally {
+            while (ob_get_level() > $bufferLevel) {
+                ob_end_clean();
+            }
+            if ($previousCwd !== false) {
+                chdir($previousCwd);
+            }
+        }
     }
 }
