@@ -47,9 +47,9 @@ class GraphsPageControllerTest extends TestCase
             ->get("/graphs?device={$device->device_id}&type=device_poller_perf&from=1700000000&to=1700003600");
 
         $response->assertOk();
-        $response->assertSee('id="customrange"', false);
-        $response->assertSee('new Date(1700000000*1000)', false);
-        $response->assertSee('new Date(1700003600*1000)', false);
+        $response->assertSee('x-data="dateRangePicker"', false);
+        $response->assertSee('data-start="1700000000"', false);
+        $response->assertSee('data-end="1700003600"', false);
         $this->assertNoPhpWarningOutput($response->getContent());
     }
 

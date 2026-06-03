@@ -38,7 +38,9 @@
 <hr />
 @endunless
 
-{!! $dateSelectorHtml !!}
+<div style="text-align: center;">
+    <x-date-range-picker :start="$graphFrom" :end="$graphTo"></x-date-range-picker>
+</div>
 
 <div style="padding-top: 5px"></div>
 <center>
@@ -82,3 +84,26 @@
 
 <x-refresh-timer :refresh="$refresh"></x-refresh-timer>
 @endsection
+
+@push('scripts')
+<script>
+    window.addEventListener('date-range-changed', (event) => {
+        const { relativeStartSeconds, relativeEndSeconds, start, end } = event.detail;
+        const url = new URL(window.location.href);
+
+        const setOrDelete = (param, value) =>
+            value ? url.searchParams.set(param, value) : url.searchParams.delete(param);
+
+        const prevFrom = url.searchParams.get('from');
+        const prevTo = url.searchParams.get('to');
+
+        const fromOffset = relativeStartSeconds && LibreNMS.Date.toShortOffset(relativeStartSeconds);
+        setOrDelete('from', fromOffset === '-1d' ? null : fromOffset || (start && LibreNMS.Date.toUrl(start)));
+        setOrDelete('to', relativeEndSeconds ? LibreNMS.Date.toShortOffset(relativeEndSeconds) : end && LibreNMS.Date.toUrl(end));
+
+        if (url.searchParams.get('from') !== prevFrom || url.searchParams.get('to') !== prevTo) {
+            window.location.href = url.toString();
+        }
+    });
+</script>
+@endpush

@@ -14,12 +14,7 @@ class GraphsPageController extends Controller
 {
     public function __invoke(Request $request): View
     {
-        // Pull in only the legacy graph helpers this page needs (mirrors LibreNMS\Util\Graph).
-        // Authentication is handled by the route's auth middleware, so init.php is not required.
-        include_once base_path('includes/dbFacile.php');
-        include_once base_path('includes/common.php');
-        include_once base_path('includes/html/functions.inc.php');
-        include_once base_path('includes/rewrites.php');
+        $this->loadLegacyGraphHelpers();
 
         $vars = $request->except(['page', 'username', 'password']);
 
@@ -31,13 +26,7 @@ class GraphsPageController extends Controller
             }
         }
 
-        if (session('widescreen')) {
-            $graphWidth = 1700;
-            $thumbWidth = 180;
-        } else {
-            $graphWidth = 1075;
-            $thumbWidth = 113;
-        }
+        ['width' => $graphWidth, 'height' => $graphHeight, 'thumbWidth' => $thumbWidth] = $this->graphDimensions();
 
         $vars['from'] = Time::parseAt($vars['from'] ?? '') ?: LibrenmsConfig::get('time.day');
         $vars['to'] = Time::parseAt($vars['to'] ?? '') ?: LibrenmsConfig::get('time.now');
@@ -66,19 +55,6 @@ class GraphsPageController extends Controller
         $graphSubtypes = in_array($type, ['sensor', 'wireless'])
             ? []
             : get_graph_subtypes($type);
-
-        if ($screenWidth = \Session::get('screen_width')) {
-            $graphWidth = $screenWidth > 800
-                ? (int) ($screenWidth - ($screenWidth / 10))
-                : (int) ($screenWidth - ($screenWidth / 4));
-        }
-
-        $graphHeight = LibrenmsConfig::get('webui.min_graph_height');
-        if ($screenHeight = \Session::get('screen_height')) {
-            $graphHeight = $screenHeight > 960
-                ? (int) ($screenHeight - ($screenHeight / 2))
-                : (int) max($graphHeight, $screenHeight - ($screenHeight / 1.5));
-        }
 
         $showCommand = isset($vars['showcommand']) && $vars['showcommand'] === 'yes';
 
@@ -160,7 +136,8 @@ class GraphsPageController extends Controller
             'periodThumbs' => $periodThumbs,
             'toggles' => $toggles,
             'trendHint' => $trendHint,
-            'dateSelectorHtml' => $this->renderDateSelector($mainGraphVars),
+            'graphFrom' => $request->input('from', '-1d'),
+            'graphTo' => $request->input('to'),
             'graphWidth' => $graphWidth,
             'graphJsState' => $graphJsState,
             'dynamicGraphHtml' => $dynamicGraphHtml,
@@ -219,15 +196,50 @@ class GraphsPageController extends Controller
     }
 
     /**
-     * @param  array<string, mixed>  $graphVars
+     * Pull in the legacy graph helpers this page relies on (get_graph_subtypes(),
+     * generate_graph_js_state(), generate_dynamic_graph_*(), and the per-type auth.inc.php files).
+     * Mirrors the include block in LibreNMS\Util\Graph::get() so the legacy scope stays contained
+     * here.
      */
-    private function renderDateSelector(array $graphVars): string
+    private function loadLegacyGraphHelpers(): void
     {
-        $graph_array = $graphVars;
-        ob_start();
-        include base_path('includes/html/print-date-selector.inc.php');
+        include_once base_path('includes/dbFacile.php');
+        include_once base_path('includes/common.php');
+        include_once base_path('includes/html/functions.inc.php');
+        include_once base_path('includes/rewrites.php');
+    }
 
-        return (string) ob_get_clean();
+    /**
+     * Resolve the main graph and thumbnail dimensions together. Width starts from the widescreen
+     * preference and is overridden by the client-reported screen width; height comes from config and
+     * is likewise refined by the reported screen height.
+     *
+     * @return array{width: int, height: int, thumbWidth: int}
+     */
+    private function graphDimensions(): array
+    {
+        if (session('widescreen')) {
+            $width = 1700;
+            $thumbWidth = 180;
+        } else {
+            $width = 1075;
+            $thumbWidth = 113;
+        }
+
+        if ($screenWidth = \Session::get('screen_width')) {
+            $width = $screenWidth > 800
+                ? (int) ($screenWidth - ($screenWidth / 10))
+                : (int) ($screenWidth - ($screenWidth / 4));
+        }
+
+        $height = LibrenmsConfig::get('webui.min_graph_height');
+        if ($screenHeight = \Session::get('screen_height')) {
+            $height = $screenHeight > 960
+                ? (int) ($screenHeight - ($screenHeight / 2))
+                : (int) max($height, $screenHeight - ($screenHeight / 1.5));
+        }
+
+        return ['width' => $width, 'height' => $height, 'thumbWidth' => $thumbWidth];
     }
 
     /**
