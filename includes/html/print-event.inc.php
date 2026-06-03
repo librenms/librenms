@@ -30,7 +30,7 @@ echo '<tr>';
 echo '<td>' . $icon . '</td>';
 echo '<td style="vertical-align: middle;">' . $entry['datetime'] . '</td>';
 
-if ($device?->exists) {
+if ($device->exists) {
     echo '<td style="vertical-align: middle;">' . Url::deviceLink($device, $device->shortDisplayName()) . '</td>';
 }
 
