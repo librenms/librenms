@@ -97,7 +97,7 @@ trait MetricsHelpers
      * Given a collection of device ids, return a keyed map of Device models by device_id.
      * If null is given, returns an empty collection.
      *
-     * @param  Collection<int, int|string>|null  $deviceIds
+     * @param  Collection<int, mixed>|null  $deviceIds
      * @return Collection<int, Device>
      */
     private function gatherDevicesForIds(?Collection $deviceIds): Collection
