@@ -88,15 +88,17 @@ class GraphsPageController extends Controller
             array_filter(array_merge($vars, $changes), fn ($v) => $v !== null)
         );
 
-        // Subtype navigation links for <x-option-bar>.
+        // Subtype navigation options for <x-select>; each value is the destination URL.
         $subtypeOptions = [];
+        $subtypeSelected = null;
         if (count($graphSubtypes) > 1) {
             foreach ($graphSubtypes as $availType) {
-                $subtypeOptions[$availType] = [
-                    'link' => $graphUrl(['type' => $type . '_' . $availType]),
+                $subtypeOptions[] = [
+                    'value' => $graphUrl(['type' => $type . '_' . $availType]),
                     'text' => StringHelpers::niceCase($availType),
                 ];
             }
+            $subtypeSelected = $graphUrl(['type' => $type . '_' . $subtype]);
         }
 
         // Thumbnail period row.
@@ -153,8 +155,8 @@ class GraphsPageController extends Controller
             'port' => $port,
             'subtitle' => $subtitle,
             'pageTitle' => $pageTitle,
-            'subtype' => $subtype,
             'subtypeOptions' => $subtypeOptions,
+            'subtypeSelected' => $subtypeSelected,
             'periodThumbs' => $periodThumbs,
             'toggles' => $toggles,
             'trendHint' => $trendHint,

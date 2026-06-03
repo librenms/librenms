@@ -9,21 +9,18 @@
 
 <div class="panel panel-default">
     <div class="panel-heading">
-        <div class="row" style="padding: 0px 10px 0px 10px;">
-            <div class="pull-left">
-                @if ($port)
-                    <x-device-link :device="$device"></x-device-link> :: {{ __('Port') }} <x-port-link :port="$port"></x-port-link>
-                @elseif ($device)
-                    <x-device-link :device="$device"></x-device-link>
-                @endif
-                {{ $subtitle }}
+        @if (count($subtypeOptions) > 1)
+            <div class="pull-right">
+                <x-select name="graph_subtype" :options="$subtypeOptions" :selected="$subtypeSelected"
+                          x-data @change="window.location = $event.target.value"></x-select>
             </div>
-            @if (count($subtypeOptions) > 1)
-                <div class="pull-right">
-                    <x-option-bar border="none" :options="$subtypeOptions" :selected="$subtype"></x-option-bar>
-                </div>
-            @endif
-        </div>
+        @endif
+        @if ($port)
+            <x-device-link :device="$device"></x-device-link> :: {{ __('Port') }} <x-port-link :port="$port"></x-port-link>
+        @elseif ($device)
+            <x-device-link :device="$device"></x-device-link>
+        @endif
+        {{ $subtitle }}
     </div>
 </div>
 
