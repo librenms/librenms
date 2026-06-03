@@ -29,10 +29,12 @@ $out_thing = '';
 $in_thingX = '';
 $out_thingX = '';
 $plus = '';
+$plusX = '';
 $pluses = '';
 $plusesX = '';
 $rrddescr_len = 14; // length of the padded rrd_descr in legend
 $seperator = '';
+$seperatorX = '';
 $descr = '';
 $descr_out = '';
 
@@ -194,7 +196,7 @@ foreach ($rrd_list ?? [] as $rrd) {
     $iter++;
 }
 
-if ($previous) {
+if ($previous && ! $nototal && ! empty($rrd_list)) {
     $rrd_options[] = 'CDEF:inBX=' . $in_thingX . $plusesX;
     $rrd_options[] = 'CDEF:outBX=' . $out_thingX . $plusesX;
     $rrd_options[] = 'CDEF:octetsX=inBX,outBX,+';
@@ -216,7 +218,7 @@ if ($previous) {
     $rrd_options[] = 'VDEF:totX=octetsX,TOTAL';
 }
 
-if ($previous) {
+if ($previous && ! $nototal && ! empty($rrd_list)) {
     $rrd_options[] = 'AREA:in' . $format . 'X#99999999' . $stacked['transparency'] . ':';
     $rrd_optionsb[] = 'AREA:dout' . $format . 'X#99999999' . $transparency . ':';
     $rrd_options[] = 'LINE1.25:in' . $format . 'X#666666:';
