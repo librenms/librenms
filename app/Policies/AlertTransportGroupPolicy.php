@@ -2,10 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\AlertTransport;
 use App\Models\AlertTransportGroup;
 use App\Models\User;
-use Illuminate\Support\Collection;
 
 class AlertTransportGroupPolicy
 {
