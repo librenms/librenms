@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class Route extends PortRelatedModel implements Keyable
 {
+    use HasFactory;
     protected $table = 'route';
     protected $primaryKey = 'route_id';
     protected $fillable = [
