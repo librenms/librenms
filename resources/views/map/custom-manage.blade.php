@@ -109,6 +109,9 @@
             }
             pendingMapToDelete = null;
             $('#mapDeleteModal').modal('hide');
+        }).fail((jqXHR) => {
+            var msg = (jqXHR.responseJSON && jqXHR.responseJSON.message) ? jqXHR.responseJSON.message : 'Delete failed';
+            toastr.error(msg);
         });
     }
 </script>

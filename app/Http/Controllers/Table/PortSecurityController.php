@@ -23,149 +23,125 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Http\Controllers\PortSecurityController as PortSecurityPageController;
+use App\Models\Port;
 use App\Models\PortSecurity;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Blade;
-use LibreNMS\Enum\PortSecurityStatus;
 
 /**
  * @extends TableController<PortSecurity>
  */
 class PortSecurityController extends TableController
 {
+    protected ?string $model = PortSecurity::class;
+
     protected function rules(): array
     {
         return [
-            'port_id' => 'nullable|integer',
             'device_id' => 'nullable|integer',
-            'searchby' => 'nullable|in:device,port,status,enable,max_secure,current_secure,violation_action,violation_count,secure_last_mac,sticky_enable',
+            'page' => 'nullable|integer',
+            'perPage' => ['nullable', 'regex:/^(\d+|all)$/'],
+            'export' => 'nullable|in:page,all',
+            ...PortSecurity::filterValidationRules(),
         ];
     }
 
     protected function filterFields(Request $request): array
     {
-        return [
-            'port_security.device_id' => 'device_id',
-            'port_security.port_id' => 'port_id',
-        ];
+        return [];
     }
 
     /**
-     * Defines the base query for this resource
+     * @return Builder<PortSecurity>
      */
     protected function baseQuery(Request $request): Builder
     {
-        return PortSecurity::hasAccess($request->user())
-            ->with(['device', 'port'])
-            ->select('port_security.*');
-    }
+        $this->authorize('viewAny', Port::class);
 
-    protected function search(?string $search, Builder $query, array $fields): Builder
-    {
-        if ($search = trim(\Request::input('searchPhrase') ?? '')) {
-            return match (\Request::input('searchby') ?? '') {
-                'device' => $query->whereHas('device', function ($q) use ($search): void {
-                    $q->where('hostname', 'like', "%$search%");
-                }),
-                'port' => $query->whereHas('port', function ($q) use ($search): void {
-                    $q->where('ifDescr', 'like', "%$search%")
-                      ->orWhere('ifAlias', 'like', "%$search%");
-                }),
-                'status' => $query->where('status', 'like', "%$search%"),
-                'enable' => $query->where('port_security_enable', 'like', "%$search%"),
-                'max_secure' => $query->where('max_addresses', $search),
-                'current_secure' => $query->where('address_count', $search),
-                'violation_action' => $query->where('violation_action', 'like', "%$search%"),
-                'violation_count' => $query->where('violation_count', $search),
-                'secure_last_mac' => $query->where('last_mac_address', 'like', "%$search%"),
-                'sticky_enable' => $query->where('sticky_enable', 'like', "%$search%"),
-                default => $query->where(function ($query) use ($search): void {
-                    $query->whereHas('device', function ($q) use ($search): void {
-                        $q->where('hostname', 'like', "%$search%");
-                    })
-                    ->orWhereHas('port', function ($q) use ($search): void {
-                        $q->where('ifDescr', 'like', "%$search%")
-                          ->orWhere('ifAlias', 'like', "%$search%");
-                    })
-                    ->orWhere('status', 'like', "%$search%")
-                    ->orWhere('port_security_enable', 'like', "%$search%")
-                    ->orWhere('violation_action', 'like', "%$search%")
-                    ->orWhere('last_mac_address', 'like', "%$search%");
-                }),
-            };
-        }
-
-        return $query;
+        return PortSecurityPageController::getFilteredQuery(
+            $request,
+            $request->integer('device_id') ?: null
+        );
     }
 
     /**
-     * @param  Request  $request
-     * @param  Builder  $query
-     * @return Builder
+     * @return Builder<PortSecurity>
      */
-    public function sort(Request $request, Builder $query): Builder
+    protected function prepareExportQuery(Request $request): Builder
     {
-        $sort = $request->input('sort');
+        $query = $this->baseQuery($request);
 
-        if (isset($sort['device'])) {
-            $query->leftJoin('devices', 'port_security.device_id', 'devices.device_id')
-                ->orderBy('hostname', $sort['device'] == 'desc' ? 'desc' : 'asc');
+        if ($request->input('export') !== 'page') {
+            return $query;
         }
 
-        if (isset($sort['interface'])) {
-            $query->leftJoin('ports', 'port_security.port_id', 'ports.port_id')
-                ->orderBy('ports.ifDescr', $sort['interface'] == 'desc' ? 'desc' : 'asc');
+        $page = max(1, (int) $request->input('page', $request->input('current', 1)));
+        $perPage = $request->input('perPage', 50);
+
+        if ($perPage === 'all') {
+            return $query;
         }
 
-        if (isset($sort['status'])) {
-            $query->orderBy('status', $sort['status'] == 'desc' ? 'desc' : 'asc');
-        }
+        $limit = max(1, (int) $perPage);
 
-        if (isset($sort['enable'])) {
-            $query->orderBy('port_security_enable', $sort['enable'] == 'desc' ? 'desc' : 'asc');
-        }
-
-        if (isset($sort['max_secure'])) {
-            $query->orderBy('max_addresses', $sort['max_secure'] == 'desc' ? 'desc' : 'asc');
-        }
-
-        if (isset($sort['current_secure'])) {
-            $query->orderBy('address_count', $sort['current_secure'] == 'desc' ? 'desc' : 'asc');
-        }
-
-        if (isset($sort['violation_action'])) {
-            $query->orderBy('violation_action', $sort['violation_action'] == 'desc' ? 'desc' : 'asc');
-        }
-
-        if (isset($sort['violation_count'])) {
-            $query->orderBy('violation_count', $sort['violation_count'] == 'desc' ? 'desc' : 'asc');
-        }
-
-        return $query;
+        return $query->skip(($page - 1) * $limit)->take($limit);
     }
 
     /**
-     * @param  PortSecurity  $model
-     * @return array<string, scalar>
+     * @return list<string>
      */
-    public function formatItem(Model $model): array
+    protected function getExportHeaders(): array
     {
-        $statusIcon = PortSecurityStatus::getIconClass($model->status);
+        $headers = [];
 
-        return [
-            'device' => Blade::render('<x-device-link :device="$device"/>', ['device' => $model->device]),
-            'interface' => $model->port ? Blade::render('<x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link>', ['port' => $model->port]) : 'N/A',
-            'port_description' => $model->port->ifAlias ?? 'N/A',
-            'status' => '<i class="fa ' . $statusIcon . '" aria-hidden="true" title="' . $model->status . '"></i> ' . $model->status,
-            'enable' => $model->port_security_enable ?? 'N/A',
-            'max_secure' => $model->max_addresses ?? 'N/A',
-            'current_secure' => $model->address_count ?? 'N/A',
-            'violation_action' => $model->violation_action ?? 'N/A',
-            'violation_count' => $model->violation_count ?? 'N/A',
-            'secure_last_mac' => $model->last_mac_address ?? 'N/A',
-            'sticky_enable' => $model->sticky_enable ?? 'N/A',
-        ];
+        if (! request()->integer('device_id')) {
+            $headers[] = 'device_id';
+            $headers[] = 'hostname';
+        }
+
+        return array_merge($headers, [
+            'port',
+            'ifName',
+            'ifDescr',
+            'ifAlias',
+            'enabled',
+            'status',
+            'current_macs',
+            'max_macs',
+            'violation_action',
+            'violations',
+            'last_mac',
+            'sticky',
+        ]);
+    }
+
+    /**
+     * @param  PortSecurity  $item
+     * @return list<scalar>
+     */
+    protected function formatExportRow(Model $item): array
+    {
+        return array_merge(
+            request()->integer('device_id') ? [] : [
+                $item->device_id,
+                $item->device?->displayName() ?? '',
+            ],
+            [
+                $item->port?->getShortLabel() ?? '',
+                $item->port->ifName ?? '',
+                $item->port->ifDescr ?? '',
+                $item->port->ifAlias ?? '',
+                $item->port_security_enable === null ? '' : ($item->port_security_enable ? 'true' : 'false'),
+                $item->status ?? '',
+                $item->address_count ?? '',
+                $item->max_addresses ?? '',
+                $item->violation_action ?? '',
+                $item->violation_count ?? '',
+                $item->last_mac_address ?? '',
+                $item->sticky_enable === null ? '' : ($item->sticky_enable ? 'true' : 'false'),
+            ],
+        );
     }
 }

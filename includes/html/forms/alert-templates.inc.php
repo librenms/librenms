@@ -29,7 +29,7 @@ use LibreNMS\Alert\AlertData;
 
 $status = 'error';
 
-if (Gate::none(['create', 'update'], AlertTemplate::class)) {
+if (Gate::none(['alert-template.create', 'alert-template.update'])) {
     header('Content-Type: application/json');
     $response = ['status' => $status, 'message' => 'You need permission'];
     exit(json_encode($response));
@@ -68,10 +68,15 @@ try {
     if (! empty($name)) {
         if ($vars['template'] && is_numeric($vars['template_id'])) {
             // Update template
-            Gate::authorize('update', AlertTemplate::class);
+            $template = AlertTemplate::findOrFail($vars['template_id']);
+            Gate::authorize('update', $template);
+            $template->template = $vars['template'];
+            $template->name = $name;
+            $template->title = $vars['title'];
+            $template->title_rec = $vars['title_rec'];
             $create = false;
-            $template_id = $vars['template_id'];
-            if (AlertTemplate::where('id', $template_id)->update(['template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']]) >= 0) {
+            $template_id = $template->id;
+            if ($template->save()) {
                 $status = 'ok';
             } else {
                 $message = 'Failed to update the template';

@@ -55,7 +55,7 @@ class PollerController extends Controller
 
     public function settingsTab()
     {
-        $this->authorize('update', PollerCluster::class);
+        $this->authorize('poller.update');
         $pollerClusters = PollerCluster::all()->keyBy('id');
 
         return view('poller.settings', [

@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\EntPhysical;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class InventoryController extends Controller
 {
     public function __invoke(Request $request): View
     {
+        $this->authorize('viewAny', EntPhysical::class);
+
         $this->validate($request, [
             'device' => 'nullable|int',
             'descr' => 'nullable|string',
@@ -37,12 +40,14 @@ class InventoryController extends Controller
                 'serial' => $request->input('serial'),
             ],
             'model_filter' => $model_filter,
-            'show_purge' => EntPhysical::whereDoesntHave('device')->exists(),
+            'show_purge' => Gate::allows('purge', EntPhysical::class) && EntPhysical::whereDoesntHave('device')->exists(),
         ]);
     }
 
     public function purge()
     {
+        $this->authorize('purge', EntPhysical::class);
+
         EntPhysical::whereDoesntHave('device')->delete();
 
         return redirect()->back();

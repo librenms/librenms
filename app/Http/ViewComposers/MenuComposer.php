@@ -29,18 +29,25 @@ namespace App\Http\ViewComposers;
 use App\Facades\LibrenmsConfig;
 use App\Models\AlertRule;
 use App\Models\BgpPeer;
+use App\Models\Bill;
 use App\Models\CustomMap;
 use App\Models\Dashboard;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Link;
 use App\Models\Location;
+use App\Models\Mempool;
 use App\Models\Notification;
 use App\Models\Package;
+use App\Models\Port;
 use App\Models\PortGroup;
 use App\Models\PortsNac;
+use App\Models\Processor;
+use App\Models\Sensor;
+use App\Models\Storage;
 use App\Models\User;
 use App\Models\UserPref;
+use App\Models\Vlan;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
 use Illuminate\Support\Arr;
@@ -79,7 +86,7 @@ class MenuComposer
         $vars['project_name'] = LibrenmsConfig::get('project_name', 'LibreNMS');
 
         //Dashboards
-        $vars['dashboards'] = Dashboard::select('dashboard_id', 'dashboard_name')->allAvailable($user)->orderBy('dashboard_name')->get();
+        $vars['dashboards'] = Dashboard::select('dashboard_id', 'dashboard_name')->hasAccess($user)->orderBy('dashboard_name')->get();
 
         // Device menu
         $vars['device_groups'] = DeviceGroup::hasAccess($user)->orderBy('name')->get(['device_groups.id', 'name', 'desc']);
@@ -102,7 +109,7 @@ class MenuComposer
         $vars['show_vmwinfo'] = $user->can('viewAny', \App\Models\Vminfo::class) && Vminfo::hasAccess($user)->exists();
         $vars['show_device_extra_divider'] = $vars['show_vmwinfo']
             || $user->can('viewAny', \App\Models\DeviceGroup::class)
-            || $user->can('update', \App\Models\Device::class);
+            || $user->can('device.update');
 
         //Maps
         $vars['links'] = Link::exists();
@@ -124,6 +131,9 @@ class MenuComposer
         }
 
         // Port menu
+        $vars['show_ports_menu'] = Gate::allows('viewAny', Port::class)
+            || Gate::allows('viewAny', Vlan::class)
+            || Gate::allows('viewAny', Bill::class);
         $vars['port_counts'] = ObjectCache::portCounts(['errored', 'ignored', 'deleted', 'shutdown', 'down']);
         $vars['port_counts']['pseudowire'] = LibrenmsConfig::get('enable_pseudowires') ? ObjectCache::portCounts(['pseudowire'])['pseudowire'] : 0;
 
@@ -152,6 +162,10 @@ class MenuComposer
         $vars['port_nac'] = PortsNac::hasAccess($user)->exists();
 
         // Sensor menu
+        $vars['show_health_menu'] = Gate::allows('viewAny', Sensor::class)
+        || Gate::allows('viewAny', Mempool::class)
+        || Gate::allows('viewAny', Processor::class)
+        || Gate::allows('viewAny', Storage::class);
         $vars['sensor_menu'] = ObjectCache::sensors();
 
         // Wireless menu

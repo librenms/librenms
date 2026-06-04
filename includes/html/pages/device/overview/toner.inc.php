@@ -11,7 +11,7 @@ foreach ($supplies as $type => $supply) {
         echo '
           <div class="row">
           <div class="col-md-12">
-            <div class="panel panel-default panel-condensed">
+            <div class="panel panel-default panel-condensed overview-panel">
               <div class="panel-heading">';
         echo '<a href="device/device=' . $device['device_id'] . '/tab=printer/">';
         $title = StringHelpers::camelToTitle($type == 'opc' ? 'organicPhotoConductor' : $type);

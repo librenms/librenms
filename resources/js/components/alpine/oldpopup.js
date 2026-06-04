@@ -4,7 +4,8 @@ export default function popup(url = "", options = {}) {
         showTimeout: null,
         hideTimeout: null,
         ignoreNextShownEvent: false,
-        delay: 300,
+        showDelay: options.showDelay || 100,
+        hideDelay: options.hideDelay || 300,
         show(timeout) {
             clearTimeout(this.hideTimeout);
             this.showTimeout = setTimeout(() => {

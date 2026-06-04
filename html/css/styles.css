@@ -1314,6 +1314,7 @@ nav.navbar-sticky-top {
   border-top-width: 0;
   border-right-width: 0;
   border-radius: 0;
+  margin-bottom: 10px !important;
 }
 
 .navbar-brand {
@@ -2590,3 +2591,7 @@ label {
 }
 
 [x-cloak] {display: none !important;}
+
+.modal-content {
+  margin-top: 60px;
+}

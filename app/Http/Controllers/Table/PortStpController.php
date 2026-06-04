@@ -27,6 +27,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Facades\DeviceCache;
+use App\Models\Port;
 use App\Models\PortStp;
 use App\Models\Stp;
 use Illuminate\Database\Eloquent\Builder;
@@ -80,7 +81,10 @@ class PortStpController extends TableController
 
     protected function baseQuery(Request $request): Builder
     {
-        return PortStp::query()->with('port');
+        $this->authorize('viewAny', Port::class);
+
+        return PortStp::hasAccess($request->user())
+            ->with('port');
     }
 
     /**

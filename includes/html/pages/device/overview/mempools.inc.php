@@ -15,7 +15,7 @@ if ($mempools->isNotEmpty()) {
     echo '
         <div class="row">
         <div class="col-md-12">
-        <div class="panel panel-default panel-condensed">
+        <div class="panel panel-default panel-condensed overview-panel">
         <div class="panel-heading">
         ';
     echo '<a href="' . $mempools_url . '">';
@@ -34,7 +34,7 @@ if ($mempools->isNotEmpty()) {
         'legend' => 'no',
         'popup_title' => DeviceCache::getPrimary()->hostname . ' - Memory Usage',
     ]);
-    echo \LibreNMS\Util\Url::graphPopup($graph, \LibreNMS\Util\Url::lazyGraphTag($graph), $mempools_url);
+    echo \LibreNMS\Util\Url::graphPopup($graph, \LibreNMS\Util\Url::lazyGraphTag($graph, 'tw:w-full tw:h-auto'), $mempools_url);
     echo '  </td>
             </tr>';
 

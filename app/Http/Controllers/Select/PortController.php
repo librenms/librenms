@@ -60,6 +60,8 @@ class PortController extends SelectController
      */
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Port::class);
+
         $query = Port::hasAccess($request->user())
             ->isNotDeleted()
             ->has('device')
