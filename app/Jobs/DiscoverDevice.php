@@ -71,12 +71,12 @@ class DiscoverDevice implements ShouldQueue
         $this->device->last_discovered_timetaken = $measurement->getDuration();
         $this->device->save();
 
-            app('Datastore')->put($this->deviceArray, 'last-discovered-perf', [
-                'rrd_def' => RrdDefinition::make()->addDataset('discover', 'GAUGE', 0),
-                'module' => 'ALL',
-            ], [
-                'discover' => $this->device->last_discovered_timetaken,
-            ]);
+        app('Datastore')->put($this->deviceArray, 'last-discovered-perf', [
+            'rrd_def' => RrdDefinition::make()->addDataset('discover', 'GAUGE', 0),
+            'module' => 'ALL',
+        ], [
+            'discover' => $this->device->last_discovered_timetaken,
+        ]);
 
         DeviceDiscovered::dispatch($this->device);
     }

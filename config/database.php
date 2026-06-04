@@ -183,7 +183,6 @@ return [
             ],
         ],
 
-
         'sentinel_metrics' => [
             ...explode(',', (string) env('REDIS_SENTINEL_HOSTS', '')),
             'options' => [
