@@ -196,6 +196,7 @@ class Wireless implements Module
         ];
 
         $tags = [
+            'sensor_id' => $sensor->sensor_id,
             'sensor_class' => $sensor->sensor_class->value,
             'sensor_type' => $sensor->sensor_type,
             'sensor_descr' => $sensor->sensor_descr,

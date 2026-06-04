@@ -104,6 +104,14 @@ class Ciscowlc extends Cisco implements
                     continue;
                 }
 
+                /** @var AccessPoint $db_ap */
+                if ($db_ap = $db_aps->get($ap->getCompositeKey())) {
+                    $ap = $db_ap->fill($ap->getAttributes());
+                }
+
+                $ap->save(); // persist ap
+                $valid_ap_ids[] = $ap->accesspoint_id;
+
                 $rrd_def = RrdDefinition::make()
                     ->addDataset('channel', 'GAUGE', 0, 200)
                     ->addDataset('txpow', 'GAUGE', 0, 200)
@@ -114,6 +122,7 @@ class Ciscowlc extends Cisco implements
                     ->addDataset('interference', 'GAUGE', 0, 2000);
 
                 $datastore->put($device, 'arubaap', [
+                    'accesspoint_id' => $ap->accesspoint_id,
                     'name' => $ap->name,
                     'radionum' => $ap->radio_number,
                     'rrd_name' => ['arubaap', $ap->name . $ap->radio_number],
@@ -127,14 +136,6 @@ class Ciscowlc extends Cisco implements
                     'numasoclients',
                     'interference',
                 ]));
-
-                /** @var AccessPoint $db_ap */
-                if ($db_ap = $db_aps->get($ap->getCompositeKey())) {
-                    $ap = $db_ap->fill($ap->getAttributes());
-                }
-
-                $ap->save(); // persist ap
-                $valid_ap_ids[] = $ap->accesspoint_id;
             }
         }
 

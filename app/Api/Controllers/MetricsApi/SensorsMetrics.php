@@ -26,7 +26,7 @@ class SensorsMetrics
         $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         // Append global metrics
-        $this->appendMetricBlock($lines, 'librenms_sensors_total', 'Total number of sensors', 'gauge', [$total]);
+        $this->appendMetricBlock($lines, 'librenms_sensors_total', 'Total number of sensors', 'gauge', ["librenms_sensors_total {$total}"]);
 
         // Default to global metrics only; detailed per-access-point metrics are opt-in via ?scope=detail
         if (! $includeDetail) {
@@ -41,14 +41,60 @@ class SensorsMetrics
         $counter_limit_warn_lines = [];
         $counter_limit_crit_lines = [];
 
-        $deviceIdsQuery = Sensor::select('device_id')->distinct();
-        $deviceIdsQuery = $this->applyDeviceFilter($deviceIdsQuery, $filters['device_ids']);
-        $deviceIds = $deviceIdsQuery->pluck('device_id');
+        // Gather per-sensor values from Redis poller snapshots
+        $payloads = $this->readRedisPollerPayloads($filters['device_ids']);
+        $snapshot = [];
+        foreach ($payloads as $payload) {
+            if (($payload['measurement'] ?? null) !== 'sensor') {
+                continue;
+            }
+
+            $deviceId = isset($payload['device_id']) ? (int) $payload['device_id'] : 0;
+            if ($deviceId <= 0) {
+                continue;
+            }
+
+            $timestamp = isset($payload['timestamp']) ? (int) $payload['timestamp'] : 0;
+            $tags = is_array($payload['tags'] ?? null) ? $payload['tags'] : [];
+            $fields = is_array($payload['fields'] ?? null) ? $payload['fields'] : [];
+            $value = $fields['sensor'] ?? null;
+            if (! is_numeric($value)) {
+                continue;
+            }
+
+            $sensorId = isset($tags['sensor_id']) ? (int) $tags['sensor_id'] : 0;
+            $key = $sensorId > 0
+                ? $deviceId . ':' . $sensorId
+                : $deviceId . ':' . ($tags['sensor_class'] ?? '') . ':' . ($tags['sensor_type'] ?? '') . ':' . ($tags['sensor_index'] ?? '');
+
+            if (! isset($snapshot[$key]) || $timestamp >= $snapshot[$key]['timestamp']) {
+                $snapshot[$key] = [
+                    'timestamp' => $timestamp,
+                    'value' => (float) $value,
+                ];
+            }
+        }
+
+        if (empty($snapshot)) {
+            return implode("\n", $lines) . "\n";
+        }
+
+        $deviceIds = collect(array_values(array_unique(array_map(fn (string $key) => (int) explode(':', $key)[0], array_keys($snapshot)))));
         $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
-        $sensorQuery = Sensor::select('sensor_id', 'device_id', 'sensor_class', 'sensor_type', 'sensor_descr', 'sensor_current', 'sensor_divisor', 'sensor_multiplier', 'sensor_limit_warn', 'sensor_limit', 'group', 'rrd_type');
+        $sensorQuery = Sensor::select('sensor_id', 'device_id', 'sensor_class', 'sensor_type', 'sensor_descr', 'sensor_index', 'sensor_limit_warn', 'sensor_limit', 'group', 'rrd_type');
         $sensorQuery = $this->applyDeviceFilter($sensorQuery, $filters['device_ids']);
         foreach ($sensorQuery->cursor() as $s) {
+            $snapshotKey = $s->device_id . ':' . $s->sensor_id;
+            if (! isset($snapshot[$snapshotKey])) {
+                $snapshotKey = $s->device_id . ':' . $s->sensor_class . ':' . $s->sensor_type . ':' . $s->sensor_index;
+            }
+            if (! isset($snapshot[$snapshotKey])) {
+                continue;
+            }
+
+            $value = (float) $snapshot[$snapshotKey]['value'];
+
             $dev = $devices->get($s->device_id);
             $device_hostname = $dev ? $this->escapeLabel((string) $dev->hostname) : '';
             $device_sysName = $dev ? $this->escapeLabel((string) $dev->sysName) : '';
@@ -64,19 +110,14 @@ class SensorsMetrics
                 $this->escapeLabel((string) $s->group)
             );
 
-            // Apply multiplier/divisor
-            $mult = (int) ($s->sensor_multiplier ?: 1);
-            $div = (int) ($s->sensor_divisor ?: 1);
-            $value = $s->sensor_current !== null ? ((float) $s->sensor_current * $mult / max(1, $div)) : null;
-
             $rrd = strtoupper((string) ($s->rrd_type ?? 'GAUGE'));
             if ($rrd === 'GAUGE') {
-                $gauge_value_lines[] = "librenms_sensors_value{{$labels}} " . ($value ?? 0);
+                $gauge_value_lines[] = "librenms_sensors_value{{$labels}} {$value}";
                 $gauge_limit_warn_lines[] = "librenms_sensors_limit_warn{{$labels}} " . ((float) ($s->sensor_limit_warn ?? 0));
                 $gauge_limit_crit_lines[] = "librenms_sensors_limit_crit{{$labels}} " . ((float) ($s->sensor_limit ?? 0));
             } else {
                 // export counter-like sensors with a different metric name to avoid TYPE conflicts
-                $counter_value_lines[] = "librenms_sensors_value_counter{{$labels}} " . ($value ?? 0);
+                $counter_value_lines[] = "librenms_sensors_value_counter{{$labels}} {$value}";
                 $counter_limit_warn_lines[] = "librenms_sensors_limit_warn_counter{{$labels}} " . ((float) ($s->sensor_limit_warn ?? 0));
                 $counter_limit_crit_lines[] = "librenms_sensors_limit_crit_counter{{$labels}} " . ((float) ($s->sensor_limit ?? 0));
             }

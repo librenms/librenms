@@ -26,7 +26,7 @@ class AccessPointsMetrics
         $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         // Append global metrics
-        $this->appendMetricBlock($lines, 'librenms_access_points_total', 'Total number of access points', 'gauge', "librenms_access_points_total {$total}");
+        $this->appendMetricBlock($lines, 'librenms_access_points_total', 'Total number of access points', 'gauge', ["librenms_access_points_total {$total}"]);
 
         // Default to global metrics only; detailed per-access-point metrics are opt-in via ?scope=detail
         if (! $includeDetail) {
@@ -44,15 +44,71 @@ class AccessPointsMetrics
         $nummonbssid_lines = [];
         $interference_lines = [];
 
-        // Gather device info mapping for labels
-        $deviceIdsQuery = AccessPoint::select('device_id')->distinct();
-        $deviceIdsQuery = $this->applyDeviceFilter($deviceIdsQuery, $filters['device_ids']);
-        $deviceIds = $deviceIdsQuery->pluck('device_id');
-        $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
-
+        // Preload AP + device metadata once, then join with Redis snapshots in memory.
         $apQuery = AccessPoint::select('accesspoint_id', 'device_id', 'name', 'radio_number', 'type', 'mac_addr', 'deleted', 'channel', 'txpow', 'radioutil', 'numasoclients', 'nummonclients', 'numactbssid', 'nummonbssid', 'interference');
         $apQuery = $this->applyDeviceFilter($apQuery, $filters['device_ids']);
-        foreach ($apQuery->cursor() as $ap) {
+        $aps = $apQuery->get();
+
+        $devices = Device::select('device_id', 'hostname', 'sysName', 'type')
+            ->whereIn('device_id', $aps->pluck('device_id')->unique()->values())
+            ->get()
+            ->keyBy('device_id');
+
+        // AP metrics are currently written with vendor/legacy measurement names.
+        $payloads = $this->readRedisPollerPayloads($filters['device_ids']);
+        $snapshot = [];
+        foreach ($payloads as $payload) {
+            $measurement = $payload['measurement'] ?? null;
+            if (! in_array($measurement, ['accesspoint', 'arubaap', 'aruba'], true)) {
+                continue;
+            }
+
+            $deviceId = isset($payload['device_id']) ? (int) $payload['device_id'] : 0;
+            if ($deviceId <= 0) {
+                continue;
+            }
+
+            $timestamp = isset($payload['timestamp']) ? (int) $payload['timestamp'] : 0;
+            $tags = is_array($payload['tags'] ?? null) ? $payload['tags'] : [];
+            $fields = is_array($payload['fields'] ?? null) ? $payload['fields'] : [];
+            if (empty($fields)) {
+                continue;
+            }
+
+            $accessPointId = isset($tags['accesspoint_id']) ? (int) $tags['accesspoint_id'] : 0;
+            if ($accessPointId > 0) {
+                $snapshotKey = 'id:' . $accessPointId;
+            } else {
+                $name = (string) ($tags['name'] ?? '');
+                $radioNumber = (string) ($tags['radionum'] ?? ($tags['radio_number'] ?? ''));
+                if ($name === '' || $radioNumber === '') {
+                    continue;
+                }
+
+                $snapshotKey = 'key:' . $deviceId . ':' . $name . ':' . $radioNumber;
+            }
+
+            if (! isset($snapshot[$snapshotKey]) || $timestamp >= $snapshot[$snapshotKey]['timestamp']) {
+                $snapshot[$snapshotKey] = [
+                    'timestamp' => $timestamp,
+                    'fields' => $fields,
+                ];
+            }
+        }
+
+        foreach ($aps as $ap) {
+            $snapshotByIdKey = 'id:' . $ap->accesspoint_id;
+            $snapshotByCompositeKey = 'key:' . $ap->device_id . ':' . (string) $ap->name . ':' . (string) $ap->radio_number;
+            if (isset($snapshot[$snapshotByIdKey])) {
+                $apFields = $snapshot[$snapshotByIdKey]['fields'];
+            } elseif (isset($snapshot[$snapshotByCompositeKey])) {
+                $apFields = $snapshot[$snapshotByCompositeKey]['fields'];
+            } else {
+                continue;
+            }
+
+            $field = static fn (array $fields, string $name): int => is_numeric($fields[$name] ?? null) ? (int) $fields[$name] : 0;
+
             $dev = $devices->get($ap->device_id);
             $device_hostname = $dev ? $this->escapeLabel((string) $dev->hostname) : '';
             $device_sysName = $dev ? $this->escapeLabel((string) $dev->sysName) : '';
@@ -70,14 +126,14 @@ class AccessPointsMetrics
             );
 
             $deleted_lines[] = "librenms_access_points_deleted{{$labels}} " . ($ap->deleted ? '1' : '0');
-            $channel_lines[] = "librenms_access_points_channel{{$labels}} " . ((int) $ap->channel ?: 0);
-            $txpow_lines[] = "librenms_access_points_txpow{{$labels}} " . ((int) $ap->txpow ?: 0);
-            $radioutil_lines[] = "librenms_access_points_radioutil{{$labels}} " . ((int) $ap->radioutil ?: 0);
-            $numasoclients_lines[] = "librenms_access_points_numasoclients{{$labels}} " . ((int) $ap->numasoclients ?: 0);
-            $nummonclients_lines[] = "librenms_access_points_nummonclients{{$labels}} " . ((int) $ap->nummonclients ?: 0);
-            $numactbssid_lines[] = "librenms_access_points_numactbssid{{$labels}} " . ((int) $ap->numactbssid ?: 0);
-            $nummonbssid_lines[] = "librenms_access_points_nummonbssid{{$labels}} " . ((int) $ap->nummonbssid ?: 0);
-            $interference_lines[] = "librenms_access_points_interference{{$labels}} " . ((int) $ap->interference ?: 0);
+            $channel_lines[] = "librenms_access_points_channel{{$labels}} " . $field($apFields, 'channel');
+            $txpow_lines[] = "librenms_access_points_txpow{{$labels}} " . $field($apFields, 'txpow');
+            $radioutil_lines[] = "librenms_access_points_radioutil{{$labels}} " . $field($apFields, 'radioutil');
+            $numasoclients_lines[] = "librenms_access_points_numasoclients{{$labels}} " . $field($apFields, 'numasoclients');
+            $nummonclients_lines[] = "librenms_access_points_nummonclients{{$labels}} " . $field($apFields, 'nummonclients');
+            $numactbssid_lines[] = "librenms_access_points_numactbssid{{$labels}} " . $field($apFields, 'numactbssid');
+            $nummonbssid_lines[] = "librenms_access_points_nummonbssid{{$labels}} " . $field($apFields, 'nummonbssid');
+            $interference_lines[] = "librenms_access_points_interference{{$labels}} " . $field($apFields, 'interference');
         }
 
         // Append per-access-point metrics

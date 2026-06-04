@@ -39,8 +39,8 @@ class PollersMetrics
         // Gather global metrics
         $total = Poller::count();
         $active = Poller::isActive()->count();
-        $this->appendMetricBlock($lines, 'librenms_pollers_total', 'Total number of legacy pollers', 'gauge', [(string) $total]);
-        $this->appendMetricBlock($lines, 'librenms_pollers_active', 'Number of active legacy pollers', 'gauge', [(string) $active]);
+        $this->appendMetricBlock($lines, 'librenms_pollers_total', 'Total number of legacy pollers', 'gauge', ["librenms_pollers_total {$total}"]);
+        $this->appendMetricBlock($lines, 'librenms_pollers_active', 'Number of active legacy pollers', 'gauge', ["librenms_pollers_active {$active}"]);
 
         // Default to global metrics only; detailed per-poller metrics are opt-in via ?scope=detail
         if (! $includeDetail) {
@@ -78,8 +78,8 @@ class PollersMetrics
         $total = PollerCluster::count();
         $active = PollerCluster::isActive()->count();
 
-        $this->appendMetricBlock($lines, 'librenms_poller_cluster_total', 'Total number of poller cluster nodes', 'gauge', [(string) $total]);
-        $this->appendMetricBlock($lines, 'librenms_poller_cluster_active', 'Number of active poller cluster nodes', 'gauge', [(string) $active]);
+        $this->appendMetricBlock($lines, 'librenms_poller_cluster_total', 'Total number of poller cluster nodes', 'gauge', ["librenms_poller_cluster_total {$total}"]);
+        $this->appendMetricBlock($lines, 'librenms_poller_cluster_active', 'Number of active poller cluster nodes', 'gauge', ["librenms_poller_cluster_active {$active}"]);
 
         // Default to global metrics only; detailed per-cluster metrics are opt-in via ?scope=detail
         if (! $includeDetail) {

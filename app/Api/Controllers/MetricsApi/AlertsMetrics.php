@@ -24,14 +24,14 @@ class AlertsMetrics
 
         // Gather global metrics
         $total_rules = AlertRule::count();
-        $this->appendMetricBlock($lines, 'librenms_alerts_rules_total', 'Total number of alert rules', 'gauge', "librenms_alerts_rules_total {$total_rules}");
+        $this->appendMetricBlock($lines, 'librenms_alerts_rules_total', 'Total number of alert rules', 'gauge', ["librenms_alerts_rules_total {$total_rules}"]);
 
         $alertsQ = Alert::query();
         $alertsQ = $this->applyDeviceFilter($alertsQ, $filters['device_ids']);
         $total_alerts = $alertsQ->count();
-        $this->appendMetricBlock($lines, 'librenms_alerts_total', 'Total number of alerts rows', 'gauge', "librenms_alerts_total {$total_alerts}");
+        $this->appendMetricBlock($lines, 'librenms_alerts_total', 'Total number of alerts rows', 'gauge', ["librenms_alerts_total {$total_alerts}"]);
 
-        // Default to global metrics only; detailed per-access-point metrics are opt-in via ?scope=detail
+        // Default to global metrics only; detailed alert metrics are opt-in via ?scope=detail
         if (! $includeDetail) {
             return implode("\n", $lines) . "\n";
         }
@@ -60,12 +60,12 @@ class AlertsMetrics
         // Active alert counts
         $activeQ = Alert::where('state', 1);
         $active = $this->applyDeviceFilter($activeQ, $filters['device_ids'])->count();
-        $this->appendMetricBlock($lines, 'librenms_alerts_active', 'Number of active alerts', 'gauge', "librenms_alerts_active {$active}");
+        $this->appendMetricBlock($lines, 'librenms_alerts_active', 'Number of active alerts', 'gauge', ["librenms_alerts_active {$active}"]);
 
         // Acknowledged alert counts
         $ackQ = Alert::where('state', 2);
         $ack = $this->applyDeviceFilter($ackQ, $filters['device_ids'])->count();
-        $this->appendMetricBlock($lines, 'librenms_alerts_acknowledged', 'Number of acknowledged alerts', 'gauge', "librenms_alerts_acknowledged {$ack}");
+        $this->appendMetricBlock($lines, 'librenms_alerts_acknowledged', 'Number of acknowledged alerts', 'gauge', ["librenms_alerts_acknowledged {$ack}"]);
 
         return implode("\n", $lines) . "\n";
     }

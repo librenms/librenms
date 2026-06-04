@@ -39,15 +39,61 @@ class MempoolsMetrics
         $total_lines = [];
         $perc_lines = [];
 
-        // Gather device info mapping for labels (using helper)
-        $deviceIdsQuery = Mempool::select('device_id')->distinct();
-        $deviceIdsQuery = $this->applyDeviceFilter($deviceIdsQuery, $filters['device_ids']);
-        $deviceIds = $deviceIdsQuery->pluck('device_id');
+        // Gather per-mempool metrics from Redis poller snapshots
+        $payloads = $this->readRedisPollerPayloads($filters['device_ids']);
+        $snapshot = [];
+        foreach ($payloads as $payload) {
+            if (($payload['measurement'] ?? null) !== 'mempool') {
+                continue;
+            }
+
+            $deviceId = isset($payload['device_id']) ? (int) $payload['device_id'] : 0;
+            if ($deviceId <= 0) {
+                continue;
+            }
+
+            $timestamp = isset($payload['timestamp']) ? (int) $payload['timestamp'] : 0;
+            $tags = is_array($payload['tags'] ?? null) ? $payload['tags'] : [];
+            $fields = is_array($payload['fields'] ?? null) ? $payload['fields'] : [];
+
+            $mempoolType = (string) ($tags['mempool_type'] ?? '');
+            $mempoolClass = (string) ($tags['mempool_class'] ?? '');
+            $mempoolIndex = (string) ($tags['mempool_index'] ?? '');
+            if ($mempoolType === '' || $mempoolClass === '' || $mempoolIndex === '') {
+                continue;
+            }
+
+            $snapshotKey = $deviceId . ':' . $mempoolType . ':' . $mempoolClass . ':' . $mempoolIndex;
+            if (! isset($snapshot[$snapshotKey]) || $timestamp >= $snapshot[$snapshotKey]['timestamp']) {
+                $snapshot[$snapshotKey] = [
+                    'timestamp' => $timestamp,
+                    'fields' => $fields,
+                ];
+            }
+        }
+
+        if (empty($snapshot)) {
+            return implode("\n", $lines) . "\n";
+        }
+
+        $deviceIds = collect(array_values(array_unique(array_map(fn (string $key) => (int) explode(':', $key)[0], array_keys($snapshot)))))
+            ->map(static fn (int $id): string => (string) $id);
         $devices = $this->gatherDevicesForIds($deviceIds);
 
-        $mpQuery = Mempool::select('mempool_id', 'device_id', 'mempool_descr', 'mempool_class', 'mempool_used', 'mempool_free', 'mempool_total', 'mempool_perc');
+        $mpQuery = Mempool::select('mempool_id', 'device_id', 'mempool_descr', 'mempool_class', 'mempool_type', 'mempool_index');
         $mpQuery = $this->applyDeviceFilter($mpQuery, $filters['device_ids']);
         foreach ($mpQuery->cursor() as $m) {
+            $snapshotKey = $m->device_id . ':' . $m->mempool_type . ':' . $m->mempool_class . ':' . $m->mempool_index;
+            if (! isset($snapshot[$snapshotKey])) {
+                continue;
+            }
+
+            $fields = $snapshot[$snapshotKey]['fields'];
+            $used = (float) ($fields['used'] ?? 0);
+            $free = (float) ($fields['free'] ?? 0);
+            $total = $used + $free;
+            $percent = $total > 0 ? (($used / $total) * 100) : 0;
+
             $dev = $devices->get($m->device_id);
             $labelsArr = [
                 'mempool_id' => (string) $m->mempool_id,
@@ -60,10 +106,10 @@ class MempoolsMetrics
 
             $labels = $this->formatLabels($labelsArr);
 
-            $used_lines[] = "librenms_mempools_used_bytes{{$labels}} " . ((int) $m->mempool_used ?: 0);
-            $free_lines[] = "librenms_mempools_free_bytes{{$labels}} " . ((int) $m->mempool_free ?: 0);
-            $total_lines[] = "librenms_mempools_total_bytes{{$labels}} " . ((int) $m->mempool_total ?: 0);
-            $perc_lines[] = "librenms_mempools_used_percent{{$labels}} " . ((int) $m->mempool_perc ?: 0);
+            $used_lines[] = "librenms_mempools_used_bytes{{$labels}} {$used}";
+            $free_lines[] = "librenms_mempools_free_bytes{{$labels}} {$free}";
+            $total_lines[] = "librenms_mempools_total_bytes{{$labels}} {$total}";
+            $perc_lines[] = "librenms_mempools_used_percent{{$labels}} {$percent}";
         }
 
         // Append per-mempool metrics

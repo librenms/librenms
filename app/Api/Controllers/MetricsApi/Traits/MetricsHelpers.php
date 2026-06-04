@@ -97,7 +97,7 @@ trait MetricsHelpers
      * Given a collection of device ids, return a keyed map of Device models by device_id.
      * If null is given, returns an empty collection.
      *
-     * @param  Collection<int, int|string>|null  $deviceIds
+     * @param  Collection<int, mixed>|null  $deviceIds
      * @return Collection<int, Device>
      */
     private function gatherDevicesForIds(?Collection $deviceIds): Collection
@@ -154,5 +154,103 @@ trait MetricsHelpers
         if (! empty($metricLinesArr)) {
             $lines = array_merge($lines, $metricLinesArr);
         }
+    }
+
+    /**
+     * Read and decode poller metric payloads from Redis.
+     * Optionally filters to the provided device ids.
+     *
+     * @param  Collection<int, int|string>|null  $deviceIds
+     * @return array<int, array<string, mixed>>
+     */
+    private function readRedisPollerPayloads(?Collection $deviceIds = null): array
+    {
+        $connection = (string) config('database.redis.metrics.connection', 'metrics');
+        $defaultKey = (string) config('database.redis.metrics.poller_key', 'librenms:metrics:poller');
+        $listKeys = array_values(array_unique([
+            $defaultKey,
+            (string) config('database.redis.metrics.services_key', $defaultKey . ':services'),
+            (string) config('database.redis.metrics.discovery_key', $defaultKey . ':discovery'),
+        ]));
+
+        try {
+            $redis = app('redis')->connection($connection);
+            $entries = [];
+            foreach ($listKeys as $listKey) {
+                $entries = array_merge($entries, $redis->lrange($listKey, 0, -1));
+            }
+        } catch (\Throwable) {
+            return [];
+        }
+
+        $payloads = [];
+        foreach ($entries as $entry) {
+            $payload = json_decode((string) $entry, true);
+            if (! is_array($payload)) {
+                continue;
+            }
+
+            $deviceId = isset($payload['device_id']) ? (int) $payload['device_id'] : 0;
+            if ($deviceId <= 0) {
+                continue;
+            }
+
+            if ($deviceIds !== null && ! $deviceIds->contains((string) $deviceId) && ! $deviceIds->contains($deviceId)) {
+                continue;
+            }
+
+            $payloads[] = $payload;
+        }
+
+        return $payloads;
+    }
+
+    /**
+     * Read latest Redis poller payload snapshot for each port interface key.
+     * Snapshot key preference is device_id + ifIndex, falling back to device_id + ifName.
+     *
+     * @param  Collection<int, int|string>|null  $deviceIds
+     * @return array<int, array{device_id: int, timestamp: int, tags: array<string, mixed>, fields: array<string, mixed>}>
+     */
+    private function readRedisPortPayloadSnapshots(?Collection $deviceIds = null): array
+    {
+        $payloads = $this->readRedisPollerPayloads($deviceIds);
+        $snapshot = [];
+
+        foreach ($payloads as $payload) {
+            if (($payload['measurement'] ?? null) !== 'ports') {
+                continue;
+            }
+
+            $deviceId = isset($payload['device_id']) ? (int) $payload['device_id'] : 0;
+            if ($deviceId <= 0) {
+                continue;
+            }
+
+            $timestamp = isset($payload['timestamp']) ? (int) $payload['timestamp'] : 0;
+            $tags = is_array($payload['tags'] ?? null) ? $payload['tags'] : [];
+            $fields = is_array($payload['fields'] ?? null) ? $payload['fields'] : [];
+
+            $ifIndex = isset($tags['ifIndex']) ? (string) $tags['ifIndex'] : '';
+            $ifName = isset($tags['ifName']) ? (string) $tags['ifName'] : '';
+            if ($ifIndex === '' && $ifName === '') {
+                continue;
+            }
+
+            $snapshotKey = $ifIndex !== ''
+                ? $deviceId . ':' . $ifIndex
+                : $deviceId . ':' . $ifName;
+
+            if (! isset($snapshot[$snapshotKey]) || $timestamp >= $snapshot[$snapshotKey]['timestamp']) {
+                $snapshot[$snapshotKey] = [
+                    'device_id' => $deviceId,
+                    'timestamp' => $timestamp,
+                    'tags' => $tags,
+                    'fields' => $fields,
+                ];
+            }
+        }
+
+        return array_values($snapshot);
     }
 }

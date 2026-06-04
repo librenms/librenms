@@ -27,7 +27,7 @@ class ServicesMetrics
         $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         // Append global metrics
-        $this->appendMetricBlock($lines, 'librenms_services_total', 'Total number of services configured', 'gauge', [$total]);
+        $this->appendMetricBlock($lines, 'librenms_services_total', 'Total number of services configured', 'gauge', ["librenms_services_total {$total}"]);
 
         // Default to global metrics only; detailed per-access-point metrics are opt-in via ?scope=detail
         if (! $includeDetail) {
@@ -47,12 +47,84 @@ class ServicesMetrics
         // Ignored Service count
         $ignoredQ = Service::where('service_ignore', 1);
         $ignored = $this->applyDeviceFilter($ignoredQ, $filters['device_ids'])->count();
-        $this->appendMetricBlock($lines, 'librenms_services_ignored', 'Number of ignored services', 'gauge', [$ignored]);
+        $this->appendMetricBlock($lines, 'librenms_services_ignored', 'Number of ignored services', 'gauge', ["librenms_services_ignored {$ignored}"]);
 
         // Disabled Service count
         $disabledQ = Service::where('service_disabled', 1);
         $disabled = $this->applyDeviceFilter($disabledQ, $filters['device_ids'])->count();
-        $this->appendMetricBlock($lines, 'librenms_services_disabled', 'Number of disabled services', 'gauge', [$disabled]);
+        $this->appendMetricBlock($lines, 'librenms_services_disabled', 'Number of disabled services', 'gauge', ["librenms_services_disabled {$disabled}"]);
+
+        // Per-service values sourced from Redis service poller snapshots
+        $service_metric_lines = [];
+        $payloads = $this->readRedisPollerPayloads($filters['device_ids']);
+        $snapshot = [];
+        foreach ($payloads as $payload) {
+            if (($payload['measurement'] ?? null) !== 'services') {
+                continue;
+            }
+
+            $timestamp = isset($payload['timestamp']) ? (int) $payload['timestamp'] : 0;
+            $tags = is_array($payload['tags'] ?? null) ? $payload['tags'] : [];
+            $fields = is_array($payload['fields'] ?? null) ? $payload['fields'] : [];
+            $serviceId = isset($tags['service_id']) ? (int) $tags['service_id'] : 0;
+            if ($serviceId <= 0 || empty($fields)) {
+                continue;
+            }
+
+            foreach ($fields as $metric => $value) {
+                if (! is_numeric($value)) {
+                    continue;
+                }
+
+                $snapshotKey = $serviceId . ':' . (string) $metric;
+                if (! isset($snapshot[$snapshotKey]) || $timestamp >= $snapshot[$snapshotKey]['timestamp']) {
+                    $snapshot[$snapshotKey] = [
+                        'timestamp' => $timestamp,
+                        'service_id' => $serviceId,
+                        'metric' => (string) $metric,
+                        'value' => (float) $value,
+                    ];
+                }
+            }
+        }
+
+        if (! empty($snapshot)) {
+            $serviceIds = collect(array_values(array_unique(array_map(fn (array $entry) => (int) $entry['service_id'], $snapshot))));
+            $services = Service::select('service_id', 'device_id', 'service_type', 'service_name', 'service_desc', 'service_status')
+                ->whereIn('service_id', $serviceIds)
+                ->get()
+                ->keyBy('service_id');
+            $devices = Device::select('device_id', 'hostname', 'sysName')
+                ->whereIn('device_id', $services->pluck('device_id')->unique()->values())
+                ->get()
+                ->keyBy('device_id');
+
+            foreach ($snapshot as $entry) {
+                $service = $services->get($entry['service_id']);
+                if (! $service) {
+                    continue;
+                }
+
+                $device = $devices->get($service->device_id);
+                $device_hostname = $device ? $this->escapeLabel((string) $device->hostname) : '';
+                $device_sysName = $device ? $this->escapeLabel((string) $device->sysName) : '';
+                $labels = sprintf(
+                    'service_id="%s",service_type="%s",service_name="%s",service_desc="%s",service_status="%s",device_id="%s",device_hostname="%s",device_sysName="%s",metric="%s"',
+                    $service->service_id,
+                    $this->escapeLabel((string) $service->service_type),
+                    $this->escapeLabel((string) $service->service_name),
+                    $this->escapeLabel((string) $service->service_desc),
+                    $service->service_status,
+                    $service->device_id,
+                    $device_hostname,
+                    $device_sysName,
+                    $this->escapeLabel((string) $entry['metric'])
+                );
+                $service_metric_lines[] = "librenms_services_metric_value{{$labels}} {$entry['value']}";
+            }
+        }
+
+        $this->appendMetricBlock($lines, 'librenms_services_metric_value', 'Latest per-service metric values from Redis service poller data', 'gauge', $service_metric_lines);
 
         // Prepare per-device counts by status (may be high-cardinality)
         $deviceIdsQuery = Service::select('device_id')->distinct();
