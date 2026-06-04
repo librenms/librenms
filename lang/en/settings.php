@@ -1633,6 +1633,20 @@ return [
                 'description' => 'Do not backup these device types',
                 'help' => 'Do not backup the listed device types with Oxidized. Only allows existing types.',
             ],
+            'history' => [
+                'enabled' => [
+                    'description' => 'Enable disabled device config history',
+                    'help' => 'Show historical Oxidized configurations for disabled or Oxidized-excluded devices using local Git repositories. Disabled devices are still not sent to Oxidized for new backups.',
+                ],
+                'git_repo_base_path' => [
+                    'description' => 'Oxidized Git repository base path',
+                    'help' => 'Directory containing local Oxidized Git repositories. LibreNMS will try <group>.git first, based on Oxidized Variable Mapping. Example: /opt/librenms/.config/oxidized',
+                ],
+                'git_repo_paths' => [
+                    'description' => 'Additional Oxidized Git repository paths',
+                    'help' => 'Optional explicit local Oxidized Git bare repository paths to search if the base path and group repository do not match.',
+                ],
+            ],
             'reload_nodes' => [
                 'description' => 'Reload Oxidized nodes list, each time a device is added',
             ],

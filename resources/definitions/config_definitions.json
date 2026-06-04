@@ -5770,6 +5770,34 @@
                 "value.*": "exists:devices,type"
             }
         },
+        "oxidized.history.enabled": {
+            "default": false,
+            "group": "external",
+            "section": "oxidized",
+            "order": 6,
+            "type": "boolean"
+        },
+        "oxidized.history.git_repo_base_path": {
+            "default": false,
+            "group": "external",
+            "section": "oxidized",
+            "order": 6,
+            "type": "text",
+            "validate": {
+                "value": "nullable|string"
+            }
+        },
+        "oxidized.history.git_repo_paths": {
+            "default": [],
+            "type": "array",
+            "group": "external",
+            "section": "oxidized",
+            "order": 6,
+            "validate": {
+                "value": "array",
+                "value.*": "string"
+            }
+        },
         "oxidized.maps": {
             "default": {
                 "os": {
