@@ -66,6 +66,12 @@ class FindGitHistoryConfig
     public function candidateFilenames(Device $device): array
     {
         $candidates = [];
+        $output = $this->buildDeviceOutput->execute($device);
+
+        $this->addCandidate($candidates, $output['hostname'] ?? null);
+        $this->addShortHostnameCandidate($candidates, $output['hostname'] ?? null);
+
+        $this->addCandidate($candidates, $output['ip'] ?? null);
 
         $this->addCandidate($candidates, $device->hostname);
         $this->addShortHostnameCandidate($candidates, $device->hostname);
