@@ -18,6 +18,7 @@ class ReadGitHistoryConfig
             'git',
             '--git-dir=' . $repo,
             'log',
+            '--diff-filter=ACMRTUXB',
             '-n',
             (string) $limit,
             '--pretty=format:%H%x1f%ct%x1f%an%x1f%s',
@@ -39,7 +40,7 @@ class ReadGitHistoryConfig
 
             [$oid, $timestamp, $author, $message] = array_pad(explode("\x1f", $line, 4), 4, '');
 
-            if ($oid === '' || ! ctype_digit($timestamp) || ! $this->gitFileExistsAt($repo, $file, $oid)) {
+            if ($oid === '' || ! ctype_digit($timestamp)) {
                 continue;
             }
 
@@ -83,19 +84,5 @@ class ReadGitHistoryConfig
         $process->run();
 
         return $process->isSuccessful() ? $process->getOutput() : '';
-    }
-
-    private function gitFileExistsAt(string $repo, string $file, string $oid): bool
-    {
-        $process = new Process([
-            'git',
-            '--git-dir=' . $repo,
-            'cat-file',
-            '-e',
-            $oid . ':' . $file,
-        ]);
-        $process->run();
-
-        return $process->isSuccessful();
     }
 }
