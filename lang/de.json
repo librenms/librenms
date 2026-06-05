@@ -425,5 +425,6 @@
   "timestamp, descending": "Zeitstempel, absteigend",
   "up": "Erreichbar",
   "warn": "Warnung",
-  "yes": "Ja"
+  "yes": "Ja",
+  "Your API token": "Ihr API-Token"
 }
