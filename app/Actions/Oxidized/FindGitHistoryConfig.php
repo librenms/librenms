@@ -150,6 +150,7 @@ class FindGitHistoryConfig
     private function isSafePathName(string $name): bool
     {
         return $name !== ''
+            && $name !== '.'
             && ! str_starts_with($name, '-')
             && ! str_contains($name, "\0")
             && ! str_contains($name, "\n")
@@ -163,6 +164,7 @@ class FindGitHistoryConfig
     private function isSafeGitPath(string $path): bool
     {
         return $path !== ''
+            && $path !== '.'
             && ! str_starts_with($path, '-')
             && ! str_contains($path, "\0")
             && ! str_contains($path, "\n")
