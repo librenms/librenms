@@ -19,8 +19,7 @@ class AlertRuleController extends Controller
 {
     public function create(Request $request): View
     {
-        $device_id = (int) $request->query('device_id', -1);
-        $deviceName = DeviceCache::get($device_id)->displayName();
+        $device_id = $request->input('device_id');
         $filters = json_encode(new QueryBuilderFilter('alert'));
         $defaults = [
             'default_severity' => LibrenmsConfig::get('alert_rule.severity'),
@@ -73,7 +72,7 @@ class AlertRuleController extends Controller
 
         return view('alerts.rules.create', array_merge([
             'device_id' => $device_id,
-            'deviceName' => $deviceName,
+            'deviceName' => DeviceCache::get($device_id)->display,
             'filters' => $filters,
             'collectionRules' => $collectionRules,
             'dbRules' => $dbRules,

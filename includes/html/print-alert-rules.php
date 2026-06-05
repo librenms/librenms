@@ -92,9 +92,9 @@ echo '<div class="table-responsive">';
 echo '<div class="col pull-left">';
 $device_id = $device['device_id'] ?? 0;
 if (Gate::allows('create', AlertRule::class)) {
-    echo '<a class="btn btn-primary btn-sm" href="/alert-rules/create?device_id=' . $device_id . '">Create new alert rule</a>';
+    echo '<a class="btn btn-primary btn-sm" href="' . route('alert-rule.create', $device_id) . '">Create new alert rule</a>';
     echo '<i> - OR - </i>';
-    echo '<a class="btn btn-primary btn-sm" href="/alert-rules/create?open=collection&device_id=' . $device_id . '">Create rule from collection</a>';
+    echo '<a class="btn btn-primary btn-sm" href="' . route('alert-rule.create', ['device_id' => $device_id, 'open' => 'collection']) . '">Create rule from collection</a>';
 }
 echo '</div>';
 
