@@ -43,7 +43,9 @@ class ShowConfigController extends Controller implements DeviceTab
     public function visible(Device $device): bool
     {
         if (Gate::allows('show-config', $device)) {
-            return $this->oxidizedEnabled($device) || $this->oxidizedHistoryEnabled($device) || $this->getRancidConfigFile() !== false;
+            return $this->oxidizedEnabled($device)
+                || $this->oxidizedHistoryEnabled($device)
+                || $this->getRancidConfigFile() !== false;
         }
 
         return false;

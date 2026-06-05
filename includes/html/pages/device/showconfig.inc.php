@@ -181,7 +181,10 @@ if (Gate::allows('showConfig', DeviceCache::getPrimary())) {
 
             $text = implode("\n", $lines);
         }
-    } elseif (($oxidizedHistoryViewData = app(\App\Actions\Oxidized\BuildGitHistoryViewData::class)->execute($primary_device, $_POST)) !== null) {
+    } elseif (
+        ($oxidizedHistoryViewData = app(\App\Actions\Oxidized\BuildGitHistoryViewData::class)
+            ->execute($primary_device, $_POST)) !== null
+    ) {
         if (! empty($oxidizedHistoryViewData['warning'])) {
             print_error($oxidizedHistoryViewData['warning']);
         }

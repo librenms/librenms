@@ -8,7 +8,13 @@ use Symfony\Component\Process\Process;
 class ReadGitHistoryConfig
 {
     /**
-     * @return array<int, array{oid: string, date: string, timestamp: int, author: array{name: string}, message: string}>
+     * @return array<int, array{
+     *     oid: string,
+     *     date: string,
+     *     timestamp: int,
+     *     author: array{name: string},
+     *     message: string
+     * }>
      */
     public function versions(string $repo, string $file, int $limit = 200): array
     {
