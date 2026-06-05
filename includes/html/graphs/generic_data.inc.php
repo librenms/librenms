@@ -27,6 +27,9 @@ $previous = $graph_params->visible('previous');
 $rrd_filename_out ??= $rrd_filename ?? '';
 $rrd_filename_in ??= $rrd_filename ?? '';
 
+// Define variables that may be populated later
+$ingress_speed = $egress_speed = null;
+
 if ($inverse) {
     $in = 'out';
     $out = 'in';
