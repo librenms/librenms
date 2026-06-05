@@ -5778,7 +5778,7 @@
             "type": "boolean"
         },
         "oxidized.history.git_repo_base_path": {
-            "default": false,
+            "default": "",
             "group": "external",
             "section": "oxidized",
             "order": 10,
