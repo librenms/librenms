@@ -72,13 +72,26 @@ class ShowConfigController extends Controller implements DeviceTab
         ];
     }
 
-    private function oxidizedEnabled(Device $device)
+    private function oxidizedEnabled(Device $device): bool
     {
-        return LibrenmsConfig::get('oxidized.enabled') === true
-                && LibrenmsConfig::has('oxidized.url')
-                && $device->getAttrib('override_Oxidized_disable') !== 'true'
-                && ! in_array($device->type, LibrenmsConfig::get('oxidized.ignore_types', []))
-                && ! in_array($device->os, LibrenmsConfig::get('oxidized.ignore_os', []));
+        if (
+            LibrenmsConfig::get('oxidized.enabled') !== true
+            || ! LibrenmsConfig::has('oxidized.url')
+            || $device->getAttrib('override_Oxidized_disable') === 'true'
+            || in_array($device->type, LibrenmsConfig::get('oxidized.ignore_types', []), true)
+            || in_array($device->os, LibrenmsConfig::get('oxidized.ignore_os', []), true)
+        ) {
+            return false;
+        }
+
+        $ignoreGroups = LibrenmsConfig::get('oxidized.ignore_groups', []);
+        if (empty($ignoreGroups)) {
+            return true;
+        }
+
+        $output = app(\App\Actions\Oxidized\BuildDeviceOutput::class)->execute($device);
+
+        return ! isset($output['group']) || ! in_array($output['group'], $ignoreGroups, true);
     }
 
     private function oxidizedHistoryEnabled(Device $device): bool
