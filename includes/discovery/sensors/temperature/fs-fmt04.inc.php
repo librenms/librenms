@@ -7,7 +7,6 @@
  * Skip lanes with vSFP*State (.1) = off — matches dBm discovery.
  * EDFA module temperature: `…10.16.2.1.22` (°C×100) when `.1.0` = on — not `.27` (that is PUMP cooling ×100 mA; see `count/fs-fmt04.inc.php`).
  */
-
 echo 'FS FMT OAP temperature ';
 
 $suites = [

@@ -3,7 +3,6 @@
 /**
  * FS FMT / OAP — chassis PSU/fan (OAP-NMU) and per-lane SFP alarms (OAP-C1-OEO).
  */
-
 echo 'FS FMT OAP state ';
 
 $sensor_type = 'fs-fmt04';

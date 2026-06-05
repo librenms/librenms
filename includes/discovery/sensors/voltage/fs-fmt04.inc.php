@@ -3,7 +3,6 @@
 /**
  * FS FMT / OAP — EDFA supply voltage (`…10.16.2.1.23`, V×100) when module `.1.0` = on.
  */
-
 echo 'FS FMT EDFA voltage ';
 
 $sensor_type = 'fs-fmt04';

@@ -11,7 +11,6 @@
  *
  * If your web UI uses different units, adjust divisors here or override in LibreNMS sensor UI.
  */
-
 echo 'FS FMT OAP count ';
 
 $suites = [

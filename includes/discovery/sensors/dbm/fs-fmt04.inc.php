@@ -10,7 +10,6 @@
  * @author   OP-16485 / FS FMT04-CH1U integration
  * @license  GPLv3
  */
-
 echo 'FS FMT OAP dBm ';
 
 $suites = [
