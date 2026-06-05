@@ -130,7 +130,7 @@ class FindGitHistoryConfig
     }
 
     /**
-     * @param array<int, string> $candidates
+     * @param  array<int, string>  $candidates
      */
     private function addCandidate(array &$candidates, mixed $value): void
     {
@@ -140,7 +140,7 @@ class FindGitHistoryConfig
     }
 
     /**
-     * @param array<int, string> $candidates
+     * @param  array<int, string>  $candidates
      */
     private function addShortHostnameCandidate(array &$candidates, mixed $value): void
     {
@@ -180,7 +180,7 @@ class FindGitHistoryConfig
     }
 
     /**
-     * @param array<string, bool> $seen
+     * @param  array<string, bool>  $seen
      * @return iterable<string, string>
      */
     private function yieldRepo(array &$seen, string $repo, string $source): iterable

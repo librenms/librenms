@@ -27,7 +27,7 @@ class BuildGitHistoryViewData
     }
 
     /**
-     * @param array<string, mixed> $input
+     * @param  array<string, mixed>  $input
      * @return array{
      *     text: string,
      *     config_versions: array<int, array<string, mixed>>,
@@ -120,7 +120,7 @@ class BuildGitHistoryViewData
     }
 
     /**
-     * @param array{repo: string, file: string, source: string} $historyConfig
+     * @param  array{repo: string, file: string, source: string}  $historyConfig
      * @return array{
      *     text: string,
      *     config_versions: array<int, array<string, mixed>>,
@@ -177,9 +177,9 @@ class BuildGitHistoryViewData
     }
 
     /**
-     * @param array<string, mixed> $input
-     * @param array<int, array<string, mixed>> $configVersions
-     * @param array<string, array<string, mixed>> $versionsByOid
+     * @param  array<string, mixed>  $input
+     * @param  array<int, array<string, mixed>>  $configVersions
+     * @param  array<string, array<string, mixed>>  $versionsByOid
      * @return array{oid: string, date: string, version: int}
      */
     private function currentConfig(array $input, array $configVersions, array $versionsByOid): array
@@ -205,10 +205,10 @@ class BuildGitHistoryViewData
     }
 
     /**
-     * @param array<string, mixed> $input
-     * @param array{oid: string, date: string, version: int} $currentConfig
-     * @param array<int, array<string, mixed>> $configVersions
-     * @param array<string, array<string, mixed>> $versionsByOid
+     * @param  array<string, mixed>  $input
+     * @param  array{oid: string, date: string, version: int}  $currentConfig
+     * @param  array<int, array<string, mixed>>  $configVersions
+     * @param  array<string, array<string, mixed>>  $versionsByOid
      * @return array{oid: string, date: string, version: int}|null
      */
     private function previousConfig(
@@ -216,8 +216,7 @@ class BuildGitHistoryViewData
         array $currentConfig,
         array $configVersions,
         array $versionsByOid
-    ): ?array
-    {
+    ): ?array {
         if (! isset($input['diff'])) {
             return null;
         }
@@ -251,9 +250,9 @@ class BuildGitHistoryViewData
     }
 
     /**
-     * @param array{repo: string, file: string, source: string} $historyConfig
-     * @param array{oid: string, date: string, version: int} $currentConfig
-     * @param array{oid: string, date: string, version: int}|null $previousConfig
+     * @param  array{repo: string, file: string, source: string}  $historyConfig
+     * @param  array{oid: string, date: string, version: int}  $currentConfig
+     * @param  array{oid: string, date: string, version: int}|null  $previousConfig
      * @return array{text: string, warning?: string}
      */
     private function configText(array $historyConfig, array $currentConfig, ?array $previousConfig): array

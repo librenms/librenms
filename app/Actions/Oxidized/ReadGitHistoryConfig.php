@@ -70,7 +70,7 @@ class ReadGitHistoryConfig
     }
 
     /**
-     * @param string[] $oids
+     * @param  string[]  $oids
      * @return array<string, bool>
      */
     private function existingFilesAt(string $repo, string $file, array $oids): array
