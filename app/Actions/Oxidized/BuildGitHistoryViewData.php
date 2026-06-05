@@ -20,7 +20,7 @@ class BuildGitHistoryViewData
      *     text: string,
      *     config_versions: array<int, array<string, mixed>>,
      *     config_total: int,
-     *     current_config: array{oid: string, date: string, version: int},
+     *     current_config?: array{oid: string, date: string, version: int},
      *     previous_config?: array{oid: string, date: string, version: int},
      *     warning?: string,
      *     node_info: array<string, mixed>,
@@ -44,7 +44,25 @@ class BuildGitHistoryViewData
         $configTotal = count($configVersions);
 
         if ($configTotal === 0) {
-            return null;
+            $oxidizedOutput = $this->buildDeviceOutput->execute($device);
+
+            return [
+                'text' => '',
+                'config_versions' => [],
+                'config_total' => 0,
+                'warning' => 'No readable historical Oxidized Git versions found for this device. Check the configured repository path, permissions, and Oxidized Git output.',
+                'node_info' => [
+                    'name' => $oxidizedOutput['hostname'] ?? $device->hostname,
+                    'ip' => $oxidizedOutput['ip'] ?? $device->ip,
+                    'model' => strtoupper((string) ($oxidizedOutput['os'] ?? $device->os)),
+                    'last_sync' => 'N/A',
+                    'status' => 'historical',
+                    'source' => 'Local Oxidized Git history',
+                ],
+                'author' => '',
+                'message' => '',
+                'source' => $historyConfig,
+            ];
         }
 
         foreach ($configVersions as $key => $version) {
