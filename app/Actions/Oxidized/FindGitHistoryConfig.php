@@ -47,7 +47,7 @@ class FindGitHistoryConfig
 
         foreach ($this->candidateRepos($device) as $repo => $source) {
             foreach ($candidates as $candidate) {
-                if ($this->gitFileExists($repo, $candidate)) {
+                if ($this->gitFileHasHistory($repo, $candidate)) {
                     return [
                         'repo' => $repo,
                         'file' => $candidate,
@@ -190,11 +190,22 @@ class FindGitHistoryConfig
         return $process->isSuccessful() && trim($process->getOutput()) === 'true';
     }
 
-    private function gitFileExists(string $repo, string $file): bool
+    private function gitFileHasHistory(string $repo, string $file): bool
     {
-        $process = new Process(['git', '--git-dir=' . $repo, 'cat-file', '-e', 'HEAD:' . $file]);
+        $process = new Process([
+            'git',
+            '--git-dir=' . $repo,
+            'log',
+            '--diff-filter=ACMRTUXB',
+            '-n',
+            '1',
+            '--format=%H',
+            '--',
+            $file,
+        ]);
+        $process->setTimeout(10);
         $process->run();
 
-        return $process->isSuccessful();
+        return $process->isSuccessful() && trim($process->getOutput()) !== '';
     }
 }
