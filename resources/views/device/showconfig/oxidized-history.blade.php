@@ -23,9 +23,24 @@
                     <div class="col-sm-6">
                         <select id="config" name="config" class="form-control">
                             @foreach($history['config_versions'] as $version)
+                                @php
+                                    $isCurrent = $history['current_config']['oid'] === $version['oid'];
+                                    $isPrevious = isset($history['previous_config']['oid']) && $history['previous_config']['oid'] === $version['oid'];
+
+                                    if ($isCurrent && isset($history['previous_config'])) {
+                                        $marker = '+';
+                                    } elseif ($isCurrent) {
+                                        $marker = '*';
+                                    } elseif ($isPrevious) {
+                                        $marker = ' -';
+                                    } else {
+                                        $marker = '  ';
+                                    }
+                                @endphp
+
                                 <option value="{{ $version['oid'] }}|{{ $version['date'] }}|{{ $version['version'] }}"
-                                    @if($history['current_config']['oid'] === $version['oid']) selected @endif
-                                >@if($history['current_config']['oid'] === $version['oid'] && isset($history['previous_config']))+@elseif($history['current_config']['oid'] === $version['oid'])*@elseif(isset($history['previous_config']['oid']) && $history['previous_config']['oid'] === $version['oid'])&nbsp;-@else&nbsp;&nbsp;@endif{{ $version['version'] }} :: {{ $version['date'] }}</option>
+                                    @if($isCurrent) selected @endif
+                                >{{ $marker }}{{ $version['version'] }} :: {{ $version['date'] }}</option>
                             @endforeach
                         </select>
                     </div>
