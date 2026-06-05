@@ -37,32 +37,22 @@ class BuildGitHistoryViewData
 
         $historyConfig = $this->findGitHistoryConfig->execute($device);
         if ($historyConfig === null) {
-            return null;
+            return $this->emptyHistoryData($device, [
+                'repo' => '',
+                'file' => '',
+                'source' => 'not_found',
+            ], 'No matching historical Oxidized Git configuration found for this device. Check the Oxidized history repository base path, additional repository paths, permissions, and Oxidized Git output.');
         }
 
         $configVersions = $this->readGitHistoryConfig->versions($historyConfig['repo'], $historyConfig['file']);
         $configTotal = count($configVersions);
 
         if ($configTotal === 0) {
-            $oxidizedOutput = $this->buildDeviceOutput->execute($device);
-
-            return [
-                'text' => '',
-                'config_versions' => [],
-                'config_total' => 0,
-                'warning' => 'No readable historical Oxidized Git versions found for this device. Check the configured repository path, permissions, and Oxidized Git output.',
-                'node_info' => [
-                    'name' => $oxidizedOutput['hostname'] ?? $device->hostname,
-                    'ip' => $oxidizedOutput['ip'] ?? $device->ip,
-                    'model' => strtoupper((string) ($oxidizedOutput['os'] ?? $device->os)),
-                    'last_sync' => 'N/A',
-                    'status' => 'historical',
-                    'source' => 'Local Oxidized Git history',
-                ],
-                'author' => '',
-                'message' => '',
-                'source' => $historyConfig,
-            ];
+            return $this->emptyHistoryData(
+                $device,
+                $historyConfig,
+                'No readable historical Oxidized Git versions found for this device. Check the configured repository path, permissions, and Oxidized Git output.'
+            );
         }
 
         foreach ($configVersions as $key => $version) {
@@ -107,6 +97,42 @@ class BuildGitHistoryViewData
         }
 
         return $data;
+    }
+
+    /**
+     * @param array{repo: string, file: string, source: string} $historyConfig
+     * @return array{
+     *     text: string,
+     *     config_versions: array<int, array<string, mixed>>,
+     *     config_total: int,
+     *     warning: string,
+     *     node_info: array<string, mixed>,
+     *     author: string,
+     *     message: string,
+     *     source: array{repo: string, file: string, source: string}
+     * }
+     */
+    private function emptyHistoryData(Device $device, array $historyConfig, string $warning): array
+    {
+        $oxidizedOutput = $this->buildDeviceOutput->execute($device);
+
+        return [
+            'text' => '',
+            'config_versions' => [],
+            'config_total' => 0,
+            'warning' => $warning,
+            'node_info' => [
+                'name' => $oxidizedOutput['hostname'] ?? $device->hostname,
+                'ip' => $oxidizedOutput['ip'] ?? $device->ip,
+                'model' => strtoupper((string) ($oxidizedOutput['os'] ?? $device->os)),
+                'last_sync' => 'N/A',
+                'status' => 'historical',
+                'source' => 'Local Oxidized Git history',
+            ],
+            'author' => '',
+            'message' => '',
+            'source' => $historyConfig,
+        ];
     }
 
     public function eligible(Device $device): bool
