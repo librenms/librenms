@@ -102,7 +102,7 @@ class FindGitHistoryConfig
 
     private function addCandidate(array &$candidates, mixed $value): void
     {
-        if (is_string($value) && $value !== '') {
+        if (is_string($value) && $this->isSafeGitPath($value)) {
             $candidates[] = $value;
         }
     }
@@ -114,13 +114,24 @@ class FindGitHistoryConfig
         }
 
         if (str_contains($value, '.')) {
-            $candidates[] = strtok($value, '.');
+            $this->addCandidate($candidates, strtok($value, '.'));
         }
     }
 
     private function isSafePathName(string $name): bool
     {
         return $name !== '' && basename($name) === $name && ! str_contains($name, DIRECTORY_SEPARATOR);
+    }
+
+    private function isSafeGitPath(string $path): bool
+    {
+        return $path !== ''
+            && ! str_starts_with($path, '-')
+            && ! str_contains($path, "\0")
+            && ! str_contains($path, "\n")
+            && ! str_contains($path, "\r")
+            && ! str_contains($path, DIRECTORY_SEPARATOR)
+            && ! str_contains($path, '..');
     }
 
     /**
