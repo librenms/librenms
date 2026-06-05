@@ -313,10 +313,10 @@ If a device is disabled or removed from LibreNMS then the Oxidized
 configuration is normally no longer available via the LibreNMS web interface.
 
 If Oxidized is configured with Git output using local bare Git repositories,
-LibreNMS can optionally show historical configurations for devices that are
-disabled or excluded from the Oxidized source. This only reads existing local
-Git history; it does not add the device back to the Oxidized source API or
-trigger new backups.
+LibreNMS can optionally show historical configurations for devices that still
+exist in LibreNMS but are disabled or excluded from the Oxidized source. This
+only reads existing local Git history; it does not add the device back to the
+Oxidized source API or trigger new backups.
 
 !!! setting "external/oxidized"
     ~~~bash
@@ -334,9 +334,9 @@ repository paths with `oxidized.history.git_repo_paths`.
     lnms config:set oxidized.history.git_repo_paths.+ /var/lib/oxidized/configs.git
     ~~~
 
-If this fallback is not enabled, or no matching local Git history is found, you
-can still access these configurations directly in the Git repository of Oxidized
-(if using Git for version control).
+For devices removed from LibreNMS, or if this fallback is not enabled or no
+matching local Git history is found, you can still access these configurations
+directly in the Git repository of Oxidized (if using Git for version control).
 
 1: Check in your Oxidized where are stored your Git repositories:
 
