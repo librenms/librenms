@@ -24,6 +24,7 @@ class ReadGitHistoryConfig
         $process = new Process([
             'git',
             '--git-dir=' . $repo,
+            '--literal-pathspecs',
             'log',
             '--diff-filter=ACMRTUXB',
             '-n',
@@ -128,6 +129,7 @@ class ReadGitHistoryConfig
         $process = new Process([
             'git',
             '--git-dir=' . $repo,
+            '--literal-pathspecs',
             'diff',
             '--no-ext-diff',
             '--no-textconv',

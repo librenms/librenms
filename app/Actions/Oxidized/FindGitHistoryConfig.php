@@ -204,6 +204,7 @@ class FindGitHistoryConfig
         $process = new Process([
             'git',
             '--git-dir=' . $repo,
+            '--literal-pathspecs',
             'log',
             '--diff-filter=ACMRTUXB',
             '-n',
