@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Gate;
 use Symfony\Component\Process\Process;
 
 if (Gate::allows('showConfig', DeviceCache::getPrimary())) {
+    $primary_device = DeviceCache::getPrimary();
     if (LibrenmsConfig::get('rancid_repo_type') == 'git-bare' && is_dir($rancid_path)) {
         echo '<div style="clear: both;">';
 
@@ -180,6 +181,20 @@ if (Gate::allows('showConfig', DeviceCache::getPrimary())) {
 
             $text = implode("\n", $lines);
         }
+    } elseif (($oxidizedHistoryViewData = app(\App\Actions\Oxidized\BuildGitHistoryViewData::class)->execute($primary_device, $_POST)) !== null) {
+        if (! empty($oxidizedHistoryViewData['warning'])) {
+            print_error($oxidizedHistoryViewData['warning']);
+        }
+
+        if (isset($oxidizedHistoryViewData['previous_config'])) {
+            $previous_config = $oxidizedHistoryViewData['previous_config'];
+        }
+
+        $author = $oxidizedHistoryViewData['author'];
+        $msg = $oxidizedHistoryViewData['message'];
+        $text = $oxidizedHistoryViewData['text'];
+
+        echo view('device.showconfig.oxidized-history', ['history' => $oxidizedHistoryViewData])->render();
     } elseif (LibrenmsConfig::get('oxidized.enabled') === true && LibrenmsConfig::has('oxidized.url')) {
         // Try with hostname as set in librenms first
         $oxidized_hostname = $device['hostname'];
