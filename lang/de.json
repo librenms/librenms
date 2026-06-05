@@ -92,7 +92,7 @@
   "Device Permissions": "Geräteberechtigungen",
   "Device does not exist": "Gerät existiert nicht",
   "Device group": "Gerätegruppe",
-  "Devices will be checked for Ping/SNMP reachability before being probed.": "Die Geräte werden vor der Überprüfung auf ihre Erreichbarkeit per Ping/SNMP geprüft."
+  "Devices will be checked for Ping/SNMP reachability before being probed.": "Die Geräte werden vor der Überprüfung auf ihre Erreichbarkeit per Ping/SNMP geprüft.",
   "Devices": "Geräte",
   "Disable TwoFactor": "Deaktiviere Zweifaktor",
   "Disabled": "Deaktiviert",
