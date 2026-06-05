@@ -25,7 +25,8 @@
                             @foreach($history['config_versions'] as $version)
                                 @php
                                     $isCurrent = $history['current_config']['oid'] === $version['oid'];
-                                    $isPrevious = isset($history['previous_config']['oid']) && $history['previous_config']['oid'] === $version['oid'];
+                                    $isPrevious = isset($history['previous_config']['oid'])
+                                        && $history['previous_config']['oid'] === $version['oid'];
 
                                     if ($isCurrent && isset($history['previous_config'])) {
                                         $marker = '+';
