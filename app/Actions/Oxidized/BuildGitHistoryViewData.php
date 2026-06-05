@@ -14,6 +14,11 @@ class BuildGitHistoryViewData
     private const NO_READABLE_HISTORY_WARNING = 'No readable historical Oxidized Git versions found '
         . 'for this device. Check the configured repository path, permissions, and Oxidized Git output.';
 
+    private const UNABLE_TO_READ_CONFIG_WARNING = 'Unable to read selected historical Oxidized '
+        . 'configuration version.';
+
+    private const UNABLE_TO_READ_DIFF_WARNING = 'Unable to read historical Oxidized configuration diff.';
+
     public function __construct(
         private readonly BuildDeviceOutput $buildDeviceOutput,
         private readonly FindGitHistoryConfig $findGitHistoryConfig,
@@ -79,12 +84,12 @@ class BuildGitHistoryViewData
         $previousConfig = $this->previousConfig($input, $currentConfig, $configVersions, $versionsByOid);
 
         $selectedVersion = $versionsByOid[$currentConfig['oid']] ?? [];
-        $text = $this->configText($historyConfig, $currentConfig, $previousConfig);
+        $configText = $this->configText($historyConfig, $currentConfig, $previousConfig);
 
         $oxidizedOutput = $this->buildDeviceOutput->execute($device);
 
         $data = [
-            'text' => $text,
+            'text' => $configText['text'],
             'config_versions' => $configVersions,
             'config_total' => $configTotal,
             'current_config' => $currentConfig,
@@ -100,6 +105,10 @@ class BuildGitHistoryViewData
             'message' => $selectedVersion['message'] ?? '',
             'source' => $historyConfig,
         ];
+
+        if (isset($configText['warning'])) {
+            $data['warning'] = $configText['warning'];
+        }
 
         if ($previousConfig !== null) {
             $data['previous_config'] = $previousConfig;
@@ -245,8 +254,9 @@ class BuildGitHistoryViewData
      * @param array{repo: string, file: string, source: string} $historyConfig
      * @param array{oid: string, date: string, version: int} $currentConfig
      * @param array{oid: string, date: string, version: int}|null $previousConfig
+     * @return array{text: string, warning?: string}
      */
-    private function configText(array $historyConfig, array $currentConfig, ?array $previousConfig): string
+    private function configText(array $historyConfig, array $currentConfig, ?array $previousConfig): array
     {
         if ($previousConfig !== null) {
             $diff = $this->readGitHistoryConfig->diff(
@@ -256,13 +266,29 @@ class BuildGitHistoryViewData
                 $previousConfig['oid']
             );
 
-            return $diff ?: 'No Difference';
+            if ($diff === null) {
+                return [
+                    'text' => '',
+                    'warning' => self::UNABLE_TO_READ_DIFF_WARNING,
+                ];
+            }
+
+            return ['text' => $diff !== '' ? $diff : 'No Difference'];
         }
 
-        return $this->readGitHistoryConfig->config(
+        $config = $this->readGitHistoryConfig->config(
             $historyConfig['repo'],
             $historyConfig['file'],
             $currentConfig['oid']
         );
+
+        if ($config === null) {
+            return [
+                'text' => '',
+                'warning' => self::UNABLE_TO_READ_CONFIG_WARNING,
+            ];
+        }
+
+        return ['text' => $config];
     }
 }

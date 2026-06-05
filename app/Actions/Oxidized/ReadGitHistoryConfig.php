@@ -107,7 +107,7 @@ class ReadGitHistoryConfig
         return $existing;
     }
 
-    public function config(string $repo, string $file, string $oid = 'HEAD'): string
+    public function config(string $repo, string $file, string $oid = 'HEAD'): ?string
     {
         $process = new Process([
             'git',
@@ -118,13 +118,13 @@ class ReadGitHistoryConfig
         $process->setTimeout(10);
 
         if (! $this->runProcess($process)) {
-            return '';
+            return null;
         }
 
         return $process->getOutput();
     }
 
-    public function diff(string $repo, string $file, string $currentOid, string $previousOid): string
+    public function diff(string $repo, string $file, string $currentOid, string $previousOid): ?string
     {
         $process = new Process([
             'git',
@@ -142,7 +142,7 @@ class ReadGitHistoryConfig
         $process->setTimeout(10);
 
         if (! $this->runProcess($process)) {
-            return '';
+            return null;
         }
 
         return $process->getOutput();
