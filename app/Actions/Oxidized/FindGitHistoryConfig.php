@@ -4,6 +4,7 @@ namespace App\Actions\Oxidized;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
 class FindGitHistoryConfig
@@ -194,9 +195,8 @@ class FindGitHistoryConfig
 
         $process = new Process(['git', '--git-dir=' . $repo, 'rev-parse', '--is-bare-repository']);
         $process->setTimeout(10);
-        $process->run();
 
-        return $process->isSuccessful() && trim($process->getOutput()) === 'true';
+        return $this->runProcess($process) && trim($process->getOutput()) === 'true';
     }
 
     private function gitFileHasHistory(string $repo, string $file): bool
@@ -213,8 +213,18 @@ class FindGitHistoryConfig
             $file,
         ]);
         $process->setTimeout(10);
-        $process->run();
 
-        return $process->isSuccessful() && trim($process->getOutput()) !== '';
+        return $this->runProcess($process) && trim($process->getOutput()) !== '';
+    }
+
+    private function runProcess(Process $process): bool
+    {
+        try {
+            $process->run();
+        } catch (ProcessTimedOutException) {
+            return false;
+        }
+
+        return $process->isSuccessful();
     }
 }

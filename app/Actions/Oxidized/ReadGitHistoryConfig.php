@@ -3,6 +3,7 @@
 namespace App\Actions\Oxidized;
 
 use App\Facades\LibrenmsConfig;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
 class ReadGitHistoryConfig
@@ -32,9 +33,8 @@ class ReadGitHistoryConfig
             $file,
         ]);
         $process->setTimeout(10);
-        $process->run();
 
-        if (! $process->isSuccessful()) {
+        if (! $this->runProcess($process)) {
             return [];
         }
 
@@ -91,9 +91,7 @@ class ReadGitHistoryConfig
             $oids
         )) . PHP_EOL);
 
-        $process->run();
-
-        if (! $process->isSuccessful()) {
+        if (! $this->runProcess($process)) {
             return [];
         }
 
@@ -117,9 +115,12 @@ class ReadGitHistoryConfig
             $oid . ':' . $file,
         ]);
         $process->setTimeout(10);
-        $process->run();
 
-        return $process->isSuccessful() ? $process->getOutput() : '';
+        if (! $this->runProcess($process)) {
+            return '';
+        }
+
+        return $process->getOutput();
     }
 
     public function diff(string $repo, string $file, string $currentOid, string $previousOid): string
@@ -137,8 +138,22 @@ class ReadGitHistoryConfig
             $file,
         ]);
         $process->setTimeout(10);
-        $process->run();
 
-        return $process->isSuccessful() ? $process->getOutput() : '';
+        if (! $this->runProcess($process)) {
+            return '';
+        }
+
+        return $process->getOutput();
+    }
+
+    private function runProcess(Process $process): bool
+    {
+        try {
+            $process->run();
+        } catch (ProcessTimedOutException) {
+            return false;
+        }
+
+        return $process->isSuccessful();
     }
 }
