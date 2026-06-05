@@ -115,7 +115,7 @@ class Fortigate extends OS implements
         }
 
         if ($lat === null || $lon === null) {
-            return new Location();
+            return parent::fetchLocation(); // no GPS data, fall back to sysLocation
         }
 
         return new Location([
