@@ -72,7 +72,7 @@ class BuildGitHistoryViewData
             'node_info' => [
                 'name' => $oxidizedOutput['hostname'] ?? $device->hostname,
                 'ip' => $oxidizedOutput['ip'] ?? $device->ip,
-                'model' => $oxidizedOutput['os'] ?? $device->os,
+                'model' => strtoupper((string) ($oxidizedOutput['os'] ?? $device->os)),
                 'last_sync' => $configVersions[0]['date'],
                 'status' => 'historical',
                 'source' => 'Local Oxidized Git history',
