@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use App\Models\Location;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
@@ -94,5 +95,32 @@ class Fortigate extends OS implements
         return [
             new WirelessSensor(WirelessSensorType::ApCount, $this->getDeviceId(), $oid, 'fortigate', 1, 'Connected APs'),
         ];
+    }
+
+    public function fetchLocation(): Location
+    {
+        $lat_raw = trim(snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.12356.101.19.6.1.3.1', '-Oqv'));
+        $lon_raw = trim(snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.12356.101.19.6.1.4.1', '-Oqv'));
+
+        $lat = null;
+        $lon = null;
+
+        if (preg_match('/^([\d.]+)\s+([NS])$/', trim((string) $lat_raw), $m)) {
+            $lat = (float) $m[1] * ($m[2] === 'S' ? -1 : 1);
+        }
+
+        if (preg_match('/^([\d.]+)\s+([EW])$/', trim((string) $lon_raw), $m)) {
+            $lon = (float) $m[1] * ($m[2] === 'W' ? -1 : 1);
+        }
+
+        if ($lat === null || $lon === null) {
+            return new Location();
+        }
+
+        return new Location([
+            'location' => "GPS {$lat},{$lon}",
+            'lat'      => $lat,
+            'lng'      => $lon,
+        ]);
     }
 }
