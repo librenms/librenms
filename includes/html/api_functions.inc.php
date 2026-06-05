@@ -2119,7 +2119,7 @@ function list_oxidized(Illuminate\Http\Request $request)
 {
     $return = [];
     $devices = Device::query()
-            ->with('attribs')
+            ->with(['attribs', 'location'])
              ->where('disabled', 0)
              ->when($request->route('hostname'), fn ($query, $hostname) => $query->where('hostname', $hostname))
              ->whereNotIn('type', LibrenmsConfig::get('oxidized.ignore_types', []))
