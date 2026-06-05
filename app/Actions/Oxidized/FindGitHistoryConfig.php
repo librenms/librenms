@@ -145,7 +145,15 @@ class FindGitHistoryConfig
 
     private function isSafePathName(string $name): bool
     {
-        return $name !== '' && basename($name) === $name && ! str_contains($name, DIRECTORY_SEPARATOR);
+        return $name !== ''
+            && ! str_starts_with($name, '-')
+            && ! str_contains($name, "\0")
+            && ! str_contains($name, "\n")
+            && ! str_contains($name, "\r")
+            && ! str_contains($name, '/')
+            && ! str_contains($name, '\\')
+            && ! str_contains($name, '..')
+            && basename($name) === $name;
     }
 
     private function isSafeGitPath(string $path): bool
