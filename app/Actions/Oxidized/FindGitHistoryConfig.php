@@ -37,7 +37,10 @@ class FindGitHistoryConfig
      */
     private function resolve(Device $device): ?array
     {
-        if (LibrenmsConfig::get('oxidized.history.enabled') !== true) {
+        if (
+            LibrenmsConfig::get('oxidized.enabled') !== true
+            || LibrenmsConfig::get('oxidized.history.enabled') !== true
+        ) {
             return null;
         }
 

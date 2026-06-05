@@ -148,7 +148,10 @@ class BuildGitHistoryViewData
 
     public function eligible(Device $device): bool
     {
-        if (LibrenmsConfig::get('oxidized.history.enabled') !== true) {
+        if (
+            LibrenmsConfig::get('oxidized.enabled') !== true
+            || LibrenmsConfig::get('oxidized.history.enabled') !== true
+        ) {
             return false;
         }
 
@@ -156,11 +159,11 @@ class BuildGitHistoryViewData
 
         return (bool) $device->disabled
             || $device->getAttrib('override_Oxidized_disable') === 'true'
-            || in_array($device->type, LibrenmsConfig::get('oxidized.ignore_types', []))
-            || in_array($device->os, LibrenmsConfig::get('oxidized.ignore_os', []))
+            || in_array($device->type, LibrenmsConfig::get('oxidized.ignore_types', []), true)
+            || in_array($device->os, LibrenmsConfig::get('oxidized.ignore_os', []), true)
             || (
                 isset($output['group'])
-                && in_array($output['group'], LibrenmsConfig::get('oxidized.ignore_groups', []))
+                && in_array($output['group'], LibrenmsConfig::get('oxidized.ignore_groups', []), true)
             );
     }
 

@@ -79,6 +79,7 @@ class ShowConfigController extends Controller implements DeviceTab
         if (
             LibrenmsConfig::get('oxidized.enabled') !== true
             || ! LibrenmsConfig::has('oxidized.url')
+            || (bool) $device->disabled
             || $device->getAttrib('override_Oxidized_disable') === 'true'
             || in_array($device->type, LibrenmsConfig::get('oxidized.ignore_types', []), true)
             || in_array($device->os, LibrenmsConfig::get('oxidized.ignore_os', []), true)
