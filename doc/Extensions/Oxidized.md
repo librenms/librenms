@@ -309,10 +309,34 @@ next_adds_job: true
 
 ## Accessing configuration of a disabled/removed device
 
-When you're disabling or removing a device from LibreNMS, the
-configuration will no longer be available via the LibreNMS web interface.  
-You can gain access to these configurations directly in the Git repository of
-Oxidized (if using Git for version control).
+If a device is disabled or removed from LibreNMS then the Oxidized
+configuration is normally no longer available via the LibreNMS web interface.
+
+If Oxidized is configured with Git output using local bare Git repositories,
+LibreNMS can optionally show historical configurations for devices that are
+disabled or excluded from the Oxidized source. This only reads existing local
+Git history; it does not add the device back to the Oxidized source API or
+trigger new backups.
+
+!!! setting "external/oxidized"
+    ~~~bash
+    lnms config:set oxidized.history.enabled true
+    lnms config:set oxidized.history.git_repo_base_path /opt/librenms/.config/oxidized
+    ~~~
+
+LibreNMS will try `<base path>/<group>.git` first when the Oxidized group can
+be derived from the existing variable mapping logic. If repositories are stored
+elsewhere, or if a single shared repository is used, add explicit local bare Git
+repository paths with `oxidized.history.git_repo_paths`.
+
+!!! setting "external/oxidized"
+    ~~~bash
+    lnms config:set oxidized.history.git_repo_paths.+ /var/lib/oxidized/configs.git
+    ~~~
+
+If this fallback is not enabled, or no matching local Git history is found, you
+can still access these configurations directly in the Git repository of Oxidized
+(if using Git for version control).
 
 1: Check in your Oxidized where are stored your Git repositories:
 
