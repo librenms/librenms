@@ -37,6 +37,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use SnmpQuery;
 
 class Fortigate extends OS implements
     OSPolling,
@@ -99,8 +100,8 @@ class Fortigate extends OS implements
 
     public function fetchLocation(): Location
     {
-        $lat_raw = trim(snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.12356.101.19.6.1.3.1', '-Oqv'));
-        $lon_raw = trim(snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.12356.101.19.6.1.4.1', '-Oqv'));
+        $lat_raw = trim((string) SnmpQuery::get('.1.3.6.1.4.1.12356.101.19.6.1.3.1')->value());
+        $lon_raw = trim((string) SnmpQuery::get('.1.3.6.1.4.1.12356.101.19.6.1.4.1')->value());
 
         $lat = null;
         $lon = null;
