@@ -60,11 +60,11 @@ class FindGitHistoryConfig
     }
 
     /**
-     * @return array<string, string>
+     * @return iterable<string, string>
      */
-    public function candidateRepos(Device $device): array
+    public function candidateRepos(Device $device): iterable
     {
-        $repos = [];
+        $seen = [];
         $basePath = $this->configuredBasePath();
 
         if ($basePath !== null) {
@@ -72,23 +72,21 @@ class FindGitHistoryConfig
             $group = $output['group'] ?? null;
 
             if (is_string($group) && $this->isSafePathName($group)) {
-                $this->addRepo($repos, $basePath . DIRECTORY_SEPARATOR . $group . '.git', 'group');
+                yield from $this->yieldRepo($seen, $basePath . DIRECTORY_SEPARATOR . $group . '.git', 'group');
             }
         }
 
         foreach (LibrenmsConfig::get('oxidized.history.git_repo_paths', []) as $repo) {
             if (is_string($repo)) {
-                $this->addRepo($repos, $repo, 'configured');
+                yield from $this->yieldRepo($seen, $repo, 'configured');
             }
         }
 
         if ($basePath !== null) {
             foreach (glob($basePath . DIRECTORY_SEPARATOR . '*.git') ?: [] as $repo) {
-                $this->addRepo($repos, $repo, 'base_path');
+                yield from $this->yieldRepo($seen, $repo, 'base_path');
             }
         }
-
-        return $repos;
     }
 
     private function configuredBasePath(): ?string
@@ -125,12 +123,22 @@ class FindGitHistoryConfig
         return $name !== '' && basename($name) === $name && ! str_contains($name, DIRECTORY_SEPARATOR);
     }
 
-    private function addRepo(array &$repos, string $repo, string $source): void
+    /**
+     * @param array<string, bool> $seen
+     * @return iterable<string, string>
+     */
+    private function yieldRepo(array &$seen, string $repo, string $source): iterable
     {
         $repo = rtrim($repo, DIRECTORY_SEPARATOR);
 
-        if (! isset($repos[$repo]) && $this->isBareGitRepo($repo)) {
-            $repos[$repo] = $source;
+        if (isset($seen[$repo])) {
+            return;
+        }
+
+        $seen[$repo] = true;
+
+        if ($this->isBareGitRepo($repo)) {
+            yield $repo => $source;
         }
     }
 
