@@ -10,7 +10,7 @@ class ReadGitHistoryConfig
     /**
      * @return array<int, array{oid: string, date: string, timestamp: int, author: array{name: string}, message: string}>
      */
-    public function versions(string $repo, string $file, int $limit = 50): array
+    public function versions(string $repo, string $file, int $limit = 200): array
     {
         $limit = max(1, min($limit, 200));
 
