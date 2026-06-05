@@ -276,7 +276,7 @@ If it doesn't work, please double check your configuration values by using the `
 Since most Socialite Providers don't provide Authorization only Authentication it is possible to set
 the default User Role for Authorized users.   Appropriate care should be taken.
 
-- none: **No Access**: User has no access
+- none: **No Permissions**: User has no permissions assigned
 
 - normal: **Normal User**: You will need to assign device / port
       permissions for users at this level.
