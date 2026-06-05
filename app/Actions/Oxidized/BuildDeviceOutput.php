@@ -40,7 +40,7 @@ class BuildDeviceOutput
                 if ($field_type == 'sysname') {
                     $value = $device->sysName; // fix typo in previous code forcing users to use sysname instead of sysName
                 } elseif ($field_type == 'location') {
-                    $value = $device->location->location;
+                    $value = $device->location?->location;
                 } else {
                     $value = $device->$field_type;
                 }
