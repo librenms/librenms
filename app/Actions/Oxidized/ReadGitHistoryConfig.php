@@ -25,6 +25,7 @@ class ReadGitHistoryConfig
             '--',
             $file,
         ]);
+        $process->setTimeout(10);
         $process->run();
 
         if (! $process->isSuccessful()) {
@@ -77,6 +78,7 @@ class ReadGitHistoryConfig
             'cat-file',
             '--batch-check',
         ]);
+        $process->setTimeout(10);
 
         $process->setInput(implode(PHP_EOL, array_map(
             static fn (string $oid): string => $oid . ':' . $file,
@@ -108,6 +110,7 @@ class ReadGitHistoryConfig
             'show',
             $oid . ':' . $file,
         ]);
+        $process->setTimeout(10);
         $process->run();
 
         return $process->isSuccessful() ? $process->getOutput() : '';
@@ -119,12 +122,15 @@ class ReadGitHistoryConfig
             'git',
             '--git-dir=' . $repo,
             'diff',
+            '--no-ext-diff',
+            '--no-textconv',
             '--find-renames',
             $previousOid,
             $currentOid,
             '--',
             $file,
         ]);
+        $process->setTimeout(10);
         $process->run();
 
         return $process->isSuccessful() ? $process->getOutput() : '';
