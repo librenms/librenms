@@ -5774,14 +5774,14 @@
             "default": false,
             "group": "external",
             "section": "oxidized",
-            "order": 6,
+            "order": 9,
             "type": "boolean"
         },
         "oxidized.history.git_repo_base_path": {
             "default": false,
             "group": "external",
             "section": "oxidized",
-            "order": 6,
+            "order": 10,
             "type": "text",
             "validate": {
                 "value": "nullable|string"
@@ -5792,7 +5792,7 @@
             "type": "array",
             "group": "external",
             "section": "oxidized",
-            "order": 6,
+            "order": 11,
             "validate": {
                 "value": "array",
                 "value.*": "string"
