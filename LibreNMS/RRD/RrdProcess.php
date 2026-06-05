@@ -5,6 +5,7 @@ namespace LibreNMS\RRD;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdNotFoundException;
+use LibreNMS\Exceptions\RrdUpdateTooFrequentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\Process;
@@ -78,6 +79,9 @@ class RrdProcess
                 $error = $matches[1];
                 if (str_contains($error, 'No such file')) {
                     throw new RrdNotFoundException($error);
+                }
+                if (str_contains($error, 'illegal attempt to update using time')) {
+                    throw new RrdUpdateTooFrequentException($error);
                 }
                 throw new RrdException($error);
             }

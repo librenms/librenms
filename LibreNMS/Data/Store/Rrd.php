@@ -38,6 +38,7 @@ use LibreNMS\Exceptions\FileExistsException;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdNotFoundException;
+use LibreNMS\Exceptions\RrdUpdateTooFrequentException;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Rewrite;
@@ -139,6 +140,8 @@ class Rrd extends BaseDatastore
 
         try {
             $this->update($rrd, $fields);
+        } catch (RrdUpdateTooFrequentException) {
+            Log::debug("RRD warning: update too soon for $rrd");
         } catch (RrdNotFoundException) {
             if (isset($rrd_def)) {
                 $this->command('create', $rrd, ['--step', $step, ...$rrd_def->getArguments(), ...$this->rra]);
@@ -313,7 +316,7 @@ class Rrd extends BaseDatastore
      */
     public function dirFromHost($host): string
     {
-        $host = self::safeName(trim($host, '[]'));
+        $host = self::safeName(trim((string) $host, '[]'));
 
         return Str::finish($this->rrd_dir, '/') . $host;
     }
