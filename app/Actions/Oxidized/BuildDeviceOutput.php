@@ -7,6 +7,9 @@ use App\Models\Device;
 
 class BuildDeviceOutput
 {
+    /**
+     * @return array<string, mixed>
+     */
     public function execute(Device $device): array
     {
         $output = [

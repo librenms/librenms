@@ -129,6 +129,9 @@ class FindGitHistoryConfig
         return rtrim($basePath, DIRECTORY_SEPARATOR);
     }
 
+    /**
+     * @param array<int, string> $candidates
+     */
     private function addCandidate(array &$candidates, mixed $value): void
     {
         if (is_string($value) && $this->isSafeGitPath($value)) {
@@ -136,6 +139,9 @@ class FindGitHistoryConfig
         }
     }
 
+    /**
+     * @param array<int, string> $candidates
+     */
     private function addShortHostnameCandidate(array &$candidates, mixed $value): void
     {
         if (! is_string($value) || $value === '' || filter_var($value, FILTER_VALIDATE_IP)) {
