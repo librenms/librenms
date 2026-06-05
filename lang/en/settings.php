@@ -1635,16 +1635,16 @@ return [
             ],
             'history' => [
                 'enabled' => [
-                    'description' => 'Enable disabled device config history',
-                    'help' => 'Show historical Oxidized configurations for disabled or Oxidized-excluded devices using local Git repositories. Disabled devices are still not sent to Oxidized for new backups.',
+                    'description' => 'Enable Oxidized Git history fallback',
+                    'help' => 'Show historical Oxidized configurations for disabled or Oxidized-excluded devices using local Oxidized Git output repositories. Requires Oxidized Git output with local bare Git repositories. Disabled devices are still not sent to Oxidized for new backups.',
                 ],
                 'git_repo_base_path' => [
-                    'description' => 'Oxidized Git repository base path',
-                    'help' => 'Directory containing local Oxidized Git repositories. LibreNMS will try <group>.git first, based on Oxidized Variable Mapping. Example: /opt/librenms/.config/oxidized',
+                    'description' => 'Oxidized history Git repository base path',
+                    'help' => 'Directory containing local Oxidized bare Git repositories for the history fallback. LibreNMS will try <group>.git first, based on Oxidized Variable Mapping. Requires Oxidized Git output. Example: /opt/librenms/.config/oxidized',
                 ],
                 'git_repo_paths' => [
-                    'description' => 'Additional Oxidized Git repository paths',
-                    'help' => 'Optional explicit local Oxidized Git bare repository paths to search if the base path and group repository do not match.',
+                    'description' => 'Additional Oxidized history Git repository paths',
+                    'help' => 'Optional explicit local Oxidized bare Git repository paths to search, for example when using a single repository or repositories stored outside the base path. Requires Oxidized Git output.',
                 ],
             ],
             'reload_nodes' => [
