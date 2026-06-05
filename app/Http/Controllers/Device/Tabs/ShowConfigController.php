@@ -43,7 +43,7 @@ class ShowConfigController extends Controller implements DeviceTab
     public function visible(Device $device): bool
     {
         if (Gate::allows('show-config', $device)) {
-            return $this->oxidizedEnabled($device) || $this->getRancidConfigFile() !== false;
+            return $this->oxidizedEnabled($device) || $this->oxidizedHistoryEnabled($device) || $this->getRancidConfigFile() !== false;
         }
 
         return false;
@@ -79,6 +79,14 @@ class ShowConfigController extends Controller implements DeviceTab
                 && $device->getAttrib('override_Oxidized_disable') !== 'true'
                 && ! in_array($device->type, LibrenmsConfig::get('oxidized.ignore_types', []))
                 && ! in_array($device->os, LibrenmsConfig::get('oxidized.ignore_os', []));
+    }
+
+    private function oxidizedHistoryEnabled(Device $device): bool
+    {
+        $viewDataBuilder = app(\App\Actions\Oxidized\BuildGitHistoryViewData::class);
+
+        return $viewDataBuilder->eligible($device)
+            && app(\App\Actions\Oxidized\FindGitHistoryConfig::class)->execute($device) !== null;
     }
 
     private function getRancidPath()
