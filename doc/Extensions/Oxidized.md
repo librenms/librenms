@@ -318,6 +318,11 @@ exist in LibreNMS but are disabled or excluded from the Oxidized source. This
 only reads existing local Git history; it does not add the device back to the
 Oxidized source API or trigger new backups.
 
+This fallback only supports local bare Git repositories that can be read
+directly with standard Git commands. Oxidized file output, HTTP output,
+encrypted output that cannot be read as plain Git history, or other non-Git
+history backends are not supported.
+
 !!! setting "external/oxidized"
     ~~~bash
     lnms config:set oxidized.history.enabled true
