@@ -1644,7 +1644,7 @@ return [
                 ],
                 'git_repo_paths' => [
                     'description' => 'Additional Oxidized history Git repository paths',
-                    'help' => 'Optional explicit local Oxidized bare Git repository paths to search, for example when using a single repository or repositories stored outside the base path. Requires Oxidized Git output.',
+                    'help' => 'Optional explicit local Oxidized bare Git repository paths to search, for example when using a single repository or repositories stored outside the base path. Add one repository path per entry. Example: /var/lib/oxidized/configs.git. Requires Oxidized Git output.',
                 ],
             ],
             'reload_nodes' => [
