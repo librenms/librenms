@@ -10,9 +10,6 @@ class Equallogic extends OS
 {
     public function discoverStorage(): Collection
     {
-        // eqliscsiVolumeStatusAllocatedSpace lives in eqliscsiVolumeStatusTable, not in
-        // eqliscsiVolumeTable, so both tables must be walked. They share the same
-        // (eqliscsiLocalMemberId, eqliscsiVolumeIndex) index.
         return \SnmpQuery::mibDir('equallogic')->walk([
             'EQLVOLUME-MIB::eqliscsiVolumeTable',
             'EQLVOLUME-MIB::eqliscsiVolumeStatusTable',
