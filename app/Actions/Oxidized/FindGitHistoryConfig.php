@@ -185,6 +185,7 @@ class FindGitHistoryConfig
         }
 
         $process = new Process(['git', '--git-dir=' . $repo, 'rev-parse', '--is-bare-repository']);
+        $process->setTimeout(10);
         $process->run();
 
         return $process->isSuccessful() && trim($process->getOutput()) === 'true';
