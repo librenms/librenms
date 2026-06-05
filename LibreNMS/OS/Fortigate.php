@@ -120,8 +120,8 @@ class Fortigate extends OS implements
 
         return new Location([
             'location' => "GPS {$lat},{$lon}",
-            'lat'      => $lat,
-            'lng'      => $lon,
+            'lat' => $lat,
+            'lng' => $lon,
         ]);
     }
 }
