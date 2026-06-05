@@ -1636,15 +1636,22 @@ return [
             'history' => [
                 'enabled' => [
                     'description' => 'Enable Oxidized Git history fallback',
-                    'help' => 'Show historical Oxidized configurations for disabled or Oxidized-excluded devices using local Oxidized Git output repositories. Requires Oxidized Git output with local bare Git repositories. Disabled devices are still not sent to Oxidized for new backups.',
+                    'help' => 'Show historical Oxidized configurations for disabled or Oxidized-excluded devices '
+                        . 'using local Oxidized Git output repositories. Requires Oxidized Git output with local '
+                        . 'bare Git repositories. Disabled devices are still not sent to Oxidized for new backups.',
                 ],
                 'git_repo_base_path' => [
                     'description' => 'Oxidized history Git repository base path',
-                    'help' => 'Directory containing local Oxidized bare Git repositories for the history fallback. LibreNMS will try <group>.git first, based on Oxidized Variable Mapping. Requires Oxidized Git output. Example: /opt/librenms/.config/oxidized',
+                    'help' => 'Directory containing local Oxidized bare Git repositories for the history fallback. '
+                        . 'LibreNMS will try <group>.git first, based on Oxidized Variable Mapping. Requires '
+                        . 'Oxidized Git output. Example: /opt/librenms/.config/oxidized',
                 ],
                 'git_repo_paths' => [
                     'description' => 'Additional Oxidized history Git repository paths',
-                    'help' => 'Optional explicit local Oxidized bare Git repository paths to search, for example when using a single repository or repositories stored outside the base path. Add one repository path per entry. Example: /var/lib/oxidized/configs.git. Requires Oxidized Git output.',
+                    'help' => 'Optional explicit local Oxidized bare Git repository paths to search, for example '
+                        . 'when using a single repository or repositories stored outside the base path. Add one '
+                        . 'repository path per entry. Example: /var/lib/oxidized/configs.git. Requires '
+                        . 'Oxidized Git output.',
                 ],
             ],
             'reload_nodes' => [
