@@ -8,6 +8,11 @@ use Symfony\Component\Process\Process;
 
 class FindGitHistoryConfig
 {
+    /**
+     * @var array<int, array{repo: string, file: string, source: string}|null>
+     */
+    private static array $resolved = [];
+
     public function __construct(private readonly BuildDeviceOutput $buildDeviceOutput)
     {
     }
@@ -16,6 +21,20 @@ class FindGitHistoryConfig
      * @return array{repo: string, file: string, source: string}|null
      */
     public function execute(Device $device): ?array
+    {
+        $cacheKey = (int) $device->device_id;
+
+        if (array_key_exists($cacheKey, self::$resolved)) {
+            return self::$resolved[$cacheKey];
+        }
+
+        return self::$resolved[$cacheKey] = $this->resolve($device);
+    }
+
+    /**
+     * @return array{repo: string, file: string, source: string}|null
+     */
+    private function resolve(Device $device): ?array
     {
         if (LibrenmsConfig::get('oxidized.history.enabled') !== true) {
             return null;
