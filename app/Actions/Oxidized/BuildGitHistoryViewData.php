@@ -7,6 +7,13 @@ use App\Models\Device;
 
 class BuildGitHistoryViewData
 {
+    private const NO_MATCHING_HISTORY_WARNING = 'No matching historical Oxidized Git configuration found '
+        . 'for this device. Check the Oxidized history repository base path, additional repository paths, '
+        . 'permissions, and Oxidized Git output.';
+
+    private const NO_READABLE_HISTORY_WARNING = 'No readable historical Oxidized Git versions found '
+        . 'for this device. Check the configured repository path, permissions, and Oxidized Git output.';
+
     public function __construct(
         private readonly BuildDeviceOutput $buildDeviceOutput,
         private readonly FindGitHistoryConfig $findGitHistoryConfig,
@@ -37,11 +44,15 @@ class BuildGitHistoryViewData
 
         $historyConfig = $this->findGitHistoryConfig->execute($device);
         if ($historyConfig === null) {
-            return $this->emptyHistoryData($device, [
-                'repo' => '',
-                'file' => '',
-                'source' => 'not_found',
-            ], 'No matching historical Oxidized Git configuration found for this device. Check the Oxidized history repository base path, additional repository paths, permissions, and Oxidized Git output.');
+            return $this->emptyHistoryData(
+                $device,
+                [
+                    'repo' => '',
+                    'file' => '',
+                    'source' => 'not_found',
+                ],
+                self::NO_MATCHING_HISTORY_WARNING
+            );
         }
 
         $configVersions = $this->readGitHistoryConfig->versions($historyConfig['repo'], $historyConfig['file']);
@@ -51,7 +62,7 @@ class BuildGitHistoryViewData
             return $this->emptyHistoryData(
                 $device,
                 $historyConfig,
-                'No readable historical Oxidized Git versions found for this device. Check the configured repository path, permissions, and Oxidized Git output.'
+                self::NO_READABLE_HISTORY_WARNING
             );
         }
 
@@ -188,7 +199,12 @@ class BuildGitHistoryViewData
      * @param array<string, array<string, mixed>> $versionsByOid
      * @return array{oid: string, date: string, version: int}|null
      */
-    private function previousConfig(array $input, array $currentConfig, array $configVersions, array $versionsByOid): ?array
+    private function previousConfig(
+        array $input,
+        array $currentConfig,
+        array $configVersions,
+        array $versionsByOid
+    ): ?array
     {
         if (! isset($input['diff'])) {
             return null;
