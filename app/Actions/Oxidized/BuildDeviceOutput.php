@@ -26,7 +26,10 @@ class BuildDeviceOutput
         }
 
         // Pre-populate the group with the default
-        if (LibrenmsConfig::get('oxidized.group_support') === true && ! empty(LibrenmsConfig::get('oxidized.default_group'))) {
+        if (
+            LibrenmsConfig::get('oxidized.group_support') === true
+            && ! empty(LibrenmsConfig::get('oxidized.default_group'))
+        ) {
             $output['group'] = LibrenmsConfig::get('oxidized.default_group');
         }
 
@@ -38,7 +41,8 @@ class BuildDeviceOutput
 
             foreach ($maps as $field_type => $fields) {
                 if ($field_type == 'sysname') {
-                    $value = $device->sysName; // fix typo in previous code forcing users to use sysname instead of sysName
+                    // fix typo in previous code forcing users to use sysname instead of sysName
+                    $value = $device->sysName;
                 } elseif ($field_type == 'location') {
                     $value = $device->location?->location;
                 } else {
@@ -47,10 +51,12 @@ class BuildDeviceOutput
 
                 foreach ($fields as $field) {
                     if (isset($field['regex']) && preg_match($field['regex'] . 'i', (string) $value)) {
-                        $output[$maps_column] = $field['value'] ?? $field[$maps_column];  // compatibility with old format
+                        // compatibility with old format
+                        $output[$maps_column] = $field['value'] ?? $field[$maps_column];
                         break;
                     } elseif (isset($field['match']) && $field['match'] == $value) {
-                        $output[$maps_column] = $field['value'] ?? $field[$maps_column]; // compatibility with old format
+                        // compatibility with old format
+                        $output[$maps_column] = $field['value'] ?? $field[$maps_column];
                         break;
                     }
                 }
