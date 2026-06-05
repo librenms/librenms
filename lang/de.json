@@ -348,6 +348,7 @@
   "Time Range": "Zeitbereich",
   "Timestamp": "Zeitstempel",
   "To": "Bis",
+  "Tokens are shown only once when created or reset. Use the REST API with the X-Auth-Token header.": "Token werden nur einmal angezeigt, und zwar bei ihrer Erstellung oder beim Zurücksetzen. Verwenden Sie die REST-API mit dem Header „X-Auth-Token“.",
   "Toner": "Toner",
   "Too many two-factor failures, please contact administrator.": "Zu viele Zweifaktor-Fehler, bitte kontaktieren Sie den Administrator",
   "Too many two-factor failures, please wait :time seconds": "Zu viele Zweifaktor-Fehler, bitte warten Sie :time Sekunden",
