@@ -2,13 +2,25 @@
 <div class="row">
     <div class="col-sm-4">
         <div class="panel panel-primary">
-            <div class="panel-heading">Sync status: <strong>{{ $history['node_info']['status'] }}</strong></div>
+            <div class="panel-heading">
+                {{ __('Sync status') }}: <strong>{{ $history['node_info']['status'] }}</strong>
+            </div>
             <ul class="list-group">
-                <li class="list-group-item"><strong>Node:</strong> {{ $history['node_info']['name'] }}</li>
-                <li class="list-group-item"><strong>IP:</strong> {{ $history['node_info']['ip'] }}</li>
-                <li class="list-group-item"><strong>Model:</strong> {{ $history['node_info']['model'] }}</li>
-                <li class="list-group-item"><strong>Last Sync:</strong> {{ $history['node_info']['last_sync'] }}</li>
-                <li class="list-group-item"><strong>Source:</strong> {{ $history['node_info']['source'] }}</li>
+                <li class="list-group-item">
+                    <strong>{{ __('Node') }}:</strong> {{ $history['node_info']['name'] }}
+                </li>
+                <li class="list-group-item">
+                    <strong>{{ __('IP') }}:</strong> {{ $history['node_info']['ip'] }}
+                </li>
+                <li class="list-group-item">
+                    <strong>{{ __('Model') }}:</strong> {{ $history['node_info']['model'] }}
+                </li>
+                <li class="list-group-item">
+                    <strong>{{ __('Last Sync') }}:</strong> {{ $history['node_info']['last_sync'] }}
+                </li>
+                <li class="list-group-item">
+                    <strong>{{ __('Source') }}:</strong> {{ $history['node_info']['source'] }}
+                </li>
             </ul>
         </div>
     </div>
@@ -19,7 +31,7 @@
                 @csrf
 
                 <div class="form-group">
-                    <label for="config" class="col-sm-2 control-label">Config version</label>
+                    <label for="config" class="col-sm-2 control-label">{{ __('Config version') }}</label>
                     <div class="col-sm-6">
                         <select id="config" name="config" class="form-control">
                             @foreach($history['config_versions'] as $version)
@@ -50,8 +62,12 @@
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-6">
                         <input type="hidden" name="prevconfig" value="{{ implode('|', $history['current_config']) }}">
-                        <button type="submit" class="btn btn-primary btn-sm" name="show">Show version</button>
-                        <button type="submit" class="btn btn-primary btn-sm" name="diff">Show diff</button>
+                        <button type="submit" class="btn btn-primary btn-sm" name="show">
+                            {{ __('Show version') }}
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-sm" name="diff">
+                            {{ __('Show diff') }}
+                        </button>
                     </div>
                 </div>
             </form>
