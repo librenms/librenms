@@ -18,7 +18,7 @@ return [
   'file_write_failed' => 
   [
     'title' => 'Error: No se pudo escribir en el archivo',
-    'message' => 'Error al escribir en el archivo (:file]. Verifique los permisos y SELinux/AppArmor si aplica.',
+    'message' => 'Error al escribir en el archivo (:file). Verifique los permisos y SELinux/AppArmor si aplica.',
   ],
   'host_exists' => 
   [
@@ -29,7 +29,7 @@ return [
   'host_name_empty' => 'El nombre de host está vacío',
   'host_unreachable' => 
   [
-    'unpingable' => 'No se pudo hacer ping a :hostname (:ip]',
+    'unpingable' => 'No se pudo hacer ping a :hostname (:ip)',
     'unsnmpable' => 'No se pudo conectar a :hostname, verifique los datos SNMP y la accesibilidad SNMP',
     'unresolvable' => 'El nombre de host no pudo resolverse a una IP',
     'no_reply_community' => 'SNMP :version: Sin respuesta con comunidad :credentials',
@@ -48,7 +48,7 @@ return [
   'unserializable_route_cache' => 
   [
     'title' => 'Error causado por incompatibilidad de versión de PHP',
-    'message' => 'La versión de PHP de su servidor web (:web_version] no coincide con la versión CLI (:cli_version]',
+    'message' => 'La versión de PHP de su servidor web (:web_version) no coincide con la versión CLI (:cli_version)',
   ],
   'snmp_version_unsupported' => 
   [

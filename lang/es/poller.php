@@ -22,7 +22,7 @@ return [
       ],
       'poller_frequency' => 
       [
-        'description' => 'Frecuencia de poller (¡Advertencia!]',
+        'description' => 'Frecuencia de poller (¡Advertencia!)',
         'help' => 'Cada cuánto sondear dispositivos en este nodo. ¡Advertencia! Cambiar esto sin corregir los archivos rrd romperá las gráficas. Ver la documentación para más información.',
       ],
       'poller_down_retry' => 

@@ -752,6 +752,6 @@ return [
     'created' => 'Rol :name creado exitosamente',
     'updated' => 'Rol :name actualizado exitosamente',
     'deleted' => 'Rol :name eliminado exitosamente',
-    'role_name_regex' => 'Los nombres de rol solo pueden contener letras minúsculas y guiones (-].',
+    'role_name_regex' => 'Los nombres de rol solo pueden contener letras minúsculas y guiones (-).',
   ],
 ];

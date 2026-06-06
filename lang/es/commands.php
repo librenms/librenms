@@ -17,7 +17,7 @@ return [
     'description' => 'Obtener valor de configuración',
     'arguments' => 
     [
-      'setting' => 'Configuración de la que obtener el valor en notación de puntos (ejemplo: snmp.community.0]',
+      'setting' => 'Configuración de la que obtener el valor en notación de puntos (ejemplo: snmp.community.0)',
     ],
     'options' => 
     [
@@ -35,10 +35,10 @@ return [
   ],
   'config:set' => 
   [
-    'description' => 'Establecer valor de configuración (o eliminar]',
+    'description' => 'Establecer valor de configuración (o eliminar)',
     'arguments' => 
     [
-      'setting' => 'Configuración a establecer en notación de puntos (ejemplo: snmp.community.0]. Para agregar a un array, agregue .+ al final',
+      'setting' => 'Configuración a establecer en notación de puntos (ejemplo: snmp.community.0). Para agregar a un array, agregue .+ al final',
       'value' => 'Valor a establecer; si se omite, se eliminará la configuración',
     ],
     'options' => 
@@ -52,7 +52,7 @@ return [
       'append' => 'No se puede agregar a una configuración que no es un array',
       'failed' => 'Error al establecer :setting',
       'invalid' => 'Esta no es una configuración válida. Por favor verifique su entrada',
-      'invalid_os' => 'El OS especificado (:os] no existe',
+      'invalid_os' => 'El OS especificado (:os) no existe',
       'nodb' => 'La base de datos no está conectada',
       'no-validation' => 'No se puede establecer :setting, falta la definición de validación.',
     ],
@@ -86,17 +86,17 @@ return [
     'description' => 'Simular dispositivos usando datos de prueba',
     'arguments' => 
     [
-      'file' => 'Nombre del archivo (solo nombre base] del archivo snmprec a actualizar o agregar a LibreNMS. Si no se especifica el archivo, no se agregará ni actualizará ningún dispositivo.',
+      'file' => 'Nombre del archivo (solo nombre base) del archivo snmprec a actualizar o agregar a LibreNMS. Si no se especifica el archivo, no se agregará ni actualizará ningún dispositivo.',
     ],
     'options' => 
     [
       'multiple' => 'Usar nombre de comunidad para hostname en lugar de snmpsim',
       'remove' => 'Eliminar el dispositivo al detener',
     ],
-    'added' => 'Dispositivo :hostname (:id] agregado',
+    'added' => 'Dispositivo :hostname (:id) agregado',
     'exit' => 'Ctrl-C para detener',
     'removed' => 'Dispositivo :id eliminado',
-    'updated' => 'Dispositivo :hostname (:id] actualizado',
+    'updated' => 'Dispositivo :hostname (:id) actualizado',
     'setup' => 'Configurando venv de snmpsim en :dir',
   ],
   'device:add' => 
@@ -114,7 +114,7 @@ return [
       'display-name' => 'Cadena de texto para mostrar como nombre del dispositivo, por defecto es el hostname.
 Puede ser una plantilla simple usando reemplazos: {{ $hostname }}, {{ $sysName }}, {{ $sysName_fallback }}, {{ $ip }}',
       'force' => 'Agregar el dispositivo directamente, sin verificaciones de seguridad',
-      'group' => 'Grupo de poller (para polling distribuido]',
+      'group' => 'Grupo de poller (para polling distribuido)',
       'ping-fallback' => 'Agregar el dispositivo como solo ping si no responde a SNMP',
       'port-association-mode' => 'Establece cómo se mapean los puertos. ifName es recomendado para Linux/Unix',
       'community' => 'Comunidad SNMP v1 o v2',
@@ -139,7 +139,7 @@ Puede ser una plantilla simple usando reemplazos: {{ $hostname }}, {{ $sysName }
     [
       'save_failed' => 'Error al guardar el dispositivo :hostname',
       'try_force' => 'Puede intentar con la opción --force para omitir las verificaciones de seguridad',
-      'added' => 'Dispositivo :hostname (:device_id] agregado',
+      'added' => 'Dispositivo :hostname (:device_id) agregado',
     ],
   ],
   'device:discover' => 
@@ -147,11 +147,11 @@ Puede ser una plantilla simple usando reemplazos: {{ $hostname }}, {{ $sysName }
     'description' => 'Descubrir información sobre dispositivos existentes, define qué se sondará',
     'arguments' => 
     [
-      'device spec' => 'Especificación del dispositivo a descubrir: device_id, hostname, comodín (*], odd, even, all',
+      'device spec' => 'Especificación del dispositivo a descubrir: device_id, hostname, comodín (*), odd, even, all',
     ],
     'options' => 
     [
-      'modules' => 'Especificar módulo(s] a ejecutar. Se pueden agregar submódulos con /. Se permiten múltiples valores.',
+      'modules' => 'Especificar módulo(s) a ejecutar. Se pueden agregar submódulos con /. Se permiten múltiples valores.',
       'os' => 'Descubrir solo dispositivos con el sistema operativo especificado',
       'type' => 'Descubrir solo dispositivos con el tipo especificado',
     ],
@@ -168,28 +168,28 @@ Puede ser una plantilla simple usando reemplazos: {{ $hostname }}, {{ $sysName }
     'description' => 'Hacer ping al dispositivo y registrar datos de respuesta',
     'arguments' => 
     [
-      'device spec' => 'Dispositivo al que hacer ping: <ID del dispositivo>, <Hostname/IP>, all, fast ("fast" hará ping a todos los dispositivos y actualizará gráficas y estado]',
+      'device spec' => 'Dispositivo al que hacer ping: <ID del dispositivo>, <Hostname/IP>, all, fast ("fast" hará ping a todos los dispositivos y actualizará gráficas y estado)',
     ],
     'options' => 
     [
-      'groups' => 'ID(s] de grupo al que hacer ping. Especifique múltiples veces para múltiples grupos. (solo válido con fast]',
+      'groups' => 'ID(s) de grupo al que hacer ping. Especifique múltiples veces para múltiples grupos. (solo válido con fast)',
     ],
     'errors' => 
     [
-      'groups_without_fast' => 'La opción --groups (-g] solo es compatible con la especificación de dispositivo "fast".',
+      'groups_without_fast' => 'La opción --groups (-g) solo es compatible con la especificación de dispositivo "fast".',
     ],
   ],
   'device:poll' => 
   [
-    'description' => 'Sondear datos de dispositivo(s] según lo definido por el descubrimiento',
+    'description' => 'Sondear datos de dispositivo(s) según lo definido por el descubrimiento',
     'arguments' => 
     [
-      'device spec' => 'Especificación del dispositivo a sondear: device_id, hostname, comodín (*], odd, even, all',
+      'device spec' => 'Especificación del dispositivo a sondear: device_id, hostname, comodín (*), odd, even, all',
     ],
     'options' => 
     [
       'modules' => 'Especificar módulo único a ejecutar. Separar módulos con comas, los submódulos se pueden agregar con /',
-      'no-data' => 'No actualizar almacenes de datos (RRD, InfluxDB, etc.]',
+      'no-data' => 'No actualizar almacenes de datos (RRD, InfluxDB, etc.)',
       'os' => 'Sondear solo dispositivos con el sistema operativo especificado',
       'type' => 'Sondear solo dispositivos con el tipo especificado',
     ],
@@ -225,7 +225,7 @@ Puede ser una plantilla simple usando reemplazos: {{ $hostname }}, {{ $sysName }
     'backups' => 'Este comando podría causar pérdida irreversible de datos e invalidará todas las sesiones de navegador. Asegúrese de tener copias de seguridad.',
     'confirm' => 'Tengo copias de seguridad y deseo continuar',
     'decrypt-failed' => 'Error al descifrar :item, omitiendo',
-    'failed' => 'Error al descifrar elemento(s]. Establezca la nueva clave como APP_KEY y ejecute esto nuevamente con la clave antigua como argumento.',
+    'failed' => 'Error al descifrar elemento(s). Establezca la nueva clave como APP_KEY y ejecute esto nuevamente con la clave antigua como argumento.',
     'current_key' => 'APP_KEY actual: :key',
     'new_key' => 'Nueva APP_KEY: :key',
     'old_key' => 'APP_KEY antigua: :key',
@@ -260,7 +260,7 @@ Puede ser una plantilla simple usando reemplazos: {{ $hostname }}, {{ $sysName }
       'force' => 'Ignorar cualquier configuración o bloqueo que impida ejecutar el comando',
       'wait' => 'Esperar un tiempo aleatorio, usado por el planificador para evitar sobrecarga del servidor',
     ],
-    'disabled' => 'Integración de MAC OUI deshabilitada (:setting]',
+    'disabled' => 'Integración de MAC OUI deshabilitada (:setting)',
     'enable_question' => '¿Habilitar integración de MAC OUI y la obtención programada?',
     'recently_fetched' => 'La base de datos de MAC OUI fue obtenida recientemente, omitiendo actualización.',
     'waiting' => 'Esperando :minutes minuto antes de intentar actualización de MAC OUI|Esperando :minutes minutos antes de intentar actualización de MAC OUI',
@@ -298,16 +298,16 @@ Puede ser una plantilla simple usando reemplazos: {{ $hostname }}, {{ $sysName }
     'description' => 'Limpiar entradas de syslog más antiguas que un número específico de días',
     'arguments' => 
     [
-      'days' => 'Número de días a conservar entradas de syslog (predeterminado: valor configurado en syslog_purge]',
+      'days' => 'Número de días a conservar entradas de syslog (predeterminado: valor configurado en syslog_purge)',
     ],
     'bad_days_input' => 'Los días deben ser numéricos',
     'bad_days_setting' => 'Limpieza de syslog deshabilitada debido a configuración inválida de syslog_purge',
-    'delete' => 'Entradas de syslog anteriores a :days días eliminadas (:count filas]',
+    'delete' => 'Entradas de syslog anteriores a :days días eliminadas (:count filas)',
     'disabled' => 'Limpieza de syslog deshabilitada, días <= 0',
   ],
   'maintenance:discover-ssl-certificates' => 
   [
-    'description' => 'Descubrir certificados SSL en dispositivos (puerto HTTPS 443]',
+    'description' => 'Descubrir certificados SSL en dispositivos (puerto HTTPS 443)',
     'options' => 
     [
       'device' => 'Especificación de dispositivo: device_id, hostname, o all',
@@ -320,7 +320,7 @@ Puede ser una plantilla simple usando reemplazos: {{ $hostname }}, {{ $sysName }
     'description' => 'Actualizar datos de certificados SSL almacenados',
     'options' => 
     [
-      'id' => 'ID del certificado a actualizar (omitir para actualizar todos los habilitados]',
+      'id' => 'ID del certificado a actualizar (omitir para actualizar todos los habilitados)',
     ],
     'none' => 'No hay certificados habilitados para actualizar',
     'summary' => 'Actualizados: :refreshed, Fallidos: :failed',
@@ -334,25 +334,25 @@ Puede ser una plantilla simple usando reemplazos: {{ $hostname }}, {{ $sysName }
     ],
     'already_disabled' => 'El plugin ya está deshabilitado',
     'disabled' => ':count plugin deshabilitado|:count plugins deshabilitados',
-    'failed' => 'Error al deshabilitar plugin(s]',
+    'failed' => 'Error al deshabilitar plugin(s)',
   ],
   'plugin:enable' => 
   [
     'description' => 'Habilitar el plugin más reciente con el nombre dado',
     'arguments' => 
     [
-      'plugin' => 'El nombre del plugin a habilitar o "all" para deshabilitar todos los plugins',
+      'plugin' => 'El nombre del plugin a habilitar o "all" para habilitar todos los plugins',
     ],
     'already_enabled' => 'El plugin ya está habilitado',
     'enabled' => ':count plugin habilitado|:count plugins habilitados',
-    'failed' => 'Error al habilitar plugin(s]',
+    'failed' => 'Error al habilitar plugin(s)',
   ],
   'port:tune' => 
   [
     'description' => 'Ajustar archivos RRD de puertos para limitar la tasa de transferencia máxima según ifSpeed',
     'arguments' => 
     [
-      'device spec' => 'Especificación del dispositivo a ajustar: device_id, hostname, comodín (*], odd, even, all',
+      'device spec' => 'Especificación del dispositivo a ajustar: device_id, hostname, comodín (*), odd, even, all',
       'ifname' => 'ifName del puerto a coincidir, puede usar all o * como comodín',
     ],
     'device' => 'Dispositivo :device:',
@@ -366,12 +366,12 @@ Puede ser una plantilla simple usando reemplazos: {{ $hostname }}, {{ $sysName }
     'counts' => 'Conteos de relaciones:',
     'arguments' => 
     [
-      'device spec' => 'Especificación del dispositivo a sondear: device_id, hostname, comodín (*], odd, even, all',
+      'device spec' => 'Especificación del dispositivo a sondear: device_id, hostname, comodín (*), odd, even, all',
     ],
     'options' => 
     [
       'list-fields' => 'Imprimir una lista de campos válidos',
-      'fields' => 'Lista de campos separados por comas a mostrar. Opciones válidas: nombres de columnas de dispositivos de la base de datos, conteos de relaciones (ports_count] y/o displayName. No se usa para salida JSON.',
+      'fields' => 'Lista de campos separados por comas a mostrar. Opciones válidas: nombres de columnas de dispositivos de la base de datos, conteos de relaciones (ports_count) y/o displayName. No se usa para salida JSON.',
       'output' => 'Formato de salida para mostrar los datos :types',
       'no-header' => 'No agregar el encabezado',
       'relationships' => 'Lista de relaciones separadas por comas a incluir. Solo se usa para salida JSON.',
@@ -406,8 +406,8 @@ Puede ser una plantilla simple usando reemplazos: {{ $hostname }}, {{ $sysName }
     'description' => 'Ejecutar consulta SNMP contra un dispositivo',
     'arguments' => 
     [
-      'device spec' => 'Especificación del dispositivo a sondear: device_id, hostname, comodín (*], odd, even, all',
-      'oid(s]' => 'Uno o más OIDs SNMP a obtener. Deben estar en formato MIB::oid o OID numérico',
+      'device spec' => 'Especificación del dispositivo a sondear: device_id, hostname, comodín (*), odd, even, all',
+      'oid(s)' => 'Uno o más OIDs SNMP a obtener. Deben estar en formato MIB::oid o OID numérico',
     ],
     'failed' => '¡El comando SNMP falló!',
     'numeric' => 'Numérico',
@@ -445,10 +445,10 @@ Puede ser una plantilla simple usando reemplazos: {{ $hostname }}, {{ $sysName }
     [
       'username' => 'Nombre de usuario',
       'password' => 'Contraseña',
-      'roles' => 'Seleccionar rol(es] de usuario',
-      'email' => 'Correo electrónico (opcional]',
-      'full-name' => 'Nombre completo (opcional]',
-      'descr' => 'Descripción (opcional]',
+      'roles' => 'Seleccionar rol(es) de usuario',
+      'email' => 'Correo electrónico (opcional)',
+      'full-name' => 'Nombre completo (opcional)',
+      'descr' => 'Descripción (opcional)',
     ],
     'success' => 'Usuario agregado exitosamente: :username',
     'wrong-auth' => 'Advertencia! No podrá iniciar sesión con este usuario porque no está usando autenticación MySQL',

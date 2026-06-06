@@ -88,7 +88,7 @@ return [
       [
         'fail' => 'No se puede conectar a la base de datos',
         'fail_connect' => 'No se puede conectar a la base de datos. Confirme que el servidor de base de datos está en ejecución y que la información de conexión es correcta. Verifique DB_HOST, DB_PORT y DB_NAME en el entorno o en :env_file',
-        'fail_access' => 'Base de datos conectada, pero el usuario no tiene permiso para acceder. Ejecute la consulta SQL para otorgar permisos (cambie localhost por el nombre de host local si la base de datos es remota]',
+        'fail_access' => 'Base de datos conectada, pero el usuario no tiene permiso para acceder. Ejecute la consulta SQL para otorgar permisos (cambie localhost por el nombre de host local si la base de datos es remota)',
         'fail_auth' => 'Credenciales de base de datos incorrectas. Verifique DB_USERNAME y DB_PASSWORD en el entorno o en :env_file',
         'ok' => 'Base de datos conectada',
       ],
@@ -120,10 +120,10 @@ return [
       'CheckSchemaVersion' => 
       [
         'fail_outdated' => '¡Su base de datos está desactualizada!',
-        'fail_legacy_outdated' => 'Su esquema de base de datos (:current] es más antiguo que el último (:latest].',
+        'fail_legacy_outdated' => 'Su esquema de base de datos (:current) es más antiguo que el último (:latest).',
         'fix_legacy_outdated' => 'Ejecute manualmente ./daily.sh y verifique si hay errores.',
-        'warn_extra_migrations' => 'Su esquema de base de datos tiene migraciones adicionales (:migrations]. Si acaba de cambiar de la versión diaria a la estable, su base de datos está entre versiones y esto se resolverá con la próxima versión.',
-        'warn_legacy_newer' => 'Su esquema de base de datos (:current] es más nuevo de lo esperado (:latest]. Si acaba de cambiar de la versión diaria a la estable, su base de datos está entre versiones y esto se resolverá con la próxima versión.',
+        'warn_extra_migrations' => 'Su esquema de base de datos tiene migraciones adicionales (:migrations). Si acaba de cambiar de la versión diaria a la estable, su base de datos está entre versiones y esto se resolverá con la próxima versión.',
+        'warn_legacy_newer' => 'Su esquema de base de datos (:current) es más nuevo de lo esperado (:latest). Si acaba de cambiar de la versión diaria a la estable, su base de datos está entre versiones y esto se resolverá con la próxima versión.',
         'ok' => 'El esquema de base de datos está actualizado',
       ],
       'CheckSchemaCollation' => 

@@ -30,7 +30,7 @@ return [
       4 => 'Parámetro opcional no soportado',
       5 => '[Obsoleto]',
       6 => 'Tiempo de espera inaceptable',
-      7 => 'Conflicto de rol (Borrador BGP temporal]',
+      7 => 'Conflicto de rol (Borrador BGP temporal)',
     ],
     3 => 
     [

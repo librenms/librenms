@@ -125,7 +125,7 @@ return [
           'ellipse' => 'Elipse',
           'text' => 'Texto',
           'device_image' => 'Imagen del dispositivo',
-          'device_image_circle' => 'Imagen del dispositivo (circular]',
+          'device_image_circle' => 'Imagen del dispositivo (circular)',
           'diamond' => 'Diamante',
           'dot' => 'Punto',
           'star' => 'Estrella',
@@ -133,7 +133,7 @@ return [
           'triangle_inverted' => 'Triángulo invertido',
           'hexagon' => 'Hexágono',
           'square' => 'Cuadrado',
-          'icon' => 'Ícono (seleccionar abajo]',
+          'icon' => 'Ícono (seleccionar abajo)',
         ],
         'icon' => 'Ícono',
         'icon_options' => 

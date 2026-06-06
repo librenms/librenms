@@ -94,7 +94,7 @@ return [
       ],
       'sso' => 
       [
-        'name' => 'Inicio de Sesión Único (SSO]',
+        'name' => 'Inicio de Sesión Único (SSO)',
       ],
     ],
     'authorization' => 
@@ -382,7 +382,7 @@ return [
       'default_operation_steps_to' => 
       [
         'description' => 'Operación predeterminada: Pasos hacia',
-        'help' => 'Paso final de escalado predeterminado para filas de operaciones creadas (-1 significa sin límite]',
+        'help' => 'Paso final de escalado predeterminado para filas de operaciones creadas (-1 significa sin límite)',
       ],
       'default_operation_start_in' => 
       [
@@ -392,7 +392,7 @@ return [
       'default_operation_step_duration' => 
       [
         'description' => 'Operación predeterminada: Duración del paso',
-        'help' => 'Duración predeterminada del paso de operación (minutos]',
+        'help' => 'Duración predeterminada del paso de operación (minutos)',
       ],
       'default_operation_notifications_suppressed' => 
       [
@@ -429,27 +429,27 @@ return [
       ],
       'admins' => 
       [
-        'description' => 'Issue alerts to admins (deprecated]',
+        'description' => 'Issue alerts to admins (deprecated)',
         'help' => 'Deprecated, use the mail alert transport instead.',
       ],
       'default_copy' => 
       [
-        'description' => 'Copy all email alerts to default contact (deprecated]',
+        'description' => 'Copy all email alerts to default contact (deprecated)',
         'help' => 'Deprecated, use the mail alert transport instead.',
       ],
       'default_if_none' => 
       [
-        'description' => 'cannot set in webui? (deprecated]',
+        'description' => 'cannot set in webui? (deprecated)',
         'help' => 'Deprecated, use the mail alert transport instead.',
       ],
       'default_mail' => 
       [
-        'description' => 'Default contact (deprecated]',
+        'description' => 'Default contact (deprecated)',
         'help' => 'Deprecated, use the mail alert transport instead.',
       ],
       'default_only' => 
       [
-        'description' => 'Send alerts to default contact only (deprecated]',
+        'description' => 'Send alerts to default contact only (deprecated)',
         'help' => 'Deprecated, use the mail alert transport instead.',
       ],
       'disable' => 
@@ -469,7 +469,7 @@ return [
       ],
       'globals' => 
       [
-        'description' => 'Issue alerts to read only users (deprecated]',
+        'description' => 'Issue alerts to read only users (deprecated)',
         'help' => 'Deprecated, use the mail alert transport instead.',
       ],
       'scheduled_maintenance_default_behavior' => 
@@ -485,7 +485,7 @@ return [
       ],
       'syscontact' => 
       [
-        'description' => 'Issue alerts to sysContact (deprecated]',
+        'description' => 'Issue alerts to sysContact (deprecated)',
         'help' => 'Deprecated, use the mail alert transport instead.',
       ],
       'transports' => 
@@ -503,7 +503,7 @@ return [
       ],
       'users' => 
       [
-        'description' => 'Issue alerts to normal users (deprecated]',
+        'description' => 'Issue alerts to normal users (deprecated)',
         'help' => 'Deprecated, use the mail alert transport instead.',
       ],
     ],
@@ -530,7 +530,7 @@ return [
     'allow_unauth_graphs_cidr' => 
     [
       'description' => 'Allow the given networks graph access',
-      'help' => 'Allow the given networks unauthenticated graph access (does not apply when unauthenticated graphs is enabled]',
+      'help' => 'Allow the given networks unauthenticated graph access (does not apply when unauthenticated graphs is enabled)',
     ],
     'api' => 
     [
@@ -648,7 +648,7 @@ return [
     [
       'allow_get_login' => 
       [
-        'description' => 'Allow get login (Insecure]',
+        'description' => 'Allow get login (Insecure)',
         'help' => 'Allow login by putting username and password variables in the url get request, useful for display systems where you cannot interactively log in. This is considered insecure because the password will be shown in logs and logins are not rate limited so it could open you up to brute force attacks.',
       ],
       'socialite' => 
@@ -739,8 +739,8 @@ return [
     ],
     'auth_ad_url' => 
     [
-      'description' => 'Active Directory Server(s]',
-      'help' => 'Set server(s], space separated. Prefix with ldaps:// for ssl. Example: ldaps://dc1.example.com ldaps://dc2.example.com',
+      'description' => 'Active Directory Server(s)',
+      'help' => 'Set server(s), space separated. Prefix with ldaps:// for ssl. Example: ldaps://dc1.example.com ldaps://dc2.example.com',
     ],
     'auth_ldap_attr' => 
     [
@@ -752,7 +752,7 @@ return [
     ],
     'auth_ldap_binddn' => 
     [
-      'description' => 'Bind DN (overrides bind username]',
+      'description' => 'Bind DN (overrides bind username)',
       'help' => 'Full DN of bind user',
     ],
     'auth_ldap_bindpassword' => 
@@ -763,11 +763,11 @@ return [
     'auth_ldap_binduser' => 
     [
       'description' => 'Bind username',
-      'help' => 'Used to query the LDAP server when no user is logged in (alerts, API, etc]',
+      'help' => 'Used to query the LDAP server when no user is logged in (alerts, API, etc)',
     ],
     'auth_ad_binddn' => 
     [
-      'description' => 'Bind DN (overrides bind username]',
+      'description' => 'Bind DN (overrides bind username)',
       'help' => 'Full DN of bind user',
     ],
     'auth_ad_bindpassword' => 
@@ -778,7 +778,7 @@ return [
     'auth_ad_binduser' => 
     [
       'description' => 'Bind username',
-      'help' => 'Used to query the AD server when no user is logged in (alerts, API, etc]',
+      'help' => 'Used to query the AD server when no user is logged in (alerts, API, etc)',
     ],
     'auth_ad_starttls' => 
     [
@@ -835,8 +835,8 @@ return [
       'options' => 
       [
         'username' => 'Username',
-        'fulldn' => 'Full DN (using prefix and suffix]',
-        'puredn' => 'DN Search (search using uid attribute]',
+        'fulldn' => 'Full DN (using prefix and suffix)',
+        'puredn' => 'DN Search (search using uid attribute)',
       ],
     ],
     'auth_ldap_groups' => 
@@ -847,7 +847,7 @@ return [
     'auth_ldap_require_groupmembership' => 
     [
       'description' => 'LDAP Group membership verification',
-      'help' => 'Perform (or skip] ldap_compare when the provider allows (or does not] for the Compare action.',
+      'help' => 'Perform (or skip) ldap_compare when the provider allows (or does not) for the Compare action.',
     ],
     'auth_ldap_port' => 
     [
@@ -861,8 +861,8 @@ return [
     ],
     'auth_ldap_server' => 
     [
-      'description' => 'LDAP Server(s]',
-      'help' => 'Set server(s], space separated. Prefix with ldaps:// for ssl',
+      'description' => 'LDAP Server(s)',
+      'help' => 'Set server(s), space separated. Prefix with ldaps:// for ssl',
     ],
     'auth_ldap_starttls' => 
     [
@@ -893,7 +893,7 @@ return [
     'auth_ldap_userdn' => 
     [
       'description' => 'Use full user DN',
-      'help' => 'Uses a user\'s full DN as the value of the member attribute in a group instead of member: username using the prefix and suffix. (it\'s member: uid=username,ou=groups,dc=domain,dc=com]',
+      'help' => 'Uses a user\'s full DN as the value of the member attribute in a group instead of member: username using the prefix and suffix. (it\'s member: uid=username,ou=groups,dc=domain,dc=com)',
     ],
     'auth_ldap_userlist_filter' => 
     [
@@ -917,11 +917,11 @@ return [
     ],
     'auth_mechanism' => 
     [
-      'description' => 'Authorization Method (Caution!]',
+      'description' => 'Authorization Method (Caution!)',
       'help' => 'Authorization method.  Caution, you may lose the ability to log in. You can override this back to mysql by setting $config[\'auth_mechanism\'] = \'mysql\'; in your config.php',
       'options' => 
       [
-        'mysql' => 'MySQL (default]',
+        'mysql' => 'MySQL (default)',
         'active_directory' => 'Active Directory',
         'ldap' => 'LDAP',
         'radius' => 'Radius',
@@ -941,7 +941,7 @@ return [
       'description' => 'Auth log entries older than',
       'help' => 'Cleanup done by daily.sh',
     ],
-    'availablity' => 
+    'availability' => 
     [
       'threshold_ok' => 
       [
@@ -950,7 +950,7 @@ return [
       ],
       'threshold_warning' => 
       [
-        'description' => 'Availablilty Warning Threshold',
+        'description' => 'Availability Warning Threshold',
         'help' => 'Threshold for orange color',
       ],
     ],
@@ -975,12 +975,12 @@ return [
     'peering_descr' => 
     [
       'description' => 'Peering Port Types',
-      'help' => 'Ports of the listed description type(s] will be shown under the peering ports menu entry.  See Interface Description Parsing docs for more info.',
+      'help' => 'Ports of the listed description type(s) will be shown under the peering ports menu entry.  See Interface Description Parsing docs for more info.',
     ],
     'transit_descr' => 
     [
       'description' => 'Transit Port Types',
-      'help' => 'Ports of the listed description type(s] will be shown under the transit ports menu entry.  See Interface Description Parsing docs for more info.',
+      'help' => 'Ports of the listed description type(s) will be shown under the transit ports menu entry.  See Interface Description Parsing docs for more info.',
     ],
     'collectd_dir' => 
     [
@@ -995,12 +995,12 @@ return [
     'core_descr' => 
     [
       'description' => 'Core Port Types',
-      'help' => 'Ports of the listed description type(s] will be shown under the core ports menu entry.  See Interface Description Parsing docs for more info.',
+      'help' => 'Ports of the listed description type(s) will be shown under the core ports menu entry.  See Interface Description Parsing docs for more info.',
     ],
     'custom_descr' => 
     [
       'description' => 'Custom Port Types',
-      'help' => 'Ports of the listed description type(s] will be shown under the custom ports menu entry.  See Interface Description Parsing docs for more info.',
+      'help' => 'Ports of the listed description type(s) will be shown under the custom ports menu entry.  See Interface Description Parsing docs for more info.',
     ],
     'custom_map' => 
     [
@@ -1105,7 +1105,7 @@ return [
       'reverse_arrows' => 
       [
         'description' => 'Reverse Edge Arrows',
-        'help' => 'Default arrow direction. Towards center (default] or towards ends',
+        'help' => 'Default arrow direction. Towards center (default) or towards ends',
       ],
       'width' => 
       [
@@ -1116,7 +1116,7 @@ return [
     'customers_descr' => 
     [
       'description' => 'Customer Port Types',
-      'help' => 'Ports of the listed description type(s] will be shown under the customers ports menu entry.  See Interface Description Parsing docs for more info.',
+      'help' => 'Ports of the listed description type(s) will be shown under the customers ports menu entry.  See Interface Description Parsing docs for more info.',
     ],
     'base_url' => 
     [
@@ -1306,7 +1306,7 @@ return [
     ],
     'distributed_poller' => 
     [
-      'description' => 'Enable Distributed Polling (requires additional setup]',
+      'description' => 'Enable Distributed Polling (requires additional setup)',
       'help' => 'Enable distributed polling system wide. This is intended for load sharing, not remote polling. You must read the documentation for steps to enable: https://docs.librenms.org/Extensions/Distributed-Poller/',
     ],
     'default_poller_group' => 
@@ -1367,7 +1367,7 @@ return [
     'email_from' => 
     [
       'description' => 'From email address',
-      'help' => 'Email address used for sending emails (from]',
+      'help' => 'Email address used for sending emails (from)',
     ],
     'email_html' => 
     [
@@ -1523,7 +1523,7 @@ return [
       'api_key' => 
       [
         'description' => 'Mapping Engine API Key',
-        'help' => 'Geocoding API Key (Required to function]',
+        'help' => 'Geocoding API Key (Required to function)',
       ],
       'dns' => 
       [
@@ -1578,7 +1578,7 @@ return [
       ],
       'prefix' => 
       [
-        'description' => 'Prefix (Optional]',
+        'description' => 'Prefix (Optional)',
         'help' => 'Will add the prefix to the start of all metrics.  Must be alphanumeric separated by dots',
       ],
     ],
@@ -1587,7 +1587,7 @@ return [
       'availability' => 
       [
         'description' => 'Duration',
-        'help' => 'Calculate Device Availability for listed durations. (Durations are defined in seconds]',
+        'help' => 'Calculate Device Availability for listed durations. (Durations are defined in seconds)',
       ],
       'availability_consider_maintenance' => 
       [
@@ -1768,7 +1768,7 @@ return [
         [
           'http' => 'HTTP',
           'https' => 'HTTPS',
-          'udp' => 'UDPRRRRRRR',
+          'udp' => 'UDP',
         ],
       ],
       'username' => 
@@ -1945,7 +1945,7 @@ return [
           'location' => 
           [
             'description' => 'SSL Certificate Authority Location',
-            'help' => 'File or directory path to CA certificate(s] for verifying the broker\'s key.',
+            'help' => 'File or directory path to CA certificate(s) for verifying the broker\'s key.',
           ],
         ],
         'certificate' => 
@@ -1953,7 +1953,7 @@ return [
           'location' => 
           [
             'description' => 'SSL Certificate Location',
-            'help' => 'Path to client\'s public key (PEM] used for authentication.',
+            'help' => 'Path to client\'s public key (PEM) used for authentication.',
           ],
         ],
         'key' => 
@@ -1961,12 +1961,12 @@ return [
           'location' => 
           [
             'description' => 'SSL Certificate Key Location',
-            'help' => 'Path to client\'s private key (PEM] used for authentication.',
+            'help' => 'Path to client\'s private key (PEM) used for authentication.',
           ],
           'password' => 
           [
             'description' => 'SSL Certificate Key Password',
-            'help' => 'Private key passphrase (to be used with kafka.ssl.key.location].',
+            'help' => 'Private key passphrase (to be used with kafka.ssl.key.location).',
           ],
         ],
         'keystore' => 
@@ -1974,12 +1974,12 @@ return [
           'location' => 
           [
             'description' => 'SSL Keystore Certificate Location',
-            'help' => 'Path to client\'s keystore (PKCS#12] used for authentication.',
+            'help' => 'Path to client\'s keystore (PKCS#12) used for authentication.',
           ],
           'password' => 
           [
             'description' => 'SSL Keystore Key Password',
-            'help' => 'Client\'s keystore (PKCS#12] password.',
+            'help' => 'Client\'s keystore (PKCS#12) password.',
           ],
         ],
       ],
@@ -2107,7 +2107,7 @@ return [
       'enabled' => 
       [
         'description' => 'Enable MAC OUI lookup',
-        'help' => 'Enable mac-address vendor (OUI] lookup (data is downloaded by daily.sh]',
+        'help' => 'Enable mac-address vendor (OUI) lookup (data is downloaded by daily.sh)',
       ],
     ],
     'mono_font' => 
@@ -2123,7 +2123,7 @@ return [
       'bytes' => 
       [
         'description' => 'MTU test packet size',
-        'help' => 'Size of packets for MTU test in bytes (blank to disable MTU tests]',
+        'help' => 'Size of packets for MTU test in bytes (blank to disable MTU tests)',
       ],
     ],
     'mydomain' => 
@@ -2134,7 +2134,7 @@ return [
     'network_map_show_on_worldmap' => 
     [
       'description' => 'Display network links on the map',
-      'help' => 'Show the networks links between the different location on the worldmap (weathermap-like]',
+      'help' => 'Show the networks links between the different location on the worldmap (weathermap-like)',
     ],
     'network_map_worldmap_show_disabled_alerts' => 
     [
@@ -2251,7 +2251,7 @@ return [
       'ignore_groups' => 
       [
         'description' => 'Do not backup these Oxidized groups',
-        'help' => 'Groups (set via Variable Mapping] excluded from being sent to Oxidized',
+        'help' => 'Groups (set via Variable Mapping) excluded from being sent to Oxidized',
       ],
       'enabled' => 
       [
@@ -2262,7 +2262,7 @@ return [
         'versioning' => 
         [
           'description' => 'Enable config versioning access',
-          'help' => 'Enable Oxidized config versioning (requires git backend]',
+          'help' => 'Enable Oxidized config versioning (requires git backend)',
         ],
       ],
       'group_support' => 
@@ -2272,7 +2272,7 @@ return [
       'ignore_os' => 
       [
         'description' => 'Do not backup these OS',
-        'help' => 'Do not backup the listed OS with Oxidized.  The OS must match the LibreNMS OS name (these are all lowercase with no spaces].  Only allows existing OS.',
+        'help' => 'Do not backup the listed OS with Oxidized.  The OS must match the LibreNMS OS name (these are all lowercase with no spaces).  Only allows existing OS.',
       ],
       'ignore_types' => 
       [
@@ -2291,7 +2291,7 @@ return [
       'url' => 
       [
         'description' => 'URL to your Oxidized API',
-        'help' => 'Oxidized API url (For example: http://127.0.0.1:8888]',
+        'help' => 'Oxidized API url (For example: http://127.0.0.1:8888)',
       ],
     ],
     'page_refresh' => 
@@ -2317,7 +2317,7 @@ return [
       'enabled' => 
       [
         'description' => 'Enable PeeringDB lookup',
-        'help' => 'Enable PeeringDB lookup (data is downloaded with daily.sh]',
+        'help' => 'Enable PeeringDB lookup (data is downloaded with daily.sh)',
       ],
     ],
     'percentile_value' => 
@@ -2702,7 +2702,7 @@ return [
       'default_roles' => 
       [
         'description' => 'Default user roles',
-        'help' => 'Sets the roles that will be assigned to the user unless Radius sends attributes that specify role(s]',
+        'help' => 'Sets the roles that will be assigned to the user unless Radius sends attributes that specify role(s)',
       ],
       'enforce_roles' => 
       [
@@ -2744,7 +2744,7 @@ return [
       ],
       'dump_errors' => 
       [
-        'description' => 'Dump debug errors (Will break your install]',
+        'description' => 'Dump debug errors (Will break your install)',
         'help' => 'Dump out errors that are normally hidden so you as a developer can find and fix the possible issues.',
       ],
       'throttle' => 
@@ -2767,11 +2767,11 @@ return [
     [
       'heartbeat' => 
       [
-        'description' => 'Change the rrd heartbeat value (default 600]',
+        'description' => 'Change the rrd heartbeat value (default 600)',
       ],
       'step' => 
       [
-        'description' => 'Change the rrd step value (default 300]',
+        'description' => 'Change the rrd step value (default 300)',
       ],
     ],
     'rrd_dir' => 
@@ -2791,8 +2791,8 @@ return [
     ],
     'rrdcached' => 
     [
-      'description' => 'Enable rrdcached (socket]',
-      'help' => 'Enables rrdcached by setting the location of the rrdcached socket. Can be unix or network socket (unix:/run/rrdcached.sock or localhost:42217]',
+      'description' => 'Enable rrdcached (socket)',
+      'help' => 'Enables rrdcached by setting the location of the rrdcached socket. Can be unix or network socket (unix:/run/rrdcached.sock or localhost:42217)',
     ],
     'rrdtool' => 
     [
@@ -2816,8 +2816,8 @@ return [
         'help' => 'Alerting task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_billing_enabled is set to true.',
         'options' => 
         [
-          'legacy' => 'Legacy (Unrestricted]',
-          'cron' => 'Cron (alerts.php]',
+          'legacy' => 'Legacy (Unrestricted)',
+          'cron' => 'Cron (alerts.php)',
           'dispatcher' => 'Dispatcher Service',
         ],
       ],
@@ -2827,8 +2827,8 @@ return [
         'help' => 'Billing task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_billing_enabled is set to true.',
         'options' => 
         [
-          'legacy' => 'Legacy (Unrestricted]',
-          'cron' => 'Cron (poll-billing.php and billing-calculate.php]',
+          'legacy' => 'Legacy (Unrestricted)',
+          'cron' => 'Cron (poll-billing.php and billing-calculate.php)',
           'dispatcher' => 'Dispatcher Service',
         ],
       ],
@@ -2838,8 +2838,8 @@ return [
         'help' => 'Discovery task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_discovery_enabled is set to true.',
         'options' => 
         [
-          'legacy' => 'Legacy (Unrestricted]',
-          'cron' => 'Cron (lnms device:discover]',
+          'legacy' => 'Legacy (Unrestricted)',
+          'cron' => 'Cron (lnms device:discover)',
           'dispatcher' => 'Dispatcher Service',
         ],
       ],
@@ -2849,9 +2849,9 @@ return [
         'help' => 'Fast ping task scheduling method. Legacy will use cron if the crontab entry exists and use the dispatcher service if the legacy config option service_ping_enabled is set to true.',
         'options' => 
         [
-          'legacy' => 'Legacy (Unrestricted]',
-          'disabled' => 'Disabled (pings only during polling]',
-          'cron' => 'Cron (ping.php]',
+          'legacy' => 'Legacy (Unrestricted)',
+          'disabled' => 'Disabled (pings only during polling)',
+          'cron' => 'Cron (ping.php)',
           'dispatcher' => 'Dispatcher Service',
         ],
       ],
@@ -2861,8 +2861,8 @@ return [
         'help' => 'Poller task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_poller_enabled is set to true.',
         'options' => 
         [
-          'legacy' => 'Legacy (Unrestricted]',
-          'cron' => 'Cron (poller.php]',
+          'legacy' => 'Legacy (Unrestricted)',
+          'cron' => 'Cron (poller.php)',
           'dispatcher' => 'Dispatcher Service',
         ],
       ],
@@ -2872,8 +2872,8 @@ return [
         'help' => 'Services task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_services_enabled is set to true.',
         'options' => 
         [
-          'legacy' => 'Legacy (Unrestricted]',
-          'cron' => 'Cron (check-services.php]',
+          'legacy' => 'Legacy (Unrestricted)',
+          'cron' => 'Cron (check-services.php)',
           'dispatcher' => 'Dispatcher Service',
         ],
       ],
@@ -2898,7 +2898,7 @@ return [
     ],
     'service_poller_frequency' => 
     [
-      'description' => 'Poller Frequency (Warning!]',
+      'description' => 'Poller Frequency (Warning!)',
       'help' => 'How often to poll devices. Sets the default value for all nodes. Warning! Changing this without fixing rrd files will break graphs. See docs for more info.',
     ],
     'service_poller_down_retry' => 
@@ -3007,17 +3007,17 @@ return [
     [
       'transports' => 
       [
-        'description' => 'Transport (priority]',
+        'description' => 'Transport (priority)',
         'help' => 'Select enabled transports and order them as you want them to be tried.',
       ],
       'version' => 
       [
-        'description' => 'Version (priority]',
+        'description' => 'Version (priority)',
         'help' => 'Select enabled versions and order them as you want them to be tried.',
       ],
       'community' => 
       [
-        'description' => 'Communities (priority]',
+        'description' => 'Communities (priority)',
         'help' => 'Enter community strings for v1 and v2c and order them as you want them to be tried',
       ],
       'max_oid' => 
@@ -3060,7 +3060,7 @@ return [
       ],
       'v3' => 
       [
-        'description' => 'SNMP v3 Authentication (priority]',
+        'description' => 'SNMP v3 Authentication (priority)',
         'help' => 'Set up v3 authentication variables and order them as you want them to be tried',
         'auth' => 'Auth',
         'crypto' => 'Crypto',
@@ -3128,12 +3128,12 @@ return [
       ],
       'days_until_expiry_warning' => 
       [
-        'description' => 'Warning (days]',
+        'description' => 'Warning (days)',
         'help' => 'Number of days until certificate expiry to trigger a warning',
       ],
       'days_until_expiry_danger' => 
       [
-        'description' => 'Danger (days]',
+        'description' => 'Danger (days)',
         'help' => 'Number of days until certificate expiry to trigger a danger alert',
       ],
     ],
@@ -3241,11 +3241,11 @@ return [
     'twofactor' => 
     [
       'description' => 'Two-Factor',
-      'help' => 'Allow users to activate and use Timebased (TOTP] or Counterbased (HOTP] One-Time Passwords (OTP]',
+      'help' => 'Allow users to activate and use Timebased (TOTP) or Counterbased (HOTP) One-Time Passwords (OTP)',
     ],
     'twofactor_lock' => 
     [
-      'description' => 'Two-Factor Throttle Time (seconds]',
+      'description' => 'Two-Factor Throttle Time (seconds)',
       'help' => 'Lock-out time to wait in seconds before allowing further attempts if Two-Factor authentication is failed 3 times consecutively - will prompt user to wait this long.  Set to 0 to disable resulting in a permanent account lock-out and a message to user to contact administrator',
     ],
     'unix-agent' => 
@@ -3257,7 +3257,7 @@ return [
       'port' => 
       [
         'description' => 'Default unix-agent port',
-        'help' => 'Default port for the unix-agent (check_mk]',
+        'help' => 'Default port for the unix-agent (check_mk)',
       ],
       'read-timeout' => 
       [
@@ -3279,7 +3279,7 @@ return [
     ],
     'uptime_warning' => 
     [
-      'description' => 'Show Device as warning if Uptime below (seconds]',
+      'description' => 'Show Device as warning if Uptime below (seconds)',
       'help' => 'Shows Device as warning if Uptime is below this value. Custom maps status will reflect this setting. 0 disables warning. Default 24h',
     ],
     'virsh' => 
@@ -3376,7 +3376,7 @@ return [
       'min_graph_height' => 
       [
         'description' => 'Set the minimum graph height',
-        'help' => 'Minimum Graph Height (default: 300]',
+        'help' => 'Minimum Graph Height (default: 300)',
       ],
       'graph_stat_percentile_disable' => 
       [
@@ -3387,13 +3387,13 @@ return [
     'device_display_default' => 
     [
       'description' => 'Default device display name template',
-      'help' => 'Sets the default display name for all devices (can be overridden per-device].  Hostname/IP: Just show the hostname or IP the device was added with. sysName: Just show the sysName from snmp. Hostname or sysName: Show hostname, but if it is an IP, show sysName.',
+      'help' => 'Sets the default display name for all devices (can be overridden per-device).  Hostname/IP: Just show the hostname or IP the device was added with. sysName: Just show the sysName from snmp. Hostname or sysName: Show hostname, but if it is an IP, show sysName.',
       'options' => 
       [
         'hostname' => 'Hostname / IP',
         'sysName_fallback' => 'Hostname, fallback to sysName for IPs',
         'sysName' => 'sysName',
-        'ip' => 'IP (from hostname IP or resolved]',
+        'ip' => 'IP (from hostname IP or resolved)',
       ],
     ],
     'device_location_map_open' => 

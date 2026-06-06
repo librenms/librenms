@@ -38,8 +38,8 @@ return [
   'access' => 
   [
     'private' => 'Privado',
-    'shared_read' => 'Compartido (Lectura]',
-    'shared_admin' => 'Compartido (Admin RW]',
+    'shared_read' => 'Compartido (Lectura)',
+    'shared_admin' => 'Compartido (Admin RW)',
     'shared' => 'Compartido',
   ],
 ];
