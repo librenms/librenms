@@ -14,9 +14,16 @@ class GraphsPageController extends Controller
 {
     public function __invoke(Request $request): View
     {
-        $this->loadLegacyGraphHelpers();
-
         $vars = $request->except(['page', 'username', 'password']);
+
+        preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', (string) ($vars['type'] ?? ''), $graphtype);
+        $type = basename($graphtype['type'] ?? '');
+        $subtype = basename($graphtype['subtype'] ?? '');
+
+        // Authorize before doing any other page-setup work, so unauthorized requests are
+        // rejected as early as possible. The auth include also resolves the $device/$port
+        // models used for the page heading.
+        [$device, $port] = $this->authorizeGraph($type, $vars);
 
         if (isset($vars['widescreen'])) {
             if ($vars['widescreen'] === 'yes') {
@@ -30,24 +37,6 @@ class GraphsPageController extends Controller
 
         $vars['from'] = Time::parseAt($vars['from'] ?? '') ?: LibrenmsConfig::get('time.day');
         $vars['to'] = Time::parseAt($vars['to'] ?? '') ?: LibrenmsConfig::get('time.now');
-
-        preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', (string) ($vars['type'] ?? ''), $graphtype);
-        $type = basename($graphtype['type'] ?? '');
-        $subtype = basename($graphtype['subtype'] ?? '');
-
-        // Authorize and resolve the graphed entity. The per-type auth include sets $auth and,
-        // depending on the type, the $device and/or $port models used for the page heading.
-        $device = isset($vars['device']) ? DeviceCache::get($vars['device']) : null;
-        $port = null;
-        /** @var bool $auth set by the required auth.inc.php below */
-        $auth = false;
-        if ($type && is_file(base_path("includes/html/graphs/$type/auth.inc.php"))) {
-            require base_path("includes/html/graphs/$type/auth.inc.php");
-        }
-
-        if (! $auth) {
-            abort(403);
-        }
 
         $subtitle = $this->buildSubtitle($type, $subtype, $vars);
         $pageTitle = trim($this->entityTitle($device, $port) . $subtitle);
@@ -193,6 +182,34 @@ class GraphsPageController extends Controller
         }
 
         return $device?->displayName() ?? '';
+    }
+
+    /**
+     * Authorize the request and resolve the graphed entity as early as possible.
+     *
+     * The per-type auth include sets $auth and, depending on the type, the $device and/or
+     * $port models used for the page heading. Aborts with 403 when access is not permitted.
+     *
+     * @param  array<string, mixed>  $vars
+     * @return array{0: ?object, 1: ?object} the resolved [$device, $port]
+     */
+    private function authorizeGraph(string $type, array $vars): array
+    {
+        $this->loadLegacyGraphHelpers();
+
+        $device = isset($vars['device']) ? DeviceCache::get($vars['device']) : null;
+        $port = null;
+        /** @var bool $auth set by the required auth.inc.php below */
+        $auth = false;
+        if ($type && is_file(base_path("includes/html/graphs/$type/auth.inc.php"))) {
+            require base_path("includes/html/graphs/$type/auth.inc.php");
+        }
+
+        if (! $auth) {
+            abort(403);
+        }
+
+        return [$device, $port];
     }
 
     /**
