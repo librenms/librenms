@@ -17,7 +17,29 @@ use LibreNMS\Util\Number;
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
 
-$options = getopt('frd');
+$options = getopt('frd', ['bill_id:', 'help']);
+
+if (isset($options['help'])) {
+    echo <<<'HELP'
+Usage:
+  ./billing-calculate.php [options]
+
+Options:
+  -f                 Force billing calculation even if cron scheduling is not enabled
+  -r                 Clear/truncate the bill_history table before running
+  -d                 Enable debug output
+  --bill_id=ID       Calculate only the specified bill_id
+  --help             Show this help text and exit
+
+Examples:
+  ./billing-calculate.php
+  ./billing-calculate.php -f
+  ./billing-calculate.php --bill_id=123
+  ./billing-calculate.php -f --bill_id=123
+
+HELP;
+    exit(0);
+}
 
 if (isset($options['r'])) {
     echo "Clearing history table.\n";
@@ -29,13 +51,22 @@ Debug::set(isset($options['d']));
 $scheduler = LibrenmsConfig::get('schedule_type.billing');
 if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
     if (Debug::isEnabled()) {
-        echo "Billing is not enabled for cron scheduling.  Add the -f command ar
-gument if you want to force this command to run.\n";
+        echo "Billing is not enabled for cron scheduling.  Add the -f command argument if you want to force this command to run.\n";
     }
     exit(0);
 }
 
-foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
+$sql = 'SELECT * FROM `bills`';
+$params = [];
+
+if (isset($options['bill_id'])) {
+    $sql .= ' WHERE `bill_id` = ?';
+    $params[] = $options['bill_id'];
+}
+
+$sql .= ' ORDER BY `bill_id`';
+
+foreach (dbFetchRows($sql, $params) as $bill) {
     echo str_pad($bill['bill_id'] . ' ' . $bill['bill_name'], 30) . " \n";
 
     $i = 0;
