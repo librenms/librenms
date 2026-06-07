@@ -36,7 +36,6 @@ use App\Models\User;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Enum\AlertRuleOperationPhase;
 use LibreNMS\Enum\MaintenanceStatus;
@@ -78,85 +77,171 @@ class AlertUtil
         return AlertRule::find($ruleId)?->alert_operation_id !== null;
     }
 
-    /**
-     * Merge timing for the problem phase from alert_rule_operations into $rextra
-     * (delay, interval, count) so RunAlerts can reuse existing scheduling logic.
-     * When the rule has no operations at all, notifications are treated as suppressed (mute).
-     *
-     * @param  array<string, mixed>  $details  alert_log details (decoded)
-     * @param  array<string, mixed>  $rextra  rule extra (decoded)
-     */
-    public static function mergeProblemPhaseTimingFromOperations(int $ruleId, array &$details, array &$rextra): void
+    public static function operationNotificationsSuppressed(int $ruleId): bool
     {
-        unset($rextra['_stop_notifications']);
-
-        $ruleRow = AlertRule::query()
-            ->with('alertOperation:id,default_operation_step_duration_seconds,notifications_suppressed')
+        $rule = AlertRule::query()
+            ->with('alertOperation:id,notifications_suppressed')
             ->whereKey($ruleId)
             ->first(['id', 'alert_operation_id']);
-        if ($ruleRow === null || $ruleRow->alert_operation_id === null) {
-            $rextra['mute'] = true;
 
-            return;
+        if ($rule === null || $rule->alert_operation_id === null) {
+            return true;
         }
 
-        $ops = AlertOperationSegment::where('alert_operation_id', $ruleRow->alert_operation_id)
+        return $rule->alertOperation === null || (bool) $rule->alertOperation->notifications_suppressed;
+    }
+
+    /**
+     * Independent per-segment scheduler for the problem phase.
+     *
+     * Each segment runs its own timer measured from when the alert started (anchor):
+     *  - the first notification is due after `start_in_seconds`
+     *  - subsequent notifications repeat every `step_duration_seconds`
+     *  - `escalation_step_from`/`escalation_step_to` cap how many times the segment fires
+     *    (to = null means it fires for as long as the alert is active)
+     *
+     * @param  array<string, mixed>  $details  alert_log details (decoded, mutated in place)
+     * @return array<int, int>  segment ids due to fire this cycle
+     */
+    public static function dueProblemSegments(int $ruleId, array &$details): array
+    {
+        $rule = AlertRule::query()
+            ->with('alertOperation:id,default_operation_step_duration_seconds')
+            ->whereKey($ruleId)
+            ->first(['id', 'alert_operation_id']);
+
+        if ($rule === null || $rule->alert_operation_id === null) {
+            return [];
+        }
+
+        $segments = AlertOperationSegment::where('alert_operation_id', $rule->alert_operation_id)
             ->where('operation_phase', AlertRuleOperationPhase::PROBLEM)
             ->orderBy('position')
             ->orderBy('id')
             ->get();
 
-        if ($ops->isEmpty()) {
-            return;
+        if ($segments->isEmpty()) {
+            return [];
         }
 
-        $opDefault = $ruleRow->alertOperation?->default_operation_step_duration_seconds;
+        $opDefault = $rule->alertOperation?->default_operation_step_duration_seconds;
         if ($opDefault === null) {
             $opDefault = max(0, 60 * (int) LibrenmsConfig::get('alert_rule.default_operation_step_duration', LibrenmsConfig::get('alert_rule.interval')));
         }
         $defaultStep = max(0, (int) $opDefault);
 
-        $notificationCount = (int) ($details['count'] ?? 0);
-        $nextStep = $notificationCount + 1;
+        $now = time();
+        $tolerance = (int) LibrenmsConfig::get('alert.tolerance_window');
 
-        $op = self::selectOperationForEscalationStep($ops, $nextStep);
-        if ($op === null) {
-            $rextra['_stop_notifications'] = true;
-
-            return;
+        $anchor = (int) ($details['op_anchor'] ?? 0);
+        if ($anchor <= 0) {
+            $anchor = $now;
+            $details['op_anchor'] = $anchor;
         }
 
-        if ($ruleRow->alertOperation === null || (bool) $ruleRow->alertOperation->notifications_suppressed) {
-            $rextra['mute'] = true;
-
-            return;
+        if (! isset($details['op_seg']) || ! is_array($details['op_seg'])) {
+            $details['op_seg'] = [];
         }
 
-        $rextra['delay'] = $notificationCount === 0 ? (int) $op->start_in_seconds : 0;
-        $stepDur = (int) $op->step_duration_seconds;
-        $rextra['interval'] = $stepDur > 0 ? $stepDur : $defaultStep;
-        // Keep legacy runAlerts() counter incrementing for escalation tracking.
-        $rextra['count'] = PHP_INT_MAX;
+        $segmentData = $segments->map(static fn (AlertOperationSegment $segment) => [
+            'id' => (int) $segment->id,
+            'escalation_step_from' => (int) $segment->escalation_step_from,
+            'escalation_step_to' => $segment->escalation_step_to === null ? null : (int) $segment->escalation_step_to,
+            'start_in_seconds' => (int) $segment->start_in_seconds,
+            'step_duration_seconds' => (int) $segment->step_duration_seconds,
+        ])->all();
+
+        [$due, $details['op_seg']] = self::evaluateSegmentTimers($segmentData, $details['op_seg'], $anchor, $now, $tolerance, $defaultStep);
+
+        return $due;
     }
 
-    public static function selectOperationForEscalationStep(Collection $operations, int $escalationStep): ?AlertOperationSegment
+    /**
+     * For each segment, the first notification is due at `anchor + start_in_seconds`, then it repeats
+     * every `step_duration_seconds` measured from its previous fire (so a paused poller catches up one
+     * notification per cycle rather than bursting). `escalation_step_from`/`escalation_step_to` only cap
+     * how many times a segment may fire (to = null means unlimited); they do not affect the timing.
+     *
+     * @param  array<int, array{id:int, escalation_step_from:int, escalation_step_to:int|null, start_in_seconds:int, step_duration_seconds:int}>  $segments
+     * @param  array<string, array{fires:int, last:int}>  $state  per-segment timer state keyed by segment id
+     * @return array{0: array<int, int>, 1: array<string, array{fires:int, last:int}>}  [due segment ids, updated state]
+     */
+    public static function evaluateSegmentTimers(array $segments, array $state, int $anchor, int $now, int $tolerance, int $defaultStep): array
     {
-        foreach ($operations as $op) {
-            $from = (int) $op->escalation_step_from;
-            $to = $op->escalation_step_to === null ? null : (int) $op->escalation_step_to;
-            if ($escalationStep < $from) {
-                continue;
-            }
-            if ($to !== null && $escalationStep > $to) {
+        $due = [];
+        foreach ($segments as $segment) {
+            $from = max(1, (int) $segment['escalation_step_from']);
+            $to = $segment['escalation_step_to'] === null ? null : (int) $segment['escalation_step_to'];
+            $maxFires = $to === null ? PHP_INT_MAX : max(0, $to - $from + 1);
+            if ($maxFires <= 0) {
                 continue;
             }
 
-            if ($op instanceof AlertOperationSegment) {
-                return $op;
+            $startIn = max(0, (int) $segment['start_in_seconds']);
+            $stepDuration = (int) $segment['step_duration_seconds'];
+            $stepDuration = $stepDuration > 0 ? $stepDuration : $defaultStep;
+
+            $key = (string) $segment['id'];
+            $segmentState = $state[$key] ?? ['fires' => 0, 'last' => 0];
+            $fires = (int) ($segmentState['fires'] ?? 0);
+            $last = (int) ($segmentState['last'] ?? 0);
+            if ($fires >= $maxFires) {
+                continue;
+            }
+
+            // First fire is anchored to the alert start; later fires repeat from the previous
+            // fire so a late/paused poller catches up one notification per cycle instead of bursting.
+            $dueAt = $fires === 0 ? ($anchor + $startIn) : ($last + max(1, $stepDuration));
+            if (($now + $tolerance) >= $dueAt) {
+                $due[] = (int) $segment['id'];
+                $state[$key] = ['fires' => $fires + 1, 'last' => $now];
             }
         }
 
-        return null;
+        return [$due, $state];
+    }
+
+    /**
+     * Resolve the (deduplicated) transports for a set of operation segments, expanding groups.
+     *
+     * @param  array<int, int>  $segmentIds
+     * @return array<int, array<string, mixed>>
+     */
+    public static function segmentTransports(array $segmentIds): array
+    {
+        $segmentIds = array_values(array_unique(array_map('intval', $segmentIds)));
+        if (empty($segmentIds)) {
+            return [];
+        }
+
+        $single = DB::table('alert_operation_transport_map as m')
+            ->join('alert_transports as b', 'b.transport_id', '=', 'm.transport_or_group_id')
+            ->where('m.target_type', '=', 'single')
+            ->whereIn('m.segment_id', $segmentIds)
+            ->select(['b.transport_id', 'b.transport_type', 'b.transport_name'])
+            ->distinct()
+            ->get();
+
+        $group = DB::table('alert_operation_transport_map as m')
+            ->join('alert_transport_groups as g', 'g.transport_group_id', '=', 'm.transport_or_group_id')
+            ->join('transport_group_transport as c', 'c.transport_group_id', '=', 'g.transport_group_id')
+            ->join('alert_transports as d', 'd.transport_id', '=', 'c.transport_id')
+            ->where('m.target_type', '=', 'group')
+            ->whereIn('m.segment_id', $segmentIds)
+            ->select(['d.transport_id', 'd.transport_type', 'd.transport_name'])
+            ->distinct()
+            ->get();
+
+        return $single
+            ->concat($group)
+            ->unique('transport_id')
+            ->values()
+            ->map(static fn ($row) => [
+                'transport_id' => (int) $row->transport_id,
+                'transport_type' => (string) $row->transport_type,
+                'transport_name' => (string) $row->transport_name,
+            ])
+            ->all();
     }
 
     /**
