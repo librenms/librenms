@@ -424,6 +424,7 @@ class Rrd extends BaseDatastore
         if ($this->rrdcached) {
             $output = $this->command('list', '/' . self::safeName($hostname));
             $files = explode("\n", trim($output));
+            array_pop($files); // remove rrdcached status line
         } else {
             $files = glob($this->dirFromHost($hostname) . '/*.rrd') ?: [];
         }
@@ -586,6 +587,28 @@ class Rrd extends BaseDatastore
         $result = str_replace(':', '\:', $result);          // escape colons
 
         return $result . ' ';
+    }
+
+    /**
+     * Run rrdtool and parse the version from the output.
+     *
+     * @return string
+     */
+    public static function version(): string
+    {
+        try {
+            $rrd = app(RrdProcess::class, ['timeout' => 10]);
+            $output = $rrd->run('--version');
+            $parts = explode(' ', $output, 3);
+
+            if (isset($parts[1])) {
+                return str_replace('1.7.01.7.0', '1.7.0', $parts[1]);
+            }
+        } catch (Exception) {
+            //
+        }
+
+        return '';
     }
 
     /**
