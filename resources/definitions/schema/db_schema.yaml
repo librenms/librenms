@@ -384,6 +384,24 @@ bill_port_counters:
     - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_id, bill_id], Unique: true, Type: BTREE }
+bill_port_data:
+  Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: timestamp, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
+    - { Field: poll_period, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: in_counter, Type: 'bigint unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: out_counter, Type: 'bigint unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: in_delta, Type: 'bigint unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: out_delta, Type: 'bigint unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: processed, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    bill_port_data_bill_id_timestamp_index: { Name: bill_port_data_bill_id_timestamp_index, Columns: [bill_id, timestamp], Unique: false, Type: BTREE }
+    bill_port_data_port_id_timestamp_index: { Name: bill_port_data_port_id_timestamp_index, Columns: [port_id, timestamp], Unique: false, Type: BTREE }
+    bill_port_data_processed_index: { Name: bill_port_data_processed_index, Columns: [processed], Unique: false, Type: BTREE }
 cache:
   Columns:
     - { Field: key, Type: varchar(255), 'Null': false, Extra: '' }
@@ -719,9 +737,9 @@ devices_perms:
     devices_perms_user_id_index: { Name: devices_perms_user_id_index, Columns: [user_id], Unique: false, Type: BTREE }
 device_graphs:
   Columns:
-    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: graph, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_graphs_device_id_index: { Name: device_graphs_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }

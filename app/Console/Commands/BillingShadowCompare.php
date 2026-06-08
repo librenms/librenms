@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 
 class BillingShadowCompare extends Command
 {
@@ -100,8 +101,11 @@ class BillingShadowCompare extends Command
 
         return 0;
     }
+    /**
+    * @return Collection<int, int<1, max>>
+    */
+    private function getBillIds(?int $billId, int $limit, int $minPortCount): Collection
 
-    private function getBillIds(?int $billId, int $limit, int $minPortCount)
     {
         if ($billId !== null && $billId > 0) {
             return collect([$billId]);
@@ -117,6 +121,20 @@ class BillingShadowCompare extends Command
             ->pluck('bill_id');
     }
 
+    /**
+     * @return array{
+     *     bill_id: int,
+     *     member_ports: int,
+     *     shadow_ports: int,
+     *     coverage_percent: float|int,
+     *     shadow_intervals: int,
+     *     bill_samples: int,
+     *     shadow_total: int,
+     *     bill_total: int,
+     *     diff_total: int,
+     *     diff_percent: float|int|null
+     * }
+     */
     private function compareBill(int $billId, int $startTs, int $endTs): array
     {
         $memberPorts = DB::table('bill_ports')
@@ -152,8 +170,8 @@ class BillingShadowCompare extends Command
                     continue;
                 }
 
-                $fromTs = strtotime($previous->timestamp);
-                $toTs = strtotime($row->timestamp);
+                $fromTs = strtotime((string) $previous->timestamp);
+                $toTs = strtotime((string) $row->timestamp);
 
                 $period = $toTs - $fromTs;
                 $inDelta = (int) $row->in_counter - (int) $previous->in_counter;
@@ -203,7 +221,7 @@ class BillingShadowCompare extends Command
         ];
 
         foreach ($billRows as $row) {
-            $rowEnd = strtotime($row->timestamp);
+            $rowEnd = strtotime((string) $row->timestamp);
             $rowStart = $rowEnd - (int) $row->period;
 
             $overlapStart = max($startTs, $rowStart);
