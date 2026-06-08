@@ -557,13 +557,6 @@ which will force a full discovery run within the configured time window.
     lnms config:set enable_clear_discovery true
     ```
 
-Disable the footer of the WebUI by setting `enable_footer` to 0.
-
-!!! setting "webui/general"
-    ```bash
-    lnms config:set enable_footer true
-    ```
-
 Show the `X`th percentile in the graph instead of the default 95th percentile.
 
 !!! setting "webui/graph"
