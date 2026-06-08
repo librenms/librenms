@@ -938,6 +938,9 @@ foreach ($ports as $port) {
                 include 'ports/cisco-if-extension.inc.php';
             }
         }
+        // Emit shadow billing input samples for bill-member ports.
+        // This does not affect production billing yet; poll-billing.php remains authoritative.
+                include 'ports/billing-port-data.inc.php';
 
         // Update Database if $port['update'] is not empty
         // or if previous poll time $port['poll_time'] is different from device globally previous port time $device_global_ports["poll_prev"]
