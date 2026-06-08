@@ -10,7 +10,7 @@ if (count($processors)) {
     echo '<a href="device/device=' . $device['device_id'] . '/tab=health/metric=processor/">';
     echo '<i class="fa fa-microchip fa-lg icon-theme" aria-hidden="true"></i> <strong>Processors</strong></a>';
     echo '</div>
-        <div class="tw:flex tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">';
+        <div class="tw:flex tw:min-w-0 tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">';
 
     $graph_array = [];
     $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
@@ -44,9 +44,9 @@ if (count($processors)) {
             $graph_array['bg'] = 'ffffff00'; // the 00 at the end makes the area transparent.
             $minigraph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
 
-            echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-3">
-                <div>' . \LibreNMS\Util\Url::overlibLink($link, $text_descr, $overlib_content) . '</div>
-                <div>' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</div>
+            echo '<div class="tw:flex tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
+                <div class="tw:w-36 tw:min-w-0 tw:shrink-0 tw:truncate">' . \LibreNMS\Util\Url::overlibLink($link, $text_descr, $overlib_content) . '</div>
+                <div class="tw:flex tw:min-w-0 tw:flex-1 tw:justify-center">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</div>
                 <div>' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Html::percentageBar(200, 10, $percent, null, $percent . '%', null, null, [
                 'left' => $background['left'],
                 'left_text' => null,
@@ -101,9 +101,9 @@ if (count($processors)) {
             $background = \LibreNMS\Util\Color::percentage($percent_usage, $percent_warn);
 
             echo '
-              <div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[2fr_1fr]">
-                <div>' . \LibreNMS\Util\Url::overlibLink($link, 'x' . $values['count'] . ' ' . $values['descr'], $overlib_content) . '</div>
-                <div>' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Html::percentageBar(400, 10, $percent_usage, null, $percent_usage . '%', null, null, [
+              <div class="tw:flex tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
+                <div class="tw:w-36 tw:min-w-0 tw:shrink-0 tw:truncate">' . \LibreNMS\Util\Url::overlibLink($link, 'x' . $values['count'] . ' ' . $values['descr'], $overlib_content) . '</div>
+                <div class="tw:ml-auto">' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Html::percentageBar(400, 10, $percent_usage, null, $percent_usage . '%', null, null, [
                 'left' => $background['left'],
                 'left_text' => null,
                 'right' => $background['right'],

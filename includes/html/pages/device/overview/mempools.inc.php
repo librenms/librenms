@@ -20,7 +20,7 @@ if ($mempools->isNotEmpty()) {
     echo '<i class="fas fa-memory fa-lg icon-theme" aria-hidden="true"></i> <strong>Memory</strong></a>';
     echo '
         </div>
-        <div class="tw:flex tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">
+        <div class="tw:flex tw:min-w-0 tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">
         ';
 
     echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
@@ -78,11 +78,10 @@ if ($mempools->isNotEmpty()) {
             default => Html::percentageBar(400, 10, $mempool->mempool_perc, "$used ($mempool->mempool_perc%)", '', $mempool->mempool_perc_warn),
         };
 
-        echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-3">
-            <div>' . \LibreNMS\Util\Url::overlibLink($link, $mempool->mempool_descr, $overlib_content) . '</div>
-            <div>' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</div>
-            <div>' . \LibreNMS\Util\Url::overlibLink($link, $percentageBar, $overlib_content) . '
-            </div>
+        echo '<div class="tw:flex tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
+            <div class="tw:w-36 tw:min-w-0 tw:shrink-0 tw:truncate">' . \LibreNMS\Util\Url::overlibLink($link, $mempool->mempool_descr, $overlib_content) . '</div>
+            <div class="tw:flex tw:min-w-0 tw:flex-1 tw:justify-center">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</div>
+            <div>' . \LibreNMS\Util\Url::overlibLink($link, $percentageBar, $overlib_content) . '</div>
             </div>';
     }//end foreach
 
