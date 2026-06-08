@@ -108,6 +108,76 @@ class RrdProcessTest extends TestCase
         $rrdProcess->run('update test.rrd N:1');
     }
 
+    public function testThrowsExceptionOnDatasourceCountMismatch(): void
+    {
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(function ($callback) {
+            return $callback(Process::OUT, "ERROR: test.rrd: expected 2 data source readings (got 1) from N\n");
+        });
+
+        $rrdProcess = new RrdProcess($this->logger, 300, fn() => $this->process);
+
+        $this->expectException(RrdException::class);
+        $this->expectExceptionMessage('expected 2 data source readings (got 1) from N');
+
+        $rrdProcess->run('update test.rrd N:1');
+    }
+
+    public function testThrowsExceptionOnUnknownDatasourceName(): void
+    {
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(function ($callback) {
+            return $callback(Process::OUT, "ERROR: unknown DS name 'nonexistent'\n");
+        });
+
+        $rrdProcess = new RrdProcess($this->logger, 300, fn() => $this->process);
+
+        $this->expectException(RrdException::class);
+        $this->expectExceptionMessage("unknown DS name 'nonexistent'");
+
+        $rrdProcess->run('update test.rrd -t nonexistent N:1');
+    }
+
+    public function testThrowsExceptionOnExtraDataInUpdateArgument(): void
+    {
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(function ($callback) {
+            return $callback(Process::OUT, "ERROR: test.rrd: found extra data on update argument: 2:3\n");
+        });
+
+        $rrdProcess = new RrdProcess($this->logger, 300, fn() => $this->process);
+
+        $this->expectException(RrdException::class);
+        $this->expectExceptionMessage('found extra data on update argument: 2:3');
+
+        $rrdProcess->run('update test.rrd N:1:2:3');
+    }
+
+    public function testThrowsExceptionOnPermissionDenied(): void
+    {
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(function ($callback) {
+            return $callback(Process::OUT, "ERROR: opening 'test.rrd': Permission denied\n");
+        });
+
+        $rrdProcess = new RrdProcess($this->logger, 300, fn() => $this->process);
+
+        $this->expectException(RrdException::class);
+        $this->expectExceptionMessage("opening 'test.rrd': Permission denied");
+
+        $rrdProcess->run('update test.rrd N:1');
+    }
+
+    public function testThrowsExceptionOnCorruptRrdFile(): void
+    {
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(function ($callback) {
+            return $callback(Process::OUT, "ERROR: reached EOF while loading header rrd->stat_head\n");
+        });
+
+        $rrdProcess = new RrdProcess($this->logger, 300, fn() => $this->process);
+
+        $this->expectException(RrdException::class);
+        $this->expectExceptionMessage('reached EOF while loading header rrd->stat_head');
+
+        $rrdProcess->run('info test.rrd');
+    }
+
     public function testHandlesErrorOutputOnStderr(): void
     {
         $this->process->shouldReceive('waitUntil')->andReturnUsing(function ($callback) {
@@ -188,7 +258,6 @@ class RrdProcessTest extends TestCase
         $rrdProcess = new RrdProcess($this->logger, 300, fn() => $this->process);
         $rrdProcess->start();
 
-        // Trigger destructor
         unset($rrdProcess);
         $this->assertTrue(true);
     }
