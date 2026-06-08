@@ -14,13 +14,14 @@ use LibreNMS\Exceptions\RrdUpdateTooFrequentException;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Tests\TestCase;
 use Mockery;
+use Mockery\MockInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\Process;
 
 class RrdProcessTest extends TestCase
 {
-    private $logger;
-    private $process;
+    private MockInterface&LoggerInterface $logger;
+    private MockInterface&Process $process;
 
     protected function setUp(): void
     {
@@ -253,7 +254,7 @@ class RrdProcessTest extends TestCase
         $rrdProcess->start(); // null -> start
         $rrdProcess->start(); // isRunning(true) -> don't start
 
-        $this->assertTrue(true);
+        $this->expectNotToPerformAssertions();
     }
 
     public function testStopProcess(): void
@@ -264,7 +265,7 @@ class RrdProcessTest extends TestCase
         $rrdProcess->start();
         $rrdProcess->stop();
 
-        $this->assertTrue(true);
+        $this->expectNotToPerformAssertions();
     }
 
     public function testRunAsyncReplacesDirWithRrdcached(): void
@@ -282,7 +283,7 @@ class RrdProcessTest extends TestCase
         $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
         $rrdProcess->run('update /opt/librenms/rrd/test.rrd N:1');
 
-        $this->assertTrue(true);
+        $this->expectNotToPerformAssertions();
     }
 
     public function testDestructorStopsProcess(): void
@@ -293,6 +294,6 @@ class RrdProcessTest extends TestCase
         $rrdProcess->start();
 
         unset($rrdProcess);
-        $this->assertTrue(true);
+        $this->expectNotToPerformAssertions();
     }
 }
