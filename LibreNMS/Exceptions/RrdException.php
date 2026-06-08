@@ -67,6 +67,10 @@ class RrdException extends \Exception
             return new RrdCorruptionException($error);
         }
 
+        if (str_contains($error, 'rrdtool: not found')) {
+            return new RrdExecutableNotFoundException($error);
+        }
+
         return new self($message);
     }
 }

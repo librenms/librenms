@@ -2,6 +2,6 @@
 
 namespace LibreNMS\Exceptions;
 
-class RrdPermissionException extends RrdException
+class RrdPermissionException extends RrdStoreException
 {
 }

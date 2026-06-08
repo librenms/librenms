@@ -6,6 +6,7 @@ use LibreNMS\Exceptions\RrdCachedConnectionException;
 use LibreNMS\Exceptions\RrdCorruptionException;
 use LibreNMS\Exceptions\RrdDsMismatchException;
 use LibreNMS\Exceptions\RrdException;
+use LibreNMS\Exceptions\RrdExecutableNotFoundException;
 use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\Exceptions\RrdPermissionException;
 use LibreNMS\Exceptions\RrdUpdateTooFrequentException;
@@ -207,6 +208,20 @@ class RrdProcessTest extends TestCase
         $this->expectExceptionMessage('Some stderr error message');
 
         $rrdProcess->run('update test.rrd N:1');
+    }
+
+    public function testThrowsExceptionWhenRrdtoolNotFound(): void
+    {
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(function ($callback) {
+            return $callback(Process::ERR, "sh: line 1: exec: rrdtool: not found\n");
+        });
+
+        $rrdProcess = new RrdProcess($this->logger, 300, fn() => $this->process);
+
+        $this->expectException(RrdExecutableNotFoundException::class);
+        $this->expectExceptionMessage('sh: line 1: exec: rrdtool: not found');
+
+        $rrdProcess->run('info test.rrd');
     }
 
     public function testCanWaitForCustomString(): void

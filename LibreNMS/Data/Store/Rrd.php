@@ -35,11 +35,10 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\FileExistsException;
-use LibreNMS\Exceptions\RrdDsMismatchException;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdNotFoundException;
-use LibreNMS\Exceptions\RrdUpdateTooFrequentException;
+use LibreNMS\Exceptions\RrdStoreException;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Rewrite;
@@ -149,15 +148,15 @@ class Rrd extends BaseDatastore
                     $this->update($rrd, $fields);
                 }
             }
-        } catch (RrdUpdateTooFrequentException|RrdDsMismatchException $e) {
-            Log::debug('RRD Warning: %y' . $e->getMessage() . '%n', ['color' => true]);
-        } catch (RrdException $e) {
+        } catch (RrdStoreException $e) {
             Log::error('RRD Error %r' . $e->getMessage() . '%n', ['color' => true]);
 
             if (++$this->updateErrorCount >= 3) {
                 $this->disabled = true;
                 Eventlog::log('RRD updates disabled, too many errors. Final error: ' . $e->getMessage(), $device_model, 'rrd', Severity::Error);
             }
+        } catch (RrdException $e) {
+            Log::error('RRD Error %r' . $e->getMessage() . '%n', ['color' => true]);
         }
     }
 
