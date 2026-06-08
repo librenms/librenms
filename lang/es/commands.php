@@ -387,7 +387,7 @@ Puede ser una plantilla simple usando reemplazos: {{ $hostname }}, {{ $sysName }
     'dns-fail' => 'no era resoluble y fue omitido de la configuración',
     'description' => 'Generar una configuración adecuada para usar con smokeping',
     'header-first' => 'Este archivo fue generado automáticamente por "lnms smokeping:generate',
-    'header-second' => 'Los cambios locales pueden ser sobreescritos sin aviso ni copias de seguridad',
+    'header-second' => 'Los cambios locales pueden ser sobrescritos sin aviso ni copias de seguridad',
     'header-third' => 'Para más información vea https://docs.librenms.org/Extensions/Smokeping/"',
     'no-devices' => 'No se encontraron dispositivos elegibles - los dispositivos no deben estar deshabilitados.',
     'no-probes' => 'Se requiere al menos un probe.',
@@ -451,6 +451,6 @@ Puede ser una plantilla simple usando reemplazos: {{ $hostname }}, {{ $sysName }
       'descr' => 'Descripción (opcional)',
     ],
     'success' => 'Usuario agregado exitosamente: :username',
-    'wrong-auth' => 'Advertencia! No podrá iniciar sesión con este usuario porque no está usando autenticación MySQL',
+    'wrong-auth' => '¡Advertencia! No podrá iniciar sesión con este usuario porque no está usando autenticación MySQL',
   ],
 ];

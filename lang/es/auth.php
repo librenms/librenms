@@ -2,5 +2,5 @@
 
 return [
   'title' => 'Autenticación',
-  'disabled' => 'Su cuenta está deshabilitada, por favor contacte al Administrador.',
+  'disabled' => 'Su cuenta está deshabilitada, por favor contacte al administrador.',
 ];

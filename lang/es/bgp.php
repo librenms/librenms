@@ -59,7 +59,7 @@ return [
       0 => 'Reservado',
       1 => 'Número máximo de prefijos alcanzado',
       2 => 'Apagado administrativo',
-      3 => 'Par desconfigirado',
+      3 => 'Par desconfigurado',
       4 => 'Reinicio administrativo',
       5 => 'Conexión rechazada',
       6 => 'Otro cambio de configuración',

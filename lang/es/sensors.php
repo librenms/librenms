@@ -144,8 +144,8 @@ return [
   ],
   'runtime' => 
   [
-    'short' => 'Tiempo de ejecución',
-    'long' => 'Tiempo de ejecución',
+    'short' => 'Tiempo de funcionamiento',
+    'long' => 'Tiempo de funcionamiento',
     'unit' => 'Min',
     'unit_long' => 'Minutos',
   ],
