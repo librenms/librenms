@@ -7,8 +7,6 @@ use Closure;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\RrdCachedConnectionException;
 use LibreNMS\Exceptions\RrdException;
-use LibreNMS\Exceptions\RrdNotFoundException;
-use LibreNMS\Exceptions\RrdUpdateTooFrequentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\Process;
@@ -79,22 +77,7 @@ class RrdProcess
 
         $this->process->waitUntil(function ($type, $buffer) use ($waitFor) {
             if ($type === Process::ERR || str_contains($buffer, 'ERROR: ')) {
-                preg_match('/ERROR: (.*)/', $buffer, $matches);
-                $error = trim($matches[1] ?? $buffer);
-
-                if (str_contains($error, 'No such file')) {
-                    throw new RrdNotFoundException($error);
-                }
-
-                if (str_contains($error, 'illegal attempt to update using time')) {
-                    throw new RrdUpdateTooFrequentException($error);
-                }
-
-                if (str_contains($error, 'Unable to connect to rrdcached')) {
-                    throw new RrdCachedConnectionException($error);
-                }
-
-                throw new RrdException($error);
+                throw RrdException::parse($buffer);
             }
 
             return str_contains($buffer, $waitFor);

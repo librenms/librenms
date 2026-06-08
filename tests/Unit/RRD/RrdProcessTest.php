@@ -3,8 +3,11 @@
 namespace LibreNMS\Tests\Unit\RRD;
 
 use LibreNMS\Exceptions\RrdCachedConnectionException;
+use LibreNMS\Exceptions\RrdCorruptionException;
+use LibreNMS\Exceptions\RrdDsMismatchException;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdNotFoundException;
+use LibreNMS\Exceptions\RrdPermissionException;
 use LibreNMS\Exceptions\RrdUpdateTooFrequentException;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Tests\TestCase;
@@ -94,6 +97,20 @@ class RrdProcessTest extends TestCase
         $rrdProcess->run('update test.rrd N:1');
     }
 
+    public function testThrowsCachedConnectionExceptionWhenSocketMissing(): void
+    {
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(function ($callback) {
+            return $callback(Process::OUT, "ERROR: Unable to connect to rrdcached: No such file or directory.\n");
+        });
+
+        $rrdProcess = new RrdProcess($this->logger, 300, fn() => $this->process);
+
+        $this->expectException(RrdCachedConnectionException::class);
+        $this->expectExceptionMessage('Unable to connect to rrdcached: No such file or directory.');
+
+        $rrdProcess->run('update test.rrd N:1');
+    }
+
     public function testThrowsGenericRrdException(): void
     {
         $this->process->shouldReceive('waitUntil')->andReturnUsing(function ($callback) {
@@ -116,7 +133,7 @@ class RrdProcessTest extends TestCase
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn() => $this->process);
 
-        $this->expectException(RrdException::class);
+        $this->expectException(RrdDsMismatchException::class);
         $this->expectExceptionMessage('expected 2 data source readings (got 1) from N');
 
         $rrdProcess->run('update test.rrd N:1');
@@ -130,7 +147,7 @@ class RrdProcessTest extends TestCase
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn() => $this->process);
 
-        $this->expectException(RrdException::class);
+        $this->expectException(RrdDsMismatchException::class);
         $this->expectExceptionMessage("unknown DS name 'nonexistent'");
 
         $rrdProcess->run('update test.rrd -t nonexistent N:1');
@@ -144,7 +161,7 @@ class RrdProcessTest extends TestCase
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn() => $this->process);
 
-        $this->expectException(RrdException::class);
+        $this->expectException(RrdDsMismatchException::class);
         $this->expectExceptionMessage('found extra data on update argument: 2:3');
 
         $rrdProcess->run('update test.rrd N:1:2:3');
@@ -158,7 +175,7 @@ class RrdProcessTest extends TestCase
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn() => $this->process);
 
-        $this->expectException(RrdException::class);
+        $this->expectException(RrdPermissionException::class);
         $this->expectExceptionMessage("opening 'test.rrd': Permission denied");
 
         $rrdProcess->run('update test.rrd N:1');
@@ -172,7 +189,7 @@ class RrdProcessTest extends TestCase
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn() => $this->process);
 
-        $this->expectException(RrdException::class);
+        $this->expectException(RrdCorruptionException::class);
         $this->expectExceptionMessage('reached EOF while loading header rrd->stat_head');
 
         $rrdProcess->run('info test.rrd');

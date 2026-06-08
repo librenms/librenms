@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\FileExistsException;
+use LibreNMS\Exceptions\RrdDsMismatchException;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdNotFoundException;
@@ -148,8 +149,8 @@ class Rrd extends BaseDatastore
                     $this->update($rrd, $fields);
                 }
             }
-        } catch (RrdUpdateTooFrequentException) {
-            Log::debug("RRD warning: update too soon for $rrd");
+        } catch (RrdUpdateTooFrequentException|RrdDsMismatchException $e) {
+            Log::debug('RRD Warning: %y' . $e->getMessage() . '%n', ['color' => true]);
         } catch (RrdException $e) {
             Log::error('RRD Error %r' . $e->getMessage() . '%n', ['color' => true]);
 
