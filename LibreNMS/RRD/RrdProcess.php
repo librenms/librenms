@@ -4,6 +4,8 @@ namespace LibreNMS\RRD;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\RrdException;
+use LibreNMS\Exceptions\RrdNotFoundException;
+use LibreNMS\Exceptions\RrdUpdateTooFrequentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\Process;
@@ -29,6 +31,10 @@ class RrdProcess
 
         if ($this->rrdcached) {
             $this->env['RRDCACHED_ADDRESS'] = $this->rrdcached;
+        }
+
+        if (session('preferences.timezone')) {
+            $this->env['TZ'] = session('preferences.timezone');
         }
     }
 
@@ -63,7 +69,6 @@ class RrdProcess
     {
         $this->runAsync($command);
 
-        $this->process->clearOutput();
         $this->process->waitUntil(function ($type, $buffer) use ($waitFor) {
             if ($type === Process::ERR) {
                 throw new RrdException($buffer);
@@ -71,7 +76,14 @@ class RrdProcess
 
             if (str_contains($buffer, 'ERROR: ')) {
                 preg_match('/ERROR: (.*)/', $buffer, $matches);
-                throw new RrdException($matches[1]);
+                $error = $matches[1];
+                if (str_contains($error, 'No such file')) {
+                    throw new RrdNotFoundException($error);
+                }
+                if (str_contains($error, 'illegal attempt to update using time')) {
+                    throw new RrdUpdateTooFrequentException($error);
+                }
+                throw new RrdException($error);
             }
 
             return str_contains($buffer, $waitFor);
@@ -86,7 +98,7 @@ class RrdProcess
         return rtrim($output);
     }
 
-    public function runAsync(string $command): void
+    private function runAsync(string $command): void
     {
         $this->start();
 
@@ -96,6 +108,7 @@ class RrdProcess
         }
 
         $this->logger->debug("RRD[%g$command%n]", ['color' => true]);
+        $this->process->clearOutput();
         $this->input->write("$command\n");
     }
 
