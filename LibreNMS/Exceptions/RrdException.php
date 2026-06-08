@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Exceptions;
 
-class RrdException extends \Exception
+abstract class RrdException extends \Exception
 {
     public static function parse(string $message): self
     {
@@ -59,6 +59,10 @@ class RrdException extends \Exception
             return new RrdDsMismatchException($error);
         }
 
+        if (str_contains($error, 'expected timestamp not found in data source')) {
+            return new RrdDsMismatchException($error);
+        }
+
         if (str_contains($error, 'Permission denied')) {
             return new RrdPermissionException($error);
         }
@@ -71,6 +75,6 @@ class RrdException extends \Exception
             return new RrdExecutableNotFoundException($error);
         }
 
-        return new self($message);
+        return new RrdUnknownException($message);
     }
 }

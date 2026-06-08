@@ -9,6 +9,7 @@ use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdExecutableNotFoundException;
 use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\Exceptions\RrdPermissionException;
+use LibreNMS\Exceptions\RrdUnknownException;
 use LibreNMS\Exceptions\RrdUpdateTooFrequentException;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Tests\TestCase;
@@ -168,6 +169,25 @@ class RrdProcessTest extends TestCase
         $rrdProcess->run('update test.rrd N:1:2:3');
     }
 
+    public function testThrowsExceptionOnExpectedTimestampNotFoundInDataSource(): void
+    {
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(function ($callback) {
+            return $callback(
+                Process::OUT,
+                "ERROR: test.rrd: expected timestamp not found in data source from foo=2\n"
+            );
+        });
+
+        $rrdProcess = new RrdProcess($this->logger, 300, fn() => $this->process);
+
+        $this->expectException(RrdDsMismatchException::class);
+        $this->expectExceptionMessage(
+            'expected timestamp not found in data source from foo=2'
+        );
+
+        $rrdProcess->run('update test.rrd foo=2');
+    }
+
     public function testThrowsExceptionOnPermissionDenied(): void
     {
         $this->process->shouldReceive('waitUntil')->andReturnUsing(function ($callback) {
@@ -222,6 +242,20 @@ class RrdProcessTest extends TestCase
         $this->expectExceptionMessage('sh: line 1: exec: rrdtool: not found');
 
         $rrdProcess->run('info test.rrd');
+    }
+
+    public function testThrowsUnknownExceptionForUnclassifiedErrors(): void
+    {
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(function ($callback) {
+            return $callback(Process::OUT, "ERROR: something completely unexpected\n");
+        });
+
+        $rrdProcess = new RrdProcess($this->logger, 300, fn() => $this->process);
+
+        $this->expectException(RrdUnknownException::class);
+        $this->expectExceptionMessage('something completely unexpected');
+
+        $rrdProcess->run('update test.rrd N:1');
     }
 
     public function testCanWaitForCustomString(): void
