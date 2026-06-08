@@ -11,29 +11,19 @@ class AlertTransportGroupPolicy
 
     public function __construct()
     {
-        $this->globalPrefix = 'alert';
+        $this->globalPrefix = 'alert-transport';
     }
 
     public function viewAny(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'view')
-            || $this->hasGlobalPermission($user, 'viewAll')
             || $this->hasGlobalPermission($user, 'create')
             || $this->hasGlobalPermission($user, 'update')
             || $this->hasGlobalPermission($user, 'delete');
     }
 
-    public function viewAll(User $user): bool
-    {
-        return $this->hasGlobalPermission($user, 'viewAll');
-    }
-
     public function view(User $user, AlertTransportGroup $group): bool
     {
-        if ($this->hasGlobalPermission($user, 'viewAll')) {
-            return true;
-        }
-
         return $this->hasGlobalPermission($user, 'view');
     }
 
