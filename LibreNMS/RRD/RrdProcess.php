@@ -38,7 +38,7 @@ class RrdProcess
             if (session('preferences.timezone')) {
                 $env['TZ'] = session('preferences.timezone');
             }
-            $this->processFactory = fn() => new Process(
+            $this->processFactory = fn () => new Process(
                 command: $command,
                 cwd: $this->rrd_dir,
                 env: $env,

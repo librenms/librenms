@@ -4,5 +4,4 @@ namespace LibreNMS\Exceptions;
 
 class RrdUnknownException extends RrdException
 {
-
 }
