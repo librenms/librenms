@@ -3,6 +3,7 @@
 namespace LibreNMS\RRD;
 
 use App\Facades\LibrenmsConfig;
+use Closure;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\RrdCachedConnectionException;
 use LibreNMS\Exceptions\RrdException;
@@ -18,36 +19,41 @@ class RrdProcess
 
     private readonly string $rrdcached;
     private readonly string $rrd_dir;
-    private readonly string $rrdtool_exec;
-    private array $env = [];
     private readonly InputStream $input;
 
     private ?Process $process = null;
+    private Closure $processFactory;
 
-    public function __construct(private readonly LoggerInterface $logger, private readonly int $timeout = 300)
+    public function __construct(private readonly LoggerInterface $logger, private readonly int $timeout = 300, ?Closure $processFactory = null)
     {
-        $this->rrdtool_exec = LibrenmsConfig::get('rrdtool', 'rrdtool');
         $this->rrdcached = (string) LibrenmsConfig::get('rrdcached', '');
         $this->rrd_dir = Str::finish(LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd'), '/');
         $this->input = new InputStream();
 
-        if ($this->rrdcached) {
-            $this->env['RRDCACHED_ADDRESS'] = $this->rrdcached;
-        }
-
-        if (session('preferences.timezone')) {
-            $this->env['TZ'] = session('preferences.timezone');
+        // set up process factory
+        if ($processFactory === null) {
+            $command = [LibrenmsConfig::get('rrdtool', 'rrdtool'), '-'];
+            $env = [];
+            if (LibrenmsConfig::get('rrdcached', '')) {
+                $env['RRDCACHED_ADDRESS'] = LibrenmsConfig::get('rrdcached', '');
+            }
+            if (session('preferences.timezone')) {
+                $env['TZ'] = session('preferences.timezone');
+            }
+            $this->processFactory = fn() => new Process(
+                command: $command,
+                cwd: $this->rrd_dir,
+                env: $env,
+            );
+        } else {
+            $this->processFactory = $processFactory;
         }
     }
 
     public function start(): void
     {
         if ($this->process === null || ! $this->process->isRunning()) {
-            $this->process = new Process(
-                command: [$this->rrdtool_exec, '-'],
-                cwd: $this->rrd_dir,
-                env: $this->env,
-            );
+            $this->process = ($this->processFactory)();
             $this->process->setInput($this->input);
             $this->process->setTimeout($this->timeout);
             $this->process->setIdleTimeout($this->timeout);
