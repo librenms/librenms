@@ -17,7 +17,7 @@ class AlertOperationSegmentPolicy
 
     public function __construct()
     {
-        $this->globalPrefix = 'alert-operation';
+        $this->globalPrefix = 'alert-rule';
     }
 
     public function viewAny(User $user): bool
