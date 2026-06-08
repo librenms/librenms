@@ -13,7 +13,7 @@ echo '<script src="js/leaflet.markercluster.js"></script>';
 echo '<script src="js/leaflet.awesome-markers.min.js"></script>';
 
 echo "<div class='overview-panel tw:mb-5'>
-            <div class='tw:px-4 tw:py-2.5 tw:bg-[#f5f5f5] tw:border-b tw:border-gray-300 tw:text-[#333] tw:dark:bg-dark-gray-200 tw:dark:border-[#1c1e22] tw:dark:text-dark-white-200'>";
+            <div class='tw:px-4 tw:py-2.5 tw:bg-neutral-100 tw:border-b tw:border-gray-300 tw:text-neutral-700 tw:dark:bg-dark-gray-200 tw:dark:border-zinc-800 tw:dark:text-dark-white-200'>";
 
 if (LibrenmsConfig::get('overview_show_sysDescr')) {
     echo '<i class="fa fa-id-card fa-lg icon-theme" aria-hidden="true"></i> <strong>';
@@ -21,7 +21,7 @@ if (LibrenmsConfig::get('overview_show_sysDescr')) {
     echo '</strong>';
 }
 
-echo '</div><div class="tw:flex tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-[#1c1e22]">';
+echo '</div><div class="tw:flex tw:flex-col tw:bg-white tw:divide-y tw:divide-gray-300 tw:dark:bg-dark-gray-400 tw:dark:divide-zinc-800">';
 
 if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
     \LibreNMS\Util\Rewrite::ciscoHardware($device, false);
@@ -33,20 +33,20 @@ if ($device['features']) {
 
 $device['os_text'] = LibrenmsConfig::getOsSetting($device['os'], 'text');
 
-echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-[#f5f5f5] tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]">
+echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]">
         <div class="tw:font-medium">System Name</div>
         <div>' . Clean::html($device['sysName'], []) . ' </div>
       </div>';
 
 if (! empty($device['overwrite_ip'])) {
-    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-[#f5f5f5] tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]"><div class="tw:font-medium">Assigned IP</div><div>' . htmlentities((string) $device['overwrite_ip']) . '</div></div>';
+    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]"><div class="tw:font-medium">Assigned IP</div><div>' . htmlentities((string) $device['overwrite_ip']) . '</div></div>';
 } elseif (! empty($device['ip'])) {
-    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-[#f5f5f5] tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]"><div class="tw:font-medium">Resolved IP</div><div>' . htmlentities((string) $device['ip']) . '</div></div>';
+    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]"><div class="tw:font-medium">Resolved IP</div><div>' . htmlentities((string) $device['ip']) . '</div></div>';
 } else {
     try {
         $ip = (string) IP::parse($device['hostname']);
         if ($ip !== format_hostname($device)) {
-            echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-[#f5f5f5] tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]"><div class="tw:font-medium">IP Address</div><div>' . htmlentities($ip) . '</div></div>';
+            echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]"><div class="tw:font-medium">IP Address</div><div>' . htmlentities($ip) . '</div></div>';
         }
     } catch (InvalidIpException) {
         // don't add an ip line
@@ -54,40 +54,40 @@ if (! empty($device['overwrite_ip'])) {
 }
 
 if ($device['purpose']) {
-    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-[#f5f5f5] tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]">
+    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]">
         <div class="tw:font-medium">Description</div>
         <div>' . Clean::html($device['purpose'], []) . '</div>
       </div>';
 }
 
 if ($device['hardware']) {
-    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-[#f5f5f5] tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]">
+    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]">
         <div class="tw:font-medium">Hardware</div>
         <div>' . Clean::html($device['hardware'], []) . '</div>
       </div>';
 }
 
-echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-[#f5f5f5] tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]">
+echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]">
         <div class="tw:font-medium tw:text-nowrap">Operating System</div>
         <div>' . Clean::html($device['os_text'] . ' ' . $device['version'] . ' ' . $device['features'], []) . ' </div>
       </div>';
 
 if ($device['serial']) {
-    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-[#f5f5f5] tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]">
+    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]">
         <div class="tw:font-medium">Serial</div>
         <div>' . Clean::html($device['serial'], []) . '</div>
       </div>';
 }
 
 if ($device['sysObjectID']) {
-    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-[#f5f5f5] tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]">
+    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]">
         <div class="tw:font-medium">Object ID</div>
         <div>' . Clean::html($device['sysObjectID'], []) . '</div>
       </div>';
 }
 
 if ($device['sysContact']) {
-    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-[#f5f5f5] tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]">
+    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]">
         <div class="tw:font-medium">Contact</div>';
 
     $contactText = get_dev_attrib($device, 'override_sysContact_bool')
@@ -115,7 +115,7 @@ if ($device['sysContact']) {
     if (get_dev_attrib($device, 'override_sysContact_bool')) {
         echo '<div>' . $displayText . '</div>
             </div>
-            <div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-[#f5f5f5] tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]">
+            <div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]">
                 <div class="tw:font-medium">SNMP Contact</div>
                 <div>' . Clean::html($device['sysContact']) . '</div>
             </div>';
@@ -128,13 +128,13 @@ if ($device['sysContact']) {
 if (! empty($device['inserted']) && preg_match('/^0/', (string) $device['inserted']) == 0) {
     $inserted_text = 'Device Added';
     $inserted = (Time::formatInterval(-(time() - strtotime((string) $device['inserted']))));
-    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-[#f5f5f5] tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]"><div class="tw:font-medium">' . $inserted_text . "</div><div title='$inserted_text on " . $device['inserted'] . "'>$inserted</div></div>";
+    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]"><div class="tw:font-medium">' . $inserted_text . "</div><div title='$inserted_text on " . $device['inserted'] . "'>$inserted</div></div>";
 }
 
 if (! empty($device['last_discovered'])) {
     $last_discovered_text = 'Last Discovered';
     $last_discovered = (empty($device['last_discovered']) ? 'Never' : Time::formatInterval(-(time() - strtotime((string) $device['last_discovered']))));
-    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-[#f5f5f5] tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]"><div class="tw:font-medium">' . $last_discovered_text . "</div><div title='$last_discovered_text at " . $device['last_discovered'] . "'>$last_discovered</div></div>";
+    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]"><div class="tw:font-medium">' . $last_discovered_text . "</div><div title='$last_discovered_text at " . $device['last_discovered'] . "'>$last_discovered</div></div>";
 }
 
 
@@ -150,7 +150,7 @@ if (! $device['status'] && ! $device['last_polled']) {
 }
 
 if ($uptime) {
-    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-[#f5f5f5] tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]"><div class="tw:font-medium">' . $uptime_text . '</div><div>' . $uptime . '</div></div>';
+    echo '<div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]"><div class="tw:font-medium">' . $uptime_text . '</div><div>' . $uptime . '</div></div>';
 }
 
 if ($device['location_id'] && $location = Location::find($device['location_id'])) {
@@ -160,11 +160,11 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
     $location_coords = $location_valid ? $location->lat . ', ' . $location->lng : 'N/A';
 
     echo '
-    <div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-[#f5f5f5] tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]">
+    <div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]">
         <div class="tw:font-medium">Location</div>
         <div>' . Clean::html($location->display(), []) . '</div>
     </div>
-    <div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-[#f5f5f5] tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]" id="coordinates-row" data-toggle="collapse" data-target="#toggle-map">
+    <div class="tw:grid tw:items-center tw:gap-2.5 tw:px-2 tw:py-2 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300 tw:grid-cols-[1fr_2fr]" id="coordinates-row" data-toggle="collapse" data-target="#toggle-map">
         <div class="tw:font-medium">Lat / Lng</div>
         <div class="tw:flex tw:items-center tw:justify-between tw:gap-2"><span id="coordinates-text">' . $location_coords . '</span>';
 
