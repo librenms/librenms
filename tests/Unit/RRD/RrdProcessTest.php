@@ -47,7 +47,7 @@ class RrdProcessTest extends TestCase
     public function testRunCommandSuccessfully(): void
     {
         $this->process->shouldReceive('getOutput')->andReturn("some output\nOK u:0.01 s:0.02 r:0.03\n");
-        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn($callback) => $callback(Process::OUT, "OK u:0.01 s:0.02 r:0.03\n"));
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::OUT, "OK u:0.01 s:0.02 r:0.03\n"));
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
         $output = $rrdProcess->run('info test.rrd');
@@ -57,7 +57,7 @@ class RrdProcessTest extends TestCase
 
     public function testThrowsNotFoundExceptionWhenFileIsMissing(): void
     {
-        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn($callback) => $callback(Process::OUT, "ERROR: No such file test.rrd\n"));
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::OUT, "ERROR: No such file test.rrd\n"));
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
 
@@ -69,7 +69,7 @@ class RrdProcessTest extends TestCase
 
     public function testThrowsUpdateTooFrequentException(): void
     {
-        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn($callback) => $callback(Process::OUT, "ERROR: illegal attempt to update using time 123456789\n"));
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::OUT, "ERROR: illegal attempt to update using time 123456789\n"));
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
 
@@ -81,7 +81,7 @@ class RrdProcessTest extends TestCase
 
     public function testThrowsCachedConnectionException(): void
     {
-        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn($callback) => $callback(Process::OUT, "ERROR: Unable to connect to rrdcached\n"));
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::OUT, "ERROR: Unable to connect to rrdcached\n"));
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
 
@@ -93,7 +93,7 @@ class RrdProcessTest extends TestCase
 
     public function testThrowsCachedConnectionExceptionWhenSocketMissing(): void
     {
-        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn($callback) => $callback(Process::OUT, "ERROR: Unable to connect to rrdcached: No such file or directory.\n"));
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::OUT, "ERROR: Unable to connect to rrdcached: No such file or directory.\n"));
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
 
@@ -105,7 +105,7 @@ class RrdProcessTest extends TestCase
 
     public function testThrowsGenericRrdException(): void
     {
-        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn($callback) => $callback(Process::OUT, "ERROR: something went wrong\n"));
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::OUT, "ERROR: something went wrong\n"));
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
 
@@ -117,7 +117,7 @@ class RrdProcessTest extends TestCase
 
     public function testThrowsExceptionOnDatasourceCountMismatch(): void
     {
-        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn($callback) => $callback(Process::OUT, "ERROR: test.rrd: expected 2 data source readings (got 1) from N\n"));
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::OUT, "ERROR: test.rrd: expected 2 data source readings (got 1) from N\n"));
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
 
@@ -129,7 +129,7 @@ class RrdProcessTest extends TestCase
 
     public function testThrowsExceptionOnUnknownDatasourceName(): void
     {
-        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn($callback) => $callback(Process::OUT, "ERROR: unknown DS name 'nonexistent'\n"));
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::OUT, "ERROR: unknown DS name 'nonexistent'\n"));
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
 
@@ -141,7 +141,7 @@ class RrdProcessTest extends TestCase
 
     public function testThrowsExceptionOnExtraDataInUpdateArgument(): void
     {
-        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn($callback) => $callback(Process::OUT, "ERROR: test.rrd: found extra data on update argument: 2:3\n"));
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::OUT, "ERROR: test.rrd: found extra data on update argument: 2:3\n"));
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
 
@@ -153,7 +153,7 @@ class RrdProcessTest extends TestCase
 
     public function testThrowsExceptionOnExpectedTimestampNotFoundInDataSource(): void
     {
-        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn($callback) => $callback(
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(
             Process::OUT,
             "ERROR: test.rrd: expected timestamp not found in data source from foo=2\n"
         ));
@@ -170,7 +170,7 @@ class RrdProcessTest extends TestCase
 
     public function testThrowsExceptionOnPermissionDenied(): void
     {
-        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn($callback) => $callback(Process::OUT, "ERROR: opening 'test.rrd': Permission denied\n"));
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::OUT, "ERROR: opening 'test.rrd': Permission denied\n"));
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
 
@@ -182,7 +182,7 @@ class RrdProcessTest extends TestCase
 
     public function testThrowsExceptionOnCorruptRrdFile(): void
     {
-        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn($callback) => $callback(Process::OUT, "ERROR: reached EOF while loading header rrd->stat_head\n"));
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::OUT, "ERROR: reached EOF while loading header rrd->stat_head\n"));
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
 
@@ -194,7 +194,7 @@ class RrdProcessTest extends TestCase
 
     public function testHandlesErrorOutputOnStderr(): void
     {
-        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn($callback) => $callback(Process::ERR, "Some stderr error message\n"));
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::ERR, "Some stderr error message\n"));
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
 
@@ -206,7 +206,7 @@ class RrdProcessTest extends TestCase
 
     public function testThrowsExceptionWhenRrdtoolNotFound(): void
     {
-        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn($callback) => $callback(Process::ERR, "sh: line 1: exec: rrdtool: not found\n"));
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::ERR, "sh: line 1: exec: rrdtool: not found\n"));
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
 
@@ -218,7 +218,7 @@ class RrdProcessTest extends TestCase
 
     public function testThrowsUnknownExceptionForUnclassifiedErrors(): void
     {
-        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn($callback) => $callback(Process::OUT, "ERROR: something completely unexpected\n"));
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::OUT, "ERROR: something completely unexpected\n"));
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
 
@@ -231,7 +231,7 @@ class RrdProcessTest extends TestCase
     public function testCanWaitForCustomString(): void
     {
         $this->process->shouldReceive('getOutput')->andReturn("some output\nDONE\n");
-        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn($callback) => $callback(Process::OUT, "DONE\n"));
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::OUT, "DONE\n"));
 
         $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
         $output = $rrdProcess->run('info test.rrd', 'DONE');
