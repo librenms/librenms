@@ -46,6 +46,7 @@ use LibreNMS\Util\Rewrite;
 class Rrd extends BaseDatastore
 {
     private $disabled = false;
+    private int $updateErrorCount = 0;
 
     private ?RrdProcess $rrd = null;
     /** @var string */
@@ -139,13 +140,22 @@ class Rrd extends BaseDatastore
         }
 
         try {
-            $this->update($rrd, $fields);
+            try {
+                $this->update($rrd, $fields);
+            } catch (RrdNotFoundException) {
+                if (isset($rrd_def)) {
+                    $this->command('create', $rrd, ['--step', $step, ...$rrd_def->getArguments(), ...$this->rra]);
+                    $this->update($rrd, $fields);
+                }
+            }
         } catch (RrdUpdateTooFrequentException) {
             Log::debug("RRD warning: update too soon for $rrd");
-        } catch (RrdNotFoundException) {
-            if (isset($rrd_def)) {
-                $this->command('create', $rrd, ['--step', $step, ...$rrd_def->getArguments(), ...$this->rra]);
-                $this->update($rrd, $fields);
+        } catch (RrdException $e) {
+            Log::error('RRD Error %r' . $e->getMessage() . '%n', ['color' => true]);
+
+            if (++$this->updateErrorCount >= 3) {
+                $this->disabled = true;
+                Eventlog::log('RRD updates disabled, too many errors. Final error: ' . $e->getMessage(), $device_model, 'rrd', Severity::Error);
             }
         }
     }
@@ -174,7 +184,6 @@ class Rrd extends BaseDatastore
      * @param  array  $data
      *
      * @throws RrdException
-     * @throws Exception
      *
      * @internal
      */
@@ -337,7 +346,7 @@ class Rrd extends BaseDatastore
      * @param  array  $options  rrdtool command options
      * @return string the output of the command
      *
-     * @throws Exception thrown when the rrdtool process(s) cannot be started
+     * @throws RrdException thrown when the rrdtool process(s) cannot be started
      */
     private function command(string $command, string $filename, array $options = []): string
     {
