@@ -940,7 +940,7 @@ foreach ($ports as $port) {
         }
         // Emit shadow billing input samples for bill-member ports.
         // This does not affect production billing yet; poll-billing.php remains authoritative.
-                include 'ports/billing-port-data.inc.php';
+        include 'ports/billing-port-data.inc.php';
 
         // Update Database if $port['update'] is not empty
         // or if previous poll time $port['poll_time'] is different from device globally previous port time $device_global_ports["poll_prev"]
