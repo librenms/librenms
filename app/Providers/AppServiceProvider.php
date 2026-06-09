@@ -219,6 +219,20 @@ class AppServiceProvider extends ServiceProvider
             return true;
         });
 
+        Validator::extend('array_keys_are_regex', function ($attribute, $value): bool {
+            if (! is_array($value)) {
+                return false;
+            }
+
+            foreach ($value as $key => $_) {
+                if (preg_match($key, '') === false) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+
         Validator::extend('date_or_relative', function ($attribute, $value, $parameters, $validator) {
             if (is_string($value) && preg_match('/^\d{9,13}$/', $value)) {
                 return true;

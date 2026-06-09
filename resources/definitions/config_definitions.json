@@ -6532,8 +6532,8 @@
             "group": "discovery",
             "section": "ports",
             "validate": {
-                "value": "array",
-                "value.*": "is_regex"
+                "value": ["array", "array_keys_are_regex"],
+                "value.*": "string"
             },
             "order": 10
         },
