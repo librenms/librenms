@@ -3,10 +3,12 @@
 /**
  * SnmpQueryMockTest.php
  *
- * Regression tests for three bugs in tests/Mocks/SnmpQueryMock.php:
+ * Regression tests for bugs in tests/Mocks/SnmpQueryMock.php:
  * prefix-overlap matching, dropped OID index suffix in walk output,
- * and missing newline termination. Each test asserts behavior that
- * was broken before the fix and is correct after.
+ * missing newline termination, and numeric output diverging from real
+ * net-snmp (missing leading dot, missing No Such Instance line). When
+ * SNMPSIM is set, numeric mock output is asserted byte-identical to a
+ * real NetSnmpQuery against the same fixture.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,11 +33,16 @@ namespace LibreNMS\Tests\Unit\Mocks;
 
 use App\Facades\DeviceCache;
 use App\Models\Device;
+use Illuminate\Database\Eloquent\Collection;
+use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Tests\Mocks\SnmpQueryMock;
+use LibreNMS\Tests\SnmpsimHelpers;
 use LibreNMS\Tests\TestCase;
 
 final class SnmpQueryMockTest extends TestCase
 {
+    use SnmpsimHelpers;
+
     private const FIXTURE = 'snmpquerymock_regression';
     private const BASE_OID = '1.3.6.1.2.1.2.2.1.2';
 
@@ -72,10 +79,12 @@ final class SnmpQueryMockTest extends TestCase
 
         // Before the fix, every row was keyed with the base OID, so all three
         // ifDescr rows appeared as "1.3.6.1.2.1.2.2.1.2 = ..." instead of
-        // having distinct .1, .2, .3 suffixes.
-        $this->assertStringContainsString('1.3.6.1.2.1.2.2.1.2.1 = eth0', $output);
-        $this->assertStringContainsString('1.3.6.1.2.1.2.2.1.2.2 = eth1', $output);
-        $this->assertStringContainsString('1.3.6.1.2.1.2.2.1.2.3 = eth2', $output);
+        // having distinct .1, .2, .3 suffixes. Byte-exact net-snmp -OQXUte -Pu
+        // -On output, verified against snmpsim (see the parity test below).
+        $this->assertSame(
+            ".1.3.6.1.2.1.2.2.1.2.1 = eth0\n.1.3.6.1.2.1.2.2.1.2.2 = eth1\n.1.3.6.1.2.1.2.2.1.2.3 = eth2\n",
+            $output
+        );
     }
 
     public function test_walk_output_lines_are_newline_terminated(): void
@@ -88,5 +97,50 @@ final class SnmpQueryMockTest extends TestCase
         $lines = array_filter(explode("\n", $output), fn ($l) => $l !== '');
         $this->assertCount(3, $lines, "expected exactly 3 newline-separated rows, got: $output");
         $this->assertStringEndsWith("\n", $output);
+    }
+
+    public function test_numeric_output_matches_real_net_snmp(): void
+    {
+        $this->requireSnmpsim();
+
+        $mock = $this->makeMock();
+        $real = NetSnmpQuery::make()->device($this->snmpsimDevice())->numeric();
+
+        $this->assertSame(
+            $real->walk(self::BASE_OID)->raw,
+            $mock->walk(self::BASE_OID)->raw,
+            'mock walk output diverges from real net-snmp'
+        );
+        $this->assertSame(
+            $real->get(self::BASE_OID . '.1')->raw,
+            $mock->get(self::BASE_OID . '.1')->raw,
+            'mock get output diverges from real net-snmp'
+        );
+        $this->assertSame(
+            $real->get(self::BASE_OID . '.99')->raw,
+            $mock->get(self::BASE_OID . '.99')->raw,
+            'mock get output for a missing OID diverges from real net-snmp'
+        );
+        $this->assertSame(
+            $real->next(self::BASE_OID)->raw,
+            $mock->next(self::BASE_OID)->raw,
+            'mock getnext output diverges from real net-snmp'
+        );
+    }
+
+    private function snmpsimDevice(): Device
+    {
+        $device = new Device([
+            'hostname' => $this->getSnmpsimIp(),
+            'port' => $this->getSnmpsimPort(),
+            'snmpver' => 'v2c',
+            'community' => self::FIXTURE,
+            'timeout' => 3,
+            'retries' => 0,
+            'os' => 'generic',
+        ]);
+        $device->setRelation('attribs', new Collection); // getAttrib without a database
+
+        return $device;
     }
 }

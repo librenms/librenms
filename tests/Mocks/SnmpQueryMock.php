@@ -168,7 +168,8 @@ class SnmpQueryMock implements SnmpQueryInterface
     {
         $community = $this->community();
         $num_oid = $this->translateNumber($oid);
-        $data = $this->getSnmprec($community)[$num_oid] ?? [0, ''];
+        // real snmpget reports missing OIDs inline with exit code 0; SnmpResponse::isValid() keys off this text
+        $data = $this->getSnmprec($community)[$num_oid] ?? ['4', 'No Such Instance currently exists at this OID'];
 
         Log::debug("[SNMP] snmpget $community $num_oid: ");
 
@@ -294,7 +295,7 @@ class SnmpQueryMock implements SnmpQueryInterface
         }
 
         if ($this->numeric) {
-            return "$key = $data\n";
+            return ".$key = $data\n"; // net-snmp -On prints numeric OIDs with a leading dot
         }
 
         if (! empty($oidObj->oid) && $oidObj->isNumeric()) {
