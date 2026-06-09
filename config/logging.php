@@ -12,7 +12,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
 
 return [
-    'default' => env('LOG_CHANNEL', 'stack'),
+    'default' => env('LOG_CHANNEL', 'default'),
 
     'deprecations' => [
         'channel' => env('LOG_DEPRECATIONS_CHANNEL', 'null'),
@@ -20,6 +20,22 @@ return [
     ],
 
     'channels' => [
+        'default' => [
+            'driver' => 'stack',
+            'channels' => ['single', 'flare'],
+            'ignore_exceptions' => false,
+        ],
+
+        'event' => [
+            'driver' => 'stack',
+            'channels' => ['event_db'],
+        ],
+
+        'auth' => [
+            'driver' => 'stack',
+            'channels' => ['auth_db'],
+        ],
+
         'stack' => [
             'driver' => 'stack',
             'channels' => ['log_file', 'flare'],
@@ -40,6 +56,46 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'daily' => [
+            'driver' => 'daily',
+            'path' => env('APP_LOG', base_path('logs/librenms.log')),
+            'formatter' => App\Logging\NoColorFormatter::class,
+            'level' => env('LOG_LEVEL', 'error'),
+            'days' => 14,
+            'replace_placeholders' => true,
+        ],
+
+        'auth_db' => [
+            'driver' => 'monolog',
+            'handler' => \App\Logging\AuthLogDbHandler::class,
+        ],
+
+        'event_db' => [
+            'driver' => 'monolog',
+            'handler' => \App\Logging\EventLogDbHandler::class,
+        ],
+
+        'stderr' => [
+            'driver' => 'monolog',
+            'level' => env('LOG_LEVEL', 'debug'),
+            'handler' => StreamHandler::class,
+            'formatter' => env('LOG_STDERR_FORMATTER', \App\Logging\CliColorFormatter::class),
+            'with' => [
+                'stream' => 'php://stderr',
+            ],
+            'processors' => [PsrLogMessageProcessor::class],
+        ],
+
+        'stdout_debug' => [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'formatter' => App\Logging\CliColorFormatter::class,
+            'with' => [
+                'stream' => 'php://output',
+            ],
+            'level' => 'debug',
+        ],
+
         'stdout' => [
             'driver' => 'monolog',
             'handler' => StreamHandler::class,
@@ -48,17 +104,6 @@ return [
                 'stream' => 'php://output',
             ],
             'level' => env('STDOUT_LOG_LEVEL', 'info'),
-        ],
-
-        'stderr' => [
-            'driver' => 'monolog',
-            'level' => env('LOG_LEVEL', 'debug'),
-            'handler' => StreamHandler::class,
-            'formatter' => env('LOG_STDERR_FORMATTER', App\Logging\CliColorFormatter::class),
-            'with' => [
-                'stream' => 'php://stderr',
-            ],
-            'processors' => [PsrLogMessageProcessor::class],
         ],
 
         'deprecations_channel' => [ // don't name deprecations
@@ -74,5 +119,4 @@ return [
             'driver' => 'flare',
         ],
     ],
-
 ];
