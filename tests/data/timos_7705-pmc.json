@@ -8290,16 +8290,16 @@
                     "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "ChBiArtr01",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
                     "bgpPeerOutTotalMessages": 0,
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": 65000
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "AS65000-MOCK-TEXT",
@@ -8313,16 +8313,16 @@
                     "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "ChBiBrtr01",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
                     "bgpPeerOutTotalMessages": 0,
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": 65000
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "AS65000-MOCK-TEXT",
@@ -8336,16 +8336,16 @@
                     "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "Casper POE",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
                     "bgpPeerOutTotalMessages": 0,
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": 65000
+                    "vrfLocalAs": null
                 }
             ]
         },
@@ -8363,16 +8363,16 @@
                     "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "ChBiArtr01",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 2790648,
                     "bgpPeerOutTotalMessages": 2784457,
                     "bgpPeerFsmEstablishedTime": 3600,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": 65000
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "AS65000-MOCK-TEXT",
@@ -8386,16 +8386,16 @@
                     "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "ChBiBrtr01",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 2790762,
                     "bgpPeerOutTotalMessages": 2784438,
                     "bgpPeerFsmEstablishedTime": 3600,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": 65000
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "AS65000-MOCK-TEXT",
@@ -8409,16 +8409,16 @@
                     "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "Casper POE",
+                    "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 2794804,
                     "bgpPeerOutTotalMessages": 2784419,
                     "bgpPeerFsmEstablishedTime": 3600,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": 65000
+                    "vrfLocalAs": null
                 }
             ]
         }

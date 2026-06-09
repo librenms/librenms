@@ -1,0 +1,339 @@
+-- *****************************************************************
+-- INFINERA-PM-FMMCSCGPTP-MIB
+-- 
+-- August 2015, Mithun Murthy
+-- 
+-- 
+-- Copyright (c) 2008-2013 by Infinera Inc.
+-- All rights reserved.
+-- ****************************************************************
+
+INFINERA-PM-FMMCSCGPTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32                                   FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP             FROM SNMPv2-CONF
+    TruthValue                                  FROM SNMPv2-TC
+    ifIndex                                     FROM IF-MIB
+    FloatHundredths, InfnSampleDuration         FROM INFINERA-TC-MIB
+    perfMon                                     FROM INFINERA-REG-MIB;
+
+
+fmmcScgPtpPmMIB MODULE-IDENTITY
+    LAST-UPDATED  "201504180000Z"
+    ORGANIZATION  "Infinera"
+    CONTACT-INFO
+        "Infinera
+        1322 Bordeaux Drive
+        Sunnyvale, CA - 94089
+
+        Contact : Technical Support
+        Email   : support@infinera.com
+        Phone   : 1-877-INF-5288"
+    DESCRIPTION
+        " "
+    REVISION      "201504180000Z" 
+    DESCRIPTION
+        "First Version"
+    ::= { perfMon 43 } 
+
+
+fmmcScgPtpPmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmmcScgPtpPmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of FmmcScgPtpPm entries. Each entry is uniquely identified by the value of ifIndex."
+    ::= { fmmcScgPtpPmMIB 2 } 
+
+fmmcScgPtpPmEntry  OBJECT-TYPE
+    SYNTAX      FmmcScgPtpPmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A FmmcScgPtp entry containing historical performance information pertaining to Infinera FMMCSCGPTP.
+        This table is a subclass of IfCommon. Entries will exist in this table only for interfaces
+        of type FMMCSCGPTP."
+    INDEX { ifIndex, fmmcScgPtpPmSampleDuration, fmmcScgPtpPmTimestamp}
+    ::= { fmmcScgPtpPmTable 1 }
+
+
+FmmcScgPtpPmEntry  ::= SEQUENCE {
+   	fmmcScgPtpPmTimestamp            Integer32,
+   	fmmcScgPtpPmSampleDuration       INTEGER,
+   	fmmcScgPtpPmValidity             TruthValue,
+   	fmmcScgPtpPmCmnScgOptMin         FloatHundredths,
+   	fmmcScgPtpPmCmnScgOptMax         FloatHundredths,
+   	fmmcScgPtpPmCmnScgOptAve         FloatHundredths,
+   	fmmcScgPtpPmCmnScgOprMin         FloatHundredths,
+   	fmmcScgPtpPmCmnScgOprMax         FloatHundredths,
+	fmmcScgPtpPmCmnScgOprAve         FloatHundredths,
+	fmmcScgPtpPmTxEdfaOprMin         FloatHundredths,
+    fmmcScgPtpPmTxEdfaOprMax         FloatHundredths,
+    fmmcScgPtpPmTxEdfaOprAve         FloatHundredths,
+    fmmcScgPtpPmRxEdfaOptMin         FloatHundredths,
+    fmmcScgPtpPmRxEdfaOptMax         FloatHundredths,
+    fmmcScgPtpPmRxEdfaOptAve         FloatHundredths
+}
+
+fmmcScgPtpPmTimestamp OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "End Time stamp for this interval. If this time is later than the current time,then the data for this bucket is currently being collected."
+    ::= { fmmcScgPtpPmEntry  1 }
+
+fmmcScgPtpPmSampleDuration OBJECT-TYPE
+    SYNTAX      INTEGER {
+        fifteenMinutes(1),
+        day(2)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The duration of this sample."
+    ::= { fmmcScgPtpPmEntry  2 }
+
+fmmcScgPtpPmValidity OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Flag indicating if data was valid for the entire interval"
+    ::= { fmmcScgPtpPmEntry  3 }
+
+fmmcScgPtpPmCmnScgOptMin OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum FmmcScg optical power min."
+    ::= { fmmcScgPtpPmEntry  4 }
+
+fmmcScgPtpPmCmnScgOptMax OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum FmmcScg optical power max."
+    ::= { fmmcScgPtpPmEntry  5 }
+
+fmmcScgPtpPmCmnScgOptAve OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average FmmcScg optical power ave."
+    ::= { fmmcScgPtpPmEntry  6 }
+
+fmmcScgPtpPmCmnScgOprMin OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum FmmcScg optical power min."
+    ::= { fmmcScgPtpPmEntry  7}
+
+fmmcScgPtpPmCmnScgOprMax OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum FmmcScg optical power max."
+    ::= { fmmcScgPtpPmEntry  8}
+
+fmmcScgPtpPmCmnScgOprAve OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average FmmcScg optical power ave."
+    ::= { fmmcScgPtpPmEntry  9}
+
+fmmcScgPtpPmTxEdfaOprMin   OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fmmcScgPtpPmEntry  10 }
+
+fmmcScgPtpPmTxEdfaOprMax   OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fmmcScgPtpPmEntry  11 }
+
+fmmcScgPtpPmTxEdfaOprAve   OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fmmcScgPtpPmEntry  12 }
+
+fmmcScgPtpPmRxEdfaOptMin	OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fmmcScgPtpPmEntry  13 }
+
+fmmcScgPtpPmRxEdfaOptMax	OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fmmcScgPtpPmEntry  14 }
+
+fmmcScgPtpPmRxEdfaOptAve	OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fmmcScgPtpPmEntry  15 }
+
+fmmcScgPtpPmRealTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmmcScgPtpPmRealEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of FmmcScgPtpPmReal entries. Each entry is uniquely identified by the value of ifIndex."
+    ::= { fmmcScgPtpPmMIB 1 } 
+
+fmmcScgPtpPmRealEntry  OBJECT-TYPE
+    SYNTAX      FmmcScgPtpPmRealEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A  fmmcScgPtp entry containing real-time performance information pertaining to Infinera
+         fmmcScgPtp interfaces. This table is a subclass of IfCommon."
+    INDEX { ifIndex }
+    ::= { fmmcScgPtpPmRealTable 1 }
+
+
+FmmcScgPtpPmRealEntry  ::= SEQUENCE {
+    fmmcScgPtpPmRealCmnScgOpt       FloatHundredths,
+    fmmcScgPtpPmRealCmnScgOpr       FloatHundredths,
+    fmmcScgPtpPmRealOptOsaTapRatio  FloatHundredths,
+	fmmcScgPtpPmRealOprOsaTapRatio  FloatHundredths,
+	fmmcScgPtpPmRealTxEdfaOpr		FloatHundredths,	
+	fmmcScgPtpPmRealRxEdfaOpt	    FloatHundredths,	
+	fmmcScgPtpPmRealEdfaLbcTx 		FloatHundredths,	
+	fmmcScgPtpPmRealRxEdfaLbc 		FloatHundredths	
+}
+
+fmmcScgPtpPmRealCmnScgOpt OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total FmmcScg optical power trasmit."
+    ::= { fmmcScgPtpPmRealEntry  1 }
+
+
+fmmcScgPtpPmRealCmnScgOpr OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total FmmcScg optical power receive."
+    ::= { fmmcScgPtpPmRealEntry  2 }
+
+
+fmmcScgPtpPmRealOptOsaTapRatio OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "FmmcScg optical power transmit ratio"
+    ::= { fmmcScgPtpPmRealEntry  3 }
+
+fmmcScgPtpPmRealOprOsaTapRatio OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "FmmcScg optical power receivei tap ratio."
+    ::= { fmmcScgPtpPmRealEntry  4 }
+
+fmmcScgPtpPmRealTxEdfaOpr	OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "FmmcScg transmit EDFA power"
+    ::= { fmmcScgPtpPmRealEntry  5 }
+
+fmmcScgPtpPmRealRxEdfaOpt	OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fmmcScgPtpPmRealEntry  6 }
+
+fmmcScgPtpPmRealEdfaLbcTx	OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fmmcScgPtpPmRealEntry  7 }
+
+fmmcScgPtpPmRealRxEdfaLbc	OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fmmcScgPtpPmRealEntry  8 }
+
+-- Conformance Statements
+fmmcScgPtpPmConformance    OBJECT IDENTIFIER ::= { fmmcScgPtpPmMIB 3 }
+fmmcScgPtpPmCompliances    OBJECT IDENTIFIER ::= { fmmcScgPtpPmConformance 1 }
+fmmcScgPtpPmGroups         OBJECT IDENTIFIER ::= { fmmcScgPtpPmConformance 2 }
+
+fmmcScgPtpPmCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+    "Describes the requirements for conformance to the  fmmcScgPtp-MIB"
+    MODULE
+        MANDATORY-GROUPS { fmmcScgPtpPmGroup }
+    ::= { fmmcScgPtpPmCompliances 1 }
+
+fmmcScgPtpPmRealCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+    "Describes the requirements for conformance to the FmmcScgPtpPmReal-MIB"
+    MODULE
+        MANDATORY-GROUPS { fmmcScgPtpPmRealGroup }
+    ::= { fmmcScgPtpPmCompliances 2 }
+
+fmmcScgPtpPmGroup OBJECT-GROUP
+    OBJECTS {
+        fmmcScgPtpPmTimestamp,
+        fmmcScgPtpPmSampleDuration,
+        fmmcScgPtpPmValidity,     
+        fmmcScgPtpPmCmnScgOptMin, 
+        fmmcScgPtpPmCmnScgOptMax, 
+        fmmcScgPtpPmCmnScgOptAve, 
+        fmmcScgPtpPmCmnScgOprMin, 
+        fmmcScgPtpPmCmnScgOprMax, 
+        fmmcScgPtpPmCmnScgOprAve,
+	    fmmcScgPtpPmTxEdfaOprMin,
+     	fmmcScgPtpPmTxEdfaOprMax,
+     	fmmcScgPtpPmTxEdfaOprAve,
+     	fmmcScgPtpPmRxEdfaOptMin,
+     	fmmcScgPtpPmRxEdfaOptMax,
+     	fmmcScgPtpPmRxEdfaOptAve
+    }
+    STATUS current
+    DESCRIPTION
+        " A collection of objects for reading the historical performance of the  fmmcScgPtp."
+    ::= { fmmcScgPtpPmGroups 1 }
+
+fmmcScgPtpPmRealGroup OBJECT-GROUP
+    OBJECTS {
+        fmmcScgPtpPmRealCmnScgOpt,
+        fmmcScgPtpPmRealCmnScgOpr,
+        fmmcScgPtpPmRealOptOsaTapRatio,
+		fmmcScgPtpPmRealOprOsaTapRatio,
+	    fmmcScgPtpPmRealTxEdfaOpr,
+        fmmcScgPtpPmRealRxEdfaOpt,
+        fmmcScgPtpPmRealEdfaLbcTx,
+        fmmcScgPtpPmRealRxEdfaLbc
+
+    }
+    STATUS current
+    DESCRIPTION
+        " A collection of objects for reading the real-time performance of the  fmmcScgPtp."
+    ::= { fmmcScgPtpPmGroups 2 }
+
+END

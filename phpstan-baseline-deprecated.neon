@@ -2,15 +2,6 @@ parameters:
 	ignoreErrors:
 		-
 			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Alert/AlertData.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbFetchCell\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
@@ -47,11 +38,20 @@ parameters:
 
 		-
 			message: '''
+				#^Call to deprecated function dbFetchCell\(\)\:
+				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
+			'''
+			identifier: function.deprecated
+			count: 1
+			path: LibreNMS/Alert/AlertUtil.php
+
+		-
+			message: '''
 				#^Call to deprecated function dbFetchRows\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
 			identifier: function.deprecated
-			count: 2
+			count: 3
 			path: LibreNMS/Alert/AlertUtil.php
 
 		-
@@ -1132,6 +1132,15 @@ parameters:
 			'''
 			identifier: function.deprecated
 			count: 1
+			path: LibreNMS/OS/Rutos2xx.php
+
+		-
+			message: '''
+				#^Call to deprecated function snmp_get_multi_oid\(\)\:
+				Please use SnmpQuery instead$#
+			'''
+			identifier: function.deprecated
+			count: 1
 			path: LibreNMS/OS/Scalance.php
 
 		-
@@ -1493,231 +1502,6 @@ parameters:
 			identifier: function.deprecated
 			count: 2
 			path: LibreNMS/OS/Zyxelwlc.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/Aos7stpNewRoot.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AuthenticationFailure.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/BridgeNewRoot.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/BridgeTopologyChanged.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/ColdBoot.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/CppmServiceRestartNotification.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/CppmServiceStartNotification.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/CppmServiceStopNotification.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/EntityDatabaseConfigChanged.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/FailedUserLogin.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 2
-			path: LibreNMS/Snmptrap/Handlers/OspfTxRetransmit.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/WarmBoot.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 5
-			path: LibreNMS/Util/Url.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/ApiClients/GraylogApi.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/Console/Commands/DevicePing.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/Console/Commands/ReportDevices.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/Console/Commands/SnmpFetch.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/Http/Controllers/Ajax/DeviceSearchController.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/Http/Controllers/Select/DeviceController.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/Http/Controllers/Table/DeviceController.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/Http/Controllers/Table/VminfoController.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/Http/Controllers/Widgets/AlertMapController.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/Http/Controllers/Widgets/AvailabilityMapController.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 2
-			path: app/Models/Device.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 2
-			path: app/View/Components/Device/Page.php
 
 		-
 			message: '''
@@ -2972,6 +2756,15 @@ parameters:
 
 		-
 			message: '''
+				#^Call to deprecated function snmp_walk\(\)\:
+				Please use SnmpQuery instead$#
+			'''
+			identifier: function.deprecated
+			count: 1
+			path: includes/discovery/sensors/pre-cache/avtech.inc.php
+
+		-
+			message: '''
 				#^Call to deprecated function snmpwalk_cache_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -4065,7 +3858,7 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
 			identifier: function.deprecated
-			count: 2
+			count: 4
 			path: includes/html/api_functions.inc.php
 
 		-
@@ -4101,7 +3894,7 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
 			'''
 			identifier: function.deprecated
-			count: 2
+			count: 3
 			path: includes/html/api_functions.inc.php
 
 		-
@@ -4110,7 +3903,7 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
 			'''
 			identifier: function.deprecated
-			count: 5
+			count: 6
 			path: includes/html/api_functions.inc.php
 
 		-
@@ -5447,6 +5240,15 @@ parameters:
 
 		-
 			message: '''
+				#^Call to deprecated function dbFetchRows\(\)\:
+				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
+			'''
+			identifier: function.deprecated
+			count: 3
+			path: includes/html/pages/edituser.inc.php
+
+		-
+			message: '''
 				#^Call to deprecated function dbInsert\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
 			'''
@@ -5456,12 +5258,12 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
+				#^Call to deprecated function dbFetchCell\(\)\:
+				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
-			identifier: method.deprecated
+			identifier: function.deprecated
 			count: 1
-			path: includes/html/pages/eventlog.inc.php
+			path: includes/html/pages/iftype.inc.php
 
 		-
 			message: '''
@@ -5550,15 +5352,6 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
 			identifier: function.deprecated
-			count: 3
-			path: includes/html/pages/routing/mpls-path-map.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
 			count: 3
 			path: includes/html/pages/routing/mpls-path-map.inc.php
 
@@ -5739,7 +5532,7 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
 			identifier: function.deprecated
-			count: 5
+			count: 7
 			path: includes/html/print-alert-rules.php
 
 		-
@@ -6387,7 +6180,7 @@ parameters:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
-			count: 9
+			count: 11
 			path: includes/polling/bgp-peers.inc.php
 
 		-
@@ -6722,6 +6515,24 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/polling/hr-mib.inc.php
+
+		-
+			message: '''
+				#^Call to deprecated function dbFetchRows\(\)\:
+				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
+			'''
+			identifier: function.deprecated
+			count: 1
+			path: includes/polling/ipmi.inc.php
+
+		-
+			message: '''
+				#^Call to deprecated function dbUpdate\(\)\:
+				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
+			'''
+			identifier: function.deprecated
+			count: 1
+			path: includes/polling/ipmi.inc.php
 
 		-
 			message: '''
@@ -7191,11 +7002,3 @@ parameters:
 			count: 1
 			path: includes/syslog.php
 
-		-
-			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 2
-			path: tests/Feature/SnmpTraps/CommonTrapTest.php
