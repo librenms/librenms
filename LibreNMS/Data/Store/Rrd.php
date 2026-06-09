@@ -421,7 +421,6 @@ class Rrd extends BaseDatastore
         if ($this->rrdcached) {
             $output = $this->command('list', '/' . self::safeName($hostname));
             $files = explode("\n", trim($output));
-            array_pop($files); // remove rrdcached status line
         } else {
             $files = glob($this->dirFromHost($hostname) . '/*.rrd') ?: [];
         }
