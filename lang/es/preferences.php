@@ -1,7 +1,7 @@
 <?php
 
 return [
-  'title' => 'Preferencias',
-  'lang' => 'Español',
-  'theme' => 'Tema',
+    'title' => 'Preferencias',
+    'lang' => 'Español',
+    'theme' => 'Tema',
 ];

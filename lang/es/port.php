@@ -1,85 +1,76 @@
 <?php
 
 return [
-  'groups' => 
-  [
-    'updated' => ':port: grupos actualizados',
-    'none' => ':port sin actualización solicitada',
-  ],
-  'filters' => 
-  [
-    'status_up' => 'Mostrar solo activos',
-    'admin_down' => 'Mostrar administrativamente caídos',
-    'disabled' => 'Mostrar deshabilitados',
-    'ignored' => 'Mostrar ignorados',
-  ],
-  'graphs' => 
-  [
-    'bits' => 'Bits',
-    'upkts' => 'Paquetes unicast',
-    'nupkts' => 'Paquetes no unicast',
-    'errors' => 'Errores',
-    'etherlike' => 'Etherlike',
-  ],
-  'mtu_label' => 'MTU :mtu',
-  'tabs' => 
-  [
-    'arp' => 'Tabla ARP',
-    'nd' => 'IPv6 ND',
-    'fdb' => 'Tabla FDB',
-    'links' => 'Vecinos',
-    'transceivers' => 'Transceptores',
-    'xdsl' => 'xDSL',
-    'portsecurity' => 'Seguridad de puerto',
-  ],
-  'transceiver' => 'Transceptor',
-  'transceivers' => 
-  [
-    'fields' => 
-    [
-      'model' => 'PN: :model',
-      'serial' => 'SN: :serial',
-      'revision' => 'Rev: :revision',
-      'date' => 'Fecha: :date',
-      'distance' => 'Distancia: :distance',
-      'encoding' => 'Codificación: :encoding',
-      'cable' => 'Cable: :cable',
-      'ddm' => 'DDM: :ddm',
-      'wavelength' => 'Longitud de onda: :wavelength',
-      'connector' => 'Conector: :connector',
-      'channels' => 'Canales: :channels',
+    'groups' => [
+        'updated' => ':port: grupos actualizados',
+        'none' => ':port sin actualización solicitada',
     ],
-    'metrics' => 
-    [
-      'power-tx' => 'Potencia Tx|Canal :channel Potencia Tx',
-      'power-rx' => 'Potencia Rx|Canal :channel Potencia Rx',
-      'bias' => 'Bias|Canal :channel Bias',
-      'temperature' => 'Temperatura|Canal :channel Temperatura',
-      'voltage' => 'Voltaje|Canal :channel Voltaje',
+    'filters' => [
+        'status_up' => 'Mostrar solo activos',
+        'admin_down' => 'Mostrar administrativamente caídos',
+        'disabled' => 'Mostrar deshabilitados',
+        'ignored' => 'Mostrar ignorados',
     ],
-    'units' => 
-    [
-      'power-tx' => 'dBm',
-      'power-rx' => 'dBm',
-      'bias' => 'mA',
-      'temperature' => '°C',
-      'voltage' => 'V',
+    'graphs' => [
+        'bits' => 'Bits',
+        'upkts' => 'Paquetes unicast',
+        'nupkts' => 'Paquetes no unicast',
+        'errors' => 'Errores',
+        'etherlike' => 'Etherlike',
     ],
-  ],
-  'unknown_port' => 'Puerto desconocido',
-  'vlan_count' => 'VLANs: :count',
-  'vlan_label' => 'VLAN: :label',
-  'vrf_label' => 'VRF: :name',
-  'xdsl' => 
-  [
-    'sync_stat' => 'Sync: :down/:up',
-    'attainable_stat' => 'Máx: :down/:up',
-    'attenuation_stat' => 'Aten: :down/:up',
-    'snr_stat' => 'SNR: :down/:up',
-    'sync' => 'Velocidad de sincronización',
-    'attainable' => 'Velocidad alcanzable',
-    'attenuation' => 'Atenuación',
-    'snr' => 'Margen SNR',
-    'power' => 'Potencias de salida',
-  ],
+    'mtu_label' => 'MTU :mtu',
+    'tabs' => [
+        'arp' => 'Tabla ARP',
+        'nd' => 'IPv6 ND',
+        'fdb' => 'Tabla FDB',
+        'links' => 'Vecinos',
+        'transceivers' => 'Transceptores',
+        'xdsl' => 'xDSL',
+        'portsecurity' => 'Seguridad de puerto',
+    ],
+    'transceiver' => 'Transceptor',
+    'transceivers' => [
+        'fields' => [
+            'model' => 'PN: :model',
+            'serial' => 'SN: :serial',
+            'revision' => 'Rev: :revision',
+            'date' => 'Fecha: :date',
+            'distance' => 'Distancia: :distance',
+            'encoding' => 'Codificación: :encoding',
+            'cable' => 'Cable: :cable',
+            'ddm' => 'DDM: :ddm',
+            'wavelength' => 'Longitud de onda: :wavelength',
+            'connector' => 'Conector: :connector',
+            'channels' => 'Canales: :channels',
+        ],
+        'metrics' => [
+            'power-tx' => 'Potencia Tx|Canal :channel Potencia Tx',
+            'power-rx' => 'Potencia Rx|Canal :channel Potencia Rx',
+            'bias' => 'Bias|Canal :channel Bias',
+            'temperature' => 'Temperatura|Canal :channel Temperatura',
+            'voltage' => 'Voltaje|Canal :channel Voltaje',
+        ],
+        'units' => [
+            'power-tx' => 'dBm',
+            'power-rx' => 'dBm',
+            'bias' => 'mA',
+            'temperature' => '°C',
+            'voltage' => 'V',
+        ],
+    ],
+    'unknown_port' => 'Puerto desconocido',
+    'vlan_count' => 'VLANs: :count',
+    'vlan_label' => 'VLAN: :label',
+    'vrf_label' => 'VRF: :name',
+    'xdsl' => [
+        'sync_stat' => 'Sync: :down/:up',
+        'attainable_stat' => 'Máx: :down/:up',
+        'attenuation_stat' => 'Aten: :down/:up',
+        'snr_stat' => 'SNR: :down/:up',
+        'sync' => 'Velocidad de sincronización',
+        'attainable' => 'Velocidad alcanzable',
+        'attenuation' => 'Atenuación',
+        'snr' => 'Margen SNR',
+        'power' => 'Potencias de salida',
+    ],
 ];

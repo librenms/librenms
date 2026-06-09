@@ -1,6 +1,6 @@
 <?php
 
 return [
-  'in' => 'Entrante',
-  'out' => 'Saliente',
+    'in' => 'Entrante',
+    'out' => 'Saliente',
 ];
