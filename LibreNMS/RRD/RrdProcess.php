@@ -3,6 +3,7 @@
 namespace LibreNMS\RRD;
 
 use App\Facades\LibrenmsConfig;
+use Illuminate\Support\Str;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\Exceptions\RrdUpdateTooFrequentException;
@@ -26,7 +27,7 @@ class RrdProcess
     {
         $this->rrdtool_exec = LibrenmsConfig::get('rrdtool', 'rrdtool');
         $this->rrdcached = (string) LibrenmsConfig::get('rrdcached', '');
-        $this->rrd_dir = LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd');
+        $this->rrd_dir = Str::finish(LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd'), '/');
         $this->input = new InputStream();
 
         if ($this->rrdcached) {
