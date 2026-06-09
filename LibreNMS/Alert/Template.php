@@ -46,9 +46,25 @@ class Template
             // Return the cached template information.
             return $this->template;
         }
-        $this->template = AlertTemplate::whereHas('map', function ($query) use ($obj): void {
-            $query->where('alert_rule_id', '=', $obj['rule_id']);
-        })->first();
+
+        // Prefer a per-transport template if available, then fall back to per-rule, then default
+        $ruleId = $obj['rule_id'] ?? null;
+        $transportId = $obj['transport_id'] ?? null;
+
+        if ($ruleId && $transportId) {
+            $this->template = AlertTemplate::whereHas('map', function ($query) use ($ruleId, $transportId): void {
+                $query->where('alert_rule_id', '=', $ruleId)
+                    ->where('transport_id', '=', $transportId);
+            })->first();
+        }
+
+        if (! $this->template && $ruleId) {
+            $this->template = AlertTemplate::whereHas('map', function ($query) use ($ruleId): void {
+                $query->where('alert_rule_id', '=', $ruleId)
+                    ->whereNull('transport_id');
+            })->first();
+        }
+
         if (! $this->template) {
             $this->template = AlertTemplate::where('name', '=', 'Default Alert Template')->first();
         }

@@ -879,7 +879,7 @@
             },
             success: function () {
                 hideDashboardEditor = hideDashboardEditor ? 0 : 1;
-                $('#toggle-dashboard-editor-text').text(hideDashboardEditor ? '{{ __('Show Dashboard Editor') }}' : '{{ __('Hide Dashboard Editor') }}')
+                $('#toggleInput-dashboard-editor-text').text(hideDashboardEditor ? '{{ __('Show Dashboard Editor') }}' : '{{ __('Hide Dashboard Editor') }}')
 
                 $('#dashboard-editor').collapse(hideDashboardEditor ? 'hide' : 'show');
             }

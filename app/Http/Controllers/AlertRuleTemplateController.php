@@ -4,14 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\AlertRule;
+use Illuminate\Http\JsonResponse;
 
 class AlertRuleTemplateController extends Controller
 {
-    public function template(int $template_id)
+    public function index(): JsonResponse
+    {
+        $collection = self::templatesCollection();
+
+        return response()->json(collect($collection)->map(fn ($rule, $index) => [
+            'id' => $index,
+            'name' => $rule['name'],
+            'builder' => $rule['builder'] ?? null,
+        ])->values()->all());
+    }
+
+    public function show(int $template_id): JsonResponse
     {
         $this->authorize('create', AlertRule::class);
 
-        $collection = $this->templatesCollection();
+        $collection = self::templatesCollection();
 
         if (! isset($collection[$template_id])) {
             return response()->json(['status' => 'error', 'message' => 'Template not found'], 404);
@@ -33,7 +45,7 @@ class AlertRuleTemplateController extends Controller
         ]);
     }
 
-    public function rule(AlertRule $alertRule)
+    public function rule(AlertRule $alertRule): JsonResponse
     {
         $this->authorize('create', AlertRule::class);
 
@@ -63,7 +75,7 @@ class AlertRuleTemplateController extends Controller
         return array_replace($default_extra, $extra);
     }
 
-    public function templatesCollection(): array
+    public static function templatesCollection(): array
     {
         return json_decode(file_get_contents(resource_path('definitions/alert_rules.json')), true);
     }

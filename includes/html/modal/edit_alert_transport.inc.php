@@ -176,9 +176,8 @@ use LibreNMS\Alert\Transport;
             $("#transport_id").val(transport_id);
             if(transport_id > 0) {
                 $.ajax({
-                    type: "POST",
-                    url: "ajax_form.php",
-                    data: { type: "show-alert-transport", transport_id: transport_id },
+                    type: "GET",
+                    url: "<?php echo route('alert.transports.show', ':transport_id') ?>".replace(':transport_id', transport_id),
                     success: function (data) {
                         loadTransport(data);
                     },

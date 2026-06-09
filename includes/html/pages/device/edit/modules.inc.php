@@ -89,7 +89,7 @@ foreach ($poller_modules as $module => $module_status) {
        <td>
        ';
 
-    echo '<input type="checkbox" style="visibility:hidden;width:100px;" name="poller-module" id="poller-toggle-' . $module . '" ' . $module_checked . '>';
+    echo '<input type="checkbox" style="visibility:hidden;width:100px;" name="poller-module" id="poller-toggleInput-' . $module . '" ' . $module_checked . '>';
 
     echo '
        </td>
@@ -184,7 +184,7 @@ foreach ($discovery_modules as $module => $module_status) {
         </td>
         <td>';
 
-    echo '<input type="checkbox" style="visibility:hidden;width:100px;" name="discovery-module" id="discovery-toggle-' . $module . '" ' . $module_checked . '>';
+    echo '<input type="checkbox" style="visibility:hidden;width:100px;" name="discovery-module" id="discovery-toggleInput-' . $module . '" ' . $module_checked . '>';
 
     echo '
         </td>
@@ -300,7 +300,7 @@ echo '
           data: { polling: 'clear'},
           dataType: "json",
           success: function(data){
-              $('#poller-toggle-'+poller_module).bootstrapSwitch('state', data.polling, true);
+              $('#poller-toggleInput-'+poller_module).bootstrapSwitch('state', data.polling, true);
               $('#poller-module-'+poller_module).removeClass('text-danger');
               $('#poller-module-'+poller_module).removeClass('text-success');
               $('#poller-module-'+poller_module).html('Unset');
@@ -318,7 +318,7 @@ echo '
           data: { discovery: 'clear'},
           dataType: "json",
           success: function(data){
-              $('#discovery-toggle-'+discovery_module).bootstrapSwitch('state', data.discovery, true);
+              $('#discovery-toggleInput-'+discovery_module).bootstrapSwitch('state', data.discovery, true);
               $('#discovery-module-'+discovery_module).removeClass('text-danger');
               $('#discovery-module-'+discovery_module).removeClass('text-success');
               $('#discovery-module-'+discovery_module).html('Unset');

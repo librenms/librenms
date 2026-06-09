@@ -202,7 +202,7 @@ if ($vars['view'] == 'paths') {
         if (is_array($host)) {
             $destination = generate_device_link($host, 0, ['tab' => 'routing', 'proto' => 'mpls']);
         }
-        echo '<tr data-toggle="collapse" data-target="#path-map' . $i . '" class="accordion-toggle" bgcolor="' . $bg_colour . '">
+        echo '<tr data-toggle="collapse" data-target="#path-map' . $i . '" class="accordion-toggleInput" bgcolor="' . $bg_colour . '">
             <td><button class="btn btn-default btn-xs"><span class="fa fa-plus"></span></button></td>
             <td>' . $path['mplsLspName'] . '</td>
             <td>' . $path['path_oid'] . '</td>

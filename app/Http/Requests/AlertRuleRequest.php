@@ -67,6 +67,10 @@ class AlertRuleRequest extends FormRequest
 
             'alert_operation_id' => ['nullable', 'integer', Rule::exists(AlertOperation::class, 'id')],
 
+            'template_id' => ['nullable', 'integer', 'exists:alert_templates,id'],
+            'template_transports' => ['sometimes', 'array'],
+            'template_transports.*' => ['nullable', 'integer', 'exists:alert_templates,id'],
+
             'proc' => ['nullable', 'string'],
             'notes' => ['nullable', 'string'],
         ];
@@ -89,8 +93,8 @@ class AlertRuleRequest extends FormRequest
                 default => false
             }])->all());
 
-        // Ensure maps is array if present as empty string
-        foreach (['maps'] as $key) {
+        // Ensure maps/transports/template_transports are arrays if present as empty string
+        foreach (['maps', 'transports', 'template_transports'] as $key) {
             $value = $this->input($key);
             if ($value === '' || $value === null) {
                 $this->merge([$key => []]);
