@@ -29,22 +29,24 @@
 
 namespace LibreNMS\Tests\Unit\Mocks;
 
+use App\Facades\DeviceCache;
 use App\Models\Device;
-use DeviceCache;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use LibreNMS\Tests\DBTestCase;
 use LibreNMS\Tests\Mocks\SnmpQueryMock;
+use LibreNMS\Tests\TestCase;
 
-final class SnmpQueryMockTest extends DBTestCase
+final class SnmpQueryMockTest extends TestCase
 {
-    use DatabaseTransactions;
-
     private const FIXTURE = 'snmpquerymock_regression';
     private const BASE_OID = '1.3.6.1.2.1.2.2.1.2';
 
     private function makeMock(): SnmpQueryMock
     {
-        $device = Device::factory()->create(['community' => self::FIXTURE]);
+        // SnmpQueryMock reads the community from DeviceCache::getPrimary() to
+        // pick its snmprec fixture. Fake the primary device so the mock has a
+        // community without touching the database.
+        $device = new Device(['community' => self::FIXTURE]);
+        $device->device_id = 1;
+        DeviceCache::fake($device);
         DeviceCache::setPrimary($device->device_id);
 
         $mock = new SnmpQueryMock();
