@@ -3,7 +3,7 @@
 @import "tailwindcss" prefix(tw);
 @source "../../includes/html/pages/**/*.php";
 @source "../../includes/html/**/*.inc.php";
-@source "../../app/Plugins/**/*.blade.php";
+@source "../views/device/overview/**/*.blade.php";
 @import "../../html/css/bootstrap.min.css" layer(components);
 @custom-variant dark (&:where(.dark, .dark *));
 @layer base {
