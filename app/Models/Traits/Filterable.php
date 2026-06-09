@@ -217,6 +217,7 @@ trait Filterable
         return [
             'filter' => ['nullable', 'array'],
             'filter.*' => [
+                'bail',
                 'array',
                 function ($attribute, $value, $fail): void {
                     $operator = array_key_first($value);
