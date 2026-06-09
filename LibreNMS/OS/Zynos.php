@@ -20,17 +20,25 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2020 Tony Murray
+ * @copyright  2025 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2025 Peca Nesovanovic
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Device;
+use App\Models\PortsFdb;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS\Shared\Zyxel;
+use SnmpQuery;
 
-class Zynos extends Zyxel implements OSDiscovery
+class Zynos extends Zyxel implements OSDiscovery, FdbTableDiscovery
 {
     public function discoverOS(Device $device): void
     {
@@ -56,5 +64,41 @@ class Zynos extends Zyxel implements OSDiscovery
                 }
             }
         }
+    }
+
+    public function discoverFdbTable(): Collection
+    {
+        $fdbt = new Collection;
+
+        if (Str::contains($this->getDeviceArray()['hardware'], 'GS1900')) {
+            //will match anything starting with GS1900 before the 1st dash (like GS1900-8, GS1900-24E etc etc)
+            echo 'Zyxel buggy Q-BRIDGE:' . PHP_EOL;
+            // These devices do not provide a proper Q-BRIDGE reply (there is a ".6." index between VLAN and MAC)
+            // <vlanid>.6.<mac1>.<mac2>.<mac3>.<mac4>.<mac5>.<mac6>
+            // We need to manually handle this here
+
+            $fdbPort_table = SnmpQuery::hideMib()->numericIndex()->walk('Q-BRIDGE-MIB::dot1qTpFdbPort')->valuesByIndex();
+            foreach ($fdbPort_table as $index => $port_data) {
+                // Let's remove the wrong data in the index
+
+                // We'll assume that 1st element is vlan, and last 6 are mac. This will remove the '6' in between them and be safe in case they
+                // fix the Q-BRIDGE implementation
+                $indexes = explode('.', (string) $index);
+                $lastSix = array_slice($indexes, -6); // Extract the last 6 elements from the array
+                $hexParts = array_map(fn ($i) => dechex((int) $i), $lastSix); // Convert each element to hexadecimal
+                $mac_address = implode(':', $hexParts); // Join them into a MAC address string
+                $fdbt->push(new PortsFdb([
+                    'port_id' => PortCache::getIdFromIfIndex($port_data['dot1qTpFdbPort'] ?? 0, $this->getDeviceId()),
+                    'mac_address' => $mac_address,
+                    'vlan_id' => $vlan = $indexes[0], //1st element
+                ]));
+            }
+        }
+
+        if ($fdbt->isEmpty()) {
+            $fdbt = parent::discoverFdbTable();
+        }
+
+        return $fdbt;
     }
 }

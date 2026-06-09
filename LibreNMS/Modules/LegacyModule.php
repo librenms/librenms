@@ -43,7 +43,6 @@ class LegacyModule implements Module
     private array $module_deps = [
         'arp-table' => ['ports'],
         'bgp-peers' => ['ports', 'vrf', 'ipv4-addresses', 'ipv6-addresses'],
-        'fdb-table' => ['ports', 'vlans'],
         'transceivers' => ['ports'],
         'vlans' => ['ports'],
         'vrf' => ['ports'],

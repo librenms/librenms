@@ -24,6 +24,7 @@
  * @copyright  2019 Tony Murray
  * @author     Vitali Kari <vitali.kari@gmail.com>
  * @author     Tony Murray <murraytony@gmail.com>
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace LibreNMS\OS;
@@ -39,13 +40,16 @@ use App\Models\MplsSdpBind;
 use App\Models\MplsService;
 use App\Models\MplsTunnelArHop;
 use App\Models\MplsTunnelCHop;
+use App\Models\PortsFdb;
 use App\Models\PortVlan;
 use App\Models\Transceiver;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
 use LibreNMS\Interfaces\Discovery\MplsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -59,9 +63,21 @@ use LibreNMS\Interfaces\Polling\MplsPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Mac;
 use SnmpQuery;
 
-class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscovery, VlanDiscovery, WirelessPowerDiscovery, WirelessSnrDiscovery, WirelessRsrqDiscovery, WirelessRssiDiscovery, WirelessRsrpDiscovery, WirelessChannelDiscovery
+class Timos extends OS implements
+    FdbTableDiscovery,
+    MplsDiscovery,
+    MplsPolling,
+    TransceiverDiscovery,
+    VlanDiscovery,
+    WirelessPowerDiscovery,
+    WirelessSnrDiscovery,
+    WirelessRsrqDiscovery,
+    WirelessRssiDiscovery,
+    WirelessRsrpDiscovery,
+    WirelessChannelDiscovery
 {
     public function discoverOS(Device $device): void
     {
@@ -1170,5 +1186,151 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
                 'channels' => (int) ($data['TIMETRA-PORT-MIB::tmnxPortSFPNumLanes'] ?? 1),
             ]);
         })->filter();
+    }
+
+    public function discoverFdbTable(): Collection
+    {
+        if (($QBridgeFdbTable = parent::discoverFdbTable())->isNotEmpty()) {
+            return $QBridgeFdbTable;
+        }
+
+        $fdbt = new Collection;
+
+        // Walk only the required FDB columns for best performance
+        // Testing showed: 5 columns = 388s, 3 columns = 144s, full table entry = 10+ min
+        // The selective approach is fastest because tlsFdbInfoEntry has 25+ columns we don't need
+        $fdbTable = SnmpQuery::hideMib()->walk([
+            'TIMETRA-SERV-MIB::tlsFdbLocale',
+            'TIMETRA-SERV-MIB::tlsFdbPortId',
+            'TIMETRA-SERV-MIB::tlsFdbEncapValue',
+        ])->table(2);
+
+        if (! empty($fdbTable)) {
+            // Count SAP entries for progress indication
+            $sapCount = 0;
+            foreach ($fdbTable as $svcId => $macEntries) {
+                foreach ($macEntries as $entry) {
+                    $locale = $entry['tlsFdbLocale'] ?? null;
+                    if ($locale === 'sap' || $locale === '1' || $locale === 1) {
+                        $sapCount++;
+                    }
+                }
+            }
+
+            Log::info("TIMETRA-SERV-MIB: $sapCount SAP entries");
+
+            foreach ($fdbTable as $svcId => $macEntries) {
+                foreach ($macEntries as $macIndex => $entry) {
+                    // Only process entries with tlsFdbLocale = 'sap' (1)
+                    // sap(1), sdp(2), cpm(3), endpoint(4), vxlan(5), evpnMpls(6), blackhole(7)
+                    $locale = $entry['tlsFdbLocale'] ?? null;
+                    if ($locale !== 'sap' && $locale !== '1' && $locale !== 1) {
+                        continue;
+                    }
+
+                    // Get the port ID (this is the TmnxPortID which is the same as ifIndex for physical ports)
+                    $portId = $entry['tlsFdbPortId'] ?? null;
+                    if (empty($portId) || $portId == 0) {
+                        Log::debug("Skipping MAC $macIndex in svc $svcId - no valid port ID\n");
+                        continue;
+                    }
+
+                    // Get the encapsulation value (VLAN ID)
+                    $encapValue = $entry['tlsFdbEncapValue'] ?? 0;
+
+                    // Parse the MAC address - the index format contains the MAC address
+                    // Format: svcId.macAddr where macAddr is 6 octets separated by dots
+                    $mac_address = Mac::parse($macIndex)->hex();
+                    if (strlen($mac_address) != 12) {
+                        Log::debug("MAC address parsing failed for $macIndex\n");
+                        continue;
+                    }
+
+                    // Get the port_id from the ifIndex (TmnxPortID equals ifIndex for physical ports)
+                    $port_id = PortCache::getIdFromIfIndex($portId, $this->getDeviceId());
+
+                    if (! $port_id) {
+                        Log::debug("Could not find port for TmnxPortID $portId (MAC: $mac_address)\n");
+                        continue;
+                    }
+
+                    // Decode the encapsulation value to get VLAN ID(s)
+                    // TmnxEncapVal is encoded: dot1q uses lower 12 bits, QinQ uses upper/lower 16 bits
+                    $decodedEncap = $this->decodeNokiaEncapValue($encapValue);
+                    $vlanNumber = $decodedEncap['outer'];  // Use outer VLAN for FDB lookup
+
+                    // Skip if no valid VLAN (null encap or wildcard)
+                    if ($vlanNumber == 0 || $vlanNumber == 4095) {
+                        Log::debug("Skipping MAC $mac_address - no valid VLAN (encap: $encapValue, decoded: $vlanNumber)\n");
+                        continue;
+                    }
+
+                    // Nokia SAP format: ServiceID:Port:EncapValue (formatted for display)
+                    $formattedEncap = $this->formatNokiaEncapValue($encapValue);
+                    $sapIdentifier = "$svcId:$portId:$formattedEncap";
+
+                    $fdbt->push(new PortsFdb([
+                        'port_id' => $port_id,
+                        'mac_address' => $mac_address,
+                        'vlan_id' => $vlanNumber,
+                    ]));
+                    Log::debug("SAP $sapIdentifier mac $mac_address vlan $vlanNumber port ($portId) $port_id\n");
+                }
+            }
+        }
+
+        return $fdbt;
+    }
+
+    /**
+     * Decode TmnxEncapVal to extract VLAN ID(s)
+     *
+     * @param  int|string  $encapVal  The encoded encapsulation value
+     * @return array Array with 'outer' and optionally 'inner' VLAN IDs
+     *
+     * @see TIMETRA-TC-MIB::TmnxEncapVal
+     */
+    private function decodeNokiaEncapValue($encapVal): array
+    {
+        $encapVal = (int) $encapVal;
+
+        // Null encapsulation
+        if ($encapVal == 0) {
+            return ['outer' => 0, 'inner' => null];
+        }
+
+        // Check for QinQ: if upper 16 bits have a value (ignoring special bits)
+        $innerVlan = ($encapVal >> 16) & 0x0FFF;  // Upper 12 bits of upper 16 bits
+        $outerVlan = $encapVal & 0x0FFF;          // Lower 12 bits
+
+        if ($innerVlan > 0) {
+            // QinQ encapsulation
+            return ['outer' => $outerVlan, 'inner' => $innerVlan];
+        }
+
+        // Simple dot1q encapsulation - VLAN is in lower 12 bits
+        return ['outer' => $outerVlan, 'inner' => null];
+    }
+
+    /**
+     * Format TmnxEncapVal for display (Nokia-friendly format)
+     *
+     * @param  int|string  $encapVal  The encoded encapsulation value
+     * @return string Formatted encap value (e.g., "500" or "100.200" for QinQ)
+     */
+    private function formatNokiaEncapValue($encapVal): string
+    {
+        $decoded = $this->decodeNokiaEncapValue($encapVal);
+
+        if ($decoded['inner'] !== null) {
+            // QinQ format: outer.inner
+            return $decoded['outer'] . '.' . $decoded['inner'];
+        }
+
+        if ($decoded['outer'] == 4095) {
+            return '*';  // Wildcard
+        }
+
+        return (string) $decoded['outer'];
     }
 }

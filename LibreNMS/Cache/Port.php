@@ -20,6 +20,15 @@ class Port
     /** @var array<int, array<int, string>> */
     private array $ifNameMaps = [];
 
+    /** @var array<int, array<int, string>> */
+    private array $ifAliasMaps = [];
+
+    /** @var array<int, array<int, string>> */
+    private array $ifDescrMaps = [];
+
+    /** @var array<int, array<int, string>> */
+    private array $ifPhysAddressMaps = [];
+
     /** @var array<int, array<string, array<string, string>>> */
     private array $ipMaps = [];
 
@@ -98,6 +107,63 @@ class Port
 
         if (isset($this->ifNameMaps[$device_id][$ifName])) {
             return (int) $this->ifNameMaps[$device_id][$ifName];
+        }
+
+        return null;
+    }
+
+    /**
+     * Get a port_id from an ifAlias.
+     * Must be constrained to a device, when $device is null, use primary device
+     */
+    public function getIdFromIfAlias(string $ifAlias, \App\Models\Device|int|null $device = null): ?int
+    {
+        $device_id = $this->deviceToId($device);
+
+        if (! array_key_exists($device_id, $this->ifAliasMaps)) {
+            $this->ifAliasMaps[$device_id] = \App\Models\Port::where('device_id', $device_id)->pluck('port_id', 'ifAlias')->all();
+        }
+
+        if (isset($this->ifAliasMaps[$device_id][$ifAlias])) {
+            return (int) $this->ifAliasMaps[$device_id][$ifAlias];
+        }
+
+        return null;
+    }
+
+    /**
+     * Get a port_id from an ifDescr.
+     * Must be constrained to a device, when $device is null, use primary device
+     */
+    public function getIdFromIfDescr(string $ifDescr, \App\Models\Device|int|null $device = null): ?int
+    {
+        $device_id = $this->deviceToId($device);
+
+        if (! array_key_exists($device_id, $this->ifDescrMaps)) {
+            $this->ifDescrMaps[$device_id] = \App\Models\Port::where('device_id', $device_id)->pluck('port_id', 'ifDescr')->all();
+        }
+
+        if (isset($this->ifDescrMaps[$device_id][$ifDescr])) {
+            return (int) $this->ifDescrMaps[$device_id][$ifDescr];
+        }
+
+        return null;
+    }
+
+    /**
+     * Get a port_id from an ifPhysAddress.
+     * Must be constrained to a device, when $device is null, use primary device
+     */
+    public function getIdFromIfPhysAddress(string $ifPhysAddress, \App\Models\Device|int|null $device = null): ?int
+    {
+        $device_id = $this->deviceToId($device);
+
+        if (! array_key_exists($device_id, $this->ifPhysAddressMaps)) {
+            $this->ifPhysAddressMaps[$device_id] = \App\Models\Port::where('device_id', $device_id)->pluck('port_id', 'ifPhysAddress')->all();
+        }
+
+        if (isset($this->ifPhysAddressMaps[$device_id][$ifPhysAddress])) {
+            return (int) $this->ifPhysAddressMaps[$device_id][$ifPhysAddress];
         }
 
         return null;
