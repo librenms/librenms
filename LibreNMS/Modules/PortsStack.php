@@ -117,7 +117,6 @@ class PortsStack implements Module
             // so a simple sync would delete it and lose the only signal an alert rule can match.
             // Preserve the existing row as notInService; it flips back to active when the member returns.
             $seen = array_flip($portStacks->filter()->pluck('low_ifIndex')->map(fn ($i) => (int) $i)->all());
-            $preservedCount = 0;
             foreach ($device->portsStack()->get() as $existing) {
                 if (! isset($seen[(int) $existing->low_ifIndex])) {
                     $portStacks->push(new PortStack([
@@ -127,11 +126,7 @@ class PortsStack implements Module
                         'low_port_id' => PortCache::getIdFromIfIndex($existing->low_ifIndex, $device) ?? $existing->low_port_id,
                         'ifStackStatus' => 'notInService',
                     ]));
-                    $preservedCount++;
                 }
-            }
-            if ($preservedCount > 5) {
-                Log::warning("PortsStack: $preservedCount LAG members preserved as notInService on device {$device->device_id}; possible truncated SNMP walk");
             }
         }
 
