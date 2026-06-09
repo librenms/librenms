@@ -2021,7 +2021,7 @@ processes:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: pid, Type: int, 'Null': false, Extra: '' }
-    - { Field: vsz, Type: int, 'Null': false, Extra: '' }
+    - { Field: vsz, Type: bigint, 'Null': false, Extra: '' }
     - { Field: rss, Type: int, 'Null': false, Extra: '' }
     - { Field: cputime, Type: varchar(14), 'Null': false, Extra: '' }
     - { Field: user, Type: varchar(50), 'Null': false, Extra: '' }
