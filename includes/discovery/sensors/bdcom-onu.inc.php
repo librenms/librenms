@@ -28,49 +28,43 @@ $rx_base = '.1.3.6.1.4.1.3320.101.10.5.1.5';
 $mac_base = '.1.3.6.1.4.1.3320.101.10.1.1.3';
 $name_base = '.1.3.6.1.4.1.3320.101.11.1.1.4';
 
-$rx_walk = (string) snmp_walk($device, $rx_base, '-OQnU', '');
+$rx_values = SnmpQuery::numeric()->walk($rx_base)->pluck($rx_base);
 
-if (trim($rx_walk) !== '') {
+if (! empty($rx_values)) {
     echo 'BDCOM ONU Optical ';
 
     // onuIfIndex -> registration MAC (12 hex chars, lower-case)
     $ifindex_to_mac = [];
-    $mac_walk = (string) snmp_walk($device, $mac_base, '-OQnUx', '');
-    foreach (explode("\n", $mac_walk) as $line) {
-        if (preg_match('#\.10\.1\.1\.3\.(\d+)\s+=?\s*(.+)$#', $line, $m)) {
-            $hex = strtolower((string) preg_replace('/[^0-9A-Fa-f]/', '', $m[2]));
-            if (strlen($hex) === 12) {
-                $ifindex_to_mac[(int) $m[1]] = $hex;
-            }
+    foreach (SnmpQuery::options(['-OQXUnx', '-Pu'])->walk($mac_base)->pluck($mac_base) as $ifIndex => $raw_mac) {
+        $hex = strtolower((string) preg_replace('/[^0-9A-Fa-f]/', '', (string) $raw_mac));
+        if (strlen($hex) === 12) {
+            $ifindex_to_mac[(int) $ifIndex] = $hex;
         }
     }
 
     // registration MAC -> operator name (drop the leading parent-port ifIndex)
     $mac_to_name = [];
-    $name_walk = (string) snmp_walk($device, $name_base, '-OQnU', '');
-    foreach (explode("\n", $name_walk) as $line) {
-        if (preg_match('#\.11\.1\.1\.4\.(\d+(?:\.\d+){6})\s+=?\s*(.*)$#', $line, $m)) {
-            $octets = array_slice(explode('.', $m[1]), -6);
-            $hex = '';
-            foreach ($octets as $o) {
-                $hex .= sprintf('%02x', (int) $o);
-            }
-            $name = trim($m[2], ' "');
-            if ($name !== '' && strcasecmp($name, 'N/A') !== 0) {
-                $mac_to_name[$hex] = $name;
-            }
+    foreach (SnmpQuery::numeric()->walk($name_base)->pluck($name_base) as $index => $raw_name) {
+        $octets = array_slice(explode('.', (string) $index), -6);
+        if (count($octets) !== 6) {
+            continue;
+        }
+        $hex = '';
+        foreach ($octets as $o) {
+            $hex .= sprintf('%02x', (int) $o);
+        }
+        $name = trim((string) $raw_name, ' "');
+        if ($name !== '' && strcasecmp($name, 'N/A') !== 0) {
+            $mac_to_name[$hex] = $name;
         }
     }
 
     // onuIfIndex -> ifName (ports are already discovered before sensors)
     $ifnames = Port::where('device_id', $device['device_id'])->pluck('ifName', 'ifIndex')->all();
 
-    foreach (explode("\n", $rx_walk) as $line) {
-        if (! preg_match('#\.10\.5\.1\.5\.(\d+)\s+=?\s*(-?\d+)#', $line, $m)) {
-            continue;
-        }
-        $ifIndex = (int) $m[1];
-        $raw = (int) $m[2];
+    foreach ($rx_values as $ifIndex => $raw_value) {
+        $ifIndex = (int) $ifIndex;
+        $raw = (int) $raw_value;
         if (in_array($raw, [0, 65535, -65535], true)) {
             continue; // no ONU / no reading
         }
@@ -85,7 +79,7 @@ if (trim($rx_walk) !== '') {
         discover_sensor(null, 'dbm', $device, $num_oid, 'bdcomOnuRx.' . $ifIndex, 'bdcom', $descr, 10, 1, null, null, null, null, $raw / 10, 'snmp', null, null, null, 'ONU Optical');
     }
 
-    unset($ifindex_to_mac, $mac_to_name, $ifnames, $mac_walk, $name_walk);
+    unset($ifindex_to_mac, $mac_to_name, $ifnames);
 }
 
-unset($rx_walk, $rx_base, $mac_base, $name_base);
+unset($rx_values, $rx_base, $mac_base, $name_base);
