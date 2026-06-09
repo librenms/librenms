@@ -395,17 +395,6 @@ class Rrd extends BaseDatastore
             }
         }
 
-        if ($this->rrdcached &&
-            ! ($command == 'create' && version_compare($this->version, '1.5.5', '<')) &&
-            ! ($command == 'tune' && version_compare($this->version, '1.5', '<'))
-        ) {
-            // only relative paths if using rrdcached
-            $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
-            $options = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $options);
-
-            return [$command, $filename, '--daemon', $this->rrdcached, ...$options];
-        }
-
         return [$command, $filename, ...$options];
     }
 
