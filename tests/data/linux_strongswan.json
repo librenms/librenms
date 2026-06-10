@@ -23,7 +23,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": "{\"labels\": {\"con1\": \"Example Partner A (192.0.2.10)\", \"a1b2c3d4-1111-2222-3333-444455556666\": \"Example Site 1 (192.0.2.20)\", \"con2\": \"Example Partner B (192.0.2.30)\"}}",
+                    "data": "{\"labels\":{\"con1\":\"Example Partner A (192.0.2.10)\",\"a1b2c3d4-1111-2222-3333-444455556666\":\"Example Site 1 (192.0.2.20)\",\"con2\":\"Example Partner B (192.0.2.30)\"}}",
                     "deleted_at": null
                 }
             ],
@@ -71,48 +71,6 @@
                     "app_type": "strongswan"
                 },
                 {
-                    "metric": "con2_bytes_in",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "strongswan"
-                },
-                {
-                    "metric": "con2_bytes_out",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "strongswan"
-                },
-                {
-                    "metric": "con2_children",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "strongswan"
-                },
-                {
-                    "metric": "con2_pkts_in",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "strongswan"
-                },
-                {
-                    "metric": "con2_pkts_out",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "strongswan"
-                },
-                {
-                    "metric": "con2_reestablishes",
-                    "value": 3,
-                    "value_prev": null,
-                    "app_type": "strongswan"
-                },
-                {
-                    "metric": "con2_state",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "strongswan"
-                },
-                {
                     "metric": "con1_bytes_in",
                     "value": 8286816,
                     "value_prev": null,
@@ -151,6 +109,48 @@
                 {
                     "metric": "con1_state",
                     "value": 1,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con2_bytes_in",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con2_bytes_out",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con2_children",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con2_pkts_in",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con2_pkts_out",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con2_reestablishes",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con2_state",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "strongswan"
                 },
