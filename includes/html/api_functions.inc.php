@@ -477,7 +477,7 @@ function add_device(Illuminate\Http\Request $request)
     } catch (\LibreNMS\Exceptions\HostExistsException | \LibreNMS\Exceptions\HostUnreachableException | \LibreNMS\Exceptions\SnmpVersionUnsupportedException $e) {
         return api_error(500, $e->getMessage());
     } catch (Exception $e) {
-        \Log::error('API add_device failed: ' . $e->getMessage(), ['exception' => $e]);
+        report($e);
 
         return api_error(500, 'Failed to add device');
     }
