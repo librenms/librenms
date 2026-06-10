@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AlertTransport;
 use App\Models\AlertOperationTransportMap;
-use App\Models\TransportGroupTransport;
+use App\Models\AlertTransport;
 use App\Models\Device;
+use App\Models\TransportGroupTransport;
 use Illuminate\Http\Request;
 use LibreNMS\Alert\AlertData;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;

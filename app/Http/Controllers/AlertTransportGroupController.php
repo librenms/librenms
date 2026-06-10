@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AlertTransportGroup;
 use App\Models\AlertOperationTransportMap;
+use App\Models\AlertTransportGroup;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 

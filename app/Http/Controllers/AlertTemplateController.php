@@ -19,6 +19,7 @@ class AlertTemplateController extends Controller
 
         if ($alertTemplate->delete()) {
             $alertTemplate->map()->delete();
+
             return response('Alert template has been deleted.');
         }
 
