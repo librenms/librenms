@@ -1,0 +1,184 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "strongswan",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "strongswan",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": "{\"labels\": {\"con1\": \"Example Partner A (192.0.2.10)\", \"a1b2c3d4-1111-2222-3333-444455556666\": \"Example Site 1 (192.0.2.20)\", \"con2\": \"Example Partner B (192.0.2.30)\"}}",
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "a1b2c3d4-1111-2222-3333-444455556666_bytes_in",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "a1b2c3d4-1111-2222-3333-444455556666_bytes_out",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "a1b2c3d4-1111-2222-3333-444455556666_children",
+                    "value": 6,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "a1b2c3d4-1111-2222-3333-444455556666_pkts_in",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "a1b2c3d4-1111-2222-3333-444455556666_pkts_out",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "a1b2c3d4-1111-2222-3333-444455556666_reestablishes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "a1b2c3d4-1111-2222-3333-444455556666_state",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con2_bytes_in",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con2_bytes_out",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con2_children",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con2_pkts_in",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con2_pkts_out",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con2_reestablishes",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con2_state",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con1_bytes_in",
+                    "value": 8286816,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con1_bytes_out",
+                    "value": 8532848,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con1_children",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con1_pkts_in",
+                    "value": 50848,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con1_pkts_out",
+                    "value": 48068,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con1_reestablishes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "con1_state",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "global_child_rekey",
+                    "value": 2000,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "global_ike_rekey",
+                    "value": 125,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "global_invalid",
+                    "value": 42,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                },
+                {
+                    "metric": "global_invalid_spi",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "strongswan"
+                }
+            ]
+        }
+    }
+}
