@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\AlertTransport;
+use App\Models\AlertOperationTransportMap;
+use App\Models\TransportGroupTransport;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use LibreNMS\Alert\AlertData;
@@ -46,6 +48,34 @@ class AlertTransportController extends Controller
         return response()->json([
             'status' => 'error',
             'message' => strip_tags($result),
+        ]);
+    }
+
+    /**
+     * Remove the specified alert transport from storage.
+     *
+     * @param  AlertTransport  $transport
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy(AlertTransport $transport): \Illuminate\Http\JsonResponse
+    {
+        $this->authorize('delete', $transport);
+
+        if ($transport->delete()) {
+            AlertOperationTransportMap::where('transport_or_group_id', $transport->transport_id)
+                ->where('target_type', 'single')
+                ->delete();
+            TransportGroupTransport::where('transport_id', $transport->transport_id)->delete();
+
+            return response()->json([
+                'status' => 'ok',
+                'message' => 'Alert transport has been deleted',
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Alert transport has not been deleted',
         ]);
     }
 }
