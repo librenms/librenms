@@ -34,8 +34,8 @@ use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Exceptions\FileExistsException;
 use LibreNMS\Exceptions\RrdException;
+use LibreNMS\Exceptions\RrdFileExistsException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\Exceptions\RrdStoreException;
@@ -355,7 +355,7 @@ class Rrd extends BaseDatastore
 
         try {
             $cmd = self::buildCommand($command, $filename, $options);
-        } catch (FileExistsException) {
+        } catch (RrdFileExistsException) {
             Log::debug("RRD[%g$filename already exists%n]", ['color' => true]);
 
             return $output;
@@ -395,7 +395,7 @@ class Rrd extends BaseDatastore
      * @param  array  $options  Options for the command possibly including the rrd definition
      * @return array returns a full command array ready to be used by rrdtool
      *
-     * @throws FileExistsException if rrdtool <1.4.3 and the rrd file exists locally
+     * @throws RrdFileExistsException if rrdtool <1.4.3 and the rrd file exists locally
      */
     public function buildCommand(string $command, string $filename, array $options = []): array
     {
@@ -403,7 +403,7 @@ class Rrd extends BaseDatastore
             // <1.4.3 doesn't support -O, so make sure the file doesn't exist
             if (version_compare($this->version, '1.4.3', '<')) {
                 if (is_file($filename)) {
-                    throw new FileExistsException();
+                    throw new RrdFileExistsException();
                 }
             } else {
                 $options[] = '-O';
