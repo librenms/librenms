@@ -474,7 +474,7 @@ function add_device(Illuminate\Http\Request $request)
         }
 
         (new ValidateDeviceAndCreate($device, $force_add, ! empty($data['ping_fallback'])))->execute();
-    } catch (\LibreNMS\Exceptions\HostExistsException | \LibreNMS\Exceptions\HostUnreachableException | \LibreNMS\Exceptions\SnmpVersionUnsupportedException $e) {
+    } catch (\LibreNMS\Exceptions\HostExistsException|\LibreNMS\Exceptions\HostUnreachableException|\LibreNMS\Exceptions\SnmpVersionUnsupportedException $e) {
         return api_error(500, $e->getMessage());
     } catch (Exception $e) {
         report($e);
