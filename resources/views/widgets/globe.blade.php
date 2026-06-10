@@ -10,7 +10,7 @@
                 data.addColumn('number', 'Status');
                 data.addColumn('number', 'Size');
                 data.addColumn({type: 'string', role: 'tooltip', 'p': {'html': true}});
-                data.addRows({!! $locations !!});
+                data.addRows(@json($locations));
                 var options = {
                     region: '{{ $region }}',
                     resolution: '{{ $resolution }}',
