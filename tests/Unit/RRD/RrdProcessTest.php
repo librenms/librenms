@@ -181,6 +181,18 @@ class RrdProcessTest extends TestCase
         $rrdProcess->run('update test.rrd N:1');
     }
 
+    public function testThrowsExceptionOnCannotCreateTemporaryFile(): void
+    {
+        $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::OUT, "ERROR: Cannot create temporary file\n"));
+
+        $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
+
+        $this->expectException(RrdPermissionException::class);
+        $this->expectExceptionMessage("Cannot create temporary file");
+
+        $rrdProcess->run('update test.rrd N:1');
+    }
+
     public function testThrowsExceptionOnCorruptRrdFile(): void
     {
         $this->process->shouldReceive('waitUntil')->andReturnUsing(fn ($callback) => $callback(Process::OUT, "ERROR: reached EOF while loading header rrd->stat_head\n"));

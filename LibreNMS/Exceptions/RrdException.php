@@ -63,7 +63,7 @@ abstract class RrdException extends \Exception
             return new RrdDsMismatchException($error);
         }
 
-        if (str_contains($error, 'Permission denied')) {
+        if (str_contains($error, 'Permission denied') || str_contains($error, 'Cannot create temporary file')) {
             return new RrdPermissionException($error);
         }
 
