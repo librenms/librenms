@@ -226,7 +226,13 @@ class Rrd extends BaseDatastore
             foreach ($fields as $field) {
                 array_push($options, '--maximum', $field . ':' . $max);
             }
-            $this->command('tune', $filename, $options);
+            try {
+                $this->command('tune', $filename, $options);
+            } catch (RrdException $e) {
+                if (! $e instanceof RrdNotFoundException) {
+                    Log::debug('RRD tune failed: ' . $e->getMessage());
+                }
+            }
         }
 
         return true;
