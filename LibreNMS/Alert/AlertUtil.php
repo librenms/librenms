@@ -101,7 +101,7 @@ class AlertUtil
      *    (to = null means it fires for as long as the alert is active)
      *
      * @param  array<string, mixed>  $details  alert_log details (decoded, mutated in place)
-     * @return array<int, int>  segment ids due to fire this cycle
+     * @return array<int, int> segment ids due to fire this cycle
      */
     public static function dueProblemSegments(int $ruleId, array &$details): array
     {
@@ -164,7 +164,7 @@ class AlertUtil
      *
      * @param  array<int, array{id:int, escalation_step_from:int, escalation_step_to:int|null, start_in_seconds:int, step_duration_seconds:int}>  $segments
      * @param  array<string, array{fires:int, last:int}>  $state  per-segment timer state keyed by segment id
-     * @return array{0: array<int, int>, 1: array<string, array{fires:int, last:int}>}  [due segment ids, updated state]
+     * @return array{0: array<int, int>, 1: array<string, array{fires:int, last:int}>} [due segment ids, updated state]
      */
     public static function evaluateSegmentTimers(array $segments, array $state, int $anchor, int $now, int $tolerance, int $defaultStep): array
     {
@@ -209,7 +209,7 @@ class AlertUtil
      */
     public static function segmentTransports(array $segmentIds): array
     {
-        $segmentIds = array_values(array_unique(array_map('intval', $segmentIds)));
+        $segmentIds = array_values(array_unique(array_map(intval(...), $segmentIds)));
         if (empty($segmentIds)) {
             return [];
         }

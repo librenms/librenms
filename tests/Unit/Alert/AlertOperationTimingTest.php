@@ -34,7 +34,7 @@ final class AlertOperationTimingTest extends TestCase
      * Run the per-segment scheduler over a simulated timeline, anchored at t=0.
      *
      * @param  array<int, array{id:int, escalation_step_from:int, escalation_step_to:int|null, start_in_seconds:int, step_duration_seconds:int}>  $segments
-     * @return array<int, array<int, int>>  fire timestamps keyed by segment id
+     * @return array<int, array<int, int>> fire timestamps keyed by segment id
      */
     private function simulate(array $segments, int $pollInterval, int $duration, int $tolerance = 0, int $defaultStep = 300): array
     {
