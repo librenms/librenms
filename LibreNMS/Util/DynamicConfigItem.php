@@ -105,11 +105,11 @@ class DynamicConfigItem implements \ArrayAccess
         } elseif (in_array($this->type, ['text', 'password'])) {
             return ! is_array($value);
         } elseif ($this->type === 'executable') {
-            $value == $this->sanitizePath($value);
+            $value = $this->sanitizePath($value);
 
             return $value !== false && is_file($value) && is_executable($value);
         } elseif ($this->type === 'directory') {
-            $value == $this->sanitizePath($value);
+            $value = $this->sanitizePath($value);
 
             return $value !== false && is_dir($value);
         }
