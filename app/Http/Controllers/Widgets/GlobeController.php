@@ -80,7 +80,7 @@ class GlobeController extends WidgetController
                     [$ports_down, $ports_up] = $device->ports->partition(fn ($port) => $port->ifOperStatus != IfOperStatus::Up && $port->ifAdminStatus == IfOperStatus::Up);
                     $count += $device->ports->count();
                     $up += $ports_up->count();
-                     $down_items = $ports_down->map(fn ($port) => htmlentities((string) $device->displayName()) . '/' . htmlentities((string) $port->getShortLabel()) . ' DOWN');
+                    $down_items = $ports_down->map(fn ($port) => htmlentities((string) $device->displayName()) . '/' . htmlentities((string) $port->getShortLabel()) . ' DOWN');
                 }
             }
 
