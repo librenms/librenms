@@ -94,7 +94,7 @@ Fields you can fill in your returned array
  - type: port type (only defined types will show as graphs)
  - descr: description of the port
  - circuit: usually a circuit id
- - speed: can be a plan name or a numeric speed 10G (or asymmetric 10G/500M), numeric speeds
+ - speed: can be a plan name or a numeric speed 10G or asymmetric egress/ingress numeric speeds (eg 10G/500M)
    can used by custom maps and some graphs
  - notes: notes
 
