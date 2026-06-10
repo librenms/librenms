@@ -74,13 +74,13 @@ class GlobeController extends WidgetController
                 $count = $location->devices->count();
                 [$devices_down, $devices_up] = $location->devices->partition(fn ($device) => $device->disabled == 0 && $device->ignore == 0 && $device->status == 0);
                 $up = $devices_up->count();
-                $down_items = $devices_down->map(fn ($device) => htmlentities($device->displayName()) . ' DOWN');
+                $down_items = $devices_down->map(fn ($device) => htmlentities((string) $device->displayName()) . ' DOWN');
             } elseif ($data['markers'] == 'ports') {
                 foreach ($location->devices as $device) {
                     [$ports_down, $ports_up] = $device->ports->partition(fn ($port) => $port->ifOperStatus != IfOperStatus::Up && $port->ifAdminStatus == IfOperStatus::Up);
                     $count += $device->ports->count();
                     $up += $ports_up->count();
-                    $down_items = $ports_down->map(fn ($port) => htmlentities($device->displayName()) . '/' . htmlentities($port->getShortLabel()) . ' DOWN');
+                     $down_items = $ports_down->map(fn ($port) => htmlentities((string) $device->displayName()) . '/' . htmlentities((string) $port->getShortLabel()) . ' DOWN');
                 }
             }
 
