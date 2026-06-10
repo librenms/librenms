@@ -179,13 +179,14 @@ class Url
     public static function portLink(?Port $port, ?string $text = null, ?string $type = null, bool $overlib = true, bool $single_graph = false, ?string $url = null): string
     {
         if ($port === null) {
-            return (string) $text;
+            return htmlentities((string) $text);
         }
 
         $label = Rewrite::normalizeIfName($port->getLabel());
         if (! $text) {
             $text = $label;
         }
+        $text = htmlentities((string) $text);
 
         // strip tags due to complexity of sanitizing here
         $content = '<div class=list-large>' . addslashes(htmlentities(strip_tags($port->device?->displayName() . ' - ' . $label))) . '</div>';
