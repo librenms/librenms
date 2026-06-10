@@ -21,6 +21,13 @@ if (! Auth::check()) {
     exit('Unauthorized');
 }
 
+// Validate the CSRF token for this legacy POST dispatcher.
+$token = $_POST['_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+if (! hash_equals(csrf_token(), (string) $token)) {
+    http_response_code(419);
+    exit(json_encode(['status' => 'error', 'message' => 'CSRF token mismatch']));
+}
+
 Debug::set(isset($_REQUEST['debug']));
 
 $ajax_form = match ($_POST['type'] ?? '') {
